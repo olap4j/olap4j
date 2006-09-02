@@ -1,0 +1,294 @@
+<!--
+  == $Id: //open/mondrian/build.xml#122 $
+  == This software is subject to the terms of the Common Public License
+  == Agreement, available at the following URL:
+  == http://www.opensource.org/licenses/cpl.html.
+  == Copyright (C) 2006-2006 Julian Hyde and others.
+  == All Rights Reserved.
+  == You must accept the terms of that agreement to use this software.
+  -->
+<project name="olap4j" default="compile">
+  <property environment="env"/>
+  <property name="project.location" location="."/>
+  <property name="lib.location" location="${project.location}/lib"/>
+  <property file="${project.location}/build.properties"/>
+  <property name="project.build.debug" value="on"/>
+  <property name="name" value="olap4j"/>
+  <property name="version" value="0.6"/>
+  <property name="dist.name" value="${name}-${version}" />
+
+  <!-- properties related to paths -->
+  <property name="src.dir" value="src"/>
+  <property name="lib.dir" value="lib"/>
+  <property name="classes.dir" value="classes"/>
+  <property name="testsrc.dir" value="testsrc"/>
+  <property name="testlib.dir" value="testlib"/>
+  <property name="testclasses.dir" value="testclasses"/>
+  <property name="build.dir" value="build"/>
+  <property name="doc.dir" value="doc"/>
+  <property name="javadoc.dir" value="doc/api"/>
+  <property name="dist.dir" value="dist"/>
+
+  <!-- generated files -->
+  <property name="jar.file" value="${lib.dir}/${name}.jar" />
+  <property name="jar-jdk14.file" value="${lib.dir}/${name}-jdk14.jar" />
+  <property name="dist.bin.file" value="${dist.dir}/${dist.name}.zip" />
+  <property name="dist.src.file" value="${dist.dir}/${dist.name}-src.zip" />
+
+  <path id="project.classpath">
+    <pathelement location="${classes.dir}"/>
+    <pathelement location="${lib.dir}/retroweaver-1.2.4.jar"/>
+    <pathelement path="${env.CLASSPATH}"/>
+    <pathelement location="${ant.home}/lib/ant.jar"/>
+    <pathelement location="${ant.home}/lib/optional.jar"/>
+    <!-- We depend on mondrian right now. Ugh. -->
+    <pathelement location="${project.location}/../mondrian/classes"/>
+   
+  </path>
+
+  <path id="project.test.classpath">
+  </path>
+
+  <!-- verify that required dependencies are defined -->
+  <fail unless="retroweaver.dir" />
+
+  <!-- Arguments to the java process spawned by the junit task. -->
+  <property name="junit.jvmargs" value="-ea -esa"/>
+
+  <target name="info">
+    <echo>==============================================================</echo>
+    <echo>| olap4j configuration info                                  |</echo>
+    <echo>==============================================================</echo>
+    <echo>project.location      = ${project.location}</echo>
+    <echo>jdk.home              = ${env.JAVA_HOME}</echo>
+    <echo>junit.dir             = ${junit.dir}</echo>
+    <echo>retroweaver.dir       = ${retroweaver.dir}</echo>
+    <echo>==============================================================</echo>
+  </target>
+
+  <target name="all" depends="clean,compile,test"/>
+
+  <target name="clean">
+    <delete includeEmptyDirs="true" quiet="true">
+      <fileset dir="${classes.dir}" includes="**/*.class,**/*.properties"/>
+      <fileset dir="${testclasses.dir}" includes="**/*.class,**/*.properties"/>
+      <fileset dir="." includes="${generated.java.files},${generated.lib.files}"/>
+      <fileset dir="${build.dir}" />
+    </delete>
+  </target>
+
+  <target name="prepare">
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${testclasses.dir}"/>
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${testlib.dir}"/>
+    <mkdir dir="${testsrc.dir}"/>
+  </target>
+
+  <target name="compile" depends="prepare,compile.java"/>
+
+  <target name="compile.java">
+    <javac
+        srcdir="${src.dir}"
+        destdir="${classes.dir}"
+        debug="${project.build.debug}"
+        classpathref="project.classpath"
+        source="1.5">
+      <include name="**/*.java"/>
+    </javac>
+  </target>
+
+  <target name="compile.tests" depends="info,compile.java">
+    <javac
+        srcdir="${testsrc.dir}"
+        destdir="${testclasses.dir}"
+        debug="${project.build.debug}"
+        classpathref="project.test.classpath"
+        source="1.5">
+        <include name="mondrian/**/*.java"/>
+    </javac>
+  </target>
+
+  <target name="version">
+    <echo message="olap4j ${version}" file="VERSION.txt"/>
+  </target>
+
+  <target name="srczip" depends="version">
+    <mkdir dir="${dist.dir}" />
+    <delete file="${dist.src.file}"/>
+    <zip
+        zipfile="${dist.src.file}"
+        update="true">
+      <zipfileset
+          dir="."
+          prefix="${dist.name}"
+          includes="
+${src.dir}/**/*.java,
+doc/**/*.css,
+doc/**/*.png,
+doc/**/*.html,
+misc/**/*.mf,
+misc/Meta.xsl,
+build.xml,
+build.properties,
+LICENSE.html,
+README.txt,
+VERSION.txt"
+          excludes="
+${javadoc.dir}/**,
+**/_vti*/*,
+**/*~,
+**/junit-results/**,
+${generated.java.files}" />
+    </zip>
+  </target>
+
+  <target name="release" depends="binzip"/>
+
+  <target name="binzip"
+      depends="version,srczip,javadoc,jar,retroweave,jar-jdk14,clean">
+    <mkdir dir="${dist.dir}" />
+    <delete file="${dist.bin.file}"/>
+    <zip zipfile="${dist.bin.file}">
+      <zipfileset
+          dir="."
+          prefix="${dist.name}"
+          includes="
+${doc.dir}/**/*.css,
+${doc.dir}/**/*.html,
+${doc.dir}/**/*.png,
+${doc.dir}/api/**/*.xml,
+${war.file},
+${jar.file},
+lib/*.dtd,
+LICENSE.html,
+README.txt,
+VERSION.txt"
+          excludes="
+**/*~,
+**/_vti*/*,
+**/*.psp,
+${doc.dir}/api/src-html/**/*"/>
+      <zipfileset
+          dir="${dist.dir}"
+          prefix="${dist.name}"
+          includes="${dist.name}-src.zip"/>
+    </zip>
+  </target>
+  
+  <target name="doczip"
+      depends="javadoc"
+      description="Builds a zipfile of the documentation, which can then be
+                   deployed to sf.net. See also doc/deployDoc.sh.">
+    <mkdir dir="${dist.dir}" />
+    <tar
+        destfile="${dist.doc.file}"
+        compression="gzip">
+      <tarfileset
+          dir="."
+          includes="
+doc/api/**/*,
+doc/**/*.html,
+doc/**/*.css,
+doc/**/*.xml"
+          excludes="
+**/*~,
+**/_vti*/*,
+**/*.sh"/>
+    </tar>
+  </target>
+
+  <target name="jar" depends="version,compile">
+    <mkdir dir="${lib.dir}" />
+    <zip
+        zipfile="${jar.file}"
+        update="true">
+      <zipfileset
+          dir="${classes.dir}"
+          includes="
+**/*.class,
+**/*.properties,
+**/*.xml,
+META-INF/**"/>
+      <zipfileset
+          dir="."
+          includes="
+LICENSE.html,
+README.txt,
+VERSION.txt"/>
+      <fileset
+          dir="${src.dir}"
+          includes="
+META-INF/**"/>
+    </zip>
+  </target>
+
+  <!-- create a retrowoven jar file which will work under jdk1.4 -->
+  <target name="jar-jdk14" depends="version,compile">
+    <mkdir dir="${lib.dir}" />
+    <zip
+        zipfile="${jar-jdk14.file}"
+        update="true">
+      <zipfileset
+          dir="${classes.dir}"
+          includes="
+**/*.class,
+**/*.properties,
+**/*.xml,
+META-INF/**"/>
+      <zipfileset
+          dir="."
+          includes="
+LICENSE.html,
+README.txt,
+VERSION.txt"/>
+      <fileset
+          dir="${src.dir}"
+          includes="
+META-INF/**"/>
+    </zip>
+  </target>
+
+  <target name="javadoc">
+    <mkdir dir="${javadoc.dir}" />
+    <delete quiet="true" file="${javadoc.dir}/index.html"/>
+    <javadoc sourcepath="${src.dir}:${testsrc.dir}"
+        classpathref="project.test.classpath"
+        destdir="${javadoc.dir}"
+        packagenames="org.olap4j.*"
+        overview="${src.dir}/overview.html"
+        footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=35302&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
+        author="true"
+        source="1.5"
+        access="package"
+        Windowtitle="olap4j, version ${version}"
+        additionalparam="-linksource"
+      >
+      <tag name="pre" description="Pre-condition:"
+           scope="constructors,methods"/>
+      <tag name="post" description="Post-condition:"
+           scope="constructors,methods"/>
+      <tag name="testcase" description="Test-case:"
+           scope="constructors,methods,types"/>
+      <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+    </javadoc>
+  </target>
+
+  <target name="test" />
+
+  <taskdef name="retroweaver"
+      classname="com.rc.retroweaver.ant.RetroWeaverTask">
+    <classpath>
+      <fileset dir="${retroweaver.dir}/lib" includes="**/*" />
+      <pathelement location="${retroweaver.dir}/release/retroweaver-1.2.4.jar" />
+      <pathelement location="${retroweaver.dir}/release/retroweaver-rt-1.2.4.jar" />
+    </classpath>
+  </taskdef>
+
+  <target name="retroweave">
+    <retroweaver srcdir="${classes.dir}" />
+  </target>
+
+</project>
+
+<!-- End build.xml -->
