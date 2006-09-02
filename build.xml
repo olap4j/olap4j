@@ -37,12 +37,12 @@
 
   <path id="project.classpath">
     <pathelement location="${classes.dir}"/>
-    <pathelement location="${lib.dir}/retroweaver-1.2.4.jar"/>
+    <!-- <pathelement location="${lib.dir}/retroweaver-1.2.4.jar"/> -->
     <pathelement path="${env.CLASSPATH}"/>
     <pathelement location="${ant.home}/lib/ant.jar"/>
     <pathelement location="${ant.home}/lib/optional.jar"/>
     <!-- We depend on mondrian right now. Ugh. -->
-    <pathelement location="${project.location}/../mondrian/classes"/>
+    <pathelement location="${lib.dir}/mondrian-2.1.1.jar"/>
    
   </path>
 
@@ -145,8 +145,11 @@ ${generated.java.files}" />
 
   <target name="release" depends="binzip"/>
 
+  <!-- These targets need to be added in: 
+  	retroweave,jar-jdk14,javadoc -->
+  	
   <target name="binzip"
-      depends="version,srczip,javadoc,jar,retroweave,jar-jdk14,clean">
+      depends="clean,jar,version,srczip">
     <mkdir dir="${dist.dir}" />
     <delete file="${dist.bin.file}"/>
     <zip zipfile="${dist.bin.file}">
@@ -276,6 +279,7 @@ META-INF/**"/>
 
   <target name="test" />
 
+  <!--
   <taskdef name="retroweaver"
       classname="com.rc.retroweaver.ant.RetroWeaverTask">
     <classpath>
@@ -288,7 +292,8 @@ META-INF/**"/>
   <target name="retroweave">
     <retroweaver srcdir="${classes.dir}" />
   </target>
-
+  -->
+  
 </project>
 
 <!-- End build.xml -->
