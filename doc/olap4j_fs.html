@@ -11,21 +11,24 @@
 <h1>olap4j Functional Specification</h1>
 
 <p>Author(s): Julian Hyde<br>
-Status: draft (version 0.5)<br>
-Last modified: August 23<sup>rd</sup>, 2006.</p>
+Version: 0.5 (draft)<br>
+Last modified: September 1<sup>st</sup>, 2006.</p>
 <hr>
 
 <h2>Introduction</h2>
 
 <p>olap4j is an open Java API for building OLAP applications.</p>
+
 <p>In essence, olap4j is to multidimensional data JDBC is for relational data. 
 olap4j has a similar programming model to JDBC, shares some of its core classes, 
 and has many of the same advantages. You can write an OLAP application in Java 
 for one 
 server (say Mondrian) and easily switch it to another (say Microsoft Analysis 
 Services, accessed via XML for Analysis).</p>
+
 <p>However, creating a standard OLAP API for Java is a contentious issue. To 
 understand why, it helps to understand the history of OLAP standards.</p>
+
 <h3>A brief history of OLAP standards</h3>
 
 <p>History is strewn with attempts to create a standard OLAP API. First, the OLAP council's 
@@ -49,6 +52,7 @@ query language. A query language is easier to explain than an API. It leaves
 unsolved the problem of how to construct queries to answer business questions, 
 but application developers could solve that problem by embedding one of the 
 off-the-shelf OLAP clients.&nbsp; </p>
+
 <p>The Open Source community has been developing a taste for OLAP. First there was Mondrian, an open-source OLAP 
 server; then there was JPivot, a client which first spoke to Mondrian, then also 
 to XML/A; then there were more OLAP clients, and applications which wanted to 
@@ -56,16 +60,20 @@ use a particular client, but wanted to talk to a variety of servers; and
 companies using a particular OLAP server that wanted to get at it from several 
 clients. It became clear the open-source OLAP tools needed a standard, and that 
 standard would probably be suitable for other Java-based OLAP tools.</p>
+
 <h3>Overview of olap4j</h3>
+
 <p>An OLAP application interacts with an OLAP server by means of MDX statements 
 belonging to connections. The statements are defined in terms of metadata and 
 validated according to a type system, and some applications are built at a 
 higher level, manipulating MDX parse trees, and defining complex queries in 
 terms that a business user can understand. The olap4j API provides all of these 
 facilities.</p>
+
 <p>At the lowest level, olap4j has a framework for registering <b>drivers</b>, 
 and managing the lifecycle of <b>connections and statements</b>. olap4j provides 
 this support by extending the JDBC framework.</p>
+
 <p>A key decision in the design of an OLAP API is whether to include a <b>query 
 language</b>. Historically, it has been a contentious one. The previous 
 standards fell into two camps: MDAPI and JOLAP had an API for building queries, 
@@ -77,6 +85,7 @@ the end-user explores the data. So, olap4j embraces both approaches: you can
 create a query by parsing an MDX statement, you can build a query by 
 manipulating an MDX parse tree, and an MDX parser library allows you to easily 
 convert an MDX string to and from a parse tree.</p>
+
 <p><b>Metadata </b>is at the heart of olap4j. You can browse the cubes, 
 dimensions, hierarchies, members in an OLAP schema, and an MDX parse tree and 
 query result are tied back to the same metadata objects. There is also a <b>type 
@@ -106,6 +115,7 @@ graphical layouts such as pivot tables.</p>
 XML/A provider to connect to the underlying data source, execute queries, and 
 browse metadata, but can still use olap4j's features for MDX parsing, query 
 models and layout. </p>
+
 <h3>Benefits of a standard Java API for OLAP</h3>
 
 <p>Once the olap4j standard is in place, we can expect that the familiar 
@@ -113,6 +123,7 @@ benefits of an open standard will emerge: a larger variety of tools, better
 tools, and more price/feature competition between OLAP servers. These benefits 
 follow because if a developer of OLAP tool can reach a larger audience, there is greater 
 incentive to build new tools.</p>
+
 <p>Eventually there will be olap4j providers for most OLAP servers. The server 
 vendors will initially have little incentive to embrace a standard which will 
 introduce competition into their market, but eventually the wealth of tools will 
@@ -377,7 +388,9 @@ evaluated at runtime.</p>
 <h3>Metadata</h3>
 
 <p>The components of the OLAP model are available as read-only Java classes.</p>
+
 <h4>Access control</h4>
+
 <p>A user's view of metadata may be subject to access control. For example, a 
 user may not have read access to certain hierarchies within a cube, or to 
 certain members within a hierarchy. The API methods must behave consistently 
@@ -501,26 +514,50 @@ provider. </p>
 <p>In principle, providers could be created to other OLAP data sources. This 
 would be particularly straightforward for servers which already have a native 
 Java API.</p>
+
 <h2>Appendix A. Opportunities for specification</h2>
+
 <p>The following are features which have been suggested for inclusion in the 
 olap4j specification, but which are not part of the current version. They may be 
 included in future revisions of the specification.</p>
+
 <h3>Date and Time types</h3>
+
 <p>Include support for Date and Time values. The package org.olap4j.mdx.type 
 could have additional classes DateType and TimeType.</p>
+
 <p>(Richard Emberson, 2006/8/14)</p>
+
 <h3>Schema notification</h3>
+
 <p>Add a mechanism for the client to detect that the schema has been modified 
 (for instance, that a cube has been added). Not necessarily to find out what 
 those changes are.</p>
+
 <p>(Richard Emberson, 2006/8/15)</p>
+
 <h2>Appendix B. Feedback</h2>
+
 <h3>Richard Emberson, email, 2006/8/15</h3>
+
 <p>One thing we found about XMLA was that our users wanted all roles to be 
 defined, stored, modified, and accessed though the same mechanism. With a large 
 application with many areas that can be permissioned, it is important that 
 olap4j let an application builder manage roles externally and apply them as part 
 of an individual's execution context.</p>
+
+<h2>Appendix C. Open issues</h2>
+
+<p>These issues will be voted upon at the next meeting. If they are accepted, 
+they will generally be put into the spec.</p>
+
+<h3>JDK version</h3>
+
+<p>See forum thread:
+<a href="http://sourceforge.net/forum/forum.php?thread_id=1560764&forum_id=577988">
+olap4j, JDK 1.5 and generics</a>. I am proceeding on the assumption that we are 
+targeting JDK 1.5, and running retroweaver for backward compatibility for JDK 
+1.4.</p>
 <hr>
 
 </body>
