@@ -34,6 +34,7 @@
   <property name="jar-jdk14.file" value="${lib.dir}/${name}-jdk14.jar" />
   <property name="dist.bin.file" value="${dist.dir}/${dist.name}.zip" />
   <property name="dist.src.file" value="${dist.dir}/${dist.name}-src.zip" />
+  <property name="dist.doc.file" value="${dist.dir}/doc.tar.gz" />
 
   <path id="project.classpath">
     <pathelement location="${classes.dir}"/>
@@ -180,7 +181,7 @@ ${doc.dir}/api/src-html/**/*"/>
   </target>
   
   <target name="doczip"
-      depends="javadoc"
+      depends="version,javadoc"
       description="Builds a zipfile of the documentation, which can then be
                    deployed to sf.net. See also doc/deployDoc.sh.">
     <mkdir dir="${dist.dir}" />
@@ -227,7 +228,7 @@ META-INF/**"/>
   </target>
 
   <!-- create a retrowoven jar file which will work under jdk1.4 -->
-  <target name="jar-jdk14" depends="version,compile">
+  <target name="jar-jdk14" depends="version,compile,retroweave">
     <mkdir dir="${lib.dir}" />
     <zip
         zipfile="${jar-jdk14.file}"
@@ -279,20 +280,19 @@ META-INF/**"/>
 
   <target name="test" />
 
-  <!--
   <taskdef name="retroweaver"
       classname="com.rc.retroweaver.ant.RetroWeaverTask">
     <classpath>
-      <fileset dir="${retroweaver.dir}/lib" includes="**/*" />
-      <pathelement location="${retroweaver.dir}/release/retroweaver-1.2.4.jar" />
-      <pathelement location="${retroweaver.dir}/release/retroweaver-rt-1.2.4.jar" />
+      <pathelement location="${lib.dir}/asm-2.2.3.jar" />
+      <pathelement location="${lib.dir}/asm-commons-2.2.3.jar" />
+      <pathelement location="${lib.dir}/retroweaver-1.2.4.jar" />
+      <pathelement location="${lib.dir}/retroweaver-rt-1.2.4.jar" />
     </classpath>
   </taskdef>
 
   <target name="retroweave">
     <retroweaver srcdir="${classes.dir}" />
   </target>
-  -->
   
 </project>
 
