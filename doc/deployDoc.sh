@@ -24,7 +24,7 @@ prefix="$1"
 # Directory at sf.net
 docdir=
 case "$prefix" in
-0.6) export docdir=htdocs;;
+0.5) export docdir=htdocs;;
 head) export docdir=head;;
 *) echo "Bad prefix '$prefix'"; exit 1;;
 esac
@@ -36,11 +36,13 @@ else
   echo Skipping generation...
 fi
 
-scp dist/doc.tar.gz jhyde@shell.sf.net:
 
-GROUP_DIR=/home/groups/o/ol/olap4j
+if false; then
 
-ssh -T jhyde@shell.sf.net <<EOF
+  scp dist/doc.tar.gz jhyde@shell.sf.net:
+  GROUP_DIR=/home/groups/o/ol/olap4j
+
+  ssh -T jhyde@shell.sf.net <<EOF
 set -e
 set -v
 rm -f $GROUP_DIR/doc.tar.gz
@@ -54,5 +56,25 @@ rm -rf old
 rm -f doc.tar.gz
 ./makeLinks
 EOF
+
+else
+
+  scp -oPort=8022 dist/doc.tar.gz jhyde@olap4j.org:/home/jhyde
+  GROUP_DIR=/home/jhyde/olap4j
+
+  ssh -p 8022 -T jhyde@olap4j.org <<EOF
+set -e
+set -v
+cd /home/jhyde
+tar xzf doc.tar.gz
+rm -rf olap4j.old
+if [ -d olap4j ]; then mv olap4j olap4j.old; fi
+mv doc olap4j
+rm -rf olap4j.old
+rm -f doc.tar.gz
+./makeLinks
+EOF
+
+fi
 
 # End deployDoc.sh

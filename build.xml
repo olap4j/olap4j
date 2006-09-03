@@ -14,7 +14,7 @@
   <property file="${project.location}/build.properties"/>
   <property name="project.build.debug" value="on"/>
   <property name="name" value="olap4j"/>
-  <property name="version" value="0.6"/>
+  <property name="version" value="0.5"/>
   <property name="dist.name" value="${name}-${version}" />
 
   <!-- properties related to paths -->
@@ -128,6 +128,7 @@ ${src.dir}/**/*.java,
 doc/**/*.css,
 doc/**/*.png,
 doc/**/*.html,
+doc/**/*.pdf,
 misc/**/*.mf,
 misc/Meta.xsl,
 build.xml,
@@ -160,6 +161,7 @@ ${generated.java.files}" />
           includes="
 ${doc.dir}/**/*.css,
 ${doc.dir}/**/*.html,
+${doc.dir}/**/*.pdf,
 ${doc.dir}/**/*.png,
 ${doc.dir}/api/**/*.xml,
 ${war.file},
@@ -193,6 +195,7 @@ ${doc.dir}/api/src-html/**/*"/>
           includes="
 doc/api/**/*,
 doc/**/*.html,
+doc/**/*.pdf,
 doc/**/*.css,
 doc/**/*.xml"
           excludes="
