@@ -4,6 +4,55 @@
 <meta http-equiv="Content-Language" content="en-us">
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <title>olap4j Functional Specification</title>
+<style type="text/css">
+CODE { 
+    font-family: 'courier new', monospace;
+    font-size: 80%;
+    font-weight: bold;
+    color: maroon;
+}
+DIV.code {
+    font-family: 'courier new', monospace;
+    font-size: 80%;
+    font-weight: bold;
+    color: maroon;
+    background-color: #e0e0e0;
+    margin-left: 20;
+    margin-right: 20;
+    border-style: solid;
+    border: solid #000000 1px;
+    border-width: 1px;
+    padding: 4px;
+}
+IMG.std {
+    border: solid #000000 1px;
+    border-color: #000000;
+    margin-left: 20;
+    margin-right: 20;
+}
+TABLE {
+    margin-left: 20;
+    margin-right: 20;
+    border: solid #000000 1px;
+    border-color:#888888;
+    border-collapse: collapse;
+    cellspacing:1;
+    cellpadding:1;
+}
+TABLE TH {
+    border: solid #000000 1px;
+    font-size:100%;
+    text-align:left;
+    vertical-align:top;
+    background-color:#d0d0d0;
+}
+
+TABLE TD {
+    border: solid #808080 1px;
+    font-size:100%;
+    vertical-align:top;
+}
+</style>
 </head>
 
 <body>
@@ -11,149 +60,138 @@
 <h1>olap4j Functional Specification</h1>
 
 <p>Author(s): Julian Hyde<br>
-Version: 0.5 (draft)<br>
-Last modified: September 1<sup>st</sup>, 2006.</p>
+Version: 0.6-dev (draft)<br>
+Last modified: September 3<sup>rd</sup>, 2006.</p>
 <hr>
 
 <h2>Introduction</h2>
 
 <p>olap4j is an open Java API for building OLAP applications.</p>
 
-<p>In essence, olap4j is to multidimensional data JDBC is for relational data. 
-olap4j has a similar programming model to JDBC, shares some of its core classes, 
-and has many of the same advantages. You can write an OLAP application in Java 
-for one 
-server (say Mondrian) and easily switch it to another (say Microsoft Analysis 
+<p>In essence, olap4j is to multidimensional data JDBC is for relational data.
+olap4j has a similar programming model to JDBC, shares some of its core classes,
+and has many of the same advantages. You can write an OLAP application in Java
+for one
+server (say Mondrian) and easily switch it to another (say Microsoft Analysis
 Services, accessed via XML for Analysis).</p>
 
-<p>However, creating a standard OLAP API for Java is a contentious issue. To 
+<p>However, creating a standard OLAP API for Java is a contentious issue. To
 understand why, it helps to understand the history of OLAP standards.</p>
 
 <h3>A brief history of OLAP standards</h3>
 
-<p>History is strewn with attempts to create a standard OLAP API. First, the OLAP council's 
-MDAPI (in two versions), then the JOLAP API emerged from Sun's Java Community 
-Process. These all failed, it seems, because at some point during the 
-committee stages, all of the OLAP server vendors concerned lost 
-interest in releasing an implementation of the standard. The standards were 
-large and complex, and no 
-user-interface provider stepped forward with a UI which worked with multiple 
+<p>History is strewn with attempts to create a standard OLAP API. First, the OLAP council's
+MDAPI (in two versions), then the JOLAP API emerged from Sun's Java Community
+Process. These all failed, it seems, because at some point during the
+committee stages, all of the OLAP server vendors concerned lost
+interest in releasing an implementation of the standard. The standards were
+large and complex, and no
+user-interface provider stepped forward with a UI which worked with multiple
 back-ends.</p>
 
-<p>Meanwhile, Microsoft introduced OLE DB for OLAP (which works only between 
-Windows clients and servers), and then XML/A (XML for Analysis, a web-services 
-API). These standards were more successful, for a variety of reasons. First, 
-since the standards (OLE DB for OLAP in particular) were mainly driven by one 
-vendor, they were not a compromise attempting to encompass the functionality of 
-several products. Second, there was a ready reference implementation, and 
-Microsoft saw to it that there were sufficient OLAP clients to make these 
-standards viable forums for competition and innovation. Third, there was the MDX 
-query language. A query language is easier to explain than an API. It leaves 
-unsolved the problem of how to construct queries to answer business questions, 
-but application developers could solve that problem by embedding one of the 
+<p>Meanwhile, Microsoft introduced OLE DB for OLAP (which works only between
+Windows clients and servers), and then XML/A (XML for Analysis, a web-services
+API). These standards were more successful, for a variety of reasons. First,
+since the standards (OLE DB for OLAP in particular) were mainly driven by one
+vendor, they were not a compromise attempting to encompass the functionality of
+several products. Second, there was a ready reference implementation, and
+Microsoft saw to it that there were sufficient OLAP clients to make these
+standards viable forums for competition and innovation. Third, there was the MDX
+query language. A query language is easier to explain than an API. It leaves
+unsolved the problem of how to construct queries to answer business questions,
+but application developers could solve that problem by embedding one of the
 off-the-shelf OLAP clients.&nbsp; </p>
 
-<p>The Open Source community has been developing a taste for OLAP. First there was Mondrian, an open-source OLAP 
-server; then there was JPivot, a client which first spoke to Mondrian, then also 
-to XML/A; then there were more OLAP clients, and applications which wanted to 
-use a particular client, but wanted to talk to a variety of servers; and 
-companies using a particular OLAP server that wanted to get at it from several 
-clients. It became clear the open-source OLAP tools needed a standard, and that 
+<p>The Open Source community has been developing a taste for OLAP. First there was Mondrian, an open-source OLAP
+server; then there was JPivot, a client which first spoke to Mondrian, then also
+to XML/A; then there were more OLAP clients, and applications which wanted to
+use a particular client, but wanted to talk to a variety of servers; and
+companies using a particular OLAP server that wanted to get at it from several
+clients. It became clear the open-source OLAP tools needed a standard, and that
 standard would probably be suitable for other Java-based OLAP tools.</p>
 
 <h3>Overview of olap4j</h3>
 
-<p>An OLAP application interacts with an OLAP server by means of MDX statements 
-belonging to connections. The statements are defined in terms of metadata and 
-validated according to a type system, and some applications are built at a 
-higher level, manipulating MDX parse trees, and defining complex queries in 
-terms that a business user can understand. The olap4j API provides all of these 
+<p>An OLAP application interacts with an OLAP server by means of MDX statements
+belonging to connections. The statements are defined in terms of metadata and
+validated according to a type system, and some applications are built at a
+higher level, manipulating MDX parse trees, and defining complex queries in
+terms that a business user can understand. The olap4j API provides all of these
 facilities.</p>
 
-<p>At the lowest level, olap4j has a framework for registering <b>drivers</b>, 
-and managing the lifecycle of <b>connections and statements</b>. olap4j provides 
+<p>At the lowest level, olap4j has a framework for registering <b>drivers</b>,
+and managing the lifecycle of <b>connections and statements</b>. olap4j provides
 this support by extending the JDBC framework.</p>
 
-<p>A key decision in the design of an OLAP API is whether to include a <b>query 
-language</b>. Historically, it has been a contentious one. The previous 
-standards fell into two camps: MDAPI and JOLAP had an API for building queries, 
-while OLE DB for OLAP and XML/A had the MDX query language. The SQL query 
-language is an essential component of relational database APIs such as ODBC and 
-JDBC, and it makes similar sense to base an OLAP API on a query language such as 
-MDX. But OLAP applications also need to <b>build and transform queries</b> as 
-the end-user explores the data. So, olap4j embraces both approaches: you can 
-create a query by parsing an MDX statement, you can build a query by 
-manipulating an MDX parse tree, and an MDX parser library allows you to easily 
+<p>A key decision in the design of an OLAP API is whether to include a <b>query
+language</b>. Historically, it has been a contentious one. The previous
+standards fell into two camps: MDAPI and JOLAP had an API for building queries,
+while OLE DB for OLAP and XML/A had the MDX query language. The SQL query
+language is an essential component of relational database APIs such as ODBC and
+JDBC, and it makes similar sense to base an OLAP API on a query language such as
+MDX. But OLAP applications also need to <b>build and transform queries</b> as
+the end-user explores the data. So, olap4j embraces both approaches: you can
+create a query by parsing an MDX statement, you can build a query by
+manipulating an MDX parse tree, and an MDX parser library allows you to easily
 convert an MDX string to and from a parse tree.</p>
 
-<p><b>Metadata </b>is at the heart of olap4j. You can browse the cubes, 
-dimensions, hierarchies, members in an OLAP schema, and an MDX parse tree and 
-query result are tied back to the same metadata objects. There is also a <b>type 
+<p><b>Metadata </b>is at the heart of olap4j. You can browse the cubes,
+dimensions, hierarchies, members in an OLAP schema, and an MDX parse tree and
+query result are tied back to the same metadata objects. There is also a <b>type
 system </b>for describing scalar expressions.</p>
 
-<p>olap4j makes it possible to write an OLAP client without starting from scratch. 
-In addition to the MDX parser, and operations on the MDX parse tree, there is a 
-higher-level query model, which includes <b>operations to transform queries</b> 
+<p>olap4j makes it possible to write an OLAP client without starting from scratch.
+In addition to the MDX parser, and operations on the MDX parse tree, there is a
+higher-level query model, which includes <b>operations to transform queries</b>
 (also called 'navigations'), and facilities to layout multidimensional results as HTML tables.</p>
 
 <h3>olap4j and XML/A</h3>
 
-<p>At this point, you may be saying: what about XML/A? XML/A was here first, is an 
-open standard, and is supported by a number of servers. Is olap4j an attempt to 
+<p>At this point, you may be saying: what about XML/A? XML/A was here first, is an
+open standard, and is supported by a number of servers. Is olap4j an attempt to
 replace XML/A? Isn't XML/A good enough for everyone?</p>
 
-<p>olap4j certainly has some similarities with XML/A. Both APIs allow an application to execute OLAP queries, and to browse the metadata of an OLAP schema. But XML/A is a 
-low-level web-services API which leaves a lot of work to the application writer. 
-(Witness the fact that the majority of successful XML/A applications run only on 
-Windows, where the ADOMD.NET is a high-level interface to XML/A servers.) 
-The APIs are mostly complementary, because olap4j can be easily 
-added to an XML/A back-end, and provides features which would be difficult or 
-impossible to provide via a web-services API. These are functions for parsing MDX, building and transforming MDX query models, and mapping result sets into 
+<p>olap4j certainly has some similarities with XML/A. Both APIs allow an application to execute OLAP queries, and to browse the metadata of an OLAP schema. But XML/A is a
+low-level web-services API which leaves a lot of work to the application writer.
+(Witness the fact that the majority of successful XML/A applications run only on
+Windows, where the ADOMD.NET is a high-level interface to XML/A servers.)
+The APIs are mostly complementary, because olap4j can be easily
+added to an XML/A back-end, and provides features which would be difficult or
+impossible to provide via a web-services API. These are functions for parsing MDX, building and transforming MDX query models, and mapping result sets into
 graphical layouts such as pivot tables.</p>
 
-<p>If a web-services based application needs these functions, it can use the 
-XML/A provider to connect to the underlying data source, execute queries, and 
-browse metadata, but can still use olap4j's features for MDX parsing, query 
+<p>If a web-services based application needs these functions, it can use the
+XML/A provider to connect to the underlying data source, execute queries, and
+browse metadata, but can still use olap4j's features for MDX parsing, query
 models and layout. </p>
 
 <h3>Benefits of a standard Java API for OLAP</h3>
 
-<p>Once the olap4j standard is in place, we can expect that the familiar 
-benefits of an open standard will emerge: a larger variety of tools, better 
-tools, and more price/feature competition between OLAP servers. These benefits 
-follow because if a developer of OLAP tool can reach a larger audience, there is greater 
+<p>Once the olap4j standard is in place, we can expect that the familiar
+benefits of an open standard will emerge: a larger variety of tools, better
+tools, and more price/feature competition between OLAP servers. These benefits
+follow because if a developer of OLAP tool can reach a larger audience, there is greater
 incentive to build new tools.</p>
 
-<p>Eventually there will be olap4j providers for most OLAP servers. The server 
-vendors will initially have little incentive to embrace a standard which will 
-introduce competition into their market, but eventually the wealth of tools will 
-compel them to write a provider; or, more likely, will tempt third-party or 
+<p>Eventually there will be olap4j providers for most OLAP servers. The server
+vendors will initially have little incentive to embrace a standard which will
+introduce competition into their market, but eventually the wealth of tools will
+compel them to write a provider; or, more likely, will tempt third-party or
 open-source efforts to build providers for their servers.</p>
 
 <h3>Architecture of olap4j</h3>
 
 <p>The following diagram shows how olap4j fits into an enterprise architecture.</p>
 
-<blockquote>
+<img class="std" alt="olap4j architecture" src="olap4j-arch.png"><h2>Components of the API</h2>
 
-  <p><img border="0" src="http://olap4j.org/olap4j-arch.png"></p>
-</blockquote>
-
-<h2>Components of the API</h2>
-
-<p>We now describe the olap4j API in more detail, by breaking it down into a set 
+<p>We now describe the olap4j API in more detail, by breaking it down into a set
 of functional areas.</p>
 
-<blockquote>
+<img class="std" alt="olap4j components" src="olap4j-comp.png" width="740" height="692"><h3>Driver</h3>
 
-  <p>
-  <img border="0" src="http://olap4j.org/olap4j-comp.png" width="740" height="692"></p>
-</blockquote>
-
-<h3>Driver</h3>
-
-<p>olap4j shares JDBC's driver management facilities. This allows olap4j clients 
-to leverage the support for JDBC such as 
+<p>olap4j shares JDBC's driver management facilities. This allows olap4j clients
+to leverage the support for JDBC such as
 connection pooling, driver registration.</p>
 
 <p>Classes:</p>
@@ -165,64 +203,49 @@ connection pooling, driver registration.</p>
 
 <h3>Session</h3>
 
-<p>olap4j's session management component manages connections to the OLAP server, 
+<p>olap4j's session management component manages connections to the OLAP server,
 statements.</p>
 
-<p>Where possible, olap4j uses JDBC's session management facility. olap4j defines extensions to 
+<p>Where possible, olap4j uses JDBC's session management facility. olap4j defines extensions to
 JDBC interfaces Connection and Statement.&nbsp; </p>
 
-<p>For example, the following code registers a driver, connects to Mondrian and 
+<p>For example, the following code registers a driver, connects to Mondrian and
 executes a statement:</p>
 
-<blockquote>
 
-  <p><code>import org.olap4j.*;<br>
+  <div class="code">
+	import org.olap4j.*;<br>
   <br>
   Class.forName(&quot;mondrian.olap4j.Driver&quot;);<br>
   OlapConnection connection = (OlapConnection)<br>
 &nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot;
   +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot;
   +<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Role='California manager'&quot;);<br>
   OlapStatement statement = connection.createOlapStatement();<br>
   <br>
   OlapResult result =<br>
 &nbsp;&nbsp;&nbsp; statement.execute(<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;SELECT {[Measures].[Unit Sales]} ON 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;SELECT {[Measures].[Unit Sales]} ON
   COLUMNS,\n&quot; +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;&nbsp; {[Product].Members} ON 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;&nbsp; {[Product].Members} ON
   ROWS\n&quot; +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;FROM [Sales]&quot;);</code></p>
-</blockquote>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;FROM [Sales]&quot;);</div>
 
-<p>Here's a piece of code to connect to Microsoft SQL Server Analysis 
-Services&#8482; (MSAS) via XML/A. Note that besides the driver class and connect 
+<p>Here's a piece of code to connect to Microsoft SQL Server Analysis
+Services&#8482; (MSAS) via XML/A. Note that besides the driver class and connect
 string, the code is identical.</p>
 
-<blockquote>
+<div style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px; padding-top: 1px; padding-bottom: 1px" class="code">
+	import org.olap4j.*;<br><br>Class.forName(&quot;olap4j.impl.xmla.Driver&quot;);<br>OlapConnection connection = (OlapConnection)<br>&nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:olap4jxmla:Server=http://localhost/xmla/msxisapi.dll;&quot;
+  +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=FoodMart&quot;);<br>OlapStatement statement = connection.createOlapStatement();<br>
+	<br>OlapResult result =<br>&nbsp;&nbsp;&nbsp; statement.execute(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;SELECT {[Measures].[Unit Sales]} ON
+  COLUMNS,\n&quot; +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;&nbsp; {[Product].Members} ON
+  ROWS\n&quot; +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;FROM [Sales]&quot;);</div>
 
-  <p><code>import org.olap4j.*;<br>
-  <br>
-  Class.forName(&quot;olap4j.impl.xmla.Driver&quot;);<br>
-  OlapConnection connection = (OlapConnection)<br>
-&nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:olap4jxmla:Server=http://localhost/xmla/msxisapi.dll;&quot; 
-  +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=FoodMart&quot;);<br>
-  OlapStatement statement = connection.createOlapStatement();<br>
-  <br>
-  OlapResult result =<br>
-&nbsp;&nbsp;&nbsp; statement.execute(<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;SELECT {[Measures].[Unit Sales]} ON 
-  COLUMNS,\n&quot; +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;&nbsp; {[Product].Members} ON 
-  ROWS\n&quot; +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;FROM [Sales]&quot;);</code></p>
-</blockquote>
-
-<p>In the above examples, a statement was created from a string. As we shall 
+<p>In the above examples, a statement was created from a string. As we shall
 see, a statement can also be created from an MDX parse tree.</p>
 
 <p>Package name: <code>org.olap4j</code></p>
@@ -247,24 +270,24 @@ see, a statement can also be created from an MDX parse tree.</p>
 <ul>
   <li>The MDX parser parses an MDX string to create an MDX query model;</li>
   <li>Client code programmatically builds a query model by calling API methods;</li>
-  <li>Code in the transform package manipulates query model in response to 
+  <li>Code in the transform package manipulates query model in response to
   graphical operations.</li>
 </ul>
 
-<p>An MDX query model can exist in an <i>unvalidated</i> and <i>validated</i> 
-state. In the unvalidated state, identifiers and function calls exist as raw 
-strings, and no type information has been assigned. During validation, 
-identifiers are resolved to specific MDX objects (members, etc.), type 
-information is assigned, and if a function exists in several overloaded forms, a 
+<p>An MDX query model can exist in an <i>unvalidated</i> and <i>validated</i>
+state. In the unvalidated state, identifiers and function calls exist as raw
+strings, and no type information has been assigned. During validation,
+identifiers are resolved to specific MDX objects (members, etc.), type
+information is assigned, and if a function exists in several overloaded forms, a
 specific instance is chosen based upon the types of its arguments.</p>
 
 <p>Any MDX query model can be serialized to a string containing MDX text.</p>
 
 <p>An MDX query model can be converted into a statement. For example,</p>
 
-<blockquote>
+<div class="code">
 
-  <p><code>// Create a query model.<br>
+  // Create a query model.<br>
   OlapConnection connection;<br>
   Query query = new Query();<br>
   query.setFrom(&quot;Sales&quot;);<br>
@@ -274,9 +297,9 @@ specific instance is chosen based upon the types of its arguments.</p>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new UnresolvedFunCall(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;{}&quot;,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   Syntax.Special,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Id(new 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Id(new
   String[] {&quot;Measures&quot;, &quot;Unit Sales&quot;})));<br>
   <br>
   // Create a statement based upon the query model.<br>
@@ -294,8 +317,7 @@ specific instance is chosen based upon the types of its arguments.</p>
 &nbsp;&nbsp;&nbsp; rset = stmt.execute();<br>
   } catch (OlapException e) {<br>
 &nbsp;&nbsp;&nbsp; System.out.println(&quot;Execution failed: &quot; + e);<br>
-  }</code></p>
-</blockquote>
+  }</div>
 
 <p>Package name: <code>org.olap4j.mdx</code></p>
 
@@ -321,43 +343,40 @@ specific instance is chosen based upon the types of its arguments.</p>
 
 <p>Here are some examples:</p>
 
-<blockquote>
-  <table border="1" id="table1" style="border-collapse: collapse; border-color: #000000">
-    <tr>
-      <th>Expression</th>
-      <th>Type</th>
-    </tr>
-    <tr>
-      <td><code>1 + 2</code></td>
-      <td>Integer</td>
-    </tr>
-    <tr>
-      <td><code>[Store]</code></td>
-      <td>Dimension</td>
-    </tr>
-    <tr>
-      <td><code>[Store].[State]</code></td>
-      <td>Level&lt;dimension=[Store], hierarchy=[Store]&gt;</td>
-    </tr>
-    <tr>
-      <td><code>[Store].[USA].[CA]</code></td>
-      <td>Member&lt;dimension=[Store], hierarchy=[Store], level=[Store].[State], 
+<table>
+	<tr>
+		<th>Expression</th>
+		<th>Type</th>
+	</tr>
+	<tr>
+		<td><code>1 + 2</code></td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td><code>[Store]</code></td>
+		<td>Dimension</td>
+	</tr>
+	<tr>
+		<td><code>[Store].[State]</code></td>
+		<td>Level&lt;dimension=[Store], hierarchy=[Store]&gt;</td>
+	</tr>
+	<tr>
+		<td><code>[Store].[USA].[CA]</code></td>
+		<td>Member&lt;dimension=[Store], hierarchy=[Store], level=[Store].[State], 
       member=[Store].[USA].[CA]&gt;</td>
-    </tr>
-    <tr>
-      <td><code>[Store].[USA].Children(2)</code></td>
-      <td>Member&lt;dimension=[Store], hierarchy=[Store], level=[Store].[State]&gt;</td>
-    </tr>
-  </table>
-</blockquote>
+	</tr>
+	<tr>
+		<td><code>[Store].[USA].Children(2)</code></td>
+		<td>Member&lt;dimension=[Store], hierarchy=[Store], level=[Store].[State]&gt;</td>
+	</tr>
+</table>
 
 <p>Since MDX is a late-binding language, some expressions will have unknown 
 types, or only partial type information. For example, the expression</p>
 
-<blockquote>
+<div class="code">
 
-  <p><code>[Store].Levels(&quot;Sta&quot; + &quot;te&quot;)</code></p>
-</blockquote>
+  	[Store].Levels(&quot;Sta&quot; + &quot;te&quot;)</div>
 
 <p>will have type <code>Level&lt;dimension=[Store], level=unknown&gt;</code>. The 
 validator knows that the <code>&lt;hierarchy&gt;.Levels(&lt;string expr&gt;)</code> function 
@@ -425,23 +444,22 @@ with access control.</p>
 is usually triggered by a gesture within the user-interface. For example, 
 clicking on the <i>Unit Sales</i> column transforms the query</p>
 
-<blockquote>
+<div class="code">
 
-  <p><code>SELECT {[Measures].[Store Sales], [Measures].[Unit Sales]} ON 
+  	SELECT {[Measures].[Store Sales], [Measures].[Unit Sales]} ON 
   COLUMNS,<br>
 &nbsp; {[Product].Members} ON ROWS<br>
-  FROM [Sales]</code></p>
-</blockquote>
+  FROM [Sales]
+</div>
 
 <p>into one with sorting:</p>
 
-<blockquote>
-
-  <p><code>SELECT {[Measures].[Store Sales], [Measures].[Unit Sales]} ON 
+<div class="code">
+  SELECT {[Measures].[Store Sales], [Measures].[Unit Sales]} ON 
   COLUMNS,<br>
 &nbsp; Order({[Product].Members}, [Measures].[Unit Sales], ASC) ON ROWS<br>
-  FROM [Sales]</code></p>
-</blockquote>
+  FROM [Sales]
+</div>
 
 <p>Package name: <code>org.olap4j.transform</code></p>
 
@@ -540,11 +558,11 @@ those changes are.</p>
 
 <h3>Richard Emberson, email, 2006/8/15</h3>
 
-<p>One thing we found about XMLA was that our users wanted all roles to be 
+<p>&quot;One thing we found about XMLA was that our users wanted all roles to be 
 defined, stored, modified, and accessed though the same mechanism. With a large 
 application with many areas that can be permissioned, it is important that 
 olap4j let an application builder manage roles externally and apply them as part 
-of an individual's execution context.</p>
+of an individual's execution context.&quot;</p>
 
 <h2>Appendix C. Open issues</h2>
 
@@ -558,7 +576,6 @@ they will generally be put into the spec.</p>
 olap4j, JDK 1.5 and generics</a>. I am proceeding on the assumption that we are 
 targeting JDK 1.5, and running retroweaver for backward compatibility for JDK 
 1.4.</p>
-<hr>
 
 </body>
 
