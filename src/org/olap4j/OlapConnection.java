@@ -22,10 +22,6 @@ import java.sql.SQLException;
  * @since Aug 22, 2006
  */
 public interface OlapConnection extends Connection {
-    /**
-     * Creates an OLAP Statement.
-     */
-    OlapStatement createOlapStatement() throws SQLException;
 
     /**
      * Creates a prepared OLAP Statement.

@@ -10,6 +10,8 @@
 package org.olap4j;
 
 import java.util.List;
+import java.util.Iterator;
+import java.util.ListIterator;
 
 /**
  * <code>ResultAxis</code> ...
@@ -23,7 +25,21 @@ public interface ResultAxis {
     int COLUMNS = 1;
     int ROWS = 2;
 
+    /**
+     * Returns a list of positions on this axis.
+     * @return
+     */
     List<ResultPosition> getPositions();
+
+    /**
+     * Opens an iterator
+     */
+    ListIterator<ResultPosition> iterate();
+
+    enum Direction {
+        ForwardOnly,
+        Restartable,
+    }
 }
 
 // End ResultAxis.java

@@ -18,7 +18,7 @@ import mondrian.olap.Query;
 
 /**
  * Object used for statically executing an MDX statement and returning an
- * {@link OlapResult}.
+ * {@link OlapResultSet}.
  *
  * @see PreparedOlapStatement
  *
@@ -27,10 +27,11 @@ import mondrian.olap.Query;
  * @since Aug 22, 2006
  */
 public interface OlapStatement extends Statement {
+
     /**
      * Executes an OLAP statement.
      */
-    OlapResult executeOlapQuery(String mdx) throws SQLException;
+    OlapResultSet executeOlapQuery(String mdx) throws SQLException;
 
     /**
      * Executes an OLAP statement expressed as a parse tree.
@@ -39,12 +40,7 @@ public interface OlapStatement extends Statement {
      * @param query Parse tree of MDX SELECT statement
      * @return Result
      */
-    OlapResult executeOlapQuery(Query query);
-
-    /**
-     * Returns the cube (or virtual cube) which this statement is based upon.
-     */
-    Cube getCube();
+    OlapResultSet executeOlapQuery(Query query);
 
 }
 

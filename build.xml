@@ -36,6 +36,9 @@
   <property name="dist.src.file" value="${dist.dir}/${dist.name}-src.zip" />
   <property name="dist.doc.file" value="${dist.dir}/doc.tar.gz" />
 
+  <property name="generated.java.files" value=""/>
+  <property name="generated.lib.files" value=""/>
+
   <path id="project.classpath">
     <pathelement location="${classes.dir}"/>
     <!-- <pathelement location="${lib.dir}/retroweaver-1.2.4.jar"/> -->
@@ -44,7 +47,7 @@
     <pathelement location="${ant.home}/lib/optional.jar"/>
     <!-- We depend on mondrian right now. Ugh. -->
     <pathelement location="${lib.dir}/mondrian-2.1.1.jar"/>
-   
+
   </path>
 
   <path id="project.test.classpath">
@@ -147,11 +150,8 @@ ${generated.java.files}" />
 
   <target name="release" depends="binzip"/>
 
-  <!-- These targets need to be added in: 
-  	retroweave,jar-jdk14,javadoc -->
-  	
   <target name="binzip"
-      depends="clean,jar,version,srczip">
+      depends="clean,jar,version,srczip,retroweave,jar-jdk14,javadoc">
     <mkdir dir="${dist.dir}" />
     <delete file="${dist.bin.file}"/>
     <zip zipfile="${dist.bin.file}">
@@ -164,8 +164,8 @@ ${doc.dir}/**/*.html,
 ${doc.dir}/**/*.pdf,
 ${doc.dir}/**/*.png,
 ${doc.dir}/api/**/*.xml,
-${war.file},
 ${jar.file},
+${jar-jdk14.file},
 lib/*.dtd,
 LICENSE.html,
 README.txt,
@@ -278,6 +278,22 @@ META-INF/**"/>
       <tag name="testcase" description="Test-case:"
            scope="constructors,methods,types"/>
       <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+    </javadoc>
+  </target>
+
+  <target name="javadoc-pdf">
+    <javadoc sourcepath="${src.dir}:${testsrc.dir}"
+        classpathref="project.test.classpath"
+        packagenames="org.olap4j.*"
+        excludepackagenames="org.olap4j.sample.*"
+        overview="${src.dir}/overview.html"
+        author="true"
+        source="1.5"
+        access="package"
+        doclet="com.tarsec.javadoc.pdfdoclet.PDFDoclet"
+        docletpath="lib/pdfdoclet-1.0.2-all.jar"
+        additionalparam="-pdf doc/olap4j_api.pdf -config doc/pdfdoclet.properties"
+      >
     </javadoc>
   </target>
 

@@ -61,10 +61,54 @@ TABLE TD {
 
 <p>Author(s): Julian Hyde<br>
 Version: 0.6-dev (draft)<br>
-Last modified: September 3<sup>rd</sup>, 2006.</p>
-<hr>
+Revision: $Id: $
+(<a href="http://svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
+Last modified: October 11<sup>th</sup>, 2006.</p>
+<hr noshade>
 
-<h2>Introduction</h2>
+<h2><a name="Contents">Contents</a></h2>
+<ol>
+	<li><a href="#Introduction">Introduction</a><ol>
+		<li><a href="#A_brief_history_of_OLAP_standards">A brief history of OLAP 
+		standards</a></li>
+		<li><a href="#Overview_of_olap4j">Overview of olap4j</a></li>
+		<li><a href="#olap4j_and_XML/A">olap4j and XML/A</a></li>
+		<li><a href="#Benefits_of_a_standard_Java_API_for_OLAP">Benefits of a 
+		standard Java API for OLAP</a></li>
+		<li><a href="#Architecture_of_olap4j">Architecture of olap4j</a></li>
+	</ol>
+	</li>
+	<li><a href="#Components_of_the_API">Components of the API</a><ol>
+		<li><a href="#Driver_management">Driver management</a></li>
+		<li><a href="#Connections">Connections</a></li>
+		<li><a href="#Statements">Statements</a></li>
+		<li><a href="#MDX_query_model">MDX query model</a></li>
+		<li><a href="#MDX_type_model">MDX type model</a></li>
+		<li><a href="#Metadata">Metadata</a></li>
+		<li><a href="#Access_control">Access control</a></li>
+		<li><a href="#Transform">Transform</a></li>
+		<li><a href="#Layout">Layout</a></li>
+	</ol>
+	</li>
+	<li><a href="#Other_components">Other components</a><ol>
+		<li><a href="#Test_suite">Test suite</a></li>
+		<li><a href="#XML/A_provider">XML/A provider</a></li>
+	</ol>
+	</li>
+	<li><a href="#Non-functionality">Non-functionality</a></li>
+	<li><a href="#Related_projects">Related projects</a><ol>
+		<li><a href="#Mondrian_provider">Mondrian provider</a></li>
+		<li><a href="#JPivot">JPivot</a></li>
+		<li><a href="#Other_data_sources">Other data sources</a></li>
+	</ol>
+	</li>
+	<li><a href="#Opportunities_for_specification">Appendix A. Opportunities for 
+	specification</a></li>
+	<li><a href="#Feedback">Appendix B. Feedback</a></li>
+	<li><a href="#Open_issues">Appendix C. Open issues</a></li>
+	<li><a href="#Miscellaneous">Appendix D. Miscellaneous</a></li>
+</ol>
+<h2>1. <a name="Introduction">Introduction</a></h2>
 
 <p>olap4j is an open Java API for building OLAP applications.</p>
 
@@ -78,7 +122,7 @@ Services, accessed via XML for Analysis).</p>
 <p>However, creating a standard OLAP API for Java is a contentious issue. To
 understand why, it helps to understand the history of OLAP standards.</p>
 
-<h3>A brief history of OLAP standards</h3>
+<h3>1.1. <a name="A_brief_history_of_OLAP_standards">A brief history of OLAP standards</a></h3>
 
 <p>History is strewn with attempts to create a standard OLAP API. First, the OLAP council's
 MDAPI (in two versions), then the JOLAP API emerged from Sun's Java Community
@@ -110,7 +154,7 @@ companies using a particular OLAP server that wanted to get at it from several
 clients. It became clear the open-source OLAP tools needed a standard, and that
 standard would probably be suitable for other Java-based OLAP tools.</p>
 
-<h3>Overview of olap4j</h3>
+<h3>1.2. <a name="Overview_of_olap4j">Overview of olap4j</a></h3>
 
 <p>An OLAP application interacts with an OLAP server by means of MDX statements
 belonging to connections. The statements are defined in terms of metadata and
@@ -145,7 +189,7 @@ In addition to the MDX parser, and operations on the MDX parse tree, there is a
 higher-level query model, which includes <b>operations to transform queries</b>
 (also called 'navigations'), and facilities to layout multidimensional results as HTML tables.</p>
 
-<h3>olap4j and XML/A</h3>
+<h3>1.3. <a name="olap4j_and_XML/A">olap4j and XML/A</a></h3>
 
 <p>At this point, you may be saying: what about XML/A? XML/A was here first, is an
 open standard, and is supported by a number of servers. Is olap4j an attempt to
@@ -165,7 +209,7 @@ XML/A provider to connect to the underlying data source, execute queries, and
 browse metadata, but can still use olap4j's features for MDX parsing, query
 models and layout. </p>
 
-<h3>Benefits of a standard Java API for OLAP</h3>
+<h3>1.4. <a name="Benefits_of_a_standard_Java_API_for_OLAP">Benefits of a standard Java API for OLAP</a></h3>
 
 <p>Once the olap4j standard is in place, we can expect that the familiar
 benefits of an open standard will emerge: a larger variety of tools, better
@@ -179,16 +223,19 @@ introduce competition into their market, but eventually the wealth of tools will
 compel them to write a provider; or, more likely, will tempt third-party or
 open-source efforts to build providers for their servers.</p>
 
-<h3>Architecture of olap4j</h3>
+<h3>1.5. <a name="Architecture_of_olap4j">Architecture of olap4j</a></h3>
 
 <p>The following diagram shows how olap4j fits into an enterprise architecture.</p>
 
-<img class="std" alt="olap4j architecture" src="olap4j-arch.png"><h2>Components of the API</h2>
+<img class="std" alt="olap4j architecture" src="olap4j-arch.png"><h2>
+2.
+<a name="Components_of_the_API">Components of the API</a></h2>
 
 <p>We now describe the olap4j API in more detail, by breaking it down into a set
 of functional areas.</p>
 
-<img class="std" alt="olap4j components" src="olap4j-comp.png" width="740" height="692"><h3>Driver</h3>
+<img class="std" alt="olap4j components" src="olap4j-comp.png" width="740" height="692"><h3>
+2.1. <a name="Driver_management">Driver management</a></h3>
 
 <p>olap4j shares JDBC's driver management facilities. This allows olap4j clients
 to leverage the support for JDBC such as
@@ -196,14 +243,26 @@ connection pooling, driver registration.</p>
 
 <p>Classes:</p>
 <ul>
-  <li>java.sql.Driver</li>
-  <li>java.sql.DriverManager</li>
-  <li>javax.sql.DataSource</li>
+  <li><a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Driver.html">java.sql.Driver</a></li>
+  <li>
+	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DriverManager.html">java.sql.DriverManager</a></li>
+  <li>
+	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DataSource.html">javax.sql.DataSource</a></li>
 </ul>
 
-<h3>Session</h3>
+<h4>2.1.1. <a name="Driver">Driver</a></h4>
+<p>Same functionality as JDBC.</p>
+<p>Here is an example of registering an olap4j driver:</p>
+<div style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px; padding-top: 1px; padding-bottom: 1px" class="code">
+	Class.forName(&quot;mondrian.olap4j.Driver&quot;);</div>
+<h4>2.1.2. <a name="DriverManager">DriverManager</a></h4>
+<p>Same functionality as JDBC.</p>
+<h4>2.1.3. <a name="DataSource">DataSource</a></h4>
+<p>Same functionality as JDBC.</p>
 
-<p>olap4j's session management component manages connections to the OLAP server,
+<h3>2.2. <a name="Connections">Connections</a></h3>
+
+<p>olap4j's connection management component manages connections to the OLAP server,
 statements.</p>
 
 <p>Where possible, olap4j uses JDBC's session management facility. olap4j defines extensions to
@@ -217,14 +276,14 @@ executes a statement:</p>
 	import org.olap4j.*;<br>
   <br>
   Class.forName(&quot;mondrian.olap4j.Driver&quot;);<br>
-  OlapConnection connection = (OlapConnection)<br>
+  	Connection connection =<br>
 &nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot;
   +<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot;
   +<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Role='California manager'&quot;);<br>
-  OlapStatement statement = connection.createOlapStatement();<br>
+  	Statement statement = connection.createStatement();<br>
   <br>
   OlapResult result =<br>
 &nbsp;&nbsp;&nbsp; statement.execute(<br>
@@ -241,7 +300,7 @@ string, the code is identical.</p>
 <div style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px; padding-top: 1px; padding-bottom: 1px" class="code">
 	import org.olap4j.*;<br><br>Class.forName(&quot;olap4j.impl.xmla.Driver&quot;);<br>OlapConnection connection = (OlapConnection)<br>&nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:olap4jxmla:Server=http://localhost/xmla/msxisapi.dll;&quot;
   +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=FoodMart&quot;);<br>OlapStatement statement = connection.createOlapStatement();<br>
-	<br>OlapResult result =<br>&nbsp;&nbsp;&nbsp; statement.execute(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;SELECT {[Measures].[Unit Sales]} ON
+	<br>OlapResultSet result =<br>&nbsp;&nbsp;&nbsp; statement.execute(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;SELECT {[Measures].[Unit Sales]} ON
   COLUMNS,\n&quot; +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;&nbsp; {[Product].Members} ON
   ROWS\n&quot; +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;FROM [Sales]&quot;);</div>
 
@@ -250,19 +309,129 @@ see, a statement can also be created from an MDX parse tree.</p>
 
 <p>Package name: <code>org.olap4j</code></p>
 
-<p>Major classes:</p>
+<h4>2.2.1. OlapConnection (extends 
+<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Connection.html">java.sql.Connection</a>)</h4>
+<p><a href="api/org/olap4j/OlapConnection.html">OlapConnection</a> is a 
+connection to an OLAP data source.</p>
+<h4>2.2.2 Connection pooling</h4>
+<p>olap4j extends various JDBC interfaces:</p>
+<table border="1" id="table1">
+	<tr>
+		<th>olap4j class</th>
+		<th>extends JDBC class</th>
+		<th>created by</th>
+	</tr>
+	<tr>
+		<td><code>org.olap4j.OlapConnection</code></td>
+		<td><code>java.sql.Connection</code></td>
+		<td><code>Connection DriverManager.createConnection()<br>
+		Connection DataSource.getConnection()</code></td>
+	</tr>
+	<tr>
+		<td><code>org.olap4j.OlapStatement</code></td>
+		<td><code>java.sql.Statement</code></td>
+		<td><code>Statement Connection.createStatement()</code></td>
+	</tr>
+	<tr>
+		<td><code>org.olap4j.PreparedOlapStatement</code></td>
+		<td><code>java.sql.PreparedStatement</code></td>
+		<td><code>PreparedStatement Connection.prepareStatement()</code></td>
+	</tr>
+	<tr>
+		<td><code>org.olap4j.OlapResultSet</code></td>
+		<td><code>java.sql.ResultSet</code></td>
+		<td><code>ResultSet Statement.executeQuery(String)<br>
+		ResultSet PreparedStatement.executeQuery()</code></td>
+	</tr>
+</table>
+<p>One would expect that it would be safe to downcast the result of a factory 
+method to the desired result. For example, if you invoke an <code>OlapConnection</code>'s
+<code>createStatement()</code> method, the result should be an <code>
+OlapStatement</code>.</p>
+<p>However, this will not be the case if you are using a connection-pooling 
+library, common examples of which include Jakarta Commons DBCP and C3P0. Every 
+connection-pooling library tracks connections by wrapping them in another class, 
+and this class will implement <code>java.sql.Connection</code> but not <code>
+OlapConnection</code>. To access methods of the <code>OlapConnection</code>, the 
+client application must first strip away the wrapper object.</p>
+<p>The problem is not restricted to connections: some connection pools also wrap
+<code>Statement</code>, <code>PreparedStatement</code>, <code>ResultSet</code> 
+and <code>DatabaseMetaData</code> objects. But the good news is that you don't 
+need to access <code>OlapConnection</code>, <code>OlapStatement</code> or <code>
+PreparedOlapStatement</code> very often, because they do do not have many 
+methods </p>
+<p>&nbsp;</p>
+<h3>2.3. <a name="Statements">Statements</a></h3>
+
+<h4>2.3.1. OlapStatement</h4>
+<p><a href="api/org/olap4j/OlapStatement.html">OlapStatement</a>&nbsp; (extends
+<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Statement.html">java.sql.Statement</a>) 
+is an object used to execute a static MDX statement and return the result it 
+produces.</p>
+<h4>2.3.2. PreparedOlapStatement</h4>
+<p><a href="api/org/olap4j/PreparedOlapStatement.html">PreparedOlapStatement</a> 
+(extends
+<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/PreparedStatement.html">
+java.sql.PreparedStatement</a>) represents a precompiled MDX statement.</p>
+<p>An MDX statement is precompiled and stored in a <code>PreparedOlapStatement</code> 
+object. This object can then be used to efficiently execute this statement 
+multiple times.</p>
+<p>The method
+<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/PreparedStatement.html#getParameterMetaData()">
+PreparedStatement.getParameterMetaData()</a> returns a description of the 
+parameters, as in JDBC. The result is an OlapParameterMetaData.</p>
+<p>To set values of parameters, use the <code>set<i>Type</i>(int, <i>type</i>)</code> 
+methods. If a parameter is a member, use the <code>setObject(int, Object)</code> 
+method; throws an exception if the object is not a member, or is a member of the 
+wrong hierarchy.</p>
+<p>Unlike JDBC, it is not necessary to assign a value to every parameter. This 
+is because OLAP parameters have a default value. Parameters have their default 
+value until they are set, and then retain their new values for each subsequent 
+execution of this <code>PreparedOlapStatement</code>.</p>
+<h4>2.3.3. OlapParameterMetaData</h4>
+<p><a href="api/org/olap4j/OlapParameterMetaData.html">OlapParameterMetaData</a> 
+(extends
+<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ParameterMetaData.html">
+java.sql.ParameterMetaData</a>) describes parameters of a <code>
+PreparedOlapStatement</code>.</p>
+<h4>2.3.4. OlapResultSet</h4>
+<p><a href="api/org/olap4j/OlapResultSet.html">OlapResultSet</a> (extends
+<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html">
+java.sql.ResultSet</a>) is the result of executing a <code>OlapStatement</code> 
+or <code>PreparedOlapStatement</code>.</p>
+<p>It extends ResultSet, but since most of these methods are concerned with rows 
+and columns, few of ResultSet's methods are applicable. The following methods 
+are applicable:</p>
 <ul>
-  <li>OlapConnection (extends java.sql.Connection)</li>
-  <li>Statement (extends java.sql.Statement)</li>
-  <li>Parameter describes the parameters of a statement</li>
-  <li>ResultSet</li>
-  <li>ResultAxis</li>
-  <li>Position</li>
+	<li><code><b>
+	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#clearWarnings%28%29">
+	clearWarnings</a></b>()</code> </li>
+	<li><code><b>
+	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#close%28%29">
+	close</a></b>()</code> </li>
+	<li><code><b>
+	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getConcurrency%28%29">
+	getConcurrency</a></b>()</code> </li>
+	<li><code><b>
+	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getStatement%28%29">
+	getStatement</a></b>()</code> </li>
+	<li><code><b>
+	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getType%28%29">
+	getType</a></b>()</code> </li>
+	<li><code><b>
+	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getWarnings%28%29">
+	getWarnings</a></b>()</code> </li>
 </ul>
+<p>Additional methods to retrieve the axes of the multidimensional result.</p>
+<h4>2.3.5. ResultAxis</h4>
+<p>[tbd]</p>
+<p>[access positions by index (i.e. a list) and by scrolling (i.e. an iterator)]</p>
+<h4>2.3.6. Position</h4>
+<p>[tbd]</p>
+<h4>2.3.7. ResultCell</h4>
+<p>[tbd]</p>
 
-<p>There is no support for JDBC's PreparedStatement.</p>
-
-<h3>MDX query model</h3>
+<h3>2.4. <a name="MDX_query_model">MDX query model</a></h3>
 
 <p>The MDX query model represents a parsed MDX statement. </p>
 
@@ -337,7 +506,7 @@ specific instance is chosen based upon the types of its arguments.</p>
   <li>Parser</li>
 </ul>
 
-<h3>MDX type model</h3>
+<h3>2.5. <a name="MDX_type_model">MDX type model</a></h3>
 
 <p>Represents the types of nodes in an MDX query model.</p>
 
@@ -404,11 +573,14 @@ evaluated at runtime.</p>
   <li>TypeUtil</li>
 </ul>
 
-<h3>Metadata</h3>
+<h3>2.6. <a name="Metadata">Metadata</a></h3>
 
-<p>The components of the OLAP model are available as read-only Java classes.</p>
+<p>Package name: <code>org.olap4j.metamodel</code></p>
 
-<h4>Access control</h4>
+<p>The components of the OLAP model are available as read-only Java classes, and 
+also via schema rowsets.</p>
+
+<h4>2.6.1. <a name="Access_control">Access control</a></h4>
 
 <p>A user's view of metadata may be subject to access control. For example, a 
 user may not have read access to certain hierarchies within a cube, or to 
@@ -422,8 +594,8 @@ with access control.</p>
 	is invisible to him.</p>
 </blockquote>
 
-<p>Package name: <code>org.olap4j.metamodel</code></p>
-
+<p>2.6.2. Schema rowsets</p>
+<p>OlapDatabaseMetaData extends </p>
 <p>Classes:</p>
 <ul>
   <li>Schema</li>
@@ -438,7 +610,15 @@ with access control.</p>
   <li>Role</li>
 </ul>
 
-<h3>Transform</h3>
+<p>Object model:</p>
+<ul>
+	<li>Schema contains Cubes</li>
+	<li>Cube contains Dimensions, Hierarchies, Measures, Sets</li>
+	<li>Hierarchy contains Levels</li>
+</ul>
+<p>&nbsp;</p>
+
+<h3>2.7. <a name="Transform">Transform</a></h3>
 
 <p>A transform is an operation which maps a query model to a new query model. It 
 is usually triggered by a gesture within the user-interface. For example, 
@@ -465,7 +645,7 @@ clicking on the <i>Unit Sales</i> column transforms the query</p>
 
 <p>Classes: TBD</p>
 
-<h3>Layout</h3>
+<h3>2.8. <a name="Layout">Layout</a></h3>
 
 <p>The layout package provides data models for graphical OLAP applications. In 
 particular, the GridModel class provides, for OLAP data, what Swing's
@@ -476,19 +656,19 @@ TableModel</a> provides for SQL data.</p>
 
 <p>Classes: TBD</p>
 
-<h2>Other components</h2>
+<h2>3. <a name="Other_components">Other components</a></h2>
 
 <p>The API described above is a set of interfaces which must be implemented by 
 any compliant provider. The olap4j project also contains some components which 
 are not part of the API.</p>
 
-<h3>Test suite</h3>
+<h3>3.1. <a name="Test_suite">Test suite</a></h3>
 
 <p>The olap4j project contains a TCK (Test Compatability Kit). The TCK is a suite 
 of tests which can be used to verify the compliance of an implementation of the 
 API.</p>
 
-<h3>XML/A provider</h3>
+<h3>3.2. <a name="XML/A_provider">XML/A provider</a></h3>
 
 <p>The XML/A provider is an implementation of the olap4j API which talks to a 
 generic XML/A provider.</p>
@@ -497,7 +677,7 @@ generic XML/A provider.</p>
 particular format and/or produce idiosyncratic responses, the XML/A provider 
 will come in several flavors.</p>
 
-<h2>Non-functionality</h2>
+<h2>4. <a name="Non-functionality">Non-functionality</a></h2>
 
 <p>Here are some of the areas of functionality which will <i>not</i> be part of 
 the olap4j project:</p>
@@ -511,14 +691,14 @@ the olap4j project:</p>
   <li>SchemaReader</li>
 </ul>
 
-<h2>Related projects</h2>
+<h2>5. <a name="Related_projects">Related projects</a></h2>
 
-<h3>Mondrian provider</h3>
+<h3>5.1. <a name="Mondrian_provider">Mondrian provider</a></h3>
 
 <p>The Mondrian project will contain an implementation of the olap4j API based on 
 the Mondrian OLAP server.</p>
 
-<h3>JPivot</h3>
+<h3>5.2. <a name="JPivot">JPivot</a></h3>
 
 <p>JPivot currently based on two data sources: the Mondrian server, and a 
 generic XML/A data source.</p>
@@ -527,13 +707,13 @@ generic XML/A data source.</p>
 Mondrian and XML/A sources will be achieved by choosing the appropriate olap4j 
 provider. </p>
 
-<h3>Other data sources</h3>
+<h3>5.3. <a name="Other_data_sources">Other data sources</a></h3>
 
 <p>In principle, providers could be created to other OLAP data sources. This 
 would be particularly straightforward for servers which already have a native 
 Java API.</p>
 
-<h2>Appendix A. Opportunities for specification</h2>
+<h2>Appendix A. <a name="Opportunities_for_specification">Opportunities for specification</a></h2>
 
 <p>The following are features which have been suggested for inclusion in the 
 olap4j specification, but which are not part of the current version. They may be 
@@ -554,7 +734,7 @@ those changes are.</p>
 
 <p>(Richard Emberson, 2006/8/15)</p>
 
-<h2>Appendix B. Feedback</h2>
+<h2>Appendix B. <a name="Feedback">Feedback</a></h2>
 
 <h3>Richard Emberson, email, 2006/8/15</h3>
 
@@ -564,7 +744,7 @@ application with many areas that can be permissioned, it is important that
 olap4j let an application builder manage roles externally and apply them as part 
 of an individual's execution context.&quot;</p>
 
-<h2>Appendix C. Open issues</h2>
+<h2>Appendix C. <a name="Open_issues">Open issues</a></h2>
 
 <p>These issues will be voted upon at the next meeting. If they are accepted, 
 they will generally be put into the spec.</p>
@@ -576,6 +756,10 @@ they will generally be put into the spec.</p>
 olap4j, JDK 1.5 and generics</a>. I am proceeding on the assumption that we are 
 targeting JDK 1.5, and running retroweaver for backward compatibility for JDK 
 1.4.</p>
+<h2>Appendix D. <a name="Miscellaneous">Miscellaneous</a></h2>
+<p>[Discuss thread safety of connections, statements, result sets.]</p>
+
+<hr noshade>
 
 </body>
 

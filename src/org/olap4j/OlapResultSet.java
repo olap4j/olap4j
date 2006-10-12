@@ -10,6 +10,7 @@
 package org.olap4j;
 
 import java.util.List;
+import java.sql.ResultSet;
 
 /**
  * Result of executing an OLAP Statement.
@@ -22,10 +23,22 @@ import java.util.List;
  * @version $Id$
  * @since Aug 22, 2006
  */
-public interface OlapResult {
+public interface OlapResultSet extends ResultSet {
+    /**
+     * Retrieves a list of axes containing the result.
+     *
+     * <p>The list contains axes according to their ordinal: 0 is the columns
+     * axis, 1 the rows axis, and so forth.
+     */
     List<ResultAxis> getAxes();
 
+    /**
+     * Returns the cell at a given set of coordinates.
+     *
+     * @param coordinates 0-based coordinates of the cell
+     * @return Cell
+     */
     ResultCell getCell(int[] coordinates);
 }
 
-// End OlapResult.java
+// End OlapResultSet.java
