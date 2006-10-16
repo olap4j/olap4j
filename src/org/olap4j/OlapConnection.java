@@ -13,6 +13,7 @@ import org.olap4j.mdx.parser.MdxParserFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Connection to an OLAP server.
@@ -32,6 +33,12 @@ public interface OlapConnection extends Connection {
      * Returns the factory used to create MDX parsers in this connection.
      */
     MdxParserFactory getParserFactory();
+
+    /**
+     * Override {@link java.sql.Connection#createStatement()} with refined
+     * result type.
+     */
+    OlapStatement createStatement() throws SQLException;
 }
 
 // End OlapConnection.java

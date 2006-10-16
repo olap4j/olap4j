@@ -1,5 +1,5 @@
 /*
-// $Id$
+// $Id: $
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -10,15 +10,13 @@
 package org.olap4j.metadata;
 
 /**
- * <code>Cube</code> ...
+ * <code>Measure</code> ...
  *
  * @author jhyde
- * @version $Id$
- * @since Aug 22, 2006
+ * @version $Id: $
+ * @since Oct 13, 2006
  */
-public interface Cube extends MetadataElement {
-    Schema getSchema();
-    NamedList<Dimension> getDimensions();
+public interface Measure extends Member {
 }
 
-// End Cube.java
+// End Measure.java

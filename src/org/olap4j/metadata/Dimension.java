@@ -16,11 +16,7 @@ package org.olap4j.metadata;
  * @version $Id$
  * @since Aug 22, 2006
  */
-public interface Dimension {
-    /**
-     * Returns the name of this Dimension.
-     */
-    String getName();
+public interface Dimension extends MetadataElement {
 
     /**
      * Returns the hierarchies in this Dimension.
@@ -60,6 +56,11 @@ public interface Dimension {
          * Indicates that a dimension is a time dimension.
          */
         Time,
+
+        /**
+         * Indicates that a dimension is the Measures dimension.
+         */
+        Measures,
     }
 }
 

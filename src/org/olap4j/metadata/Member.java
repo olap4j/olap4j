@@ -13,6 +13,7 @@ import mondrian.olap.Exp;
 import mondrian.olap.Property;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * <code>Member</code> is a data value in a in an OLAP Dimension.
@@ -21,9 +22,7 @@ import java.sql.SQLException;
  * @version $Id$
  * @since Aug 22, 2006
  */
-public interface Member {
-    String getName();
-
+public interface Member extends MetadataElement {
     /**
      * Returns the children of this Member, indexed by name.
      *
@@ -38,17 +37,32 @@ public interface Member {
     Member getParentMember();
 
     /**
-     * Returns the level of this Member.
+     * Returns the Level of this Member.
+     *
+     * <p>Never returns null.</p>
      */
     Level getLevel();
 
     /**
-     * Returns the hierarchy of this Member.
+     * Returns the Hierarchy of this Member.
+     *
+     * <p>Never returns null.
+     * Result is always the same as <code>getLevel().getHierarchy()</code>.
      */
     Hierarchy getHierarchy();
 
     /**
+     * Returns the Dimension of this Member.
+     *
+     * <p>Never returns null. Result is always the same as
+     * <code>getLevel().getHierarchy().getDimension()</code>.
+     */
+    Dimension getDimension();
+
+    /**
      * Returns the type of this Member.
+     *
+     * <p>Never returns null.</p>
      */
     Type getMemberType();
 
@@ -103,7 +117,7 @@ public interface Member {
     /**
      * Returns array of all members, which are ancestor to <code>this</code>.
      */
-    Member[] getAncestorMembers();
+    List<Member> getAncestorMembers();
 
     /**
      * Returns whether this member is computed from a <code>with member</code>
@@ -145,7 +159,7 @@ public interface Member {
     /**
      * Returns the definitions of the properties this member may have.
      */
-    Property[] getProperties();
+    List<Property> getProperties();
 
     /**
      * Returns the ordinal of the member.
@@ -159,9 +173,11 @@ public interface Member {
     boolean isHidden();
 
     /**
-     * returns the depth of this member, which is not the level's depth
-     *  in case of parent child dimensions
-     * @return depth
+     * Returns the depth of this member.
+     *
+     * <p>In regular hierarchies, this is as the same as the level's depth,
+     * but in parent-child and ragged hierarchies the value may be
+     * different.</p>
      */
     int getDepth();
 

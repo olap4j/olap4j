@@ -16,7 +16,7 @@ package org.olap4j.metadata;
  * @version $Id$
  * @since Aug 23, 2006
  */
-public interface Hierarchy {
+public interface Hierarchy extends MetadataElement {
     /**
      * Returns the {@link Dimension} this Hierarchy belongs to.
      */

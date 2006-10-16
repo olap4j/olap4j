@@ -10,10 +10,10 @@
 package org.olap4j.sample;
 
 import org.olap4j.*;
+import org.olap4j.type.MemberType;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.mdx.parser.MdxParserFactory;
 import org.olap4j.metadata.Member;
-import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.Dimension;
 
 import java.sql.*;
@@ -53,10 +53,11 @@ public class SimpleQuerySample {
 
         // Execute a statement.
         Statement statement = connection.createStatement();
-        OlapResultSet result = statement.executeOlapQuery(
+        OlapResultSet result = Olap4j.convert(
+            statement.executeQuery(
             "select {[Measures].[Unit Sales]} on columns,\n" +
                 " CrossJoin([Store].Children, [Gender].Members) on rows\n" +
-                "from [Sales]");
+                "from [Sales]"));
 
         List<ResultAxis> resultAxes = result.getAxes();
 
@@ -124,17 +125,18 @@ public class SimpleQuerySample {
             (OlapParameterMetaData) statement.getParameterMetaData();
 
         // Locate the member "[Store].[USA].[WA].[Seattle]".
-        Cube cube = statement.getCube();
-        Dimension dimension = cube.getDimensions().get("Store");
+        MemberType type = (MemberType) parameterMetaData.getOlapType(1);
+        Dimension dimension = type.getDimension();
+        assert dimension.getName().equals("Store");
         Member allStores = dimension.getRootMembers().get(0);
         Member memberUsa = allStores.getChildMembers().get("USA");
         Member memberWa = memberUsa.getChildMembers().get("WA");
         Member memberSeattle = memberWa.getChildMembers().get("Seattle");
-        statement.setMember(1, memberSeattle);
+        statement.setObject(1, memberSeattle);
         statement.setInt(2, 10);
 
         // Execute, and print result.
-        OlapResultSet result = statement.executeOlapQuery();
+        OlapResultSet result = Olap4j.convert(statement.executeQuery());
         printResult(result);
 
         // Close the statement and connection.
@@ -150,8 +152,8 @@ public class SimpleQuerySample {
         Class.forName("mondrian.olap4j.Driver");
 
         // Create connection.
-        OlapConnection connection = (OlapConnection)
-                DriverManager.getConnection("jdbc:mondrian:embedded");
+        OlapConnection connection = Olap4j.convert(
+            DriverManager.getConnection("jdbc:mondrian:embedded"));
 
         // Create a parser.
         MdxParserFactory parserFactory = connection.getParserFactory();
@@ -162,7 +164,7 @@ public class SimpleQuerySample {
         query.axes[0].setNonEmpty(false);
 
         // Create statement.
-        Statement statement = connection.createStatement();
+        OlapStatement statement = connection.createStatement();
         statement.executeOlapQuery(query);
     }
 
@@ -202,18 +204,6 @@ public class SimpleQuerySample {
             }
             System.out.println();
         }
-    }
-
-    void parameterMetadata() throws ClassNotFoundException, SQLException {
-        // Register driver.
-        Class.forName("mondrian.olap4j.Driver");
-
-        // Create connection and statement.
-        Connection connection =
-                DriverManager.getConnection("jdbc:mondrian:embedded");
-        Statement statement = connection.prepareStatement();
-
-
     }
 }
 

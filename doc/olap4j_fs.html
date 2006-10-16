@@ -11,11 +11,31 @@ CODE {
     font-weight: bold;
     color: maroon;
 }
+A.javadoc {
+    font-family: 'courier new', monospace;
+    font-size: 80%;
+    font-weight: bold;
+    color: maroon;
+    text-decoration: none;
+}
+A:hover.javadoc, A:active.javadoc {
+	color: black;
+	text-decoration: underline;
+}
 DIV.code {
     font-family: 'courier new', monospace;
     font-size: 80%;
     font-weight: bold;
     color: maroon;
+    background-color: #e0e0e0;
+    margin-left: 20;
+    margin-right: 20;
+    border-style: solid;
+    border: solid #000000 1px;
+    border-width: 1px;
+    padding: 4px;
+}
+DIV.note {
     background-color: #e0e0e0;
     margin-left: 20;
     margin-right: 20;
@@ -63,29 +83,70 @@ TABLE TD {
 Version: 0.6-dev (draft)<br>
 Revision: $Id: $
 (<a href="http://svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
-Last modified: October 11<sup>th</sup>, 2006.</p>
+Last modified: October 14<sup>th</sup>, 2006.</p>
 <hr noshade>
 
 <h2><a name="Contents">Contents</a></h2>
 <ol>
 	<li><a href="#Introduction">Introduction</a><ol>
-		<li><a href="#A_brief_history_of_OLAP_standards">A brief history of OLAP 
+		<li><a href="#A_brief_history_of_OLAP_standards">A brief history of OLAP
 		standards</a></li>
 		<li><a href="#Overview_of_olap4j">Overview of olap4j</a></li>
+		<li><a href="#Relationship to other standards">Relationship to other
+		standards</a><ol>
 		<li><a href="#olap4j_and_XML/A">olap4j and XML/A</a></li>
-		<li><a href="#Benefits_of_a_standard_Java_API_for_OLAP">Benefits of a 
+		<li><a href="#olap4j_is_built_on_other_standards">olap4j is built on
+		other standards</a></li>
+	</ol>
+		</li>
+		<li><a href="#Benefits_of_a_standard_Java_API_for_OLAP">Benefits of a
 		standard Java API for OLAP</a></li>
 		<li><a href="#Architecture_of_olap4j">Architecture of olap4j</a></li>
 	</ol>
 	</li>
 	<li><a href="#Components_of_the_API">Components of the API</a><ol>
 		<li><a href="#Driver_management">Driver management</a></li>
-		<li><a href="#Connections">Connections</a></li>
-		<li><a href="#Statements">Statements</a></li>
+		<li><a href="#Connections">Connections</a><ol>
+		<li><a href="#OlapConnection">OlapConnection</a></li>
+		<li><a href="#Connection_pooling">Connection pooling</a></li>
+	</ol>
+		</li>
+		<li><a href="#Statements">Statements</a><ol>
+		<li><a href="#OlapStatement">OlapStatement</a></li>
+		<li><a href="#PreparedOlapStatement">PreparedOlapStatement</a></li>
+	</ol>
+		</li>
 		<li><a href="#MDX_query_model">MDX query model</a></li>
 		<li><a href="#MDX_type_model">MDX type model</a></li>
-		<li><a href="#Metadata">Metadata</a></li>
+		<li><a href="#Metadata">Metadata</a><ol>
 		<li><a href="#Access_control">Access control</a></li>
+		<li><a href="#Metadata_objects">Metadata objects</a><ol>
+		<li><a href="#Schema">Schema</a></li>
+		<li><a href="#Cube">Cube</a></li>
+		<li><a href="#Dimension">Dimension</a></li>
+		<li><a href="#Hierarchy">Hierarchy</a></li>
+		<li><a href="#Level">Level</a></li>
+		<li><a href="#Measure">Measure</a></li>
+		<li><a href="#Member">Member</a></li>
+		<li><a href="#Property">Property</a></li>
+	</ol></li>
+		<li><a href="#Methods_which_return_schema_rowsets">Methods which return
+		schema rowsets</a><ol>
+		<li><a href="#getDatasources">getDatasources</a></li>
+		<li><a href="#getDatabaseProperties">getDatabaseProperties</a></li>
+		<li><a href="#getLiterals">getLiterals</a></li>
+		<li><a href="#getCubes">getCubes</a></li>
+		<li><a href="#getDimensions">getDimensions</a></li>
+		<li><a href="#getFunctions">getFunctions</a></li>
+		<li><a href="#getHierarchies">getHierarchies</a></li>
+		<li><a href="#getLevels">getLevels</a></li>
+		<li><a href="#getMeasures">getMeasures</a></li>
+		<li><a href="#getMembers">getMembers</a></li>
+		<li><a href="#getProperties">getProperties</a></li>
+		<li><a href="#getSets">getSets</a></li>
+	</ol></li>
+		<li><a href="#Other_methods">Other methods</a></li>
+	</ol></li>
 		<li><a href="#Transform">Transform</a></li>
 		<li><a href="#Layout">Layout</a></li>
 	</ol>
@@ -102,11 +163,12 @@ Last modified: October 11<sup>th</sup>, 2006.</p>
 		<li><a href="#Other_data_sources">Other data sources</a></li>
 	</ol>
 	</li>
-	<li><a href="#Opportunities_for_specification">Appendix A. Opportunities for 
+	<li><a href="#Opportunities_for_specification">Appendix A. Opportunities for
 	specification</a></li>
 	<li><a href="#Feedback">Appendix B. Feedback</a></li>
 	<li><a href="#Open_issues">Appendix C. Open issues</a></li>
 	<li><a href="#Miscellaneous">Appendix D. Miscellaneous</a></li>
+	<li><a href="#References">Appendix E. References</a></li>
 </ol>
 <h2>1. <a name="Introduction">Introduction</a></h2>
 
@@ -182,14 +244,16 @@ convert an MDX string to and from a parse tree.</p>
 <p><b>Metadata </b>is at the heart of olap4j. You can browse the cubes,
 dimensions, hierarchies, members in an OLAP schema, and an MDX parse tree and
 query result are tied back to the same metadata objects. There is also a <b>type
-system </b>for describing scalar expressions.</p>
+system </b>for describing expressions.</p>
 
 <p>olap4j makes it possible to write an OLAP client without starting from scratch.
 In addition to the MDX parser, and operations on the MDX parse tree, there is a
 higher-level query model, which includes <b>operations to transform queries</b>
 (also called 'navigations'), and facilities to layout multidimensional results as HTML tables.</p>
 
-<h3>1.3. <a name="olap4j_and_XML/A">olap4j and XML/A</a></h3>
+<h3>1.3. <a name="Relationship to other standards">Relationship to other
+standards</a></h3>
+<h4>1.3.1. <a name="olap4j_and_XML/A">olap4j and XML/A</a></h4>
 
 <p>At this point, you may be saying: what about XML/A? XML/A was here first, is an
 open standard, and is supported by a number of servers. Is olap4j an attempt to
@@ -207,7 +271,37 @@ graphical layouts such as pivot tables.</p>
 <p>If a web-services based application needs these functions, it can use the
 XML/A provider to connect to the underlying data source, execute queries, and
 browse metadata, but can still use olap4j's features for MDX parsing, query
-models and layout. </p>
+models and layout.</p>
+<h4>1.3.2. <a name="olap4j_is_built_on_other_standards">olap4j is built on other
+standards</a></h4>
+<p>Where possible, olap4j leverages existing standards. This has several
+advantages. First, an end-user familiar with the existing standards can come up
+to speed with olap4j quickly. For instance, creating a connection and executing
+a statement should be straightforward to anyone familiar with JDBC connections,
+statements and result sets work.</p>
+<p>If an OLAP server implementor has already implemented a driver for one
+standard, then it should be less work to implement an olap4j driver. This
+clearly applies to the MDX language (borrowed from XML/A and OLE DB for OLAP).
+Implementation schema result sets should be straightforward if the server
+already supports XML/A schema rowsets.</p>
+<p>If olap4j is sufficiently similar to an existing standard, tools designed for
+use with that standard may be applicable to olap4j also. For instance, one goal
+of olap4j is that people will be able to use connection-pooling libraries such
+as <a href="http://jakarta.apache.org/commons/dbcp/">Jakarta Commons DBCP</a>,
+<a href="http://sourceforge.net/projects/c3p0">C3P0</a>. (This presents some
+challenges because olap4j extends some of the JDBC interfaces, but we hope to
+solve them.)</p>
+<p>Lastly, reusing an existing standard is less work for the authors of the new
+standard!</p>
+<p>Sometimes the standards conflict. ADOMD exposes its metadata through an
+object model, whereas JDBC and XML/A expose metadata relationally, via what
+XML/A calls rowsets and what we and JDBC call result sets. In this case, we
+chose to do both, because of the diversity of needs of olap4j clients. Metadata
+objects allow you to integrate query results with metadata using much fewer
+code: positions can reference members, and you can navigate from a member to its
+hierarchy, and so forth. Likewise, metadata objects can be used in building MDX
+parse trees. But if a client tool wants to maintain its own metadata cache,
+schema rowsets are more flexible and efficient.</p>
 
 <h3>1.4. <a name="Benefits_of_a_standard_Java_API_for_OLAP">Benefits of a standard Java API for OLAP</a></h3>
 
@@ -243,17 +337,17 @@ connection pooling, driver registration.</p>
 
 <p>Classes:</p>
 <ul>
-  <li><a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Driver.html">java.sql.Driver</a></li>
+  <li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Driver.html">java.sql.Driver</a></li>
   <li>
-	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DriverManager.html">java.sql.DriverManager</a></li>
+	<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DriverManager.html">java.sql.DriverManager</a></li>
   <li>
-	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DataSource.html">javax.sql.DataSource</a></li>
+	<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/javax/sql/DataSource.html">javax.sql.DataSource</a></li>
 </ul>
 
 <h4>2.1.1. <a name="Driver">Driver</a></h4>
 <p>Same functionality as JDBC.</p>
 <p>Here is an example of registering an olap4j driver:</p>
-<div style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px; padding-top: 1px; padding-bottom: 1px" class="code">
+<div class="code">
 	Class.forName(&quot;mondrian.olap4j.Driver&quot;);</div>
 <h4>2.1.2. <a name="DriverManager">DriverManager</a></h4>
 <p>Same functionality as JDBC.</p>
@@ -276,14 +370,14 @@ executes a statement:</p>
 	import org.olap4j.*;<br>
   <br>
   Class.forName(&quot;mondrian.olap4j.Driver&quot;);<br>
-  	Connection connection =<br>
+  	OlapConnection connection = (OlapConnection)<br>
 &nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot;
   +<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot;
   +<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Role='California manager'&quot;);<br>
-  	Statement statement = connection.createStatement();<br>
+  	OlapStatement statement = connection.createOlapStatement();<br>
   <br>
   OlapResult result =<br>
 &nbsp;&nbsp;&nbsp; statement.execute(<br>
@@ -297,7 +391,7 @@ executes a statement:</p>
 Services&#8482; (MSAS) via XML/A. Note that besides the driver class and connect
 string, the code is identical.</p>
 
-<div style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px; padding-top: 1px; padding-bottom: 1px" class="code">
+<div class="code">
 	import org.olap4j.*;<br><br>Class.forName(&quot;olap4j.impl.xmla.Driver&quot;);<br>OlapConnection connection = (OlapConnection)<br>&nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:olap4jxmla:Server=http://localhost/xmla/msxisapi.dll;&quot;
   +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=FoodMart&quot;);<br>OlapStatement statement = connection.createOlapStatement();<br>
 	<br>OlapResultSet result =<br>&nbsp;&nbsp;&nbsp; statement.execute(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;SELECT {[Measures].[Unit Sales]} ON
@@ -307,128 +401,111 @@ string, the code is identical.</p>
 <p>In the above examples, a statement was created from a string. As we shall
 see, a statement can also be created from an MDX parse tree.</p>
 
-<p>Package name: <code>org.olap4j</code></p>
+<p>Package name: <a class="javadoc" href="api/org/olap4j/overview-summary.html">org.olap4j</a></p>
 
-<h4>2.2.1. OlapConnection (extends 
-<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Connection.html">java.sql.Connection</a>)</h4>
-<p><a href="api/org/olap4j/OlapConnection.html">OlapConnection</a> is a 
+<h4>2.2.1.&nbsp;<a name="OlapConnection">OlapConnection</a><p>
+<a class="javadoc" href="api/org/olap4j/OlapConnection.html">OlapConnection</a>&nbsp; (extends
+<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Connection.html">
+java.sql.Connection</a>) is a
 connection to an OLAP data source.</p>
-<h4>2.2.2 Connection pooling</h4>
-<p>olap4j extends various JDBC interfaces:</p>
-<table border="1" id="table1">
-	<tr>
-		<th>olap4j class</th>
-		<th>extends JDBC class</th>
-		<th>created by</th>
-	</tr>
-	<tr>
-		<td><code>org.olap4j.OlapConnection</code></td>
-		<td><code>java.sql.Connection</code></td>
-		<td><code>Connection DriverManager.createConnection()<br>
-		Connection DataSource.getConnection()</code></td>
-	</tr>
-	<tr>
-		<td><code>org.olap4j.OlapStatement</code></td>
-		<td><code>java.sql.Statement</code></td>
-		<td><code>Statement Connection.createStatement()</code></td>
-	</tr>
-	<tr>
-		<td><code>org.olap4j.PreparedOlapStatement</code></td>
-		<td><code>java.sql.PreparedStatement</code></td>
-		<td><code>PreparedStatement Connection.prepareStatement()</code></td>
-	</tr>
-	<tr>
-		<td><code>org.olap4j.OlapResultSet</code></td>
-		<td><code>java.sql.ResultSet</code></td>
-		<td><code>ResultSet Statement.executeQuery(String)<br>
-		ResultSet PreparedStatement.executeQuery()</code></td>
-	</tr>
-</table>
-<p>One would expect that it would be safe to downcast the result of a factory 
+<h4>2.2.2. <a name="Connection_pooling">Connection pooling</a></h4>
+<p>Look again at the code samples in the previous section. One would expect that it would be safe to downcast the result of a factory
 method to the desired result. For example, if you invoke an <code>OlapConnection</code>'s
 <code>createStatement()</code> method, the result should be an <code>
 OlapStatement</code>.</p>
-<p>However, this will not be the case if you are using a connection-pooling 
-library, common examples of which include Jakarta Commons DBCP and C3P0. Every 
-connection-pooling library tracks connections by wrapping them in another class, 
+<p>But if you you are using a connection-pooling
+library (common examples of which include <a href="http://jakarta.apache.org/commons/dbcp/">Jakarta Commons DBCP</a> 
+and
+<a href="http://sourceforge.net/projects/c3p0">C3P0</a>), this is not so. Every
+connection-pooling library tracks connections by wrapping them in another class,
 and this class will implement <code>java.sql.Connection</code> but not <code>
-OlapConnection</code>. To access methods of the <code>OlapConnection</code>, the 
+OlapConnection</code>. To access methods of the <code>OlapConnection</code>, the
 client application must first strip away the wrapper object.</p>
-<p>The problem is not restricted to connections: some connection pools also wrap
-<code>Statement</code>, <code>PreparedStatement</code>, <code>ResultSet</code> 
-and <code>DatabaseMetaData</code> objects. But the good news is that you don't 
-need to access <code>OlapConnection</code>, <code>OlapStatement</code> or <code>
-PreparedOlapStatement</code> very often, because they do do not have many 
-methods </p>
-<p>&nbsp;</p>
+<p>If you are using a connection-pooling library, olap4j provides a helper class to access the object underneath a wrapped 
+connection, statement, prepared statement or result set. For instance,</p>
+
+<div class="code">DataSource dataSource; // a data source using a connection 
+	pool<br>
+  	Connection connection =<br>
+&nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot;
+  +<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot;
+  +<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Role='California manager'&quot;);<br>
+	OlapConnection olapConnection = Olap4j.convert(connection);<br>
+  	OlapStatement statement = olapConnection.createOlapStatement();</div>
+
+<p>The
+<a class="javadoc" href="api/org/olap4j/Olap4j.html#convert(java.sql.Connection)">
+Olap4j.convert(Connection)</a> method returns an <code>OlapConnection</code>. It 
+works with common connection pools, and the resulting object is instrumented so 
+that any statements or prepared statements created from that connection also 
+work with the connection pool. </p>
+<p>The problem does not just affect connections: some connection pools also wrap
+<code>Statement</code>, <code>PreparedStatement</code>, <code>ResultSet</code>
+and <code>DatabaseMetaData</code> objects, so there are <code>convert()</code> 
+methods for these too.</p>
+<p>Hopefully this problem will only be temporary. As olap4j gains popularity, we 
+expect connection pools to add support for the extended interfaces, and it will 
+be sufficient merely to cast the objects returned from factory methods.</p>
 <h3>2.3. <a name="Statements">Statements</a></h3>
 
-<h4>2.3.1. OlapStatement</h4>
-<p><a href="api/org/olap4j/OlapStatement.html">OlapStatement</a>&nbsp; (extends
-<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Statement.html">java.sql.Statement</a>) 
-is an object used to execute a static MDX statement and return the result it 
+<h4>2.3.1. <a name="OlapStatement">OlapStatement</a></h4>
+<p><a class="javadoc" href="api/org/olap4j/OlapStatement.html">OlapStatement</a>&nbsp; (extends
+<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Statement.html">java.sql.Statement</a>)
+is an object used to execute a static MDX statement and return the result it
 produces.</p>
-<h4>2.3.2. PreparedOlapStatement</h4>
-<p><a href="api/org/olap4j/PreparedOlapStatement.html">PreparedOlapStatement</a> 
+<h4>2.3.2. <a name="PreparedOlapStatement">PreparedOlapStatement</a></h4>
+<p><a class="javadoc" href="api/org/olap4j/PreparedOlapStatement.html">PreparedOlapStatement</a>
 (extends
-<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/PreparedStatement.html">
+<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/PreparedStatement.html">
 java.sql.PreparedStatement</a>) represents a precompiled MDX statement.</p>
-<p>An MDX statement is precompiled and stored in a <code>PreparedOlapStatement</code> 
-object. This object can then be used to efficiently execute this statement 
+<p>An MDX statement is precompiled and stored in a <code>PreparedOlapStatement</code>
+object. This object can then be used to efficiently execute this statement
 multiple times.</p>
 <p>The method
-<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/PreparedStatement.html#getParameterMetaData()">
-PreparedStatement.getParameterMetaData()</a> returns a description of the 
+<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/PreparedStatement.html#getParameterMetaData()">
+PreparedStatement.getParameterMetaData()</a> returns a description of the
 parameters, as in JDBC. The result is an OlapParameterMetaData.</p>
-<p>To set values of parameters, use the <code>set<i>Type</i>(int, <i>type</i>)</code> 
-methods. If a parameter is a member, use the <code>setObject(int, Object)</code> 
-method; throws an exception if the object is not a member, or is a member of the 
+<p>To set values of parameters, use the <code>set<i>Type</i>(int, <i>type</i>)</code>
+methods. If a parameter is a member, use the <code>setObject(int, Object)</code>
+method; throws an exception if the object is not a member, or is a member of the
 wrong hierarchy.</p>
-<p>Unlike JDBC, it is not necessary to assign a value to every parameter. This 
-is because OLAP parameters have a default value. Parameters have their default 
-value until they are set, and then retain their new values for each subsequent 
+<p>Unlike JDBC, it is not necessary to assign a value to every parameter. This
+is because OLAP parameters have a default value. Parameters have their default
+value until they are set, and then retain their new values for each subsequent
 execution of this <code>PreparedOlapStatement</code>.</p>
-<h4>2.3.3. OlapParameterMetaData</h4>
-<p><a href="api/org/olap4j/OlapParameterMetaData.html">OlapParameterMetaData</a> 
+<p>[How to find out what cube a prepared statement relates to?]</p>
+<h4>2.3.3. <a name="OlapParameterMetaData">OlapParameterMetaData</a></h4>
+<p><a class="javadoc" href="api/org/olap4j/OlapParameterMetaData.html">OlapParameterMetaData</a>
 (extends
-<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ParameterMetaData.html">
+<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ParameterMetaData.html">
 java.sql.ParameterMetaData</a>) describes parameters of a <code>
 PreparedOlapStatement</code>.</p>
-<h4>2.3.4. OlapResultSet</h4>
-<p><a href="api/org/olap4j/OlapResultSet.html">OlapResultSet</a> (extends
-<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html">
-java.sql.ResultSet</a>) is the result of executing a <code>OlapStatement</code> 
-or <code>PreparedOlapStatement</code>.</p>
-<p>It extends ResultSet, but since most of these methods are concerned with rows 
-and columns, few of ResultSet's methods are applicable. The following methods 
+<h4>2.3.4. <a name="OlapResultSet">OlapResultSet</a></h4>
+<p><a class="javadoc" href="api/org/olap4j/OlapResultSet.html">OlapResultSet</a> (extends
+<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html">
+java.sql.ResultSet</a>) is the result of executing an <a class="javadoc" href="api/org/olap4j/OlapStatement.html">OlapStatement</a>
+or <a class="javadoc" href="api/org/olap4j/PreparedOlapStatement.html">PreparedOlapStatement</a>.</p>
+<p>It extends ResultSet, but since most of these methods are concerned with rows
+and columns, few of ResultSet's methods are applicable. The following methods
 are applicable:</p>
 <ul>
-	<li><code><b>
-	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#clearWarnings%28%29">
-	clearWarnings</a></b>()</code> </li>
-	<li><code><b>
-	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#close%28%29">
-	close</a></b>()</code> </li>
-	<li><code><b>
-	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getConcurrency%28%29">
-	getConcurrency</a></b>()</code> </li>
-	<li><code><b>
-	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getStatement%28%29">
-	getStatement</a></b>()</code> </li>
-	<li><code><b>
-	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getType%28%29">
-	getType</a></b>()</code> </li>
-	<li><code><b>
-	<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getWarnings%28%29">
-	getWarnings</a></b>()</code> </li>
+	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#clearWarnings%28%29">clearWarnings()</a></li>
+	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#close%28%29">close()</a></li>
+	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getConcurrency%28%29">	getConcurrency()</a></li>
+	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getStatement%28%29">getStatement()</a></li>
+	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getType%28%29">getType()</a></li>
+	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getWarnings%28%29">getWarnings()</a></li>
 </ul>
 <p>Additional methods to retrieve the axes of the multidimensional result.</p>
-<h4>2.3.5. ResultAxis</h4>
+<h4>2.3.5. <a name="ResultAxis">ResultAxis</a></h4>
 <p>[tbd]</p>
 <p>[access positions by index (i.e. a list) and by scrolling (i.e. an iterator)]</p>
-<h4>2.3.6. Position</h4>
+<h4>2.3.6. <a name="Position">Position</a></h4>
 <p>[tbd]</p>
-<h4>2.3.7. ResultCell</h4>
+<h4>2.3.7. <a name="ResultCell">ResultCell</a></h4>
 <p>[tbd]</p>
 
 <h3>2.4. <a name="MDX_query_model">MDX query model</a></h3>
@@ -508,6 +585,8 @@ specific instance is chosen based upon the types of its arguments.</p>
 
 <h3>2.5. <a name="MDX_type_model">MDX type model</a></h3>
 
+<p>Package name: <code>org.olap4j.mdx.type</code></p>
+
 <p>Represents the types of nodes in an MDX query model.</p>
 
 <p>Here are some examples:</p>
@@ -531,7 +610,7 @@ specific instance is chosen based upon the types of its arguments.</p>
 	</tr>
 	<tr>
 		<td><code>[Store].[USA].[CA]</code></td>
-		<td>Member&lt;dimension=[Store], hierarchy=[Store], level=[Store].[State], 
+		<td>Member&lt;dimension=[Store], hierarchy=[Store], level=[Store].[State],
       member=[Store].[USA].[CA]&gt;</td>
 	</tr>
 	<tr>
@@ -540,61 +619,2193 @@ specific instance is chosen based upon the types of its arguments.</p>
 	</tr>
 </table>
 
-<p>Since MDX is a late-binding language, some expressions will have unknown 
+<p>Since MDX is a late-binding language, some expressions will have unknown
 types, or only partial type information. For example, the expression</p>
 
 <div class="code">
 
   	[Store].Levels(&quot;Sta&quot; + &quot;te&quot;)</div>
 
-<p>will have type <code>Level&lt;dimension=[Store], level=unknown&gt;</code>. The 
-validator knows that the <code>&lt;hierarchy&gt;.Levels(&lt;string expr&gt;)</code> function 
-returns a level, but exactly which level is not known until the expression is 
+<p>will have type <code>Level&lt;dimension=[Store], level=unknown&gt;</code>. The
+validator knows that the <code>&lt;hierarchy&gt;.Levels(&lt;string expr&gt;)</code> function
+returns a level, but exactly which level is not known until the expression is
 evaluated at runtime.</p>
-
-<p>Package name: <code>org.olap4j.mdx.type</code></p>
-
-<p>Classes:</p>
+<p><a class="javadoc" href="api/org/olap4j/type/Type.html">Type</a> is the base class for all types.</p>
+<p>Scalar types:</p>
 <ul>
-  <li>BooleanType</li>
-  <li>CubeType</li>
-  <li>DecimalType</li>
-  <li>DimensionType</li>
-  <li>HierarchyType</li>
-  <li>LevelType</li>
-  <li>MemberType</li>
-  <li>NumericType</li>
-  <li>ScalarType</li>
-  <li>SetType</li>
-  <li>StringType</li>
-  <li>SymbolType</li>
-  <li>TupleType</li>
-  <li>Type</li>
-  <li>TypeUtil</li>
+	<li><a class="javadoc" href="api/org/olap4j/type/ScalarType.html">ScalarType</a> represents the type of an expression which has a
+	simple value such as a number or a string.</li>
+	<li><a class="javadoc" href="api/org/olap4j/type/BooleanType.html">
+	BooleanType</a> (extends <a class="javadoc" href="api/org/olap4j/type/ScalarType.html">ScalarType</a>) represents an expression which can have values
+	TRUE and FALSE.</li>
+	<li><a class="javadoc" href="api/org/olap4j/type/NumericType.html">
+	NumericType</a> represents the type of a numeric expression.</li>
+	<li><a class="javadoc" href="api/org/olap4j/type/DecimalType.html">
+	DecimalType</a> (extends <code>NumericType</code>) represents a fixed-point numeric expression. It
+	is a subclass of <code>NumericType</code>, and has precision and scale. An
+	integer expression would have scale 0.</li>
+	<li><a class="javadoc" href="api/org/olap4j/type/StringType.html">StringType</a> (extends <a class="javadoc" href="api/org/olap4j/type/ScalarType.html">ScalarType</a>) represents the type of an expression which has a string
+	value.</li>
+	<li><a class="javadoc" href="api/org/olap4j/type/SymbolType.html">SymbolType</a> (extends ScalarType) represents the type of a
+	symbol, or flag, argument to a builtin function. For example, the <code>ASC</code>
+	keyword in the expression <code>Order(Gender.MEMBERS, Measures.[Unit Sales],
+	ASC)</code> is a symbol. Symbol types are rarely used except if you are
+	manipulating a parse tree.</li>
 </ul>
-
+<p>Metadata types:</p>
+<ul>
+	<li><a class="javadoc" href="api/org/olap4j/type/CubeType.html">CubeType</a> represents the type of an expression whose value
+	is a cube.</li>
+	<li><a class="javadoc" href="api/org/olap4j/type/DimensionType.html">
+	DimensionType</a> represents the type of an expression whose
+	value is a dimension.</li>
+	<li><a class="javadoc" href="api/org/olap4j/type/HierarchyType.html">
+	HierarchyType</a> represents the type of an expression whose
+	value is a hierarchy.</li>
+	<li><a class="javadoc" href="api/org/olap4j/type/LevelType.html">LevelType</a> represents the type of an expression whose value
+	is a level.</li>
+	<li><a class="javadoc" href="api/org/olap4j/type/MemberType.html">MemberType</a> represents the type of an expression whose value
+	is a member.</li>
+</ul>
+<p>A metadata type may be constrained to a particular part of the schema. For
+example, <code>LevelType(hierarchy=[Time])</code> indicates that the expression
+must evaluate to one of the levels of the <code>[Time]</code> hierarchy, that
+is, one of the values <code>[Time].[Year]</code>, <code>[Time].[Quarter]</code>,
+or <code>[Time].[Month]</code>.</p>
+<p>Composite types</p>
+<ul>
+	<li><a class="javadoc" href="api/org/olap4j/type/SetType.html">SetType</a> represents the type of an expression which is a
+	set. It has a component type, for example, the type of the expression <code>
+	{[Store].[USA].Children}</code> is <code>Set(Member(level=[Store].[Store
+	State])</code>.</li>
+	<li><a class="javadoc" href="api/org/olap4j/type/TupleType.html">TupleType</a> represents the type of an expression which
+	consists of an n-tuple of members. It has a set of component types, each of
+	which is a member type. For example, the type of the expression <code>
+	CrossJoin({[Gender].[F], [Gender].[M]}, [Store].Members)</code> is <code>
+	Set(Tuple(Member(level=[Gender].[Gender]), Member(hierarchy=[Store]))</code>.</li>
+</ul>
 <h3>2.6. <a name="Metadata">Metadata</a></h3>
-
-<p>Package name: <code>org.olap4j.metamodel</code></p>
-
-<p>The components of the OLAP model are available as read-only Java classes, and 
-also via schema rowsets.</p>
-
+<p>Package name:
+<a class="javadoc" href="api/org/olap4j/metamodel/overview-summary.html">
+org.olap4j.metamodel</a></p>
+<p>Metadata are the objects which describe the structure of an OLAP schema:
+cubes, dimensions, members, properties and so forth.</p>
+<p>olap4j exposes metadata in two very different ways:</p>
+<ul>
+	<li>A <dfn>metadata object</dfn> is a Java object which represents a particular
+metadata class. For example, <a class="javadoc" href="api/org/olap4j/metadata/Cube.html">
+org.olap4j.metadata.Cube</a>.</li>
+	<li>A <dfn>schema result set</dfn> is a JDBC ResultSet which returns a record
+	for each instance of a particular metadata class. There is a method in
+	OlapDatabaseMetaData to create a schema rowset for each metadata class. Some
+	of these methods accept parameters to filter the rows returned. For example,
+	<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getCubes(java.lang.String, java.lang.String, java.lang.String)">
+	OlapDatabaseMetaData.getCubes(&lt;schemaName&gt;, &lt;cubeName&gt;)</a>.</li>
+</ul>
 <h4>2.6.1. <a name="Access_control">Access control</a></h4>
 
-<p>A user's view of metadata may be subject to access control. For example, a 
-user may not have read access to certain hierarchies within a cube, or to 
-certain members within a hierarchy. The API methods must behave consistently 
+<p>A user's view of metadata may be subject to access control. For example, a
+user may not have read access to certain hierarchies within a cube, or to
+certain members within a hierarchy. The API methods must behave consistently
 with access control.</p>
 <blockquote>
-	<p><i>Example</i>: If Fred does not have access to the <code>[Nation]</code> 
+	<p><i>Example</i>: If Fred does not have access to the <code>[Nation]</code>
 	level of the <code>[Store]</code> hierarchy, then the <code>
 	Member.getParentMember()</code> method will return null if applied to <code>
-	[Store].[USA].[CA]</code>, because the 'real' parent member <code>[Store].[USA]</code> 
+	[Store].[USA].[CA]</code>, because the 'real' parent member <code>[Store].[USA]</code>
 	is invisible to him.</p>
 </blockquote>
 
-<p>2.6.2. Schema rowsets</p>
+<h4>2.6.2. <a name="Metadata_objects">Metadata objects</a></h4>
+<p>[Diagram of object model, showing relationships between Schema, Cube,
+Dimension, etc.]</p>
+<h5>2.6.2.1. <a name="MetadataElement">MetadataElement</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
+MetadataElement</a> is the base class for Cube, Dimension, Hierarchy, Level, Member, Property; provides
+name and unique-name properties (not localized), and localized caption and
+description.</p>
+<ul>
+	<li>String getName()</li>
+	<li>String getUniqueName()</li>
+	<li>String getCaption(Locale locale)</li>
+	<li>String getDescription(Locale locale)</li>
+</ul>
+<h5>2.6.2.2. <a name="Schema">Schema</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Schema.html">Schema</a> ...</p>
+<ul>
+	<li>String getName()</li>
+</ul>
+<h5>2.6.2.3. <a name="Cube">Cube</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Cube.html">Cube</a> ...</p>
+<ul>
+	<li>List&lt;Dimension&gt; getDimensions()</li>
+	<li>Schema getSchema()</li>
+	<li>String getName()</li>
+</ul>
+<h5>2.6.2.4. <a name="Dimension">Dimension</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Dimension.html">Dimension</a>
+...</p>
+<ul>
+	<li>String getName()</li>
+	<li>List&lt;Hierarchy&gt; getHierarchies()</li>
+	<li>List&lt;Member&gt; getRootMembers()</li>
+	<li>Dimension.Type getDimensionType()</li>
+</ul>
+<h5>2.6.2.5. <a name="Hierarchy">Hierarchy</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Hierarchy.html">Hierarchy</a>
+...</p>
+<ul>
+	<li>Dimension getDimension()</li>
+	<li>String getName()</li>
+	<li>List&lt;Level&gt; getLevels()</li>
+	<li>boolean hasAll()</li>
+</ul>
+<h5>2.6.2.6. <a name="Level">Level</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Level.html">Level</a> ...</p>
+<ul>
+	<li>int getDepth()</li>
+	<li>Hierarchy getHierarchy()</li>
+	<li>Level.Type getLevelType()</li>
+	<li>List&lt;Property&gt; getProperties()</li>
+</ul>
+<h5>2.6.2.6. <a name="Measure">Measure</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Measure.html">Meaure</a> ...</p>
+<ul>
+	<li>extends Member</li>
+</ul>
+<h5>2.6.2.7. <a name="Member">Member</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Member.html">Member</a> ...</p>
+<ul>
+	<li>String getName()</li>
+	<li>List&lt;Member&gt; getChildMembers()</li>
+	<li>Member getParentMember()</li>
+	<li>Level getLevel()</li>
+	<li>Hierarchy getHierarchy()</li>
+	<li>boolean isChildOrEqualTo(Member member)</li>
+	<li>boolean isCalculated()</li>
+	<li>boolean isCalculatedInQuery()</li>
+	<li>int solveOrder()</li>
+	<li>List&lt;Member&gt; getAncestorMembers()</li>
+	<li>Object getPropertyValue(String propertyName)</li>
+	<li>String getPropertyFormattedValue(String propertyName)</li>
+	<li>void setProperty(String name, Object value)</li>
+	<li>List&lt;Property&gt; getProperties()</li>
+	<li>int getOrdinal()</li>
+	<li>boolean isHidden()</li>
+	<li>Member getDataMember()</li>
+</ul>
+<h5>2.6.2.8. <a name="Property">Property</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Property.html">Property</a>
+...</p>
+<ul>
+	<li>Datatype getType()</li>
+	<li>Scope getScope()</li>
+	<li>String getCaption()</li>
+	<li>boolean isInternal()</li>
+	<li>enum Scope { MEMBER, CELL }</li>
+	<li>enum Datatype { STRING, OTHER, NUMERIC, BOOLEAN }</li>
+	<li>enum StandardMemberProperty { CATALOG_NAME, SCHEMA_NAME, CUBE_NAME, ...
+	}</li>
+	<li>enum StandardCellProperty { BACK_COLOR, CELL_EVALUATION_LIST, ... }</li>
+</ul>
+<h4>2.6.3. <a name="Methods_which_return_schema_rowsets">Methods which return schema rowsets</a></h4>
+<p>Schema rowsets are specified as in [<a href="#XMLA">XML for Analysis
+specification</a>]. Here is a table of the XML/A methods and the corresponding
+olap4j method.</p>
+
+<table>
+	<tr>
+		<th>XML for Analysis schema rowset</th>
+		<th>OlapDatabaseMetaData method</th>
+	</tr>
+	<tr>
+		<td>DISCOVER_DATASOURCES</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getDatasources(java.lang.String)">
+		getDatasources</a></td>
+	</tr>
+	<tr>
+		<td>DISCOVER_ENUMERATORS</td>
+		<td>not supported</td>
+	</tr>
+	<tr>
+		<td>DISCOVER_KEYWORDS</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getMdxKeywords()">
+		getMdxKeywords</a></td>
+	</tr>
+	<tr>
+		<td>DISCOVER_LITERALS</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getLiterals()">
+		getLiterals</a></td>
+	</tr>
+	<tr>
+		<td>DISCOVER_PROPERTIES</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getDatabaseProperties(java.lang.String)">
+		getDatabaseProperties</a></td>
+	</tr>
+	<tr>
+		<td>DISCOVER_SCHEMA_ROWSETS</td>
+		<td>not supported</td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_ACTIONS</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getActions()">
+		getActions</a></td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_CUBES</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getCubes(java.lang.String, java.lang.String, java.lang.String)">
+		getCubes</a></td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_DIMENSIONS</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getDimensions()">
+		getDimensions</a></td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_FUNCTIONS</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getFunctions()">
+		getFunctions</a></td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_HIERARCHIES</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getHierarchies()">
+		getHierarchies</a></td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_INPUT_DATASOURCES</td>
+		<td>not supported</td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_KPIS</td>
+		<td>not supported</td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_LEVELS</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getLevels()">
+		getLevels</a></td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_MEASURES</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getMeasures()">
+		getMeasures</a></td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_MEMBERS</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getMembers()">
+		getMembers</a></td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_PROPERTIES</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getProperties()">
+		getProperties</a></td>
+	</tr>
+	<tr>
+		<td>MDSCHEMA_SETS</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getSets()">
+		getSets</a></td>
+	</tr>
+</table>
+<p class="Text">The rows returned in the result set returned from the metadata
+methods are structured according to the result set column layouts detailed in this
+section.</p>
+<p class="Text">All columns noted in the following result sets are required, and
+they must be returned in the order shown. However, additional columns (which
+should be ignored by clients not expecting thxem) can be added at the end, and
+some columns can contain null data for info
+xxx<si<sicrmation that does not apply.</p>
+<p class="Text">The following sections describe the columns in each rowset. Each
+section includes a table that provides the following information for each
+column.</p>
+
+<table>
+	<tr>
+		<th nowrap>Column heading</th>
+		<th>Contents</th>
+	</tr>
+	<tr>
+		<td>Column name</td>
+		<td>The name of the column in the output rowset.</td>
+	</tr>
+	<tr>
+		<td>Type</td>
+		<td>A description of the data type for the column.</td>
+	</tr>
+	<tr>
+		<td>Description</td>
+		<td>A brief description of the purpose of the column.</td>
+	</tr>
+	<tr>
+
+		<td>Restriction</td>
+
+		<td>Indicates whether the column can be used to restrict the
+		returned rowset by inclusion in the <i>Restrictions</i>
+		parameter of the <b>Discover</b> method.
+		<i>Yes</i> means that the column is available to
+		use as a <i>Restrictions</i> item to filter results
+		by this field.</td>
+	</tr>
+	<tr>
+
+		<td>Nullable</td>
+
+		<td>Indicates whether the data must be returned or if a null
+		string is allowed if the column does not apply. <i>Yes</i>
+		means nulls are allowed, and the data is optional. <i>
+		No</i> means that the data is required.</td>
+	</tr>
+</table>
+<p>[Need to clean up data types in the following tables. Types should all be
+JDBC types.]</p>
+<p>[Need to clean up column names in the following tables. Columns should be
+UPPER_CASE, not CamelCase.]</p>
+<p>[It would be useful to define enum types for the various attributes, such as
+the ProviderType and AuthenticationMode attributes of getDatasources, and the
+DIMENSION_TYPE attribute of getDimensions. In some cases those enums already
+exist, but need to be extended.]</p>
+
+<h5>2.6.3.1. <a name="getDatasources">getDatasources</a></h5>
+<p>Specified by the <code>DISCOVER_DATASOURCES</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns.</p>
+
+<table>
+	<tr>
+		<th>Column name</th>
+		<th>Type</th>
+		<th>Description</th>
+		<th>Nullable</th>
+	</tr>
+	<tr>
+		<th>DataSourceName</th>
+		<td>string</td>
+		<td>The name of the data source, such as <b>
+		FoodMart 2000</b>.</td>
+		<td>No</td>
+	</tr>
+	<tr>
+
+		<th>DataSourceDescription</th>
+
+		<td>string</td>
+
+		<td>A description of the data source, as entered by the
+		publisher.</td>
+
+		<td>Yes</td>
+	</tr>
+	<tr>
+
+		<th>URL</th>
+
+		<td>string</td>
+
+		<td>The unique path that shows where to invoke the XML for
+		Analysis methods for that data source.</td>
+
+		<td>Yes</td>
+	</tr>
+	<tr>
+
+		<th>DataSourceInfo</th>
+		<td>string</td>
+		<td>
+            <p>A string containing any additional information required
+		to connect to the data source. This can include the Initial Catalog
+		property or other information for the provider.</p>
+            <p>Example: <code>&quot;Provider=MSOLAP;Data Source=Local;&quot;</code></p>
+        </td>
+		<td>Yes</td>
+	</tr>
+	<tr>
+		<th>ProviderName</th>
+		<td>string</td>
+		<td>
+            <p>The name of the provider behind the data source. </p>
+        <p>Example: <code>&quot;MSDASQL&quot;</code></p>
+        </td>
+		<td>Yes</td>
+	</tr>
+	<tr>
+
+		<th>ProviderType</th>
+
+		<td>array</td>
+
+		<td>
+            <p>The types of data supported by the
+		provider. May include one or more of the following types. Example
+		follows this table.</p>
+            <ul>
+                <li><b>TDP</b>: tabular data provider.</li>
+                <li><b>MDP</b>: multidimensional data provider.</li>
+                <li><b>DMP</b>: data mining provider. A DMP provider
+                    implements the OLE DB for Data Mining specification.</li>
+            </ul>
+        </td>
+		<td>No</td>
+	</tr>
+	<tr>
+
+		<th>AuthenticationMode</th>
+
+		<td>EnumString</td>
+
+		<td>
+            Specification of what type of
+		security mode the data source uses. Values can be one of the following:
+        <ul>
+        <li><b>Unauthenticated</b>: no user ID or password needs to be sent.</li>
+        <li><b>Authenticated</b>: User ID and
+		Password must be included in the information required for the
+		connection.</li>
+        <li><b>Integrated</b>: the data source uses the
+		underlying security to determine authorization, such as Integrated
+		Security provided by Microsoft Internet Information Services (IIS).</li>
+        </ul>
+        </td>
+
+        <td>No</td>
+	</tr>
+</table>
+
+<h5>2.6.3.2. <a name="getDatabaseProperties">getDatabaseProperties</a></h5>
+
+<p>Returns
+information about the standard and provider-specific properties supported by an
+olap4j provider. Properties that are not supported by a provider are
+not listed in the return result set.</p>
+<p>Specified by the <code>DISCOVER_PROPERTIES</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns.</p>
+
+<table>
+	<tr>
+		<th>Column name</th>
+		<th>Type</th>
+		<th>Description</th>
+		<th>Nullable</th>
+	</tr>
+	<tr>
+		<td>PROPERTY_NAME</td>
+		<td>string</td>
+		<td>The name of the property. </td>
+		<td>No</td>
+	</tr>
+	<tr>
+		<td>PROPERTY_DESCRIPTION</td>
+
+		<td>string</td>
+
+		<td>A localizable text description of the property.</td>
+
+		<td>Yes</td>
+	</tr>
+	<tr>
+
+		<td>PROPERTY_TYPE</td>
+
+		<td>string</td>
+
+		<td>The XML data type of the property.</td>
+
+		<td>Yes</td>
+	</tr>
+	<tr>
+
+		<td>PROPERTY_ACCESS_TYPE</td>
+
+		<td>EnumString</td>
+
+		<td>Access for the property. The value can be Read, Write,
+		or ReadWrite.</td>
+
+		<td>No</td>
+	</tr>
+	<tr>
+
+		<td>IS_REQUIRED</td>
+
+		<td>boolean</td>
+
+		<td>True if a property is required,
+		false if it is not required.</td>
+
+		<td>Yes</td>
+	</tr>
+	<tr>
+
+		<td>VALUE</td>
+
+		<td>string</td>
+
+		<td>The current value of the property.</td>
+
+		<td>Yes</td>
+	</tr>
+</table>
+
+<p>[Is VALUE a JDBC reserved word? If so, change it.]</p>
+
+<h5>2.6.3.3 <a name="getLiterals">getLiterals</a></h5>
+<p>Retrieves a list of information on supported literals, including data types
+and values.</p>
+<p>Specified by the <code>DISCOVER_LITERALS</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns.</p>
+
+<table>
+	<tr>
+		<th>Column name</th>
+		<th>Type</th>
+		<th>Description</th>
+		<th>Restriction</th>
+		<th>Nullable</th>
+	</tr>
+	<tr>
+		<td>LiteralName</td>
+		<td>string</td>
+		<td><p>The name of the literal described in the row.</p>
+		<p>Example: DBLITERAL_LIKE_PERCENT</p></td>
+		<td>Yes, as an array</td>
+		<td>No</td>
+	</tr>
+	<tr>
+		<td>LiteralValue</td>
+		<td>string</td>
+        <td>
+        <p>Contains the actual literal value. </p>
+        <p>Example, if <b>LiteralName</b> is
+            DBLITERAL_LIKE_PERCENT and the percent character (%) is used to match
+            zero or more characters in a LIKE clause, this column’s value would be
+            &quot;%&quot;.</p>
+    </td>
+
+		<td>No</td>
+
+		<td>Yes</td>
+	</tr>
+	<tr>
+
+		<td>LiteralInvalidChars</td>
+
+		<td>string</td>
+
+		<td><p>The characters, in the literal, that are not valid. </p>
+		<p>For example, if table names can contain anything other
+		than a numeric character, this string would be &quot;0123456789&quot;.</p></td>
+
+		<td>No</td>
+
+		<td>Yes</td>
+	</tr>
+	<tr>
+
+		<td>LiteralInvalidStartingChars</td>
+
+		<td>string</td>
+
+		<td>The characters that are not valid as the first character
+		of the literal. If the literal can start with any valid character, this
+		is null.</td>
+
+		<td>No</td>
+
+		<td>Yes</td>
+	</tr>
+	<tr>
+
+		<td>LiteralMaxLength</td>
+
+		<td>integer</td>
+
+		<td>The maximum number of characters in the literal. If
+		there is no maximum or the maximum is unknown, the value is –1.</td>
+
+		<td>No</td>
+
+		<td>Yes</td>
+	</tr>
+</table>
+
+<h5>2.6.3.4. <a name="getCubes">getCubes</a></h5>
+
+		<p>Describes the structure of cubes within a database.</p>
+<p>Specified by the <code>MDSCHEMA_CUBES</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns.</p>
+
+<table>
+<tr>
+    <th>Column name</th>
+    <th>Type indicator</th>
+    <th>Description</th>
+</tr>
+<tr>
+    <td>CATALOG_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the database.</td>
+</tr>
+<tr>
+    <td>SCHEMA_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>Not supported.</td>
+</tr>
+<tr>
+    <td>CUBE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the cube or dimension. Dimension
+        names are prefaced by a dollar sign ($) symbol.</td>
+</tr>
+<tr>
+    <td>CUBE_TYPE</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The type of the cube. Valid values are:<ul>
+        <li><b>CUBE</b> </li>
+        <li><b>DIMENSION</b></li>
+    </ul>
+    </td>
+</tr>
+<tr>
+    <td>CUBE_GUID</td>
+    <td>DBTYPE_GUID</td>
+    <td>Not supported.</td>
+</tr>
+<tr>
+    <td>CREATED_ON</td>
+    <td>DBTYPE_DBTIMESTAMP</td>
+    <td>Not supported.</td>
+</tr>
+<tr>
+    <td>LAST_SCHEMA_UPDATE</td>
+    <td>DBTYPE_DBTIMESTAMP</td>
+    <td>The time that the cube was last processed.</td>
+</tr>
+<tr>
+    <td>SCHEMA_UPDATED_BY</td>
+    <td>DBTYPE_WSTR</td>
+    <td>Not supported.</td>
+</tr>
+<tr>
+    <td>LAST_DATA_UPDATE</td>
+    <td>DBTYPE_DBTIMESTAMP</td>
+    <td>The time that the cube was last processed.</td>
+</tr>
+<tr>
+    <td>DATA_UPDATED_BY</td>
+    <td>DBTYPE_WSTR</td>
+    <td>Not supported.</td>
+</tr>
+<tr>
+    <td>DESCRIPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>A user-friendly description of the cube.</td>
+</tr>
+<tr>
+    <td>IS_DRILLTHROUGH_ENABLED</td>
+    <td>DBTYPE_BOOL</td>
+    <td>A Boolean that always returns true.</td>
+</tr>
+<tr>
+    <td>IS_LINKABLE</td>
+    <td>DBTYPE_BOOL</td>
+    <td>A Boolean that indicates whether a cube can be
+        used in a linked cube.</td>
+</tr>
+<tr>
+    <td>IS_WRITE_ENABLED</td>
+    <td>DBTYPE_BOOL</td>
+    <td>A Boolean that indicates whether a cube is
+        write-enabled.</td>
+</tr>
+<tr>
+    <td>IS_SQL_ENABLED</td>
+    <td>DBTYPE_BOOL</td>
+    <td>A Boolean that indicates whether SQL can be used
+        on the cube.</td>
+</tr>
+<tr>
+    <td>CUBE_CAPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The caption of the cube.</td>
+</tr>
+<tr>
+    <td>BASE_CUBE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the source cube if this cube is a
+        perspective cube.</td>
+</tr>
+<tr>
+    <td>ANNOTATIONS</td>
+    <td>DBTYPE_WSTR</td>
+    <td>(Optional) A set of notes, in XML format.</td>
+</tr>
+</table>
+
+<p>The rowset is sorted on <b>CATALOG_NAME</b>, <b>
+    SCHEMA_NAME</b>, <b>CUBE_NAME</b>.</p>
+
+<h5>2.6.3.5. <a name="getDimensions">getDimensions</a></h5>
+
+<p>Retrieves a result set describing the shared and private dimensions within a database.</p>
+<p>Specified by the <code>MDSCHEMA_DIMENSIONS</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns.</p>
+
+<table>
+<tr>
+    <th>Column name</th>
+    <th>Type indicator</th>
+    <th>Description</th>
+</tr>
+<tr>
+    <td>CATALOG_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the database.</td>
+</tr>
+<tr>
+    <td>SCHEMA_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>Not supported.</td>
+</tr>
+<tr>
+    <td>CUBE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the cube.</td>
+</tr>
+<tr>
+    <td>DIMENSION_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the dimension. If a dimension is
+        part of more than one cube or measure group, then
+        there is one row for each unique combination of
+        dimension, measure group, and cube.</td>
+</tr>
+<tr>
+    <td>DIMENSION_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The unique name of the dimension.</td>
+</tr>
+<tr>
+    <td>DIMENSION_GUID</td>
+    <td>DBTYPE_GUID</td>
+    <td>Not supported.</td>
+</tr>
+<tr>
+    <td>DIMENSION_CAPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The caption of the dimension. This should be
+        used when displaying the name of the dimension to
+        the user, such as in the user interface or reports.</td>
+</tr>
+<tr>
+    <td>DIMENSION_ORDINAL</td>
+    <td>DBTYPE_UI4</td>
+    <td>The position of the dimension within the cube.</td>
+</tr>
+<tr>
+    <td>DIMENSION_TYPE</td>
+    <td>DBTYPE_I2</td>
+    <td>The type of the dimension. Valid values include:<ul>
+        <li><b>MD_DIMTYPE_UNKNOWN</b> (<b>0</b>)</li>
+        <li><b>MD_DIMTYPE_TIME</b> (<b>1</b>)</li>
+        <li><b>MD_DIMTYPE_MEASURE</b> (<b>2</b>)</li>
+        <li><b>MD_DIMTYPE_OTHER</b> (<b>3</b>)</li>
+        <li><b>MD_DIMTYPE_QUANTITATIVE</b> (<b>5</b>)</li>
+        <li><b>MD_DIMTYPE_ACCOUNTS</b> (<b>6</b>)</li>
+        <li><b>MD_DIMTYPE_CUSTOMERS</b> (<b>7</b>)</li>
+        <li><b>MD_DIMTYPE_PRODUCTS</b> (<b>8</b>)</li>
+        <li><b>MD_DIMTYPE_SCENARIO</b> (<b>9</b>)</li>
+        <li><b>MD_DIMTYPE_UTILIY</b> (<b>10</b>)</li>
+        <li><b>MD_DIMTYPE_CURRENCY</b> (<b>11</b>)</li>
+        <li><b>MD_DIMTYPE_RATES</b> (<b>12</b>)</li>
+        <li><b>MD_DIMTYPE_CHANNEL</b> (<b>13</b>)</li>
+        <li><b>MD_DIMTYPE_PROMOTION</b> (<b>14</b>)</li>
+        <li><b>MD_DIMTYPE_ORGANIZATION</b> (<b>15</b>)</li>
+        <li><b>MD_DIMTYPE_BILL_OF_MATERIALS</b> (<b>16</b>)</li>
+        <li><b>MD_DIMTYPE_GEOGRAPHY</b> (<b>17</b>)</li>
+    </ul>
+    </td>
+</tr>
+<tr>
+    <td>DIMENSION_CARDINALITY</td>
+    <td>DBTYPE_UI4</td>
+    <td>The number of members in the key attribute.</td>
+</tr>
+<tr>
+    <td>DEFAULT_HIERARCHY</td>
+    <td>DBTYPE_WSTR</td>
+    <td>A hierarchy from the dimension. Preserved for
+        backwards compatibility.</td>
+</tr>
+<tr>
+    <td>DESCRIPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>A user-friendly description of the dimension.</td>
+</tr>
+<tr>
+    <td>IS_VIRTUAL</td>
+    <td>DBTYPE_BOOL</td>
+    <td>Always <b>FALSE</b>.</td>
+</tr>
+<tr>
+    <td>IS_READWRITE</td>
+    <td>DBTYPE_BOOL</td>
+    <td>A Boolean that indicates whether the dimension
+        is write-enabled.<p><b>TRUE</b> if the dimension is
+        write-enabled.</td>
+</tr>
+<tr>
+    <td>DIMENSION_UNIQUE_SETTINGS</td>
+    <td>DBTYPE_I4</td>
+    <td>A bitmap that specifies which columns contain
+        unique values if the dimension contains only members
+        with unique names. The following bit value constants
+        are defined in Msmd.h for this bitmap:
+        <ul>
+            <li><b>MDDIMENSIONS_MEMBER_KEY_UNIQUE</b></li>
+        </ul>
+    </td>
+</tr>
+<tr>
+    <td>DIMENSION_MASTER_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>Always <b>NULL</b>.</td>
+</tr>
+<tr>
+    <td>DIMENSION_IS_VISIBLE</td>
+    <td>DBTYPE_BOOL</td>
+    <td>Always <b>TRUE</b>.</td>
+</tr>
+</table>
+
+<p>The result set is sorted on <b>CATALOG_NAME</b>, <b>
+    SCHEMA_NAME</b>, <b>CUBE_NAME</b>, <b>DIMENSION_NAME</b>.</p>
+
+<h5>2.6.3.6. <a name="getFunctions">getFunctions</a></h5>
+
+<p>Retrieves a result set describing the functions available to client
+    applications connected to the database.</p>
+<p>Specified by the <code>MDSCHEMA_FUNCTIONS</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns.</p>
+
+<table>
+    <tr>
+        <th>Column name</th>
+        <th>Type indicator</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>FUNCTION_NAME</td>
+        <td>DBTYPE_WSTR</td>
+        <td>The name of the function.</td>
+    </tr>
+    <tr>
+        <td>DESCRIPTION</td>
+        <td>DBTYPE_WSTR</td>
+        <td>A description of the function.</td>
+    </tr>
+    <tr>
+        <td>PARAMETER_LIST</td>
+        <td>DBTYPE_WSTR</td>
+        <td>A comma delimited list of parameters formatted
+            as in Microsoft Visual Basic. For example, a
+            parameter might be Name as String.</td>
+    </tr>
+    <tr>
+        <td>RETURN_TYPE</td>
+        <td>DBTYPE_I4</td>
+        <td>The <b>VARTYPE</b> of the return data type of
+            the function.</td>
+    </tr>
+    <tr>
+        <td>ORIGIN</td>
+        <td>DBTYPE_I4</td>
+        <td>The origin of the function:<ul>
+            <li>1 for MDX functions.</li>
+            <li>2 for user-defined functions.</li>
+        </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>INTERFACE_NAME</td>
+        <td>DBTYPE_WSTR</td>
+        <td>The name of the interface for user-defined
+            functions<p>The group name for Multidimensional
+            Expressions (MDX) functions.</td>
+    </tr>
+    <tr>
+        <td>LIBRARY_NAME</td>
+        <td>DBTYPE_WSTR</td>
+        <td>The name of the type library for user-defined
+            functions. <b>NULL</b> for MDX functions. </td>
+    </tr>
+    <tr>
+        <td>DLL_NAME</td>
+        <td>DBTYPE_WSTR</td>
+        <td>(Optional) The name of the assembly that
+            implements the user-defined function.<p>Returns <b>
+            VT_NULL</b> for MDX functions.</td>
+    </tr>
+    <tr>
+        <td>HELP_FILE</td>
+        <td>DBTYPE_WSTR</td>
+        <td>(Optional) The name of the file that contains
+            the help documentation for the user-defined
+            function.<p>Returns <b>VT_NULL</b> for MDX
+            functions.</td>
+    </tr>
+    <tr>
+        <td>HELP_CONTEXT</td>
+        <td>DBTYPE_I4</td>
+        <td>(Optional) Returns the Help context ID for this
+            function.</td>
+    </tr>
+    <tr>
+        <td>OBJECT</td>
+        <td>DBTYPE_WSTR</td>
+        <td>(Optional) The generic name of the object class
+            to which a property applies. For example, the rowset
+            corresponding to the &lt;level_name&gt;.Members function
+            returns &quot;<b>Level</b>&quot;.<p>Returns <b>VT_NULL</b> for
+            user-defined functions, or non-property MDX
+            functions.</td>
+    </tr>
+    <tr>
+        <td>CAPTION</td>
+        <td>DBTYPE_WSTR</td>
+        <td>The display caption for the function.</td>
+    </tr>
+</table>
+
+<p>The rowset is sorted on <b>ORIGIN</b>, <b>INTERFACE_NAME</b>,
+    <b>FUNCTION_NAME</b>.</p>
+
+<h5>2.6.3.7. <a name="getHierarchies">getHierarchies</a></h5>
+<p>Retrieves a result set describing each hierarchy within a particular
+dimension.</p>
+<p>Specified by the <code>MDSCHEMA_HIERARCHIES</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns.</p>
+
+<table>
+<tr>
+    <th>Column name</th>
+    <th>Type indicator</th>
+    <th>Description</th>
+</tr>
+<tr>
+    <td>CATALOG_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the catalog to which this hierarchy
+        belongs. <b>NULL</b> if the provider does not
+        support catalogs.</td>
+</tr>
+<tr>
+    <td>SCHEMA_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>Not supported</td>
+</tr>
+<tr>
+    <td>CUBE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>(Required) The name of the cube to which this
+        hierarchy belongs.</td>
+</tr>
+<tr>
+    <td>DIMENSION_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The unique name of the dimension to which this
+        hierarchy belongs. For providers that generate
+        unique names by qualification, each component of
+        this name is delimited.</td>
+</tr>
+<tr>
+    <td>HIERARCHY_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the hierarchy. Blank if there is
+        only a single hierarchy in the dimension. This will
+        always have a value in Microsoft SQL Server 2005
+        Analysis Services (SSAS).</td>
+</tr>
+<tr>
+    <td>HIERARCHY_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The unique name of the hierarchy.</td>
+</tr>
+<tr>
+    <td>HIERARCHY_GUID</td>
+    <td>DBTYPE_GUID</td>
+    <td>Not supported</td>
+</tr>
+<tr>
+    <td>HIERARCHY_CAPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>A label or a caption associated with the
+        hierarchy. Used primarily for display purposes. If a
+        caption does not exist, <b>HIERARCHY_NAME</b> is
+        returned. If the dimension either does not contain a
+        hierarchy or has just one hierarchy, this column
+        will contain the name of the dimension.</td>
+</tr>
+<tr>
+    <td>DIMENSION_TYPE</td>
+    <td>DBTYPE_I2</td>
+    <td>The type of the dimension. Valid values include
+        the following values:<ul>
+        <li><b>MD_DIMTYPE_UNKNOWN</b> (<b>0</b>)</li>
+        <li><b>MD_DIMTYPE_TIME</b> (<b>1</b>)</li>
+        <li><b>MD_DIMTYPE_MEASURE</b> (<b>2</b>)</li>
+        <li><b>MD_DIMTYPE_OTHER</b> (<b>3</b>)</li>
+        <li><b>MD_DIMTYPE_QUANTITATIVE</b> (<b>5</b>)</li>
+        <li><b>MD_DIMTYPE_ACCOUNTS</b> (<b>6</b>)</li>
+        <li><b>MD_DIMTYPE_CUSTOMERS</b> (<b>7</b>)</li>
+        <li><b>MD_DIMTYPE_PRODUCTS</b> (<b>8</b>)</li>
+        <li><b>MD_DIMTYPE_SCENARIO</b> (<b>9</b>)</li>
+        <li><b>MD_DIMTYPE_UTILIY</b> (<b>10</b>)</li>
+        <li><b>MD_DIMTYPE_CURRENCY</b> (<b>11</b>)</li>
+        <li><b>MD_DIMTYPE_RATES</b> (<b>12</b>)</li>
+        <li><b>MD_DIMTYPE_CHANNEL</b> (<b>13</b>)</li>
+        <li><b>MD_DIMTYPE_PROMOTION</b> (<b>14</b>)</li>
+        <li><b>MD_DIMTYPE_ORGANIZATION</b> (<b>15</b>)</li>
+        <li><b>MD_DIMTYPE_BILL_OF_MATERIALS</b> (<b>16</b>)</li>
+        <li><b>MD_DIMTYPE_GEOGRAPHY</b> (<b>17</b>)</li>
+    </ul>
+    </td>
+</tr>
+<tr>
+    <td>HIERARCHY_CARDINALITY</td>
+    <td>DBTYPE_UI4</td>
+    <td>The number of members in the hierarchy.</td>
+</tr>
+<tr>
+    <td>DEFAULT_MEMBER</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The default member for this hierarchy. This is a
+        unique name. Every hierarchy must have a default
+        member.</td>
+</tr>
+<tr>
+    <td>ALL_MEMBER</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The member at the highest level of the rollup.</td>
+</tr>
+<tr>
+    <td>DESCRIPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>A human-readable description of the hierarchy.
+        <b>NULL</b> if no description exists.</td>
+</tr>
+<tr>
+    <td>STRUCTURE</td>
+    <td>DBTYPE_I2</td>
+    <td>The structure of the hierarchy. Valid values
+        include the following values:<ul>
+        <li><b>MD_STRUCTURE_FULLYBALANCED</b> (<b>0</b>)</li>
+        <li><b>MD_STRUCTURE_RAGGEDBALANCED</b> (<b>1</b>)</li>
+        <li><b>MD_STRUCTURE_UNBALANCED</b> (<b>2</b>)</li>
+        <li><b>MD_STRUCTURE_NETWORK</b> (<b>3</b>)</li>
+    </ul>
+    </td>
+</tr>
+<tr>
+    <td>IS_VIRTUAL</td>
+    <td>DBTYPE_BOOL</td>
+    <td>Always returns <b>False</b>.</td>
+</tr>
+<tr>
+    <td>IS_READWRITE</td>
+    <td>DBTYPE_BOOL</td>
+    <td>A Boolean that indicates whether the Write Back
+        to dimension column is enabled.<p>Returns <b>TRUE</b>
+        if the <b>Write Back to dimension</b> column that
+        represents this hierarchy is enabled.</td>
+</tr>
+<tr>
+    <td>DIMENSION_UNIQUE_SETTINGS</td>
+    <td>DBTYPE_I4</td>
+    <td>Always returns <b>MDDIMENSIONS_MEMBER_KEY_UNIQUE</b>
+        (<b>1</b>).</td>
+</tr>
+<tr>
+    <td>DIMENSION_MASTER_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>Always returns <b>NULL</b>.</td>
+</tr>
+<tr>
+    <td>DIMENSION_IS_VISIBLE</td>
+    <td>DBTYPE_BOOL</td>
+    <td>Always returns <b>true</b>. If the dimension is
+        not visible, it will not appear in the schema
+        rowset.</td>
+</tr>
+<tr>
+    <td>HIERARCHY_ORDINAL</td>
+    <td>DBTYPE_UI4</td>
+    <td>The ordinal number of the hierarchy across all
+        hierarchies of the cube.</td>
+</tr>
+<tr>
+    <td>DIMENSION_IS_SHARED</td>
+    <td>DBTYPE_BOOL</td>
+    <td>Always returns <b>TRUE</b>.</td>
+</tr>
+<tr>
+    <td>HIERARCHY_IS_VISIBLE</td>
+    <td>DBTYPE_BOOL</td>
+    <td>A Boolean that indicates whether the hieararchy
+        is visible.<p>Returns <b>TRUE</b> if the hierarchy
+        is visible; otherwise, <b>FALSE</b>.</td>
+</tr>
+<tr>
+    <td>HIERARCHY_ORIGIN</td>
+    <td>DBTYPE_UI2</td>
+    <td>A bit mask that determines the source of the
+        hierarchy:<ul>
+        <li><b>MD_USER_DEFINED</b> identifies user
+            defined hierarchies, and has a value of <b>
+            0x0000001</b>.</li>
+        <li><b>MD_SYSTEM_ENABLED</b> identifies
+            attribute hierarchies, and has a value of <b>
+            0x0000002</b>.</li>
+        <li><b>MD_SYSTEM_INTERNAL</b> identifies
+            attributes with no attribute hierarchies, and
+            has a value of<b> 0x0000004</b>.</li>
+    </ul>
+        <p>A parent/child attribute hierarchy is both <b>
+            MD_USER_DEFINED</b> and <b>MD_SYSTEM_ENABLED</b>.</td>
+</tr>
+<tr>
+    <td>HIERARCHY_DISPLAY_FOLDER</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The path to be used when displaying the
+        hierarchy in the user interface. Folder names will
+        be separated by a semicolon (;). Nested folders are
+        indicated by a backslash (\).</td>
+</tr>
+<tr>
+    <td>INSTANCE_SELECTION</td>
+    <td>DBTYPE_UI2</td>
+    <td>A hint to the client application on how to show
+        the hierarchy. Valid values include the following
+        values:<ul>
+        <li><b>MD_INSTANCE_SELECTION_NONE</b></li>
+        <li><b>MD_INSTANCE_SELECTION_DROPDOWN</b></li>
+        <li><b>MD_INSTANCE_SELECTION_LIST</b></li>
+        <li><b>MD_INSTANCE_SELECTION_FILTEREDLIST</b></li>
+        <li><b>MD_INSTANCE_SELECTION_MANDATORYFILTER</b></li>
+    </ul>
+    </td>
+</tr>
+</table>
+
+<p>The rowset is sorted on <b>CATALOG_NAME</b>, <b>
+    SCHEMA_NAME</b>, <b>CUBE_NAME</b>, <b>DIMENSION_UNIQUE_NAME</b>,
+    <b>HIERARCHY_NAME</b>.</p>
+
+<h5>2.6.3.8. <a name="getLevels">getLevels</a></h5>
+<p>Retrieves a result set describing each level within a particular hierarchy.</p>
+<p>Specified by the <code>MDSCHEMA_LEVELS</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns.</p>
+<table>
+<tr>
+    <th>Column name</th>
+    <th>Type indicator</th>
+    <th>Description</th>
+</tr>
+<tr>
+    <td>CATALOG_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the catalog to which this level
+        belongs. <b>NULL</b> if the provider does not
+        support catalogs.</td>
+</tr>
+<tr>
+    <td>SCHEMA_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the schema to which this level
+        belongs. <b>NULL</b> if the provider does not
+        support schemas.</td>
+</tr>
+<tr>
+    <td>CUBE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the cube to which this level
+        belongs.</td>
+</tr>
+<tr>
+    <td>DIMENSION_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The unique name of the dimension to which this
+        level belongs. For providers that generate unique
+        names by qualification, each component of this name
+        is delimited.</td>
+</tr>
+<tr>
+    <td>HIERARCHY_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The unique name of the hierarchy. If the level
+        belongs to more than one hierarchy, there is one row
+        for each hierarchy to which it belongs. For
+        providers that generate unique names by
+        qualification, each component of this name is
+        delimited.</td>
+</tr>
+<tr>
+    <td>LEVEL_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the level.</td>
+</tr>
+<tr>
+    <td>LEVEL_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The properly escaped unique name of the level.</td>
+</tr>
+<tr>
+    <td>LEVEL_GUID</td>
+    <td>DBTYPE_GUID</td>
+    <td>Not supported.</td>
+</tr>
+<tr>
+    <td>LEVEL_CAPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>A label or caption associated with the
+        hierarchy. Used primarily for display purposes. If a
+        caption does not exist, <b>LEVEL_NAME</b> is
+        returned. </td>
+</tr>
+<tr>
+    <td>LEVEL_NUMBER</td>
+    <td>DBTYPE_UI4</td>
+    <td>The distance of the level from the root of the
+        hierarchy. Root level is zero (<b>0)</b>.</td>
+</tr>
+<tr>
+    <td>LEVEL_CARDINALITY</td>
+    <td>DBTYPE_UI4</td>
+    <td>The number of members in the level.</td>
+</tr>
+<tr>
+    <td>LEVEL_TYPE</td>
+    <td>DBTYPE_I4</td>
+    <td>Type of the level:<ul>
+        <li><b>MDLEVEL_TYPE_GEO_CONTINENT</b> (<b>0x2001</b>)</li>
+        <li><b>MDLEVEL_TYPE_GEO_REGION</b> (<b>0x2002</b>)</li>
+        <li><b>MDLEVEL_TYPE_GEO_COUNTRY</b> (<b>0x2003</b>)</li>
+        <li><b>MDLEVEL_TYPE_GEO_STATE_OR_PROVINCE</b> (<b>0x2004</b>)</li>
+        <li><b>MDLEVEL_TYPE_GEO_COUNTY</b> (<b>0x2005</b>)</li>
+        <li><b>MDLEVEL_TYPE_GEO_CITY</b> (<b>0x2006</b>)</li>
+        <li><b>MDLEVEL_TYPE_GEO_POSTALCODE</b> (<b>0x2007</b>)</li>
+        <li><b>MDLEVEL_TYPE_GEO_POINT</b> (<b>0x2008</b>)</li>
+        <li><b>MDLEVEL_TYPE_ORG_UNIT</b> (<b>0x1011</b>)</li>
+        <li><b>MDLEVEL_TYPE_BOM_RESOURCE</b> (<b>0x1012</b>)</li>
+        <li><b>MDLEVEL_TYPE_QUANTITATIVE </b>(<b>0x1013</b>)</li>
+        <li><b>MDLEVEL_TYPE_ACCOUNT</b> (<b>0x1014</b>)</li>
+        <li><b>MDLEVEL_TYPE_CUSTOMER</b> (<b>0x1021</b>)</li>
+        <li><b>MDLEVEL_TYPE_CUSTOMER_GROUP</b> (<b>0x1022</b>)</li>
+        <li><b>MDLEVEL_TYPE_CUSTOMER_HOUSEHOLD</b> (<b>0x1023</b>)</li>
+        <li><b>MDLEVEL_TYPE_PRODUCT</b> (<b>0x1031</b>)</li>
+        <li><b>MDLEVEL_TYPE_PRODUCT_GROUP</b> (<b>0x1032</b>)</li>
+        <li><b>MDLEVEL_TYPE_SCENARIO</b> (<b>0x1015</b>)</li>
+        <li><b>MDLEVEL_TYPE_UTILITY</b> (<b>0x1016</b>)</li>
+        <li><b>MDLEVEL_TYPE_PERSON</b> (<b>0x1041</b>)</li>
+        <li><b>MDLEVEL_TYPE_COMPANY</b> (<b>0x1042</b>)</li>
+        <li><b>MDLEVEL_TYPE_CURRENCY_SOURCE</b> (<b>0x1051</b>)</li>
+        <li><b>MDLEVEL_TYPE_CURRENCY_DESTINATION</b> (<b>0x1052</b>)</li>
+        <li><b>MDLEVEL_TYPE_CHANNEL</b> (<b>0x1061</b>)</li>
+        <li><b>MDLEVEL_TYPE_REPRESENTATIVE</b> (<b>0x1062</b>)</li>
+        <li><b>MDLEVEL_TYPE_PROMOTION</b> (<b>0x1071</b>)</li>
+    </ul>
+    </td>
+</tr>
+<tr>
+    <td>DESCRIPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>A human-readable description of the level. NULL
+        if no description exists.</td>
+</tr>
+<tr>
+    <td>CUSTOM_ROLLUP_SETTINGS</td>
+    <td>DBTYPE_I4</td>
+    <td>A bitmap that specifies the custom rollup
+        options:<ul>
+        <li><b>MDLEVELS_CUSTOM_ROLLUP_EXPRESSION</b> (<b>0x01</b>)
+            indicates an expression exists for this level.
+            (Deprecated)</li>
+        <li><b>MDLEVELS_CUSTOM_ROLLUP_COLUMN</b> (<b>0x02</b>)
+            indicates that there is a custom rollup column
+            for this level.</li>
+        <li><b>MDLEVELS_SKIPPED_LEVELS</b> (<b>0x04</b>)
+            indicates that there is a skipped level
+            associated with members of this level.</li>
+        <li><b>MDLEVELS_CUSTOM_MEMBER_PROPERTIES</b> (<b>0x08</b>)
+            indicates that members of the level have custom
+            member properties.</li>
+        <li><b>MDLEVELS_UNARY_OPERATOR</b> (<b>0x10</b>)
+            indicates that members on the level have unary
+            operators.</li>
+    </ul>
+    </td>
+</tr>
+<tr>
+    <td>LEVEL_UNIQUE_SETTINGS</td>
+    <td>DBTYPE_I4</td>
+    <td>A bitmap that specifies which columns contain
+        unique values, if the level only has members with
+        unique names or keys. The Msmd.h file defines the
+        following bit value constants for this bitmap:
+        <ul>
+            <li><b>MDDIMENSIONS_MEMBER_KEY_UNIQUE</b> (<b>1</b>)</li>
+            <li><b>MDDIMENSIONS_MEMBER_NAME_UNIQUE</b> (<b>2</b>)</li>
+        </ul>
+        <p>The key is always unique in Microsoft SQL Server
+            2005 Analysis Services (SSAS). The name will be
+            unique if the setting on the attribute is <b>
+            UniqueInDimension</b> or <b>UniqueInAttribute</b></p></td>
+</tr>
+<tr>
+    <td>LEVEL_IS_VISIBLE</td>
+    <td>DBTYPE_BOOL</td>
+    <td>A Boolean that indicates whether the level is
+        visible.<p>Always returns True. If the level is not
+        visible, it will not be included in the schema
+        rowset.</td>
+</tr>
+<tr>
+    <td>LEVEL_ORDERING_PROPERTY</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The ID of the attribute that the level is sorted
+        on.</td>
+</tr>
+<tr>
+    <td>LEVEL_DBTYPE</td>
+    <td>DBTYPE_I4</td>
+    <td>The <b>DBTYPE</b> enumeration of the member key
+        column that is used for the level attribute.<p>Null
+        if concatenated keys are used as the member key
+        column.</td>
+</tr>
+<tr>
+    <td>LEVEL_MASTER_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>Always returns NULL.</td>
+</tr>
+<tr>
+    <td>LEVEL_NAME_SQL_COLUMN_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The SQL representation of the level member
+        names.</td>
+</tr>
+<tr>
+    <td>LEVEL_KEY_SQL_COLUMN_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The SQL representation of the level member key
+        values.</td>
+</tr>
+<tr>
+    <td>LEVEL_UNIQUE_NAME_SQL_COLUMN_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The SQL representation of the member unique
+        names.</td>
+</tr>
+<tr>
+    <td>LEVEL_ATTRIBUTE_HIERARCHY_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the attribute hierarchy providing
+        the source of the level.</td>
+</tr>
+<tr>
+    <td>LEVEL_KEY_CARDINALITY</td>
+    <td>DBTYPE_UI2</td>
+    <td>The number of columns in the level key.</td>
+</tr>
+<tr>
+    <td>LEVEL_ORIGIN</td>
+    <td>DBTYPE_UI2</td>
+    <td>A bit map that defines how the level was
+        sourced:<ul>
+        <li><b>MD_ORIGIN_USER_DEFINED</b> identifies
+            levels in a user defined hierarchy.</li>
+        <li><b>MD_ORIGIN_ATTRIBUTE</b> identifies levels
+            in an attribute hierarchy.</li>
+        <li><b>MD_ORIGIN_KEY_ATTRIBUTE</b> identifies
+            levels in a key attribute hierarchy.</li>
+        <li><b>MD_ORIGIN_INTERNAL</b> identifies levels
+            in attribute hierarchies that are not enabled.</li>
+    </ul>
+    </td>
+</tr>
+</table>
+
+<p>The rowset is sorted on <b>CATALOG_NAME</b>, <b>
+    SCHEMA_NAME</b>, <b>CUBE_NAME</b>, <b>DIMENSION_UNIQUE_NAME</b>,
+    <b>HIERARCHY_UNIQUE_NAME</b>, <b>LEVEL_NUMBER</b>.</p>
+
+<h5>2.6.3.9. <a name="getMeasures">getMeasures</a></h5>
+<p>Retrieves a result set describing each measure within a cube.</p>
+<p>Specified by the <code>MDSCHEMA_MEASURES</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns.</p>
+<table>
+<tr>
+    <th>Column name</th>
+    <th>Type indicator</th>
+    <th>Length</th>
+    <th>Description</th>
+</tr>
+<tr>
+    <td>CATALOG_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The name of the catalog to which this measure
+        belongs. <b>NULL</b> if the provider does not
+        support catalogs.</td>
+</tr>
+<tr>
+    <td>SCHEMA_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The name of the schema to which this measure
+        belongs. <b>NULL</b> if the provider does not
+        support schemas.</td>
+</tr>
+<tr>
+    <td>CUBE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The name of the cube to which this measure
+        belongs.</td>
+</tr>
+<tr>
+    <td>MEASURE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The name of the measure.</td>
+</tr>
+<tr>
+    <td>MEASURE_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The Unique name of the measure. For providers
+        that generate unique names by qualification, each
+        component of this name is delimited.</td>
+</tr>
+<tr>
+    <td>MEASURE_CAPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>A label or caption associated with the measure.
+        Used primarily for display purposes. If a caption
+        does not exist, <b>MEASURE_NAME</b> is returned.</td>
+</tr>
+<tr>
+    <td>MEASURE_GUID</td>
+    <td>DBTYPE_GUID</td>
+    <td>&nbsp;</td>
+    <td>Not supported.</td>
+</tr>
+<tr>
+    <td>MEASURE_AGGREGATOR</td>
+    <td>DBTYPE_I4</td>
+    <td>&nbsp;</td>
+    <td>An enumeration that identifies how a measure was
+        derived. Can be one of the following values:<ul>
+        <li><b>MDMEASURE_AGGR_SUM</b> (<b>1</b>)</li>
+        <li><b>MDMEASURE_AGGR_COUNT</b> (<b>2</b>)</li>
+        <li><b>MDMEASURE_AGGR_MIN </b>(<b>3</b>)</li>
+        <li><b>MDMEASURE_AGGR_MAX </b>(<b>4</b>)</li>
+        <li><b>MDMEASURE_AGGR_AVG</b> (<b>5</b>)</li>
+        <li><b>MDMEASURE_AGGR_VAR</b> (<b>6</b>)</li>
+        <li><b>MDMEASURE_AGGR_STD</b> (<b>7</b>)
+            identifies that the measure was derived from an
+            aggregation function that was <b>SUM</b>, <b>
+            COUNT</b>, <b>MIN</b>, <b>MAX</b>, <b>AVG</b>,
+            <b>VAR</b>, or <b>STDEV</b>, respectively. </li>
+        <li><b>MDMEASURE_AGGR_CALCULATED</b> (<b>127</b>)
+            identifies that the measure was derived from a
+            formula that was not any single function above.
+        </li>
+        <li><b>MDMEASURE_AGGR_UNKNOWN</b> (<b>0</b>)
+            identifies that the measure was derived from an
+            unknown aggregation function or formula. </li>
+    </ul>
+    </td>
+</tr>
+<tr>
+    <td>DATA_TYPE</td>
+    <td>DBTYPE_UI2</td>
+    <td>&nbsp;</td>
+    <td>The data type of the measure.</td>
+</tr>
+<tr>
+    <td>NUMERIC_PRECISION</td>
+    <td>DBTYPE_UI2</td>
+    <td>&nbsp;</td>
+    <td>The maximum precision of the property if the
+        measure object's data type is exact numeric. <b>NULL</b>
+        for all other property types. </td>
+</tr>
+<tr>
+    <td>NUMERIC_SCALE</td>
+    <td>DBTYPE_I2</td>
+    <td>&nbsp;</td>
+    <td>The number of digits to the right of the decimal
+        point if the measure object's type indicator is <b>
+        DBTYPE_NUMERIC</b> or <b>DBTYPE_DECIMAL</b>.
+        Otherwise, this value is <b>NULL</b>. </td>
+</tr>
+<tr>
+    <td>MEASURE_UNITS</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>Not supported</td>
+</tr>
+<tr>
+    <td>DESCRIPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>A human-readable description of the measure. <b>
+        NULL</b> if no description exists.</td>
+</tr>
+<tr>
+    <td>EXPRESSION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>An expression for the member.</td>
+</tr>
+<tr>
+    <td>MEASURE_IS_VISIBLE</td>
+    <td>DBTYPE_BOOL</td>
+    <td>&nbsp;</td>
+    <td>A Boolean that always returns True. If the
+        measure is not visible, it will not be included in
+        the schema rowset.</td>
+</tr>
+<tr>
+    <td>LEVELS_LIST</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>A string that always returns <b>NULL</b>.</td>
+</tr>
+<tr>
+    <td>MEASURE_NAME_SQL_COLUMN_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The name of the column in the SQL query that
+        corresponds to the measure's name.</td>
+</tr>
+<tr>
+    <td>MEASURE_UNQUALIFIED_CAPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The name of the measure, not qualified with the
+        measure group name.</td>
+</tr>
+<tr>
+    <td>MEASUREGROUP_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The name of the measure group to which the
+        measure belongs.</td>
+</tr>
+<tr>
+    <td>MEASURE_DISPLAY_FOLDER</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The path to be used when displaying the measure
+        in the user interface. Folder names will be
+        separated by a semicolon. Nested folders are
+        indicated by a backslash (\).</td>
+</tr>
+<tr>
+    <td>DEFAULT_FORMAT_STRING</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The default format string for the measure.</td>
+</tr>
+</table>
+
+<p>The rowset is sorted on <b>CATALOG_NAME</b>, <b>
+    SCHEMA_NAME</b>, <b>CUBE_NAME</b>, <b>MEASURE_NAME</b>.</p>
+
+<h5>2.6.3.10. <a name="getMembers">getMembers</a></h5>
+<p>Retrieves a result set describing the members within a database.</p>
+<p>Specified by the <code>MDSCHEMA_MEMBERS</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns.</p>
+
+<table>
+<tr>
+    <th>Column name</th>
+    <th>Type indicator</th>
+    <th>Length</th>
+    <th>Description</th>
+</tr>
+<tr>
+    <td>CATALOG_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The name of the database to which this member
+        belongs.</td>
+</tr>
+<tr>
+    <td>SCHEMA_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The name of the schema to which this member
+        belongs.</td>
+</tr>
+<tr>
+    <td>CUBE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The name of the cube to which this member
+        belongs.</td>
+</tr>
+<tr>
+    <td>DIMENSION_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The unique name of the dimension to which this
+        member belongs.</td>
+</tr>
+<tr>
+    <td>HIERARCHY_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The unique name of the hierarchy to which this
+        member belongs.</td>
+</tr>
+<tr>
+    <td>LEVEL_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The unique name of the level to which this
+        member belongs.</td>
+</tr>
+<tr>
+    <td>LEVEL_NUMBER</td>
+    <td>DBTYPE_UI4</td>
+    <td>&nbsp;</td>
+    <td>The distance of the member from the root of the
+        hierarchy. The root level is zero (0).</td>
+</tr>
+<tr>
+    <td>MEMBER_ORDINAL</td>
+    <td>DBTYPE_UI4</td>
+    <td>&nbsp;</td>
+    <td>(Deprecated) Always returns <b>0</b>. </td>
+</tr>
+<tr>
+    <td>MEMBER_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The name of the member.</td>
+</tr>
+<tr>
+    <td>MEMBER_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The unique name of the member.</td>
+</tr>
+<tr>
+    <td>MEMBER_TYPE</td>
+    <td>DBTYPE_I4</td>
+    <td>&nbsp;</td>
+    <td>The type of the member:
+        <ul>
+            <li><b>MDMEMBER_TYPE_REGULAR</b> (<b>1</b>)</li>
+            <li><b>MDMEMBER_TYPE_ALL</b> (<b>2</b>)</li>
+            <li><b>MDMEMBER_TYPE_MEASURE</b> (<b>3</b>)</li>
+            <li><b>MDMEMBER_TYPE_FORMULA</b> (<b>4</b>)</li>
+            <li><b>MDMEMBER_TYPE_UNKNOWN</b> (<b>0</b>)</li>
+            <li><b>MDMEMBER_TYPE_FORMULA </b>takes
+                precedence over <b>MDMEMBER_TYPE_MEASURE</b>.
+                For example, if there is a formula (calculated)
+                member on the Measures dimension, it is listed
+                as <b>MDMEMBER_TYPE_FORMULA</b>. </li>
+        </ul>
+    </td>
+</tr>
+<tr>
+    <td>MEMBER_GUID</td>
+    <td>DBTYPE_GUID</td>
+    <td>&nbsp;</td>
+    <td>The GUID of the member. <b>NULL</b> if no GUID
+        exists.</td>
+</tr>
+<tr>
+    <td>MEMBER_CAPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>A label or caption associated with the member.
+        Used primarily for display purposes. If a caption
+        does not exist, <b>MEMBER_NAME</b> is returned.</td>
+</tr>
+<tr>
+    <td>CHILDREN_CARDINALITY</td>
+    <td>DBTYPE_UI4</td>
+    <td>&nbsp;</td>
+    <td>The number of children that the member has. This
+        can be an estimate, so consumers should not rely on
+        this to be the exact count. Providers should return
+        the best estimate possible.</td>
+</tr>
+<tr>
+    <td>PARENT_LEVEL</td>
+    <td>DBTYPE_UI4</td>
+    <td>&nbsp;</td>
+    <td>The distance of the member's parent from the
+        root level of the hierarchy. The root level is zero
+        (0).</td>
+</tr>
+<tr>
+    <td>PARENT_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The unique name of the member's parent. <b>NULL</b>
+        is returned for any members at the root level.</td>
+</tr>
+<tr>
+    <td>PARENT_COUNT</td>
+    <td>DBTYPE_UI4</td>
+    <td>&nbsp;</td>
+    <td>The number of parents that this member has.</td>
+</tr>
+<tr>
+    <td>DESCRIPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>Always returns <b>NULL</b>.</td>
+</tr>
+<tr>
+    <td>EXPRESSION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The expression for calculations, if the member
+        is of type <b>MDMEMBER_TYPE_FORMULA</b>.</td>
+</tr>
+<tr>
+    <td>MEMBER_KEY</td>
+    <td>DBTYPE_WSTR</td>
+    <td>&nbsp;</td>
+    <td>The value of the member's key column. Returns <b>
+        NULL</b> if the member has a composite key.</td>
+</tr>
+<tr>
+    <td>IS_PLACEHOLDERMEMBER</td>
+    <td>DBTYPE_BOOL</td>
+    <td>&nbsp;</td>
+    <td>A Boolean that indicates whether a member is a
+        placeholder member for an empty position in a
+        dimension hierarchy.<p>It is valid only if the <b>
+        MDX Compatibility</b> property has been set to 1.
+    </td>
+</tr>
+<tr>
+    <td>IS_DATAMEMBER</td>
+    <td>DBTYPE_BOOL</td>
+    <td>&nbsp;</td>
+    <td>A Boolean that indicates whether the member is a
+        data member.<p>Returns True if the member is a data
+        member. </td>
+</tr>
+<tr>
+    <td>Zero or more additional columns</td>
+    <td>DBTYPE_UI2</td>
+    <td>&nbsp;</td>
+    <td>No properties are returned if the members could
+        be returned from multiple levels. For example, if
+        the Tree operator is <b>PARENT</b> and <b>SELF</b>
+        for a non-parent child hierarchy, no member
+        properties are returned.<p>This applies to ragged
+        hierarchies where tree operators could return
+        members from different levels (for example, if the
+        prior level contains holes and parent on members is
+        requested).</td>
+</tr>
+</table>
+
+<p>The rowset is sorted on <b>CATALOG_NAME</b>, <b>
+    SCHEMA_NAME</b>, <b>CUBE_NAME</b>, <b>DIMENSION_UNIQUE_NAME</b>,
+    <b>HIERARCHY_UNIQUE_NAME</b>, <b>LEVEL_UNIQUE_NAME</b>, <b>
+    LEVEL_NUMBER</b>, <b>MEMBER_ORDINAL</b>.</p>
+
+<h5>2.6.3.11. <a name="getProperties">getProperties</a></h5>
+
+<p>Retrieves a list of descriptions of member and cell Properties.</p>
+<p>Specified by the <code>MDSCHEMA_PROPERTIES</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns. </p>
+
+<table>
+<tr>
+    <th>Column name</th>
+    <th>Type indicator</th>
+    <th>Description</th>
+</tr>
+<tr>
+    <td>CATALOG_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the database.</td>
+</tr>
+<tr>
+    <td>SCHEMA_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the schema to which this property
+        belongs. <b>NULL</b> if the provider does not
+        support schemas.</td>
+</tr>
+<tr>
+    <td>CUBE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the cube.</td>
+</tr>
+<tr>
+    <td>DIMENSION_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The unique name of the dimension. For providers
+        that generate unique names by qualification, each
+        component of this name is delimited. </td>
+</tr>
+<tr>
+    <td>HIERARCHY_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The unique name of the hierarchy. For providers
+        that generate unique names by qualification, each
+        component of this name is delimited. </td>
+</tr>
+<tr>
+    <td>LEVEL_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The unique name of the level to which this
+        property belongs. If the provider does not support
+        named levels, it should return the <b>
+        DIMENSION_UNIQUE_NAME</b> value for this field. For
+        providers that generate unique names by
+        qualification, each component of this name is
+        delimited. </td>
+</tr>
+<tr>
+    <td>MEMBER_UNIQUE_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The unique name of the member to which the
+        property belongs. Used for data stores that do not
+        support named levels or have properties on a
+        member-by-member basis. If the property applies to
+        all members in a level, this column is <b>NULL</b>.
+        For providers that generate unique names by
+        qualification, each component of this name is
+        delimited. </td>
+</tr>
+<tr>
+    <td>PROPERTY_TYPE</td>
+    <td>DBTYPE_I2</td>
+    <td>A bitmap that specifies the type of the
+        property:<ul>
+        <li><b>MDPROP_MEMBER</b> (<b>1</b>) identifies a
+            property of a member. This property can be used
+            in the DIMENSION PROPERTIES clause of the SELECT
+            statement.</li>
+        <li><b>MDPROP_CELL</b> (<b>2</b>) identifies a
+            property of a cell. This property can be used in
+            the CELL PROPERTIES clause that occurs at the
+            end of the SELECT statement. </li>
+        <li><b>MDPROP_SYSTEM</b> (<b>4</b>) identifies
+            an internal property.</li>
+        <li><b>MDPROP_BLOB</b> (<b>8</b>) identifies a
+            property which contains a binary large object
+            (blob).</li>
+    </ul>
+    </td>
+</tr>
+<tr>
+    <td>PROPERTY_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the property. If the key for the
+        property is the same as the name for the property,
+        <b>PROPERTY_NAME</b> will be blank.</td>
+</tr>
+<tr>
+    <td>PROPERTY_CAPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>A label or caption associated with the property,
+        used primarily for display purposes. Returns <b>
+        PROPERTY_NAME</b> if a caption does not exist.</td>
+</tr>
+<tr>
+    <td>DATA_TYPE</td>
+    <td>DBTYPE_UI2</td>
+    <td>The data type of the property.</td>
+</tr>
+<tr>
+    <td>CHARACTER_MAXIMUM_LENGTH</td>
+    <td>DBTYPE_UI4</td>
+    <td>The maximum possible length of the property, if
+        it is a character, binary, or bit type.<p>Zero
+        indicates there is no defined maximum length.</p>
+        <p>Returns <b>NULL</b> for all other data types.</td>
+</tr>
+<tr>
+    <td>CHARACTER_OCTET_LENGTH</td>
+    <td>DBTYPE_UI4</td>
+    <td>The maximum possible length (in bytes) of the
+        property, if it is a character or binary type.<p>
+        Zero indicates there is no defined maximum length.</p>
+        <p>Returns <b>NULL</b> for all other data types.</td>
+</tr>
+<tr>
+    <td>NUMERIC_PRECISION</td>
+    <td>DBTYPE_UI2</td>
+    <td>The maximum precision of the property, if it is
+        a numeric data type.<p>Returns <b>NULL</b> for all
+        other data types.</td>
+</tr>
+<tr>
+    <td>NUMERIC_SCALE</td>
+    <td>DBTYPE_I2</td>
+    <td>The number of digits to the right of the decimal
+        point, if it is a <b>DBTYPE_NUMERIC</b> or <b>
+        DBTYPE_DECIMAL</b> type.<p>Returns <b>NULL</b> for
+        all other data types.</td>
+</tr>
+<tr>
+    <td>DESCRIPTION</td>
+    <td>DBTYPE_WSTR</td>
+    <td>A human readable description of the property. <b>
+        NULL</b> if no description exists.</td>
+</tr>
+<tr>
+    <td>PROPERTY_CONTENT_TYPE</td>
+    <td>DBTYPE_I2</td>
+    <td>The type of the property. Can be one of the
+        following enumerations:<ul>
+        <li><b>MD_PROPTYPE_REGULAR </b>(<b>0x00</b>)</li>
+        <li><b>MD_PROPTYPE_ID </b>(<b>0x01</b>)</li>
+        <li><b>MD_PROPTYPE_RELATION_TO_PARENT </b>(<b>0x02</b>)</li>
+        <li><b>MD_PROPTYPE_ROLLUP_OPERATOR </b>(<b>0x03</b>)</li>
+        <li><b>MD_PROPTYPE_ORG_TITLE </b>(<b>0x11</b>)</li>
+        <li><b>MD_PROPTYPE_CAPTION </b>(<b>0x21</b>)</li>
+        <li><b>MD_PROPTYPE_CAPTION_SHORT </b>(<b>0x22</b>)</li>
+        <li><b>MD_PROPTYPE_CAPTION_DESCRIPTION </b>(<b>0x23</b>)</li>
+        <li><b>MD_PROPTYPE_CAPTION_ABREVIATION </b>(<b>0x24</b>)</li>
+        <li><b>MD_PROPTYPE_WEB_URL </b>(<b>0x31</b>)</li>
+        <li><b>MD_PROPTYPE_WEB_HTML </b>(<b>0x32</b>)</li>
+        <li><b>MD_PROPTYPE_WEB_XML_OR_XSL </b>(<b>0x33</b>)</li>
+        <li><b>MD_PROPTYPE_WEB_MAIL_ALIAS </b>(<b>0x34</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS </b>(<b>0x41</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_STREET </b>(<b>0x42</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_HOUSE </b>(<b>0x43</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_CITY </b>(<b>0x44</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_STATE_OR_PROVINCE </b>(<b>0x45</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_ZIP </b>(<b>0x46</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_QUARTER </b>(<b>0x47</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_COUNTRY </b>(<b>0x48</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_BUILDING </b>(<b>0x49</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_ROOM </b>(<b>0x4A</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_FLOOR </b>(<b>0x4B</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_FAX </b>(<b>0x4C</b>)</li>
+        <li><b>MD_PROPTYPE_ADDRESS_PHONE </b>(<b>0x4D</b>)</li>
+        <li><b>MD_PROPTYPE_GEO_CENTROID_X </b>(<b>0x61</b>)</li>
+        <li><b>MD_PROPTYPE_GEO_CENTROID_Y </b>(<b>0x62</b>)</li>
+        <li><b>MD_PROPTYPE_GEO_CENTROID_Z </b>(<b>0x63</b>)</li>
+        <li><b>MD_PROPTYPE_GEO_BOUNDARY_TOP </b>(<b>0x64</b>)</li>
+        <li><b>MD_PROPTYPE_GEO_BOUNDARY_LEFT </b>(<b>0x65</b>)</li>
+        <li><b>MD_PROPTYPE_GEO_BOUNDARY_BOTTOM </b>(<b>0x66</b>)</li>
+        <li><b>MD_PROPTYPE_GEO_BOUNDARY_RIGHT </b>(<b>0x67</b>)</li>
+        <li><b>MD_PROPTYPE_GEO_BOUNDARY_FRONT </b>(<b>0x68</b>)</li>
+        <li><b>MD_PROPTYPE_GEO_BOUNDARY_REAR </b>(<b>0x69</b>)</li>
+        <li><b>MD_PROPTYPE_GEO_BOUNDARY_POLYGON </b>(<b>0x6A</b>)</li>
+        <li><b>MD_PROPTYPE_PHYSICAL_SIZE </b>(<b>0x71</b>)</li>
+        <li><b>MD_PROPTYPE_PHYSICAL_COLOR </b>(<b>0x72</b>)</li>
+        <li><b>MD_PROPTYPE_PHYSICAL_WEIGHT </b>(<b>0x73</b>)</li>
+        <li><b>MD_PROPTYPE_PHYSICAL_HEIGHT </b>(<b>0x74</b>)</li>
+        <li><b>MD_PROPTYPE_PHYSICAL_WIDTH </b>(<b>0x75</b>)</li>
+        <li><b>MD_PROPTYPE_PHYSICAL_DEPTH </b>(<b>0x76</b>)</li>
+        <li><b>MD_PROPTYPE_PHYSICAL_VOLUME </b>(<b>0x77</b>)</li>
+        <li><b>MD_PROPTYPE_PHYSICAL_DENSITY </b>(<b>0x78</b>)</li>
+        <li><b>MD_PROPTYPE_PERSON_FULL_NAME </b>(<b>0x82</b>)</li>
+        <li><b>MD_PROPTYPE_PERSON_FIRST_NAME </b>(<b>0x83</b>)</li>
+        <li><b>MD_PROPTYPE_PERSON_LAST_NAME </b>(<b>0x84</b>)</li>
+        <li><b>MD_PROPTYPE_PERSON_MIDDLE_NAME </b>(<b>0x85</b>)</li>
+        <li><b>MD_PROPTYPE_PERSON_DEMOGRAPHIC </b>(<b>0x86</b>)</li>
+        <li><b>MD_PROPTYPE_PERSON_CONTACT </b>(<b>0x87</b>)</li>
+        <li><b>MD_PROPTYPE_QTY_RANGE_LOW </b>(<b>0x91</b>)</li>
+        <li><b>MD_PROPTYPE_QTY_RANGE_HIGH </b>(<b>0x92</b>)</li>
+        <li><b>MD_PROPTYPE_FORMATTING_COLOR </b>(<b>0xA1</b>)</li>
+        <li><b>MD_PROPTYPE_FORMATTING_ORDER </b>(<b>0xA2</b>)</li>
+        <li><b>MD_PROPTYPE_FORMATTING_FONT </b>(<b>0xA3</b>)</li>
+        <li><b>MD_PROPTYPE_FORMATTING_FONT_EFFECTS </b>(<b>0xA4</b>)</li>
+        <li><b>MD_PROPTYPE_FORMATTING_FONT_SIZE </b>(<b>0xA5</b>)</li>
+        <li><b>MD_PROPTYPE_FORMATTING_SUB_TOTAL </b>(<b>0xA6</b>)</li>
+        <li><b>MD_PROPTYPE_DATE </b>(<b>0xB1</b>)</li>
+        <li><b>MD_PROPTYPE_DATE_START </b>(<b>0xB2</b>)</li>
+        <li><b>MD_PROPTYPE_DATE_ENDED </b>(<b>0xB3</b>)</li>
+        <li><b>MD_PROPTYPE_DATE_CANCELED </b>(<b>0xB4</b>)</li>
+        <li><b>MD_PROPTYPE_DATE_MODIFIED </b>(<b>0xB5</b>)</li>
+        <li><b>MD_PROPTYPE_DATE_DURATION </b>(<b>0xB6</b>)</li>
+        <li><b>MD_PROPTYPE_VERSION </b>(<b>0xC1</b>)</li>
+    </ul>
+    </td>
+</tr>
+<tr>
+    <td>SQL_COLUMN_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the property used in SQL queries
+        from the cube dimension or database dDimension.</td>
+</tr>
+<tr>
+    <td>LANGUAGE</td>
+    <td>DBTYPE_UI2</td>
+    <td>The translation expressed as an <b>LCID</b>.
+        Only valid for property translations.</td>
+</tr>
+<tr>
+    <td>PROPERTY_ORIGIN</td>
+    <td>DBTYPE_UI2</td>
+    <td>Identifies the type of hierarchy that the
+        property applies to:<ul>
+        <li><b>MD_USER_DEFINED</b> (<b>1</b>) indicates
+            the property is on a user defined hierarchy</li>
+        <li><b>MD_SYSTEM_ENABLED</b> (<b>2</b>)
+            indicates the property is on an attribute
+            hierarchy</li>
+        <li><b>MD_SYSTEM_DISABLED</b> (<b>4</b>)
+            indicates the property is on an attribute
+            hierarchy that is not enabled.</li>
+    </ul>
+    </td>
+</tr>
+<tr>
+    <td>PROPERTY_ATTRIBUTE_HIERARCHY_NAME</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The name of the attribute hierarchy sourcing
+        this property.</td>
+</tr>
+<tr>
+    <td>PROPERTY_CARDINALITY</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The cardinality of the property. Possible values
+        include the following strings:<ul>
+        <li><b>ONE</b></li>
+        <li><b>MANY</b></li>
+    </ul>
+    </td>
+</tr>
+<tr>
+    <td>MIME_TYPE</td>
+    <td>DBTYPE_WSTR</td>
+    <td>The mime type for binary large objects (BLOBs).</td>
+</tr>
+<tr>
+    <td>PROPERTY_IS_VISIBLE</td>
+    <td>DBTYPE_BOOL</td>
+    <td>A Boolean that indicates whether the property is
+        visible.<p><b>TRUE</b> if the property is visible;
+        otherwise, <b>FALSE</b>.</td>
+</tr>
+</table>
+
+<p>This schema rowset is not sorted.</p>
+
+<h5>2.6.3.12. <a name="getSets">getSets</a></h5>
+<p>Retrieves a result set describing any sets that are currently defined in a
+database, including session-scoped sets.</p>
+<p>Specified by the <code>MDSCHEMA_SETS</code> XML for Analysis method.</p>
+<p>The returned result set contains the following columns.</p>
+
+<table>
+    <tr>
+        <th>Column name</th>
+        <th>Type indicator</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>CATALOG_NAME</td>
+        <td>DBTYPE_WSTR</td>
+        <td>The name of the database.</td>
+    </tr>
+    <tr>
+        <td>SCHEMA_NAME</td>
+        <td>DBTYPE_WSTR</td>
+        <td>Not supported.</td>
+    </tr>
+    <tr>
+        <td>CUBE_NAME</td>
+        <td>DBTYPE_WSTR</td>
+        <td>The name of the cube.</td>
+    </tr>
+    <tr>
+        <td>SET_NAME</td>
+        <td>DBTYPE_WSTR</td>
+        <td>The name of the set, as specified in the <b>
+            CREATE SET</b> statement.</td>
+    </tr>
+    <tr>
+        <td>SCOPE</td>
+        <td>DBTYPE_I4</td>
+        <td>The scope of the set:<ul>
+            <li><b>MDSET_SCOPE_GLOBAL</b> (<b>1</b>)</li>
+            <li><b>MDSET_SCOPE_SESSION</b> (<b>2</b>)</li>
+        </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>DESCRIPTION</td>
+        <td>DBTYPE_WSTR</td>
+        <td>Not supported.</td>
+    </tr>
+    <tr>
+        <td>EXPRESSION</td>
+        <td>DBTYPE_WSTR</td>
+        <td>The expression for the set.</td>
+    </tr>
+    <tr>
+        <td>DIMENSIONS</td>
+        <td>DBTYPE_WSTR</td>
+        <td>A comma delimited list of hierarchies included
+            in the set.</td>
+    </tr>
+    <tr>
+        <td>SET_CAPTION</td>
+        <td>DBTYPE_WSTR</td>
+        <td>A label or caption associated with the set. The
+            label or caption is used primarily for display
+            purposes.</td>
+    </tr>
+    <tr>
+        <td>SET_DISPLAY_FOLDER</td>
+        <td>DBTYPE_WSTR</td>
+        <td>The path to be used by the user interface when
+            displaying the set. Folder names are separated by a
+            backslash (<b>\</b>), folders are separated by a
+            semicolon (<b>;</b>).</td>
+    </tr>
+</table>
+
+<p>The rowset is sorted on <b>CATALOG_NAME</b>, <b>
+    SCHEMA_NAME</b>, <b>CUBE_NAME</b>.</p>
+
+<p>&nbsp;</p>
+
+<h4>2.6.4. <a name="Other_methods">Other methods</a></h4>
+
+<table>
+	<tr>
+		<th>Method</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td><code><a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html">getMdxKeywords()</a></code></td>
+		<td>Returns </td>
+	</tr>
+</table>
+
 <p>OlapDatabaseMetaData extends </p>
 <p>Classes:</p>
 <ul>
@@ -620,13 +2831,13 @@ with access control.</p>
 
 <h3>2.7. <a name="Transform">Transform</a></h3>
 
-<p>A transform is an operation which maps a query model to a new query model. It 
-is usually triggered by a gesture within the user-interface. For example, 
+<p>A transform is an operation which maps a query model to a new query model. It
+is usually triggered by a gesture within the user-interface. For example,
 clicking on the <i>Unit Sales</i> column transforms the query</p>
 
 <div class="code">
 
-  	SELECT {[Measures].[Store Sales], [Measures].[Unit Sales]} ON 
+  	SELECT {[Measures].[Store Sales], [Measures].[Unit Sales]} ON
   COLUMNS,<br>
 &nbsp; {[Product].Members} ON ROWS<br>
   FROM [Sales]
@@ -635,7 +2846,7 @@ clicking on the <i>Unit Sales</i> column transforms the query</p>
 <p>into one with sorting:</p>
 
 <div class="code">
-  SELECT {[Measures].[Store Sales], [Measures].[Unit Sales]} ON 
+  SELECT {[Measures].[Store Sales], [Measures].[Unit Sales]} ON
   COLUMNS,<br>
 &nbsp; Order({[Product].Members}, [Measures].[Unit Sales], ASC) ON ROWS<br>
   FROM [Sales]
@@ -647,9 +2858,9 @@ clicking on the <i>Unit Sales</i> column transforms the query</p>
 
 <h3>2.8. <a name="Layout">Layout</a></h3>
 
-<p>The layout package provides data models for graphical OLAP applications. In 
+<p>The layout package provides data models for graphical OLAP applications. In
 particular, the GridModel class provides, for OLAP data, what Swing's
-<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/table/TableModel.html">
+<a class="javadoc" href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/table/TableModel.html">
 TableModel</a> provides for SQL data.</p>
 
 <p>Package name: <code>org.olap4j.layout</code></p>
@@ -658,28 +2869,28 @@ TableModel</a> provides for SQL data.</p>
 
 <h2>3. <a name="Other_components">Other components</a></h2>
 
-<p>The API described above is a set of interfaces which must be implemented by 
-any compliant provider. The olap4j project also contains some components which 
+<p>The API described above is a set of interfaces which must be implemented by
+any compliant provider. The olap4j project also contains some components which
 are not part of the API.</p>
 
 <h3>3.1. <a name="Test_suite">Test suite</a></h3>
 
-<p>The olap4j project contains a TCK (Test Compatability Kit). The TCK is a suite 
-of tests which can be used to verify the compliance of an implementation of the 
+<p>The olap4j project contains a TCK (Test Compatability Kit). The TCK is a suite
+of tests which can be used to verify the compliance of an implementation of the
 API.</p>
 
 <h3>3.2. <a name="XML/A_provider">XML/A provider</a></h3>
 
-<p>The XML/A provider is an implementation of the olap4j API which talks to a 
+<p>The XML/A provider is an implementation of the olap4j API which talks to a
 generic XML/A provider.</p>
 
-<p>Since there are many XML/A providers, and some of them require requests in a 
-particular format and/or produce idiosyncratic responses, the XML/A provider 
+<p>Since there are many XML/A providers, and some of them require requests in a
+particular format and/or produce idiosyncratic responses, the XML/A provider
 will come in several flavors.</p>
 
 <h2>4. <a name="Non-functionality">Non-functionality</a></h2>
 
-<p>Here are some of the areas of functionality which will <i>not</i> be part of 
+<p>Here are some of the areas of functionality which will <i>not</i> be part of
 the olap4j project:</p>
 <ul>
   <li>Schema reader parses an XML file to create a schema</li>
@@ -695,44 +2906,48 @@ the olap4j project:</p>
 
 <h3>5.1. <a name="Mondrian_provider">Mondrian provider</a></h3>
 
-<p>The Mondrian project will contain an implementation of the olap4j API based on 
+<p>The Mondrian project will contain an implementation of the olap4j API based on
 the Mondrian OLAP server.</p>
 
 <h3>5.2. <a name="JPivot">JPivot</a></h3>
 
-<p>JPivot currently based on two data sources: the Mondrian server, and a 
+<p>JPivot currently based on two data sources: the Mondrian server, and a
 generic XML/A data source.</p>
 
-<p>We intend to convert JPivot to run solely on the olap4j API. Connectivity to 
-Mondrian and XML/A sources will be achieved by choosing the appropriate olap4j 
+<p>We intend to convert JPivot to run solely on the olap4j API. Connectivity to
+Mondrian and XML/A sources will be achieved by choosing the appropriate olap4j
 provider. </p>
 
 <h3>5.3. <a name="Other_data_sources">Other data sources</a></h3>
 
-<p>In principle, providers could be created to other OLAP data sources. This 
-would be particularly straightforward for servers which already have a native 
+<p>In principle, providers could be created to other OLAP data sources. This
+would be particularly straightforward for servers which already have a native
 Java API.</p>
 
 <h2>Appendix A. <a name="Opportunities_for_specification">Opportunities for specification</a></h2>
 
-<p>The following are features which have been suggested for inclusion in the 
-olap4j specification, but which are not part of the current version. They may be 
+<p>The following are features which have been suggested for inclusion in the
+olap4j specification, but which are not part of the current version. They may be
 included in future revisions of the specification.</p>
 
-<h3>Date and Time types</h3>
+<h3>A.1. Date and Time types</h3>
 
-<p>Include support for Date and Time values. The package org.olap4j.mdx.type 
+<p>Include support for Date and Time values. The package org.olap4j.mdx.type
 could have additional classes DateType and TimeType.</p>
 
 <p>(Richard Emberson, 2006/8/14)</p>
 
-<h3>Schema notification</h3>
+<h3>A.2. Schema notification</h3>
 
-<p>Add a mechanism for the client to detect that the schema has been modified 
-(for instance, that a cube has been added). Not necessarily to find out what 
+<p>Add a mechanism for the client to detect that the schema has been modified
+(for instance, that a cube has been added). Not necessarily to find out what
 those changes are.</p>
 
 <p>(Richard Emberson, 2006/8/15)</p>
+<h3>A.3. Writethrough/Writeback</h3>
+<p>Specify how clients can write cell values back to the database. Useful for
+budgeting applications and 'what if?' analysis.</p>
+<p>(PALO, 2006/10/14)</p>
 
 <h2>Appendix B. <a name="Feedback">Feedback</a></h2>
 
@@ -757,7 +2972,11 @@ olap4j, JDK 1.5 and generics</a>. I am proceeding on the assumption that we are
 targeting JDK 1.5, and running retroweaver for backward compatibility for JDK 
 1.4.</p>
 <h2>Appendix D. <a name="Miscellaneous">Miscellaneous</a></h2>
+<h3>D.1. To be specified</h3>
 <p>[Discuss thread safety of connections, statements, result sets.]</p>
+<h2>Appendix E. <a name="References">References</a></h2>
+<p>1. <a name="XMLA">XMLA</a>: <a class="l" href="http://www.xmla.org/spec/1.1/xmla1.1.doc">XML for 
+Analysis Specification, version 1.1</a></p>
 
 <hr noshade>
 

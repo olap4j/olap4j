@@ -41,7 +41,6 @@ public interface OlapStatement extends Statement {
      * @return Result
      */
     OlapResultSet executeOlapQuery(Query query);
-
 }
 
 // End OlapStatement.java

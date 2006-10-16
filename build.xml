@@ -14,7 +14,7 @@
   <property file="${project.location}/build.properties"/>
   <property name="project.build.debug" value="on"/>
   <property name="name" value="olap4j"/>
-  <property name="version" value="0.5"/>
+  <property name="version" value="0.6"/>
   <property name="dist.name" value="${name}-${version}" />
 
   <!-- properties related to paths -->
@@ -183,7 +183,7 @@ ${doc.dir}/api/src-html/**/*"/>
   </target>
   
   <target name="doczip"
-      depends="version,javadoc"
+      depends="version,javadoc,javadoc-pdf"
       description="Builds a zipfile of the documentation, which can then be
                    deployed to sf.net. See also doc/deployDoc.sh.">
     <mkdir dir="${dist.dir}" />
@@ -197,7 +197,8 @@ doc/api/**/*,
 doc/**/*.html,
 doc/**/*.pdf,
 doc/**/*.css,
-doc/**/*.xml"
+doc/**/*.xml,
+doc/olap4j_api.pdf"
           excludes="
 **/*~,
 **/_vti*/*,

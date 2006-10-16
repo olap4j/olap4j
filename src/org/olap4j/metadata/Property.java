@@ -11,6 +11,8 @@ package org.olap4j.metadata;
 
 import mondrian.olap.PropertyFormatter;
 
+import java.util.Locale;
+
 /**
  * Definition of a property of a Member or Cell.
  *
@@ -18,7 +20,7 @@ import mondrian.olap.PropertyFormatter;
  * @version $Id$
  * @since Aug 23, 2006
  */
-public interface Property {
+public interface Property extends MetadataElement {
     /**
      * Returns the datatype of this Property.
      */
@@ -28,14 +30,6 @@ public interface Property {
      * Returns the scope of this property.
      */
     Scope getScope();
-
-    String getDescription();
-
-    /**
-     * Returns the caption of this property.
-     * The default implementation returns the name of the property.
-     */
-    String getCaption();
 
     boolean isInternal();
 
@@ -265,20 +259,28 @@ public interface Property {
             this.description = description;
         }
 
+        public String getName() {
+            return name();
+        }
+
+        public String getUniqueName() {
+            return name();
+        }
+
+        public String getDescription(Locale locale) {
+            return description;
+        }
+
+        public String getCaption(Locale locale) {
+            return name();
+        }
+
         public Datatype getType() {
             return type;
         }
 
         public Scope getScope() {
             return Scope.MEMBER;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getCaption() {
-            return name();
         }
 
         public boolean isInternal() {
@@ -384,16 +386,24 @@ public interface Property {
             return Scope.CELL;
         }
 
-        public String getDescription() {
+        public String getName() {
+            return name();
+        }
+
+        public String getUniqueName() {
+            return name();
+        }
+
+        public String getCaption(Locale locale) {
+            return name();
+        }
+
+        public String getDescription(Locale locale) {
             return description;
         }
 
         public PropertyFormatter getFormatter() {
             return null;
-        }
-
-        public String getCaption() {
-            return name();
         }
 
         public boolean isInternal() {

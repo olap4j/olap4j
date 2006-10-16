@@ -17,7 +17,7 @@ package org.olap4j.metadata;
  * @version $Id$
  * @since Aug 23, 2006
  */
-public interface Level {
+public interface Level extends MetadataElement {
     /**
      * Returns the depth of this level.
      *
@@ -33,6 +33,12 @@ public interface Level {
      * Returns the Hierarchy this Level belongs to.
      */
     Hierarchy getHierarchy();
+
+    /**
+     * Returns the Dimension this Level belongs to.
+     * (Always equivalent to <code>getHierarchy().getDimension()</code>.)
+     */
+    Dimension getDimension();
 
     /**
      * Returns the type of this Level.
