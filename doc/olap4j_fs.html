@@ -83,7 +83,7 @@ TABLE TD {
 Version: 0.6-dev (draft)<br>
 Revision: $Id: $
 (<a href="http://svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
-Last modified: October 14<sup>th</sup>, 2006.</p>
+Last modified: October 17<sup>th</sup>, 2006.</p>
 <hr noshade>
 
 <h2><a name="Contents">Contents</a></h2>
@@ -102,6 +102,7 @@ Last modified: October 14<sup>th</sup>, 2006.</p>
 		<li><a href="#Benefits_of_a_standard_Java_API_for_OLAP">Benefits of a
 		standard Java API for OLAP</a></li>
 		<li><a href="#Architecture_of_olap4j">Architecture of olap4j</a></li>
+        <li><a href="#Compatibility">Compatibility</a></li>
 	</ol>
 	</li>
 	<li><a href="#Components_of_the_API">Components of the API</a><ol>
@@ -321,7 +322,27 @@ open-source efforts to build providers for their servers.</p>
 
 <p>The following diagram shows how olap4j fits into an enterprise architecture.</p>
 
-<img class="std" alt="olap4j architecture" src="olap4j-arch.png"><h2>
+<img class="std" alt="olap4j architecture" src="olap4j-arch.png"/>
+
+<h3>1.6. <a name="Compatibility">Compatibility</a></h3>
+
+<p>olap4j requires JDK 1.5 or higher, in particular because it uses the generics 
+and enum features introduced in JDK 1.5.0.</p>
+
+<p>JDK 1.4 compability will be available on demand, using the
+<a href="http://retroweaver.sourceforge.net/">Retroweaver</a> utility. This will 
+consist of a retrowoven JAR file, <code>olap4j-jdk1.4.jar</code> and 
+retroweaver's runtime library <code>retroweaver-rt-1.2.4.jar</code>. (See
+<a href="#JDK">design note</a>.)</p>
+
+<p>jdbc is consistent with JDBC version 3.0 (which was introduced in JDK 1.4 and 
+is also in JDK 1.5).</p>
+
+<p>JDBC version 4.0 is expected to be introduced in JDK 1.6.0. We expect JDBC 
+4.0 will add new methods to existing JDBC classes, and therefore compatibility 
+with JDBC 4.0 will require a new release of olap4j.</p>
+
+<h2>
 2.
 <a name="Components_of_the_API">Components of the API</a></h2>
 
@@ -401,18 +422,23 @@ string, the code is identical.</p>
 <p>In the above examples, a statement was created from a string. As we shall
 see, a statement can also be created from an MDX parse tree.</p>
 
-<p>Package name: <a class="javadoc" href="api/org/olap4j/overview-summary.html">org.olap4j</a></p>
+<p>Package name: <a class="javadoc" href="api/org/olap4j/package-summary.html">org.olap4j</a></p>
 
-<h4>2.2.1.&nbsp;<a name="OlapConnection">OlapConnection</a><p>
+<h4>2.2.1.&nbsp;<a name="OlapConnection">OlapConnection</a></h4>
+
+<p>
 <a class="javadoc" href="api/org/olap4j/OlapConnection.html">OlapConnection</a>&nbsp; (extends
 <a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Connection.html">
 java.sql.Connection</a>) is a
 connection to an OLAP data source.</p>
+
 <h4>2.2.2. <a name="Connection_pooling">Connection pooling</a></h4>
+
 <p>Look again at the code samples in the previous section. One would expect that it would be safe to downcast the result of a factory
 method to the desired result. For example, if you invoke an <code>OlapConnection</code>'s
 <code>createStatement()</code> method, the result should be an <code>
 OlapStatement</code>.</p>
+
 <p>But if you you are using a connection-pooling
 library (common examples of which include <a href="http://jakarta.apache.org/commons/dbcp/">Jakarta Commons DBCP</a> 
 and
@@ -421,7 +447,8 @@ connection-pooling library tracks connections by wrapping them in another class,
 and this class will implement <code>java.sql.Connection</code> but not <code>
 OlapConnection</code>. To access methods of the <code>OlapConnection</code>, the
 client application must first strip away the wrapper object.</p>
-<p>If you are using a connection-pooling library, olap4j provides a helper class to access the object underneath a wrapped 
+
+<p>If you are using a connection-pooling library, olap4j provides a helper class to access the object underneath a wrapped
 connection, statement, prepared statement or result set. For instance,</p>
 
 <div class="code">DataSource dataSource; // a data source using a connection 
@@ -565,7 +592,7 @@ specific instance is chosen based upon the types of its arguments.</p>
 &nbsp;&nbsp;&nbsp; System.out.println(&quot;Execution failed: &quot; + e);<br>
   }</div>
 
-<p>Package name: <code>org.olap4j.mdx</code></p>
+<p>Package name: <a class="javadoc" href="api/org/olap4j/mdx/package-summary.html">org.olap4j.mdx</a></p>
 
 <p>Classes:</p>
 <ul>
@@ -585,7 +612,7 @@ specific instance is chosen based upon the types of its arguments.</p>
 
 <h3>2.5. <a name="MDX_type_model">MDX type model</a></h3>
 
-<p>Package name: <code>org.olap4j.mdx.type</code></p>
+<p>Package name: <a class="javadoc" href="api/org/olap4j/type/package-summary.html">org.olap4j.type</a></p>
 
 <p>Represents the types of nodes in an MDX query model.</p>
 
@@ -685,9 +712,9 @@ or <code>[Time].[Month]</code>.</p>
 	Set(Tuple(Member(level=[Gender].[Gender]), Member(hierarchy=[Store]))</code>.</li>
 </ul>
 <h3>2.6. <a name="Metadata">Metadata</a></h3>
-<p>Package name:
-<a class="javadoc" href="api/org/olap4j/metamodel/overview-summary.html">
-org.olap4j.metamodel</a></p>
+
+<p>Package name: <a class="javadoc" href="api/org/olap4j/metadata/package-summary.html">org.olap4j.metadata</a></p>
+
 <p>Metadata are the objects which describe the structure of an OLAP schema:
 cubes, dimensions, members, properties and so forth.</p>
 <p>olap4j exposes metadata in two very different ways:</p>
@@ -919,15 +946,17 @@ olap4j method.</p>
 		getSets</a></td>
 	</tr>
 </table>
-<p class="Text">The rows returned in the result set returned from the metadata
+
+<p>The rows returned in the result set returned from the metadata
 methods are structured according to the result set column layouts detailed in this
 section.</p>
-<p class="Text">All columns noted in the following result sets are required, and
+
+<p>All columns noted in the following result sets are required, and
 they must be returned in the order shown. However, additional columns (which
-should be ignored by clients not expecting thxem) can be added at the end, and
-some columns can contain null data for info
-xxx<si<sicrmation that does not apply.</p>
-<p class="Text">The following sections describe the columns in each rowset. Each
+should be ignored by clients not expecting them) can be added at the end, and
+some columns can contain null data for info that does not apply.</p>
+
+<p>The following sections describe the columns in each rowset. Each
 section includes a table that provides the following information for each
 column.</p>
 
@@ -2852,7 +2881,7 @@ clicking on the <i>Unit Sales</i> column transforms the query</p>
   FROM [Sales]
 </div>
 
-<p>Package name: <code>org.olap4j.transform</code></p>
+<p>Package name: <a class="javadoc" href="api/org/olap4j/transform/package-summary.html">org.olap4j.transform</a></p>
 
 <p>Classes: TBD</p>
 
@@ -2863,7 +2892,7 @@ particular, the GridModel class provides, for OLAP data, what Swing's
 <a class="javadoc" href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/table/TableModel.html">
 TableModel</a> provides for SQL data.</p>
 
-<p>Package name: <code>org.olap4j.layout</code></p>
+<p>Package name: <a class="javadoc" href="api/org/olap4j/layout/package-summary.html">org.olap4j.layout</a></p>
 
 <p>Classes: TBD</p>
 
@@ -2932,7 +2961,7 @@ included in future revisions of the specification.</p>
 
 <h3>A.1. Date and Time types</h3>
 
-<p>Include support for Date and Time values. The package org.olap4j.mdx.type
+<p>Include support for Date and Time values. The package <code>org.olap4j.type</code>
 could have additional classes DateType and TimeType.</p>
 
 <p>(Richard Emberson, 2006/8/14)</p>
@@ -2964,18 +2993,25 @@ of an individual's execution context.&quot;</p>
 <p>These issues will be voted upon at the next meeting. If they are accepted, 
 they will generally be put into the spec.</p>
 
-<h3>JDK version</h3>
+<p>(No issues are currently open.)</p>
 
-<p>See forum thread:
-<a href="http://sourceforge.net/forum/forum.php?thread_id=1560764&forum_id=577988">
-olap4j, JDK 1.5 and generics</a>. I am proceeding on the assumption that we are 
-targeting JDK 1.5, and running retroweaver for backward compatibility for JDK 
-1.4.</p>
 <h2>Appendix D. <a name="Miscellaneous">Miscellaneous</a></h2>
+
 <h3>D.1. To be specified</h3>
+
 <p>[Discuss thread safety of connections, statements, result sets.]</p>
+<p>[API for cancelling statements.]</p>
+
+<h3>D.2. Design notes</h3>
+
+<p><a name="JDK">JDK</a>. We are targeting JDK 1.5, and running retroweaver for
+backward compatibility for JDK 1.4. See forum thread:
+<a href="http://sourceforge.net/forum/forum.php?thread_id=1560764&forum_id=577988">
+olap4j, JDK 1.5 and generics</a>. </p>
+
 <h2>Appendix E. <a name="References">References</a></h2>
-<p>1. <a name="XMLA">XMLA</a>: <a class="l" href="http://www.xmla.org/spec/1.1/xmla1.1.doc">XML for 
+
+<p>1. <a name="XMLA">XMLA</a>: <a class="l" href="http://www.xmla.org/spec/1.1/xmla1.1.doc">XML for
 Analysis Specification, version 1.1</a></p>
 
 <hr noshade>
