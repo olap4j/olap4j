@@ -196,6 +196,7 @@ ${doc.dir}/api/src-html/**/*"/>
 doc/api/**/*,
 doc/**/*.html,
 doc/**/*.pdf,
+doc/**/*.png,
 doc/**/*.css,
 doc/**/*.xml,
 doc/olap4j_api.pdf"
