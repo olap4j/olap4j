@@ -78,7 +78,7 @@ TABLE TD {
 
 <h1>olap4j Functional Specification</h1>
 
-<p>Author(s): Julian Hyde<br>
+<p>Author(s): Julian Hyde, Barry Klawans<br>
 Version: 0.6-dev (draft)<br>
 Revision: $Id: $
 (<a href="http://svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
@@ -3161,6 +3161,54 @@ they will generally be put into the spec.</p>
 
 <p>[Discuss thread safety of connections, statements, result sets.]</p>
 <p>[API for cancelling statements.]</p>
+<p>[2006/10/20#1. Specification should include compliance levels, like the SQL 
+specification does. In particular, we will allow providers to comply with a 
+limited subset of MDX.]</p>
+<p>[2006/10/20#2. Metadata objects need to be compared using equals, not 
+identity. (Michael had war-stories of an OLAP API where members from a result 
+set were not equal to members obtained by browsing the schema.)]</p>
+<p>[2006/10/20#3. Need to allow clients to access the members on a ResultAxis 
+via a list (for convenience) and via an iterator. Iterators need to be 
+restartable, but not bidirectional. Need to know the size of the axes, even if 
+using the iterator interface.]</p>
+<p>[2006/10/20#4. Cells - random access (not the 'etchasketch' model used by 
+JOLAP). Access via ordinal, not via a coordinates. Since access to cells is 
+random access, it makes it hard for a low-memory provider to access cells 
+without many round-trips. We agreed that the provider should try to recognize 
+the pattern. John drew the analogy of a modern file system, implementing a 
+serial access interface (streams) on top of random-access primitives. Michael 
+suggested that we implement a method to get a cell range - the hypercube of 
+cells between coordinates minX and maxX, and minY and maxY - but we deferred 
+that to a future release.]</p>
+<p>[2006/10/20#5. Available locales in cubes and schemas. Use case: suppose one 
+cube is available in English and French, and in French and Spanish, and both are 
+shown in same portal. Clients typically say that seeing reports in a mixture of 
+languages is confusing; the portal would figure out the best common language, in 
+this case French. Add methods to Schema and Cube.]</p>
+<p>[2006/10/20#6. We discussed session support. It is necessary for write-back. 
+JDBC's 'stateful session' is difficult to implement over a stateless protocol 
+like HTTP. Michael suggested adding 'session name' as a parameter to 'execute' 
+methods. Julian disagreed. No conclusion reached.]</p>
+<p>[2006/10/20#7. We discussed the goals and intended audience of olap4j. The 
+audience spans from a beginner's audience (only 2 hours experience with the API) 
+who don't want to write a lot of code, to writers of clients (2 yrs experience 
+with the API) who want performance and don't care how much code they need to 
+write. Distributed clients (e.g. olap4j provider for XMLA) have bandwidth 
+constraints. Mobile clients also have memory constraints.</p>
+<p>ADOMD addressed beginners audience well, but used a lot of memory. Challenge 
+is to support an object model (hence easy programming model) without increasing 
+memory. No specific change to the specification, but decided to add memory 
+efficiency as a design goal.]</p>
+<p>[2006/10/20#8. Need to make shared dimensions accessible from schema.]</p>
+<p>[2006/10/20#9. Need to support drill-through. Method which returns a result 
+set. (Mondrian exposes the SQL statement used to form the result set, and 
+exposes the mapping from columns to members/levels, but we will not include this 
+in the olap4j interface.)]</p>
+<p>[2006/10/20#10. John proposed adding OlapException. These would extend 
+SQLException, and have a 'Object getContext()' method which would return the 
+context (member or cell) where the error occurred. New methods would have 
+'throws OlapException', and existing methods (e.g. Statement.close()) can (at 
+provider's choice) throw either OlapException or SQLException.]</p>
 
 <h3>D.2. Design notes</h3>
 
@@ -3172,7 +3220,7 @@ olap4j, JDK 1.5 and generics</a>. </p>
 <h2>Appendix E. <a name="References">References</a></h2>
 
 <p>1. <a name="XMLA">XMLA</a>: <a class="l" href="http://www.xmla.org/spec/1.1/xmla1.1.doc">XML for
-Analysis Specification, version 1.1</a></p>
+Analysis Specification, version 1.1</a>.</p>
 
 <hr noshade="noshade">
 
