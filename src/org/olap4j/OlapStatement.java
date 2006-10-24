@@ -9,12 +9,9 @@
 */
 package org.olap4j;
 
-import org.olap4j.metadata.Cube;
+import mondrian.olap.Query;
 
 import java.sql.Statement;
-import java.sql.SQLException;
-
-import mondrian.olap.Query;
 
 /**
  * Object used for statically executing an MDX statement and returning an
@@ -31,7 +28,7 @@ public interface OlapStatement extends Statement {
     /**
      * Executes an OLAP statement.
      */
-    OlapResultSet executeOlapQuery(String mdx) throws SQLException;
+    OlapResultSet executeOlapQuery(String mdx) throws OlapException;
 
     /**
      * Executes an OLAP statement expressed as a parse tree.

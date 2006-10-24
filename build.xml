@@ -47,6 +47,8 @@
     <pathelement location="${ant.home}/lib/optional.jar"/>
     <!-- We depend on mondrian right now. Ugh. -->
     <pathelement location="${lib.dir}/mondrian-2.1.1.jar"/>
+    <!-- We depend on spring, but only for examples. -->
+    <pathelement location="${lib.dir}/spring.jar"/>
 
   </path>
 

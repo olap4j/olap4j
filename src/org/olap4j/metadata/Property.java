@@ -14,7 +14,8 @@ import mondrian.olap.PropertyFormatter;
 import java.util.Locale;
 
 /**
- * Definition of a property of a Member or Cell.
+ * Definition of a property of a {@link Member} or
+ * {@link org.olap4j.ResultCell}.
  *
  * @author jhyde
  * @version $Id$

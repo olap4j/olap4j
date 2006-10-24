@@ -12,7 +12,6 @@ package org.olap4j;
 import org.olap4j.type.Type;
 
 import java.sql.ParameterMetaData;
-import java.sql.SQLException;
 
 /**
  * Extension to {@link ParameterMetaData} for parameters of OLAP statements.
@@ -44,9 +43,9 @@ public interface OlapParameterMetaData extends ParameterMetaData {
      *
      * @param param the first parameter is 1, the second is 2, ...
      * @return OLAP type
-     * @exception SQLException if a database access error occurs
+     * @exception OlapException if a database access error occurs
      */
-    Type getOlapType(int param) throws SQLException;
+    Type getOlapType(int param) throws OlapException;
 }
 
 // End OlapParameterMetaData.java

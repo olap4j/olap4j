@@ -123,7 +123,7 @@ Last modified: October 17<sup>th</sup>, 2006.</p>
         <li><a href="#OlapParameterMetaData">The OlapParameterMetaData interface</a></li>
         <li><a href="#OlapResultSet">The OlapResultSet interface</a></li>
         <li><a href="#ResultAxis">The ResultAxis interface</a></li>
-        <li><a href="#The_ResultPosition_interface">The Position interface</a></li>
+        <li><a href="#The_ResultPosition_interface">The ResultPosition interface</a></li>
         <li><a href="#ResultCell">The ResultCell interface</a></li>
 	</ol>
 		</li>
@@ -133,6 +133,7 @@ Last modified: October 17<sup>th</sup>, 2006.</p>
 		<li><a href="#Access_control">Access control</a></li>
 		<li><a href="#Metadata_objects">Metadata objects</a><ol>
 		<li><a href="#MetadataElement">The MetadataElement interface</a></li>
+        <li><a href="#The_Database_interface">The Database interface</a></li>
         <li><a href="#Catalog">The Catalog interface</a></li>
         <li><a href="#Schema">The Schema interface</a></li>
 		<li><a href="#Cube">The Cube interface</a></li>
@@ -381,7 +382,7 @@ with JDBC 4.0 will require a new release of olap4j.</p>
 <p>We now describe the olap4j API in more detail, by breaking it down into a set
 of functional areas.</p>
 
-<img class="std" alt="olap4j components" src="olap4j-comp.png" width="740" height="692">
+<img class="std" alt="olap4j components" src="open/olap4j/doc/olap4j-comp.png" width="740" height="692">
 
 <h3>2.1. <a name="Driver_management">Driver management</a></h3>
 
@@ -537,7 +538,9 @@ that any statements or prepared statements created from that connection also
 work with the connection pool. </p>
 <p>The problem does not just affect connections: some connection pools also wrap
 <code>Statement</code>, <code>PreparedStatement</code>, <code>ResultSet</code>
-and <code>DatabaseMetaData</code> objects, so there are <code>convert()</code>
+and 
+<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DatabaseMetaData.html">
+DatabaseMetaData</a> objects, so there are <code>convert()</code>
 methods for these too.</p>
 <p>Hopefully this problem will only be temporary. As olap4j gains popularity, we
 expect connection pools to add support for the extended interfaces, and it will
@@ -606,7 +609,7 @@ are applicable:</p>
 
 <h4>2.3.5. <a name="ResultAxis">The ResultAxis interface</a></h4>
 <p>A <a class="javadoc" href="api/org/olap4j/ResultAxis.html">ResultAxis</a> is 
-a </p>
+a ...</p>
 <p>[tbd]</p>
 <p>[access positions by index (i.e. a list) and by scrolling (i.e. an iterator)]</p>
 <h4>2.3.6. <a name="The_ResultPosition_interface">The ResultPosition interface</a></h4>
@@ -886,13 +889,21 @@ description.</p>
 	<li>String getCaption(Locale locale)</li>
 	<li>String getDescription(Locale locale)</li>
 </ul>
-<h5>2.6.2.2. <a name="Catalog">The Catalog interface</a></h5>
-<p><a class="javadoc" href="api/org/olap4j/metadata/Catalog.html">Catalog</a> ...</p>
+<h5>2.6.2.2. <a name="The_Database_interface">The Database interface</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Database.html">Database</a> 
+is the root element in a hierarchy of metadata elements.</p>
+<p>Methods:</p>
+<ul>
+	<li>NamedList&lt;Catalog&gt; getCatalogs()</li>
+</ul>
+<h5>2.6.2.3. <a name="Catalog">The Catalog interface</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Catalog.html">Catalog</a> 
+...</p>
 <ul>
 	<li>String getName()</li>
     <li>NamedList&lt;Schema&gt; getSchemas()</li>
 </ul>
-<h5>2.6.2.3. <a name="Schema">The Schema interface</a></h5>
+<h5>2.6.2.4. <a name="Schema">The Schema interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Schema.html">Schema</a> ...</p>
 <ul>
 	<li>String getName()</li>
@@ -901,7 +912,7 @@ description.</p>
     <li>getSupportedLocales() (see <a href="#Internationalization">
     Internationalization</a>)</li>
 </ul>
-<h5>2.6.2.4. <a name="Cube">The Cube interface</a></h5>
+<h5>2.6.2.5. <a name="Cube">The Cube interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Cube.html">Cube</a> ...</p>
 <ul>
 	<li>List&lt;Dimension&gt; getDimensions()</li>
@@ -910,17 +921,20 @@ description.</p>
     <li>getSupportedLocales() (see <a href="#Internationalization">
     Internationalization</a>)</li>
 </ul>
-<h5>2.6.2.5. <a name="Dimension">The Dimension interface</a></h5>
+<h5>2.6.2.6. <a name="Dimension">The Dimension interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Dimension.html">Dimension</a>
-...</p>
+(extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
+MetadataElement</a>)</p>
 <ul>
 	<li>String getName()</li>
 	<li>List&lt;Hierarchy&gt; getHierarchies()</li>
 	<li>List&lt;Member&gt; getRootMembers()</li>
 	<li>Dimension.Type getDimensionType()</li>
 </ul>
-<h5>2.6.2.6. <a name="Hierarchy">The Hierarchy interface</a></h5>
-<p><a class="javadoc" href="api/org/olap4j/metadata/Hierarchy.html">Hierarchy</a>
+<h5>2.6.2.7. <a name="Hierarchy">The Hierarchy interface</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Hierarchy.html">Hierarchy</a>&nbsp; 
+(extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
+MetadataElement</a>)
 ...</p>
 <ul>
 	<li>Dimension getDimension()</li>
@@ -928,16 +942,20 @@ description.</p>
 	<li>List&lt;Level&gt; getLevels()</li>
 	<li>boolean hasAll()</li>
 </ul>
-<h5>2.6.2.7. <a name="Level">The Level interface</a></h5>
-<p><a class="javadoc" href="api/org/olap4j/metadata/Level.html">Level</a> ...</p>
+<h5>2.6.2.8. <a name="Level">The Level interface</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Level.html">Level</a>&nbsp; 
+(extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
+MetadataElement</a>) ...</p>
 <ul>
 	<li>int getDepth()</li>
 	<li>Hierarchy getHierarchy()</li>
 	<li>Level.Type getLevelType()</li>
 	<li>List&lt;Property&gt; getProperties()</li>
 </ul>
-<h5>2.6.2.8. <a name="Member">The Member interface</a></h5>
-<p><a class="javadoc" href="api/org/olap4j/metadata/Member.html">Member</a> ...</p>
+<h5>2.6.2.9. <a name="Member">The Member interface</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Member.html">Member</a>&nbsp; 
+(extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
+MetadataElement</a>) ...</p>
 <ul>
 	<li>String getName()</li>
 	<li>List&lt;Member&gt; getChildMembers()</li>
@@ -957,13 +975,17 @@ description.</p>
 	<li>boolean isHidden()</li>
 	<li>Member getDataMember()</li>
 </ul>
-<h5>2.6.2.9. <a name="Measure">The Measure interface</a></h5>
-<p><a class="javadoc" href="api/org/olap4j/metadata/Measure.html">Measure</a> ...</p>
+<h5>2.6.2.10. <a name="Measure">The Measure interface</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Measure.html">Measure</a>&nbsp; 
+(extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
+MetadataElement</a>) ...</p>
 <ul>
 	<li>extends Member</li>
 </ul>
-<h5>2.6.2.10. <a name="Property">The Property interface</a></h5>
-<p><a class="javadoc" href="api/org/olap4j/metadata/Property.html">Property</a>
+<h5>2.6.2.11. <a name="Property">The Property interface</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/Property.html">Property</a>&nbsp; 
+(extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
+MetadataElement</a>)
 ...</p>
 <ul>
 	<li>Datatype getType()</li>
@@ -976,6 +998,14 @@ description.</p>
 	}</li>
 	<li>enum StandardCellProperty { BACK_COLOR, CELL_EVALUATION_LIST, ... }</li>
 </ul>
+<h5>2.6.2.12. <a name="The_NamedSet_interface">The NamedSet interface</a></h5>
+<p><a class="javadoc" href="api/org/olap4j/metadata/NamedSet.html">NamedSet</a> 
+(extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
+MetadataElement</a>)
+...</p>
+<ul>
+	<li>Cube getCube()</li>
+</ul>
 <h4>2.6.3. 
 <a name="The_OlapDatabaseMetaData_interface_and_methods_which_return_schema_rowsets">The OlapDatabaseMetaData 
 interface, and methods which return schema rowsets</a></h4>
@@ -984,114 +1014,170 @@ OlapDatabaseMetaData</a> (extends
 <a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DatabaseMetaData.html">
 java.sql.DatabaseMetaData</a>) contains methods which return schema result sets.</p>
 <p>Schema result sets are specified as in [<a href="#XMLA">XML for Analysis
-specification</a>]. Here is a table of the XML/A methods and the corresponding
-olap4j method.</p>
+specification</a>]. Here is a table of the XML/A methods and the corresponding 
+olap4j method and element type.</p>
 
 <table>
 	<tbody>
     <tr>
 		<th>XML for Analysis schema rowset</th>
-		<th>OlapDatabaseMetaData method</th>
+		<th>Schema result set method</th>
+		<th>Metadata element</th>
+	</tr>
+	<tr>
+		<td>not supported</td>
+		<td>
+		not supported</td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/metadata/Database.html">Database</a></td>
+	</tr>
+	<tr>
+		<td>not supported</td>
+		<td>
+		<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DatabaseMetaData.html#getCatalogs()">
+        DatabaseMetaData.getCatalogs</a></td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/metadata/Catalog.html">Catalog</a></td>
+	</tr>
+	<tr>
+		<td>not supported</td>
+		<td>
+		<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DatabaseMetaData.html#getSchemas()">
+        DatabaseMetaData.getSchemas</a></td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/metadata/Schema.html">Schema</a></td>
 	</tr>
 	<tr>
 		<td>DISCOVER_DATASOURCES</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getDatasources(java.lang.String)">
-		getDatasources</a></td>
+        OlapDatabaseMetaData.getDatasources</a></td>
+		<td>
+		not supported</td>
 	</tr>
 	<tr>
 		<td>DISCOVER_ENUMERATORS</td>
+		<td>not supported</td>
 		<td>not supported</td>
 	</tr>
 	<tr>
 		<td>DISCOVER_KEYWORDS</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getMdxKeywords()">
-		getMdxKeywords</a></td>
+        OlapDatabaseMetaData.getMdxKeywords</a></td>
+		<td>
+		not supported</td>
 	</tr>
 	<tr>
 		<td>DISCOVER_LITERALS</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getLiterals()">
-		getLiterals</a></td>
+        OlapDatabaseMetaData.getLiterals</a></td>
+		<td>
+		not supported</td>
 	</tr>
 	<tr>
 		<td>DISCOVER_PROPERTIES</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getDatabaseProperties(java.lang.String)">
-		getDatabaseProperties</a></td>
+        OlapDatabaseMetaData.getDatabaseProperties</a></td>
+		<td>
+		not supported</td>
 	</tr>
 	<tr>
 		<td>DISCOVER_SCHEMA_ROWSETS</td>
+		<td>not supported</td>
 		<td>not supported</td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_ACTIONS</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getActions()">
-		getActions</a></td>
+        OlapDatabaseMetaData.getActions</a></td>
+		<td>
+		not supported</td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_CUBES</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getCubes(java.lang.String, java.lang.String, java.lang.String)">
-		getCubes</a></td>
+        OlapDatabaseMetaData.getCubes</a></td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/metadata/Cube.html">Cube</a></td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_DIMENSIONS</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getDimensions()">
-		getDimensions</a></td>
+        OlapDatabaseMetaData.getDimensions</a></td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/metadata/Dimension.html">Dimension</a></td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_FUNCTIONS</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getFunctions()">
-		getFunctions</a></td>
+        OlapDatabaseMetaData.getFunctions</a></td>
+		<td>
+		not supported</td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_HIERARCHIES</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getHierarchies()">
-		getHierarchies</a></td>
+        OlapDatabaseMetaData.getHierarchies</a></td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/metadata/Hierarchy.html">Hierarchy</a></td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_INPUT_DATASOURCES</td>
 		<td>not supported</td>
+		<td>not supported</td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_KPIS</td>
+		<td>not supported</td>
 		<td>not supported</td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_LEVELS</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getLevels()">
-		getLevels</a></td>
+        OlapDatabaseMetaData.getLevels</a></td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/metadata/Level.html">Level</a></td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_MEASURES</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getMeasures()">
-		getMeasures</a></td>
+        OlapDatabaseMetaData.getMeasures</a></td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/metadata/Measure.html">Measure</a></td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_MEMBERS</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getMembers()">
-		getMembers</a></td>
+        OlapDatabaseMetaData.getMembers</a></td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/metadata/Member.html">Member</a></td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_PROPERTIES</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getProperties()">
-		getProperties</a></td>
+        OlapDatabaseMetaData.getProperties</a></td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/metadata/Property.html">Property</a></td>
 	</tr>
 	<tr>
 		<td>MDSCHEMA_SETS</td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getSets()">
-		getSets</a></td>
+        OlapDatabaseMetaData.getSets</a></td>
+		<td>
+		<a class="javadoc" href="api/org/olap4j/metadata/NamedSet.html">NamedSet</a></td>
 	</tr>
 </tbody></table>
 
@@ -1119,31 +1205,12 @@ column.</p>
 	</tr>
 	<tr>
 		<td>Type</td>
-		<td>A description of the data type for the column.</td>
+		<td>A description of the data type for the column, and whether the 
+        column may be NULL.</td>
 	</tr>
 	<tr>
 		<td>Description</td>
 		<td>A brief description of the purpose of the column.</td>
-	</tr>
-	<tr>
-
-		<td>Restriction</td>
-
-		<td>Indicates whether the column can be used to restrict the
-		returned rowset by inclusion in the <i>Restrictions</i>
-		parameter of the <b>Discover</b> method.
-		<i>Yes</i> means that the column is available to
-		use as a <i>Restrictions</i> item to filter results
-		by this field.</td>
-	</tr>
-	<tr>
-
-		<td>Nullable</td>
-
-		<td>Indicates whether the data must be returned or if a null
-		string is allowed if the column does not apply. <i>Yes</i>
-		means nulls are allowed, and the data is optional. <i>
-		No</i> means that the data is required.</td>
 	</tr>
 </tbody></table>
 <p>[Need to clean up data types in the following tables. Types should all be
@@ -1154,6 +1221,10 @@ UPPER_CASE, not CamelCase.]</p>
 the ProviderType and AuthenticationMode attributes of getDatasources, and the
 DIMENSION_TYPE attribute of getDimensions. In some cases those enums already
 exist, but need to be extended.]</p>
+<p>[Mapping from OLE DB- and XML/A-style column sets to JDBC-style. Types: 
+DBTYPE_WSTR to String, DBTYPE_GUID to String, DBTYPE_DBTIMESTAMP to Timestamp, 
+DBTYPE_BOOL to boolean; DBTYPE_I4, DBTYPE_UI4, DBTYPE_I2 and DBTYPE_UI2 all map 
+to int. Column names: mapped CamelCase to UPPER_CASE.]</p>
 
 <h5>2.6.3.1. <a name="getDatasources">getDatasources</a></h5>
 <p>Specified by the <code>DISCOVER_DATASOURCES</code> XML for Analysis method.</p>
@@ -1161,66 +1232,60 @@ exist, but need to be extended.]</p>
 
 <table>
 	<tbody><tr>
-		<th>Column name</th>
-		<th>Type</th>
+		<th width="250">Column name</th>
+		<th width="100">Type</th>
 		<th>Description</th>
-		<th>Nullable</th>
 	</tr>
 	<tr>
-		<th>DataSourceName</th>
-		<td>string</td>
+		<td>DATA_SOURCE_NAME</td>
+		<td width="74">String not null</td>
 		<td>The name of the data source, such as <b>
 		FoodMart 2000</b>.</td>
-		<td>No</td>
 	</tr>
 	<tr>
 
-		<th>DataSourceDescription</th>
+		<td>DATA_SOURCE_DESCRIPTION</td>
 
-		<td>string</td>
+		<td width="74">String</td>
 
 		<td>A description of the data source, as entered by the
 		publisher.</td>
 
-		<td>Yes</td>
 	</tr>
 	<tr>
 
-		<th>URL</th>
+		<td>URL</td>
 
-		<td>string</td>
+		<td width="74">String</td>
 
 		<td>The unique path that shows where to invoke the XML for
 		Analysis methods for that data source.</td>
 
-		<td>Yes</td>
 	</tr>
 	<tr>
 
-		<th>DataSourceInfo</th>
-		<td>string</td>
+		<td>DATA_SOURCE_INFO</td>
+		<td width="74">String</td>
 		<td>
             <p>A string containing any additional information required
 		to connect to the data source. This can include the Initial Catalog
 		property or other information for the provider.</p>
             <p>Example: <code>"Provider=MSOLAP;Data Source=Local;"</code></p>
         </td>
-		<td>Yes</td>
 	</tr>
 	<tr>
-		<th>ProviderName</th>
-		<td>string</td>
+		<td>PROVIDER_NAME</td>
+		<td width="74">String</td>
 		<td>
             <p>The name of the provider behind the data source. </p>
         <p>Example: <code>"MSDASQL"</code></p>
         </td>
-		<td>Yes</td>
 	</tr>
 	<tr>
 
-		<th>ProviderType</th>
+		<td>PROVIDER_TYPE</td>
 
-		<td>array</td>
+		<td width="74">array [todo] not null</td>
 
 		<td>
             <p>The types of data supported by the
@@ -1233,13 +1298,12 @@ exist, but need to be extended.]</p>
                     implements the OLE DB for Data Mining specification.</li>
             </ul>
         </td>
-		<td>No</td>
 	</tr>
 	<tr>
 
-		<th>AuthenticationMode</th>
+		<td>AUTHENTICATION_MODE</td>
 
-		<td>EnumString</td>
+		<td width="74">EnumString [todo] not null</td>
 
 		<td>
             Specification of what type of
@@ -1255,7 +1319,6 @@ exist, but need to be extended.]</p>
         </ul>
         </td>
 
-        <td>No</td>
 	</tr>
 </tbody></table>
 
@@ -1270,46 +1333,41 @@ not listed in the return result set.</p>
 
 <table>
 	<tbody><tr>
-		<th>Column name</th>
-		<th>Type</th>
+		<th width="250">Column name</th>
+		<th width="100">Type</th>
 		<th>Description</th>
-		<th>Nullable</th>
 	</tr>
 	<tr>
 		<td>PROPERTY_NAME</td>
-		<td>string</td>
+		<td>String not null</td>
 		<td>The name of the property. </td>
-		<td>No</td>
 	</tr>
 	<tr>
 		<td>PROPERTY_DESCRIPTION</td>
 
-		<td>string</td>
+		<td>String</td>
 
 		<td>A localizable text description of the property.</td>
 
-		<td>Yes</td>
 	</tr>
 	<tr>
 
 		<td>PROPERTY_TYPE</td>
 
-		<td>string</td>
+		<td>String</td>
 
 		<td>The XML data type of the property.</td>
 
-		<td>Yes</td>
 	</tr>
 	<tr>
 
 		<td>PROPERTY_ACCESS_TYPE</td>
 
-		<td>EnumString</td>
+		<td>EnumString [todo] not null</td>
 
 		<td>Access for the property. The value can be Read, Write,
 		or ReadWrite.</td>
 
-		<td>No</td>
 	</tr>
 	<tr>
 
@@ -1320,22 +1378,19 @@ not listed in the return result set.</p>
 		<td>True if a property is required,
 		false if it is not required.</td>
 
-		<td>Yes</td>
 	</tr>
 	<tr>
 
 		<td>VALUE</td>
 
-		<td>string</td>
+		<td>String</td>
 
 		<td>The current value of the property.</td>
 
-		<td>Yes</td>
 	</tr>
 </tbody></table>
 
 <p>[Is VALUE a JDBC reserved word? If so, change it.]</p>
-
 <h5>2.6.3.3 <a name="getLiterals">getLiterals</a></h5>
 <p>Retrieves a list of information on supported literals, including data types
 and values.</p>
@@ -1344,23 +1399,19 @@ and values.</p>
 
 <table>
 	<tbody><tr>
-		<th>Column name</th>
-		<th>Type</th>
+		<th width="250">Column name</th>
+		<th width="100">Type</th>
 		<th>Description</th>
-		<th>Restriction</th>
-		<th>Nullable</th>
 	</tr>
 	<tr>
-		<td>LiteralName</td>
-		<td>string</td>
+		<td>LITERAL_NAME</td>
+		<td>String not null</td>
 		<td><p>The name of the literal described in the row.</p>
 		<p>Example: DBLITERAL_LIKE_PERCENT</p></td>
-		<td>Yes, as an array</td>
-		<td>No</td>
 	</tr>
 	<tr>
-		<td>LiteralValue</td>
-		<td>string</td>
+		<td>LITERAL_VALUE</td>
+		<td>String</td>
         <td>
         <p>Contains the actual literal value. </p>
         <p>Example, if <b>LiteralName</b> is
@@ -1369,50 +1420,39 @@ and values.</p>
             "%".</p>
     </td>
 
-		<td>No</td>
-
-		<td>Yes</td>
 	</tr>
 	<tr>
 
-		<td>LiteralInvalidChars</td>
+		<td>LITERAL_INVALID_CHARS</td>
 
-		<td>string</td>
+		<td>String</td>
 
 		<td><p>The characters, in the literal, that are not valid. </p>
 		<p>For example, if table names can contain anything other
 		than a numeric character, this string would be &quot;0123456789&quot;.</p></td>
 
-		<td>No</td>
-
-		<td>Yes</td>
 	</tr>
 	<tr>
 
-		<td>LiteralInvalidStartingChars</td>
+		<td>LITERAL_INVALID_<br>
+        STARTING_CHARS</td>
 
-		<td>string</td>
+		<td>String</td>
 
 		<td>The characters that are not valid as the first character
 		of the literal. If the literal can start with any valid character, this
 		is null.</td>
 
-		<td>No</td>
-
-		<td>Yes</td>
 	</tr>
 	<tr>
 
-		<td>LiteralMaxLength</td>
+		<td>LITERAL_MAX_LENGTH</td>
 
-		<td>integer</td>
+		<td>int</td>
 
 		<td>The maximum number of characters in the literal. If
 		there is no maximum or the maximum is unknown, the value is –1.</td>
 
-		<td>No</td>
-
-		<td>Yes</td>
 	</tr>
 </tbody></table>
 
@@ -1424,29 +1464,29 @@ and values.</p>
 
 <table>
 <tbody><tr>
-    <th>Column name</th>
-    <th>Type indicator</th>
+    <th width="250">Column name</th>
+    <th width="100">Type</th>
     <th>Description</th>
 </tr>
 <tr>
     <td>CATALOG_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the database.</td>
 </tr>
 <tr>
     <td>SCHEMA_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>Not supported.</td>
 </tr>
 <tr>
     <td>CUBE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the cube or dimension. Dimension
         names are prefaced by a dollar sign ($) symbol.</td>
 </tr>
 <tr>
     <td>CUBE_TYPE</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The type of the cube. Valid values are:<ul>
         <li><b>CUBE</b> </li>
         <li><b>DIMENSION</b></li>
@@ -1455,76 +1495,76 @@ and values.</p>
 </tr>
 <tr>
     <td>CUBE_GUID</td>
-    <td>DBTYPE_GUID</td>
+    <td>String</td>
     <td>Not supported.</td>
 </tr>
 <tr>
     <td>CREATED_ON</td>
-    <td>DBTYPE_DBTIMESTAMP</td>
+    <td>Timestamp</td>
     <td>Not supported.</td>
 </tr>
 <tr>
     <td>LAST_SCHEMA_UPDATE</td>
-    <td>DBTYPE_DBTIMESTAMP</td>
+    <td>Timestamp</td>
     <td>The time that the cube was last processed.</td>
 </tr>
 <tr>
     <td>SCHEMA_UPDATED_BY</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>Not supported.</td>
 </tr>
 <tr>
     <td>LAST_DATA_UPDATE</td>
-    <td>DBTYPE_DBTIMESTAMP</td>
+    <td>Timestamp</td>
     <td>The time that the cube was last processed.</td>
 </tr>
 <tr>
     <td>DATA_UPDATED_BY</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>Not supported.</td>
 </tr>
 <tr>
     <td>DESCRIPTION</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>A user-friendly description of the cube.</td>
 </tr>
 <tr>
     <td>IS_DRILLTHROUGH_ENABLED</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>A Boolean that always returns true.</td>
 </tr>
 <tr>
     <td>IS_LINKABLE</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>A Boolean that indicates whether a cube can be
         used in a linked cube.</td>
 </tr>
 <tr>
     <td>IS_WRITE_ENABLED</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>A Boolean that indicates whether a cube is
         write-enabled.</td>
 </tr>
 <tr>
     <td>IS_SQL_ENABLED</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>A Boolean that indicates whether SQL can be used
         on the cube.</td>
 </tr>
 <tr>
     <td>CUBE_CAPTION</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The caption of the cube.</td>
 </tr>
 <tr>
     <td>BASE_CUBE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the source cube if this cube is a
         perspective cube.</td>
 </tr>
 <tr>
     <td>ANNOTATIONS</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>(Optional) A set of notes, in XML format.</td>
 </tr>
 </tbody></table>
@@ -1540,28 +1580,28 @@ and values.</p>
 
 <table>
 <tbody><tr>
-    <th>Column name</th>
-    <th>Type indicator</th>
+    <th width="250">Column name</th>
+    <th width="100">Type</th>
     <th>Description</th>
 </tr>
 <tr>
     <td>CATALOG_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the database.</td>
 </tr>
 <tr>
     <td>SCHEMA_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>Not supported.</td>
 </tr>
 <tr>
     <td>CUBE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the cube.</td>
 </tr>
 <tr>
     <td>DIMENSION_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the dimension. If a dimension is
         part of more than one cube or measure group, then
         there is one row for each unique combination of
@@ -1569,29 +1609,29 @@ and values.</p>
 </tr>
 <tr>
     <td>DIMENSION_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The unique name of the dimension.</td>
 </tr>
 <tr>
     <td>DIMENSION_GUID</td>
-    <td>DBTYPE_GUID</td>
+    <td>String</td>
     <td>Not supported.</td>
 </tr>
 <tr>
     <td>DIMENSION_CAPTION</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The caption of the dimension. This should be
         used when displaying the name of the dimension to
         the user, such as in the user interface or reports.</td>
 </tr>
 <tr>
     <td>DIMENSION_ORDINAL</td>
-    <td>DBTYPE_UI4</td>
+    <td>int</td>
     <td>The position of the dimension within the cube.</td>
 </tr>
 <tr>
     <td>DIMENSION_TYPE</td>
-    <td>DBTYPE_I2</td>
+    <td>int</td>
     <td>The type of the dimension. Valid values include:<ul>
         <li><b>MD_DIMTYPE_UNKNOWN</b> (<b>0</b>)</li>
         <li><b>MD_DIMTYPE_TIME</b> (<b>1</b>)</li>
@@ -1615,28 +1655,28 @@ and values.</p>
 </tr>
 <tr>
     <td>DIMENSION_CARDINALITY</td>
-    <td>DBTYPE_UI4</td>
+    <td>int</td>
     <td>The number of members in the key attribute.</td>
 </tr>
 <tr>
     <td>DEFAULT_HIERARCHY</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>A hierarchy from the dimension. Preserved for
         backwards compatibility.</td>
 </tr>
 <tr>
     <td>DESCRIPTION</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>A user-friendly description of the dimension.</td>
 </tr>
 <tr>
     <td>IS_VIRTUAL</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>Always <b>FALSE</b>.</td>
 </tr>
 <tr>
     <td>IS_READWRITE</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>A Boolean that indicates whether the dimension
         is write-enabled.
 
@@ -1645,7 +1685,7 @@ and values.</p>
 </tr>
 <tr>
     <td>DIMENSION_UNIQUE_SETTINGS</td>
-    <td>DBTYPE_I4</td>
+    <td>int</td>
     <td>A bitmap that specifies which columns contain
         unique values if the dimension contains only members
         with unique names. The following bit value constants
@@ -1656,13 +1696,14 @@ and values.</p>
     </td>
 </tr>
 <tr>
-    <td>DIMENSION_MASTER_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>DIMENSION_MASTER_<br>
+    UNIQUE_NAME</td>
+    <td>String</td>
     <td>Always <b>NULL</b>.</td>
 </tr>
 <tr>
     <td>DIMENSION_IS_VISIBLE</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>Always <b>TRUE</b>.</td>
 </tr>
 </tbody></table>
@@ -1679,36 +1720,36 @@ and values.</p>
 
 <table>
     <tbody><tr>
-        <th>Column name</th>
-        <th>Type indicator</th>
+        <th width="250">Column name</th>
+        <th width="100">Type</th>
         <th>Description</th>
     </tr>
     <tr>
         <td>FUNCTION_NAME</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>The name of the function.</td>
     </tr>
     <tr>
         <td>DESCRIPTION</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>A description of the function.</td>
     </tr>
     <tr>
         <td>PARAMETER_LIST</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>A comma delimited list of parameters formatted
             as in Microsoft Visual Basic. For example, a
             parameter might be Name as String.</td>
     </tr>
     <tr>
         <td>RETURN_TYPE</td>
-        <td>DBTYPE_I4</td>
+        <td>int</td>
         <td>The <b>VARTYPE</b> of the return data type of
             the function.</td>
     </tr>
     <tr>
         <td>ORIGIN</td>
-        <td>DBTYPE_I4</td>
+        <td>int</td>
         <td>The origin of the function:<ul>
             <li>1 for MDX functions.</li>
             <li>2 for user-defined functions.</li>
@@ -1717,27 +1758,27 @@ and values.</p>
     </tr>
     <tr>
         <td>INTERFACE_NAME</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>The name of the interface for user-defined
             functions<p>The group name for Multidimensional
             Expressions (MDX) functions.</p></td>
     </tr>
     <tr>
         <td>LIBRARY_NAME</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>The name of the type library for user-defined
             functions. <b>NULL</b> for MDX functions. </td>
     </tr>
     <tr>
         <td>DLL_NAME</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>(Optional) The name of the assembly that
             implements the user-defined function.<p>Returns <b>
             VT_NULL</b> for MDX functions.</p></td>
     </tr>
     <tr>
         <td>HELP_FILE</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>(Optional) The name of the file that contains
             the help documentation for the user-defined
             function.<p>Returns <b>VT_NULL</b> for MDX
@@ -1745,13 +1786,13 @@ and values.</p>
     </tr>
     <tr>
         <td>HELP_CONTEXT</td>
-        <td>DBTYPE_I4</td>
+        <td>int</td>
         <td>(Optional) Returns the Help context ID for this
             function.</td>
     </tr>
     <tr>
         <td>OBJECT</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>(Optional) The generic name of the object class
             to which a property applies. For example, the rowset
             corresponding to the &lt;level_name&gt;.Members function
@@ -1761,7 +1802,7 @@ and values.</p>
     </tr>
     <tr>
         <td>CAPTION</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>The display caption for the function.</td>
     </tr>
 </tbody></table>
@@ -1777,31 +1818,31 @@ dimension.</p>
 
 <table>
 <tbody><tr>
-    <th>Column name</th>
-    <th>Type indicator</th>
+    <th width="250">Column name</th>
+    <th width="100">Type</th>
     <th>Description</th>
 </tr>
 <tr>
     <td>CATALOG_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the catalog to which this hierarchy
         belongs. <b>NULL</b> if the provider does not
         support catalogs.</td>
 </tr>
 <tr>
     <td>SCHEMA_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>Not supported</td>
 </tr>
 <tr>
     <td>CUBE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>(Required) The name of the cube to which this
         hierarchy belongs.</td>
 </tr>
 <tr>
     <td>DIMENSION_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The unique name of the dimension to which this
         hierarchy belongs. For providers that generate
         unique names by qualification, each component of
@@ -1809,7 +1850,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>HIERARCHY_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the hierarchy. Blank if there is
         only a single hierarchy in the dimension. This will
         always have a value in Microsoft SQL Server 2005
@@ -1817,17 +1858,17 @@ dimension.</p>
 </tr>
 <tr>
     <td>HIERARCHY_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The unique name of the hierarchy.</td>
 </tr>
 <tr>
     <td>HIERARCHY_GUID</td>
-    <td>DBTYPE_GUID</td>
+    <td>String</td>
     <td>Not supported</td>
 </tr>
 <tr>
     <td>HIERARCHY_CAPTION</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>A label or a caption associated with the
         hierarchy. Used primarily for display purposes. If a
         caption does not exist, <b>HIERARCHY_NAME</b> is
@@ -1837,7 +1878,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>DIMENSION_TYPE</td>
-    <td>DBTYPE_I2</td>
+    <td>int [define enum]</td>
     <td>The type of the dimension. Valid values include
         the following values:<ul>
         <li><b>MD_DIMTYPE_UNKNOWN</b> (<b>0</b>)</li>
@@ -1862,30 +1903,30 @@ dimension.</p>
 </tr>
 <tr>
     <td>HIERARCHY_CARDINALITY</td>
-    <td>DBTYPE_UI4</td>
+    <td>int</td>
     <td>The number of members in the hierarchy.</td>
 </tr>
 <tr>
     <td>DEFAULT_MEMBER</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The default member for this hierarchy. This is a
         unique name. Every hierarchy must have a default
         member.</td>
 </tr>
 <tr>
     <td>ALL_MEMBER</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The member at the highest level of the rollup.</td>
 </tr>
 <tr>
     <td>DESCRIPTION</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>A human-readable description of the hierarchy.
         <b>NULL</b> if no description exists.</td>
 </tr>
 <tr>
     <td>STRUCTURE</td>
-    <td>DBTYPE_I2</td>
+    <td>int</td>
     <td>The structure of the hierarchy. Valid values
         include the following values:<ul>
         <li><b>MD_STRUCTURE_FULLYBALANCED</b> (<b>0</b>)</li>
@@ -1897,12 +1938,12 @@ dimension.</p>
 </tr>
 <tr>
     <td>IS_VIRTUAL</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>Always returns <b>False</b>.</td>
 </tr>
 <tr>
     <td>IS_READWRITE</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>A Boolean that indicates whether the Write Back
         to dimension column is enabled.<p>Returns <b>TRUE</b>
         if the <b>Write Back to dimension</b> column that
@@ -1910,43 +1951,44 @@ dimension.</p>
 </tr>
 <tr>
     <td>DIMENSION_UNIQUE_SETTINGS</td>
-    <td>DBTYPE_I4</td>
+    <td>int</td>
     <td>Always returns <b>MDDIMENSIONS_MEMBER_KEY_UNIQUE</b>
         (<b>1</b>).</td>
 </tr>
 <tr>
-    <td>DIMENSION_MASTER_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>DIMENSION_MASTER_<br>
+    UNIQUE_NAME</td>
+    <td>String</td>
     <td>Always returns <b>NULL</b>.</td>
 </tr>
 <tr>
     <td>DIMENSION_IS_VISIBLE</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>Always returns <b>true</b>. If the dimension is
         not visible, it will not appear in the schema
         rowset.</td>
 </tr>
 <tr>
     <td>HIERARCHY_ORDINAL</td>
-    <td>DBTYPE_UI4</td>
+    <td>int</td>
     <td>The ordinal number of the hierarchy across all
         hierarchies of the cube.</td>
 </tr>
 <tr>
     <td>DIMENSION_IS_SHARED</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>Always returns <b>TRUE</b>.</td>
 </tr>
 <tr>
     <td>HIERARCHY_IS_VISIBLE</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>A Boolean that indicates whether the hieararchy
         is visible.<p>Returns <b>TRUE</b> if the hierarchy
         is visible; otherwise, <b>FALSE</b>.</p></td>
 </tr>
 <tr>
     <td>HIERARCHY_ORIGIN</td>
-    <td>DBTYPE_UI2</td>
+    <td>int</td>
     <td>A bit mask that determines the source of the
         hierarchy:<ul>
         <li><b>MD_USER_DEFINED</b> identifies user
@@ -1964,7 +2006,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>HIERARCHY_DISPLAY_FOLDER</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The path to be used when displaying the
         hierarchy in the user interface. Folder names will
         be separated by a semicolon (;). Nested folders are
@@ -1972,7 +2014,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>INSTANCE_SELECTION</td>
-    <td>DBTYPE_UI2</td>
+    <td>int</td>
     <td>A hint to the client application on how to show
         the hierarchy. Valid values include the following
         values:<ul>
@@ -1996,33 +2038,33 @@ dimension.</p>
 <p>The returned result set contains the following columns.</p>
 <table>
 <tbody><tr>
-    <th>Column name</th>
-    <th>Type indicator</th>
+    <th width="250">Column name</th>
+    <th width="100">Type</th>
     <th>Description</th>
 </tr>
 <tr>
     <td>CATALOG_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the catalog to which this level
         belongs. <b>NULL</b> if the provider does not
         support catalogs.</td>
 </tr>
 <tr>
     <td>SCHEMA_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the schema to which this level
         belongs. <b>NULL</b> if the provider does not
         support schemas.</td>
 </tr>
 <tr>
     <td>CUBE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the cube to which this level
         belongs.</td>
 </tr>
 <tr>
     <td>DIMENSION_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The unique name of the dimension to which this
         level belongs. For providers that generate unique
         names by qualification, each component of this name
@@ -2030,7 +2072,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>HIERARCHY_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The unique name of the hierarchy. If the level
         belongs to more than one hierarchy, there is one row
         for each hierarchy to which it belongs. For
@@ -2040,22 +2082,22 @@ dimension.</p>
 </tr>
 <tr>
     <td>LEVEL_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the level.</td>
 </tr>
 <tr>
     <td>LEVEL_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The properly escaped unique name of the level.</td>
 </tr>
 <tr>
     <td>LEVEL_GUID</td>
-    <td>DBTYPE_GUID</td>
+    <td>String</td>
     <td>Not supported.</td>
 </tr>
 <tr>
     <td>LEVEL_CAPTION</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>A label or caption associated with the
         hierarchy. Used primarily for display purposes. If a
         caption does not exist, <b>LEVEL_NAME</b> is
@@ -2063,18 +2105,18 @@ dimension.</p>
 </tr>
 <tr>
     <td>LEVEL_NUMBER</td>
-    <td>DBTYPE_UI4</td>
+    <td>int</td>
     <td>The distance of the level from the root of the
         hierarchy. Root level is zero (<b>0)</b>.</td>
 </tr>
 <tr>
     <td>LEVEL_CARDINALITY</td>
-    <td>DBTYPE_UI4</td>
+    <td>int</td>
     <td>The number of members in the level.</td>
 </tr>
 <tr>
     <td>LEVEL_TYPE</td>
-    <td>DBTYPE_I4</td>
+    <td>int</td>
     <td>Type of the level:<ul>
         <li><b>MDLEVEL_TYPE_GEO_CONTINENT</b> (<b>0x2001</b>)</li>
         <li><b>MDLEVEL_TYPE_GEO_REGION</b> (<b>0x2002</b>)</li>
@@ -2107,13 +2149,13 @@ dimension.</p>
 </tr>
 <tr>
     <td>DESCRIPTION</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>A human-readable description of the level. NULL
         if no description exists.</td>
 </tr>
 <tr>
     <td>CUSTOM_ROLLUP_SETTINGS</td>
-    <td>DBTYPE_I4</td>
+    <td>int</td>
     <td>A bitmap that specifies the custom rollup
         options:<ul>
         <li><b>MDLEVELS_CUSTOM_ROLLUP_EXPRESSION</b> (<b>0x01</b>)
@@ -2136,7 +2178,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>LEVEL_UNIQUE_SETTINGS</td>
-    <td>DBTYPE_I4</td>
+    <td>int</td>
     <td>A bitmap that specifies which columns contain
         unique values, if the level only has members with
         unique names or keys. The Msmd.h file defines the
@@ -2152,7 +2194,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>LEVEL_IS_VISIBLE</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>A Boolean that indicates whether the level is
         visible.<p>Always returns True. If the level is not
         visible, it will not be included in the schema
@@ -2160,55 +2202,60 @@ dimension.</p>
 </tr>
 <tr>
     <td>LEVEL_ORDERING_PROPERTY</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The ID of the attribute that the level is sorted
         on.</td>
 </tr>
 <tr>
     <td>LEVEL_DBTYPE</td>
-    <td>DBTYPE_I4</td>
+    <td>int</td>
     <td>The <b>DBTYPE</b> enumeration of the member key
         column that is used for the level attribute.<p>Null
         if concatenated keys are used as the member key
         column.</p></td>
 </tr>
 <tr>
-    <td>LEVEL_MASTER_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>LEVEL_MASTER_<br>
+    UNIQUE_NAME</td>
+    <td>String</td>
     <td>Always returns NULL.</td>
 </tr>
 <tr>
-    <td>LEVEL_NAME_SQL_COLUMN_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>LEVEL_NAME_<br>
+    SQL_COLUMN_NAME</td>
+    <td>String</td>
     <td>The SQL representation of the level member
         names.</td>
 </tr>
 <tr>
-    <td>LEVEL_KEY_SQL_COLUMN_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>LEVEL_KEY_<br>
+    SQL_COLUMN_NAME</td>
+    <td>String</td>
     <td>The SQL representation of the level member key
         values.</td>
 </tr>
 <tr>
-    <td>LEVEL_UNIQUE_NAME_SQL_COLUMN_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>LEVEL_UNIQUE_NAME_<br>
+    SQL_COLUMN_NAME</td>
+    <td>String</td>
     <td>The SQL representation of the member unique
         names.</td>
 </tr>
 <tr>
-    <td>LEVEL_ATTRIBUTE_HIERARCHY_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>LEVEL_ATTRIBUTE_<br>
+    HIERARCHY_NAME</td>
+    <td>String</td>
     <td>The name of the attribute hierarchy providing
         the source of the level.</td>
 </tr>
 <tr>
     <td>LEVEL_KEY_CARDINALITY</td>
-    <td>DBTYPE_UI2</td>
+    <td>int</td>
     <td>The number of columns in the level key.</td>
 </tr>
 <tr>
     <td>LEVEL_ORIGIN</td>
-    <td>DBTYPE_UI2</td>
+    <td>int</td>
     <td>A bit map that defines how the level was
         sourced:<ul>
         <li><b>MD_ORIGIN_USER_DEFINED</b> identifies
@@ -2234,66 +2281,57 @@ dimension.</p>
 <p>The returned result set contains the following columns.</p>
 <table>
 <tbody><tr>
-    <th>Column name</th>
-    <th>Type indicator</th>
-    <th>Length</th>
+    <th width="250">Column name</th>
+    <th width="100">Type</th>
     <th>Description</th>
 </tr>
 <tr>
     <td>CATALOG_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The name of the catalog to which this measure
         belongs. <b>NULL</b> if the provider does not
         support catalogs.</td>
 </tr>
 <tr>
     <td>SCHEMA_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The name of the schema to which this measure
         belongs. <b>NULL</b> if the provider does not
         support schemas.</td>
 </tr>
 <tr>
     <td>CUBE_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The name of the cube to which this measure
         belongs.</td>
 </tr>
 <tr>
     <td>MEASURE_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The name of the measure.</td>
 </tr>
 <tr>
     <td>MEASURE_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The Unique name of the measure. For providers
         that generate unique names by qualification, each
         component of this name is delimited.</td>
 </tr>
 <tr>
     <td>MEASURE_CAPTION</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>A label or caption associated with the measure.
         Used primarily for display purposes. If a caption
         does not exist, <b>MEASURE_NAME</b> is returned.</td>
 </tr>
 <tr>
     <td>MEASURE_GUID</td>
-    <td>DBTYPE_GUID</td>
-    <td> </td>
+    <td>String</td>
     <td>Not supported.</td>
 </tr>
 <tr>
     <td>MEASURE_AGGREGATOR</td>
-    <td>DBTYPE_I4</td>
-    <td> </td>
+    <td>int</td>
     <td>An enumeration that identifies how a measure was
         derived. Can be one of the following values:<ul>
         <li><b>MDMEASURE_AGGR_SUM</b> (<b>1</b>)</li>
@@ -2319,22 +2357,19 @@ dimension.</p>
 </tr>
 <tr>
     <td>DATA_TYPE</td>
-    <td>DBTYPE_UI2</td>
-    <td> </td>
+    <td>int</td>
     <td>The data type of the measure.</td>
 </tr>
 <tr>
     <td>NUMERIC_PRECISION</td>
-    <td>DBTYPE_UI2</td>
-    <td> </td>
+    <td>int</td>
     <td>The maximum precision of the property if the
         measure object's data type is exact numeric. <b>NULL</b>
         for all other property types. </td>
 </tr>
 <tr>
     <td>NUMERIC_SCALE</td>
-    <td>DBTYPE_I2</td>
-    <td> </td>
+    <td>int</td>
     <td>The number of digits to the right of the decimal
         point if the measure object's type indicator is <b>
         DBTYPE_NUMERIC</b> or <b>DBTYPE_DECIMAL</b>.
@@ -2342,62 +2377,55 @@ dimension.</p>
 </tr>
 <tr>
     <td>MEASURE_UNITS</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>Not supported</td>
 </tr>
 <tr>
     <td>DESCRIPTION</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>A human-readable description of the measure. <b>
         NULL</b> if no description exists.</td>
 </tr>
 <tr>
     <td>EXPRESSION</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>An expression for the member.</td>
 </tr>
 <tr>
     <td>MEASURE_IS_VISIBLE</td>
-    <td>DBTYPE_BOOL</td>
-    <td> </td>
+    <td>boolean</td>
     <td>A Boolean that always returns True. If the
         measure is not visible, it will not be included in
         the schema rowset.</td>
 </tr>
 <tr>
     <td>LEVELS_LIST</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>A string that always returns <b>NULL</b>.</td>
 </tr>
 <tr>
-    <td>MEASURE_NAME_SQL_COLUMN_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>MEASURE_NAME_<br>
+    SQL_COLUMN_NAME</td>
+    <td>String</td>
     <td>The name of the column in the SQL query that
         corresponds to the measure's name.</td>
 </tr>
 <tr>
-    <td>MEASURE_UNQUALIFIED_CAPTION</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>MEASURE_UNQUALIFIED_<br>
+    CAPTION</td>
+    <td>String</td>
     <td>The name of the measure, not qualified with the
         measure group name.</td>
 </tr>
 <tr>
     <td>MEASUREGROUP_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The name of the measure group to which the
         measure belongs.</td>
 </tr>
 <tr>
     <td>MEASURE_DISPLAY_FOLDER</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The path to be used when displaying the measure
         in the user interface. Folder names will be
         separated by a semicolon. Nested folders are
@@ -2405,8 +2433,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>DEFAULT_FORMAT_STRING</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The default format string for the measure.</td>
 </tr>
 </tbody></table>
@@ -2421,82 +2448,70 @@ dimension.</p>
 
 <table>
 <tbody><tr>
-    <th>Column name</th>
-    <th>Type indicator</th>
-    <th>Length</th>
+    <th width="250">Column name</th>
+    <th width="100">Type</th>
     <th>Description</th>
 </tr>
 <tr>
     <td>CATALOG_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The name of the database to which this member
         belongs.</td>
 </tr>
 <tr>
     <td>SCHEMA_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The name of the schema to which this member
         belongs.</td>
 </tr>
 <tr>
     <td>CUBE_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The name of the cube to which this member
         belongs.</td>
 </tr>
 <tr>
     <td>DIMENSION_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The unique name of the dimension to which this
         member belongs.</td>
 </tr>
 <tr>
     <td>HIERARCHY_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The unique name of the hierarchy to which this
         member belongs.</td>
 </tr>
 <tr>
     <td>LEVEL_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The unique name of the level to which this
         member belongs.</td>
 </tr>
 <tr>
     <td>LEVEL_NUMBER</td>
-    <td>DBTYPE_UI4</td>
-    <td> </td>
+    <td>int</td>
     <td>The distance of the member from the root of the
         hierarchy. The root level is zero (0).</td>
 </tr>
 <tr>
     <td>MEMBER_ORDINAL</td>
-    <td>DBTYPE_UI4</td>
-    <td> </td>
+    <td>int</td>
     <td>(Deprecated) Always returns <b>0</b>. </td>
 </tr>
 <tr>
     <td>MEMBER_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The name of the member.</td>
 </tr>
 <tr>
     <td>MEMBER_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The unique name of the member.</td>
 </tr>
 <tr>
     <td>MEMBER_TYPE</td>
-    <td>DBTYPE_I4</td>
-    <td> </td>
+    <td>int</td>
     <td>The type of the member:
         <ul>
             <li><b>MDMEMBER_TYPE_REGULAR</b> (<b>1</b>)</li>
@@ -2514,23 +2529,20 @@ dimension.</p>
 </tr>
 <tr>
     <td>MEMBER_GUID</td>
-    <td>DBTYPE_GUID</td>
-    <td> </td>
+    <td>String</td>
     <td>The GUID of the member. <b>NULL</b> if no GUID
         exists.</td>
 </tr>
 <tr>
     <td>MEMBER_CAPTION</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>A label or caption associated with the member.
         Used primarily for display purposes. If a caption
         does not exist, <b>MEMBER_NAME</b> is returned.</td>
 </tr>
 <tr>
     <td>CHILDREN_CARDINALITY</td>
-    <td>DBTYPE_UI4</td>
-    <td> </td>
+    <td>int</td>
     <td>The number of children that the member has. This
         can be an estimate, so consumers should not rely on
         this to be the exact count. Providers should return
@@ -2538,49 +2550,42 @@ dimension.</p>
 </tr>
 <tr>
     <td>PARENT_LEVEL</td>
-    <td>DBTYPE_UI4</td>
-    <td> </td>
+    <td>int</td>
     <td>The distance of the member's parent from the
         root level of the hierarchy. The root level is zero
         (0).</td>
 </tr>
 <tr>
     <td>PARENT_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The unique name of the member's parent. <b>NULL</b>
         is returned for any members at the root level.</td>
 </tr>
 <tr>
     <td>PARENT_COUNT</td>
-    <td>DBTYPE_UI4</td>
-    <td> </td>
+    <td>int</td>
     <td>The number of parents that this member has.</td>
 </tr>
 <tr>
     <td>DESCRIPTION</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>Always returns <b>NULL</b>.</td>
 </tr>
 <tr>
     <td>EXPRESSION</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The expression for calculations, if the member
         is of type <b>MDMEMBER_TYPE_FORMULA</b>.</td>
 </tr>
 <tr>
     <td>MEMBER_KEY</td>
-    <td>DBTYPE_WSTR</td>
-    <td> </td>
+    <td>String</td>
     <td>The value of the member's key column. Returns <b>
         NULL</b> if the member has a composite key.</td>
 </tr>
 <tr>
     <td>IS_PLACEHOLDERMEMBER</td>
-    <td>DBTYPE_BOOL</td>
-    <td> </td>
+    <td>boolean</td>
     <td>A Boolean that indicates whether a member is a
         placeholder member for an empty position in a
         dimension hierarchy.<p>It is valid only if the <b>
@@ -2589,8 +2594,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>IS_DATAMEMBER</td>
-    <td>DBTYPE_BOOL</td>
-    <td> </td>
+    <td>boolean</td>
     <td>A Boolean that indicates whether the member is a
         data member.
 
@@ -2599,8 +2603,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>Zero or more additional columns</td>
-    <td>DBTYPE_UI2</td>
-    <td> </td>
+    <td>int</td>
     <td>No properties are returned if the members could
         be returned from multiple levels. For example, if
         the Tree operator is <b>PARENT</b> and <b>SELF</b>
@@ -2628,44 +2631,44 @@ dimension.</p>
 
 <table>
 <tbody><tr>
-    <th>Column name</th>
-    <th>Type indicator</th>
+    <th width="250">Column name</th>
+    <th width="100">Type</th>
     <th>Description</th>
 </tr>
 <tr>
     <td>CATALOG_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the database.</td>
 </tr>
 <tr>
     <td>SCHEMA_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the schema to which this property
         belongs. <b>NULL</b> if the provider does not
         support schemas.</td>
 </tr>
 <tr>
     <td>CUBE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the cube.</td>
 </tr>
 <tr>
     <td>DIMENSION_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The unique name of the dimension. For providers
         that generate unique names by qualification, each
         component of this name is delimited. </td>
 </tr>
 <tr>
     <td>HIERARCHY_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The unique name of the hierarchy. For providers
         that generate unique names by qualification, each
         component of this name is delimited. </td>
 </tr>
 <tr>
     <td>LEVEL_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The unique name of the level to which this
         property belongs. If the provider does not support
         named levels, it should return the <b>
@@ -2676,7 +2679,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>MEMBER_UNIQUE_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The unique name of the member to which the
         property belongs. Used for data stores that do not
         support named levels or have properties on a
@@ -2688,7 +2691,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>PROPERTY_TYPE</td>
-    <td>DBTYPE_I2</td>
+    <td>int</td>
     <td>A bitmap that specifies the type of the
         property:<ul>
         <li><b>MDPROP_MEMBER</b> (<b>1</b>) identifies a
@@ -2709,26 +2712,27 @@ dimension.</p>
 </tr>
 <tr>
     <td>PROPERTY_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the property. If the key for the
         property is the same as the name for the property,
         <b>PROPERTY_NAME</b> will be blank.</td>
 </tr>
 <tr>
     <td>PROPERTY_CAPTION</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>A label or caption associated with the property,
         used primarily for display purposes. Returns <b>
         PROPERTY_NAME</b> if a caption does not exist.</td>
 </tr>
 <tr>
     <td>DATA_TYPE</td>
-    <td>DBTYPE_UI2</td>
+    <td>int</td>
     <td>The data type of the property.</td>
 </tr>
 <tr>
-    <td>CHARACTER_MAXIMUM_LENGTH</td>
-    <td>DBTYPE_UI4</td>
+    <td>CHARACTER_<br>
+    MAXIMUM_LENGTH</td>
+    <td>int</td>
     <td>The maximum possible length of the property, if
         it is a character, binary, or bit type.
 
@@ -2738,7 +2742,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>CHARACTER_OCTET_LENGTH</td>
-    <td>DBTYPE_UI4</td>
+    <td>int</td>
     <td>The maximum possible length (in bytes) of the
         property, if it is a character or binary type.
 
@@ -2748,7 +2752,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>NUMERIC_PRECISION</td>
-    <td>DBTYPE_UI2</td>
+    <td>int</td>
     <td>The maximum precision of the property, if it is
         a numeric data type.
 
@@ -2757,7 +2761,7 @@ dimension.</p>
 </tr>
 <tr>
     <td>NUMERIC_SCALE</td>
-    <td>DBTYPE_I2</td>
+    <td>int</td>
     <td>The number of digits to the right of the decimal
         point, if it is a <b>DBTYPE_NUMERIC</b> or <b>
         DBTYPE_DECIMAL</b> type.
@@ -2766,13 +2770,13 @@ dimension.</p>
 </tr>
 <tr>
     <td>DESCRIPTION</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>A human readable description of the property. <b>
         NULL</b> if no description exists.</td>
 </tr>
 <tr>
     <td>PROPERTY_CONTENT_TYPE</td>
-    <td>DBTYPE_I2</td>
+    <td>int</td>
     <td>The type of the property. Can be one of the
         following enumerations:<ul>
         <li><b>MD_PROPTYPE_REGULAR </b>(<b>0x00</b>)</li>
@@ -2845,19 +2849,19 @@ dimension.</p>
 </tr>
 <tr>
     <td>SQL_COLUMN_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The name of the property used in SQL queries
         from the cube dimension or database dDimension.</td>
 </tr>
 <tr>
     <td>LANGUAGE</td>
-    <td>DBTYPE_UI2</td>
+    <td>int</td>
     <td>The translation expressed as an <b>LCID</b>.
         Only valid for property translations.</td>
 </tr>
 <tr>
     <td>PROPERTY_ORIGIN</td>
-    <td>DBTYPE_UI2</td>
+    <td>int</td>
     <td>Identifies the type of hierarchy that the
         property applies to:<ul>
         <li><b>MD_USER_DEFINED</b> (<b>1</b>) indicates
@@ -2872,14 +2876,15 @@ dimension.</p>
     </td>
 </tr>
 <tr>
-    <td>PROPERTY_ATTRIBUTE_HIERARCHY_NAME</td>
-    <td>DBTYPE_WSTR</td>
+    <td>PROPERTY_ATTRIBUTE_<br>
+    HIERARCHY_NAME</td>
+    <td>String</td>
     <td>The name of the attribute hierarchy sourcing
         this property.</td>
 </tr>
 <tr>
     <td>PROPERTY_CARDINALITY</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The cardinality of the property. Possible values
         include the following strings:<ul>
         <li><b>ONE</b></li>
@@ -2889,12 +2894,12 @@ dimension.</p>
 </tr>
 <tr>
     <td>MIME_TYPE</td>
-    <td>DBTYPE_WSTR</td>
+    <td>String</td>
     <td>The mime type for binary large objects (BLOBs).</td>
 </tr>
 <tr>
     <td>PROPERTY_IS_VISIBLE</td>
-    <td>DBTYPE_BOOL</td>
+    <td>boolean</td>
     <td>A Boolean that indicates whether the property is
         visible.
 
@@ -2913,34 +2918,34 @@ database, including session-scoped sets.</p>
 
 <table>
     <tbody><tr>
-        <th>Column name</th>
-        <th>Type indicator</th>
+        <th width="250">Column name</th>
+        <th width="100">Type</th>
         <th>Description</th>
     </tr>
     <tr>
         <td>CATALOG_NAME</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>The name of the database.</td>
     </tr>
     <tr>
         <td>SCHEMA_NAME</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>Not supported.</td>
     </tr>
     <tr>
         <td>CUBE_NAME</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>The name of the cube.</td>
     </tr>
     <tr>
         <td>SET_NAME</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>The name of the set, as specified in the <b>
             CREATE SET</b> statement.</td>
     </tr>
     <tr>
         <td>SCOPE</td>
-        <td>DBTYPE_I4</td>
+        <td>int</td>
         <td>The scope of the set:<ul>
             <li><b>MDSET_SCOPE_GLOBAL</b> (<b>1</b>)</li>
             <li><b>MDSET_SCOPE_SESSION</b> (<b>2</b>)</li>
@@ -2949,30 +2954,30 @@ database, including session-scoped sets.</p>
     </tr>
     <tr>
         <td>DESCRIPTION</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>Not supported.</td>
     </tr>
     <tr>
         <td>EXPRESSION</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>The expression for the set.</td>
     </tr>
     <tr>
         <td>DIMENSIONS</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>A comma delimited list of hierarchies included
             in the set.</td>
     </tr>
     <tr>
         <td>SET_CAPTION</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>A label or caption associated with the set. The
             label or caption is used primarily for display
             purposes.</td>
     </tr>
     <tr>
         <td>SET_DISPLAY_FOLDER</td>
-        <td>DBTYPE_WSTR</td>
+        <td>String</td>
         <td>The path to be used by the user interface when
             displaying the set. Folder names are separated by a
             backslash (<b>\</b>), folders are separated by a
@@ -2991,8 +2996,15 @@ database, including session-scoped sets.</p>
 		<th>Description</th>
 	</tr>
 	<tr>
-		<td><code><a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html">getMdxKeywords()</a></code></td>
-		<td>Returns </td>
+		<td><code>
+        <a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getDatabase()">getDatabase()</a></code></td>
+		<td>Returns the one and only Database.</td>
+	</tr>
+	<tr>
+		<td><code>
+        <a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html">getMdxKeywords()</a></code></td>
+		<td>Returns the keywords of this dialect of MDX, as a comma-separated 
+        string.</td>
 	</tr>
 </tbody></table>
 

@@ -12,8 +12,9 @@ package org.olap4j.metadata;
 import mondrian.olap.Exp;
 import mondrian.olap.Property;
 
-import java.sql.SQLException;
 import java.util.List;
+
+import org.olap4j.OlapException;
 
 /**
  * <code>Member</code> is a data value in an OLAP Dimension.
@@ -153,10 +154,10 @@ public interface Member extends MetadataElement {
      *
      * @param name Property name
      * @param value Property value
-     * @throws java.sql.SQLException if the value not valid for this property
+     * @throws OlapException if the value not valid for this property
      *   (for example, a String value assigned to a Boolean property)
      */
-    void setProperty(String name, Object value) throws SQLException;
+    void setProperty(String name, Object value) throws OlapException;
 
     /**
      * Returns the definitions of the properties this member may have.

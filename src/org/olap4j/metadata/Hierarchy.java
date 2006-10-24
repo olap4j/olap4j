@@ -18,24 +18,20 @@ package org.olap4j.metadata;
  */
 public interface Hierarchy extends MetadataElement {
     /**
-     * Returns the {@link Dimension} this Hierarchy belongs to.
+     * Returns the {@link Dimension} this <code>Hierarchy</code> belongs to.
      */
     Dimension getDimension();
 
     /**
-     * Returns the name of this Hierarchy.
-     */
-    String getName();
-
-    /**
-     * Returns a list of the {@link Level}s in this Hierarchy.
+     * Returns a list of the {@link Level} objects in this
+     * <code>Hierarchy</code>.
      *
      * @see org.olap4j.OlapDatabaseMetaData#getLevels
      */
     NamedList<Level> getLevels();
 
     /**
-     * Returns whether this Hierarchy has an 'all' member.
+     * Returns whether this <code>Hierarchy</code> has an 'all' member.
      */
     boolean hasAll();
 }

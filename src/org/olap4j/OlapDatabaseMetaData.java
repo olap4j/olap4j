@@ -13,7 +13,6 @@ import org.olap4j.metadata.Database;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Information about an OLAP database.
@@ -44,7 +43,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      *
      * <p>todo: document parameters and result set columns
      */
-    ResultSet getActions() throws SQLException;
+    ResultSet getActions() throws OlapException;
 
     /**
      * Retrives a list of olap4j data sources that are available on the server.
@@ -54,7 +53,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      * <p>todo: document parameters and result set columns
      */
     ResultSet getDatasources(
-        String dataSourceName) throws SQLException;
+        String dataSourceName) throws OlapException;
 
     /**
      * Retrieves a list of information on supported literals, including data
@@ -64,7 +63,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      *
      * <p>todo: document parameters and result set columns
      */
-    ResultSet getLiterals() throws SQLException;
+    ResultSet getLiterals() throws OlapException;
 
     /**
      * Retrieves a list of the standard and provider-specific properties
@@ -78,7 +77,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      * <p>todo: document parameters and result set columns
      */
     ResultSet getDatabaseProperties(
-        String dataSourceName) throws SQLException;
+        String dataSourceName) throws OlapException;
 
     /**
      * Retrieves a list of descriptions of member and cell Properties.
@@ -89,15 +88,15 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      *
      * <p>todo: document parameters and result set columns
      */
-    ResultSet getProperties() throws SQLException;
+    ResultSet getProperties() throws OlapException;
 
     /**
      * Retrieves a comma-separated list of all of this database's MDX keywords.
      *
      * @return the list of this database's MDX keywords
-     * @exception java.sql.SQLException if a database access error occurs
+     * @exception OlapException if a database access error occurs
      */
-    String getMdxKeywords() throws SQLException;
+    String getMdxKeywords() throws OlapException;
 
     /**
      * Retrieves a description of a cube.
@@ -117,7 +116,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
     public ResultSet getCubes(
         String catalog,
         String schemaPattern,
-        String cubeNamePattern) throws SQLException;
+        String cubeNamePattern) throws OlapException;
     /**
      * Retrieves a result set describing the shared and private dimensions
      * within a database.
@@ -126,7 +125,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      *
      * <p>todo: document parameters and result set columns
      */
-    ResultSet getDimensions() throws SQLException;
+    ResultSet getDimensions() throws OlapException;
 
     /**
      * Retrieves a result set describing the functions available to client
@@ -136,7 +135,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      *
      * <p>todo: document parameters and result set columns
      */
-    ResultSet getFunctions() throws SQLException;
+    ResultSet getFunctions() throws OlapException;
 
     /**
      * Retrieves a result set describing each hierarchy within a particular
@@ -146,7 +145,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      *
      * <p>todo: document parameters and result set columns
      */
-    ResultSet getHierarchies() throws SQLException;
+    ResultSet getHierarchies() throws OlapException;
 
     /**
      * Retrieves a result set describing each measure within a cube.
@@ -155,7 +154,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      *
      * <p>todo: document parameters and result set columns
      */
-    ResultSet getMeasures() throws SQLException;
+    ResultSet getMeasures() throws OlapException;
 
     /**
      * Retrieves a result set describing the members within a database.
@@ -164,7 +163,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      *
      * <p>todo: document parameters and result set columns
      */
-    ResultSet getMembers() throws SQLException;
+    ResultSet getMembers() throws OlapException;
 
     /**
      * Retrieves a result set describing each level within a particular
@@ -174,7 +173,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      *
      * <p>todo: document parameters and result set columns
      */
-    ResultSet getLevels() throws SQLException;
+    ResultSet getLevels() throws OlapException;
 
     /**
      * Retrieves a result set describing each calculated set.
@@ -183,7 +182,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
      *
      * <p>todo: document parameters and result set columns
      */
-    ResultSet getSets() throws SQLException;
+    ResultSet getSets() throws OlapException;
 }
 
 // End OlapDatabaseMetaData.java

@@ -11,12 +11,10 @@ package org.olap4j.sample;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.dao.DataAccessException;
 import org.olap4j.OlapResultSet;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Example of olap4j code running inside Spring framework.
@@ -41,7 +39,6 @@ public class SpringSample {
             "from [Sales]",
             new ResultSetExtractor() {
                 public Object extractData(ResultSet resultSet)
-                    throws SQLException, DataAccessException
                 {
                     OlapResultSet olapResult = (OlapResultSet) resultSet;
                     return "Result has " +

@@ -9,13 +9,8 @@
 */
 package org.olap4j;
 
-import org.olap4j.metadata.Property;
-import org.olap4j.metadata.Cube;
-
 import java.util.List;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 
 /**
  * Result of executing an OLAP Statement.

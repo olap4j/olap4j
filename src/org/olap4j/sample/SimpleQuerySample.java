@@ -9,18 +9,21 @@
 */
 package org.olap4j.sample;
 
+import mondrian.olap.Query;
+
 import org.olap4j.*;
-import org.olap4j.type.MemberType;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.mdx.parser.MdxParserFactory;
-import org.olap4j.metadata.Member;
 import org.olap4j.metadata.Dimension;
+import org.olap4j.metadata.Member;
+import org.olap4j.type.MemberType;
 
-import java.sql.*;
-import java.util.List;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-
-import mondrian.olap.Query;
+import java.util.List;
 
 /**
  * Collection of olap4j samples illustrating connections and statements.
@@ -33,6 +36,8 @@ public class SimpleQuerySample {
     public static void main(String[] args) {
         try {
             new SimpleQuerySample().simpleStatement();
+        } catch (OlapException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -44,7 +49,9 @@ public class SimpleQuerySample {
      * Simple example which connects to an OLAP server, executes an OLAP
      * statement and prints the result.
      */
-    void simpleStatement() throws SQLException, ClassNotFoundException {
+    void simpleStatement()
+        throws OlapException, SQLException, ClassNotFoundException
+    {
         // Register driver.
         Class.forName("mondrian.olap4j.Driver");
 

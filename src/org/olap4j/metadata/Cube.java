@@ -41,6 +41,13 @@ public interface Cube extends MetadataElement {
     List<Measure> getMeasures();
 
     /**
+     * Returns a list of {@link NamedSet} objects in this Cube.
+     *
+     * @see org.olap4j.OlapDatabaseMetaData#getSets()
+     */
+    NamedList<NamedSet> getSets();
+
+    /**
      * Returns a collection of {@link java.util.Locale} objects for which this
      * <code>Cube</code> has been localized.
      *

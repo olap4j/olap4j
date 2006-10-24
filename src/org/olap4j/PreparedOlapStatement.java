@@ -12,25 +12,24 @@ package org.olap4j;
 import org.olap4j.metadata.Cube;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 /**
  * An object that represents a precompiled OLAP statement.
  *
- * <P>An OLAP statement is precompiled and stored in a
+ * <p>An OLAP statement is precompiled and stored in a
  * <code>PreparedOlapStatement</code> object. This object can then be used to
- * efficiently execute this statement multiple times.
+ * efficiently execute this statement multiple times.</p>
  *
- * <P><B>Note:</B> The setter methods (<code>setShort</code>,
+ * <p><B>Note:</B> The setter methods (<code>setShort</code>,
  * <code>setString</code>, and so on) for setting IN parameter values
  * must specify types that are compatible with the defined type of
  * the input parameter. For instance, if the IN parameter has type
- * <code>INTEGER</code>, then the method <code>setInt</code> should be used.
+ * <code>INTEGER</code>, then the method <code>setInt</code> should be used.</p>
  *
  * <p>If a parameter has Member type, use the {@link #setObject(int, Object)}
- * method to set it. A {@link SQLException} will be thrown if the object is not
+ * method to set it. A {@link OlapException} will be thrown if the object is not
  * an instance of {@link org.olap4j.metadata.Member} or does not belong to the
- * correct {@link org.olap4j.metadata.Hierarchy}.
+ * correct {@link org.olap4j.metadata.Hierarchy}.</p>
  *
  * <p>The method {@link #getParameterMetaData()} returns a description of the
  * parameters, as in JDBC. The result is an {@link OlapParameterMetaData}.
@@ -55,9 +54,9 @@ public interface PreparedOlapStatement
      *
      * @return an <code>OlapResultSet</code> object that contains the data produced
      *         by the query; never <code>null</code>
-     * @exception SQLException if a database access error occurs
+     * @exception OlapException if a database access error occurs
      */
-    OlapResultSet executeQuery()  throws SQLException;
+    OlapResultSet executeQuery()  throws OlapException;
 
     /**
      * Retrieves the number, types and properties of this
@@ -66,10 +65,10 @@ public interface PreparedOlapStatement
      * @return an <code>OlapParameterMetaData</code> object that contains
      *         information about the number, types and properties of this
      *         <code>PreparedOlapStatement</code> object's parameters
-     * @exception SQLException if a database access error occurs
+     * @exception OlapException if a database access error occurs
      * @see OlapParameterMetaData
      */
-    OlapParameterMetaData getParameterMetaData() throws SQLException;
+    OlapParameterMetaData getParameterMetaData() throws OlapException;
 
     /**
      * Returns the cube (or virtual cube) which this statement is based upon.

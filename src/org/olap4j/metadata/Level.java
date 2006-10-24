@@ -19,7 +19,7 @@ package org.olap4j.metadata;
  */
 public interface Level extends MetadataElement {
     /**
-     * Returns the depth of this level.
+     * Returns the depth of this <code>Level</code>.
      *
      * <p>Note #1: In an access-controlled context, the first visible level of
      * a hierarchy may not have a depth of 0.</p>
@@ -30,24 +30,24 @@ public interface Level extends MetadataElement {
     int getDepth();
 
     /**
-     * Returns the Hierarchy this Level belongs to.
+     * Returns the {@link Hierarchy} this <code>Level</code> belongs to.
      */
     Hierarchy getHierarchy();
 
     /**
-     * Returns the Dimension this Level belongs to.
+     * Returns the Dimension this <code>Level</code> belongs to.
      * (Always equivalent to <code>getHierarchy().getDimension()</code>.)
      */
     Dimension getDimension();
 
     /**
-     * Returns the type of this Level.
+     * Returns the type of this <code>Level</code>.
      */
     Level.Type getLevelType();
 
     /**
      * Returns a list of definitions for the properties available to members
-     * of this Level.
+     * of this <code>Level</code>.
      *
      * @see org.olap4j.OlapDatabaseMetaData#getProperties()
      */

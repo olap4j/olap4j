@@ -10,10 +10,9 @@
 package org.olap4j;
 
 import org.olap4j.mdx.parser.MdxParserFactory;
+import org.olap4j.metadata.Schema;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * Connection to an OLAP server.
@@ -24,21 +23,27 @@ import java.sql.Statement;
  */
 public interface OlapConnection extends Connection {
 
+    // overrides Connection, with refined return type and throws list
+    OlapDatabaseMetaData getMetaData() throws OlapException;
+
     /**
      * Creates a prepared OLAP Statement.
      */
-    PreparedOlapStatement prepareOlapStatement(String mdx) throws SQLException;
+    PreparedOlapStatement prepareOlapStatement(String mdx) throws OlapException;
 
     /**
      * Returns the factory used to create MDX parsers in this connection.
      */
     MdxParserFactory getParserFactory();
 
+    // overrides Connection, with refined return type and throws list
+    OlapStatement createStatement() throws OlapException;
+
     /**
-     * Override {@link java.sql.Connection#createStatement()} with refined
-     * result type.
+     * Returns the current {@link org.olap4j.metadata.Schema} of this
+     * connection.
      */
-    OlapStatement createStatement() throws SQLException;
+    Schema getSchema() throws OlapException;
 }
 
 // End OlapConnection.java
