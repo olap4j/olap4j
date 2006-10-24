@@ -29,6 +29,8 @@ public interface Hierarchy extends MetadataElement {
 
     /**
      * Returns a list of the {@link Level}s in this Hierarchy.
+     *
+     * @see org.olap4j.OlapDatabaseMetaData#getLevels
      */
     NamedList<Level> getLevels();
 

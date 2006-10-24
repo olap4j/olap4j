@@ -9,6 +9,8 @@
 */
 package org.olap4j;
 
+import org.olap4j.metadata.Database;
+
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,6 +30,12 @@ import java.sql.SQLException;
  * @since Oct 12, 2006
  */
 public interface OlapDatabaseMetaData extends DatabaseMetaData {
+    /**
+     * Returns the <code>Database</code>, which is the root of the hierarchy
+     * of metadata objects.
+     * @return the Database
+     */
+    Database getDatabase();
 
     /**
      * Retrieves a list of descriptions of an Action.

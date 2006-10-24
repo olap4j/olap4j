@@ -10,7 +10,7 @@
 package org.olap4j.metadata;
 
 /**
- * Group of {@link Member}s in a {@link Hierarchy},
+ * Group of {@link Member} objects in a {@link Hierarchy},
  * all with the same attributes and at the same depth in the hierarchy.
  *
  * @author jhyde
@@ -48,6 +48,8 @@ public interface Level extends MetadataElement {
     /**
      * Returns a list of definitions for the properties available to members
      * of this Level.
+     *
+     * @see org.olap4j.OlapDatabaseMetaData#getProperties()
      */
     NamedList<Property> getProperties();
 

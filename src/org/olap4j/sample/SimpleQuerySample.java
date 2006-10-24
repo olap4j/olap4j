@@ -1,5 +1,5 @@
 /*
-// $Id$
+// $Id: SimpleQuerySample.java 10 2006-10-16 05:37:08Z jhyde $
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -18,6 +18,7 @@ import org.olap4j.metadata.Dimension;
 
 import java.sql.*;
 import java.util.List;
+import java.util.ArrayList;
 
 import mondrian.olap.Query;
 
@@ -25,7 +26,7 @@ import mondrian.olap.Query;
  * Collection of olap4j samples illustrating connections and statements.
  *
  * @author jhyde
- * @version $Id$
+ * @version $Id: SimpleQuerySample.java 10 2006-10-16 05:37:08Z jhyde $
  * @since Aug 22, 2006
  */
 public class SimpleQuerySample {
@@ -63,17 +64,18 @@ public class SimpleQuerySample {
 
         // Print headings.
         System.out.print("\t");
-        ResultAxis columnsAxis = resultAxes.get(ResultAxis.COLUMNS);
+        ResultAxis columnsAxis = resultAxes.get(Axis.COLUMNS.ordinal());
         for (ResultPosition position : columnsAxis.getPositions()) {
             Member measure = position.getMembers().get(0);
             System.out.print(measure.getName());
         }
 
         // Print rows.
-        ResultAxis rowsAxis = resultAxes.get(ResultAxis.ROWS);
-        for (ResultPosition position : rowsAxis.getPositions()) {
+        ResultAxis rowsAxis = resultAxes.get(Axis.ROWS.axisOrdinal());
+        int cellOrdinal = 0;
+        for (ResultPosition rowPosition : rowsAxis.getPositions()) {
             boolean first = true;
-            for (Member member : position.getMembers()) {
+            for (Member member : rowPosition.getMembers()) {
                 if (first) {
                     first = false;
                 } else {
@@ -84,11 +86,20 @@ public class SimpleQuerySample {
 
             // Print the value of the cell in each column.
             for (ResultPosition columnPosition : columnsAxis.getPositions()) {
-                ResultCell cell = result.getCell(
-                    new int[] {
-                        columnPosition.getOrdinal(),
-                        position.getOrdinal(),
-                });
+                // Access the cell via its ordinal. The ordinal is kept in step
+                // because we increment the ordinal once for each row and
+                // column.
+                ResultCell cell = result.getCell(cellOrdinal);
+
+                // Just for kicks, convert the ordinal to a list of coordinates.
+                // The list matches the row and column positions.
+                List<Integer> coordList =
+                    result.ordinalToCoordinates(cellOrdinal);
+                assert coordList.get(0) == rowPosition.getOrdinal();
+                assert coordList.get(1) == columnPosition.getOrdinal();
+
+                ++cellOrdinal;
+
                 System.out.print('\t');
                 System.out.print(cell.getFormattedValue());
             }
@@ -173,32 +184,35 @@ public class SimpleQuerySample {
 
         // Print headings.
         System.out.print("\t");
-        ResultAxis columnsAxis = resultAxes.get(ResultAxis.COLUMNS);
+        ResultAxis columnsAxis = resultAxes.get(Axis.COLUMNS.axisOrdinal());
         for (ResultPosition position : columnsAxis.getPositions()) {
             Member measure = position.getMembers().get(0);
             System.out.print(measure.getName());
         }
 
         // Print rows.
-        ResultAxis rowsAxis = resultAxes.get(ResultAxis.ROWS);
-        for (ResultPosition position : rowsAxis.getPositions()) {
-            boolean first = true;
-            for (Member member : position.getMembers()) {
-                if (first) {
-                    first = false;
-                } else {
+        ResultAxis rowsAxis = resultAxes.get(Axis.ROWS.axisOrdinal());
+        List<Integer> coordList = new ArrayList<Integer>(2);
+        int row = 0;
+        for (ResultPosition rowPosition : rowsAxis.getPositions()) {
+            assert rowPosition.getOrdinal() == row;
+            coordList.set(0, row++);
+
+            // Print the row label.
+            int memberOrdinal = 0;
+            for (Member member : rowPosition.getMembers()) {
+                if (memberOrdinal++ > 0) {
                     System.out.print('\t');
                 }
                 System.out.print(member.getName());
             }
 
             // Print the value of the cell in each column.
+            int column = 0;
             for (ResultPosition columnPosition : columnsAxis.getPositions()) {
-                ResultCell cell = result.getCell(
-                    new int[] {
-                        columnPosition.getOrdinal(),
-                        position.getOrdinal(),
-                });
+                assert columnPosition.getOrdinal() == column;
+                coordList.set(1, column++);
+                ResultCell cell = result.getCell(coordList);
                 System.out.print('\t');
                 System.out.print(cell.getFormattedValue());
             }

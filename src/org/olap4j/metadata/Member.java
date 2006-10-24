@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * <code>Member</code> is a data value in a in an OLAP Dimension.
+ * <code>Member</code> is a data value in an OLAP Dimension.
  *
  * @author jhyde
  * @version $Id$
@@ -28,6 +28,8 @@ public interface Member extends MetadataElement {
      *
      * <p>If access-control is in place, the list does not contain inaccessible
      * children.
+     *
+     * @see org.olap4j.OlapDatabaseMetaData#getMembers()
      */
     NamedList<Member> getChildMembers();
 
@@ -138,7 +140,7 @@ public interface Member extends MetadataElement {
      *
      * <p>Every member has certain system properties such as "name" and
      * "caption" (the full list is described in the {@link Property}
-     * ({@link org.olap4j.Todo} move Property)
+     * ({@link org.olap4j.Todo todo: move Property})
      * enumeration), as well as extra properties defined for its Level
      * (see {@link Level#getProperties()}
      *

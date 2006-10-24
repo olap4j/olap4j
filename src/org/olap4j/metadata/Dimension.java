@@ -9,6 +9,8 @@
 */
 package org.olap4j.metadata;
 
+import org.olap4j.OlapException;
+
 /**
  * <code>Dimension</code> ...
  *
@@ -23,8 +25,10 @@ public interface Dimension extends MetadataElement {
      *
      * <p>Many dimensions have only one Hierarchy, whose name is the same as the
      * Dimension.
+     *
+     * @see org.olap4j.OlapDatabaseMetaData#getHierarchies
      */
-    NamedList<Hierarchy> getHierarchies();
+    NamedList<Hierarchy> getHierarchies() throws OlapException;
 
     /**
      * Returns the root member or members of this Dimension.
@@ -32,12 +36,12 @@ public interface Dimension extends MetadataElement {
      * <p>If the dimension has an 'all' member, then this will be the sole
      * root member.
      */
-    NamedList<Member> getRootMembers();
+    NamedList<Member> getRootMembers() throws OlapException;
 
     /**
      * Returns the type of this Dimension.
      */
-    Dimension.Type getDimensionType();
+    Dimension.Type getDimensionType() throws OlapException;
 
     /**
      * Enumeration of the types of a <code>Dimension</code>.

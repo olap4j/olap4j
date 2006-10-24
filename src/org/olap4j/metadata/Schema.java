@@ -9,6 +9,13 @@
 */
 package org.olap4j.metadata;
 
+import mondrian.xmla.DataSourcesConfig;
+
+import java.util.Locale;
+import java.util.Collection;
+
+import org.olap4j.OlapException;
+
 /**
  * <code>Schema</code> ...
  *
@@ -17,7 +24,48 @@ package org.olap4j.metadata;
  * @since Oct 13, 2006
  */
 public interface Schema {
-    NamedList<Cube> getCubes();
+    /**
+     * Returns the {@link Catalog} this <code>Schema</code> belongs to.
+     */
+    Catalog getCatalog();
+
+    /**
+     * Returns a list of cubes in this <code>Schema</code>.
+     *
+     * @see org.olap4j.OlapDatabaseMetaData#getCubes
+     * @return List of cubes in this Schema
+     */
+    NamedList<Cube> getCubes() throws OlapException;
+
+    /**
+     * Returns a list of shared {@link Dimension} objects in this
+     * <code>Schema</code>.
+     *
+     * @see org.olap4j.OlapDatabaseMetaData#getDimensions()
+     */
+    NamedList<Dimension> getSharedDimensions() throws OlapException;
+
+    /**
+     * Returns a collection of {@link java.util.Locale} objects for which this
+     * <code>Schema</code> has been localized.
+     *
+     * <p>Consider the following use case. Suppose one cube is available in
+     * English and French, and in French and Spanish, and both are shown in same
+     * portal. Clients typically say that seeing reports in a mixture of
+     * languages is confusing; the portal would figure out the best common
+     * language, in this case French. This method allows the client to choose
+     * the most appropriate locale.</p>
+     *
+     * <p>The list is advisory: a client is free to choose another locale,
+     * in which case, the server will probably revert to the base locale for
+     * locale-specific behavior such as captions and formatting.
+     *
+     * @see Cube#getSupportedLocales
+     *
+     * @return List of locales for which this <code>Schema</code> has been
+     * localized
+     */
+    Collection<Locale> getSupportedLocales() throws OlapException;
 }
 
 // End Schema.java
