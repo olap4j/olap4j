@@ -12,6 +12,7 @@ package org.olap4j.type;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Hierarchy;
 import org.olap4j.metadata.Level;
+import org.olap4j.OlapException;
 
 /**
  * Tuple type.
@@ -52,7 +53,7 @@ public class TupleType implements Type {
         throw new UnsupportedOperationException();
     }
 
-    public Type getValueType() {
+    public Type getValueType() throws OlapException {
         for (Type elementType : elementTypes) {
             if (elementType instanceof MemberType) {
                 MemberType memberType = (MemberType) elementType;

@@ -28,8 +28,8 @@ public enum Axis {
 
     /**
      * Returns the ordinal which is to be used for retrieving this axis from
-     * the {@link org.olap4j.OlapResultSet#getAxes()}, or retrieving its
-     * coordinate from {@link ResultCell#getCoordinateList()}.
+     * the {@link org.olap4j.CellSet#getAxes()}, or retrieving its
+     * coordinate from {@link Cell#getCoordinateList()}.
      *
      * <p>The axis ordinal is one less than the {@link #ordinal} value which
      * every <code>enum</code> value possesses. Hence, {@link #SLICER} is -1

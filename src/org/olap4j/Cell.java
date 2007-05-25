@@ -1,5 +1,5 @@
 /*
-// $Id$
+// $Id: Cell.java 15 2006-10-24 08:41:02Z jhyde $
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -15,26 +15,26 @@ import java.util.List;
 import java.sql.ResultSet;
 
 /**
- * Cell returned from a {@link OlapResultSet}.
+ * Cell returned from a {@link CellSet}.
  *
  * @author jhyde
- * @version $Id$
+ * @version $Id: Cell.java 15 2006-10-24 08:41:02Z jhyde $
  * @since Aug 22, 2006
  */
-public interface ResultCell {
+public interface Cell {
     /**
-     * Returns the {@link OlapResultSet} that this ResultCell belongs to.
+     * Returns the {@link CellSet} that this Cell belongs to.
      *
-     * @return OlapResultSet, never null
+     * @return CellSet, never null
      */
-    OlapResultSet getResultSet();
+    CellSet getCellSet();
 
     /**
-     * Returns the ordinal of this ResultCell.
+     * Returns the ordinal of this Cell.
      *
      * <p>The formula is the sequence, zero-based, which the cell would be
      * visited in a raster-scan through all of the cells of this
-     * {@link OlapResultSet}. The ordinal of the first cell is zero, and the
+     * {@link CellSet}. The ordinal of the first cell is zero, and the
      * ordinal of the last cell is the product of the lengths of the axes, minus
      * 1. For example, if a result has 10 columns and 20
      * rows, then:<ul>
@@ -47,7 +47,7 @@ public interface ResultCell {
     int getOrdinal();
 
     /**
-     * Returns the coordinates of this ResultCell in its {@link ResultAxis}.
+     * Returns the coordinates of this Cell in its {@link CellSetAxis}.
      *
      * <p>This method is provided for convenience. It is equivalent to the
      * following code:
@@ -60,9 +60,9 @@ public interface ResultCell {
     List<Integer> getCoordinateList();
 
     /**
-     * Returns the value of a given property for this ResultCell.
+     * Returns the value of a given property for this Cell.
      *
-     * @see org.olap4j.OlapResultSet#getMetaData()
+     * @see org.olap4j.CellSet#getMetaData()
      * @see Todo
      */
     Object getPropertyValue(Property property);
@@ -90,6 +90,8 @@ public interface ResultCell {
 
     /**
      * Returns the value of this cell as a <code>double</code> value.
+     *
+     * @throws OlapException if this cell does not have a numeric value
      */
     double getDoubleValue() throws OlapException;
 
@@ -100,16 +102,18 @@ public interface ResultCell {
 
     /**
      * @see Todo
-     * returns a OlapException if the cell is an error
+     *
+     * Returns (does not throw) an {@link OlapException} if the cell is an
+     * error.
      */
     Object getValue();
 
     /**
-     * Returns the value of this ResultCell, formatted according to the
+     * Returns the value of this Cell, formatted according to the
      * FORMAT_STRING property and using the numeric formatting tokens the
      * current locale.
      *
-     * @return Formatted value of this ResultCell
+     * @return Formatted value of this Cell
      */
     String getFormattedValue();
 
@@ -120,4 +124,4 @@ public interface ResultCell {
     ResultSet drillThrough();
 }
 
-// End ResultCell.java
+// End Cell.java

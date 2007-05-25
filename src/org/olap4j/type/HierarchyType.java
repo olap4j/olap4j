@@ -12,6 +12,7 @@ package org.olap4j.type;
 import org.olap4j.metadata.Hierarchy;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Level;
+import org.olap4j.OlapException;
 
 /**
  * The type of an expression which represents a hierarchy.
@@ -31,7 +32,7 @@ public class HierarchyType implements Type {
     public HierarchyType(Dimension dimension, Hierarchy hierarchy) {
         this.dimension = dimension;
         this.hierarchy = hierarchy;
-        StringBuffer buf = new StringBuffer("HierarchyType<");
+        StringBuilder buf = new StringBuilder("HierarchyType<");
         if (hierarchy != null) {
             buf.append("hierarchy=").append(hierarchy.getUniqueName());
         } else if (dimension != null) {
@@ -46,7 +47,7 @@ public class HierarchyType implements Type {
         return new HierarchyType(hierarchy.getDimension(), hierarchy);
     }
 
-    public static HierarchyType forType(Type type) {
+    public static HierarchyType forType(Type type) throws OlapException {
         return new HierarchyType(type.getDimension(), type.getHierarchy());
     }
 

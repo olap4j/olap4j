@@ -15,8 +15,6 @@ import java.util.List;
  * Extension to {@link java.util.List} which allows access to members of the
  * list by name as well as by ordinal.
  *
- * <p>The
- *
  * @author jhyde
  * @version $Id$
  * @since Aug 22, 2006

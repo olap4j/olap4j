@@ -10,6 +10,7 @@
 package org.olap4j.type;
 
 import org.olap4j.metadata.Hierarchy;
+import org.olap4j.OlapException;
 
 /**
  * Utility methods relating to types.
@@ -35,7 +36,7 @@ public class TypeUtil {
      * Converts a type to a member or tuple type.
      * If it cannot, returns null.
      */
-    public static Type toMemberOrTupleType(Type type) {
+    public static Type toMemberOrTupleType(Type type) throws OlapException {
         type = stripSetType(type);
         if (type instanceof TupleType) {
             return (TupleType) type;
@@ -52,7 +53,7 @@ public class TypeUtil {
      * a member type.
      * If it is a tuple, number, string, or boolean, returns null.
      */
-    public static MemberType toMemberType(Type type) {
+    public static MemberType toMemberType(Type type) throws OlapException {
         type = stripSetType(type);
         if (type instanceof MemberType) {
             return (MemberType) type;
@@ -70,7 +71,7 @@ public class TypeUtil {
      * In general, to be union-compatible, types must have the same
      * dimensionality.
      */
-    public static boolean isUnionCompatible(Type type1, Type type2) {
+    public static boolean isUnionCompatible(Type type1, Type type2) throws OlapException {
         if (type1 instanceof TupleType) {
             TupleType tupleType1 = (TupleType) type1;
             if (type2 instanceof TupleType) {

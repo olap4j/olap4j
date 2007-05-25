@@ -27,6 +27,15 @@ public interface Catalog {
      * @return List of Schema in this <code>Catalog</code>
      */
     NamedList<Schema> getSchemas() throws OlapException;
+
+    /**
+     * Returns the {@link Database} this <code>Catalog</code> belongs to.
+     *
+     * @return the Database this Catalog belongs to
+     */
+    Database getDatabase();
+
+    String getName();
 }
 
 // End Catalog.java

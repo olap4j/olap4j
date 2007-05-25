@@ -11,7 +11,7 @@ package org.olap4j.sample;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.olap4j.OlapResultSet;
+import org.olap4j.CellSet;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -40,7 +40,7 @@ public class SpringSample {
             new ResultSetExtractor() {
                 public Object extractData(ResultSet resultSet)
                 {
-                    OlapResultSet olapResult = (OlapResultSet) resultSet;
+                    CellSet olapResult = (CellSet) resultSet;
                     return "Result has " +
                         olapResult.getAxes().get(0).getPositions().size() +
                         " columns and " +

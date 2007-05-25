@@ -10,6 +10,8 @@
 package org.olap4j;
 
 import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.DriverManager;
 
 /**
  * <p>An exception describing an error accessing an OLAP database.</p>
@@ -74,6 +76,18 @@ public class OlapException extends SQLException {
     }
 
     /**
+     *  Constructs an <code>OlapException</code> object with a given
+     * <code>reason</code> and <code>cause</code>.
+     * <p>
+     * @param cause the underlying reason for this <code>SQLException</code>
+     * (which is saved for later retrieval by the <code>getCause()</code> method);
+     * may be null indicating the cause is non-existent or unknown.
+     */
+    public OlapException(String reason, Throwable cause) {
+        super(reason, cause);
+    }
+
+    /**
      * Sets the textual region where the exception occurred.
      */
     public void setRegion(Region region) {
@@ -92,21 +106,21 @@ public class OlapException extends SQLException {
      * Sets the context where the exception occurred.
      *
      * @param context Context where the exception occurred
-     * @throws IllegalArgumentException If context is not a {@link ResultCell}
-     *   or a {@link ResultPosition}
+     * @throws IllegalArgumentException If context is not a {@link Cell}
+     *   or a {@link Position}
      */
     public void setContext(Object context) {
-        if (!(context instanceof ResultCell) &&
-            !(context instanceof ResultPosition)) {
+        if (!(context instanceof Cell) &&
+            !(context instanceof Position)) {
             throw new IllegalArgumentException(
-                "expected ResultCell or ResultPosition");
+                "expected Cell or Position");
         }
         this.context = context;
     }
 
     /**
      * Returns the context where the exception occurred.
-     * Typically a {@link ResultCell} or a {@link ResultPosition}, or null.
+     * Typically a {@link Cell} or a {@link Position}, or null.
      */
     public Object getContext() {
         return context;

@@ -32,7 +32,7 @@ public interface Member extends MetadataElement {
      *
      * @see org.olap4j.OlapDatabaseMetaData#getMembers()
      */
-    NamedList<Member> getChildMembers();
+    NamedList<? extends Member> getChildMembers();
 
     /**
      * Returns the parent of this Member, or null if it has no parent.

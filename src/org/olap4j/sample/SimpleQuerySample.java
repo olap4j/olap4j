@@ -61,26 +61,26 @@ public class SimpleQuerySample {
 
         // Execute a statement.
         Statement statement = connection.createStatement();
-        OlapResultSet result = Olap4j.convert(
+        CellSet result = Olap4j.convert(
             statement.executeQuery(
             "select {[Measures].[Unit Sales]} on columns,\n" +
                 " CrossJoin([Store].Children, [Gender].Members) on rows\n" +
                 "from [Sales]"));
 
-        List<ResultAxis> resultAxes = result.getAxes();
+        List<CellSetAxis> cellSetAxes = result.getAxes();
 
         // Print headings.
         System.out.print("\t");
-        ResultAxis columnsAxis = resultAxes.get(Axis.COLUMNS.ordinal());
-        for (ResultPosition position : columnsAxis.getPositions()) {
+        CellSetAxis columnsAxis = cellSetAxes.get(Axis.COLUMNS.ordinal());
+        for (Position position : columnsAxis.getPositions()) {
             Member measure = position.getMembers().get(0);
             System.out.print(measure.getName());
         }
 
         // Print rows.
-        ResultAxis rowsAxis = resultAxes.get(Axis.ROWS.axisOrdinal());
+        CellSetAxis rowsAxis = cellSetAxes.get(Axis.ROWS.axisOrdinal());
         int cellOrdinal = 0;
-        for (ResultPosition rowPosition : rowsAxis.getPositions()) {
+        for (Position rowPosition : rowsAxis.getPositions()) {
             boolean first = true;
             for (Member member : rowPosition.getMembers()) {
                 if (first) {
@@ -92,11 +92,11 @@ public class SimpleQuerySample {
             }
 
             // Print the value of the cell in each column.
-            for (ResultPosition columnPosition : columnsAxis.getPositions()) {
+            for (Position columnPosition : columnsAxis.getPositions()) {
                 // Access the cell via its ordinal. The ordinal is kept in step
                 // because we increment the ordinal once for each row and
                 // column.
-                ResultCell cell = result.getCell(cellOrdinal);
+                Cell cell = result.getCell(cellOrdinal);
 
                 // Just for kicks, convert the ordinal to a list of coordinates.
                 // The list matches the row and column positions.
@@ -154,7 +154,7 @@ public class SimpleQuerySample {
         statement.setInt(2, 10);
 
         // Execute, and print result.
-        OlapResultSet result = Olap4j.convert(statement.executeQuery());
+        CellSet result = Olap4j.convert(statement.executeQuery());
         printResult(result);
 
         // Close the statement and connection.
@@ -186,22 +186,22 @@ public class SimpleQuerySample {
         statement.executeOlapQuery(query);
     }
 
-    private void printResult(OlapResultSet result) {
-        List<ResultAxis> resultAxes = result.getAxes();
+    private void printResult(CellSet result) {
+        List<CellSetAxis> cellSetAxes = result.getAxes();
 
         // Print headings.
         System.out.print("\t");
-        ResultAxis columnsAxis = resultAxes.get(Axis.COLUMNS.axisOrdinal());
-        for (ResultPosition position : columnsAxis.getPositions()) {
+        CellSetAxis columnsAxis = cellSetAxes.get(Axis.COLUMNS.axisOrdinal());
+        for (Position position : columnsAxis.getPositions()) {
             Member measure = position.getMembers().get(0);
             System.out.print(measure.getName());
         }
 
         // Print rows.
-        ResultAxis rowsAxis = resultAxes.get(Axis.ROWS.axisOrdinal());
+        CellSetAxis rowsAxis = cellSetAxes.get(Axis.ROWS.axisOrdinal());
         List<Integer> coordList = new ArrayList<Integer>(2);
         int row = 0;
-        for (ResultPosition rowPosition : rowsAxis.getPositions()) {
+        for (Position rowPosition : rowsAxis.getPositions()) {
             assert rowPosition.getOrdinal() == row;
             coordList.set(0, row++);
 
@@ -216,10 +216,10 @@ public class SimpleQuerySample {
 
             // Print the value of the cell in each column.
             int column = 0;
-            for (ResultPosition columnPosition : columnsAxis.getPositions()) {
+            for (Position columnPosition : columnsAxis.getPositions()) {
                 assert columnPosition.getOrdinal() == column;
                 coordList.set(1, column++);
-                ResultCell cell = result.getCell(coordList);
+                Cell cell = result.getCell(coordList);
                 System.out.print('\t');
                 System.out.print(cell.getFormattedValue());
             }

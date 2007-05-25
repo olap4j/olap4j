@@ -12,6 +12,7 @@ package org.olap4j.type;
 import org.olap4j.metadata.Level;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Hierarchy;
+import org.olap4j.OlapException;
 
 /**
  * The type of an expression which represents a level.
@@ -48,7 +49,7 @@ public class LevelType implements Type {
             assert hierarchy.getDimension() == dimension :
                 "hierarchy.getDimension() == dimension";
         }
-        StringBuffer buf = new StringBuffer("LevelType<");
+        StringBuilder buf = new StringBuilder("LevelType<");
         if (level != null) {
             buf.append("level=").append(level.getUniqueName());
         } else if (hierarchy != null) {
@@ -60,7 +61,7 @@ public class LevelType implements Type {
         this.digest = buf.toString();
     }
 
-    public static LevelType forType(Type type) {
+    public static LevelType forType(Type type) throws OlapException {
         return new LevelType(
                 type.getDimension(),
                 type.getHierarchy(),

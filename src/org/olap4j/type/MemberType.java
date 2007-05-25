@@ -13,6 +13,7 @@ import org.olap4j.metadata.Member;
 import org.olap4j.metadata.Level;
 import org.olap4j.metadata.Hierarchy;
 import org.olap4j.metadata.Dimension;
+import org.olap4j.OlapException;
 
 /**
  * The type of an expression which represents a member.
@@ -59,7 +60,7 @@ public class MemberType implements Type {
             assert dimension != null;
             assert hierarchy.getDimension() == dimension;
         }
-        StringBuffer buf = new StringBuffer("MemberType<");
+        StringBuilder buf = new StringBuilder("MemberType<");
         if (member != null) {
             buf.append("member=").append(member.getUniqueName());
         } else if (level != null) {
@@ -132,7 +133,7 @@ public class MemberType implements Type {
         return dimension;
     }
 
-    public static MemberType forType(Type type) {
+    public static MemberType forType(Type type) throws OlapException {
         if (type instanceof MemberType) {
             return (MemberType) type;
         } else {

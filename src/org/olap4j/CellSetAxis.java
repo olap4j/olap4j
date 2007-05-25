@@ -1,5 +1,5 @@
 /*
-// $Id$
+// $Id: CellSetAxis.java 15 2006-10-24 08:41:02Z jhyde $
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -9,25 +9,19 @@
 */
 package org.olap4j;
 
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.NamedList;
-
 import java.util.List;
-import java.util.Iterator;
 import java.util.ListIterator;
 
-import mondrian.olap.Property;
-
 /**
- * <code>ResultAxis</code> ...
+ * <code>CellSetAxis</code> ...
  *
  * @author jhyde
- * @version $Id$
+ * @version $Id: CellSetAxis.java 15 2006-10-24 08:41:02Z jhyde $
  * @since Aug 22, 2006
  */
-public interface ResultAxis {
+public interface CellSetAxis {
     /**
-     * Returns the ordinal of this <code>ResultAxis</code>.
+     * Returns the ordinal of this <code>CellSetAxis</code>.
      *
      * <p>0 = ROWS, 1 = COLUMNS, and so forth, as described by the
      * {@link Axis#axisOrdinal()} method of the {@link Axis} enumeration.</p>
@@ -35,10 +29,10 @@ public interface ResultAxis {
     int getOrdinal();
 
     /**
-     * Returns the {@link OlapResultSet} which this <code>ResultAxis</code>
+     * Returns the {@link CellSet} which this <code>CellSetAxis</code>
      * belongs to.
      */
-    OlapResultSet getResultSet();
+    CellSet getCellSet();
 
     /**
      * Returns a description of the type (e.g. {@link Axis#ROWS}) of this
@@ -47,21 +41,21 @@ public interface ResultAxis {
      * <p>The result is identical to evaluating
      * <blockquote>
      * <code>
-     * getResultSet().getMetaData().getAxesMetaData(getOrdinal())
+     * getCellSet().getMetaData().getAxesMetaData(getOrdinal())
      * </code>
      * </blockquote>
      */
-    OlapResultSetAxisMetaData getAxisMetaData();
+    CellSetAxisMetaData getAxisMetaData();
 
     /**
-     * Returns a list of <code>ResultPosition</code> objects on this ResultAxis.
+     * Returns a list of <code>Position</code> objects on this CellSetAxis.
      *
      * @return List of positions on this axis (never null)
      */
-    List<ResultPosition> getPositions();
+    List<Position> getPositions();
 
     /**
-     * Returns the number of positions on this ResultAxis.
+     * Returns the number of positions on this CellSetAxis.
      *
      * <p>This method can be called at any time. In particular, it is not
      * necessary to complete an iteration through all positions before calling
@@ -75,8 +69,8 @@ public interface ResultAxis {
     /**
      * Opens an iterator on
      */
-    ListIterator<ResultPosition> iterate();
+    ListIterator<Position> iterate();
 
 }
 
-// End ResultAxis.java
+// End CellSetAxis.java

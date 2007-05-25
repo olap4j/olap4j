@@ -15,7 +15,7 @@ import org.olap4j.metadata.Property;
 import java.util.List;
 
 /**
- * Description of structure of a particular axis of an {@link OlapResultSet}.
+ * Description of structure of a particular axis of an {@link CellSet}.
  *
  * <p>For example, in the MDX statement
  * <blockquote>
@@ -52,13 +52,13 @@ import java.util.List;
  * @version $Id: $
  * @since Oct 23, 2006
  */
-public interface OlapResultSetAxisMetaData {
+public interface CellSetAxisMetaData {
     /**
      * Returns the definition of the axis.
      * ({@link Axis#SLICER}, {@link Axis#ROWS}, and so forth.)
      */
     Axis getAxis();
-    
+
     /**
      * Returns the hierarchies which are mapped onto this axis.
      */
@@ -70,4 +70,4 @@ public interface OlapResultSetAxisMetaData {
     List<Property> getProperties();
 }
 
-// End OlapResultSetAxisMetaData.java
+// End CellSetAxisMetaData.java

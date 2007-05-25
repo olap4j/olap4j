@@ -12,6 +12,7 @@ package org.olap4j.type;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Hierarchy;
 import org.olap4j.metadata.Level;
+import org.olap4j.OlapException;
 
 /**
  * Type of an MDX expression.
@@ -54,7 +55,7 @@ public interface Type {
     /**
      * Returns the hierarchy of this type. If not applicable, throws.
      */
-    Hierarchy getHierarchy();
+    Hierarchy getHierarchy() throws OlapException;
 
     /**
      * Returns the level of this type, or null if not known.

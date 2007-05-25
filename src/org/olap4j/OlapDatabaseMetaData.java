@@ -117,6 +117,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData {
         String catalog,
         String schemaPattern,
         String cubeNamePattern) throws OlapException;
+    
     /**
      * Retrieves a result set describing the shared and private dimensions
      * within a database.

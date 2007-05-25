@@ -15,7 +15,7 @@ import java.util.Locale;
 
 /**
  * Definition of a property of a {@link Member} or
- * {@link org.olap4j.ResultCell}.
+ * {@link org.olap4j.Cell}.
  *
  * @author jhyde
  * @version $Id$
@@ -291,7 +291,7 @@ public interface Property extends MetadataElement {
 
     /**
      * Enumeration of the system properties available for every
-     * {@link org.olap4j.ResultCell}.
+     * {@link org.olap4j.Cell}.
      *
      * <p>The following propertiess are mandatory for cells:<ul>
      * <li>{@link #BACK_COLOR}</li>

@@ -30,6 +30,13 @@ public interface Schema {
     Catalog getCatalog();
 
     /**
+     * Returns the name of this Schema.
+     *
+     * @return name of this Schema
+     */
+    String getName();
+
+    /**
      * Returns a list of cubes in this <code>Schema</code>.
      *
      * @see org.olap4j.OlapDatabaseMetaData#getCubes

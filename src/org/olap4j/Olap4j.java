@@ -58,7 +58,7 @@ import java.sql.*;
  * 		</td>
  * 	</tr>
  * 	<tr>
- * 		<td>{@link OlapResultSet}</td>
+ * 		<td>{@link CellSet}</td>
  * 		<td><code>{@link ResultSet}</code></td>
  * 		<td>
  * 		<ul>
@@ -125,13 +125,13 @@ public class Olap4j {
 
     /**
      * Converts a JDBC result set ({@link java.sql.ResultSet})
-     * to an olap4j result set ({@link OlapResultSet}).
+     * to an olap4j result set ({@link CellSet}).
      *
      * <p>The result set eproduced by an olap4j driver will already
-     * implement the <code>OlapResultSet</code> interface, but certain
+     * implement the <code>CellSet</code> interface, but certain
      * connection pools add wrappers. This method removes those wrappers.
      */
-    public static OlapResultSet convert(ResultSet resultSet) {
+    public static CellSet convert(ResultSet resultSet) {
         return adapterFor(resultSet).convert(resultSet);
     }
 
@@ -201,7 +201,7 @@ public class Olap4j {
         OlapStatement convert(Statement stmt);
         PreparedOlapStatement convert(PreparedStatement pstmt);
         OlapDatabaseMetaData convert(DatabaseMetaData metadata);
-        OlapResultSet convert(ResultSet resultSet);
+        CellSet convert(ResultSet resultSet);
     }
 
 
@@ -228,8 +228,8 @@ public class Olap4j {
             return (OlapDatabaseMetaData) metadata;
         }
 
-        public OlapResultSet convert(ResultSet resultSet) {
-            return (OlapResultSet) resultSet;
+        public CellSet convert(ResultSet resultSet) {
+            return (CellSet) resultSet;
         }
     }
 }

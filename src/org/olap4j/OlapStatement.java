@@ -15,7 +15,7 @@ import java.sql.Statement;
 
 /**
  * Object used for statically executing an MDX statement and returning an
- * {@link OlapResultSet}.
+ * {@link CellSet}.
  *
  * @see PreparedOlapStatement
  *
@@ -28,7 +28,7 @@ public interface OlapStatement extends Statement {
     /**
      * Executes an OLAP statement.
      */
-    OlapResultSet executeOlapQuery(String mdx) throws OlapException;
+    CellSet executeOlapQuery(String mdx) throws OlapException;
 
     /**
      * Executes an OLAP statement expressed as a parse tree.
@@ -37,7 +37,7 @@ public interface OlapStatement extends Statement {
      * @param query Parse tree of MDX SELECT statement
      * @return Result
      */
-    OlapResultSet executeOlapQuery(Query query);
+    CellSet executeOlapQuery(Query query);
 }
 
 // End OlapStatement.java

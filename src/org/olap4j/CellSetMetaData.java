@@ -16,15 +16,15 @@ import java.sql.ResultSetMetaData;
 import java.util.List;
 
 /**
- * <code>OlapResultSetMetaData</code> ...
+ * <code>CellSetMetaData</code> ...
  *
  * @author jhyde
  * @version $Id: $
  * @since Oct 23, 2006
  */
-public interface OlapResultSetMetaData extends ResultSetMetaData {
+public interface CellSetMetaData extends ResultSetMetaData {
     /**
-     * Returns a list of properties which each ResultCell may have.
+     * Returns a list of properties which each Cell may have.
      */
     List<Property> getCellProperties();
 
@@ -36,7 +36,7 @@ public interface OlapResultSetMetaData extends ResultSetMetaData {
     /**
      * Returns a list of metadata describing each result axis.
      */
-    List<OlapResultSetAxisMetaData> getAxesMetaData();
+    List<CellSetAxisMetaData> getAxesMetaData();
 }
 
-// End OlapResultSetMetaData.java
+// End CellSetMetaData.java

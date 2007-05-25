@@ -1,5 +1,5 @@
 /*
-// $Id$
+// $Id: CellSet.java 16 2006-10-24 22:48:56Z jhyde $
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -50,48 +50,60 @@ import java.sql.ResultSet;
  * </blockquote></p>
  *
  * @author jhyde
- * @version $Id$
+ * @version $Id: CellSet.java 16 2006-10-24 22:48:56Z jhyde $
  * @since Aug 22, 2006
  */
-public interface OlapResultSet extends ResultSet {
+public interface CellSet extends ResultSet {
     /**
-     * Retrieves the description of this <code>OlapResultSet</code>'s axes
+     * Retrieves the description of this <code>CellSet</code>'s axes
      * and cells.
      *
-     * @return the description of this <code>OlapResultSet</code>'s axes
+     * @return the description of this <code>CellSet</code>'s axes
      * and cells
      * @exception OlapException if a database access error occurs
      */
-    OlapResultSetMetaData getMetaData() throws OlapException;
+    CellSetMetaData getMetaData() throws OlapException;
 
     /**
-     * Retrieves a list of ResultAxis objects containing the result.
+     * Retrieves a list of CellSetAxis objects containing the result.
      *
      * <p>The list contains axes according to their ordinal: 0 is the columns
      * axis, 1 the rows axis, and so forth.
+     *
+     * @return list of CellSetAxis objects containing the result
      */
-    List<ResultAxis> getAxes();
+    List<CellSetAxis> getAxes();
 
     /**
-     * Returns the ResultCell at a given set of coordinates.
+     * Retrieves the CellSetAxis representing the filter axis.
+     *
+     * <p>This axis always has one row, and contains one member for each
+     * dimension included on in the WHERE clause of the MDX statement.
+     *
+     * @return the filter axis
+     */
+    CellSetAxis getFilterAxis();
+
+    /**
+     * Returns the Cell at a given set of coordinates.
      *
      * @param coordinates List of 0-based coordinates of the cell
      * @return Cell
      */
-    ResultCell getCell(List<Integer> coordinates);
+    Cell getCell(List<Integer> coordinates);
 
     /**
-     * Returns the ResultCell at a ordinal.
+     * Returns the Cell at a ordinal.
      *
      * <p>Equivalent to
      * <blockquote><code>
-     * getCell(ordinalToCoordinates(ordinal)
+     * getCellFromStar(ordinalToCoordinates(ordinal)
      * </code></blockquote>
      *
      * @param ordinal 0-based ordinal of the cell
      * @return Cell
      */
-    ResultCell getCell(int ordinal);
+    Cell getCell(int ordinal);
 
     /**
      * Converts a cell ordinal to a list of cell coordinates.
@@ -112,4 +124,4 @@ public interface OlapResultSet extends ResultSet {
 
 }
 
-// End OlapResultSet.java
+// End CellSet.java
