@@ -9,12 +9,10 @@
 */
 package org.olap4j.metadata;
 
-import mondrian.olap.Exp;
-import mondrian.olap.Property;
-
 import java.util.List;
 
 import org.olap4j.OlapException;
+import org.olap4j.mdx.ParseTreeNode;
 
 /**
  * <code>Member</code> is a data value in an OLAP Dimension.
@@ -115,7 +113,7 @@ public interface Member extends MetadataElement {
      */
     int getSolveOrder();
 
-    Exp getExpression();
+    ParseTreeNode getExpression();
 
     /**
      * Returns array of all members, which are ancestor to <code>this</code>.

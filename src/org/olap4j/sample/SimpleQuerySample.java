@@ -9,11 +9,10 @@
 */
 package org.olap4j.sample;
 
-import mondrian.olap.Query;
-
 import org.olap4j.*;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.mdx.parser.MdxParserFactory;
+import org.olap4j.mdx.SelectNode;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Member;
 import org.olap4j.type.MemberType;
@@ -50,7 +49,7 @@ public class SimpleQuerySample {
      * statement and prints the result.
      */
     void simpleStatement()
-        throws OlapException, SQLException, ClassNotFoundException
+        throws SQLException, ClassNotFoundException
     {
         // Register driver.
         Class.forName("mondrian.olap4j.Driver");
@@ -176,14 +175,15 @@ public class SimpleQuerySample {
         // Create a parser.
         MdxParserFactory parserFactory = connection.getParserFactory();
         MdxParser parser = parserFactory.createMdxParser(connection);
-        Query query = parser.parseSelect(
+        SelectNode query = parser.parseSelect(
             "select {[Measures].[Unit Sales]} on columns\n" +
                 "from [Sales]");
-        query.axes[0].setNonEmpty(false);
+        query.getAxisList().get(0).setNonEmpty(false);
 
         // Create statement.
         OlapStatement statement = connection.createStatement();
-        statement.executeOlapQuery(query);
+        CellSet cellSet = statement.executeOlapQuery(query);
+        printResult(cellSet);
     }
 
     private void printResult(CellSet result) {

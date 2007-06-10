@@ -17,7 +17,6 @@ import java.sql.DriverManager;
 import java.util.Properties;
 import java.util.List;
 import java.util.Locale;
-import java.util.ArrayList;
 import java.io.Writer;
 import java.io.StringWriter;
 import java.io.PrintWriter;
@@ -25,9 +24,11 @@ import java.io.PrintWriter;
 import org.olap4j.metadata.*;
 import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Member;
 import org.olap4j.metadata.Schema;
-import mondrian.olap.*;
+import org.olap4j.mdx.SelectNode;
+import org.olap4j.mdx.ParseTreeWriter;
+import org.olap4j.mdx.parser.MdxParser;
+import org.olap4j.test.TestContext;
 
 /**
  * Unit test for olap4j Driver and Connection classes.
@@ -362,6 +363,7 @@ public class ConnectionTest extends TestCase {
 
     public void testCell() {
         // todo: test Cell methods
+
         /*
              public CellSet getCellSet() {
     public int getOrdinal() {
@@ -376,6 +378,8 @@ public class ConnectionTest extends TestCase {
     public String getFormattedValue() {
     public ResultSet drillThrough() {
 */
+        // in particular, create a result set with null, empty and error cells,
+        // and make sure they look different
 
         // todo: test CellSetAxis methods
         /*
@@ -394,6 +398,113 @@ public class ConnectionTest extends TestCase {
          */
     }
 
+    public void testProperty() {
+        // todo: submit a query with cell and dimension properties, and make
+        // sure the properties appear in the result set
+    }
+
+    /**
+     * Tests different scrolling characteristics.
+     *
+     * <p>In one mode, you request that you get all of the positions on an axis.
+     * You can call {@link CellSetAxis#getPositions()} and
+     *  {@link CellSetAxis#getPositions()}.
+     *
+     * <p>In another mode, you can iterate over the positions, calling
+     * {@link CellSetAxis#iterate()}. Note that this method returns a
+     * {@link java.util.ListIterator}, which has
+     * {@link java.util.ListIterator#nextIndex()}. We could maybe extend this
+     * interface further, to allow to jump forwards/backwards by N.
+     *
+     * <p>This test should check that queries work correctly when you ask
+     * for axes as lists and iterators. If you open the query as a list,
+     * you can get it as an iterator, but if you open it as an iterator, you
+     * cannot get it as a list. (Or maybe you can, but it is expensive.)
+     *
+     * <p>The existing JDBC method {@link Connection#createStatement(int, int)},
+     * where the 2nd parameter has values such as
+     * {@link ResultSet#TYPE_FORWARD_ONLY} and
+     * {@link ResultSet#TYPE_SCROLL_INSENSITIVE}, might be the way to invoke
+     * those two modes.
+     *
+     * <p>Note that cell ordinals are not well-defined until axis lengths are
+     * known. Test that cell ordinal property is not available if the statement
+     * is opened in this mode.
+     *
+     * <p>It was proposed that there would be an API to get blocks of cell
+     * values. Not in the spec yet.
+     */
+    public void testScrolling() {
+        // todo: submit a query where you ask for different scrolling
+        // characteristics. maybe the values
+        int x = ResultSet.TYPE_SCROLL_INSENSITIVE;
+        int y = ResultSet.TYPE_FORWARD_ONLY;
+        // are how to ask for these characteristics. also need to document this
+        // behavior in the API and the spec. in one mode,
+
+    }
+
+    /**
+     * Tests creation of an MDX parser, and converting an MDX statement into
+     * a parse tree.
+     *
+     * <p>Also create a set of negative tests. Do we give sensible errors if
+     * the MDX is misformed.
+     *
+     * <p>Also have a set of validator tests, which check that the functions
+     * used exist, are applied to arguments of the correct type, and members
+     * exist.
+     */
+    public void testParsing() throws SQLException {
+
+        // parse
+
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
+        MdxParser mdxParser =
+            olapConnection.getParserFactory().createMdxParser(olapConnection);
+        SelectNode select =
+            mdxParser.parseSelect(
+                "with member [Measures].[Foo] as ' [Measures].[Bar] ', FORMAT_STRING='xxx'\n" +
+            " select {[Gender]} on columns, {[Store].Children} on rows\n" +
+            "from [sales]\n" +
+            "where [Time].[1997].[Q4]");
+
+        // unparse
+
+        StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        ParseTreeWriter parseTreeWriter = new ParseTreeWriter(pw);
+        select.unparse(parseTreeWriter);
+        pw.flush();
+        String mdx = sw.toString();
+        TestContext.assertEqualsVerbose(
+            TestContext.fold("WITH\n" +
+                "MEMBER [Measures].[Foo] AS '[Measures].[Bar]', FORMAT_STRING = \"xxx\"\n" +
+                "SELECT\n" +
+                "{[Gender]} ON COLUMNS,\n" +
+                "{[Store].Children} ON ROWS\n" +
+                "FROM [sales]\n" +
+                "WHERE [Time].[1997].[Q4]"),
+            mdx);
+
+        // build parse tree (todo)
+
+        // test that get error if axes do not have unique names (todo)
+    }
+
+    /**
+     * Tests creation of an MDX query from a parse tree. Build the parse tree
+     * programmatically.
+     */
+    public void testUnparsing() {
+
+    }
+
+    /**
+     * Tests access control. The metadata (e.g. members & hierarchies) should
+     * reflect what the current user/role can see. For example, USA.CA.SF has no children.
+     */
     /**
      * Abstracts the information about specific drivers and database instances
      * needed by this test. This allows the same test suite to be used for
@@ -461,103 +572,6 @@ public class ConnectionTest extends TestCase {
         public static final String DRIVER_URL_PREFIX = "jdbc:mondrian:";
         private static final String USER = "user";
         private static final String PASSWORD = "password";
-
-    }
-
-    static class TestContext {
-        private static final String NL = System.getProperty("line.separator");
-
-        /**
-         * Converts a string constant into locale-specific line endings.
-         */
-        public static String fold(String string) {
-            if (!NL.equals("\n")) {
-                string = Util.replace(string, "\n", NL);
-            }
-            return string;
-        }
-
-        /**
-         * Formats a {@link org.olap4j.CellSet}.
-         */
-        public static String toString(CellSet cellSet) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            print(cellSet, pw);
-            pw.flush();
-            return sw.toString();
-        }
-
-        private static void print(CellSet cellSet, PrintWriter pw) {
-            pw.println("Axis #0:");
-            printAxis(pw, cellSet.getFilterAxis());
-            final List<CellSetAxis> axes = cellSet.getAxes();
-            int i = 0;
-            for (CellSetAxis axis : axes) {
-                pw.println("Axis #" + (++i) + ":");
-                printAxis(pw, axis);
-            }
-            // Usually there are 3 axes: {slicer, columns, rows}. Position is a
-            // {column, row} pair. We call printRows with axis=2. When it
-            // recurses to axis=-1, it prints.
-            List<Integer> pos = new ArrayList<Integer>(axes.size());
-            for (CellSetAxis axis : axes) {
-                pos.add(-1);
-            }
-            printRows(cellSet, pw, axes.size() - 1, pos);
-        }
-
-        private static void printRows(
-            CellSet cellSet, PrintWriter pw, int axis, List<Integer> pos)
-        {
-            CellSetAxis _axis = axis < 0 ?
-                cellSet.getFilterAxis() :
-                cellSet.getAxes().get(axis);
-            List<org.olap4j.Position> positions = _axis.getPositions();
-            int i = 0;
-            for (Position position : positions) {
-                if (axis < 0) {
-                    if (i > 0) {
-                        pw.print(", ");
-                    }
-                    printCell(cellSet, pw, pos);
-                } else {
-                    pos.set(axis, i);
-                    if (axis == 0) {
-                        int row = axis + 1 < pos.size() ? pos.get(axis + 1) : 0;
-                        pw.print("Row #" + row + ": ");
-                    }
-                    printRows(cellSet, pw, axis - 1, pos);
-                    if (axis == 0) {
-                        pw.println();
-                    }
-                }
-                i++;
-            }
-        }
-
-        private static void printAxis(PrintWriter pw, CellSetAxis axis) {
-            List<Position> positions = axis.getPositions();
-            for (Position position: positions) {
-                boolean firstTime = true;
-                pw.print("{");
-                for (Member member : position.getMembers()) {
-                    if (! firstTime) {
-                        pw.print(", ");
-                    }
-                    pw.print(member.getUniqueName());
-                    firstTime = false;
-                }
-                pw.println("}");
-            }
-        }
-
-        private static void printCell(
-            CellSet cellSet, PrintWriter pw, List<Integer> pos)
-        {
-            Cell cell = cellSet.getCell(pos);
-            pw.print(cell.getFormattedValue());
-        }
     }
 }
 

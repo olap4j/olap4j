@@ -12,6 +12,7 @@ package mondrian.olap4j;
 import org.olap4j.metadata.*;
 
 import java.util.Locale;
+import java.util.List;
 
 /**
  * <code>MondrianOlap4jLevel</code> ...
@@ -52,6 +53,20 @@ class MondrianOlap4jLevel implements Level {
     }
 
     public NamedList<Property> getProperties() {
+        if (false) {
+            return null;
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    public Member findMember(String memberName) {
+        if (false) {
+            return null;
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    public List<Member> getMembers() {
         if (false) {
             return null;
         }

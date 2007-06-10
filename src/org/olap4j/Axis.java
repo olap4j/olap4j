@@ -9,6 +9,8 @@
 */
 package org.olap4j;
 
+import java.util.Locale;
+
 /**
  * Enumeration of axis types.
  *
@@ -19,6 +21,7 @@ package org.olap4j;
  * @since Oct 23, 2006
  */
 public enum Axis {
+    UNUSED,
     SLICER,
     COLUMNS,
     ROWS,
@@ -31,10 +34,10 @@ public enum Axis {
      * the {@link org.olap4j.CellSet#getAxes()}, or retrieving its
      * coordinate from {@link Cell#getCoordinateList()}.
      *
-     * <p>The axis ordinal is one less than the {@link #ordinal} value which
-     * every <code>enum</code> value possesses. Hence, {@link #SLICER} is -1
-     * (because it is not treated the same as the other axes), {@link #COLUMNS}
-     * is 0, {@link #ROWS} is 1, and so forth.
+     * <p>The axis ordinal is two less than the {@link #ordinal} value which
+     * every <code>enum</code> value possesses. Hence, {@link #UNUSED} is -2
+     * and {@link #SLICER} is -1 (because they are not treated the same as the
+     * other axes), {@link #COLUMNS} is 0, {@link #ROWS} is 1, and so forth.
      *
      * @return Axis ordinal
      */
@@ -42,7 +45,29 @@ public enum Axis {
         return axisOrdinal;
     }
 
-    private final int axisOrdinal = ordinal() - 1;
+    /**
+     * Returns localized name for this Axis.
+     */
+    public String getCaption(Locale locale) {
+        // todo: localize
+        return name();
+    }
+
+    /**
+     * Returns the axis with a given {@link #axisOrdinal()}.
+     */
+    public static Axis forOrdinal(int axisOrdinal) {
+        Axis axis = values()[axisOrdinal + 2];
+        assert axis.axisOrdinal() == axisOrdinal;
+        return axis;
+    }
+
+    private final int axisOrdinal = ordinal() - 2;
+
+    /**
+     * The largest legal value for {@link #forOrdinal(int)}.
+     */
+    public static final int MAX_ORDINAL = SECTIONS.axisOrdinal();
 }
 
 // End Axis.java

@@ -36,8 +36,12 @@ class MondrianOlap4jDimension implements Dimension, Named {
         this.dimension = dimension;
     }
 
-    public NamedList<Hierarchy> getHierarchies() throws OlapException {
+    public NamedList<Hierarchy> getHierarchies() {
         throw new UnsupportedOperationException();
+    }
+
+    public Hierarchy getDefaultHierarchy() {
+        return getHierarchies().get(0);
     }
 
     public NamedList<Member> getRootMembers() throws OlapException {

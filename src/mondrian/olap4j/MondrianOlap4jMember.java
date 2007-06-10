@@ -15,7 +15,7 @@ import org.olap4j.metadata.Hierarchy;
 import org.olap4j.metadata.Level;
 import org.olap4j.metadata.Member;
 import org.olap4j.OlapException;
-import mondrian.olap.*;
+import org.olap4j.mdx.ParseTreeNode;
 
 import java.util.List;
 import java.util.Locale;
@@ -89,7 +89,7 @@ class MondrianOlap4jMember implements Member, Named {
         throw new UnsupportedOperationException();
     }
 
-    public Exp getExpression() {
+    public ParseTreeNode getExpression() {
         throw new UnsupportedOperationException();
     }
 
@@ -113,7 +113,7 @@ class MondrianOlap4jMember implements Member, Named {
         throw new UnsupportedOperationException();
     }
 
-    public List<mondrian.olap.Property> getProperties() {
+    public List<Property> getProperties() {
         throw new UnsupportedOperationException();
     }
 

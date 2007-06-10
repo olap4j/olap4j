@@ -9,8 +9,6 @@
 */
 package org.olap4j.metadata;
 
-import mondrian.xmla.DataSourcesConfig;
-
 import java.util.Locale;
 import java.util.Collection;
 

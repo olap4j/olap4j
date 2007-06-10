@@ -9,9 +9,9 @@
 */
 package org.olap4j;
 
-import mondrian.olap.Query;
-
 import java.sql.Statement;
+
+import org.olap4j.mdx.SelectNode;
 
 /**
  * Object used for statically executing an MDX statement and returning an
@@ -27,6 +27,10 @@ public interface OlapStatement extends Statement {
 
     /**
      * Executes an OLAP statement.
+     *
+     * @param mdx MDX <code>SELECT</code> statement
+     * @return Cell set
+     * @throws OlapException if error occurs
      */
     CellSet executeOlapQuery(String mdx) throws OlapException;
 
@@ -34,10 +38,12 @@ public interface OlapStatement extends Statement {
      * Executes an OLAP statement expressed as a parse tree.
      *
      * <p>Validates the parse tree before executing it.
-     * @param query Parse tree of MDX SELECT statement
-     * @return Result
+     *
+     * @param selectNode Parse tree of MDX <code>SELECT</code> statement
+     * @return Cell set
+     * @throws OlapException if error occurs
      */
-    CellSet executeOlapQuery(Query query);
+    CellSet executeOlapQuery(SelectNode selectNode) throws OlapException;
 }
 
 // End OlapStatement.java

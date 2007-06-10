@@ -20,6 +20,8 @@ import org.olap4j.metadata.Schema;
 import org.olap4j.metadata.Database;
 import org.olap4j.metadata.Catalog;
 import org.olap4j.mdx.parser.MdxParserFactory;
+import org.olap4j.mdx.parser.MdxParser;
+import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
 
 /**
  * <code>MondrianOlap4jConnection</code> ...
@@ -59,9 +61,12 @@ class MondrianOlap4jConnection implements OlapConnection {
      *
      * @param url Connect-string URL
      * @param info Additional properties
+     * @throws SQLException if there is an error
      */
     MondrianOlap4jConnection(String url, Properties info) throws SQLException {
         if (!url.startsWith(CONNECT_STRING_PREFIX)) {
+            // This is not a URL we can handle.
+            // DriverManager should not have invoked us.
             throw new AssertionError(
                 "does not start with '" + CONNECT_STRING_PREFIX + "'");
         }
@@ -326,7 +331,11 @@ class MondrianOlap4jConnection implements OlapConnection {
     }
 
     public MdxParserFactory getParserFactory() {
-        throw new UnsupportedOperationException();
+        return new MdxParserFactory() {
+            public MdxParser createMdxParser(OlapConnection connection) {
+                return new DefaultMdxParserImpl(connection);
+            }
+        };
     }
 
     public Schema getSchema() throws OlapException {

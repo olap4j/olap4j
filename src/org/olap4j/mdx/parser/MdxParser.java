@@ -9,11 +9,15 @@
 */
 package org.olap4j.mdx.parser;
 
-import mondrian.olap.Exp;
-import mondrian.olap.Query;
+import org.olap4j.mdx.SelectNode;
+import org.olap4j.mdx.ParseTreeNode;
 
 /**
  * Parser for the MDX query language.
+ *
+ * <p>A parser is reusable but not reentrant: you can call {@link #parseSelect}
+ * and {@link #parseExpression} several times, but not at the same time
+ * from different threads.
  *
  * @see MdxParserFactory
  * @see org.olap4j.mdx.parser.impl.DefaultMdxParserImpl
@@ -24,18 +28,46 @@ import mondrian.olap.Query;
  */
 public interface MdxParser {
     /**
-     * Parses an MDX Select statement.
+     * Parses an MDX Select statement and returns the {@link SelectNode} at the
+     * root of the parse tree.
      *
-     * {@link org.olap4j.Todo} change return type
+     * <p>In order to be parsed successfully, the expression must be
+     * syntactically correct but does not need to be valid. (Syntactic
+     * correctness and validity are described further in the description of
+     * {@link #parseExpression(String)}.)
+     *
+     * @param mdx MDX query string
+     * @return Parse tree
      */
-    Query parseSelect(String mdx);
+    SelectNode parseSelect(String mdx);
 
     /**
-     * Parses an expression.
+     * Parses an MDX expression and returns a parse tree.
      *
-     * {@link org.olap4j.Todo} change return type
+     * <p>An expression is a combination of operators and operands, which can
+     * occur in many places inside an MDX query, such as the definition of a
+     * calculated member or an axis.
+     *
+     * <p>In order to be parsed successfully, the expression must be
+     * syntactically correct but does not need to be valid.
+     * For example,
+     *
+     * <blockquote><code>(1 + (2 + 3)</code></blockquote>
+     *
+     * is syntactically incorrect,
+     * because there are more open parentheses "(" than close parentheses ")",
+     * and the parser will give an error. Conversely,
+     *
+     * <blockquote><code>(1 + [Measures].[Bad Measure])</code></blockquote>
+     *
+     * is syntactically correct, and the parser
+     * will successfully create a parse tree, even if
+     * <code>[Measures].[Bad Measure]</code> does not exist.
+     *
+     * @param mdx MDX expression
+     * @return Parse tree
      */
-    Exp parseExpression(String mdx);
+    ParseTreeNode parseExpression(String mdx);
 }
 
 // End MdxParser.java

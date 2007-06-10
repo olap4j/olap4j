@@ -34,6 +34,8 @@ public interface Hierarchy extends MetadataElement {
      * Returns whether this <code>Hierarchy</code> has an 'all' member.
      */
     boolean hasAll();
+
+    Member getDefaultMember();
 }
 
 // End Hierarchy.java

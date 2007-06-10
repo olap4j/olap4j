@@ -9,8 +9,6 @@
 */
 package org.olap4j.metadata;
 
-import mondrian.olap.PropertyFormatter;
-
 import java.util.Locale;
 
 /**
@@ -24,11 +22,15 @@ import java.util.Locale;
 public interface Property extends MetadataElement {
     /**
      * Returns the datatype of this Property.
+     *
+     * @return datatype of this Property
      */
     Datatype getType();
 
     /**
      * Returns the scope of this property.
+     *
+     * @return scope of this Property
      */
     Scope getScope();
 
@@ -71,38 +73,6 @@ public interface Property extends MetadataElement {
      * </ul>
      */
     enum StandardMemberProperty implements Property {
-
-        /**
-         * Definition of the internal property which
-         * holds a member's name.
-         */
-        $name(Datatype.TYPE_STRING, 2, true, null),
-
-        /**
-         * Definition of the internal property which
-         * holds a member's caption.
-         */
-        $caption(Datatype.TYPE_STRING, 3, true, null),
-
-        /**
-         * Definition of the internal property which
-         * holds, for a member of a  parent-child hierarchy, a
-         * {@link java.util.List} containing the member's data
-         * member and all of its children (including non-visible children).
-         */
-        $contributingChildren(Datatype.TYPE_OTHER, 4, true, null),
-
-        /**
-         * Definition of the internal property which
-         * returns a calculated member's {@link mondrian.olap.Formula} object.
-         */
-        $formula(Datatype.TYPE_OTHER, 5, true, null),
-
-        /**
-         * Definition of the internal property which
-         * describes whether a calculated member belongs to a query or a cube.
-         */
-        $member_scope(Datatype.TYPE_OTHER, 6, true, null),
 
         /**
          * Definition of the property which
@@ -401,10 +371,6 @@ public interface Property extends MetadataElement {
 
         public String getDescription(Locale locale) {
             return description;
-        }
-
-        public PropertyFormatter getFormatter() {
-            return null;
         }
 
         public boolean isInternal() {

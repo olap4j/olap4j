@@ -12,6 +12,7 @@ package mondrian.olap4j;
 import org.olap4j.OlapStatement;
 import org.olap4j.CellSet;
 import org.olap4j.OlapException;
+import org.olap4j.mdx.SelectNode;
 
 import java.sql.*;
 
@@ -254,7 +255,7 @@ class MondrianOlap4jStatement implements OlapStatement {
         return openCellSet;
     }
 
-    public CellSet executeOlapQuery(Query query) {
+    public CellSet executeOlapQuery(SelectNode selectNode) {
         throw new UnsupportedOperationException();
     }
 }

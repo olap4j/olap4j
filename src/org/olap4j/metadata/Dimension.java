@@ -28,7 +28,7 @@ public interface Dimension extends MetadataElement {
      *
      * @see org.olap4j.OlapDatabaseMetaData#getHierarchies
      */
-    NamedList<Hierarchy> getHierarchies() throws OlapException;
+    NamedList<Hierarchy> getHierarchies();
 
     /**
      * Returns the root member or members of this Dimension.
@@ -42,6 +42,8 @@ public interface Dimension extends MetadataElement {
      * Returns the type of this Dimension.
      */
     Dimension.Type getDimensionType() throws OlapException;
+
+    Hierarchy getDefaultHierarchy();
 
     /**
      * Enumeration of the types of a <code>Dimension</code>.

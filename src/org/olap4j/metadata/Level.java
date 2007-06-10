@@ -9,6 +9,8 @@
 */
 package org.olap4j.metadata;
 
+import java.util.List;
+
 /**
  * Group of {@link Member} objects in a {@link Hierarchy},
  * all with the same attributes and at the same depth in the hierarchy.
@@ -53,6 +55,13 @@ public interface Level extends MetadataElement {
      */
     NamedList<Property> getProperties();
 
+    // todo: needs specification
+    Member findMember(String memberName);
+
+    // todo: better query interface? (level can have a lot of members)
+    // todo: return NamedList?
+    List<Member> getMembers();
+
     /**
      * Enumeration of the types of a {@link Level}.
      *
@@ -68,35 +77,35 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that a level refers to years.
          * It must be used in a dimension whose type is
-         * {@link mondrian.olap.DimensionType#TimeDimension}.
+         * {@link org.olap4j.metadata.Dimension.Type#Time}.
          */
         TimeYears(true),
 
         /**
          * Indicates that a level refers to quarters.
          * It must be used in a dimension whose type is
-         * {@link mondrian.olap.DimensionType#TimeDimension}.
+         * {@link org.olap4j.metadata.Dimension.Type#Time}.
          */
         TimeQuarters(true),
 
         /**
          * Indicates that a level refers to months.
          * It must be used in a dimension whose type is
-         * {@link mondrian.olap.DimensionType#TimeDimension}.
+         * {@link org.olap4j.metadata.Dimension.Type#Time}.
          */
         TimeMonths(true),
 
         /**
          * Indicates that a level refers to weeks.
          * It must be used in a dimension whose type is
-         * {@link mondrian.olap.DimensionType#TimeDimension}.
+         * {@link org.olap4j.metadata.Dimension.Type#Time}.
          */
         TimeWeeks(true),
 
         /**
          * Indicates that a level refers to days.
          * It must be used in a dimension whose type is
-         * {@link mondrian.olap.DimensionType#TimeDimension}.
+         * {@link org.olap4j.metadata.Dimension.Type#Time}.
          */
         TimeDays(true),
 

@@ -9,10 +9,7 @@
 */
 package mondrian.olap4j;
 
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Level;
-import org.olap4j.metadata.NamedList;
+import org.olap4j.metadata.*;
 
 import java.util.Locale;
 
@@ -52,6 +49,13 @@ class MondrianOlap4jHierarchy implements Hierarchy {
     public boolean hasAll() {
         if (false) {
             return false;
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    public Member getDefaultMember() {
+        if (false) {
+            return null;
         }
         throw new UnsupportedOperationException();
     }

@@ -10,8 +10,9 @@
 package org.olap4j.mdx.parser.impl;
 
 import org.olap4j.mdx.parser.MdxParser;
-import mondrian.olap.Query;
-import mondrian.olap.Exp;
+import org.olap4j.mdx.SelectNode;
+import org.olap4j.mdx.ParseTreeNode;
+import org.olap4j.OlapConnection;
 
 /**
  * Default implementation of {@link org.olap4j.mdx.parser.MdxParser MDX Parser}.
@@ -21,18 +22,39 @@ import mondrian.olap.Exp;
  * @since Aug 22, 2006
  */
 public class DefaultMdxParserImpl implements MdxParser {
-    public Query parseSelect(String mdx) {
-        if (false) {
-            return null;
+    private final OlapConnection connection;
+    private boolean debug = true;
+    private boolean load = false;
+    private final FunTable funTable = new FunTable() {
+        public boolean isProperty(String s) {
+            return s.equals("CHILDREN");
         }
-        throw new UnsupportedOperationException();
+    };
+
+    public DefaultMdxParserImpl(OlapConnection olapConnection) {
+        super();
+        connection = olapConnection;
     }
 
-    public Exp parseExpression(String mdx) {
-        if (false) {
-            return null;
-        }
-        throw new UnsupportedOperationException();
+    public SelectNode parseSelect(String mdx) {
+        return new DefaultMdxParser().parseSelect(
+            connection,
+            mdx,
+            debug,
+            funTable,
+            load);
+    }
+
+    public ParseTreeNode parseExpression(String mdx) {
+        return new DefaultMdxParser().parseExpression(
+            connection,
+            mdx,
+            debug,
+            funTable);
+    }
+
+    interface FunTable {
+        boolean isProperty(String s);
     }
 }
 
