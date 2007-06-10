@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -31,7 +31,7 @@ import mondrian.olap.Util;
  * <p>Also provides static utility methods such as {@link #fold(String)}.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 7, 2007
 */
 public class TestContext {

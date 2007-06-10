@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -13,7 +13,7 @@ package org.olap4j.metadata;
  * Metadata object describing a named set defined against a {@link Cube}.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Oct 24, 2006
  */
 public interface NamedSet extends MetadataElement {

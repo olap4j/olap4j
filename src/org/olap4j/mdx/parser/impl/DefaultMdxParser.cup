@@ -1,5 +1,5 @@
 /*
-// $Id: //open/mondrian/src/main/mondrian/olap/Parser.cup#34 $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -23,7 +23,7 @@ import org.olap4j.mdx.*;
 // Preliminaries to set up and use the scanner.
 // action code {: ... :};
 parser code {:
-    // Generated from $Id: //open/mondrian/src/main/mondrian/olap/Parser.cup#34 $
+    // Generated from $Id$
     private Scanner scanner;
     private String queryString;
     private OlapConnection mdxConnection;

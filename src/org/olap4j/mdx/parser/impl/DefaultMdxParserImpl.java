@@ -1,5 +1,5 @@
 /*
-// $Id: DefaultMdxParserImpl.java 18 2007-06-10 18:31:17Z jhyde $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -18,7 +18,7 @@ import org.olap4j.OlapConnection;
  * Default implementation of {@link org.olap4j.mdx.parser.MdxParser MDX Parser}.
  *
  * @author jhyde
- * @version $Id: DefaultMdxParserImpl.java 18 2007-06-10 18:31:17Z jhyde $
+ * @version $Id$
  * @since Aug 22, 2006
  */
 public class DefaultMdxParserImpl implements MdxParser {

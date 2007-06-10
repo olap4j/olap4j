@@ -1,5 +1,5 @@
 /*
-// $Id: //open/mondrian/src/main/org.olap4j.type/DecimalType.java#3 $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -15,7 +15,7 @@ package org.olap4j.type;
  *
  * @author jhyde
  * @since May 3, 2005
- * @version $Id: //open/mondrian/src/main/org.olap4j.type/DecimalType.java#3 $
+ * @version $Id$
  */
 public class DecimalType extends NumericType {
     private final int precision;

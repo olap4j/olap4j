@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -25,7 +25,7 @@ import java_cup.runtime.Symbol;
  *
  * <p>NOTE: This class is not part of the public olap4j API.
  *
- * @version $Id: $
+ * @version $Id$
  * @author jhyde
  */
 class Scanner {

@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -26,7 +26,7 @@ import java.io.PrintWriter;
  * <code>ParamRef(name)</code> creates a reference to a parameter defined
  * elsewhere in the query.
  *
- * @version $Id: //open/mondrian/src/main/mondrian/olap/QueryAxis.java#24 $
+ * @version $Id$
  */
 public class ParameterNode implements ParseTreeNode {
     private String name;

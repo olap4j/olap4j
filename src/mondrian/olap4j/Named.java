@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -15,7 +15,7 @@ package mondrian.olap4j;
  * {@link org.olap4j.metadata.NamedList} which works on such objects.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since May 23, 2007
  */
 interface Named {

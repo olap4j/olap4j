@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -18,7 +18,7 @@ import org.olap4j.OlapException;
  * <code>Schema</code> ...
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Oct 13, 2006
  */
 public interface Schema {

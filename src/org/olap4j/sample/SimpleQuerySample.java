@@ -1,5 +1,5 @@
 /*
-// $Id: SimpleQuerySample.java 10 2006-10-16 05:37:08Z jhyde $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -25,7 +25,7 @@ import java.util.List;
  * Collection of olap4j samples illustrating connections and statements.
  *
  * @author jhyde
- * @version $Id: SimpleQuerySample.java 10 2006-10-16 05:37:08Z jhyde $
+ * @version $Id$
  * @since Aug 22, 2006
  */
 public class SimpleQuerySample {

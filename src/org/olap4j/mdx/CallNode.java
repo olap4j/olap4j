@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -32,7 +32,7 @@ import org.olap4j.type.Type;
  * </ul>
  *
  * @author jhyde
- * @version $Id: //open/mondrian/src/main/mondrian/olap/FunCall.java#22 $
+ * @version $Id$
  * @since Jan 6, 2006
  */
 public class CallNode implements ParseTreeNode {

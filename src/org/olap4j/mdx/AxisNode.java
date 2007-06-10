@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -19,7 +19,7 @@ import org.olap4j.type.Type;
  * An axis in an MDX query. For example, the typical MDX query has two axes,
  * which appear as the "ON COLUMNS" and "ON ROWS" clauses.
  *
- * @version $Id: //open/mondrian/src/main/mondrian/olap/QueryAxis.java#24 $
+ * @version $Id$
  */
 public class AxisNode implements ParseTreeNode {
 

@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -19,7 +19,7 @@ import java.io.PrintWriter;
  * <p>NOTE: Package protected. Not part of the public olap4j API.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 6, 2007
  */
 class MdxUtil {

@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -23,7 +23,7 @@ import java.sql.ResultSet;
  * <p>For example, {@link #getCubes} returns the description of a cube.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Oct 12, 2006
  */
 public interface OlapDatabaseMetaData extends DatabaseMetaData {

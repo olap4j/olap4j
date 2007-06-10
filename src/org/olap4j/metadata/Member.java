@@ -1,5 +1,5 @@
 /*
-// $Id: Member.java 18 2007-06-10 18:31:17Z jhyde $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -18,7 +18,7 @@ import org.olap4j.mdx.ParseTreeNode;
  * <code>Member</code> is a data value in an OLAP Dimension.
  *
  * @author jhyde
- * @version $Id: Member.java 18 2007-06-10 18:31:17Z jhyde $
+ * @version $Id$
  * @since Aug 22, 2006
  */
 public interface Member extends MetadataElement {

@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -20,7 +20,7 @@ import java.sql.ResultSet;
  * Example of olap4j code running inside Spring framework.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Oct 11, 2006
  */
 public class SpringSample {

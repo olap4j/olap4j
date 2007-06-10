@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -33,7 +33,7 @@ import org.olap4j.test.TestContext;
 /**
  * Unit test for olap4j Driver and Connection classes.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class ConnectionTest extends TestCase {
     private final Helper helper = new HelperImpl();

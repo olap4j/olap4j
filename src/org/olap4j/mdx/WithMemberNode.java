@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -18,7 +18,7 @@ import java.io.PrintWriter;
  * Parse tree node which declares a calculated member. Represented as the
  * <code>WITH MEMBER</code> clause of an MDX <code>SELECT</code> statement.
  *
- * @version $Id: $
+ * @version $Id$
  * @author jhyde
  */
 public class WithMemberNode implements ParseTreeNode {

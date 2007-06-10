@@ -1,5 +1,5 @@
 /*
-// $Id: //open/mondrian/src/main/org.olap4j.type/ScalarType.java#3 $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -22,7 +22,7 @@ import org.olap4j.metadata.Level;
  *
  * @author jhyde
  * @since Feb 17, 2005
- * @version $Id: //open/mondrian/src/main/org.olap4j.type/ScalarType.java#3 $
+ * @version $Id$
  */
 public class ScalarType implements Type {
     public boolean usesDimension(Dimension dimension, boolean maybe) {

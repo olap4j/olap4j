@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * the {@link Named} interface.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since May 23, 2007
  */
 class NamedListImpl<T extends Named>

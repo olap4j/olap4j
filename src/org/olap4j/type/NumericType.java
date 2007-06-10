@@ -1,5 +1,5 @@
 /*
-// $Id: //open/mondrian/src/main/org.olap4j.type/NumericType.java#3 $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -17,7 +17,7 @@ import org.olap4j.metadata.Hierarchy;
  *
  * @author jhyde
  * @since Feb 17, 2005
- * @version $Id: //open/mondrian/src/main/org.olap4j.type/NumericType.java#3 $
+ * @version $Id$
  */
 public class NumericType extends ScalarType {
 

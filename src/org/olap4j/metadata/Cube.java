@@ -1,5 +1,5 @@
 /*
-// $Id: Cube.java 16 2006-10-24 22:48:56Z jhyde $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -17,7 +17,7 @@ import java.util.Collection;
  * <code>Cube</code> ...
  *
  * @author jhyde
- * @version $Id: Cube.java 16 2006-10-24 22:48:56Z jhyde $
+ * @version $Id$
  * @since Aug 22, 2006
  */
 public interface Cube extends MetadataElement {

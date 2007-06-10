@@ -1,5 +1,5 @@
 /*
-// $Id: CellSetAxis.java 15 2006-10-24 08:41:02Z jhyde $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -16,7 +16,7 @@ import java.util.ListIterator;
  * <code>CellSetAxis</code> ...
  *
  * @author jhyde
- * @version $Id: CellSetAxis.java 15 2006-10-24 08:41:02Z jhyde $
+ * @version $Id$
  * @since Aug 22, 2006
  */
 public interface CellSetAxis {

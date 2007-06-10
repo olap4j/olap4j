@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -20,7 +20,7 @@ import java.io.PrintWriter;
  * <code>Order([Store].Members, [Measures].[Unit Sales], ASC)</code>, are
  * also represented as Literals.
  *
- * @version $Id: //open/mondrian/src/main/mondrian/olap/Literal.java#22 $
+ * @version $Id$
  * @author jhyde
  */
 public class LiteralNode implements ParseTreeNode {

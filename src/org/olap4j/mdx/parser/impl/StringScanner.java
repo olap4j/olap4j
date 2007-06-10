@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -14,7 +14,7 @@ package org.olap4j.mdx.parser.impl;
  *
  * <p>NOTE: This class is not part of the public olap4j API.
  *
- * @version $Id: $
+ * @version $Id$
  * @author jhyde
  */
 class StringScanner extends Scanner {

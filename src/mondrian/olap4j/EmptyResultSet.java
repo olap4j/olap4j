@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -21,7 +21,7 @@ import java.net.URL;
  * <code>EmptyResultSet</code> ...
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since May 24, 2007
  */
 class EmptyResultSet implements ResultSet {

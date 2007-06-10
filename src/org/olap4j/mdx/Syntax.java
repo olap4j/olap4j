@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author jhyde
  * @since 21 July, 2003
- * @version $Id: //open/mondrian/src/main/mondrian/olap/Syntax.java#15 $
+ * @version $Id$
  */
 public enum Syntax {
     /**

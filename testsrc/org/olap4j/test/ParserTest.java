@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -22,7 +22,7 @@ import java.util.List;
  * Tests the MDX parser.
  *
  * @author gjohnson, jhyde
- * @version $Id: //open/mondrian/testsrc/main/mondrian/olap/ParserTest.java#28 $
+ * @version $Id$
  */
 public class ParserTest extends TestCase {
     public ParserTest(String name) {

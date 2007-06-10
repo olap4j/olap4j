@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -22,7 +22,7 @@ import org.olap4j.type.Type;
  * <p>NOTE: This class is experimental. Not part of the public olap4j API.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 4, 2007
  */
 class MdxValidator implements ParseTreeVisitor<ParseTreeNode> {

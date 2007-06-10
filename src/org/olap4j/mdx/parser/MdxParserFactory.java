@@ -1,5 +1,5 @@
 /*
-// $Id: MdxParserFactory.java 1 2006-09-02 14:08:27Z sgwood $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -15,7 +15,7 @@ import org.olap4j.OlapConnection;
  * Factory for MDX parsers.
  *
  * @author jhyde
- * @version $Id: MdxParserFactory.java 1 2006-09-02 14:08:27Z sgwood $
+ * @version $Id$
  * @since Aug 22, 2006
  */
 public interface MdxParserFactory {

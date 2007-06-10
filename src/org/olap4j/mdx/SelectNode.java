@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -19,7 +19,7 @@ import java.io.PrintWriter;
  * Parse tree model for an MDX SELECT statement.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 4, 2007
  */
 public class SelectNode implements ParseTreeNode {

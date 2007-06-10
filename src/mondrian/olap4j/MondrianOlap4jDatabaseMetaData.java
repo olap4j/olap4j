@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -25,7 +25,7 @@ import java.sql.SQLException;
  * Implementation of {@link org.olap4j.OlapDatabaseMetaData} for Mondrian.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since May 23, 2007
  */
 class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
