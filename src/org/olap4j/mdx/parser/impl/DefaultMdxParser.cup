@@ -201,9 +201,9 @@ parser code {:
             int loc[] = new int[2];
             scanner.getLocation(cur_token, loc);
             throw new RuntimeException(
-                "Syntax error at line " + s +
-                ", column " + Integer.toString(loc[0] + 1) +
-                ", token '" + Integer.toString(loc[1] + 1) + "'");
+                "Syntax error at line " + Integer.toString(loc[0] + 1) +
+                ", column " + Integer.toString(loc[1] + 1) +
+                ", token '" + s + "'");
         } else {
             throw new RuntimeException(
                 "Syntax error at token '" + s + "'");

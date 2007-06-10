@@ -12,6 +12,7 @@ package org.olap4j.mdx;
 import org.olap4j.type.Type;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.io.PrintWriter;
 
 /**
@@ -26,7 +27,7 @@ public class SelectNode implements ParseTreeNode {
     private final List<AxisNode> axisList;
     private final AxisNode slicerAxis;
     private final List<IdentifierNode> cellPropertyList;
-    private final IdentifierNode cubeName;
+    private IdentifierNode cubeName;
 
     /**
      * Creates a SelectNode.
@@ -49,6 +50,15 @@ public class SelectNode implements ParseTreeNode {
         this.cubeName = cubeName;
         this.slicerAxis = slicerAxis;
         this.cellPropertyList = cellPropertyList;
+    }
+
+    public SelectNode() {
+        this(
+            new ArrayList<ParseTreeNode>(),
+            new ArrayList<AxisNode>(),
+            null,
+            null,
+            new ArrayList<IdentifierNode>());
     }
 
     public <T> T accept(ParseTreeVisitor<T> visitor) {
@@ -113,6 +123,10 @@ public class SelectNode implements ParseTreeNode {
 
     public IdentifierNode getCubeName() {
         return cubeName;
+    }
+
+    public void setCubeName(IdentifierNode cubeName) {
+        this.cubeName = cubeName;
     }
 }
 

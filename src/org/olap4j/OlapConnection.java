@@ -1,5 +1,5 @@
 /*
-// $Id$
+// $Id: OlapConnection.java 16 2006-10-24 22:48:56Z jhyde $
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -11,6 +11,8 @@ package org.olap4j;
 
 import org.olap4j.mdx.parser.MdxParserFactory;
 import org.olap4j.metadata.Schema;
+import org.olap4j.metadata.Catalog;
+import org.olap4j.metadata.NamedList;
 
 import java.sql.Connection;
 
@@ -18,7 +20,7 @@ import java.sql.Connection;
  * Connection to an OLAP server.
  *
  * @author jhyde
- * @version $Id$
+ * @version $Id: OlapConnection.java 16 2006-10-24 22:48:56Z jhyde $
  * @since Aug 22, 2006
  */
 public interface OlapConnection extends Connection {
@@ -44,6 +46,15 @@ public interface OlapConnection extends Connection {
      * connection.
      */
     Schema getSchema() throws OlapException;
+
+    /**
+     * Returns a list of {@link org.olap4j.metadata.Catalog} objects which
+     * belong to this connection's OLAP server.
+     *
+     * @see OlapDatabaseMetaData#getCatalogs()
+     * @return List of Catalogs in this connection's OLAP server
+     */
+    NamedList<Catalog> getCatalogs();
 }
 
 // End OlapConnection.java

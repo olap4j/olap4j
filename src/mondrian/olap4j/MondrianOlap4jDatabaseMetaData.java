@@ -14,7 +14,8 @@ import mondrian.olap.MondrianServer;
 
 import org.olap4j.OlapDatabaseMetaData;
 import org.olap4j.OlapException;
-import org.olap4j.metadata.Database;
+import org.olap4j.metadata.Catalog;
+import org.olap4j.metadata.NamedList;
 
 import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
@@ -40,6 +41,17 @@ class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         this.connection = connection;
         mondrianServer = MondrianServer.forConnection(connection);
     }
+
+    // package-protected
+    NamedList<Catalog> getCatalogObjects() {
+        // A mondrian instance contains only one catalog.
+        NamedList<MondrianOlap4jCatalog> list =
+            new NamedListImpl<MondrianOlap4jCatalog>();
+        list.add(new MondrianOlap4jCatalog(this));
+        return (NamedList) list;
+    }
+
+    // implement DatabaseMetaData
 
     public boolean allProceduresAreCallable() throws SQLException {
         throw new UnsupportedOperationException();
@@ -816,11 +828,6 @@ class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     // implement OlapDatabaseMetaData
-
-    public Database getDatabase() {
-        return new MondrianOlap4jDatabase(
-            mondrianServer, this);
-    }
 
     public ResultSet getActions() throws OlapException {
         return new EmptyResultSet(olap4jConnection);

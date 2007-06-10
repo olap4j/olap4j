@@ -12,15 +12,12 @@ package org.olap4j.sample;
 import org.olap4j.*;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.mdx.parser.MdxParserFactory;
-import org.olap4j.mdx.SelectNode;
+import org.olap4j.mdx.*;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Member;
 import org.olap4j.type.MemberType;
 
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,16 +52,18 @@ public class SimpleQuerySample {
         Class.forName("mondrian.olap4j.Driver");
 
         // Create connection.
-        OlapConnection connection = (OlapConnection)
-                DriverManager.getConnection("jdbc:mondrian:embedded");
+        Connection connection =
+            DriverManager.getConnection("jdbc:mondrian:embedded");
+        OlapConnection olapConnection =
+            connection.unwrap(OlapConnection.class);
 
         // Execute a statement.
-        Statement statement = connection.createStatement();
-        CellSet result = Olap4j.convert(
-            statement.executeQuery(
+        OlapStatement statement = olapConnection.createStatement();
+        CellSet result =
+            statement.executeOlapQuery(
             "select {[Measures].[Unit Sales]} on columns,\n" +
                 " CrossJoin([Store].Children, [Gender].Members) on rows\n" +
-                "from [Sales]"));
+                "from [Sales]");
 
         List<CellSetAxis> cellSetAxes = result.getAxes();
 
@@ -130,7 +129,7 @@ public class SimpleQuerySample {
                 DriverManager.getConnection("jdbc:mondrian:embedded");
 
         // Prepare a statement.
-        PreparedStatement statement = connection.prepareStatement(
+        PreparedOlapStatement statement = connection.prepareOlapStatement(
             "select {[Measures].[Unit Sales]} on columns,\n" +
                 "  {TopCount\n(" +
                 "      Parameter(\"Store\", [Store].[USA].[CA]).Children,\n" +
@@ -139,7 +138,7 @@ public class SimpleQuerySample {
 
         // Describe the parameters.
         OlapParameterMetaData parameterMetaData =
-            (OlapParameterMetaData) statement.getParameterMetaData();
+            statement.getParameterMetaData();
 
         // Locate the member "[Store].[USA].[WA].[Seattle]".
         MemberType type = (MemberType) parameterMetaData.getOlapType(1);
@@ -153,7 +152,7 @@ public class SimpleQuerySample {
         statement.setInt(2, 10);
 
         // Execute, and print result.
-        CellSet result = Olap4j.convert(statement.executeQuery());
+        CellSet result = statement.executeQuery();
         printResult(result);
 
         // Close the statement and connection.
@@ -169,19 +168,20 @@ public class SimpleQuerySample {
         Class.forName("mondrian.olap4j.Driver");
 
         // Create connection.
-        OlapConnection connection = Olap4j.convert(
-            DriverManager.getConnection("jdbc:mondrian:embedded"));
+        Connection connection =
+            DriverManager.getConnection("jdbc:mondrian:embedded");
+        OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
 
         // Create a parser.
-        MdxParserFactory parserFactory = connection.getParserFactory();
-        MdxParser parser = parserFactory.createMdxParser(connection);
+        MdxParserFactory parserFactory = olapConnection.getParserFactory();
+        MdxParser parser = parserFactory.createMdxParser(olapConnection);
         SelectNode query = parser.parseSelect(
             "select {[Measures].[Unit Sales]} on columns\n" +
                 "from [Sales]");
         query.getAxisList().get(0).setNonEmpty(false);
 
         // Create statement.
-        OlapStatement statement = connection.createStatement();
+        OlapStatement statement = olapConnection.createStatement();
         CellSet cellSet = statement.executeOlapQuery(query);
         printResult(cellSet);
     }
@@ -224,6 +224,47 @@ public class SimpleQuerySample {
                 System.out.print(cell.getFormattedValue());
             }
             System.out.println();
+        }
+    }
+
+    /**
+     * Example in "MDX query model" section of olap4j_fs.html.
+     *
+     * @param connection Connection
+     */
+    void executeSelectNode(OlapConnection connection) {
+        // Create a query model.
+        SelectNode query = new SelectNode();
+        query.setCubeName(
+            new IdentifierNode(
+                new IdentifierNode.Segment("Sales")));
+        query.getAxisList().add(
+            new AxisNode(
+                false,
+                new CallNode(
+                    "{}",
+                    Syntax.Braces,
+                    new IdentifierNode(
+                        new IdentifierNode.Segment("Measures"),
+                        new IdentifierNode.Segment("Unit Sales"))),
+                Axis.ROWS,
+                new ArrayList<IdentifierNode>()));
+
+        // Create a statement based upon the query model.
+        OlapStatement stmt;
+        try {
+            stmt = connection.createStatement();
+        } catch (OlapException e) {
+            System.out.println("Validation failed: " + e);
+            return;
+        }
+
+        // Execute the statement.
+        CellSet cset;
+        try {
+            cset = stmt.executeOlapQuery(query);
+        } catch (OlapException e) {
+            System.out.println("Execution failed: " + e);
         }
     }
 }

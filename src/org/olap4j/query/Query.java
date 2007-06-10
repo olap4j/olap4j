@@ -45,7 +45,7 @@ public class Query {
         this.name = name;
         this.cube = cube;
         this.connection =
-            cube.getSchema().getCatalog().getDatabase().getMetaData()
+            cube.getSchema().getCatalog().getMetaData()
                 .getConnection().unwrap(OlapConnection.class);
         this.unused = new QueryAxis(this, null);
         for (Dimension dimension : cube.getDimensions()) {

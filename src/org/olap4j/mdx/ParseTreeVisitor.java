@@ -18,36 +18,36 @@ package org.olap4j.mdx;
  */
 public interface ParseTreeVisitor<T> {
     /**
-     * Visits a {@link SelectNode}.
+     * Visits a select statement.
      *
-     * @param selectNode Node representing a SELECT statement.
-     * @return value returned by SelectNode#accept(ParseTreeVisitor)
+     * @param selectNode Node representing a SELECT statement
+     * @see SelectNode#accept(ParseTreeVisitor)
      */
     T visit(SelectNode selectNode);
 
     /**
-     * Visits an {@link AxisNode}.
+     * Visits an axis of a select statement.
      *
      * @see AxisNode#accept(ParseTreeVisitor)
      */
     T visit(AxisNode axis);
 
     /**
-     * Visits a {@link WithMemberNode}.
+     * Visits a member declaration.
      *
      * @see WithMemberNode#accept(ParseTreeVisitor)
      */
     T visit(WithMemberNode calcMemberNode);
 
     /**
-     * Visits a {@link WithSetNode}.
+     * Visits a set declaration.
      *
      * @see WithSetNode#accept(ParseTreeVisitor)
      */
     T visit(WithSetNode calcSetNode);
 
     /**
-     * Visits a {@link CallNode}.
+     * Visits a call to an operator or function.
      *
      * @see CallNode#accept(ParseTreeVisitor)
      */
@@ -61,49 +61,49 @@ public interface ParseTreeVisitor<T> {
     T visit(IdentifierNode id);
 
     /**
-     * Visits a Parameter.
+     * Visits a parameter.
      *
      * @see ParameterNode#accept(ParseTreeVisitor)
      */
     T visit(ParameterNode parameterNode);
 
     /**
-     * Visits an DimensionNode.
+     * Visits a usage of a {@link org.olap4j.metadata.Dimension} in a query.
      *
      * @see DimensionNode#accept(ParseTreeVisitor)
      */
     T visit(DimensionNode dimensionNode);
 
     /**
-     * Visits an HierarchyNode.
+     * Visits a usage of a {@link org.olap4j.metadata.Hierarchy} in a query.
      *
      * @see HierarchyNode#accept(ParseTreeVisitor)
      */
     T visit(HierarchyNode hierarchyNode);
 
     /**
-     * Visits an LevelNode.
+     * Visits a usage of a {@link org.olap4j.metadata.Level} in a query.
      *
      * @see LevelNode#accept(ParseTreeVisitor)
      */
     T visit(LevelNode levelExpr);
 
     /**
-     * Visits an MemberNode.
+     * Visits a usage of a {@link org.olap4j.metadata.Member} in a query.
      *
      * @see MemberNode#accept(ParseTreeVisitor)
      */
     T visit(MemberNode memberNode);
 
     /**
-     * Visits an MdxLiteral.
+     * Visits a literal.
      *
      * @see LiteralNode#accept(ParseTreeVisitor)
      */
     T visit(LiteralNode literalNode);
 
     /**
-     * Visits a {@link PropertyValueNode}.
+     * Visits a property-value pair.
      *
      * @see PropertyValueNode#accept(ParseTreeVisitor)
      */

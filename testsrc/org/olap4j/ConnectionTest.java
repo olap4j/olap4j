@@ -211,13 +211,10 @@ public class ConnectionTest extends TestCase {
                 schemaPattern,
                 cubeNamePattern));
 
-        Database database = olapDatabaseMetaData.getDatabase();
-        assertNotNull(database);
-
         int k = 0;
-        for (Catalog catalog : database.getCatalogs()) {
+        for (Catalog catalog : olapConnection.getCatalogs()) {
             ++k;
-            assertEquals(catalog.getDatabase(), database);
+            assertEquals(catalog.getMetaData(), olapDatabaseMetaData);
             for (Schema schema : catalog.getSchemas()) {
                 ++k;
                 assertEquals(schema.getCatalog(), catalog);

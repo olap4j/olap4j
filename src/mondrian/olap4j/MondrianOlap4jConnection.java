@@ -17,8 +17,8 @@ import java.util.Map;
 
 import org.olap4j.*;
 import org.olap4j.metadata.Schema;
-import org.olap4j.metadata.Database;
 import org.olap4j.metadata.Catalog;
+import org.olap4j.metadata.NamedList;
 import org.olap4j.mdx.parser.MdxParserFactory;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
@@ -45,6 +45,8 @@ class MondrianOlap4jConnection implements OlapConnection {
      * Current schema.
      */
     MondrianOlap4jSchema olap4jSchema;
+
+    private final MondrianOlap4jDatabaseMetaData olap4jDatabaseMetaData;
 
     /**
      * The name of the sole catalog.
@@ -77,9 +79,10 @@ class MondrianOlap4jConnection implements OlapConnection {
         }
         this.connection =
             mondrian.olap.DriverManager.getConnection(list, null);
-        final OlapDatabaseMetaData olapDatabaseMetaData = getMetaData();
-        final Database database = olapDatabaseMetaData.getDatabase();
-        final Catalog catalog = database.getCatalogs().get(getCatalog());
+        this.olap4jDatabaseMetaData =
+            new MondrianOlap4jDatabaseMetaData(this, connection);
+        String catalogName = getCatalog();
+        final Catalog catalog = getCatalogs().get(catalogName);
         this.olap4jSchema =
             new MondrianOlap4jSchema(
                 (MondrianOlap4jCatalog) catalog,
@@ -132,7 +135,11 @@ class MondrianOlap4jConnection implements OlapConnection {
     }
 
     public OlapDatabaseMetaData getMetaData() {
-        return new MondrianOlap4jDatabaseMetaData(this, connection);
+        return olap4jDatabaseMetaData;
+    }
+
+    public NamedList<Catalog> getCatalogs() {
+        return olap4jDatabaseMetaData.getCatalogObjects();
     }
 
     public void setReadOnly(boolean readOnly) throws SQLException {

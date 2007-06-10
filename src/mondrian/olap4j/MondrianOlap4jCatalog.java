@@ -12,22 +12,22 @@ package mondrian.olap4j;
 import org.olap4j.metadata.Catalog;
 import org.olap4j.metadata.NamedList;
 import org.olap4j.metadata.Schema;
-import org.olap4j.metadata.Database;
 import org.olap4j.OlapException;
+import org.olap4j.OlapDatabaseMetaData;
 
 /**
- * <code>MondrianOlap4jCatalog</code> ...
+ * Implementation of {@link org.olap4j.metadata.Catalog} for Mondrian.
  *
  * @author jhyde
  * @version $Id: $
  * @since May 23, 2007
  */
 class MondrianOlap4jCatalog implements Catalog, Named {
-    final MondrianOlap4jDatabase olap4jDatabase;
+    final MondrianOlap4jDatabaseMetaData olap4jDatabaseMetaData;
 
     MondrianOlap4jCatalog(
-        MondrianOlap4jDatabase olap4jDatabase) {
-        this.olap4jDatabase = olap4jDatabase;
+        MondrianOlap4jDatabaseMetaData olap4jDatabaseMetaData) {
+        this.olap4jDatabaseMetaData = olap4jDatabaseMetaData;
     }
 
     public NamedList<Schema> getSchemas() throws OlapException {
@@ -38,17 +38,17 @@ class MondrianOlap4jCatalog implements Catalog, Named {
         list.add(
             new MondrianOlap4jSchema(
                 this,
-                olap4jDatabase.metaData.connection.getSchemaReader(),
-                olap4jDatabase.metaData.connection.getSchema()));
+                olap4jDatabaseMetaData.connection.getSchemaReader(),
+                olap4jDatabaseMetaData.connection.getSchema()));
         return (NamedList) list;
-    }
-
-    public Database getDatabase() {
-        return olap4jDatabase;
     }
 
     public String getName() {
         return "LOCALDB";
+    }
+
+    public OlapDatabaseMetaData getMetaData() {
+        return olap4jDatabaseMetaData;
     }
 }
 

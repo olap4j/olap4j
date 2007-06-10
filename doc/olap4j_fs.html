@@ -82,7 +82,7 @@ TABLE TD {
 Version: 0.6-dev (draft)<br>
 Revision: $Id: $
 (<a href="http://svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
-Last modified: May 26<sup>th</sup>, 2007.</p>
+Last modified: June 10<sup>th</sup>, 2007.</p>
 <hr noshade="noshade">
 
 <h2><a name="Contents">Contents</a></h2>
@@ -134,13 +134,13 @@ Last modified: May 26<sup>th</sup>, 2007.</p>
         interface</a></li>
 	</ol>
 		</li>
-		<li><a href="#MDX_query_model">MDX query model</a></li>
+		<li><a href="#MDX_query_model">MDX parse tree model</a></li>
+        <li><a href="#MDX_parser">MDX parser</a></li>
 		<li><a href="#MDX_type_model">MDX type model</a></li>
 		<li><a href="#Metadata">Metadata</a><ol>
 		<li><a href="#Access_control">Access control</a></li>
 		<li><a href="#Metadata_objects">Metadata objects</a><ol>
 		<li><a href="#MetadataElement">The MetadataElement interface</a></li>
-        <li><a href="#The_Database_interface">The Database interface</a></li>
         <li><a href="#Catalog">The Catalog interface</a></li>
         <li><a href="#Schema">The Schema interface</a></li>
 		<li><a href="#Cube">The Cube interface</a></li>
@@ -505,6 +505,11 @@ see, a statement can also be created from an MDX parse tree.</p>
 <a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Connection.html">
 java.sql.Connection</a>) is a
 connection to an OLAP data source.</p>
+<p>
+Methods:</p>
+<ul>
+    <li>NamedList&lt;Catalog&gt; getCatalogs()</li>
+</ul>
 
 <h4>2.2.2. <a name="Connection_pooling">Connection pooling</a></h4>
 
@@ -523,7 +528,8 @@ and this class will implement <code>java.sql.Connection</code> but not <code>
 OlapConnection</code>. To access methods of the <code>OlapConnection</code>, the
 client application must first strip away the wrapper object.</p>
 
-<p>If you are using a connection-pooling library, olap4j provides a helper class to access the object underneath a wrapped
+<p>If you are using a connection-pooling library, olap4j provides a helper 
+method <code>unwrap(Class)</code> to access the object underneath a wrapped
 connection, statement, prepared statement or result set. For instance,</p>
 
 <div class="code">DataSource dataSource; // a data source using a connection
@@ -535,24 +541,13 @@ connection, statement, prepared statement or result set. For instance,</p>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot;
   +<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Role='California manager'&quot;);<br>
-	OlapConnection olapConnection = Olap4j.convert(connection);<br>
+	OlapConnection olapConnection = connection.unwrap(OlapConnection.class);<br>
   	OlapStatement statement = olapConnection.createOlapStatement();</div>
 
-<p>The
-<a class="javadoc" href="api/org/olap4j/Olap4j.html#convert(java.sql.Connection)">
-Olap4j.convert(Connection)</a> method returns an <code>OlapConnection</code>. It
-works with common connection pools, and the resulting object is instrumented so
-that any statements or prepared statements created from that connection also
-work with the connection pool. </p>
-<p>The problem does not just affect connections: some connection pools also wrap
-<code>Statement</code>, <code>PreparedStatement</code>, <code>CellSet</code>
-and 
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DatabaseMetaData.html">
-DatabaseMetaData</a> objects, so there are <code>convert()</code>
-methods for these too.</p>
-<p>Hopefully this problem will only be temporary. As olap4j gains popularity, we
-expect connection pools to add support for the extended interfaces, and it will
-be sufficient merely to cast the objects returned from factory methods.</p>
+<p>The <code>unwrap</code> method is part of the
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/Wrapper.html">java.sql.Wrapper</a> interface introduced in JDBC 4.0, but 
+will also work when olap4j is used with JDBC 3.0. We hope that popular 
+connection pools will utilize this method in the near future.</p>
 <h3>2.3. <a name="Statements">Statements</a></h3>
 
 <h4>2.3.1. <a name="OlapStatement">The OlapStatement interface</a></h4>
@@ -656,17 +651,42 @@ CellSet</a>.</p>
 
 <h4>2.3.8. <a name="The_CellSetMetaData_interface">The CellSetMetaData interface</a></h4>
 
-<p>Extends ResultSetMetaData</p>
+<p>Extends 
+<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSetMetaData.html">
+java.sql.ResultSetMetaData</a>. </p>
+<p>Methods:</p>
+<ul>
+    <li>List&lt;Property&gt; getCellProperties()</li>
+    <li>Cube getCube()</li>
+    <li>List&lt;CellSetAxisMetaData&gt; getAxesMetaData()</li>
+</ul>
 
 <h4>2.3.9. <a name="The_OlapDatabaseMetaData_interface">The OlapDatabaseMetaData 
 interface</a></h4>
 
-<p>Extends DatabaseMetaData</p>
+<p>Extends 
+<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DatabaseMetaData.html">
+java.sql.DatabaseMetaData</a>.</p>
 
 <h4>2.3.10. <a name="The_CellSetAxis_interface">The CellSetAxis interface</a></h4>
+<p>Methods:</p>
+<ul>
+    <li>int getOrdinal()</li>
+    <li>CellSet getCellSet()</li>
+    <li>CellSetAxisMetaData getAxisMetaData()</li>
+    <li>List&lt;Position&gt; getPositions()</li>
+    <li>int getPositionCount()</li>
+    <li>ListIterator&lt;Position&gt; iterate()</li>
+</ul>
 
 <h4>2.3.11. <a name="The_CellSetAxisMetaData_interface">The CellSetAxisMetaData 
 interface</a></h4>
+<p>Methods:</p>
+<ul>
+    <li>Axis getAxis()</li>
+    <li>List&lt;Hierarchy&gt; getHierarchies()</li>
+    <li>List&lt;Property&gt; getProperties()</li>
+</ul>
 
 <h3>2.4. <a name="MDX_query_model">MDX query model</a></h3>
 
@@ -694,56 +714,76 @@ specific instance is chosen based upon the types of its arguments.</p>
 <div class="code">
 
   // Create a query model.<br>
-  OlapConnection connection;<br>
-  Query query = new Query();<br>
-  query.setFrom(&quot;Sales&quot;);<br>
-  query.getAxes().add(<br>
-    new Axis(<br>
-        "ROWS",<br>
-        false,<br>
-        new UnresolvedFunCall(<br>
-            "{}",<br>
-           
-  Syntax.Special,<br>
-            new Id(new
-  String[] {"Measures", "Unit Sales"})));<br>
+  SelectNode query = new SelectNode();<br>
+  query.setCubeName(<br>
+&nbsp;&nbsp;&nbsp; new IdentifierNode(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new 
+  IdentifierNode.Segment(&quot;Sales&quot;)));<br>
+  query.getAxisList().add(<br>
+&nbsp;&nbsp;&nbsp; new AxisNode(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new CallNode(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;{}&quot;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+  Syntax.Braces,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new 
+  IdentifierNode(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+  new IdentifierNode.Segment(&quot;Measures&quot;),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+  new IdentifierNode.Segment(&quot;Unit Sales&quot;))),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Axis.ROWS,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new ArrayList&lt;IdentifierNode&gt;()));<br>
   <br>
   // Create a statement based upon the query model.<br>
   OlapStatement stmt;<br>
   try {<br>
-    stmt = connection.createOlapStatement(query);<br>
+&nbsp;&nbsp;&nbsp; stmt = connection.createStatement();<br>
   } catch (OlapException e) {<br>
-    System.out.println("Validation failed: " + e);<br>
-    return;<br>
+&nbsp;&nbsp;&nbsp; System.out.println(&quot;Validation failed: &quot; + e);<br>
+&nbsp;&nbsp;&nbsp; return;<br>
   }<br>
   <br>
   // Execute the statement.<br>
   CellSet cset;<br>
   try {<br>
-    cset = stmt.execute();<br>
+&nbsp;&nbsp;&nbsp; cset = stmt.executeOlapQuery(query);<br>
   } catch (OlapException e) {<br>
-    System.out.println("Execution failed: " + e);<br>
-  }</div>
+&nbsp;&nbsp;&nbsp; System.out.println(&quot;Execution failed: &quot; + e);<br>
+  }<br>
+&nbsp;</div>
 
 <p>Package name: <a class="javadoc" href="api/org/olap4j/mdx/package-summary.html">org.olap4j.mdx</a></p>
 
 <p>Classes:</p>
 <ul>
-  <li>Query</li>
-  <li>Axis</li>
-  <li>FunCall</li>
-  <li>UnresolvedFunCall</li>
-  <li>Id</li>
-  <li>Literal</li>
-  <li>MemberExpr</li>
-  <li>LevelExpr</li>
-  <li>HierarchyExpr</li>
-  <li>DimensionExpr</li>
-  <li>ParserFactory</li>
-  <li>Parser</li>
+  <li>ParseTreeNode</li>
+  <li>SelectNode</li>
+  <li>AxisNode</li>
+  <li>CallNode</li>
+  <li>IdentifierNode</li>
+  <li>LiteralNode</li>
+  <li>MemberNode</li>
+  <li>LevelNode</li>
+  <li>HierarchyNode</li>
+  <li>DimensionNode</li>
+  <li>WithMemberNode</li>
+  <li>WithSetNode</li>
+  <li>PropertyValueNode</li>
 </ul>
 
-<h3>2.5. <a name="MDX_type_model">MDX type model</a></h3>
+<h3>2.5. <a name="MDX_parser">MDX parser</a></h3>
+
+<p>Package name: <a class="javadoc" href="api/org/olap4j/type/package-summary.html">org.olap4j.mdx.parser</a></p>
+
+<p>Represents the types of nodes in an MDX query model.</p>
+
+<ul>
+  <li>MdxParserFactory</li>
+  <li>MdxParser</li>
+</ul>
+
+<h3 align="left">2.6. <a name="MDX_type_model">MDX type model</a></h3>
 
 <p>Package name: <a class="javadoc" href="api/org/olap4j/type/package-summary.html">org.olap4j.type</a></p>
 
@@ -849,7 +889,7 @@ or <code>[Time].[Month]</code>.</p>
 	CrossJoin({[Gender].[F], [Gender].[M]}, [Store].Members)</code> is <code>
 	Set(Tuple(Member(level=[Gender].[Gender]), Member(hierarchy=[Store]))</code>.</li>
 </ul>
-<h3>2.6. <a name="Metadata">Metadata</a></h3>
+<h3>2.7. <a name="Metadata">Metadata</a></h3>
 
 <p>Package name: <a class="javadoc" href="api/org/olap4j/metadata/package-summary.html">org.olap4j.metadata</a></p>
 
@@ -868,7 +908,7 @@ org.olap4j.metadata.Cube</a>.</li>
 	<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getCubes(java.lang.String, java.lang.String, java.lang.String)">
 	OlapDatabaseMetaData.getCubes(&lt;schemaName&gt;, &lt;cubeName&gt;)</a>.</li>
 </ul>
-<h4>2.6.1. <a name="Access_control">Access control</a></h4>
+<h4>2.7.1. <a name="Access_control">Access control</a></h4>
 
 <p>A user's view of metadata may be subject to access control. For example, a
 user may not have read access to certain hierarchies within a cube, or to
@@ -882,7 +922,7 @@ with access control.</p>
 	is invisible to him.</p>
 </blockquote>
 
-<h4>2.6.2. <a name="Metadata_objects">Metadata objects</a></h4>
+<h4>2.7.2. <a name="Metadata_objects">Metadata objects</a></h4>
 <p>[Diagram of object model, showing relationships. Catalog contains Schema; 
 Schema contains Cube and shared Dimension; Cube contains Dimension, Measure and 
 Set; Measure is a Member; Dimension contains Hierarchy; Hierarchy contains 
@@ -905,7 +945,7 @@ equals()</a>, not the <code>=</code> operator, when comparing metadata objects,
 and do not use
 <a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/IdentityHashMap.html">
 IdentityHashMap</a>.</p>
-<h5>2.6.2.1. <a name="MetadataElement">The MetadataElement interfacee</a></h5>
+<h5>2.7.2.1. <a name="MetadataElement">The MetadataElement interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a> is the base class for Cube, Dimension, Hierarchy, Level, Member, Property; provides
 name and unique-name properties (not localized), and localized caption and
@@ -916,21 +956,19 @@ description.</p>
 	<li>String getCaption(Locale locale)</li>
 	<li>String getDescription(Locale locale)</li>
 </ul>
-<h5>2.6.2.2. <a name="The_Database_interface">The Database interface</a></h5>
-<p><a class="javadoc" href="api/org/olap4j/metadata/Database.html">Database</a> 
-is the root element in a hierarchy of metadata elements.</p>
-<p>Methods:</p>
-<ul>
-	<li>NamedList&lt;Catalog&gt; getCatalogs()</li>
-</ul>
-<h5>2.6.2.3. <a name="Catalog">The Catalog interface</a></h5>
+<h5>2.7.2.2. <a name="Catalog">The Catalog interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Catalog.html">Catalog</a> 
-...</p>
+is the highest level element in the hierarchy of metadata objects.</p>
+<p>Some OLAP servers may only have one catalog. Mondrian is one such OLAP 
+server; its sole catalog is always called &quot;LOCALDB&quot;.</p>
+<p>To obtain the collection of catalogs in the current server, call the <code>
+OlapConnection.getCatalogs()</code> method.</p>
+<p>Methods:</p>
 <ul>
 	<li>String getName()</li>
     <li>NamedList&lt;Schema&gt; getSchemas()</li>
 </ul>
-<h5>2.6.2.4. <a name="Schema">The Schema interface</a></h5>
+<h5>2.7.2.3. <a name="Schema">The Schema interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Schema.html">Schema</a> ...</p>
 <ul>
 	<li>String getName()</li>
@@ -939,7 +977,7 @@ is the root element in a hierarchy of metadata elements.</p>
     <li>getSupportedLocales() (see <a href="#Internationalization">
     Internationalization</a>)</li>
 </ul>
-<h5>2.6.2.5. <a name="Cube">The Cube interface</a></h5>
+<h5>2.7.2.4. <a name="Cube">The Cube interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Cube.html">Cube</a> ...</p>
 <ul>
 	<li>List&lt;Dimension&gt; getDimensions()</li>
@@ -948,7 +986,7 @@ is the root element in a hierarchy of metadata elements.</p>
     <li>getSupportedLocales() (see <a href="#Internationalization">
     Internationalization</a>)</li>
 </ul>
-<h5>2.6.2.6. <a name="Dimension">The Dimension interface</a></h5>
+<h5>2.7.2.5. <a name="Dimension">The Dimension interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Dimension.html">Dimension</a>
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>)</p>
@@ -958,7 +996,7 @@ MetadataElement</a>)</p>
 	<li>List&lt;Member&gt; getRootMembers()</li>
 	<li>Dimension.Type getDimensionType()</li>
 </ul>
-<h5>2.6.2.7. <a name="Hierarchy">The Hierarchy interface</a></h5>
+<h5>2.7.2.6. <a name="Hierarchy">The Hierarchy interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Hierarchy.html">Hierarchy</a>&nbsp; 
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>)
@@ -968,8 +1006,9 @@ MetadataElement</a>)
 	<li>String getName()</li>
 	<li>List&lt;Level&gt; getLevels()</li>
 	<li>boolean hasAll()</li>
+    <li>Member getDefaultMember()</li>
 </ul>
-<h5>2.6.2.8. <a name="Level">The Level interface</a></h5>
+<h5>2.7.2.7. <a name="Level">The Level interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Level.html">Level</a>&nbsp; 
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>) ...</p>
@@ -979,7 +1018,7 @@ MetadataElement</a>) ...</p>
 	<li>Level.Type getLevelType()</li>
 	<li>List&lt;Property&gt; getProperties()</li>
 </ul>
-<h5>2.6.2.9. <a name="Member">The Member interface</a></h5>
+<h5>2.7.2.8. <a name="Member">The Member interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Member.html">Member</a>&nbsp; 
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>) ...</p>
@@ -1002,14 +1041,14 @@ MetadataElement</a>) ...</p>
 	<li>boolean isHidden()</li>
 	<li>Member getDataMember()</li>
 </ul>
-<h5>2.6.2.10. <a name="Measure">The Measure interface</a></h5>
+<h5>2.7.2.9. <a name="Measure">The Measure interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Measure.html">Measure</a>&nbsp; 
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>) ...</p>
 <ul>
 	<li>extends Member</li>
 </ul>
-<h5>2.6.2.11. <a name="Property">The Property interface</a></h5>
+<h5>2.7.2.10. <a name="Property">The Property interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Property.html">Property</a>&nbsp; 
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>)
@@ -1025,7 +1064,7 @@ MetadataElement</a>)
 	}</li>
 	<li>enum StandardCellProperty { BACK_COLOR, CELL_EVALUATION_LIST, ... }</li>
 </ul>
-<h5>2.6.2.12. <a name="The_NamedSet_interface">The NamedSet interface</a></h5>
+<h5>2.7.2.11. <a name="The_NamedSet_interface">The NamedSet interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/NamedSet.html">NamedSet</a> 
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>)
@@ -1033,7 +1072,7 @@ MetadataElement</a>)
 <ul>
 	<li>Cube getCube()</li>
 </ul>
-<h4>2.6.3. 
+<h4>2.7.3. 
 <a name="The_OlapDatabaseMetaData_interface_and_methods_which_return_schema_rowsets">The OlapDatabaseMetaData 
 interface, and methods which return schema rowsets</a></h4>
 <p><a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html">
@@ -1253,7 +1292,7 @@ DBTYPE_WSTR to String, DBTYPE_GUID to String, DBTYPE_DBTIMESTAMP to Timestamp,
 DBTYPE_BOOL to boolean; DBTYPE_I4, DBTYPE_UI4, DBTYPE_I2 and DBTYPE_UI2 all map 
 to int. Column names: mapped CamelCase to UPPER_CASE.]</p>
 
-<h5>2.6.3.1. <a name="getDatasources">getDatasources</a></h5>
+<h5>2.7.3.1. <a name="getDatasources">getDatasources</a></h5>
 <p>Specified by the <code>DISCOVER_DATASOURCES</code> XML for Analysis method.</p>
 <p>The returned result set contains the following columns.</p>
 
@@ -1349,7 +1388,7 @@ to int. Column names: mapped CamelCase to UPPER_CASE.]</p>
 	</tr>
 </tbody></table>
 
-<h5>2.6.3.2. <a name="getDatabaseProperties">getDatabaseProperties</a></h5>
+<h5>2.7.3.2. <a name="getDatabaseProperties">getDatabaseProperties</a></h5>
 
 <p>Returns
 information about the standard and provider-specific properties supported by an
@@ -1418,7 +1457,7 @@ not listed in the return result set.</p>
 </tbody></table>
 
 <p>[Is VALUE a JDBC reserved word? If so, change it.]</p>
-<h5>2.6.3.3 <a name="getLiterals">getLiterals</a></h5>
+<h5>2.7.3.3 <a name="getLiterals">getLiterals</a></h5>
 <p>Retrieves a list of information on supported literals, including data types
 and values.</p>
 <p>Specified by the <code>DISCOVER_LITERALS</code> XML for Analysis method.</p>
@@ -1483,7 +1522,7 @@ and values.</p>
 	</tr>
 </tbody></table>
 
-<h5>2.6.3.4. <a name="getCubes">getCubes</a></h5>
+<h5>2.7.3.4. <a name="getCubes">getCubes</a></h5>
 
 		<p>Describes the structure of cubes within a database.</p>
 <p>Specified by the <code>MDSCHEMA_CUBES</code> XML for Analysis method.</p>
@@ -1599,7 +1638,7 @@ and values.</p>
 <p>The rowset is sorted on <b>CATALOG_NAME</b>, <b>
     SCHEMA_NAME</b>, <b>CUBE_NAME</b>.</p>
 
-<h5>2.6.3.5. <a name="getDimensions">getDimensions</a></h5>
+<h5>2.7.3.5. <a name="getDimensions">getDimensions</a></h5>
 
 <p>Retrieves a result set describing the shared and private dimensions within a database.</p>
 <p>Specified by the <code>MDSCHEMA_DIMENSIONS</code> XML for Analysis method.</p>
@@ -1738,7 +1777,7 @@ and values.</p>
 <p>The result set is sorted on <b>CATALOG_NAME</b>, <b>
     SCHEMA_NAME</b>, <b>CUBE_NAME</b>, <b>DIMENSION_NAME</b>.</p>
 
-<h5>2.6.3.6. <a name="getFunctions">getFunctions</a></h5>
+<h5>2.7.3.6. <a name="getFunctions">getFunctions</a></h5>
 
 <p>Retrieves a result set describing the functions available to client
     applications connected to the database.</p>
@@ -1837,7 +1876,7 @@ and values.</p>
 <p>The rowset is sorted on <b>ORIGIN</b>, <b>INTERFACE_NAME</b>,
     <b>FUNCTION_NAME</b>.</p>
 
-<h5>2.6.3.7. <a name="getHierarchies">getHierarchies</a></h5>
+<h5>2.7.3.7. <a name="getHierarchies">getHierarchies</a></h5>
 <p>Retrieves a result set describing each hierarchy within a particular
 dimension.</p>
 <p>Specified by the <code>MDSCHEMA_HIERARCHIES</code> XML for Analysis method.</p>
@@ -2059,7 +2098,7 @@ dimension.</p>
     SCHEMA_NAME</b>, <b>CUBE_NAME</b>, <b>DIMENSION_UNIQUE_NAME</b>,
     <b>HIERARCHY_NAME</b>.</p>
 
-<h5>2.6.3.8. <a name="getLevels">getLevels</a></h5>
+<h5>2.7.3.8. <a name="getLevels">getLevels</a></h5>
 <p>Retrieves a result set describing each level within a particular hierarchy.</p>
 <p>Specified by the <code>MDSCHEMA_LEVELS</code> XML for Analysis method.</p>
 <p>The returned result set contains the following columns.</p>
@@ -2302,7 +2341,7 @@ dimension.</p>
     SCHEMA_NAME</b>, <b>CUBE_NAME</b>, <b>DIMENSION_UNIQUE_NAME</b>,
     <b>HIERARCHY_UNIQUE_NAME</b>, <b>LEVEL_NUMBER</b>.</p>
 
-<h5>2.6.3.9. <a name="getMeasures">getMeasures</a></h5>
+<h5>2.7.3.9. <a name="getMeasures">getMeasures</a></h5>
 <p>Retrieves a result set describing each measure within a cube.</p>
 <p>Specified by the <code>MDSCHEMA_MEASURES</code> XML for Analysis method.</p>
 <p>The returned result set contains the following columns.</p>
@@ -2468,7 +2507,7 @@ dimension.</p>
 <p>The rowset is sorted on <b>CATALOG_NAME</b>, <b>
     SCHEMA_NAME</b>, <b>CUBE_NAME</b>, <b>MEASURE_NAME</b>.</p>
 
-<h5>2.6.3.10. <a name="getMembers">getMembers</a></h5>
+<h5>2.7.3.10. <a name="getMembers">getMembers</a></h5>
 <p>Retrieves a result set describing the members within a database.</p>
 <p>Specified by the <code>MDSCHEMA_MEMBERS</code> XML for Analysis method.</p>
 <p>The returned result set contains the following columns.</p>
@@ -2650,7 +2689,7 @@ dimension.</p>
     <b>HIERARCHY_UNIQUE_NAME</b>, <b>LEVEL_UNIQUE_NAME</b>, <b>
     LEVEL_NUMBER</b>, <b>MEMBER_ORDINAL</b>.</p>
 
-<h5>2.6.3.11. <a name="getProperties">getProperties</a></h5>
+<h5>2.7.3.11. <a name="getProperties">getProperties</a></h5>
 
 <p>Retrieves a list of descriptions of member and cell Properties.</p>
 <p>Specified by the <code>MDSCHEMA_PROPERTIES</code> XML for Analysis method.</p>
@@ -2937,7 +2976,7 @@ dimension.</p>
 
 <p>This schema rowset is not sorted.</p>
 
-<h5>2.6.3.12. <a name="getSets">getSets</a></h5>
+<h5>2.7.3.12. <a name="getSets">getSets</a></h5>
 <p>Retrieves a result set describing any sets that are currently defined in a
 database, including session-scoped sets.</p>
 <p>Specified by the <code>MDSCHEMA_SETS</code> XML for Analysis method.</p>
@@ -3015,7 +3054,7 @@ database, including session-scoped sets.</p>
 <p>The rowset is sorted on <b>CATALOG_NAME</b>, <b>
     SCHEMA_NAME</b>, <b>CUBE_NAME</b>.</p>
 
-<h4>2.6.4. <a name="Other_methods">Other methods</a></h4>
+<h4>2.7.4. <a name="Other_methods">Other methods</a></h4>
 
 <table>
 	<tbody><tr>
@@ -3035,7 +3074,7 @@ database, including session-scoped sets.</p>
 	</tr>
 </tbody></table>
 
-<h3>2.7. <a name="Transform">Transform</a></h3>
+<h3>2.8. <a name="Transform">Transform</a></h3>
 
 <p>A transform is an operation which maps a query model to a new query model. It
 is usually triggered by a gesture within the user-interface. For example,
@@ -3076,7 +3115,7 @@ outside of the cube.</p>
     <li>Slicer</li>
 </ul>
 
-<h4>2.7.1. <a name="Query_Model_Details">Query Model Details</a></h4>
+<h4>2.8.1. <a name="Query_Model_Details">Query Model Details</a></h4>
 <p><b>This section should probably be moved into Section 2.4</b></p>
 
 <p>The MDX query language uses a data model based on cubes, dimensions, tuples
@@ -3089,12 +3128,12 @@ dimension.  A set is an ordered collection of tuples.  An MDX query selects
 zero or more axes using a data slicer. (The axes loosely correspond to the "SELECT"
 clause in a SQL query, and the slicer to the "WHERE".)
 
-<h4>2.7.2. <a name="Navigation_Actions">Navigation Actions</a></h4>
+<h4>2.8.2. <a name="Navigation_Actions">Navigation Actions</a></h4>
 
 <p>The defined set of navigations can be divided into four categories: Slicing,
 Restructuring, Drilling, Scoping.</p>
 
-<h5>2.7.2.1. <a name="Slicing_navigations">Slicing Navigations</a></h5>
+<h5>2.8.2.1. <a name="Slicing_navigations">Slicing Navigations</a></h5>
 <dl>
     <dt>setSlicer</dt><dd>Secifies the slicer to use, replacing any current one.</dd>
     <dt>getSlicer</dt><dd>Retrieve the current slicer.</dd>
@@ -3103,7 +3142,7 @@ Restructuring, Drilling, Scoping.</p>
     for a specified measure.</dd>
 </dl>
 
-<h5>2.7.2.2. <a name="Restructuring_navigations">Restructuring Navigations</a></h5>
+<h5>2.8.2.2. <a name="Restructuring_navigations">Restructuring Navigations</a></h5>
 <p>Restructuring navigations change the axes of the returned cube.</p>
 
 <dl>
@@ -3122,7 +3161,7 @@ Restructuring, Drilling, Scoping.</p>
     <dt>deleteTotal</dt><dd>Deletes an aggregation from the specified member.</dd>
 </dl>
 
-<h5>2.7.2.3. <a name="Drilling_navigations">Drilling Navigations</a></h5>
+<h5>2.8.2.3. <a name="Drilling_navigations">Drilling Navigations</a></h5>
 <p>Navigations that allow a user to move through the levels in a hierarchy.  All
 drill navigations operate on a single Axis.</p>
 <ul>
@@ -3130,7 +3169,7 @@ drill navigations operate on a single Axis.</p>
     hierarchy.  All members of the hierarchy are replaced by this action.</dd>
 </ul>
 
-<h5>2.7.2.4. <a name="Scoping_navigations">Scoping Navigations</a></h5>
+<h5>2.8.2.4. <a name="Scoping_navigations">Scoping Navigations</a></h5>
 <p>Navigations that allow a user to expand/collapse sections of a result set.
 All scoping navigations operate on single Axis.</p>
 <ul>
@@ -3143,7 +3182,7 @@ All scoping navigations operate on single Axis.</p>
 
 </ul>
 
-<h5>2.7.2.5. <a name="Supporting_actions">Supporting Actions</a></h5>
+<h5>2.8.2.5. <a name="Supporting_actions">Supporting Actions</a></h5>
 <p>Axis Operations</p>
 <ul>
     <li>getSet</li>
@@ -3185,7 +3224,7 @@ All scoping navigations operate on single Axis.</p>
     the change.
 </ul>
 
-<h3>2.8. <a name="Layout">Layout</a></h3>
+<h3>2.9. <a name="Layout">Layout</a></h3>
 
 <p>The layout package provides data models for graphical OLAP applications. In
 particular, the GridModel class provides, for OLAP data, what Swing's
@@ -3363,6 +3402,11 @@ Analysis Specification, version 1.1</a>.</p>
     <li>Rename OlapResultSet to CellSet, OlapResultSetMetaData to 
     CellSetMetaData, OlapResultAxis to CellSetAxis, ResultCell to Cell, 
     ResultSetPosition to Position.</li>
+    <li>Removed class org.olap4j.metadata.Database; it was not adding much value 
+    over OlapDatabaseMetaData, and was confusing because Database is a synonym 
+    for Catalog in some servers.</li>
+    <li>Removed class Olap4j; unwrapping of Connections etc. is now provided 
+    using java.sql.Wrapper.unwrap.</li>
 </ul>
 
 <hr noshade="noshade">

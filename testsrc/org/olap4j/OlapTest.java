@@ -67,7 +67,7 @@ public class OlapTest {
             // The code from here on is generic olap4j stuff
 
             // Get a list of the schemas available from this connection and dump their names
-            NamedList<Schema> schemas = connection.getMetaData().getDatabase().getCatalogs().get("LOCALDB").getSchemas();
+            NamedList<Schema> schemas = connection.getCatalogs().get("LOCALDB").getSchemas();
             for (Schema schema : schemas) {
                 System.out.println("schema name="+schema.getName());
             }

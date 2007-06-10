@@ -14,7 +14,8 @@ import org.olap4j.type.Type;
 /**
  * Parse tree node representing a property-value pair.
  *
- * <p>For example, in <code>WITH MEMBER [Measures].[Foo] AS ' [Measures].[Unit Sales] ',
+ * <p>Property-value pairs are used to define properties of calculated members.
+ * For example, in <code>WITH MEMBER [Measures].[Foo] AS ' [Measures].[Unit Sales] ',
  * FORMAT_STRING = 'Bold',
  * SOLVE_ORDER = 2
  * SELECT ...</code>

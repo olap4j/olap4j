@@ -12,12 +12,15 @@ package org.olap4j.mdx;
 import org.olap4j.type.Type;
 
 import java.util.List;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.io.PrintWriter;
 
 /**
  * Multi-part identifier.
+ *
+ * @version $Id: $
+ * @author jhyde
  */
 public class IdentifierNode
     implements ParseTreeNode {
@@ -25,12 +28,14 @@ public class IdentifierNode
     private final List<Segment> segments;
 
     /**
-     * Creates an identifier containing a single part.
+     * Creates an identifier containing one or more segments.
      *
-     * @param segment Segment, consisting of a name and quoting style
+     * @param segments Array of Segments, each consisting of a name and quoting
+     * style
      */
-    public IdentifierNode(IdentifierNode.Segment segment) {
-        segments = Collections.singletonList(segment);
+    public IdentifierNode(IdentifierNode.Segment... segments) {
+        assert segments.length >= 1;
+        this.segments = new ArrayList<Segment>(Arrays.asList(segments));
     }
 
     private IdentifierNode(List<IdentifierNode.Segment> segments) {
@@ -54,7 +59,8 @@ public class IdentifierNode
      * @return New identifier
      */
     public IdentifierNode append(IdentifierNode.Segment segment) {
-        List<IdentifierNode.Segment> newSegments = new ArrayList<Segment>(segments);
+        List<IdentifierNode.Segment> newSegments =
+            new ArrayList<Segment>(segments);
         newSegments.add(segment);
         return new IdentifierNode(newSegments);
     }
@@ -100,9 +106,24 @@ public class IdentifierNode
         public final String name;
         public final IdentifierNode.Quoting quoting;
 
+        /**
+         * Creates a segment with the given quoting.
+         *
+         * @param name Name
+         * @param quoting Quoting style
+         */
         public Segment(String name, IdentifierNode.Quoting quoting) {
             this.name = name;
             this.quoting = quoting;
+        }
+
+        /**
+         * Creates a quoted segment, "[name]".
+         *
+         * @param name Name of segment
+         */
+        public Segment(String name) {
+            this(name, Quoting.QUOTED);
         }
     }
 

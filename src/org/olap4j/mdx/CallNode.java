@@ -29,6 +29,7 @@ import org.olap4j.type.Type;
  * <li><code>[Gender].Properties("FORMAT_STRING")</code>, a call to the
  *   <code>Properties</code> operator, which has
  *   {@link Syntax#Method method syntax}</li>
+ * </ul>
  *
  * @author jhyde
  * @version $Id: //open/mondrian/src/main/mondrian/olap/FunCall.java#22 $
