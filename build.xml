@@ -3,7 +3,7 @@
   == This software is subject to the terms of the Common Public License
   == Agreement, available at the following URL:
   == http://www.opensource.org/licenses/cpl.html.
-  == Copyright (C) 2006-2006 Julian Hyde and others.
+  == Copyright (C) 2006-2007 Julian Hyde and others.
   == All Rights Reserved.
   == You must accept the terms of that agreement to use this software.
   -->
@@ -29,15 +29,16 @@
   <property name="javadoc.dir" value="doc/api"/>
   <property name="dist.dir" value="dist"/>
 
+  <!-- for now, assume that mondrian is a sibling directory and contains src,
+       classes, testsrc and testclasses directories -->
+  <property name="mondrian.dir" value="../mondrian"/>
+
   <!-- generated files -->
   <property name="jar.file" value="${lib.dir}/${name}.jar" />
   <property name="jar-jdk14.file" value="${lib.dir}/${name}-jdk14.jar" />
   <property name="dist.bin.file" value="${dist.dir}/${dist.name}.zip" />
   <property name="dist.src.file" value="${dist.dir}/${dist.name}-src.zip" />
   <property name="dist.doc.file" value="${dist.dir}/doc.tar.gz" />
-
-  <property name="generated.java.files" value=""/>
-  <property name="generated.lib.files" value=""/>
 
   <path id="project.classpath">
     <pathelement location="${classes.dir}"/>
@@ -49,7 +50,9 @@
     <pathelement location="${lib.dir}/log4j-1.2.9.jar"/>
     <pathelement location="${lib.dir}/javacup.jar"/>
     <!-- We depend on mondrian right now. Ugh. -->
-    <pathelement location="${lib.dir}/mondrian-2.1.1.jar"/>
+    <pathelement location="${mondrian.dir}/classes"/>
+    <pathelement location="${mondrian.dir}/testclasses"/>
+    <pathelement location="${mondrian.dir}/lib/eigenbase-xom.jar"/>
     <!-- We depend on spring, but only for examples. -->
     <pathelement location="${lib.dir}/spring.jar"/>
 
@@ -82,7 +85,6 @@
     <delete includeEmptyDirs="true" quiet="true">
       <fileset dir="${classes.dir}" includes="**/*.class,**/*.properties"/>
       <fileset dir="${testclasses.dir}" includes="**/*.class,**/*.properties"/>
-      <fileset dir="." includes="${generated.java.files},${generated.lib.files}"/>
       <fileset dir="${build.dir}" />
     </delete>
   </target>
@@ -160,8 +162,7 @@ VERSION.txt"
 ${javadoc.dir}/**,
 **/_vti*/*,
 **/*~,
-**/junit-results/**,
-${generated.java.files}" />
+**/junit-results/**" />
     </zip>
   </target>
 
@@ -200,7 +201,7 @@ ${doc.dir}/api/src-html/**/*"/>
   </target>
 
   <target name="doczip"
-      depends="version,javadoc,javadoc-pdf"
+      depends="version,javadoc-with-ydoc,javadoc-pdf"
       description="Builds a zipfile of the documentation, which can then be
                    deployed to sf.net. See also doc/deployDoc.sh.">
     <mkdir dir="${dist.dir}" />
@@ -286,7 +287,7 @@ META-INF/**"/>
     <javadoc sourcepath="${src.dir}:${testsrc.dir}"
         classpathref="project.test.classpath"
         destdir="${javadoc.dir}"
-        packagenames="org.olap4j.*"
+        packagenames="org.olap4j.*,mondrian.olap4j.*"
         overview="${src.dir}/overview.html"
         footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=35302&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
         author="true"
@@ -301,8 +302,60 @@ META-INF/**"/>
            scope="constructors,methods"/>
       <tag name="testcase" description="Test-case:"
            scope="constructors,methods,types"/>
-      <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+      <link href="http://java.sun.com/javase/6/docs/api/"/>
+      <link href="http://mondrian.pentaho.org/api/"/>
       <link href="http://www.junit.org/junit/javadoc/3.8/"/>
+    </javadoc>
+  </target>
+
+  <!-- Generate javadoc with embedded UML diagrams using the yDoc doclet from
+       yWorks.com. Set ydoc.home in build.properties, then replace
+       ${ydoc.home}/resources/ydoc.license with a full license (free for open
+       source use). -->
+  <target name="javadoc-with-ydoc">
+    <mkdir dir="${javadoc.dir}" />
+    <!-- remove stray package.html files under classes to avoid 'multiple
+         sources of package comments' errors -->
+    <delete includeEmptyDirs="false" quiet="true">
+      <fileset dir="${classes.dir}" includes="**/package.html"/>
+    </delete>
+    <delete quiet="true" file="${javadoc.dir}/index.html"/>
+    <property name="ps" value="${path.separator}"/>
+    <javadoc sourcepath="${src.dir}:${testsrc.dir}"
+        classpathref="project.test.classpath"
+        destdir="${javadoc.dir}"
+        packagenames="org.olap4j.*,mondrian.olap4j.*"
+        overview="${src.dir}/overview.html"
+        footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=35302&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
+        author="true"
+        source="1.5"
+        access="package"
+        Windowtitle="olap4j, version ${version}"
+        additionalparam="-linksource"
+      >
+      <tag name="pre" description="Pre-condition:"
+           scope="constructors,methods"/>
+      <tag name="post" description="Post-condition:"
+           scope="constructors,methods"/>
+      <tag name="testcase" description="Test-case:"
+           scope="constructors,methods,types"/>
+      <link href="http://java.sun.com/javase/6/docs/api/"/>
+      <link href="http://mondrian.pentaho.org/api/"/>
+      <link href="http://www.junit.org/junit/javadoc/3.8/"/>
+      <doclet
+          name="ydoc.doclets.YStandard"
+          path="${ydoc.home}/lib/ydoc.jar${ps}${ydoc.home}/lib/class2svg.jar${ps}${ydoc.home}/resources${ps}${ydoc.home}/doc">
+        <param name="-author"/>
+        <param name="-generic"/>
+        <param name="-umlautogen"/>
+        <param name="-tag" value="y.precondition"/>
+        <param name="-tag" value="y.postcondition"/>
+        <param name="-tag" value="y.complexity"/>
+        <param name="-tag" value="param"/>
+        <param name="-tag" value="return"/>
+        <param name="-tag" value="see"/>
+        <param name="-tag" value="y.uml"/>
+      </doclet>
     </javadoc>
   </target>
 
@@ -320,18 +373,18 @@ META-INF/**"/>
         author="true"
         source="1.5"
         access="package"
+      >
+        <!--
         doclet="com.tarsec.javadoc.pdfdoclet.PDFDoclet"
         docletpath="lib/pdfdoclet-1.0.2-all.jar"
         additionalparam="-pdf doc/olap4j_api.pdf -config doc/pdfdoclet.properties"
-      >
-      <tag name="pre" description="Pre-condition:"
-           scope="constructors,methods"/>
-      <tag name="post" description="Post-condition:"
-           scope="constructors,methods"/>
-      <tag name="testcase" description="Test-case:"
-           scope="constructors,methods,types"/>
-      <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-      <link href="http://www.junit.org/junit/javadoc/3.8/"/>
+
+        -->
+      <doclet name="com.tarsec.javadoc.pdfdoclet.PDFDoclet"
+            path="lib/pdfdoclet-1.0.2-all.jar">
+          <param name="-pdf" value="doc/olap4j_api.pdf"/>
+          <param name="-config" value="doc/pdfdoclet.properties"/>
+      </doclet>
     </javadoc>
   </target>
 
