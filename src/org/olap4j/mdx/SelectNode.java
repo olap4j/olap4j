@@ -23,6 +23,7 @@ import java.io.PrintWriter;
  * @since Jun 4, 2007
  */
 public class SelectNode implements ParseTreeNode {
+    private final ParseRegion region;
     private final List<ParseTreeNode> withList;
     private final List<AxisNode> axisList;
     private final AxisNode slicerAxis;
@@ -39,12 +40,14 @@ public class SelectNode implements ParseTreeNode {
      * @param slicerAxis Slicer axis
      */
     public SelectNode(
+        ParseRegion region,
         List<ParseTreeNode> withList,
         List<AxisNode> axisList,
         IdentifierNode cubeName,
         AxisNode slicerAxis,
         List<IdentifierNode> cellPropertyList)
     {
+        this.region = region;
         this.withList = withList;
         this.axisList = axisList;
         this.cubeName = cubeName;
@@ -54,11 +57,16 @@ public class SelectNode implements ParseTreeNode {
 
     public SelectNode() {
         this(
+            null,
             new ArrayList<ParseTreeNode>(),
             new ArrayList<AxisNode>(),
             null,
             null,
             new ArrayList<IdentifierNode>());
+    }
+
+    public ParseRegion getRegion() {
+        return region;
     }
 
     public <T> T accept(ParseTreeVisitor<T> visitor) {

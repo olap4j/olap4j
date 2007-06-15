@@ -82,6 +82,8 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
      * uses the traditional JDBC {@link java.sql.DriverManager}.
      * See {@link mondrian.olap4j.MondrianOlap4jDriver} for more details.
      *
+     * @pre acceptsURL(url)
+     *
      * @param url Connect-string URL
      * @param info Additional properties
      * @throws SQLException if there is an error
@@ -93,7 +95,7 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
         throws SQLException
     {
         this.factory = factory;
-        if (!url.startsWith(CONNECT_STRING_PREFIX)) {
+        if (!acceptsURL(url)) {
             // This is not a URL we can handle.
             // DriverManager should not have invoked us.
             throw new AssertionError(
@@ -109,6 +111,10 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
         this.olap4jDatabaseMetaData =
             factory.newDatabaseMetaData(this);
         this.olap4jSchema = toOlap4j(connection.getSchema());
+    }
+
+    static boolean acceptsURL(String url) {
+        return url.startsWith(CONNECT_STRING_PREFIX);
     }
 
     public OlapStatement createStatement() {

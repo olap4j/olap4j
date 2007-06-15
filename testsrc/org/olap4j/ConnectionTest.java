@@ -840,7 +840,11 @@ public class ConnectionTest extends TestCase {
         }
 
         public static String getDefaultConnectString() {
+            if (false) {
                 return "jdbc:mondrian:Jdbc='jdbc:odbc:MondrianFoodMart';Catalog='../mondrian/demo/FoodMart.xml';JdbcDrivers=sun.jdbc.odbc.JdbcOdbcDriver;";
+            } else {
+                return "jdbc:mondrian:Jdbc=jdbc:oracle:thin:foodmart/foodmart@//marmalade.hydromatic.net:1521/XE;JdbcUser=foodmart;JdbcPassword=foodmart;Catalog=../mondrian/demo/FoodMart.xml;JdbcDrivers=oracle.jdbc.OracleDriver;";
+            }
         }
 
         public static final String DRIVER_CLASS_NAME = "mondrian.olap4j.MondrianOlap4jDriver";

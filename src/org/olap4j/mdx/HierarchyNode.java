@@ -22,14 +22,26 @@ import org.olap4j.type.HierarchyType;
  * @since Jun 4, 2007
  */
 public class HierarchyNode implements ParseTreeNode {
+    private final ParseRegion region;
     private final Hierarchy hierarchy;
 
-
-    public HierarchyNode(Hierarchy hierarchy) {
-        super();
+    public HierarchyNode(
+        ParseRegion region,
+        Hierarchy hierarchy)
+    {
+        this.region = region;
         this.hierarchy = hierarchy;
     }
 
+    public ParseRegion getRegion() {
+        return region;
+    }
+
+    /**
+     * Returns the Hierarchy used in this expression.
+     *
+     * @return hierarchy used in this expression
+     */
     public Hierarchy getHierarchy() {
         return hierarchy;
     }

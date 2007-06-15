@@ -22,14 +22,26 @@ import org.olap4j.type.DimensionType;
  * @since Jun 4, 2007
  */
 public class DimensionNode implements ParseTreeNode {
+    private final ParseRegion region;
     private final Dimension dimension;
 
-
-    public DimensionNode(Dimension dimension) {
-        super();
+    public DimensionNode(
+        ParseRegion region,
+        Dimension dimension)
+    {
+        this.region = region;
         this.dimension = dimension;
     }
 
+    public ParseRegion getRegion() {
+        return region;
+    }
+
+    /**
+     * Returns the Dimension used in this expression.
+     *
+     * @return dimension used in this expression
+     */
     public Dimension getDimension() {
         return dimension;
     }

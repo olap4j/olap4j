@@ -29,47 +29,38 @@ public class LiteralNode implements ParseTreeNode {
 
     private final Object value;
     private final Type type;
-
-    // Constants for commonly used literals.
-
-    public static final LiteralNode NULL_VALUE =
-        new LiteralNode(new NullType(), null);
-
-    public static final LiteralNode EMPTY_STRING =
-        new LiteralNode(new StringType(), "");
-
-    public static final LiteralNode INTEGER_ZERO =
-        new LiteralNode(new NumericType(), 0);
-
-    public static final LiteralNode INTEGER_ONE =
-        new LiteralNode(new NumericType(), 1);
-
-    public static final LiteralNode INTEGER_NEGATIVE_ONE =
-        new LiteralNode(new NumericType(), -1);
-
-    public static final LiteralNode DOUBLE_ZERO =
-        new LiteralNode(new NumericType(), 0.0);
-
-    public static final LiteralNode DOUBLE_ONE =
-        new LiteralNode(new NumericType(), 1.0);
-
-    public static final LiteralNode DOUBLE_NEGATIVE_ONE =
-        new LiteralNode(new NumericType(), -1.0);
+    private final ParseRegion region;
 
     /**
      * Private constructor.
      *
-     * <p>Use the creation methods {@link #createString(String)} etc.
+     * <p>Use the creation methods {@link #createString} etc.
      *
+     * @param region Region
      * @param type Type of this literal; must not be null
      * @param value Value of this literal, must be null only if this is the
      *   null literal
      */
-    private LiteralNode(Type type, Object value) {
+    private LiteralNode(
+        ParseRegion region,
+        Type type,
+        Object value)
+    {
         assert type != null;
         assert (type instanceof NullType) == (value == null);
+        this.region = region;
         this.type = type;
         this.value = value;
+    }
+
+    /**
+     * Creates a literal with the NULL value.
+     *
+     * @param region Region
+     * @return literal representing the NULL value
+     */
+    public static LiteralNode createNull(ParseRegion region) {
+        return new LiteralNode(region, new NullType(), null);
     }
 
     /**
@@ -77,12 +68,11 @@ public class LiteralNode implements ParseTreeNode {
      *
      * @see #createSymbol
      */
-    public static LiteralNode createString(String value) {
-        if (value.equals("")) {
-            return EMPTY_STRING;
-        } else {
-            return new LiteralNode(new StringType(), value);
-        }
+    public static LiteralNode createString(
+        ParseRegion region,
+        String value)
+    {
+        return new LiteralNode(region, new StringType(), value);
     }
 
     /**
@@ -90,8 +80,11 @@ public class LiteralNode implements ParseTreeNode {
      *
      * @see #createString
      */
-    public static LiteralNode createSymbol(String value) {
-        return new LiteralNode(new SymbolType(), value);
+    public static LiteralNode createSymbol(
+        ParseRegion region,
+        String value)
+    {
+        return new LiteralNode(region, new SymbolType(), value);
     }
 
     /**
@@ -99,18 +92,12 @@ public class LiteralNode implements ParseTreeNode {
      *
      * @param value Value of literal; must not be null
      */
-    public static LiteralNode create(Double value) {
+    public static LiteralNode create(
+        ParseRegion region,
+        Double value)
+    {
         assert value != null;
-        double dv = value; // unbox, so we compare by value not reference
-        if (dv == 0.0) {
-            return DOUBLE_ZERO;
-        } else if (dv == 1.0) {
-            return DOUBLE_ONE;
-        } else if (dv == -1.0) {
-            return DOUBLE_NEGATIVE_ONE;
-        } else {
-            return new LiteralNode(new NumericType(), value);
-        }
+        return new LiteralNode(region, new NumericType(), value);
     }
 
     /**
@@ -118,20 +105,13 @@ public class LiteralNode implements ParseTreeNode {
      *
      * @param value Value of literal; must not be null
      */
-    public static LiteralNode create(Integer value) {
+    public static LiteralNode create(
+        ParseRegion region,
+        Integer value)
+    {
         assert value != null;
-        switch (value) {
-        case -1:
-            return INTEGER_NEGATIVE_ONE;
-        case 0:
-            return INTEGER_ZERO;
-        case 1:
-            return INTEGER_ONE;
-        default:
-            return new LiteralNode(new NumericType(), value);
-        }
+        return new LiteralNode(region, new NumericType(), value);
     }
-
 
     public <T> T accept(ParseTreeVisitor<T> visitor) {
         return visitor.visit(this);
@@ -139,6 +119,10 @@ public class LiteralNode implements ParseTreeNode {
 
     public Type getType() {
         return type;
+    }
+
+    public ParseRegion getRegion() {
+        return region;
     }
 
     /**

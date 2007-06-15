@@ -22,14 +22,26 @@ import org.olap4j.metadata.Member;
  * @since Jun 4, 2007
  */
 public class MemberNode implements ParseTreeNode {
+    private final ParseRegion region;
     private final Member member;
 
-
-    public MemberNode(Member member) {
-        super();
+    public MemberNode(
+        ParseRegion region,
+        Member member)
+    {
+        this.region = region;
         this.member = member;
     }
 
+    public ParseRegion getRegion() {
+        return region;
+    }
+
+    /**
+     * Returns the Member used in this expression.
+     *
+     * @return member used in this expression
+     */
     public Member getMember() {
         return member;
     }

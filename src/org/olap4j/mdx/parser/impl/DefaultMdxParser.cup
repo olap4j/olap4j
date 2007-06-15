@@ -7,11 +7,6 @@
 // Copyright (C) 2002-2006 Julian Hyde and others.
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
-//
-// jhyde, 20 January, 1999
-//
-// Grammar condensed from OLE DB reference
-// (http://www.microsoft.com/data/reference/oledb2.htm) by jhyde on 990120.
 */
 
 import java_cup.runtime.*;
@@ -19,12 +14,12 @@ import java.util.*;
 import org.olap4j.OlapConnection;
 import org.olap4j.Axis;
 import org.olap4j.mdx.*;
+import org.olap4j.mdx.parser.MdxParseException;
 
 // Preliminaries to set up and use the scanner.
-// action code {: ... :};
 parser code {:
     // Generated from $Id$
-    private Scanner scanner;
+    Scanner scanner;
     private String queryString;
     private OlapConnection mdxConnection;
     private DefaultMdxParserImpl.FunTable funTable;
@@ -138,8 +133,8 @@ parser code {:
             return parent.next_token();
         }
 
-        void getLocation(Symbol symbol, int[] loc) {
-            parent.getLocation(symbol, loc);
+        ParseRegion createRegion(int left, int right) {
+            return parent.createRegion(left, right);
         }
     }
 
@@ -148,6 +143,7 @@ parser code {:
      * Override this function to make your kind of query.
      */
     protected SelectNode newSelect(
+        ParseRegion region,
         List<ParseTreeNode> withList,
         List<AxisNode> axisList,
         IdentifierNode cubeName,
@@ -158,7 +154,8 @@ parser code {:
             slicer == null ?
                 null :
                 new AxisNode(
-                    false, slicer, Axis.SLICER, Collections.EMPTY_LIST);
+                    slicer.getRegion(), false, slicer, Axis.SLICER,
+                    Collections.EMPTY_LIST);
         // sort axes by ordinal
         Collections.sort(axisList, new Comparator<AxisNode>() {
             public int compare(AxisNode o1, AxisNode o2) {
@@ -166,7 +163,7 @@ parser code {:
             }
         });
         return new SelectNode(
-            withList, axisList, cubeName, slicerAxis, cellProps);
+            region, withList, axisList, cubeName, slicerAxis, cellProps);
     }
 
     // Override lr_parser methods for NLS.  With this error handling scheme,
@@ -198,11 +195,11 @@ parser code {:
     {
         String s = cur_token.value.toString();
         if (cur_token.left != -1) {
-            int loc[] = new int[2];
-            scanner.getLocation(cur_token, loc);
-            throw new RuntimeException(
-                "Syntax error at line " + Integer.toString(loc[0] + 1) +
-                ", column " + Integer.toString(loc[1] + 1) +
+            final ParseRegion region =
+                scanner.createRegion(cur_token.left, cur_token.right);
+            throw new MdxParseException(
+                region,
+                "Syntax error at " + region +
                 ", token '" + s + "'");
         } else {
             throw new RuntimeException(
@@ -226,6 +223,34 @@ parser code {:
     protected boolean isFunCall(String s) {
        return funTable.isProperty(s);
     }
+:};
+
+action code {:
+    ParseRegion createRegion(final int... ordinals) {
+        assert ordinals.length % 2 == 0;
+        return ParseRegion.sum(
+            new Iterable<ParseRegion>() {
+                public Iterator<ParseRegion> iterator() {
+                    return new Iterator<ParseRegion>() {
+                        int i = 0;
+                        public boolean hasNext() {
+                            return i < ordinals.length;
+                        }
+
+                        public ParseRegion next() {
+                            return parser.scanner.createRegion(
+                                ordinals[i++], ordinals[i++]);
+                        }
+
+                        public void remove() {
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+            }
+        );
+    }
+
 
     static <T> List<T> emptyList(List<T> list) {
         if (list == null) {
@@ -234,9 +259,11 @@ parser code {:
         return list;
     }
 :};
+
 init with {:
     scanner.init();
 :};
+
 scan with {:
     return scanner.next_token();
 :};
@@ -391,22 +418,26 @@ start with statement;
 
 quoted_identifier ::=
         QUOTED_ID:i  {:
-            RESULT = new IdentifierNode.Segment(i, IdentifierNode.Quoting.QUOTED);
+            ParseRegion region = createRegion(ileft, iright);
+            RESULT = new IdentifierNode.Segment(region, i, IdentifierNode.Quoting.QUOTED);
         :}
     ;
 
 amp_quoted_identifier ::=
         AMP_QUOTED_ID:i {:
-            RESULT = new IdentifierNode.Segment(i, IdentifierNode.Quoting.KEY);
+            ParseRegion region = createRegion(ileft, iright);
+            RESULT = new IdentifierNode.Segment(region, i, IdentifierNode.Quoting.KEY);
         :}
     ;
 
 unquoted_identifier ::=
         ID:i {:
-            RESULT = new IdentifierNode.Segment(i, IdentifierNode.Quoting.UNQUOTED);
+            ParseRegion region = createRegion(ileft, iright);
+            RESULT = new IdentifierNode.Segment(region, i, IdentifierNode.Quoting.UNQUOTED);
         :}
     |   keyword:i {:
-            RESULT = new IdentifierNode.Segment(i, IdentifierNode.Quoting.UNQUOTED);
+            ParseRegion region = createRegion(ileft, iright);
+            RESULT = new IdentifierNode.Segment(region, i, IdentifierNode.Quoting.UNQUOTED);
         :}
     ;
 
@@ -639,76 +670,91 @@ cube_name ::= compound_id ;
 value_expression ::=
         term5
     |   value_expression:x OR term5:y {:
-            RESULT = new CallNode("OR", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, "OR", Syntax.Infix, x, y);
         :}
     |   value_expression:x XOR term5:y {:
-            RESULT = new CallNode("XOR", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, "XOR", Syntax.Infix, x, y);
         :}
     ;
 
 term5 ::=
         term4
     |   term5:x AND term4:y {:
-            RESULT = new CallNode("AND", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, "AND", Syntax.Infix, x, y);
         :}
     ;
 
 term4 ::=
         term3
-    |   NOT term4:p {:
-            RESULT = new CallNode("NOT", Syntax.Prefix, p);
+    |   NOT:not term4:p {:
+            ParseRegion region = createRegion(notleft, pright);
+            RESULT = new CallNode(region, "NOT", Syntax.Prefix, p);
         :}
     ;
 
 term3 ::=
         term2
     |   term3:x comp_op:op term2:y {: // e.g. "1 < 5"
-            RESULT = new CallNode(op, Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, op, Syntax.Infix, x, y);
         :}
     |
         // We expect a shift-reduce conflict here, because NULL is a literal and
         // so is a valid argument to the IS operator. JavaCUP resolves the
         // conflict by shifting, which is what we want. Compile with expect=61
         // to ignore the conflicts and continue.
-        term3:x IS NULL {:
-            RESULT = new CallNode("IS NULL", Syntax.Postfix, x);
+        term3:x IS NULL:n {:
+            ParseRegion region = createRegion(xleft, nright);
+            RESULT = new CallNode(region, "IS NULL", Syntax.Postfix, x);
         :}
     |   term3:x IS term2:y {: // e.g. "x IS y"; but "x IS NULL" is handled elsewhere
-            RESULT = new CallNode("IS", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, "IS", Syntax.Infix, x, y);
         :}
-    |   term3:x IS EMPTY {:
-            RESULT = new CallNode("IS EMPTY", Syntax.Postfix, x);
+    |   term3:x IS EMPTY:empty {:
+            ParseRegion region = createRegion(xleft, emptyright);
+            RESULT = new CallNode(region, "IS EMPTY", Syntax.Postfix, x);
         :}
     |   term3:x MATCHES term2:y {:
-            RESULT = new CallNode("MATCHES", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, "MATCHES", Syntax.Infix, x, y);
         :}
     |   term3:x NOT MATCHES term2:y {:
+            ParseRegion region = createRegion(xleft, yright);
             RESULT =
                 new CallNode(
-                    "NOT", Syntax.Prefix,
-                    new CallNode("MATCHES", Syntax.Infix, x, y));
+                    region, "NOT", Syntax.Prefix,
+                    new CallNode(region, "MATCHES", Syntax.Infix, x, y));
         :}
     |   term3:x IN term2:y {:
-            RESULT = new CallNode("IN", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, "IN", Syntax.Infix, x, y);
         :}
     |   term3:x NOT IN term2:y {:
+            ParseRegion region = createRegion(xleft, yright);
             RESULT =
                 new CallNode(
-                    "NOT", Syntax.Prefix,
-                    new CallNode("IN", Syntax.Infix, x, y));
+                    region, "NOT", Syntax.Prefix,
+                    new CallNode(region, "IN", Syntax.Infix, x, y));
         :}
     ;
 
 term2 ::=
         term
     |   term2:x PLUS term:y {:
-            RESULT = new CallNode("+", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, "+", Syntax.Infix, x, y);
         :}
     |   term2:x MINUS term:y {:
-            RESULT = new CallNode("-", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, "-", Syntax.Infix, x, y);
         :}
     |   term2:x CONCAT term:y {:
-            RESULT = new CallNode("||", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, "||", Syntax.Infix, x, y);
         :}
     ;
 
@@ -717,10 +763,12 @@ term2 ::=
 term ::=
         factor
     |   term:x ASTERISK factor:y {:
-            RESULT = new CallNode("*", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, "*", Syntax.Infix, x, y);
         :}
     |   term:x SOLIDUS factor:y {:
-            RESULT = new CallNode("/", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, "/", Syntax.Infix, x, y);
         :}
     ;
 //
@@ -731,8 +779,9 @@ factor ::=
     |   PLUS value_expression_primary:p {:
             RESULT = p;
         :}
-    |   MINUS value_expression_primary:p {:
-            RESULT = new CallNode("-", Syntax.Prefix, p);
+    |   MINUS:minus value_expression_primary:p {:
+            ParseRegion region = createRegion(minusleft, pright);
+            RESULT = new CallNode(region, "-", Syntax.Prefix, p);
         :}
     ;
 
@@ -761,10 +810,12 @@ factor ::=
 //                             |  <conditional_expression>
 value_expression_primary ::=
         STRING:s {:
-            RESULT = LiteralNode.createString(s);
+            ParseRegion region = createRegion(sleft, sright);
+            RESULT = LiteralNode.createString(region, s);
         :}
     |   NUMBER:d {:
-            RESULT = LiteralNode.create(d);
+            ParseRegion region = createRegion(dleft, dright);
+            RESULT = LiteralNode.create(region, d);
         :}
     |   identifier:i {:
             RESULT = new IdentifierNode(i);
@@ -773,14 +824,16 @@ value_expression_primary ::=
             if (i instanceof IdentifierNode && !parser.isFunCall(j.name)) {
                 RESULT = ((IdentifierNode) i).append(j);
             } else {
-                RESULT = new CallNode(j.name, Syntax.Property, i);
+                ParseRegion region = createRegion(ileft, jright);
+                RESULT = new CallNode(region, j.name, Syntax.Property, i);
             }
         :}
     |   value_expression_primary:i DOT quoted_identifier:j {:
             if (i instanceof IdentifierNode) {
                 RESULT = ((IdentifierNode) i).append(j);
             } else {
-                RESULT = new CallNode(
+                ParseRegion region = createRegion(ileft, jright);
+                RESULT = new CallNode(region,
                     j.name, Syntax.QuotedProperty, i);
             }
         :}
@@ -788,37 +841,44 @@ value_expression_primary ::=
             if (i instanceof IdentifierNode) {
                 RESULT = ((IdentifierNode) i).append(j);
             } else {
-                RESULT = new CallNode(
+                ParseRegion region = createRegion(ileft, jright);
+                RESULT = new CallNode(region,
                     j.name, Syntax.AmpersandQuotedProperty, i);
             }
         :}
-    |   value_expression_primary:i DOT identifier:j LPAREN exp_list_opt:lis RPAREN {:
+    |   value_expression_primary:i DOT identifier:j LPAREN exp_list_opt:lis RPAREN:rparen {:
             lis.add(0, i);
-            RESULT = new CallNode(j.name, Syntax.Method, lis);
+            ParseRegion region = createRegion(ileft, rparenright);
+            RESULT = new CallNode(region, j.name, Syntax.Method, lis);
         :}
-    |   identifier:i LPAREN exp_list_opt:lis RPAREN {:
-            RESULT = new CallNode(i.name, Syntax.Function, lis);
+    |   identifier:i LPAREN exp_list_opt:lis RPAREN:rparen {:
+            ParseRegion region = createRegion(ileft, rparenright);
+            RESULT = new CallNode(region, i.name, Syntax.Function, lis);
         :}
-    |   CAST LPAREN expression:e AS identifier:t RPAREN {:
-            RESULT = new CallNode(
-                "CAST", Syntax.Cast, e, LiteralNode.createSymbol(t.name));
+    |   CAST:cast LPAREN expression:e AS identifier:t RPAREN:rparen {:
+            LiteralNode symbol = LiteralNode.createSymbol(t.getRegion(), t.name);
+            ParseRegion region = createRegion(castleft, rparenright);
+            RESULT = new CallNode(region, "CAST", Syntax.Cast, e, symbol);
         :}
-    |   LPAREN exp_list:lis RPAREN {:
+    |   LPAREN:lparen exp_list:lis RPAREN:rparen {:
             // Whereas ([Sales],[Time]) and () are tuples, ([Sales]) and (5)
             // are just expressions.
-            RESULT = new CallNode("()", Syntax.Parentheses, lis);
+            ParseRegion region = createRegion(lparenleft, rparenright);
+            RESULT = new CallNode(region, "()", Syntax.Parentheses, lis);
         :}
-    |   LBRACE exp_list_opt:lis RBRACE {: // set built from sets/tuples
-            RESULT = new CallNode("{}", Syntax.Braces, lis);
+    |   LBRACE:lbrace exp_list_opt:lis RBRACE:rbrace {: // set built from sets/tuples
+            ParseRegion region = createRegion(lbraceleft, rbraceright);
+            RESULT = new CallNode(region, "{}", Syntax.Braces, lis);
         :}
-    |  NULL {:
-            RESULT = LiteralNode.NULL_VALUE;
+    |  NULL:n {:
+            ParseRegion region = createRegion(nleft, nright);
+            RESULT = LiteralNode.createNull(region);
         :}
     |   case_expression
     ;
 
 case_expression ::=
-        CASE value_expression_opt:x
+        CASE:kase value_expression_opt:x
         when_list:y
         else_clause_opt:z
         END {:
@@ -835,10 +895,11 @@ case_expression ::=
             if (z != null) {
                 v.add(z);
             }
+            ParseRegion region = createRegion(kaseleft, zright);
             if (x == null) {
-                RESULT = new CallNode("_CaseTest", Syntax.Case, v);
+                RESULT = new CallNode(region, "_CaseTest", Syntax.Case, v);
             } else {
-                RESULT = new CallNode("_CaseMatch", Syntax.Case, v);
+                RESULT = new CallNode(region, "_CaseMatch", Syntax.Case, v);
             }
         :}
     ;
@@ -1120,7 +1181,8 @@ comp_op ::=
 //                                              [, <member>]]])
 expression ::=
         expression:x COLON value_expression:y {: // range yields set
-            RESULT = new CallNode(":", Syntax.Infix, x, y);
+            ParseRegion region = createRegion(xleft, yright);
+            RESULT = new CallNode(region, ":", Syntax.Infix, x, y);
         :}
     |   value_expression
     ;
@@ -1200,12 +1262,12 @@ statement ::=
 
 select_statement ::=
         with_formula_specification_opt:f
-        SELECT axis_specification_list_opt:a
+        SELECT:select axis_specification_list_opt:a
         FROM cube_specification:c
         where_clause_opt:w
         cell_props_opt:cp {:
-            DefaultMdxParser parser = (DefaultMdxParser) CUP$DefaultMdxParser$parser;
-            RESULT = parser.newSelect(f, a, c, w, cp);
+            ParseRegion region = createRegion(selectleft, selectright);
+            RESULT = parser.newSelect(region, f, a, c, w, cp);
         :};
 
 with_formula_specification_opt ::=
@@ -1267,17 +1329,16 @@ single_formula_specification ::=
 //                                 [, <solve_order_specification>]
 //                                 [, <member_property_definition>...]
 member_specification ::=
-        MEMBER member_name:m AS FORMULA_STRING:s
+        MEMBER:member member_name:m AS FORMULA_STRING:s
         comma_member_property_def_list_opt:l {:
             ParseTreeNode e = parser.recursivelyParseExp(s);
-            RESULT = new WithMemberNode(
-                m,
-                e,
-                l);
+            ParseRegion region = createRegion(memberleft, sright);
+            RESULT = new WithMemberNode(region, m, e, l);
         :}
-    |   MEMBER member_name:m AS value_expression:e
+    |   MEMBER:member member_name:m AS value_expression:e
         comma_member_property_def_list_opt:l {:
-            RESULT = new WithMemberNode(m, e, l);
+            ParseRegion region = createRegion(memberleft, eright);
+            RESULT = new WithMemberNode(region, m, e, l);
         :}
     ;
 comma_member_property_def_list_opt ::=
@@ -1320,7 +1381,8 @@ member_name ::= compound_id;
 // <member_property_definition> ::= <identifier> = <value_expression>
 member_property_definition ::=
         identifier:id EQ value_expression:e {:
-            RESULT = new PropertyValueNode(id.name, e);
+            ParseRegion region = createRegion(idleft, eright);
+            RESULT = new PropertyValueNode(region, id.name, e);
         :}
     ;
 //
@@ -1331,12 +1393,14 @@ member_property_definition ::=
 //
 // <set_specification> ::= SET <set_name> AS <set>
 set_specification ::=
-        SET set_name:n AS FORMULA_STRING:s {:
+        SET:set set_name:n AS FORMULA_STRING:s {:
             ParseTreeNode e = parser.recursivelyParseExp(s);
-            RESULT = new WithSetNode(n, e);
+            ParseRegion region = createRegion(setleft, sright);
+            RESULT = new WithSetNode(region, n, e);
         :}
-    |   SET set_name:n AS expression:e {:
-            RESULT = new WithSetNode(n, e);
+    |   SET:set set_name:n AS expression:e {:
+            ParseRegion region = createRegion(setleft, eright);
+            RESULT = new WithSetNode(region, n, e);
         :}
     ;
 //
@@ -1352,7 +1416,9 @@ set_name ::= compound_id ;
 axis_specification ::=
         non_empty_opt:b expression:s dim_props_opt:dp ON axis_name:a {:
             Axis axis = Axis.valueOf(a.toUpperCase());
-            RESULT = new AxisNode(b.booleanValue(), s, axis, DefaultMdxParser.emptyList(dp));
+            ParseRegion region = createRegion(
+                bleft, bright, sleft, sright, dpleft, dpright, aleft, aright);
+            RESULT = new AxisNode(region, b, s, axis, emptyList(dp));
         :}
     |   non_empty_opt:b expression:s dim_props_opt:dp ON axis_number:n {:
             double d = n.doubleValue();
@@ -1361,13 +1427,17 @@ axis_specification ::=
             // Legal axis ordinals run from 0 (COLUMS) to 4 (SECTIONS),
             // inclusive.
             if (index < 0 || index != d || index > Axis.MAX_ORDINAL) {
-                throw new RuntimeException(
-                    "Invalid axis specification. The axis number must be an integer between 0 and " + Axis.MAX_ORDINAL +
-                    ", but it was " + d + ".");
+                System.out.println("nleft=" + nleft + ", nright=" + nright);
+                throw new MdxParseException(
+                    createRegion(nleft, nright),
+                    "Invalid axis specification. The axis number must be an integer between 0 and " +
+                    Axis.MAX_ORDINAL + ", but it was " + d + ".");
             }
 
             Axis axis = Axis.forOrdinal(index);
-            RESULT = new AxisNode(b.booleanValue(), s, axis, DefaultMdxParser.emptyList(dp));
+            ParseRegion region = createRegion(
+                bleft, bright, sleft, sright, dpleft, dpright, nleft, nright);
+            RESULT = new AxisNode(region, b, s, axis, emptyList(dp));
         :}
     ;
 

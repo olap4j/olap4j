@@ -22,6 +22,7 @@ import java.io.PrintWriter;
  */
 public class WithSetNode implements ParseTreeNode {
 
+    private final ParseRegion region;
     /** name of set */
     private final IdentifierNode name;
 
@@ -29,11 +30,24 @@ public class WithSetNode implements ParseTreeNode {
     private ParseTreeNode expression;
 
     /**
-     * Constructs formula specifying a set.
+     * Creates a declaration of a named set.
+     *
+     * @param region Region of source code
+     * @param name Name of set
+     * @param expression Expression to calculate set
      */
-    public WithSetNode(IdentifierNode name, ParseTreeNode expression) {
+    public WithSetNode(
+        ParseRegion region,
+        IdentifierNode name,
+        ParseTreeNode expression)
+    {
+        this.region = region;
         this.name = name;
         this.expression = expression;
+    }
+
+    public ParseRegion getRegion() {
+        return region;
     }
 
     public void unparse(ParseTreeWriter writer) {
@@ -45,12 +59,31 @@ public class WithSetNode implements ParseTreeNode {
         pw.print("'");
     }
 
+    /**
+     * Returns the name of the set.
+     *
+     * @return name of the set
+     */
     public IdentifierNode getIdentifier() {
         return name;
     }
 
+    /**
+     * Returns the expression which calculates the set.
+     *
+     * @return expression which calculates the set
+     */
     public ParseTreeNode getExpression() {
         return expression;
+    }
+
+    /**
+     * Sets the expression which calculates the set.
+     *
+     * @param expression expression which calculates the set
+     */
+    public void setExpression(ParseTreeNode expression) {
+        this.expression = expression;
     }
 
     public <T> T accept(ParseTreeVisitor<T> visitor) {
@@ -65,9 +98,6 @@ public class WithSetNode implements ParseTreeNode {
         throw new UnsupportedOperationException();
     }
 
-    public void setExpression(ParseTreeNode expression) {
-        this.expression = expression;
-    }
 }
 
 // End WithSetNode.java

@@ -54,7 +54,29 @@ public interface ParseTreeNode {
      */
     Type getType();
 
+    /**
+     * Converts this node into MDX text.
+     *
+     * @param writer Parse tree writer
+     */
     void unparse(ParseTreeWriter writer);
+
+    /**
+     * Returns the region of the source code which this node was created from,
+     * if it was created by parsing.
+     *
+     * <p>A non-leaf node's region will encompass the regions of all of its
+     * children. For example, a the region of a function call node
+     * <code>Crossjoin([Gender], {[Store].[USA]})</code> stretches from
+     * the first character of the function name to the closing parenthesis.
+     *
+     * <p>Region may be null, if the node was created programmatically, not
+     * from a piece of source code.
+     *
+     * @return Region of the source code this node was created from, if it was
+     * created by parsing
+     */
+    ParseRegion getRegion();
 }
 
 // End ParseTreeNode.java

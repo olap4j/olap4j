@@ -212,9 +212,7 @@ public class OlapTest {
 
     }
 
-}
-
-class Olap4jXml {
+static class Olap4jXml {
 
     public static Document newDocument() {
         DocumentBuilderFactory dbf;
@@ -579,6 +577,7 @@ class Olap4jXml {
         }
         return null;
     }
+}
 }
 
 // End OlapTest.java

@@ -23,6 +23,8 @@ import java.io.PrintWriter;
  */
 public class WithMemberNode implements ParseTreeNode {
 
+    private final ParseRegion region;
+
     /** name of set or member */
     private final IdentifierNode name;
 
@@ -36,15 +38,20 @@ public class WithMemberNode implements ParseTreeNode {
      * Constructs a formula specifying a member.
      */
     public WithMemberNode(
+        ParseRegion region,
         IdentifierNode name,
         ParseTreeNode exp,
         List<PropertyValueNode> memberPropertyList)
     {
+        this.region = region;
         this.name = name;
         this.expression = exp;
         this.memberPropertyList = memberPropertyList;
     }
 
+    public ParseRegion getRegion() {
+        return region;
+    }
 
     public void unparse(ParseTreeWriter writer) {
         PrintWriter pw = writer.getPrintWriter();
@@ -71,8 +78,22 @@ public class WithMemberNode implements ParseTreeNode {
         return name;
     }
 
+    /**
+     * Returns the expression to evaluate to calculate the member.
+     *
+     * @return expression
+     */
     public ParseTreeNode getExpression() {
         return expression;
+    }
+
+    /**
+     * Sets the expression to evaluate to calculate the member.
+     *
+     * @param expression Expression
+     */
+    public void setExpression(ParseTreeNode expression) {
+        this.expression = expression;
     }
 
 
@@ -88,10 +109,14 @@ public class WithMemberNode implements ParseTreeNode {
         throw new UnsupportedOperationException();
     }
 
-    public void setExpression(ParseTreeNode expression) {
-        this.expression = expression;
-    }
-
+    /**
+     * Returns the list of properties of this member.
+     *
+     * <p>The list may be empty, but is never null.
+     * Each entry is a (name, expression) pair.
+     *
+     * @return list of properties
+     */
     public List<PropertyValueNode> getMemberPropertyList() {
         return memberPropertyList;
     }

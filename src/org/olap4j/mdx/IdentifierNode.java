@@ -11,13 +11,12 @@ package org.olap4j.mdx;
 
 import org.olap4j.type.Type;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.io.PrintWriter;
+import java.util.*;
 
 /**
  * Multi-part identifier.
+ *
+ * <p>An identifier is immutable.
  *
  * @version $Id$
  * @author jhyde
@@ -34,12 +33,21 @@ public class IdentifierNode
      * style
      */
     public IdentifierNode(IdentifierNode.Segment... segments) {
-        assert segments.length >= 1;
-        this.segments = new ArrayList<Segment>(Arrays.asList(segments));
+        this(Arrays.asList(segments));
     }
 
+    /**
+     * Creates an identifier containing a list of segments.
+     *
+     * @param segments List of segments
+     */
     private IdentifierNode(List<IdentifierNode.Segment> segments) {
-        this.segments = segments;
+        if (segments.size() < 1) {
+            throw new IllegalArgumentException();
+        }
+        this.segments =
+            Collections.unmodifiableList(
+                new ArrayList<Segment>(segments));
     }
 
     public Type getType() {
@@ -47,8 +55,37 @@ public class IdentifierNode
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Returns the list of segments which consistitute this identifier.
+     *
+     * @return list of constituent segments
+     */
     public List<Segment> getSegmentList() {
         return segments;
+    }
+
+    public ParseRegion getRegion() {
+        // Region is the span from the first segment to the last.
+        return ParseRegion.sum(
+            new Iterable<ParseRegion>() {
+                public Iterator<ParseRegion> iterator() {
+                    final Iterator<Segment> segmentIter = segments.iterator();
+                    return new Iterator<ParseRegion>() {
+                        public boolean hasNext() {
+                            return segmentIter.hasNext();
+                        }
+
+                        public ParseRegion next() {
+                            return segmentIter.next().region;
+                        }
+
+                        public void remove() {
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+            }
+        );
     }
 
     /**
@@ -70,24 +107,33 @@ public class IdentifierNode
     }
 
     public void unparse(ParseTreeWriter writer) {
-        PrintWriter pw = writer.getPrintWriter();
+        writer.getPrintWriter().print(toString());
+    }
+
+    public String toString() {
+        final StringBuilder buf = new StringBuilder();
         int k = 0;
         for (IdentifierNode.Segment s : segments) {
             if (k++ > 0) {
-                pw.print(".");
+                buf.append('.');
             }
             switch (s.quoting) {
             case UNQUOTED:
-                pw.print(s.name);
+                buf.append(s.name);
                 break;
             case KEY:
-                pw.print("&[" + MdxUtil.mdxEncodeString(s.name) + "]");
+                buf.append("&[");
+                buf.append(MdxUtil.mdxEncodeString(s.name));
+                buf.append("]");
                 break;
             case QUOTED:
-                pw.print("[" + MdxUtil.mdxEncodeString(s.name) + "]");
+                buf.append("[");
+                buf.append(MdxUtil.mdxEncodeString(s.name));
+                buf.append("]");
                 break;
             }
         }
+        return buf.toString();
     }
 
     /**
@@ -105,14 +151,20 @@ public class IdentifierNode
     public static class Segment {
         public final String name;
         public final IdentifierNode.Quoting quoting;
+        private final ParseRegion region;
 
         /**
-         * Creates a segment with the given quoting.
+         * Creates a segment with the given quoting and region.
          *
          * @param name Name
          * @param quoting Quoting style
          */
-        public Segment(String name, IdentifierNode.Quoting quoting) {
+        public Segment(
+            ParseRegion region,
+            String name,
+            IdentifierNode.Quoting quoting)
+        {
+            this.region = region;
             this.name = name;
             this.quoting = quoting;
         }
@@ -123,7 +175,15 @@ public class IdentifierNode
          * @param name Name of segment
          */
         public Segment(String name) {
-            this(name, Quoting.QUOTED);
+            this(null, name, Quoting.QUOTED);
+        }
+
+        /**
+         * Returns the region of the source code which this Segment was created
+         * from, if it was created by parsing.
+         */
+        public ParseRegion getRegion() {
+            return region;
         }
     }
 

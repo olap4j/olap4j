@@ -10,6 +10,8 @@
 package org.olap4j.mdx.parser.impl;
 
 import org.apache.log4j.Logger;
+import org.olap4j.mdx.ParseRegion;
+import org.olap4j.mdx.parser.MdxParseException;
 
 import java.math.BigDecimal;
 import java.io.IOException;
@@ -43,7 +45,7 @@ class Scanner {
     protected boolean debug;
 
     /** lines[x] is the start of the x'th line */
-    private List<Integer> lines;
+    private final List<Integer> lines = new ArrayList<Integer>();
 
     /** number of times advance() has been called */
     private int iChar;
@@ -187,30 +189,9 @@ class Scanner {
         throws java.io.IOException {
 
         initReswords();
-        lines = new ArrayList<Integer>();
+        lines.clear();
         iChar = iPrevChar = 0;
         advance();
-    }
-
-    /**
-     * Deduces the line and column (0-based) of a symbol.
-     */
-    void getLocation(Symbol symbol, int[] loc) {
-        int iTarget = symbol.left;
-        int iLine = -1;
-        int iLineEnd = 0;
-        int iLineStart;
-        do {
-            iLine++;
-            iLineStart = iLineEnd;
-            iLineEnd = Integer.MAX_VALUE;
-            if (iLine < lines.size()) {
-                iLineEnd = lines.get(iLine);
-            }
-        } while (iLineEnd < iTarget);
-
-        loc[0] = iLine; // line
-        loc[1] = iTarget - iLineStart; // column
     }
 
     private Symbol trace(Symbol s) {
@@ -779,15 +760,15 @@ class Scanner {
 
             default:
                 // If it's whitespace, skip over it.
-                // (When we switch to JDK 1.5, use Character.isWhitespace(int);
-                // til then, there's just Character.isWhitespace(char).)
                 if (nextChar <= Character.MAX_VALUE &&
-                        Character.isWhitespace((char) nextChar)) {
+                    Character.isWhitespace(nextChar))
+                {
                     // fall through
                 } else {
                     // everything else is an error
-                    throw new RuntimeException(
-                            "Unexpected character '" + (char) nextChar + "'");
+                    throw new MdxParseException(
+                        createRegion(iPrevChar, iChar),
+                        "Unexpected character '" + (char) nextChar + "'");
                 }
 
             case ' ':
@@ -800,6 +781,51 @@ class Scanner {
                 break;
             }
         }
+    }
+
+    /**
+     * Creates a region from a start and end point.
+     * Called by {@link DefaultMdxParser#syntax_error}.
+     */
+    ParseRegion createRegion(final int left, final int right) {
+        int target = left;
+        int line = -1;
+        int lineEnd = 0;
+        int lineStart;
+        do {
+            line++;
+            lineStart = lineEnd;
+            lineEnd = Integer.MAX_VALUE;
+            if (line < lines.size()) {
+                lineEnd = lines.get(line);
+            }
+        } while (lineEnd < target);
+
+        int startLine = line;
+        int startColumn = target - lineStart;
+
+        if (right == left) {
+            return new ParseRegion(startLine + 1, startColumn + 1);
+        }
+
+        target = right - 1;
+        if (target > left) --target; // don't know why
+        line = -1;
+        lineEnd = 0;
+        do {
+            line++;
+            lineStart = lineEnd;
+            lineEnd = Integer.MAX_VALUE;
+            if (line < lines.size()) {
+                lineEnd = lines.get(line);
+            }
+        } while (lineEnd < target);
+
+        int endLine = line;
+        int endColumn = target - lineStart;
+
+        return new ParseRegion(
+            startLine + 1, startColumn + 1, endLine + 1, endColumn + 1);
     }
 
     private enum State {

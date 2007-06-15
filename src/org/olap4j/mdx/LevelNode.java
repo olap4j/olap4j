@@ -22,14 +22,26 @@ import org.olap4j.type.LevelType;
  * @since Jun 4, 2007
  */
 public class LevelNode implements ParseTreeNode {
+    private final ParseRegion region;
     private final Level level;
 
-
-    public LevelNode(Level level) {
-        super();
+    public LevelNode(
+        ParseRegion region,
+        Level level)
+    {
+        this.region = region;
         this.level = level;
     }
 
+    public ParseRegion getRegion() {
+        return region;
+    }
+
+    /**
+     * Returns the Level used in this expression.
+     *
+     * @return level used in this expression
+     */
     public Level getLevel() {
         return level;
     }

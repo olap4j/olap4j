@@ -172,7 +172,8 @@ class MdxValidator implements ParseTreeVisitor<ParseTreeNode> {
             final IdentifierNode.Segment s = identifier.getSegmentList().get(0);
             if (s.quoting == IdentifierNode.Quoting.UNQUOTED &&
                 isReserved(s.name)) {
-                return LiteralNode.createSymbol(s.name.toUpperCase());
+                return LiteralNode.createSymbol(
+                    s.getRegion(), s.name.toUpperCase());
             }
         }
         final ParseTreeNode element =

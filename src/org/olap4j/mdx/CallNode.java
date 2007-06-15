@@ -40,6 +40,7 @@ public class CallNode implements ParseTreeNode {
     private final String name;
     private final Syntax syntax;
     private final List<ParseTreeNode> argList;
+    private final ParseRegion region;
 
     /**
      * Creates an CallNode.
@@ -55,10 +56,12 @@ public class CallNode implements ParseTreeNode {
      * @param args List of zero or more arguments
      */
     public CallNode(
+        ParseRegion region,
         String name,
         Syntax syntax,
         List<ParseTreeNode> args)
     {
+        this.region = region;
         assert name != null;
         assert syntax != null;
         assert args != null;
@@ -99,11 +102,16 @@ public class CallNode implements ParseTreeNode {
      * @param args List of zero or more arguments
      */
     public CallNode(
+        ParseRegion region,
         String name,
         Syntax syntax,
         ParseTreeNode... args)
     {
-        this(name, syntax, Arrays.asList(args));
+        this(region, name, syntax, Arrays.asList(args));
+    }
+
+    public ParseRegion getRegion() {
+        return region;
     }
 
     public Type getType() {

@@ -32,6 +32,7 @@ public class ParameterNode implements ParseTreeNode {
     private String name;
     private Type type;
     private ParseTreeNode defaultValueExpression;
+    private final ParseRegion region;
 
     /**
      * Creates a ParameterNode.
@@ -46,6 +47,7 @@ public class ParameterNode implements ParseTreeNode {
      * of the parameter
      */
     public ParameterNode(
+        ParseRegion region,
         String name,
         Type type,
         ParseTreeNode defaultValueExpression)
@@ -53,9 +55,14 @@ public class ParameterNode implements ParseTreeNode {
         assert name != null;
         assert type != null;
         assert defaultValueExpression != null;
+        this.region = region;
         this.name = name;
         this.type = type;
         this.defaultValueExpression = defaultValueExpression;
+    }
+
+    public ParseRegion getRegion() {
+        return region;
     }
 
     public <T> T accept(ParseTreeVisitor<T> visitor) {

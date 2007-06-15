@@ -26,12 +26,28 @@ import org.olap4j.type.Type;
  */
 public class PropertyValueNode implements ParseTreeNode {
 
+    private final ParseRegion region;
     private final String name;
     private ParseTreeNode expression;
 
-    public PropertyValueNode(String name, ParseTreeNode exp) {
+    /**
+     * Creates a PropertyValueNode.
+     *
+     * @param name Name of property
+     * @param expression Expression for value of property (often a literal)
+     */
+    public PropertyValueNode(
+        ParseRegion region,
+        String name,
+        ParseTreeNode expression)
+    {
+        this.region = region;
         this.name = name;
-        this.expression = exp;
+        this.expression = expression;
+    }
+
+    public ParseRegion getRegion() {
+        return region;
     }
 
     public Type getType() {
@@ -45,7 +61,6 @@ public class PropertyValueNode implements ParseTreeNode {
     public String getName() {
         return name;
     }
-
 
     public <T> T accept(ParseTreeVisitor<T> visitor) {
         return visitor.visit(this);

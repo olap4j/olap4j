@@ -10,13 +10,17 @@
 package org.olap4j.test;
 
 import junit.framework.TestCase;
+import junit.framework.AssertionFailedError;
 import org.olap4j.mdx.parser.MdxParser;
+import org.olap4j.mdx.parser.MdxParseException;
 import org.olap4j.mdx.*;
 import org.olap4j.OlapConnection;
 import org.olap4j.Axis;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Tests the MDX parser.
@@ -25,6 +29,13 @@ import java.util.List;
  * @version $Id$
  */
 public class ParserTest extends TestCase {
+    private static final Pattern lineColPattern =
+        Pattern.compile("At line ([0-9]+), column ([0-9]+)");
+
+    private static final Pattern lineColTwicePattern =
+        Pattern.compile(
+            "(?s)From line ([0-9]+), column ([0-9]+) to line ([0-9]+), column ([0-9]+): (.*)");
+
     public ParserTest(String name) {
         super(name);
     }
@@ -36,6 +47,33 @@ public class ParserTest extends TestCase {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void testAddCarets()
+    {
+        assertEquals(
+            "values (^foo^)",
+            new ParseRegion(1, 9, 1, 11).annotate("values (foo)"));
+        assertEquals(
+            "abc^def",
+            new ParseRegion(1, 4, 1, 4).annotate("abcdef"));
+        assertEquals(
+            "abcdef^",
+            new ParseRegion(1, 7, 1, 7).annotate("abcdef"));
+
+        assertEquals(
+            "[1:9, 1:11]",
+            ParseRegion.findPos("values (^foo^)").region.toString());
+
+        assertEquals(
+            "[1:4]",
+            ParseRegion.findPos("abc^def").region.toString());
+
+        assertEquals(
+            "[1:7]",
+            ParseRegion.findPos("abcdef^").region.toString());
+
+        assertNull(ParseRegion.findPos("abc").region);
     }
 
     public void testAxisParsing() throws Exception {
@@ -66,12 +104,45 @@ public class ParserTest extends TestCase {
     }
 
     public void testNegativeCases() throws Exception {
-        assertParseQueryFails("select [member] on axis(1.7) from sales", "The axis number must be an integer");
-        assertParseQueryFails("select [member] on axis(-1) from sales", "Syntax error at line");
-        assertParseQueryFails("select [member] on axis(5) from sales", "The axis number must be an integer");
-        assertParseQueryFails("select [member] on axes(0) from sales", "Syntax error at line");
-        assertParseQueryFails("select [member] on 0.5 from sales", "The axis number must be an integer");
-        assertParseQueryFails("select [member] on 555 from sales", "The axis number must be an integer");
+        assertParseQueryFails(
+            "^s^ from sales",
+            "Syntax error at \\[1:1\\], token 's'");
+
+        assertParseQueryFails(
+            "^seleg^ from sales",
+            "Syntax error at \\[1:1, 1:5\\], token 'seleg'");
+
+        assertParseQueryFails(
+            "^seleg^   from sales",
+            "Syntax error at \\[1:1, 1:5\\], token 'seleg'");
+
+        assertParseQueryFails(
+            "select [member] on ^axis(1.7)^ from sales",
+            "(?s).*The axis number must be an integer.*");
+
+        assertParseQueryFails(
+            "select [member] on axis(-^ ^1) from sales",
+            "Syntax error at \\[1:26\\], token '-'");
+
+        assertParseQueryFails(
+            "select [member] on axis(-^1^) from sales",
+            "Syntax error at \\[1:26\\], token '-'");
+
+        assertParseQueryFails(
+            "select [member] on ^axis(5)^ from sales",
+            "Invalid axis specification\\. The axis number must be an integer between 0 and 4, but it was 5\\.0\\.");
+
+        assertParseQueryFails(
+            "select [member] on axes(^0^) from sales",
+            "Syntax error at \\[1:25\\], token '\\('");
+
+        assertParseQueryFails(
+            "select [member] on ^0.5^ from sales",
+            "Invalid axis specification\\. The axis number must be an integer between 0 and 4, but it was 0\\.5\\.");
+
+        assertParseQueryFails(
+            "select [member] on ^555^ from sales",
+            "Invalid axis specification\\. The axis number must be an integer between 0 and 4, but it was 555\\.0\\.");
     }
 
     public void testScannerPunc() {
@@ -82,12 +153,13 @@ public class ParserTest extends TestCase {
                 "SELECT\n" +
                     "[measures].[$foo] ON COLUMNS\n" +
                     "FROM sales"));
+
         assertParseQueryFails(
-            "select [measures].$foo on columns from sales",
-                "Unexpected character '$'");
+            "select [measures].$^f^oo on columns from sales", // todo: parser off by one
+                "Unexpected character '\\$'");
 
         // ']' unexcpected
-        assertParseQueryFails("select { Customers].Children } on columns from [Sales]",
+        assertParseQueryFails("select { Customers]^.^Children } on columns from [Sales]",
                 "Unexpected character ']'");
     }
 
@@ -134,16 +206,170 @@ public class ParserTest extends TestCase {
     }
 
     private void checkFails(MdxParser p, String query, String expected) {
+        final ParseRegion.RegionAndSource ras = ParseRegion.findPos(query);
         try {
-            SelectNode selectNode = p.parseSelect(query);
+            SelectNode selectNode = p.parseSelect(ras.source);
             fail("Must return an error");
         } catch (Exception e) {
-            Exception nested = (Exception) e.getCause();
-            String message = nested.getMessage();
-            if (message.indexOf(expected) < 0) {
-                fail("Actual result [" + message +
-                    "] did not contain [" + expected +
-                    "]");
+            checkEx(e, expected, ras);
+        }
+    }
+
+    /**
+     * Checks whether an exception matches the pattern and expected position
+     * expected.
+     *
+     * @param ex Exception thrown
+     * @param expectedMsgPattern Expected pattern
+     * @param ras Query and position in query
+     */
+    public static void checkEx(
+        Throwable ex,
+        String expectedMsgPattern,
+        ParseRegion.RegionAndSource ras)
+    {
+        String NL = TestContext.NL;
+        if (null == ex) {
+            if (expectedMsgPattern == null) {
+                // No error expected, and no error happened.
+                return;
+            } else {
+                throw new AssertionFailedError(
+                    "Expected query to throw exception, but it did not; "
+                    + "query [" + ras.source
+                    + "]; expected [" + expectedMsgPattern + "]");
+            }
+        }
+        Throwable actualException = ex;
+        String actualMessage = actualException.getMessage();
+        int actualLine = -1;
+        int actualColumn = -1;
+        int actualEndLine = 100;
+        int actualEndColumn = 99;
+
+        // Search for a SqlParseException -- with its position set -- somewhere
+        // in the stack.
+        MdxParseException mpe = null;
+        for (Throwable x = ex; x != null; x = x.getCause()) {
+            if ((x instanceof MdxParseException)
+                && (((MdxParseException) x).getRegion() != null))
+            {
+                mpe = (MdxParseException) x;
+                break;
+            }
+            if (x.getCause() == x) {
+                break;
+            }
+        }
+
+        if (mpe != null) {
+            final ParseRegion region = mpe.getRegion();
+            actualLine = region.getStartLine();
+            actualColumn = region.getStartColumn();
+            actualEndLine = region.getEndLine();
+            actualEndColumn = region.getEndColumn();
+            actualException = mpe;
+            actualMessage = actualException.getMessage();
+        } else {
+            final String message = ex.getMessage();
+
+            if (message != null) {
+                Matcher matcher = lineColTwicePattern.matcher(message);
+                if (matcher.matches()) {
+                    actualLine = Integer.parseInt(matcher.group(1));
+                    actualColumn = Integer.parseInt(matcher.group(2));
+                    actualEndLine = Integer.parseInt(matcher.group(3));
+                    actualEndColumn = Integer.parseInt(matcher.group(4));
+                    actualMessage = matcher.group(5);
+                } else {
+                    matcher = lineColPattern.matcher(message);
+                    if (matcher.matches()) {
+                        actualLine = Integer.parseInt(matcher.group(1));
+                        actualColumn = Integer.parseInt(matcher.group(2));
+                    }
+                }
+            }
+        }
+
+        if (null == expectedMsgPattern) {
+            if (null != actualException) {
+                actualException.printStackTrace();
+                fail(
+                    "Validator threw unexpected exception"
+                    + "; query [" + ras.source
+                    + "]; exception [" + actualMessage
+                    + "]; pos [line " + actualLine
+                    + " col " + actualColumn
+                    + " thru line " + actualLine
+                    + " col " + actualColumn + "]");
+            }
+        } else if (null != expectedMsgPattern) {
+            if (null == actualException) {
+                fail(
+                    "Expected validator to throw "
+                    + "exception, but it did not; query [" + ras.source
+                    + "]; expected [" + expectedMsgPattern + "]");
+            } else {
+                if ((actualColumn <= 0)
+                    || (actualLine <= 0)
+                    || (actualEndColumn <= 0)
+                    || (actualEndLine <= 0))
+                {
+                    throw new AssertionFailedError(
+                        "Error did not have position: "
+                        + " actual pos [line " + actualLine
+                        + " col " + actualColumn
+                        + " thru line " + actualEndLine
+                        + " col " + actualEndColumn + "]");
+                }
+                String sqlWithCarets =
+                    new ParseRegion(
+                        actualLine,
+                        actualColumn,
+                        actualEndLine,
+                        actualEndColumn).annotate(ras.source);
+                if (ras.region == null) {
+                    throw new AssertionFailedError(
+                        "todo: add carets to sql: " + sqlWithCarets);
+                }
+                if ((actualMessage == null)
+                    || !actualMessage.matches(expectedMsgPattern))
+                {
+                    actualException.printStackTrace();
+                    final String actualJavaRegexp =
+                        (actualMessage == null) ? "null"
+                        : TestContext.toJavaString(
+                            TestContext.quotePattern(actualMessage));
+                    fail(
+                        "Validator threw different "
+                        + "exception than expected; query [" + ras.source
+                        + "];" + NL
+                        + " expected pattern [" + expectedMsgPattern
+                        + "];" + NL
+                        + " actual [" + actualMessage
+                        + "];" + NL
+                        + " actual as java regexp [" + actualJavaRegexp
+                        + "]; pos [" + actualLine
+                        + " col " + actualColumn
+                        + " thru line " + actualEndLine
+                        + " col " + actualEndColumn
+                        + "]; sql [" + sqlWithCarets + "]");
+                } else if (
+                    (ras.region != null)
+                    && ((actualLine != ras.region.getStartLine())
+                        || (actualColumn != ras.region.getStartColumn())
+                        || (actualEndLine != ras.region.getEndLine())
+                        || (actualEndColumn != ras.region.getEndColumn())))
+                {
+                    fail(
+                        "Validator threw expected "
+                        + "exception [" + actualMessage
+                        + "]; but at pos [line " + actualLine
+                        + " col " + actualColumn
+                        + " thru line " + actualEndLine
+                        + " col " + actualEndColumn
+                        + "]; sql [" + sqlWithCarets + "]");
+                }
             }
         }
     }
@@ -327,7 +553,8 @@ public class ParserTest extends TestCase {
         assertParseExpr("+45", "45.0");
 
         // space bad
-        assertParseExprFails("4 5", "Syntax error at line 1, column 35, token '5.0'");
+        assertParseExprFails("4 ^5^",
+            "Syntax error at \\[1:35\\], token '5\\.0'");
 
         assertParseExpr("3.14", "3.14");
         assertParseExpr(".12345", "0.12345");
@@ -340,10 +567,12 @@ public class ParserTest extends TestCase {
 
         // exponents akimbo
         assertParseExpr("1e2", "100.0");
-        assertParseExprFails("1e2e3", "Syntax error at line 1, column 37, token 'e3'");
+        assertParseExprFails("1e2e^3^", // todo: fix parser; should be "1e2^e3^"
+            "Syntax error at .* token 'e3'");
         assertParseExpr("1.2e3", "1200.0");
         assertParseExpr("-1.2345e3", "(- 1234.5)");
-        assertParseExprFails("1.2e3.4", "Syntax error at line 1, column 39, token '0.4'");
+        assertParseExprFails("1.2e3.^4^", // todo: fix parser; should be "1.2e3^.4^"
+            "Syntax error at .* token '0.4'");
         assertParseExpr(".00234e0003", "2.34");
         assertParseExpr(".00234e-0067", "2.34E-70");
     }
@@ -373,6 +602,51 @@ public class ParserTest extends TestCase {
                     "{Filter([Product].[Product Department].members, (([Measures].[Small Number] >= 0.3) AND ([Measures].[Small Number] <= 0.5000001234)))} ON ROWS\n" +
                     "FROM Sales\n" +
                     "WHERE ([Time].[1997].[Q2].[4])"));
+    }
+
+    public void testIdentifier() {
+        // must have at least one segment
+        IdentifierNode id;
+        try {
+            id = new IdentifierNode();
+            fail("expected exception");
+        } catch (IllegalArgumentException e) {
+            // ok
+        }
+
+        id = new IdentifierNode(
+            new IdentifierNode.Segment("foo"));
+        assertEquals("[foo]", id.toString());
+
+        // append does not mutate
+        IdentifierNode id2 = id.append(
+            new IdentifierNode.Segment(
+                null, "bar", IdentifierNode.Quoting.KEY));
+        assertTrue(id != id2);
+        assertEquals("[foo]", id.toString());
+        assertEquals("[foo].&[bar]", id2.toString());
+
+        // cannot mutate segment list
+        final List<IdentifierNode.Segment> segments = id.getSegmentList();
+        try {
+            segments.remove(0);
+            fail("expected exception");
+        } catch (UnsupportedOperationException e) {
+            // ok
+        }
+        try {
+            segments.clear();
+            fail("expected exception");
+        } catch (UnsupportedOperationException e) {
+            // ok
+        }
+        try {
+            segments.add(
+                new IdentifierNode.Segment("baz"));
+            fail("expected exception");
+        } catch (UnsupportedOperationException e) {
+            // ok
+        }
     }
 
     /**

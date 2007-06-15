@@ -241,8 +241,10 @@ public class SimpleQuerySample {
                 new IdentifierNode.Segment("Sales")));
         query.getAxisList().add(
             new AxisNode(
+                null,
                 false,
                 new CallNode(
+                    null,
                     "{}",
                     Syntax.Braces,
                     new IdentifierNode(

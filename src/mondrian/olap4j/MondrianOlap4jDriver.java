@@ -103,11 +103,14 @@ public class MondrianOlap4jDriver implements Driver {
     }
 
     public Connection connect(String url, Properties info) throws SQLException {
+        if (!MondrianOlap4jConnection.acceptsURL(url)) {
+            return null;
+        }
         return factory.newConnection(url, info);
     }
 
     public boolean acceptsURL(String url) throws SQLException {
-        return url.startsWith("jdbc:mondrian:");
+        return MondrianOlap4jConnection.acceptsURL(url);
     }
 
     public DriverPropertyInfo[] getPropertyInfo(

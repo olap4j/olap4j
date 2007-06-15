@@ -35,7 +35,7 @@ import mondrian.olap.Util;
  * @since Jun 7, 2007
 */
 public class TestContext {
-    private static final String NL = System.getProperty("line.separator");
+    public static final String NL = System.getProperty("line.separator");
     private static final TestContext INSTANCE = new TestContext();
     private static final String lineBreak2 = "\\\\n\" +" + NL + "\"";
     private static final String lineBreak3 = "\\n\" +" + NL + "\"";
@@ -199,7 +199,8 @@ public class TestContext {
     }
 
     public static String getDefaultConnectString() {
-            return "jdbc:mondrian:Jdbc='jdbc:odbc:MondrianFoodMart';Catalog='../mondrian/demo/FoodMart.xml';JdbcDrivers=sun.jdbc.odbc.JdbcOdbcDriver;";
+//            return "jdbc:mondrian:Jdbc='jdbc:odbc:MondrianFoodMart';Catalog='../mondrian/demo/FoodMart.xml';JdbcDrivers=sun.jdbc.odbc.JdbcOdbcDriver;";
+        return "jdbc:mondrian:Jdbc='jdbc:oracle:thin:foodmart/foodmart@//marmalade.hydromatic.net:1521/XE';Catalog='../mondrian/demo/FoodMart.xml';JdbcDrivers=oracle.jdbc.OracleDriver;";
     }
 
     public static final String DRIVER_CLASS_NAME = "mondrian.olap4j.MondrianOlap4jDriver";
@@ -262,13 +263,26 @@ public class TestContext {
         throw new ComparisonFailure(message, expected, actual);
     }
 
-    private static String toJavaString(String s) {
+    /**
+     * Converts a string (which may contain quotes and newlines) into a java
+     * literal.
+     *
+     * <p>For example, <code>
+     * <pre>string with "quotes" split
+     * across lines</pre>
+     * </code> becomes <code>
+     * <pre>"string with \"quotes\" split" + NL +
+     *  "across lines"</pre>
+     * </code>
+     */
+    static String toJavaString(String s) {
 
         // Convert [string with "quotes" split
         // across lines]
         // into ["string with \"quotes\" split\n" +
         // "across lines
         //
+        s = Util.replace(s, "\\", "\\\\");
         s = Util.replace(s, "\"", "\\\"");
         s = LineBreakPattern.matcher(s).replaceAll(lineBreak2);
         s = TabPattern.matcher(s).replaceAll("\\\\t");
@@ -280,6 +294,27 @@ public class TestContext {
         if (s.indexOf(lineBreak3) >= 0) {
             s = "fold(" + NL + s + ")";
         }
+        return s;
+    }
+
+    /**
+     * Quotes a pattern.
+     */
+    public static String quotePattern(String s)
+    {
+        s = s.replaceAll("\\\\", "\\\\");
+        s = s.replaceAll("\\.", "\\\\.");
+        s = s.replaceAll("\\+", "\\\\+");
+        s = s.replaceAll("\\{", "\\\\{");
+        s = s.replaceAll("\\}", "\\\\}");
+        s = s.replaceAll("\\|", "\\\\||");
+        s = s.replaceAll("[$]", "\\\\\\$");
+        s = s.replaceAll("\\?", "\\\\?");
+        s = s.replaceAll("\\*", "\\\\*");
+        s = s.replaceAll("\\(", "\\\\(");
+        s = s.replaceAll("\\)", "\\\\)");
+        s = s.replaceAll("\\[", "\\\\[");
+        s = s.replaceAll("\\]", "\\\\]");
         return s;
     }
 }

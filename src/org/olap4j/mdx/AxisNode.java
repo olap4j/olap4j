@@ -23,9 +23,10 @@ import org.olap4j.type.Type;
  */
 public class AxisNode implements ParseTreeNode {
 
+    private final ParseRegion region;
     private boolean nonEmpty;
-    private ParseTreeNode exp;
-    final Axis axis;
+    private ParseTreeNode expression;
+    private final Axis axis;
 
     private final List<IdentifierNode>  dimensionProperties;
 
@@ -34,28 +35,34 @@ public class AxisNode implements ParseTreeNode {
      *
      * @param nonEmpty Whether to filter out members of this axis whose cells
      *    are all empty
-     * @param expr Expression to populate the axis
+     * @param expression Expression to populate the axis
      * @param axisDef Which axis (ROWS, COLUMNS, etc.)
      * @param dimensionProperties List of dimension properties
      */
     public AxisNode(
+        ParseRegion region,
         boolean nonEmpty,
-        ParseTreeNode expr,
+        ParseTreeNode expression,
         Axis axisDef,
         List<IdentifierNode> dimensionProperties)
     {
+        this.region = region;
         assert dimensionProperties != null;
         this.nonEmpty = nonEmpty;
-        this.exp = expr;
+        this.expression = expression;
         this.axis = axisDef;
         this.dimensionProperties = dimensionProperties;
+    }
+
+    public ParseRegion getRegion() {
+        return region;
     }
 
     public <T> T accept(ParseTreeVisitor<T> visitor) {
         final T o = visitor.visit(this);
 
         // visit the expression which forms the axis
-        exp.accept(visitor);
+        expression.accept(visitor);
 
         return o;
     }
@@ -89,7 +96,7 @@ public class AxisNode implements ParseTreeNode {
      * Returns the expression which is used to compute the value of this axis.
      */
     public ParseTreeNode getExpression() {
-        return exp;
+        return expression;
     }
 
     /**
@@ -97,7 +104,7 @@ public class AxisNode implements ParseTreeNode {
      * See {@link #getExpression()}.
      */
     public void setExpression(ParseTreeNode expr) {
-        this.exp = expr;
+        this.expression = expr;
     }
 
     public void unparse(ParseTreeWriter writer) {
@@ -105,8 +112,8 @@ public class AxisNode implements ParseTreeNode {
         if (nonEmpty) {
             pw.print("NON EMPTY ");
         }
-        if (exp != null) {
-            exp.unparse(writer);
+        if (expression != null) {
+            expression.unparse(writer);
         }
         if (dimensionProperties.size() > 0) {
             pw.print(" DIMENSION PROPERTIES ");
@@ -123,10 +130,14 @@ public class AxisNode implements ParseTreeNode {
         }
     }
 
+    /**
+     * Returns the list of dimension properties of this axis.
+     *
+     * @return list of dimension properties
+     */
     public List<IdentifierNode> getDimensionProperties() {
         return dimensionProperties;
     }
-
 
     public Type getType() {
         // not an expression
