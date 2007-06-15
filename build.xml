@@ -100,9 +100,29 @@
   <target name="compile" depends="prepare,parser,compile.java"/>
 
   <target name="compile.java">
+    <condition property="jdk16.present">
+      <equals arg1="${ant.java.version}" arg2="1.6"/>
+    </condition>
+    <condition property="jdk16.not.present">
+      <not>
+        <equals arg1="${ant.java.version}" arg2="1.6"/>
+      </not>
+    </condition>
+
     <javac
         srcdir="${src.dir}"
         destdir="${classes.dir}"
+        debug="${project.build.debug}"
+        classpathref="project.classpath"
+        source="1.5">
+      <include name="**/*.java"/>
+      <exclude name="mondrian/olap4j/FactoryJdbc3Impl.java" if="jdk16.present"/>
+      <exclude name="mondrian/olap4j/FactoryJdbc4Impl.java" if="jdk16.not.present"/>
+    </javac>
+
+    <javac
+        srcdir="${testsrc.dir}"
+        destdir="${testclasses.dir}"
         debug="${project.build.debug}"
         classpathref="project.classpath"
         source="1.5">

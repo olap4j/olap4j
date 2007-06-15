@@ -58,7 +58,8 @@ public class OlapTest {
                     + ";User=" + userName
                     + ";Password=" + password
                     + ";Catalog=" + schemaUri);
-            OlapConnection connection = jdbcConnection.unwrap(OlapConnection.class);
+            OlapConnection connection =
+                ((OlapWrapper) jdbcConnection).unwrap(OlapConnection.class);
 
             // REVIEW: jhyde: Why do you want to name connections? We could add
             // a connect string property 'description', if that helps

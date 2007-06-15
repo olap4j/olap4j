@@ -18,7 +18,8 @@ import org.olap4j.metadata.Property;
 import java.util.*;
 
 /**
- * <code>MondrianOlap4jCellSetAxis</code> ...
+ * Implementation of {@link org.olap4j.CellSetAxis}
+ * for the Mondrian OLAP engine.
  *
  * @author jhyde
  * @version $Id$

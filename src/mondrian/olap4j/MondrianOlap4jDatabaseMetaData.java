@@ -9,45 +9,46 @@
 */
 package mondrian.olap4j;
 
-import mondrian.olap.Connection;
 import mondrian.olap.MondrianServer;
 
 import org.olap4j.OlapDatabaseMetaData;
 import org.olap4j.OlapException;
+import org.olap4j.OlapConnection;
 import org.olap4j.metadata.Catalog;
 import org.olap4j.metadata.NamedList;
 
 import java.sql.ResultSet;
-import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 
 /**
- * Implementation of {@link org.olap4j.OlapDatabaseMetaData} for Mondrian.
+ * Implementation of {@link org.olap4j.OlapDatabaseMetaData}
+ * for the Mondrian OLAP engine.
  *
  * @author jhyde
  * @version $Id$
  * @since May 23, 2007
  */
-class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
-    private final MondrianOlap4jConnection olap4jConnection;
-    final Connection connection;
+abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
+    final MondrianOlap4jConnection olap4jConnection;
     final MondrianServer mondrianServer;
 
+    // A mondrian instance contains only one catalog (and one schema).
+    private final MondrianOlap4jCatalog olap4jCatalog =
+        new MondrianOlap4jCatalog(this);
+
     MondrianOlap4jDatabaseMetaData(
-        MondrianOlap4jConnection olap4jConnection,
-        Connection connection)
+        MondrianOlap4jConnection olap4jConnection)
     {
         this.olap4jConnection = olap4jConnection;
-        this.connection = connection;
-        mondrianServer = MondrianServer.forConnection(connection);
+        mondrianServer =
+            MondrianServer.forConnection(olap4jConnection.connection);
     }
 
     // package-protected
     NamedList<Catalog> getCatalogObjects() {
-        // A mondrian instance contains only one catalog.
         NamedList<MondrianOlap4jCatalog> list =
             new NamedListImpl<MondrianOlap4jCatalog>();
-        list.add(new MondrianOlap4jCatalog(this));
+        list.add(olap4jCatalog);
         return (NamedList) list;
     }
 
@@ -62,7 +63,7 @@ class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public String getURL() throws SQLException {
-        return connection.getConnectString();
+        return olap4jConnection.connection.getConnectString();
     }
 
     public String getUserName() throws SQLException {
@@ -695,8 +696,8 @@ class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         throw new UnsupportedOperationException();
     }
 
-    public java.sql.Connection getConnection() throws SQLException {
-        throw new UnsupportedOperationException();
+    public OlapConnection getConnection() throws SQLException {
+        return olap4jConnection;
     }
 
     public boolean supportsSavepoints() throws SQLException {
@@ -775,41 +776,7 @@ class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         throw new UnsupportedOperationException();
     }
 
-    public RowIdLifetime getRowIdLifetime() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public ResultSet getSchemas(
-        String catalog, String schemaPattern) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public ResultSet getClientInfoProperties() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public ResultSet getFunctions(
-        String catalog,
-        String schemaPattern,
-        String functionNamePattern) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public ResultSet getFunctionColumns(
-        String catalog,
-        String schemaPattern,
-        String functionNamePattern,
-        String columnNamePattern) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
+    // implement java.sql.Wrapper
 
     // straightforward implementation of unwrap and isWrapperFor, since this
     // class already implements the interface they most likely require:
@@ -830,25 +797,25 @@ class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     // implement OlapDatabaseMetaData
 
     public ResultSet getActions() throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public ResultSet getDatasources(
         String dataSourceName) throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public ResultSet getLiterals() throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public ResultSet getDatabaseProperties(
         String dataSourceName) throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public ResultSet getProperties() throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public String getMdxKeywords() throws OlapException {
@@ -866,35 +833,35 @@ class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String catalog,
         String schemaPattern,
         String cubeNamePattern) throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public ResultSet getDimensions() throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public ResultSet getFunctions() throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public ResultSet getHierarchies() throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public ResultSet getMeasures() throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public ResultSet getMembers() throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public ResultSet getLevels() throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
     public ResultSet getSets() throws OlapException {
-        return new EmptyResultSet(olap4jConnection);
+        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 }
 

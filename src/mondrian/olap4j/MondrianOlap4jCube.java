@@ -22,7 +22,8 @@ import java.util.Collection;
 import mondrian.olap.*;
 
 /**
- * <code>MondrianOlap4jCube</code> ...
+ * Implementation of {@link Cube}
+ * for the Mondrian OLAP engine.
  *
  * @author jhyde
  * @version $Id$
@@ -68,19 +69,21 @@ class MondrianOlap4jCube implements Cube, Named {
     }
 
     public String getName() {
-        throw new UnsupportedOperationException();
+        return cube.getName();
     }
 
     public String getUniqueName() {
-        throw new UnsupportedOperationException();
+        return cube.getUniqueName();
     }
 
     public String getCaption(Locale locale) {
-        throw new UnsupportedOperationException();
+        // todo: i81n
+        return cube.getCaption();
     }
 
     public String getDescription(Locale locale) {
-        throw new UnsupportedOperationException();
+        // todo: i81n
+        return cube.getDescription();
     }
 }
 

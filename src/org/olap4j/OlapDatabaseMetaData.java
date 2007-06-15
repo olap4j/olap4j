@@ -11,6 +11,7 @@ package org.olap4j;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Information about an OLAP database.
@@ -26,7 +27,10 @@ import java.sql.ResultSet;
  * @version $Id$
  * @since Oct 12, 2006
  */
-public interface OlapDatabaseMetaData extends DatabaseMetaData {
+public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
+
+    // override return type
+    OlapConnection getConnection() throws SQLException;
 
     /**
      * Retrieves a list of descriptions of an Action.

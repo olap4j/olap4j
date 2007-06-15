@@ -23,7 +23,8 @@ import mondrian.olap.*;
 import mondrian.olap.Hierarchy;
 
 /**
- * <code>MondrianOlap4jSchema</code> ...
+ * Implementation of {@link org.olap4j.metadata.Schema}
+ * for the Mondrian OLAP engine.
  *
  * @author jhyde
  * @version $Id$
@@ -51,8 +52,10 @@ class MondrianOlap4jSchema implements Schema, Named {
     public NamedList<Cube> getCubes() throws OlapException {
         NamedList<MondrianOlap4jCube> list =
             new NamedListImpl<MondrianOlap4jCube>();
+        final MondrianOlap4jConnection olap4jConnection =
+            olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection;
         for (mondrian.olap.Cube cube : schema.getCubes()) {
-            list.add(new MondrianOlap4jCube(cube, this));
+            list.add(olap4jConnection.toOlap4j(cube));
         }
         return (NamedList) list;
     }
@@ -60,11 +63,10 @@ class MondrianOlap4jSchema implements Schema, Named {
     public NamedList<Dimension> getSharedDimensions() throws OlapException {
         NamedList<MondrianOlap4jDimension> list =
             new NamedListImpl<MondrianOlap4jDimension>();
+        final MondrianOlap4jConnection olap4jConnection =
+            olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection;
         for (Hierarchy hierarchy : schema.getSharedHierarchies()) {
-            list.add(
-                new MondrianOlap4jDimension(
-                    this,
-                    hierarchy.getDimension()));
+            list.add(olap4jConnection.toOlap4j(hierarchy.getDimension()));
         }
         return (NamedList) list;
     }

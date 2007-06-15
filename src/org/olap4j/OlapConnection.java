@@ -23,7 +23,7 @@ import java.sql.Connection;
  * @version $Id$
  * @since Aug 22, 2006
  */
-public interface OlapConnection extends Connection {
+public interface OlapConnection extends Connection, OlapWrapper {
 
     // overrides Connection, with refined return type and throws list
     OlapDatabaseMetaData getMetaData() throws OlapException;

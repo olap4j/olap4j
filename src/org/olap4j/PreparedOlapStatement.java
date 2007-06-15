@@ -12,6 +12,7 @@ package org.olap4j;
 import org.olap4j.metadata.Cube;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * An object that represents a precompiled OLAP statement.
@@ -69,6 +70,18 @@ public interface PreparedOlapStatement
      * @see OlapParameterMetaData
      */
     OlapParameterMetaData getParameterMetaData() throws OlapException;
+
+    /**
+     * Retrieves a <code>CellSetMetaData</code> object that contains
+     * information about the axes and cells of the <code>CellSet</code> object
+     * that will be returned when this <code>PreparedOlapStatement</code> object
+     * is executed.
+     *
+     * @return the description of this <code>CellSet</code>'s axes
+     * and cells
+     * @exception OlapException if a database access error occurs
+     */
+    CellSetMetaData getMetaData() throws SQLException;
 
     /**
      * Returns the cube (or virtual cube) which this statement is based upon.

@@ -14,7 +14,8 @@ import org.olap4j.metadata.*;
 import java.util.Locale;
 
 /**
- * <code>MondrianOlap4jHierarchy</code> ...
+ * Implementation of {@link org.olap4j.metadata.Hierarchy}
+ * for the Mondrian OLAP engine.
  *
  * @author jhyde
  * @version $Id$
@@ -32,11 +33,18 @@ class MondrianOlap4jHierarchy implements Hierarchy {
         this.hierarchy = hierarchy;
     }
 
+    public boolean equals(Object obj) {
+        return obj instanceof MondrianOlap4jHierarchy &&
+            hierarchy.equals(((MondrianOlap4jHierarchy) obj).hierarchy);
+    }
+
+    public int hashCode() {
+        return hierarchy.hashCode();
+    }
+
     public Dimension getDimension() {
-        if (false) {
-            return null;
-        }
-        throw new UnsupportedOperationException();
+        return new MondrianOlap4jDimension(
+            olap4jSchema, hierarchy.getDimension());
     }
 
     public NamedList<Level> getLevels() {
@@ -68,10 +76,7 @@ class MondrianOlap4jHierarchy implements Hierarchy {
     }
 
     public String getUniqueName() {
-        if (false) {
-            return null;
-        }
-        throw new UnsupportedOperationException();
+        return hierarchy.getUniqueName();
     }
 
     public String getCaption(Locale locale) {

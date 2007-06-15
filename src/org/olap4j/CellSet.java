@@ -53,7 +53,7 @@ import java.sql.ResultSet;
  * @version $Id$
  * @since Aug 22, 2006
  */
-public interface CellSet extends ResultSet {
+public interface CellSet extends ResultSet, OlapWrapper {
     /**
      * Retrieves the description of this <code>CellSet</code>'s axes
      * and cells.

@@ -13,14 +13,19 @@ import org.olap4j.OlapStatement;
 import org.olap4j.CellSet;
 import org.olap4j.OlapException;
 import org.olap4j.mdx.SelectNode;
+import org.olap4j.mdx.ParseTreeNode;
+import org.olap4j.mdx.ParseTreeWriter;
 
 import java.sql.*;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 import mondrian.olap.Query;
 import mondrian.olap.Result;
 
 /**
- * <code>MondrianOlap4jStatement</code> ...
+ * Implementation of {@link org.olap4j.OlapStatement}
+ * for the Mondrian OLAP engine.
  *
  * @author jhyde
  * @version $Id$
@@ -236,8 +241,19 @@ class MondrianOlap4jStatement implements OlapStatement {
 
     // implement OlapStatement
 
-
     public CellSet executeOlapQuery(String mdx) throws OlapException {
+        Query query = olap4jConnection.connection.parseQuery(mdx);
+        return executeOlapQueryInternal(query);
+    }
+
+    /**
+     * Executes a parsed query, closing any previously open cellset.
+     *
+     * @param query Parsed query
+     * @return Cell set
+     * @throws OlapException if a database error occurs
+     */
+    protected CellSet executeOlapQueryInternal(Query query) throws OlapException {
         // Close the previous open CellSet, if there is one.
         if (openCellSet != null) {
             final MondrianOlap4jCellSet cs = openCellSet;
@@ -249,14 +265,29 @@ class MondrianOlap4jStatement implements OlapStatement {
                     null, "Error while closing previous CellSet", e);
             }
         }
-        Query query = olap4jConnection.connection.parseQuery(mdx);
         Result result = olap4jConnection.connection.execute(query);
-        openCellSet = new MondrianOlap4jCellSet(this, result);
+        openCellSet = olap4jConnection.factory.newCellSet(this, result);
         return openCellSet;
     }
 
-    public CellSet executeOlapQuery(SelectNode selectNode) {
-        throw new UnsupportedOperationException();
+    public CellSet executeOlapQuery(SelectNode selectNode) throws OlapException {
+        final String mdx = toString(selectNode);
+        return executeOlapQuery(mdx);
+    }
+
+    /**
+     * Converts a {@link org.olap4j.mdx.ParseTreeNode} to MDX string.
+     *
+     * @param node Parse tree node
+     * @return MDX text
+     */
+    private static String toString(ParseTreeNode node) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ParseTreeWriter parseTreeWriter = new ParseTreeWriter(pw);
+        node.unparse(parseTreeWriter);
+        pw.flush();
+        return sw.toString();
     }
 }
 

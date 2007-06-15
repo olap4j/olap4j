@@ -11,8 +11,6 @@ package mondrian.olap4j;
 
 import org.olap4j.*;
 import org.olap4j.Cell;
-import org.olap4j.metadata.Property;
-import org.olap4j.metadata.Cube;
 import mondrian.olap.*;
 import mondrian.olap.Axis;
 
@@ -25,16 +23,18 @@ import java.io.Reader;
 import java.net.URL;
 
 /**
- * <code>MondrianOlap4jCellSet</code> ...
+ * Implementation of {@link CellSet}
+ * for the Mondrian OLAP engine.
  *
  * @author jhyde
  * @version $Id$
  * @since May 24, 2007
  */
-class MondrianOlap4jCellSet implements CellSet, CellSetMetaData {
+abstract class MondrianOlap4jCellSet implements CellSet {
     final MondrianOlap4jStatement olap4jStatement;
     private final Result result;
-    private boolean closed;
+    protected boolean closed;
+    private final MondrianOlap4jCellSetMetaData metaData;
 
     public MondrianOlap4jCellSet(
         MondrianOlap4jStatement olap4jStatement,
@@ -45,10 +45,18 @@ class MondrianOlap4jCellSet implements CellSet, CellSetMetaData {
         this.olap4jStatement = olap4jStatement;
         this.result = result;
         this.closed = false;
+        if (olap4jStatement instanceof MondrianOlap4jPreparedStatement) {
+            this.metaData =
+                ((MondrianOlap4jPreparedStatement) olap4jStatement).cellSetMetaData;
+        } else {
+            this.metaData =
+                new MondrianOlap4jCellSetMetaData(
+                    olap4jStatement, result.getQuery());
+        }
     }
 
     public CellSetMetaData getMetaData() throws OlapException {
-        return this;
+        return metaData;
     }
 
     public List<CellSetAxis> getAxes() {
@@ -81,7 +89,16 @@ class MondrianOlap4jCellSet implements CellSet, CellSetMetaData {
     }
 
     public Cell getCell(int ordinal) {
-        throw new UnsupportedOperationException();
+        Axis[] axes = result.getAxes();
+        final int[] pos = new int[axes.length];
+        int modulo = 1;
+        for (int i = 0; i < axes.length; i++) {
+            int prevModulo = modulo;
+            modulo *= axes[i].getPositions().size();
+            pos[i] = (ordinal % modulo) / prevModulo;
+        }
+        mondrian.olap.Cell cell = result.getCell(pos);
+        return new MondrianOlap4jCell(pos, this, cell);
     }
 
     public List<Integer> ordinalToCoordinates(int ordinal) {
@@ -663,234 +680,6 @@ class MondrianOlap4jCellSet implements CellSet, CellSetMetaData {
         throw new UnsupportedOperationException();
     }
 
-    public RowId getRowId(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public RowId getRowId(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateRowId(int columnIndex, RowId x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateRowId(String columnLabel, RowId x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public int getHoldability() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean isClosed() throws SQLException {
-        return closed;
-    }
-
-    public void updateNString(
-        int columnIndex, String nString) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateNString(
-        String columnLabel, String nString) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateNClob(
-        String columnLabel, NClob nClob) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public NClob getNClob(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public NClob getNClob(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public SQLXML getSQLXML(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public SQLXML getSQLXML(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateSQLXML(
-        int columnIndex, SQLXML xmlObject) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateSQLXML(
-        String columnLabel, SQLXML xmlObject) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getNString(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getNString(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public Reader getNCharacterStream(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public Reader getNCharacterStream(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateNCharacterStream(
-        int columnIndex, Reader x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateNCharacterStream(
-        String columnLabel, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateAsciiStream(
-        int columnIndex, InputStream x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateBinaryStream(
-        int columnIndex, InputStream x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateCharacterStream(
-        int columnIndex, Reader x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateAsciiStream(
-        String columnLabel, InputStream x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateBinaryStream(
-        String columnLabel, InputStream x, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateCharacterStream(
-        String columnLabel, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateBlob(
-        int columnIndex,
-        InputStream inputStream,
-        long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateBlob(
-        String columnLabel,
-        InputStream inputStream,
-        long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateClob(
-        int columnIndex, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateClob(
-        String columnLabel, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateNClob(
-        int columnIndex, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateNClob(
-        String columnLabel, Reader reader, long length) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateNCharacterStream(
-        int columnIndex, Reader x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateNCharacterStream(
-        String columnLabel, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateAsciiStream(
-        int columnIndex, InputStream x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateBinaryStream(
-        int columnIndex, InputStream x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateCharacterStream(
-        int columnIndex, Reader x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateAsciiStream(
-        String columnLabel, InputStream x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateBinaryStream(
-        String columnLabel, InputStream x) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateCharacterStream(
-        String columnLabel, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateBlob(
-        int columnIndex, InputStream inputStream) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateBlob(
-        String columnLabel, InputStream inputStream) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateClob(int columnIndex, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateClob(
-        String columnLabel, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateNClob(
-        int columnIndex, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateNClob(
-        String columnLabel, Reader reader) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
     // implement Wrapper
 
     public <T> T unwrap(Class<T> iface) throws SQLException {
@@ -898,105 +687,6 @@ class MondrianOlap4jCellSet implements CellSet, CellSetMetaData {
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    // implement CellSetMetaData
-
-
-    public List<Property> getCellProperties() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Cube getCube() {
-        throw new UnsupportedOperationException();
-    }
-
-    public List<CellSetAxisMetaData> getAxesMetaData() {
-        throw new UnsupportedOperationException();
-    }
-
-    public int getColumnCount() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean isAutoIncrement(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean isCaseSensitive(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean isSearchable(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean isCurrency(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public int isNullable(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean isSigned(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public int getColumnDisplaySize(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getColumnLabel(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getColumnName(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getSchemaName(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public int getPrecision(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public int getScale(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getTableName(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getCatalogName(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public int getColumnType(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getColumnTypeName(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean isReadOnly(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean isWritable(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean isDefinitelyWritable(int column) throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getColumnClassName(int column) throws SQLException {
         throw new UnsupportedOperationException();
     }
 }

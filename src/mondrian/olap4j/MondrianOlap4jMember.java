@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Implementation of {@link Member} as a wrapper around a mondrian
+ * Implementation of {@link Member}
+ * for the Mondrian OLAP engine,
+ * as a wrapper around a mondrian
  * {@link mondrian.olap.Member}.
  *
  * @author jhyde
@@ -29,7 +31,7 @@ import java.util.Locale;
  * @since May 25, 2007
  */
 class MondrianOlap4jMember implements Member, Named {
-    private final mondrian.olap.Member mondrianMember;
+    final mondrian.olap.Member member;
     private final MondrianOlap4jSchema olap4jSchema;
 
     MondrianOlap4jMember(
@@ -37,13 +39,22 @@ class MondrianOlap4jMember implements Member, Named {
         mondrian.olap.Member mondrianMember)
     {
         this.olap4jSchema = olap4jSchema;
-        this.mondrianMember = mondrianMember;
+        this.member = mondrianMember;
+    }
+
+    public boolean equals(Object obj) {
+        return obj instanceof MondrianOlap4jMember &&
+            member.equals(((MondrianOlap4jMember) obj).member);
+    }
+
+    public int hashCode() {
+        return member.hashCode();
     }
 
     public NamedList<MondrianOlap4jMember> getChildMembers() {
         final mondrian.olap.Member[] children =
             olap4jSchema.schemaReader.getMemberChildren(
-                mondrianMember);
+                member);
         return new AbstractNamedList<MondrianOlap4jMember>() {
             public MondrianOlap4jMember get(int index) {
                 return new MondrianOlap4jMember(olap4jSchema, children[index]);
@@ -56,21 +67,21 @@ class MondrianOlap4jMember implements Member, Named {
     }
 
     public Member getParentMember() {
-        return new MondrianOlap4jMember(olap4jSchema, mondrianMember);
+        return new MondrianOlap4jMember(olap4jSchema, member);
     }
 
     public Level getLevel() {
-        return new MondrianOlap4jLevel(olap4jSchema, mondrianMember.getLevel());
+        return new MondrianOlap4jLevel(olap4jSchema, member.getLevel());
     }
 
     public Hierarchy getHierarchy() {
         return new MondrianOlap4jHierarchy(
-            olap4jSchema, mondrianMember.getHierarchy());
+            olap4jSchema, member.getHierarchy());
     }
 
     public Dimension getDimension() {
         return new MondrianOlap4jDimension(
-            olap4jSchema, mondrianMember.getDimension());
+            olap4jSchema, member.getDimension());
     }
 
     public Type getMemberType() {
@@ -138,7 +149,7 @@ class MondrianOlap4jMember implements Member, Named {
     }
 
     public String getUniqueName() {
-        return mondrianMember.getUniqueName();
+        return member.getUniqueName();
     }
 
     public String getCaption(Locale locale) {

@@ -50,15 +50,15 @@ public class MemberType implements Type {
         this.member = member;
         if (member != null) {
             assert level != null;
-            assert member.getLevel() == level;
+            assert member.getLevel().equals(level);
         }
         if (level != null) {
             assert hierarchy != null;
-            assert level.getHierarchy() == hierarchy;
+            assert level.getHierarchy().equals(hierarchy);
         }
         if (hierarchy != null) {
             assert dimension != null;
-            assert hierarchy.getDimension() == dimension;
+            assert hierarchy.getDimension().equals(dimension);
         }
         StringBuilder buf = new StringBuilder("MemberType<");
         if (member != null) {

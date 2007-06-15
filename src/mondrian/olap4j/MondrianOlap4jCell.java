@@ -19,7 +19,8 @@ import java.util.ArrayList;
 import java.sql.ResultSet;
 
 /**
- * <code>MondrianOlap4jCell</code> ...
+ * Implementation of {@link Cell}
+ * for the Mondrian OLAP engine.
  *
  * @author jhyde
  * @version $Id$

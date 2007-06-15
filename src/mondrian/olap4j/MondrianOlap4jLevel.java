@@ -15,7 +15,8 @@ import java.util.Locale;
 import java.util.List;
 
 /**
- * <code>MondrianOlap4jLevel</code> ...
+ * Implementation of {@link Level}
+ * for the Mondrian OLAP engine.
  *
  * @author jhyde
  * @version $Id$
@@ -31,6 +32,15 @@ class MondrianOlap4jLevel implements Level {
     {
         this.olap4jSchema = olap4jSchema;
         this.level = level;
+    }
+
+    public boolean equals(Object obj) {
+        return obj instanceof MondrianOlap4jLevel &&
+            level.equals(((MondrianOlap4jLevel) obj).level);
+    }
+
+    public int hashCode() {
+        return level.hashCode();
     }
 
     public int getDepth() {

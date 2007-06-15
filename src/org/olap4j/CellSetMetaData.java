@@ -16,13 +16,30 @@ import java.sql.ResultSetMetaData;
 import java.util.List;
 
 /**
- * <code>CellSetMetaData</code> ...
+ * An object that can be used to get information about the axes
+ * and cells in a <code>CellSet</code> object.
+ *
+ * <p>The following code fragment creates the <code>CellSet</code> object cs,
+ * creates the <code>CellSetMetaData</code> object csmd, and uses csmd
+ * to find out how many axes cs has and the name of the cube.
+ *
+ * <blockquote>
+ * <pre>
+ * CellSet cs = stmt.executeOlapQuery(
+ *     "SELECT {[Measures].[Unit Sales] ON COLUMNS,\n" +
+ *     "   Crossjoin([Time].Children, [Store].Children) ON ROWS\n" +
+ *     "FROM [Sales]");
+ * CellSetMetaData csmd = cs.getMetaData();
+ * int numberOfAxes = csmd.getAxesMetaData().size();
+ * String cubeName = csmd.getCube().getName();
+ * </pre>
+ * </blockquote>
  *
  * @author jhyde
  * @version $Id$
  * @since Oct 23, 2006
  */
-public interface CellSetMetaData extends ResultSetMetaData {
+public interface CellSetMetaData extends ResultSetMetaData, OlapWrapper {
     /**
      * Returns a list of properties which each Cell may have.
      */

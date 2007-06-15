@@ -10,8 +10,6 @@
 package org.olap4j;
 
 import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.DriverManager;
 
 /**
  * <p>An exception describing an error accessing an OLAP database.</p>
@@ -84,7 +82,10 @@ public class OlapException extends SQLException {
      * may be null indicating the cause is non-existent or unknown.
      */
     public OlapException(String reason, Throwable cause) {
-        super(reason, cause);
+        // Cannot call super(reason, cause) because
+        // SQLException(String, Throwable) only exists from JDK 1.6.
+        super(reason);
+        initCause(cause);
     }
 
     /**
@@ -146,11 +147,13 @@ public class OlapException extends SQLException {
         public final int startColumn;
         public final int endLine;
         public final int endColumn;
+
         protected Region(
             int startLine,
             int startColumn,
             int endLine,
-            int endColumn) {
+            int endColumn)
+        {
             this.startLine = startLine;
             this.startColumn = startColumn;
             this.endColumn = endLine;

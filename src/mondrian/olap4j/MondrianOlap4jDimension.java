@@ -18,7 +18,8 @@ import org.olap4j.OlapException;
 import java.util.Locale;
 
 /**
- * <code>MondrianOlap4jDimension</code> ...
+ * Implementation of {@link org.olap4j.metadata.Dimension}
+ * for the Mondrian OLAP engine.
  *
  * @author jhyde
  * @version $Id$
@@ -34,6 +35,15 @@ class MondrianOlap4jDimension implements Dimension, Named {
     {
         this.olap4jSchema = olap4jSchema;
         this.dimension = dimension;
+    }
+
+    public boolean equals(Object obj) {
+        return obj instanceof MondrianOlap4jDimension &&
+            dimension.equals(((MondrianOlap4jDimension) obj).dimension);
+    }
+
+    public int hashCode() {
+        return dimension.hashCode();
     }
 
     public NamedList<Hierarchy> getHierarchies() {

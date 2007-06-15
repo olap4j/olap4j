@@ -16,7 +16,8 @@ import org.olap4j.OlapException;
 import org.olap4j.OlapDatabaseMetaData;
 
 /**
- * Implementation of {@link org.olap4j.metadata.Catalog} for Mondrian.
+ * Implementation of {@link Catalog}
+ * for the Mondrian OLAP engine.
  *
  * @author jhyde
  * @version $Id$
@@ -31,20 +32,19 @@ class MondrianOlap4jCatalog implements Catalog, Named {
     }
 
     public NamedList<Schema> getSchemas() throws OlapException {
-        // A mondrian catalog contains one schema, so implicitly it contains
+        // A mondrian instance contains one schema, so implicitly it contains
         // one catalog
         NamedList<MondrianOlap4jSchema> list =
             new NamedListImpl<MondrianOlap4jSchema>();
+        final mondrian.olap.Schema schema =
+            olap4jDatabaseMetaData.olap4jConnection.connection.getSchema();
         list.add(
-            new MondrianOlap4jSchema(
-                this,
-                olap4jDatabaseMetaData.connection.getSchemaReader(),
-                olap4jDatabaseMetaData.connection.getSchema()));
+            olap4jDatabaseMetaData.olap4jConnection.toOlap4j(schema));
         return (NamedList) list;
     }
 
     public String getName() {
-        return "LOCALDB";
+        return MondrianOlap4jConnection.LOCALDB_CATALOG_NAME;
     }
 
     public OlapDatabaseMetaData getMetaData() {

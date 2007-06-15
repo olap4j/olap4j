@@ -23,7 +23,7 @@ import org.olap4j.mdx.SelectNode;
  * @version $Id$
  * @since Aug 22, 2006
  */
-public interface OlapStatement extends Statement {
+public interface OlapStatement extends Statement, OlapWrapper {
 
     /**
      * Executes an OLAP statement.

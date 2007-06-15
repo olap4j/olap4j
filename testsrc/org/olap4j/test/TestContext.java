@@ -160,7 +160,8 @@ public class TestContext {
 
     public OlapConnection getConnection() throws SQLException {
         java.sql.Connection connection = createConnection();
-        OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
         return olapConnection;
     }
 

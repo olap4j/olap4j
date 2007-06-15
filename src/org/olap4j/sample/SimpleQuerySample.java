@@ -55,7 +55,7 @@ public class SimpleQuerySample {
         Connection connection =
             DriverManager.getConnection("jdbc:mondrian:embedded");
         OlapConnection olapConnection =
-            connection.unwrap(OlapConnection.class);
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
 
         // Execute a statement.
         OlapStatement statement = olapConnection.createStatement();
@@ -141,7 +141,7 @@ public class SimpleQuerySample {
             statement.getParameterMetaData();
 
         // Locate the member "[Store].[USA].[WA].[Seattle]".
-        MemberType type = (MemberType) parameterMetaData.getOlapType(1);
+        MemberType type = (MemberType) parameterMetaData.getParameterOlapType(1);
         Dimension dimension = type.getDimension();
         assert dimension.getName().equals("Store");
         Member allStores = dimension.getRootMembers().get(0);
@@ -170,7 +170,8 @@ public class SimpleQuerySample {
         // Create connection.
         Connection connection =
             DriverManager.getConnection("jdbc:mondrian:embedded");
-        OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
 
         // Create a parser.
         MdxParserFactory parserFactory = olapConnection.getParserFactory();

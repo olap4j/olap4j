@@ -66,6 +66,7 @@ public class MondrianOlap4jDriver implements Driver {
     public static final String VERSION = "2.4";
     public static final int MAJOR_VERSION = 2;
     public static final int MINOR_VERSION = 4;
+    private final Factory factory;
 
     static {
         try {
@@ -75,12 +76,34 @@ public class MondrianOlap4jDriver implements Driver {
         }
     }
 
+    MondrianOlap4jDriver() {
+        String factoryClassName;
+        try {
+            Class.forName("java.sql.Wrapper");
+            factoryClassName = "mondrian.olap4j.FactoryJdbc4Impl";
+        } catch (ClassNotFoundException e) {
+            // java.sql.Wrapper is not present. This means we are running JDBC
+            // 3.0 or earlier (probably JDK 1.5). Load the JDBC 3.0 factory
+            factoryClassName = "mondrian.olap4j.FactoryJdbc3Impl";
+        }
+        try {
+            final Class clazz = Class.forName(factoryClassName);
+            factory = (Factory) clazz.newInstance();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void register() throws SQLException {
         DriverManager.registerDriver(new MondrianOlap4jDriver());
     }
 
     public Connection connect(String url, Properties info) throws SQLException {
-        return new MondrianOlap4jConnection(url, info);
+        return factory.newConnection(url, info);
     }
 
     public boolean acceptsURL(String url) throws SQLException {

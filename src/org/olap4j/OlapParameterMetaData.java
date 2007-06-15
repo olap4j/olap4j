@@ -22,11 +22,13 @@ import java.sql.ParameterMetaData;
  * <li>An OLAP statement parameter may be a member. If this is the case,
  *     the {@link #getParameterType(int)} method returns
  *     {@link java.sql.Types#OTHER}.
- * <li>An additional method {@link #getOlapType(int)} provides extra type
- *     information; in particular, the hierarchy that a member parameter
+ * <li>An additional method {@link #getParameterOlapType(int)} provides extra
+ *     type information; in particular, the hierarchy that a member parameter
  *     belongs to.
  * </ul>
- * <p>an
+ *
+ * <p>Parameters to an OLAP statement must have default values, and therefore
+ * it is not necessary to set every parameter.
  *
  * @author jhyde
  * @version $Id$
@@ -35,8 +37,12 @@ import java.sql.ParameterMetaData;
 public interface OlapParameterMetaData extends ParameterMetaData {
     /**
      * Returns the name of this parameter.
+     *
+     * @param param the first parameter is 1, the second is 2, ...
+     * @return parameter name
+     * @exception OlapException if a database access error occurs
      */
-    String getName();
+    String getParameterName(int param) throws OlapException;
 
     /**
      * Retrieves the designated parameter's OLAP type.
@@ -45,7 +51,7 @@ public interface OlapParameterMetaData extends ParameterMetaData {
      * @return OLAP type
      * @exception OlapException if a database access error occurs
      */
-    Type getOlapType(int param) throws OlapException;
+    Type getParameterOlapType(int param) throws OlapException;
 }
 
 // End OlapParameterMetaData.java

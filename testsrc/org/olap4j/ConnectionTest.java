@@ -10,6 +10,7 @@
 package org.olap4j;
 
 import junit.framework.TestCase;
+import junit.framework.AssertionFailedError;
 
 import java.sql.*;
 import java.sql.Connection;
@@ -20,6 +21,7 @@ import java.util.Locale;
 import java.io.Writer;
 import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 
 import org.olap4j.metadata.*;
 import org.olap4j.metadata.Cube;
@@ -29,6 +31,7 @@ import org.olap4j.mdx.SelectNode;
 import org.olap4j.mdx.ParseTreeWriter;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.test.TestContext;
+import org.olap4j.type.Type;
 
 /**
  * Unit test for olap4j Driver and Connection classes.
@@ -37,6 +40,8 @@ import org.olap4j.test.TestContext;
  */
 public class ConnectionTest extends TestCase {
     private final Helper helper = new HelperImpl();
+    private static final boolean IS_JDK_16 =
+        System.getProperty("java.version").startsWith("1.6.");
 
     /**
      * Driver basics.
@@ -79,6 +84,68 @@ public class ConnectionTest extends TestCase {
         assertTrue(driverPropertyInfos.length > 0);
     }
 
+    void assertIsValid(Connection connection, int timeout) {
+        if (!IS_JDK_16) {
+            return;
+        }
+        //  assertTrue(connection.isValid(0));
+        try {
+            java.lang.reflect.Method method =
+                Connection.class.getMethod("isValid", int.class);
+            Boolean b = (Boolean) method.invoke(connection, timeout);
+            assertTrue(b);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Checks that the <code>isClosed</code> method of a Statement, ResultSet or
+     * Connection object returns the expected result. Uses reflection because
+     * the <code>isClosed</code> method only exists from JDBC 4.0 (JDK 1.6)
+     * onwrds.
+     *
+     * @param o Connection, Statement or ResultSet object
+     * @param b Expected result
+     */
+    void assertIsClosed(Object o, boolean b) {
+        if (!IS_JDK_16) {
+            return;
+        }
+        //  assertTrue(statment.isClosed());
+        try {
+            Class clazz;
+            if (o instanceof Statement){
+                clazz = Statement.class;
+            } else if (o instanceof ResultSet) {
+                clazz = ResultSet.class;
+            } else if (o instanceof Connection) {
+                clazz = Connection.class;
+            } else {
+                throw new AssertionFailedError(
+                    "not a statement, resultSet or connection");
+            }
+            java.lang.reflect.Method method =
+                clazz.getMethod("isClosed");
+            Boolean closed = (Boolean) method.invoke(o);
+            if (b) {
+                assertTrue(closed);
+            } else {
+                assertFalse(closed);
+            }
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void testConnection() throws ClassNotFoundException, SQLException {
         Class.forName(helper.getDriverClassName());
 
@@ -90,10 +157,10 @@ public class ConnectionTest extends TestCase {
         assertFalse(connection.isClosed());
 
         // check valid with no time limit
-        assertTrue(connection.isValid(0));
+        assertIsValid(connection, 0);
 
         // check valid with one minute time limit; should be enough
-        assertTrue(connection.isValid(60));
+        assertIsValid(connection, 60);
 
         connection.close();
 
@@ -121,19 +188,19 @@ public class ConnectionTest extends TestCase {
         java.sql.Connection connection = helper.createConnection();
 
         // Trivial unwrap
-        assertTrue(connection.isWrapperFor(Connection.class));
-        Connection connection2 = connection.unwrap(Connection.class);
+        assertTrue(((OlapWrapper) connection).isWrapperFor(Connection.class));
+        Connection connection2 = ((OlapWrapper) connection).unwrap(Connection.class);
         assertEquals(connection2, connection);
 
         // Silly unwrap
-        assertTrue(connection.isWrapperFor(Object.class));
-        Object object = connection.unwrap(Object.class);
+        assertTrue(((OlapWrapper) connection).isWrapperFor(Object.class));
+        Object object = ((OlapWrapper) connection).unwrap(Object.class);
         assertEquals(object, connection);
 
         // Invalid unwrap
-        assertFalse(connection.isWrapperFor(Writer.class));
+        assertFalse(((OlapWrapper) connection).isWrapperFor(Writer.class));
         try {
-            Writer writer = connection.unwrap(Writer.class);
+            Writer writer = ((OlapWrapper) connection).unwrap(Writer.class);
             fail("expected exception, got writer" + writer);
         } catch (SQLException e) {
             assertTrue(e.getMessage().contains("does not implement"));
@@ -142,7 +209,7 @@ public class ConnectionTest extends TestCase {
         // Unwrap the mondrian connection.
         if (helper.isMondrian()) {
             final mondrian.olap.Connection mondrianConnection =
-                connection.unwrap(mondrian.olap.Connection.class);
+                ((OlapWrapper) connection).unwrap(mondrian.olap.Connection.class);
             assertNotNull(mondrianConnection);
         }
     }
@@ -167,15 +234,16 @@ public class ConnectionTest extends TestCase {
 
         // unwrap connection; may or may not be the same object as connection;
         // check extended methods
-        OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
         OlapDatabaseMetaData olapDatabaseMetaData =
             olapConnection.getMetaData();
 
         // also unwrap metadata from regular connection
-        assertTrue(databaseMetaData.isWrapperFor(OlapDatabaseMetaData.class));
-        assertFalse(databaseMetaData.isWrapperFor(OlapStatement.class));
+        assertTrue(((OlapWrapper) databaseMetaData).isWrapperFor(OlapDatabaseMetaData.class));
+        assertFalse(((OlapWrapper) databaseMetaData).isWrapperFor(OlapStatement.class));
         OlapDatabaseMetaData olapDatabaseMetaData1 =
-            databaseMetaData.unwrap(
+            ((OlapWrapper) databaseMetaData).unwrap(
                 OlapDatabaseMetaData.class);
         assertTrue(
             olapDatabaseMetaData1.getDatabaseProductVersion().equals(
@@ -282,16 +350,17 @@ public class ConnectionTest extends TestCase {
         Statement statement = connection.createStatement();
 
         // Closing a statement is idempotent.
-        assertFalse(statement.isClosed());
+        assertIsClosed(statement, false);
         statement.close();
-        assertTrue(statement.isClosed());
+        assertIsClosed(statement, true);
         statement.close();
-        assertTrue(statement.isClosed());
+        assertIsClosed(statement, true);
 
         // Unwrap the statement to get the olap statement. Depending on the
         // driver, this may or may not be the same object.
         statement = connection.createStatement();
-        OlapStatement olapStatement = statement.unwrap(OlapStatement.class);
+        OlapStatement olapStatement =
+            ((OlapWrapper) statement).unwrap(OlapStatement.class);
         assertNotNull(olapStatement);
 
         // Execute a simple query.
@@ -303,33 +372,242 @@ public class ConnectionTest extends TestCase {
         assertEquals(0, axesList.size());
 
         // Executing another query implicitly closes the previous result set.
-        assertFalse(statement.isClosed());
-        assertFalse(cellSet.isClosed());
+        assertIsClosed(statement, false);
+        assertIsClosed(cellSet, false);
         CellSet cellSet2 =
             olapStatement.executeOlapQuery(
                 "SELECT FROM [Sales]");
-        assertFalse(statement.isClosed());
-        assertTrue(cellSet.isClosed());
+        assertIsClosed(statement, false);
+        assertIsClosed(cellSet, true);
 
         // Close the statement; this closes the result set.
-        assertFalse(cellSet2.isClosed());
+        assertIsClosed(cellSet2, false);
         statement.close();
-        assertTrue(statement.isClosed());
-        assertTrue(cellSet2.isClosed());
+        assertIsClosed(statement, true);
+        assertIsClosed(cellSet2, true);
         cellSet.close();
-        assertTrue(statement.isClosed());
-        assertTrue(cellSet2.isClosed());
-        assertTrue(cellSet.isClosed());
+        assertIsClosed(statement, true);
+        assertIsClosed(cellSet2, true);
+        assertIsClosed(cellSet, true);
 
         // Close the connection.
         connection.close();
+    }
+
+    // todo: test statement with no slicer
+
+    private enum Method { ClassName, Mode, Type, TypeName, OlapType }
+
+    public void testPreparedStatement() throws SQLException {
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+        PreparedOlapStatement pstmt =
+            olapConnection.prepareOlapStatement(
+                "SELECT {\n" +
+                    "   Parameter(\"P1\", [Store], [Store].[USA].[CA]).Parent,\n" +
+                    "   ParamRef(\"P1\").Children} ON 0\n" +
+                    "FROM [Sales]\n" +
+                    "WHERE [Gender].[M]");
+        OlapParameterMetaData parameterMetaData =
+            pstmt.getParameterMetaData();
+        int paramCount = parameterMetaData.getParameterCount();
+        assertEquals(1, paramCount);
+        int[] paramIndexes = {0, 1, 2};
+        for (int paramIndex : paramIndexes) {
+            for (Method method : Method.values()) {
+                try {
+                    switch (method) {
+                    case ClassName:
+                        String className =
+                            parameterMetaData.getParameterClassName(paramIndex);
+                        assertEquals("org.olap4j.metadata.Member", className);
+                        break;
+                    case Mode:
+                        int mode =
+                            parameterMetaData.getParameterMode(paramIndex);
+                        assertEquals(ParameterMetaData.parameterModeIn, mode);
+                        break;
+                    case Type:
+                        int type = parameterMetaData.getParameterType(paramIndex);
+                        assertEquals(Types.OTHER, type);
+                        break;
+                    case TypeName:
+                        String typeName =
+                            parameterMetaData.getParameterTypeName(paramIndex);
+                        assertEquals("MemberType<hierarchy=[Store]>", typeName);
+                        break;
+                    case OlapType:
+                        Type olapType =
+                            parameterMetaData.getParameterOlapType(paramIndex);
+                        assertEquals(
+                            "MemberType<hierarchy=[Store]>",
+                            olapType.toString());
+                        break;
+                    }
+                    if (paramIndex != 1) {
+                        fail("expected exception");
+                    }
+                } catch (SQLException e) {
+                    if (paramIndex == 1) {
+                        throw e;
+                    } else {
+                        // ok - expecting exception
+                    }
+                }
+            }
+        }
+
+        // Check metadata exists. (Support for this method is optional.)
+        final CellSetMetaData metaData = pstmt.getMetaData();
+
+        CellSet cellSet = pstmt.executeQuery();
+        assertEquals(metaData, cellSet.getMetaData());
+        String s = TestContext.toString(cellSet);
+        TestContext.assertEqualsVerbose(
+            TestContext.fold("Axis #0:\n" +
+                "{[Gender].[All Gender].[M]}\n" +
+                "Axis #1:\n" +
+                "{[Store].[All Stores].[USA]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Alameda]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Beverly Hills]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Los Angeles]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[San Diego]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[San Francisco]}\n" +
+                "Row #0: 135,215\n" +
+                "Row #0: \n" +
+                "Row #0: 10,562\n" +
+                "Row #0: 13,574\n" +
+                "Row #0: 12,800\n" +
+                "Row #0: 1,053\n"),
+            s);
+
+        // Bind parameter and re-execute.
+        final List<Position> positions =
+            cellSet.getAxes().get(0).getPositions();
+        final Member member =
+            positions.get(positions.size() - 1).getMembers().get(0);
+        pstmt.setObject(1, member);
+        CellSet cellSet2 = pstmt.executeQuery();
+        assertIsClosed(cellSet, true);
+        assertIsClosed(cellSet2, false);
+        s = TestContext.toString(cellSet2);
+        TestContext.assertEqualsVerbose(
+            TestContext.fold(
+                "Axis #0:\n" +
+                    "{[Gender].[All Gender].[M]}\n" +
+                    "Axis #1:\n" +
+                    "{[Store].[All Stores].[USA].[CA]}\n" +
+                    "{[Store].[All Stores].[USA].[CA].[San Francisco].[Store 14]}\n" +
+                    "Row #0: 37,989\n" +
+                    "Row #0: 1,053\n"),
+            s);
+
+        // Re-execute with a new MDX string.
+        CellSet cellSet3 = pstmt.executeOlapQuery("SELECT FROM [Sales] WHERE [Gender]");
+        TestContext.assertEqualsVerbose(
+            TestContext.fold("Axis #0:\n" +
+                "{[Gender].[All Gender]}\n" +
+                "266,773"),
+            TestContext.toString(cellSet3));
+
+        // Number of parameters has changed.
+        OlapParameterMetaData parameterMetaData1 = pstmt.getParameterMetaData();
+        assertEquals(0, parameterMetaData1.getParameterCount());
+
+        // Try to bind non-existent parameter.
+        try {
+            pstmt.setInt(1, 100);
+            fail("expected exception");
+        } catch (SQLException e) {
+            // ok
+        }
+
+        // Execute again.
+        CellSet cellSet4 = pstmt.executeQuery();
+        assertIsClosed(cellSet4, false);
+        assertIsClosed(cellSet3, true);
+        assertEquals(0, cellSet4.getAxes().size());
+        assertEquals(266773.0, cellSet4.getCell(0).getValue());
+
+        // Re-execute with a parse tree.
+        MdxParser mdxParser =
+            olapConnection.getParserFactory().createMdxParser(olapConnection);
+        SelectNode select =
+            mdxParser.parseSelect(
+                "select {[Gender]} on columns from [sales]\n" +
+                    "where [Time].[1997].[Q4]");
+        CellSet cellSet5 = pstmt.executeOlapQuery(select);
+        TestContext.assertEqualsVerbose(
+            TestContext.fold(
+                "Axis #0:\n" +
+                    "{[Time].[1997].[Q4]}\n" +
+                    "Axis #1:\n" +
+                    "{[Gender].[All Gender]}\n" +
+                    "Row #0: 72,024\n"),
+            TestContext.toString(cellSet5));
+
+        // Execute.
+        CellSet cellSet6 = pstmt.executeQuery();
+        assertIsClosed(cellSet6, false);
+        assertIsClosed(cellSet5, true);
+        assertEquals(1, cellSet6.getAxes().size());
+        assertEquals(72024.0, cellSet6.getCell(0).getDoubleValue());
+
+        // Close prepared statement.
+        assertIsClosed(pstmt, false);
+        pstmt.close();
+        assertIsClosed(pstmt, true);
+        assertIsClosed(cellSet, true);
+        assertIsClosed(cellSet2, true);
+        assertIsClosed(cellSet6, true);
+
+        // todo: test all of the PreparedOlapStatement.setXxx methods
+    }
+
+    public void testCellSetMetaData() throws SQLException {
+        // Metadata of prepared statement
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+
+        final String mdx =
+            "select {[Gender]} on columns from [sales]\n" +
+            "where [Time].[1997].[Q4]";
+        PreparedOlapStatement pstmt =
+            olapConnection.prepareOlapStatement(mdx);
+        final CellSetMetaData cellSetMetaData = pstmt.getMetaData();
+        checkCellSetMetaData(cellSetMetaData);
+
+        // Metadata of its cellset
+        final CellSet cellSet = pstmt.executeQuery();
+        checkCellSetMetaData(cellSet.getMetaData());
+
+        // Metadata of regular statement executing string.
+        final OlapStatement stmt = olapConnection.createStatement();
+        final CellSet cellSet1 = stmt.executeOlapQuery(mdx);
+        checkCellSetMetaData(cellSet1.getMetaData());
+
+        // Metadata of regular statement executing parse tree.
+        MdxParser mdxParser =
+            olapConnection.getParserFactory().createMdxParser(olapConnection);
+        SelectNode select = mdxParser.parseSelect(mdx);
+        final OlapStatement stmt2 = olapConnection.createStatement();
+        CellSet cellSet2 = stmt2.executeOlapQuery(select);
+        checkCellSetMetaData(cellSet2.getMetaData());
+    }
+
+    private void checkCellSetMetaData(CellSetMetaData cellSetMetaData) {
+        assertNotNull(cellSetMetaData);
+        assertEquals(1, cellSetMetaData.getAxesMetaData().size());
+        assertEquals("Sales", cellSetMetaData.getCube().getName());
     }
 
     public void testCellSet() throws SQLException {
         Connection connection = helper.createConnection();
         Statement statement = connection.createStatement();
         final OlapStatement olapStatement =
-            statement.unwrap(OlapStatement.class);
+            ((OlapWrapper) statement).unwrap(OlapStatement.class);
         final CellSet cellSet =
             olapStatement.executeOlapQuery(
                 "SELECT\n" +
@@ -457,7 +735,8 @@ public class ConnectionTest extends TestCase {
         // parse
 
         Connection connection = helper.createConnection();
-        OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
         MdxParser mdxParser =
             olapConnection.getParserFactory().createMdxParser(olapConnection);
         SelectNode select =
