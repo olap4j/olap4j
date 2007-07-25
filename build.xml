@@ -45,10 +45,9 @@
     <!-- <pathelement location="${lib.dir}/retroweaver-1.2.4.jar"/> -->
     <pathelement path="${env.CLASSPATH}"/>
     <pathelement location="${ant.home}/lib/ant.jar"/>
-    <pathelement location="${ant.home}/lib/optional.jar"/>
-    <pathelement location="${ant.home}/lib/junit.jar"/>
     <pathelement location="${lib.dir}/log4j-1.2.9.jar"/>
     <pathelement location="${lib.dir}/javacup.jar"/>
+    <pathelement location="${testlib.dir}/junit.jar"/>
     <!-- We depend on mondrian right now. Ugh. -->
     <pathelement location="${mondrian.dir}/classes"/>
     <pathelement location="${mondrian.dir}/testclasses"/>
