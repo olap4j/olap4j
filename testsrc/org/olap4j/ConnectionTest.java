@@ -15,13 +15,10 @@ import junit.framework.AssertionFailedError;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.Properties;
-import java.util.List;
-import java.util.Locale;
-import java.io.Writer;
-import java.io.StringWriter;
-import java.io.PrintWriter;
+import java.util.*;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 
 import org.olap4j.metadata.*;
 import org.olap4j.metadata.Cube;
@@ -32,14 +29,48 @@ import org.olap4j.mdx.ParseTreeWriter;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.test.TestContext;
 import org.olap4j.type.Type;
+import org.olap4j.driver.xmla.XmlaOlap4jDriver;
+import org.xml.sax.SAXException;
+import mondrian.tui.XmlaSupport;
+
+import javax.servlet.ServletException;
 
 /**
  * Unit test for olap4j Driver and Connection classes.
  *
+ * <p>The system property "org.olap4j.test.helperClassName" determines the
+ * name of the helper class. By default, uses {@link MondrianHelper}, which
+ * runs against mondrian; {@link XmlaHelper} is also available.
+ *
  * @version $Id$
  */
 public class ConnectionTest extends TestCase {
-    private final Helper helper = new HelperImpl();
+    private final Helper helper = createHelper();
+
+    /**
+     * Factory method for the {@link org.olap4j.ConnectionTest.Helper}
+     * object which determines which driver to test.
+     *
+     * @return a new Helper
+     */
+    private Helper createHelper() {
+        String helperClassName =
+            System.getProperty("org.olap4j.test.helperClassName");
+        if (helperClassName != null) {
+            try {
+                Class<?> clazz = Class.forName(helperClassName);
+                return (Helper) clazz.newInstance();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return new MondrianHelper();
+    }
+
     private static final boolean IS_JDK_16 =
         System.getProperty("java.version").startsWith("1.6.");
 
@@ -804,7 +835,7 @@ public class ConnectionTest extends TestCase {
      * Implementation of {@link Helper} which speaks to the mondrian olap4j
      * driver.
      */
-    static class HelperImpl implements Helper {
+    public static class MondrianHelper implements Helper {
 
         public Connection createConnection() throws SQLException {
             try {
@@ -840,8 +871,8 @@ public class ConnectionTest extends TestCase {
         }
 
         public static String getDefaultConnectString() {
-            if (false) {
-                return "jdbc:mondrian:Jdbc='jdbc:odbc:MondrianFoodMart';Catalog='../mondrian/demo/FoodMart.xml';JdbcDrivers=sun.jdbc.odbc.JdbcOdbcDriver;";
+            if (true) {
+                return "jdbc:mondrian:Jdbc='jdbc:odbc:MondrianFoodMart';Catalog='file://c:/open/mondrian/demo/FoodMart.xml';JdbcDrivers=sun.jdbc.odbc.JdbcOdbcDriver;";
             } else {
                 return "jdbc:mondrian:Jdbc=jdbc:oracle:thin:foodmart/foodmart@//marmalade.hydromatic.net:1521/XE;JdbcUser=foodmart;JdbcPassword=foodmart;Catalog=../mondrian/demo/FoodMart.xml;JdbcDrivers=oracle.jdbc.OracleDriver;";
             }
@@ -852,6 +883,97 @@ public class ConnectionTest extends TestCase {
         public static final String DRIVER_URL_PREFIX = "jdbc:mondrian:";
         private static final String USER = "user";
         private static final String PASSWORD = "password";
+    }
+
+    /**
+     * Implementation of {@link Helper} which speaks to the XML/A olap4j
+     * driver.
+     */
+    public static class XmlaHelper implements Helper {
+        XmlaOlap4jDriver.Proxy proxy =
+            new MondrianInprocProxy();
+
+        public Connection createConnection() throws SQLException {
+            try {
+                Class.forName(DRIVER_CLASS_NAME);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("oops", e);
+            }
+            try {
+                XmlaOlap4jDriver.THREAD_PROXY.set(proxy);
+                Properties info = new Properties();
+                info.setProperty("UseThreadProxy", "true");
+                return
+                    DriverManager.getConnection(
+                        getURL(),
+                        info);
+            } finally {
+                XmlaOlap4jDriver.THREAD_PROXY.set(null);
+            }
+        }
+
+        public Connection createConnectionWithUserPassword() throws SQLException {
+            try {
+                Class.forName(DRIVER_CLASS_NAME);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("oops", e);
+            }
+            try {
+                XmlaOlap4jDriver.THREAD_PROXY.set(proxy);
+                Properties info = new Properties();
+                info.setProperty("UseThreadProxy", "true");
+                return DriverManager.getConnection(
+                    getURL(), USER, PASSWORD);
+            } finally {
+                XmlaOlap4jDriver.THREAD_PROXY.set(null);
+            }
+        }
+
+        public String getDriverUrlPrefix() {
+            return DRIVER_URL_PREFIX;
+        }
+
+        public String getDriverClassName() {
+            return DRIVER_CLASS_NAME;
+        }
+
+        public String getURL() {
+            return "jdbc:xmla:Server=http://foo;UseThreadProxy=true";
+        }
+
+        public boolean isMondrian() {
+            return false;
+        }
+
+        public static final String DRIVER_CLASS_NAME =
+             "org.olap4j.driver.xmla.XmlaOlap4jDriver";
+
+        public static final String DRIVER_URL_PREFIX = "jdbc:xmla:";
+        private static final String USER = "user";
+        private static final String PASSWORD = "password";
+
+        /**
+         * Proxy which implements XMLA requests by talking to mondrian
+         * in-process. This is more convenient to debug than an inter-process
+         * request using HTTP.
+         */
+        private static class MondrianInprocProxy implements XmlaOlap4jDriver.Proxy {
+            public InputStream get(URL url, String request) throws IOException {
+                try {
+                    Map<String, String> map = new HashMap<String, String>();
+                    String urlString = url.toString();
+                    byte[] bytes = XmlaSupport.processSoapXmla(
+                        request, urlString, map, null);
+                    return new ByteArrayInputStream(bytes);
+                } catch (ServletException e) {
+                    throw new IOException(
+                        "Error while reading '" + url + "'", e);
+                } catch (SAXException e) {
+                    throw new IOException(
+                        "Error while reading '" + url + "'", e);
+                }
+            }
+        }
     }
 }
 

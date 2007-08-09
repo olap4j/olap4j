@@ -139,11 +139,11 @@ public class MondrianOlap4jDriver implements Driver {
     }
 
     public int getMajorVersion() {
-        return 2;
+        return MAJOR_VERSION;
     }
 
     public int getMinorVersion() {
-        return 4;
+        return MINOR_VERSION;
     }
 
     public boolean jdbcCompliant() {

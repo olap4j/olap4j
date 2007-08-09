@@ -48,6 +48,7 @@
     <pathelement location="${lib.dir}/log4j-1.2.9.jar"/>
     <pathelement location="${lib.dir}/javacup.jar"/>
     <pathelement location="${testlib.dir}/junit.jar"/>
+    <pathelement location="${testlib.dir}/servlet.jar"/>
     <!-- We depend on mondrian right now. Ugh. -->
     <pathelement location="${mondrian.dir}/classes"/>
     <pathelement location="${mondrian.dir}/testclasses"/>
@@ -117,6 +118,8 @@
       <include name="**/*.java"/>
       <exclude name="mondrian/olap4j/FactoryJdbc3Impl.java" if="jdk16.present"/>
       <exclude name="mondrian/olap4j/FactoryJdbc4Impl.java" if="jdk16.not.present"/>
+      <exclude name="org/olap4j/driver/xmla/FactoryJdbc3Impl.java" if="jdk16.present"/>
+      <exclude name="org/olap4j/driver/xmla/FactoryJdbc4Impl.java" if="jdk16.not.present"/>
     </javac>
 
     <javac

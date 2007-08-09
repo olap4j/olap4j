@@ -1,5 +1,4 @@
 /*
-// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -212,372 +211,372 @@ public class OlapTest {
 
     }
 
-static class Olap4jXml {
+    static class Olap4jXml {
 
-    public static Document newDocument() {
-        DocumentBuilderFactory dbf;
-        DocumentBuilder db;
-        Document doc;
+        public static Document newDocument() {
+            DocumentBuilderFactory dbf;
+            DocumentBuilder db;
+            Document doc;
 
-        try {
-            // Check and open XML document
-            dbf = DocumentBuilderFactory.newInstance();
-            db = dbf.newDocumentBuilder();
-            doc = db.newDocument();
+            try {
+                // Check and open XML document
+                dbf = DocumentBuilderFactory.newInstance();
+                db = dbf.newDocumentBuilder();
+                doc = db.newDocument();
+                return doc;
+            } catch (Throwable t) {
+                // todo:
+            }
+            return null;
+        }
+
+        public static Document cubeToDoc(Cube cube) {
+            Document doc = Olap4jXml.newDocument();
+            Element root = doc.createElement("olap4j");
+            doc.appendChild(root);
+            cubeToXml(cube, true, doc, root);
             return doc;
-        } catch (Throwable t) {
-            // todo:
         }
-        return null;
-    }
 
-    public static Document cubeToDoc(Cube cube) {
-        Document doc = Olap4jXml.newDocument();
-        Element root = doc.createElement("olap4j");
-        doc.appendChild(root);
-        cubeToXml(cube, true, doc, root);
-        return doc;
-    }
+        public static Document selectionToDoc(Selection selection, List<Member> members) {
+            Document doc = Olap4jXml.newDocument();
+            Element root = doc.createElement("olap4j");
+            doc.appendChild(root);
+            selectionToXml(selection, members, doc, root);
+            return doc;
+        }
 
-    public static Document selectionToDoc(Selection selection, List<Member> members) {
-        Document doc = Olap4jXml.newDocument();
-        Element root = doc.createElement("olap4j");
-        doc.appendChild(root);
-        selectionToXml(selection, members, doc, root);
-        return doc;
-    }
+        public static Document queryToDoc(Query query) {
+            Document doc = Olap4jXml.newDocument();
+            Element root = doc.createElement("olap4j");
+            doc.appendChild(root);
+            queryToXml(query, doc, root);
+            return doc;
+        }
 
-    public static Document queryToDoc(Query query) {
-        Document doc = Olap4jXml.newDocument();
-        Element root = doc.createElement("olap4j");
-        doc.appendChild(root);
-        queryToXml(query, doc, root);
-        return doc;
-    }
+        public static Document resultToDoc(CellSet result) {
+            Document doc = Olap4jXml.newDocument();
+            Element root = doc.createElement("olap4j");
+            doc.appendChild(root);
+            resultsToXml(result, doc, root);
+            return doc;
+        }
 
-    public static Document resultToDoc(CellSet result) {
-        Document doc = Olap4jXml.newDocument();
-        Element root = doc.createElement("olap4j");
-        doc.appendChild(root);
-        resultsToXml(result, doc, root);
-        return doc;
-    }
+        public static void selectionToXml(Selection selection, List<Member> members, Document doc, Element parent) {
 
-    public static void selectionToXml(Selection selection, List<Member> members, Document doc, Element parent) {
+            try {
+                Element root = doc.createElement("olap4j-members");
+                parent.appendChild(root);
 
-        try {
-            Element root = doc.createElement("olap4j-members");
-            parent.appendChild(root);
+                selectionToXml(selection, doc, root);
 
-            selectionToXml(selection, doc, root);
+                Element membersNode = doc.createElement("members");
+                root.appendChild(membersNode);
 
-            Element membersNode = doc.createElement("members");
-            root.appendChild(membersNode);
-
-            if (members != null) {
-                for (Member member : members) {
-                    memberToXml(member, doc, membersNode);
+                if (members != null) {
+                    for (Member member : members) {
+                        memberToXml(member, doc, membersNode);
+                    }
                 }
+
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-
-        } catch (Throwable t) {
-            t.printStackTrace();
         }
-    }
 
-    public static void queryToXml(Query query, Document doc, Element parent) {
+        public static void queryToXml(Query query, Document doc, Element parent) {
 
-        try {
+            try {
 
-            Element root = doc.createElement("query");
-            parent.appendChild(root);
+                Element root = doc.createElement("query");
+                parent.appendChild(root);
 
-            cubeToXml(query.getCube(), false, doc, root);
+                cubeToXml(query.getCube(), false, doc, root);
 
-            Element axes = doc.createElement("axes");
-            root.appendChild(axes);
+                Element axes = doc.createElement("axes");
+                root.appendChild(axes);
 
-            axisToXml(query.getAxes().get(Axis.COLUMNS), doc, axes);
-            axisToXml(query.getAxes().get(Axis.ROWS), doc, axes);
-            axisToXml(query.getAxes().get(Axis.SLICER), doc, axes);
+                axisToXml(query.getAxes().get(Axis.COLUMNS), doc, axes);
+                axisToXml(query.getAxes().get(Axis.ROWS), doc, axes);
+                axisToXml(query.getAxes().get(Axis.SLICER), doc, axes);
 
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    public static void resultsToXml(CellSet result, Document doc, Element parent) {
-
-        try {
-
-            Element root = doc.createElement("result");
-            parent.appendChild(root);
-
-            Element dimensionsNode = doc.createElement("dimensions");
-            root.appendChild(dimensionsNode);
-
-            Element gridNode = doc.createElement("grid");
-            root.appendChild(gridNode);
-
-            for (CellSetAxis axis : result.getAxes()) {
-                for (Hierarchy hierarchy : axis.getAxisMetaData().getHierarchies()) {
-                    Element dimensionNode = dimensionInfoToXml(hierarchy.getDimension(), doc);
-                    dimensionsNode.appendChild(dimensionNode);
-                }
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-
-            // TODO
-
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    public static void axisToXml(QueryAxis axis, Document doc, Element parent) {
-
-        try {
-            Element root = doc.createElement("axis");
-            parent.appendChild(root);
-            Element dimensionsNode = doc.createElement("dimensions");
-            root.appendChild(dimensionsNode);
-
-            switch(axis.getLocation()) {
-            case COLUMNS: addAttribute("location", "across", root); break;
-            case ROWS: addAttribute("location", "down", root); break;
-            case SLICER: addAttribute("location", "slicer", root); break;
-            }
-
-            List<QueryDimension> dimensions = axis.getDimensions();
-            for (QueryDimension dimension : dimensions) {
-                dimensionSelectionsToXml(dimension, doc, dimensionsNode);
-            }
-
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    public static void memberToXml(
-        Member member,
-        Document doc,
-        Element parent)
-    {
-        try {
-
-            Element root = doc.createElement("member");
-            parent.appendChild(root);
-
-            addCDataNode("name", member.getName(), root);
-            addCDataNode("unique-name", member.getUniqueName(), root);
-            addCDataNode("description", member.getDescription(null), root);
-
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    public static void selectionToXml(
-        Selection selection,
-        Document doc,
-        Element parent)
-    {
-        try {
-
-            Element root = doc.createElement("selection");
-            parent.appendChild(root);
-
-            addCDataNode("name", selection.getName(), root);
-            addCDataNode("dimension-name", selection.getDimension().getName(), root);
-            switch (selection.getOperator()) {
-            case CHILDREN: addCDataNode("operation", "children", root); break;
-            case SIBLINGS: addCDataNode("operation", "siblings", root); break;
-            case MEMBER: addCDataNode("operation", "member", root); break;
-            }
-
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    public static void cubeToXml(
-        Cube cube,
-        boolean includeDimensions,
-        Document doc,
-        Element parent)
-    {
-        NamedList<Dimension> dimensions = cube.getDimensions();
-        if (dimensions == null) {
-            return;
         }
 
-        try {
+        public static void resultsToXml(CellSet result, Document doc, Element parent) {
 
-            Element root = doc.createElement("cube");
-            parent.appendChild(root);
+            try {
 
-            addCDataNode("name", cube.getName(), root);
+                Element root = doc.createElement("result");
+                parent.appendChild(root);
 
-            if (includeDimensions) {
                 Element dimensionsNode = doc.createElement("dimensions");
                 root.appendChild(dimensionsNode);
 
-                for (Dimension dimension : dimensions) {
-                    dimensionToXml(dimension, doc, dimensionsNode);
+                Element gridNode = doc.createElement("grid");
+                root.appendChild(gridNode);
+
+                for (CellSetAxis axis : result.getAxes()) {
+                    for (Hierarchy hierarchy : axis.getAxisMetaData().getHierarchies()) {
+                        Element dimensionNode = dimensionInfoToXml(hierarchy.getDimension(), doc);
+                        dimensionsNode.appendChild(dimensionNode);
+                    }
                 }
+
+                // TODO
+
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+
+        public static void axisToXml(QueryAxis axis, Document doc, Element parent) {
+
+            try {
+                Element root = doc.createElement("axis");
+                parent.appendChild(root);
+                Element dimensionsNode = doc.createElement("dimensions");
+                root.appendChild(dimensionsNode);
+
+                switch(axis.getLocation()) {
+                case COLUMNS: addAttribute("location", "across", root); break;
+                case ROWS: addAttribute("location", "down", root); break;
+                case SLICER: addAttribute("location", "slicer", root); break;
+                }
+
+                List<QueryDimension> dimensions = axis.getDimensions();
+                for (QueryDimension dimension : dimensions) {
+                    dimensionSelectionsToXml(dimension, doc, dimensionsNode);
+                }
+
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+
+        public static void memberToXml(
+            Member member,
+            Document doc,
+            Element parent)
+        {
+            try {
+
+                Element root = doc.createElement("member");
+                parent.appendChild(root);
+
+                addCDataNode("name", member.getName(), root);
+                addCDataNode("unique-name", member.getUniqueName(), root);
+                addCDataNode("description", member.getDescription(null), root);
+
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+
+        public static void selectionToXml(
+            Selection selection,
+            Document doc,
+            Element parent)
+        {
+            try {
+
+                Element root = doc.createElement("selection");
+                parent.appendChild(root);
+
+                addCDataNode("name", selection.getName(), root);
+                addCDataNode("dimension-name", selection.getDimension().getName(), root);
+                switch (selection.getOperator()) {
+                case CHILDREN: addCDataNode("operation", "children", root); break;
+                case SIBLINGS: addCDataNode("operation", "siblings", root); break;
+                case MEMBER: addCDataNode("operation", "member", root); break;
+                }
+
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+
+        public static void cubeToXml(
+            Cube cube,
+            boolean includeDimensions,
+            Document doc,
+            Element parent)
+        {
+            NamedList<Dimension> dimensions = cube.getDimensions();
+            if (dimensions == null) {
+                return;
             }
 
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
+            try {
 
-    public static void dimensionToXml(
-        Dimension dimension,
-        Document doc,
-        Element parent) throws OlapException
-    {
-        Element dimensionNode = dimensionInfoToXml(dimension, doc);
-        parent.appendChild(dimensionNode);
-        Element hierarchyNode;
+                Element root = doc.createElement("cube");
+                parent.appendChild(root);
 
-        NamedList<Hierarchy> hierarchies  = dimension.getHierarchies();
+                addCDataNode("name", cube.getName(), root);
 
-        for (Hierarchy hierarchy : hierarchies) {
-            hierarchyNode = hierarchyToXml(hierarchy, doc);
-            dimensionNode.appendChild(hierarchyNode);
-        }
-    }
+                if (includeDimensions) {
+                    Element dimensionsNode = doc.createElement("dimensions");
+                    root.appendChild(dimensionsNode);
 
-    public static Element dimensionInfoToXml(
-        Dimension dimension,
-        Document doc)
-        throws OlapException
-    {
-        Element dimensionNode;
-        Element nameNode;
-        Attr attr;
-        CDATASection cdata;
+                    for (Dimension dimension : dimensions) {
+                        dimensionToXml(dimension, doc, dimensionsNode);
+                    }
+                }
 
-        dimensionNode = doc.createElement("dimension");
-        nameNode = doc.createElement("name");
-        cdata = doc.createCDATASection(dimension.getName());
-        nameNode.appendChild(cdata);
-        dimensionNode.appendChild(nameNode);
-        attr = doc.createAttribute("isMeasure");
-        boolean isMeasures =
-            dimension.getDimensionType() == Dimension.Type.Measures;
-        attr.setTextContent(Boolean.toString(isMeasures));
-        dimensionNode.setAttribute("isMeasures", Boolean.toString(isMeasures));
-
-        return dimensionNode;
-    }
-
-    public static void dimensionSelectionsToXml(
-        QueryDimension dimension,
-        Document doc,
-        Element parent) throws OlapException
-    {
-        Element dimensionNode = dimensionInfoToXml(dimension.getDimension(), doc);
-        parent.appendChild(dimensionNode);
-        Element selectionsNode;
-
-        selectionsNode = doc.createElement("selections");
-        dimensionNode.appendChild(selectionsNode);
-
-        List<Selection> selections = dimension.getSelections();
-
-        for (Selection selection : selections) {
-            selectionToXml(selection, doc, selectionsNode);
-        }
-    }
-
-    public static Element hierarchyToXml(Hierarchy hierarchy, Document doc) {
-        Element hierarchyNode;
-        Element levelNode;
-        Element nameNode;
-        CDATASection cdata;
-
-        hierarchyNode = doc.createElement("hierarchy");
-        nameNode = doc.createElement("name");
-        cdata = doc.createCDATASection(hierarchy.getName());
-        nameNode.appendChild(cdata);
-        hierarchyNode.appendChild(nameNode);
-        Element defaultMember = doc.createElement("default-member");
-        hierarchyNode.appendChild(defaultMember);
-        memberToXml(hierarchy.getDefaultMember(), defaultMember);
-
-        for (Level level : hierarchy.getLevels()) {
-            levelNode = levelToXml(level, doc);
-            hierarchyNode.appendChild(levelNode);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         }
 
-        return hierarchyNode;
-    }
+        public static void dimensionToXml(
+            Dimension dimension,
+            Document doc,
+            Element parent) throws OlapException
+        {
+            Element dimensionNode = dimensionInfoToXml(dimension, doc);
+            parent.appendChild(dimensionNode);
+            Element hierarchyNode;
 
-    public static Element memberToXml(Member member, Element parent) {
+            NamedList<Hierarchy> hierarchies  = dimension.getHierarchies();
 
-        Document doc = parent.getOwnerDocument();
-        Element memberNode = doc.createElement("member");
+            for (Hierarchy hierarchy : hierarchies) {
+                hierarchyNode = hierarchyToXml(hierarchy, doc);
+                dimensionNode.appendChild(hierarchyNode);
+            }
+        }
 
-        addCDataNode("name", member.getName(), memberNode);
-        addCDataNode("unique-name", member.getUniqueName(), memberNode);
+        public static Element dimensionInfoToXml(
+            Dimension dimension,
+            Document doc)
+            throws OlapException
+        {
+            Element dimensionNode;
+            Element nameNode;
+            Attr attr;
+            CDATASection cdata;
 
-        parent.appendChild(memberNode);
+            dimensionNode = doc.createElement("dimension");
+            nameNode = doc.createElement("name");
+            cdata = doc.createCDATASection(dimension.getName());
+            nameNode.appendChild(cdata);
+            dimensionNode.appendChild(nameNode);
+            attr = doc.createAttribute("isMeasure");
+            boolean isMeasures =
+                dimension.getDimensionType() == Dimension.Type.Measures;
+            attr.setTextContent(Boolean.toString(isMeasures));
+            dimensionNode.setAttribute("isMeasures", Boolean.toString(isMeasures));
 
-        return memberNode;
-    }
+            return dimensionNode;
+        }
 
-    public static void addCDataNode(String name, String value, Element parent) {
-        Document doc = parent.getOwnerDocument();
-        Element node = doc.createElement(name);
-        if (value != null) {
-            CDATASection cdata = doc.createCDATASection(value);
-            node.appendChild(cdata);
+        public static void dimensionSelectionsToXml(
+            QueryDimension dimension,
+            Document doc,
+            Element parent) throws OlapException
+        {
+            Element dimensionNode = dimensionInfoToXml(dimension.getDimension(), doc);
+            parent.appendChild(dimensionNode);
+            Element selectionsNode;
+
+            selectionsNode = doc.createElement("selections");
+            dimensionNode.appendChild(selectionsNode);
+
+            List<Selection> selections = dimension.getSelections();
+
+            for (Selection selection : selections) {
+                selectionToXml(selection, doc, selectionsNode);
+            }
+        }
+
+        public static Element hierarchyToXml(Hierarchy hierarchy, Document doc) {
+            Element hierarchyNode;
+            Element levelNode;
+            Element nameNode;
+            CDATASection cdata;
+
+            hierarchyNode = doc.createElement("hierarchy");
+            nameNode = doc.createElement("name");
+            cdata = doc.createCDATASection(hierarchy.getName());
+            nameNode.appendChild(cdata);
+            hierarchyNode.appendChild(nameNode);
+            Element defaultMember = doc.createElement("default-member");
+            hierarchyNode.appendChild(defaultMember);
+            memberToXml(hierarchy.getDefaultMember(), defaultMember);
+
+            for (Level level : hierarchy.getLevels()) {
+                levelNode = levelToXml(level, doc);
+                hierarchyNode.appendChild(levelNode);
+            }
+
+            return hierarchyNode;
+        }
+
+        public static Element memberToXml(Member member, Element parent) {
+
+            Document doc = parent.getOwnerDocument();
+            Element memberNode = doc.createElement("member");
+
+            addCDataNode("name", member.getName(), memberNode);
+            addCDataNode("unique-name", member.getUniqueName(), memberNode);
+
+            parent.appendChild(memberNode);
+
+            return memberNode;
+        }
+
+        public static void addCDataNode(String name, String value, Element parent) {
+            Document doc = parent.getOwnerDocument();
+            Element node = doc.createElement(name);
+            if (value != null) {
+                CDATASection cdata = doc.createCDATASection(value);
+                node.appendChild(cdata);
+                parent.appendChild(node);
+            }
+        }
+
+        public static void addNode(String name, String value, Element parent) {
+            Document doc = parent.getOwnerDocument();
+            Element node = doc.createElement(name);
+            if (value != null) {
+                node.setTextContent(value);
+            }
             parent.appendChild(node);
         }
-    }
 
-    public static void addNode(String name, String value, Element parent) {
-        Document doc = parent.getOwnerDocument();
-        Element node = doc.createElement(name);
-        if (value != null) {
-            node.setTextContent(value);
+        public static void addAttribute(String name, String value, Element parent) {
+            if (name != null && value != null) {
+                parent.setAttribute(name, value);
+            }
         }
-        parent.appendChild(node);
-    }
 
-    public static void addAttribute(String name, String value, Element parent) {
-        if (name != null && value != null) {
-            parent.setAttribute(name, value);
+        public static Element levelToXml(Level level, Document doc) {
+
+            Element levelNode = doc.createElement("level");
+
+            addCDataNode("name", level.getName(), levelNode);
+
+            return levelNode;
+        }
+
+        public static String xmlToString(Node node) {
+            try {
+                Source source = new DOMSource(node);
+                StringWriter stringWriter = new StringWriter();
+                Result result = new StreamResult(stringWriter);
+                TransformerFactory factory = TransformerFactory.newInstance();
+                Transformer transformer = factory.newTransformer();
+                transformer.transform(source, result);
+                return stringWriter.getBuffer().toString();
+            } catch (TransformerConfigurationException e) {
+                e.printStackTrace();
+            } catch (TransformerException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
-
-    public static Element levelToXml(Level level, Document doc) {
-
-        Element levelNode = doc.createElement("level");
-
-        addCDataNode("name", level.getName(), levelNode);
-
-        return levelNode;
-    }
-
-    public static String xmlToString(Node node) {
-        try {
-            Source source = new DOMSource(node);
-            StringWriter stringWriter = new StringWriter();
-            Result result = new StreamResult(stringWriter);
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer transformer = factory.newTransformer();
-            transformer.transform(source, result);
-            return stringWriter.getBuffer().toString();
-        } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-}
 }
 
 // End OlapTest.java
