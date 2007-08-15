@@ -966,10 +966,10 @@ public class ConnectionTest extends TestCase {
                         request, urlString, map, null);
                     return new ByteArrayInputStream(bytes);
                 } catch (ServletException e) {
-                    throw new IOException(
+                    throw new RuntimeException(
                         "Error while reading '" + url + "'", e);
                 } catch (SAXException e) {
-                    throw new IOException(
+                    throw new RuntimeException(
                         "Error while reading '" + url + "'", e);
                 }
             }
