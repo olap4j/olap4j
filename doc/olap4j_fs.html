@@ -192,7 +192,7 @@ Last modified: June 10<sup>th</sup>, 2007.</p>
 	<li><a href="#Non-functionality">Non-functionality</a></li>
 	<li><a href="#Related_projects">Related projects</a><ol>
 		<li><a href="#Mondrian_provider">Mondrian provider</a></li>
-		<li><a href="#JPivot">JPivot</a></li>
+		<li><a href="#XMLA_provider">XML for Analysis provider</a></li>
 		<li><a href="#Other_data_sources">Other data sources</a></li>
 	</ol>
 	</li>
@@ -208,7 +208,7 @@ Last modified: June 10<sup>th</sup>, 2007.</p>
 
 <p>olap4j is an open Java API for building OLAP applications.</p>
 
-<p>In essence, olap4j is to multidimensional data JDBC is for relational data.
+<p>In essence, olap4j is to multidimensional data what JDBC is for relational data.
 olap4j has a similar programming model to JDBC, shares some of its core classes,
 and has many of the same advantages. You can write an OLAP application in Java
 for one
@@ -390,7 +390,7 @@ with JDBC 4.0 will require a new release of olap4j.</p>
 <p>We now describe the olap4j API in more detail, by breaking it down into a set
 of functional areas.</p>
 
-<img class="std" alt="olap4j components" src="open/olap4j/doc/olap4j-comp.png" width="740" height="692">
+<img class="std" alt="olap4j components" src="olap4j-comp.png" width="740" height="692">
 
 <h3>2.1. <a name="Driver_management">Driver management</a></h3>
 
@@ -3259,12 +3259,12 @@ will come in several flavors.</p>
 <h2>4. <a name="Non-functionality">Non-functionality</a></h2>
 
 <p>Here are some of the areas of functionality which will <i>not</i> be part of
-the olap4j project:</p>
+olap4j:</p>
 <ul>
   <li>Schema reader parses an XML file to create a schema</li>
   <li>Cache management functions </li>
   <li>Ability to create/modify schema dynamically</li>
-  <li>Definitions of MDX functions</li>
+  <li>Definitions of MDX functions (such as the number and types of parameters)</li>
   <li>SPI to extend the system by creating user-defined functions and so forth</li>
   <li>XML/A bridge (to make an olap4j data source appear as an XML/A server)</li>
   <li>SchemaReader</li>
@@ -3275,16 +3275,19 @@ the olap4j project:</p>
 <h3>5.1. <a name="Mondrian_provider">Mondrian provider</a></h3>
 
 <p>The Mondrian project will contain an implementation of the olap4j API based on
-the Mondrian OLAP server.</p>
+the Mondrian OLAP engine.</p>
+<p>This code is currently being developed the same source-code repository as 
+olap4j, and is the reference implementation of olap4j. The code will be 
+contributed to the mondrian project in the mondrian-3.0 release, when olap4j 
+will become mondrian's primary API, and the mondrian team will take over its 
+development.</p>
 
-<h3>5.2. <a name="JPivot">JPivot</a></h3>
-
-<p>JPivot currently based on two data sources: the Mondrian server, and a
-generic XML/A data source.</p>
-
-<p>We intend to convert JPivot to run solely on the olap4j API. Connectivity to
-Mondrian and XML/A sources will be achieved by choosing the appropriate olap4j
-provider. </p>
+<h3>5.2. <a name="XMLA_provider">XML for Analysis provider</a></h3>
+<p>We intend to create an a driver which implements the olap4j API on top of any 
+XML/A data source.</p>
+<p>This code is currently being developed in the same source-code repository as 
+olap4j, but will never be part of any olap4j release, and will be spun off as a 
+separate project before olap4j 1.0.</p>
 
 <h3>5.3. <a name="Other_data_sources">Other data sources</a></h3>
 

@@ -58,8 +58,14 @@ public interface Level extends MetadataElement {
     // todo: needs specification
     Member findMember(String memberName);
 
-    // todo: better query interface? (level can have a lot of members)
-    // todo: return NamedList?
+    /**
+     * Returns a list of Member objects which belong to this Level.
+     *
+     * <p>Some levels have a very many members. In this case, calling this
+     * method may be expensive in space and/or time and is not recommended.
+     *
+     * @return List of members in this level
+     */
     List<Member> getMembers();
 
     /**

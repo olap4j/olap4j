@@ -1,0 +1,105 @@
+# Tasks for olap4j 0.9 
+# Author: Julian Hyde
+# $Id: $
+
+Introduction: How to use this document
+--------------------------------------
+
+This document is a list of tasks to be accomplished before olap4j-0.9 is released.
+
+The tasks are grouped by category, but sometimes different aspects of the same task appear in multiple categories, so be smart when selecting which tasks to work on. For example, writing a description of the Cube class appears as a specification task and a javadoc task.
+
+Pick some tasks to work on - most of them are quite short - make the changes to the specification, delete the completed tasks from this list, and check in your changes along with the new version of this file.
+
+Remember that other people may be editing this file, so avoid non-mergeable edits.
+
+Specification
+-------------
+
+* D.1 add discussion of thread-safety 
+* D.1 add discussion of api for cancelling statements 
+* D.1 add discussion of compliance levels 
+* D.1 describe how members of axis can be accessed via iterator or list, with code examples 
+* 2.1.5 internationalization: move section elsewhere; what is the behavior of locale? does it belong to connection? fix and test Query.getLocale(). document that all methods which return localized strings take a locale parameter; that parameter may be null, in which case the connection's locale is used 
+* 2.3.2 how to find out what cube a prepared statement relates to 
+* 2.3.10 remove section CellSetAxis - duplicates 2.3.5 
+* 2.7.2 diagram of object model 
+* 2.7.2.x define Schema, Cube, Dimension, Hierarchy, Level, Member, Measure, Property, NamedSet. 
+* 2.7.3 The OlapDatabaseMetaData interface: 
+** clean up data types (should be JDBC types)  
+** clean up column names (should be UPPER_CASE) 
+** define enum types 
+* 2.7.3.2 is VALUE a SQL reserved word? if so, rename the property 
+* 2.8 query model - barry and/or james complete? 
+* 2.9 layout - remove from spec? 
+* add parse and parser model to specification 
+* discuss access-control (each provider can have their own rules. can set access-control on the connection. metadata methods should be consistent with that.) 
+ 
+Javadoc
+-------
+ 
+* class doc for org.olap4j.cellsetaxis 
+* class doc for org.olap4j.olapwrapper 
+* class doc for mondrian.olap4j.emptyresultset 
+* class doc for mondrianolap4jconnection.helper 
+* class doc for olap4j.mdx.parsetreewriter 
+* class doc for olap4j.mdx.parseregion.regionandsource 
+* class doc for org.olap4j.metadata.Catalog 
+* class doc for org.olap4j.metadata.Cube 
+* class doc for org.olap4j.metadata.Dimension 
+* class doc for org.olap4j.metadata.Hierarchy 
+* class doc for org.olap4j.metadata.Measure 
+* class doc for org.olap4j.metadata.MetadataElement 
+* class doc for org.olap4j.metadata.Schema 
+* class doc for org.olap4j.metadata.Property.Datatype 
+* class doc for org.olap4j.metadata.Property.Scope 
+* change ant task so it doesn't generate mondrian.olap4j.* or olap4j.test.* or org.olap4j.mdx.parser.impl or package-protected classes (E.g. org.olap4j.mdx.MdxValidator) in public api; remove class OlapTest, class Todo 
+* package mdx.parser.impl - comment that this package is not part of the spec, and implementation may change at any time 
+* ensure that every public method has a javadoc description, including @param, @return and @throws declarations 
+* document OlapDatabaseMetadata.getXxx methods 
+* Review olap4j.type package. Document all public methods. Make non-essential methods (E.g. MemberType.forType) package-private. If in doubt, leave it out 
+ 
+Code
+----
+ 
+* Write javadoc for, implement and test Level.findMember 
+* in QueryAxis, make dimension list mutable; remove methods QueryAxis.clearDimensions, appendDimensions, appendDimension, insertDimension, removeDimension; and add tests for the functionality of these methods; remove methods from spec. 
+* in QueryDimension, make selection list mutable; remove methods addSelection, addMemberSelection, addSelections, clearSelections; add tests; remove from spec. 
+* fix 4 TODOs in ParserTest 
+ 
+Testing
+-------
+ 
+* Ensure that there is a unit test for every method in every public class or interface. 
+* Write unit test for metadata classes. 
+* Write unit test for OlapDatabaseMetadata.getXxx methods 
+* Internationalization test, including Connection.getLocale(), Query.getLocale(), and all methods with Locale methods or results 
+* Test access control. The metadata (e.g. members & hierarchies) should reflect what the current user/role can see. For example, USA.CA.SF has no children. This test should test every method which returns a metadata element or collection of metadata elements. 
+* ConnectionTest (301, 12) // todo: call getCubes with a pattern for cube name and schema name  
+* ConnectionTest (303, 12) // todo: call getCubes with a different schema  
+* ConnectionTest (367, 12) // todo: More tests required for other methods on DatabaseMetaData  
+* ConnectionTest (428, 8) // todo: test statement with no slicer  
+* ConnectionTest (596, 12) // todo: test all of the PreparedOlapStatement.setXxx methods 
+* Test methods in class Cell. (see ConnectionTest.testCell) 
+* Test methods in class CellSetAxis. (see ConnectionTest.testCellSetAxis) 
+* Test methods in OlapResultAxisMetaData (see ConnectionTest.testOlapResultAxisMetaData) 
+* Test cell and dimension properties (in ConnectionTest, see "todo: submit a query with cell and dimension properties, and make sure the properties appear in the result set") 
+* Test scrolling (in ConnectionTest, see "todo: submit a query where you ask for different scrolling") 
+* Test building parse tree (in ConnectionTest see "build parse tree (todo) ") 
+* Test axis name uniqueness (in ConnectionTest, see "test that get error if axes do not have unique names (todo)") 
+ 
+Not in scope for olap4j 0.9
+---------------------------
+ 
+* convert parser to javacc 
+* XMLA driver 
+ 
+General guidelines
+------------------
+ 
+* Coding standards are as for mondrian: 80 characters, indent 4, no tabs 
+* Javadoc: all public classes and members have javadoc, including @param, @return, @throws 
+* Do not write javadoc for overriding/implementing methods 
+* Must be javadoc clean on checkin 
+
+# Ends

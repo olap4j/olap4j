@@ -809,10 +809,6 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
-     * Tests access control. The metadata (e.g. members & hierarchies) should
-     * reflect what the current user/role can see. For example, USA.CA.SF has no children.
-     */
-    /**
      * Abstracts the information about specific drivers and database instances
      * needed by this test. This allows the same test suite to be used for
      * multiple implementations of olap4j.

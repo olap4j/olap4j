@@ -43,6 +43,8 @@ public interface Cell {
      * <li>(row 1, column 0) has ordinal 10,</li>
      * <li>(row 19, column 9) has ordinal 199.</li>
      * </ul>
+     *
+     * @return Ordinal of this Cell
      */
     int getOrdinal();
 
@@ -56,14 +58,22 @@ public interface Cell {
      *    getResult().ordinalToCoordinateList(getOrdinal())
      * </code>
      * </blockquote>
+     *
+     * @return Coordinates of this Cell
      */
     List<Integer> getCoordinateList();
 
     /**
      * Returns the value of a given property for this Cell.
      *
-     * @see org.olap4j.CellSet#getMetaData()
-     * @see Todo
+     * <p>The list of allowable properties may be obtained by calling
+     * {@link org.olap4j.CellSet#getMetaData()} followed by
+     * {@link CellSetMetaData#getCellProperties()}.</p>
+     *
+     * @param property Property whose value to retrieve
+     *
+     * @return Value of the given property for this Cell; if the property is
+     * not set, returns null
      */
     Object getPropertyValue(Property property);
 
@@ -91,20 +101,40 @@ public interface Cell {
     /**
      * Returns the value of this cell as a <code>double</code> value.
      *
+     * <p>Not all values can be represented as using the Java
+     * <code>double</code>, therefore for some providers, {@link #getValue()}
+     * may return a more accurate result.
+     *
+     * @return The value of this cell; if the cell is null, the
+     * returns <code>0</code>
+     *
      * @throws OlapException if this cell does not have a numeric value
      */
     double getDoubleValue() throws OlapException;
 
     /**
-     * @see Todo
+     * Returns the error message of this Cell, or null if the cell is not
+     * in error.
+     *
+     * <p>If the cell is an error, the value will be an {@link OlapException}.
+     * (This value is returned, not thrown.)
+     *
+     * @return value of this Cell
      */
     String getErrorText();
 
     /**
-     * @see Todo
+     * Returns the value of this Cell.
      *
-     * Returns (does not throw) an {@link OlapException} if the cell is an
-     * error.
+     * <p>If the cell is an error, the value will be an {@link OlapException}.
+     * (This value is returned, not thrown.)
+     *
+     * <p>If the cell has a numeric value, returns an object which implements
+     * the {@link Number} interface.
+     *
+     * @see #getDoubleValue()
+     *
+     * @return value of this Cell
      */
     Object getValue();
 
@@ -120,6 +150,8 @@ public interface Cell {
     /**
      * Drills through from this cell to the underlying fact table data,
      * and returns a {@link java.sql.ResultSet} of the results.
+     *
+     * @return result set of the fact rows underlying this Cell
      */
     ResultSet drillThrough();
 }

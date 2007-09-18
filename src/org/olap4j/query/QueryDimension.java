@@ -85,8 +85,13 @@ public class QueryDimension {
         selections.clear();
     }
 
-    public Selection createSelection(String hierarchyName, String levelName, String memberName) {
-        return createSelection(hierarchyName, levelName, memberName, Selection.Operator.MEMBER);
+    public Selection createSelection(
+        String hierarchyName,
+        String levelName,
+        String memberName)
+    {
+        return createSelection(
+            hierarchyName, levelName, memberName, Selection.Operator.MEMBER);
     }
 
     public Selection createSelection(
@@ -102,7 +107,9 @@ public class QueryDimension {
             if (level != null) {
                 Member member = level.findMember(memberName);
                 if (member != null) {
-                    selection = query.getSelectionFactory().createMemberSelection(member);
+                    selection =
+                        query.getSelectionFactory()
+                            .createMemberSelection(member);
                 }
             }
         }

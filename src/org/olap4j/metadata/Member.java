@@ -139,9 +139,8 @@ public interface Member extends MetadataElement {
      *
      * <p>Every member has certain system properties such as "name" and
      * "caption" (the full list is described in the {@link Property}
-     * ({@link org.olap4j.Todo todo: move Property})
      * enumeration), as well as extra properties defined for its Level
-     * (see {@link Level#getProperties()}
+     * (see {@link Level#getProperties()}).</p>
      *
      * @see #getPropertyValue(String)
      */
