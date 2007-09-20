@@ -15,7 +15,11 @@ import java.util.Collection;
 import org.olap4j.OlapException;
 
 /**
- * <code>Schema</code> ...
+ * A collection of database objects that contain structural information, or
+ * metadata, about a database.
+ *
+ * <p>A Schema belongs to a {@link Catalog} and contains a number of
+ * {@link Cube}s and shared {@link Dimension}s.
  *
  * @author jhyde
  * @version $Id$
@@ -24,6 +28,8 @@ import org.olap4j.OlapException;
 public interface Schema {
     /**
      * Returns the {@link Catalog} this <code>Schema</code> belongs to.
+     *
+     * @return catalog this schema belongs to
      */
     Catalog getCatalog();
 
@@ -37,8 +43,13 @@ public interface Schema {
     /**
      * Returns a list of cubes in this <code>Schema</code>.
      *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.</p>
+     *
      * @see org.olap4j.OlapDatabaseMetaData#getCubes
      * @return List of cubes in this Schema
+     *
+     * @throws OlapException if database error occurs
      */
     NamedList<Cube> getCubes() throws OlapException;
 
@@ -46,7 +57,14 @@ public interface Schema {
      * Returns a list of shared {@link Dimension} objects in this
      * <code>Schema</code>.
      *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.</p>
+     *
      * @see org.olap4j.OlapDatabaseMetaData#getDimensions()
+     *
+     * @return list of shared dimensions
+     * 
+     * @throws OlapException if database error occurs
      */
     NamedList<Dimension> getSharedDimensions() throws OlapException;
 
@@ -69,6 +87,8 @@ public interface Schema {
      *
      * @return List of locales for which this <code>Schema</code> has been
      * localized
+     *
+     * @throws OlapException if database error occurs
      */
     Collection<Locale> getSupportedLocales() throws OlapException;
 }

@@ -364,10 +364,33 @@ public class ParseRegion {
         return sqlWithCarets;
     }
 
+    /**
+     * Combination of a region within an MDX statement with the source text
+     * of the whole MDX statement.
+     *
+     * <p>Useful for reporting errors. For example, the error in the statement
+     *
+     * <blockquote>
+     * <pre>
+     * SELECT {<b><i>[Measures].[Units In Stock]</i></b>} ON COLUMNS
+     * FROM [Sales]
+     * </pre>
+     * </blockquote>
+     *
+     * has source
+     * "SELECT {[Measures].[Units In Stock]} ON COLUMNS\nFROM [Sales]" and
+     * region [1:9, 1:34].
+     */
     public static class RegionAndSource {
         public final String source;
         public final ParseRegion region;
 
+        /**
+         * Creates a RegionAndSource.
+         *
+         * @param source Source MDX code
+         * @param region Coordinates of region within MDX code
+         */
         public RegionAndSource(String source, ParseRegion region) {
             this.source = source;
             this.region = region;

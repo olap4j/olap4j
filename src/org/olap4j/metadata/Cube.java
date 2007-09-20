@@ -14,7 +14,11 @@ import java.util.Locale;
 import java.util.Collection;
 
 /**
- * <code>Cube</code> ...
+ * Central metadata object for representation of multidimensional data.
+ *
+ * <p>A Cube belongs to a {@link Schema}, and is described by a list of
+ * {@link Dimension}s and a list of {@link Measure}s. It may also have one or
+ * more {@link NamedSet}s.
  *
  * @author jhyde
  * @version $Id$
@@ -23,13 +27,20 @@ import java.util.Collection;
 public interface Cube extends MetadataElement {
     /**
      * Returns the {@link Schema} this Cube belongs to.
+     *
+     * @return Schema this Cube belongs to
      */
     Schema getSchema();
 
     /**
      * Returns a list of {@link Dimension} objects in this Cube.
      *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.</p>
+     *
      * @see org.olap4j.OlapDatabaseMetaData#getDimensions()
+     *
+     * @return list of Dimensions
      */
     NamedList<Dimension> getDimensions();
 
@@ -37,13 +48,20 @@ public interface Cube extends MetadataElement {
      * Returns a list of {@link Measure} objects in this Cube.
      *
      * @see org.olap4j.OlapDatabaseMetaData#getMeasures()
+     *
+     * @return list of Measures
      */
     List<Measure> getMeasures();
 
     /**
      * Returns a list of {@link NamedSet} objects in this Cube.
      *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.</p>
+     *
      * @see org.olap4j.OlapDatabaseMetaData#getSets()
+     *
+     * @return list of NamedSets
      */
     NamedList<NamedSet> getSets();
 

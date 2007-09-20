@@ -18,7 +18,10 @@ package org.olap4j.metadata;
  */
 public interface NamedSet extends MetadataElement {
     /**
-     * Returns the <code>Cube</code> that this <code>NamedSet</code> belongs to.
+     * Returns the <code>Cube</code> that this <code>NamedSet</code> belongs
+     * to.
+     *
+     * @return cube this named set belongs to
      */
     Cube getCube();
 }

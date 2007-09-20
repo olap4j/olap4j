@@ -12,7 +12,25 @@ package org.olap4j.mdx;
 import java.io.PrintWriter;
 
 /**
- * <code>ParseTreeWriter</code> ...
+ * Writer for MDX parse tree.
+ *
+ * <p>Typical use is with the {@link ParseTreeNode#unparse(ParseTreeWriter)}
+ * method as follows:
+ * 
+ * <blockquote>
+ * <pre>
+ * ParseTreeNode node;
+ * StringWriter sw = new StringWriter();
+ * PrintWriter pw = new PrintWriter(sw);
+ * ParseTreeWriter mdxWriter = new ParseTreeWriter(pw);
+ * node.unparse(mdxWriter);
+ * pw.flush();
+ * String mdx = sw.toString();
+ * </pre>
+ * </blockquote>
+ *
+ *
+ * @see org.olap4j.mdx.ParseTreeNode#unparse(ParseTreeWriter)
  *
  * @author jhyde
  * @version $Id$
@@ -21,10 +39,20 @@ import java.io.PrintWriter;
 public class ParseTreeWriter {
     private final PrintWriter pw;
 
+    /**
+     * Creates a ParseTreeWriter.
+     *
+     * @param pw Underlying writer
+     */
     public ParseTreeWriter(PrintWriter pw) {
         this.pw = pw;
     }
 
+    /**
+     * Returns the underlying writer.
+     *
+     * @return underlying writer
+     */
     public PrintWriter getPrintWriter() {
         return pw;
     }

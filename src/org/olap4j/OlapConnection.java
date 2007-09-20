@@ -51,6 +51,9 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * Returns a list of {@link org.olap4j.metadata.Catalog} objects which
      * belong to this connection's OLAP server.
      *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.</p>
+     *
      * @see OlapDatabaseMetaData#getCatalogs()
      * @return List of Catalogs in this connection's OLAP server
      */

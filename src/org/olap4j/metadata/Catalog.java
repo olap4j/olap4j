@@ -13,10 +13,18 @@ import org.olap4j.OlapException;
 import org.olap4j.OlapDatabaseMetaData;
 
 /**
- * <code>Catalog</code> ...
+ * Highest level element in the hierarchy of metadata objects.
  *
- * A <code>Catalog</code> is the root object in the hierarchy of metadata
- * objects:
+ * <p>A Catalog contains one or more {@link Schema}s.</p>
+ *
+ * <p>Some OLAP servers may only have one Catalog. Mondrian is one such
+ * OLAP server; its sole catalog is called "LOCALDB".
+ *
+ * <p>To obtain the collection of catalogs in the current server, call the
+ * {@link org.olap4j.OlapConnection#getCatalogs()} method.
+ *
+ * <p>The hierarchy of metadata objects, rooted at the connection from which 
+ * they are accessed, is as follows:
  * <blockquote>
  * <ul>
  * <li type="circle">{@link org.olap4j.OlapConnection}<ul>
@@ -38,6 +46,7 @@ import org.olap4j.OlapDatabaseMetaData;
  *     </ul></li>
  *  </ul>
  * </blockquote>
+ * </p>
  *
  * @author jhyde
  * @version $Id$
@@ -47,6 +56,9 @@ public interface Catalog {
     /**
      * Returns a list of {@link Schema} objects which belong to
      * this <code>Catalog</code>.
+     *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.</p>
      *
      * @see org.olap4j.OlapDatabaseMetaData#getSchemas
      * @return List of Schema in this <code>Catalog</code>

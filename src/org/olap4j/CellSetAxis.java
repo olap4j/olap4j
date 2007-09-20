@@ -13,7 +13,20 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * <code>CellSetAxis</code> ...
+ * Axis of a CellSet.
+ *
+ * <p>A cell set has the same number of axes as the MDX statement which was
+ * executed to produce it. For example, a typical cell set, resulting from an
+ * MDX query with COLUMNS and ROWS expressions is two-dimensional, and
+ * therefore has two axes.</p>
+ *
+ * <p>Each axis is an ordered collection of members or tuples. Each member or
+ * tuple on an axis is called a {@link Position}.</p>
+ *
+ * <p>The positions on the cell set axis can be accessed sequentially or
+ * random-access. Use the {@link #getPositions()} method to return a list for
+ * random access, or the {@link #iterate()} method to obtain an iterator for
+ * sequential access.
  *
  * @author jhyde
  * @version $Id$
@@ -25,12 +38,16 @@ public interface CellSetAxis {
      *
      * <p>0 = ROWS, 1 = COLUMNS, and so forth, as described by the
      * {@link Axis#axisOrdinal()} method of the {@link Axis} enumeration.</p>
+     *
+     * @return the ordinal of this axis
      */
     int getOrdinal();
 
     /**
      * Returns the {@link CellSet} which this <code>CellSetAxis</code>
      * belongs to.
+     *
+     * @return the CellSet
      */
     CellSet getCellSet();
 
@@ -44,6 +61,8 @@ public interface CellSetAxis {
      * getCellSet().getMetaData().getAxesMetaData(getOrdinal())
      * </code>
      * </blockquote>
+     *
+     * @return metadata describing this CellSetAxis
      */
     CellSetAxisMetaData getAxisMetaData();
 
@@ -63,11 +82,15 @@ public interface CellSetAxis {
      *
      * <p>The number of positions on an axis is important when computing the
      * ordinal of a cell.</p>
+     *
+     * @return the number of positions
      */
     int getPositionCount();
 
     /**
-     * Opens an iterator on
+     * Opens an iterator over the positions on this CellSetAxis.
+     *
+     * @return iterator over the collection of positions
      */
     ListIterator<Position> iterate();
 

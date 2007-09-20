@@ -12,15 +12,25 @@ package org.olap4j.metadata;
 import java.util.Locale;
 
 /**
- * Common interface for
+ * An element which describes the structure of an OLAP schema.
  *
  * @author jhyde
  * @version $Id$
  * @since Oct 13, 2006
  */
 public interface MetadataElement {
+    /**
+     * Returns the name of this element.
+     *
+     * @return name
+     */
     String getName();
 
+    /**
+     * Returns the unique name of this element within its schema.
+     *
+     * @return unique name of this element
+     */
     String getUniqueName();
     
     /**

@@ -56,58 +56,34 @@ class MondrianOlap4jLevel implements Level {
     }
 
     public Type getLevelType() {
-        if (false) {
-            return null;
-        }
         throw new UnsupportedOperationException();
     }
 
     public NamedList<Property> getProperties() {
-        if (false) {
-            return null;
-        }
         throw new UnsupportedOperationException();
     }
 
     public Member findMember(String memberName) {
-        if (false) {
-            return null;
-        }
         throw new UnsupportedOperationException();
     }
 
     public List<Member> getMembers() {
-        if (false) {
-            return null;
-        }
         throw new UnsupportedOperationException();
     }
 
     public String getName() {
-        if (false) {
-            return null;
-        }
         throw new UnsupportedOperationException();
     }
 
     public String getUniqueName() {
-        if (false) {
-            return null;
-        }
         throw new UnsupportedOperationException();
     }
 
     public String getCaption(Locale locale) {
-        if (false) {
-            return null;
-        }
         throw new UnsupportedOperationException();
     }
 
     public String getDescription(Locale locale) {
-        if (false) {
-            return null;
-        }
         throw new UnsupportedOperationException();
     }
 }

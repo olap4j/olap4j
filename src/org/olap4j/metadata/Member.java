@@ -28,7 +28,15 @@ public interface Member extends MetadataElement {
      * <p>If access-control is in place, the list does not contain inaccessible
      * children.
      *
+     * <p>If the member has no children, returns an empty list: the result is
+     * never null.
+     *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.</p>
+     *
      * @see org.olap4j.OlapDatabaseMetaData#getMembers()
+     *
+     * @return children of this member
      */
     NamedList<? extends Member> getChildMembers();
 

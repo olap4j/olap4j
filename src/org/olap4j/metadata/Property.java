@@ -36,11 +36,18 @@ public interface Property extends MetadataElement {
 
     boolean isInternal();
 
+    /**
+     * Enumeration of the scope of a Property: whether it belongs to a member
+     * or a cell.
+     */
     enum Scope {
         MEMBER,
         CELL
     }
 
+    /**
+     * Enumeration of the allowable data types of a Property.
+     */
     enum Datatype {
         TYPE_STRING,
         TYPE_OTHER,

@@ -28,22 +28,30 @@ public interface Level extends MetadataElement {
      *
      * <p>Note #2: In a parent-child hierarchy, the depth of a member (as
      * returned by may not be the same as the depth of its level.
+     *
+     * @return depth of this level
      */
     int getDepth();
 
     /**
      * Returns the {@link Hierarchy} this <code>Level</code> belongs to.
+     *
+     * @return hierarchy this level belongs to
      */
     Hierarchy getHierarchy();
 
     /**
      * Returns the Dimension this <code>Level</code> belongs to.
      * (Always equivalent to <code>getHierarchy().getDimension()</code>.)
+     *
+     * @return dimension this level belongs to
      */
     Dimension getDimension();
 
     /**
      * Returns the type of this <code>Level</code>.
+     *
+     * @return level type
      */
     Level.Type getLevelType();
 
@@ -51,7 +59,12 @@ public interface Level extends MetadataElement {
      * Returns a list of definitions for the properties available to members
      * of this <code>Level</code>.
      *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.</p>
+     *
      * @see org.olap4j.OlapDatabaseMetaData#getProperties()
+     *
+     * @return properties of this level
      */
     NamedList<Property> getProperties();
 
@@ -130,6 +143,8 @@ public interface Level extends MetadataElement {
          * Returns whether this is a time-related level
          * ({@link #TimeYears}, {@link #TimeQuarters}, {@link #TimeMonths},
          * {@link #TimeWeeks}, {@link #TimeDays}).
+         *
+         * @return whether this is a time-related level
          */
         public boolean isTime() {
             return time;

@@ -12,7 +12,14 @@ package org.olap4j;
 import java.sql.SQLException;
 
 /**
- * <code>OlapWrapper</code> ...
+ * Interface for olap4j classes which provide the ability to retrieve the
+ * delegate instance when the instance in question is in fact a proxy class.
+ *
+ * <p><code>OlapWrapper</code> duplicates the functionality of the
+ * <code>java.sql.Wrapper</code> interface (introduced in JDBC 4.0), making
+ * this functionality available to olap4j clients running in a JDBC 3.0
+ * environment. For code which will run only on JDBC 4.0 and later, Wrapper can
+ * be used, and OlapWrapper can be ignored.</p>
  *
  * <p>In JDBC 3.0 (JDK 1.5) and earlier, the <code>OlapWrapper</code> interface
  * is used to convert a JDBC class to the corresponding olap4j class. For

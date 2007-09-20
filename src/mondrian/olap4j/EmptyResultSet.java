@@ -20,7 +20,11 @@ import java.util.Calendar;
 import java.net.URL;
 
 /**
- * <code>EmptyResultSet</code> ...
+ * Implementation of {@link ResultSet} which returns 0 rows.
+ *
+ * <p>This class is used to implement {@link java.sql.DatabaseMetaData}
+ * methods for querying object types where those object types never have
+ * any instances for this particular driver.</p>
  *
  * @author jhyde
  * @version $Id$
@@ -82,9 +86,6 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
     }
 
     public byte[] getBytes(int columnIndex) throws SQLException {
-        if (false) {
-            return new byte[0];
-        }
         throw new UnsupportedOperationException();
     }
 
@@ -150,9 +151,6 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
     }
 
     public byte[] getBytes(String columnLabel) throws SQLException {
-        if (false) {
-            return new byte[0];
-        }
         throw new UnsupportedOperationException();
     }
 

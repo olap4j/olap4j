@@ -84,6 +84,7 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
      *
      * @pre acceptsURL(url)
      *
+     * @param factory Factory
      * @param url Connect-string URL
      * @param info Additional properties
      * @throws SQLException if there is an error
@@ -440,13 +441,16 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
         return types;
     }
 
-    public Axis toOlap4j(mondrian.olap.AxisOrdinal axisOrdinal) {
-        if (false) {
-            return null;
-        }
+    Axis toOlap4j(mondrian.olap.AxisOrdinal axisOrdinal) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Converts a Properties object to a Map with String keys and values.
+     *
+     * @param properties Properties
+     * @return Map backed by the given Properties object
+     */
     public static Map<String, String> toMap(final Properties properties) {
         return new AbstractMap<String, String>() {
             public Set<Entry<String, String>> entrySet() {
@@ -457,23 +461,57 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
 
     // inner classes
 
+    /**
+     * Package-private helper class which encapsulates policies which are
+     * common throughout the driver. These policies include exception handling
+     * and factory methods.
+     */
     static class Helper {
         SQLException createException(String msg) {
             return new SQLException(msg);
         }
 
+        /**
+         * Creates an exception in the context of a particular Cell.
+         *
+         * @param context Cell context for exception
+         * @param msg Message
+         * @return New exception
+         */
         OlapException createException(Cell context, String msg) {
             OlapException exception = new OlapException(msg);
             exception.setContext(context);
             return exception;
         }
 
-        OlapException createException(Cell context, String msg, Throwable cause) {
+        /**
+         * Creates an exception in the context of a particular Cell and with
+         * a given cause.
+         *
+         * @param context Cell context for exception
+         * @param msg Message
+         * @param cause Causing exception
+         * @return New exception
+         */
+        OlapException createException(
+            Cell context, String msg, Throwable cause)
+        {
             OlapException exception = new OlapException(msg, cause);
             exception.setContext(context);
             return exception;
         }
 
+        /**
+         * Converts a SQLException to an OlapException. Casts the exception
+         * if it is already an OlapException, wraps otherwise.
+         *
+         * <p>This method is typically used as an adapter for SQLException
+         * instances coming from a base class, where derived interface declares
+         * that it throws the more specific OlapException.
+         *
+         * @param e Exception
+         * @return Exception as an OlapException
+         */
         public OlapException toOlapException(SQLException e) {
             if (e instanceof OlapException) {
                 return (OlapException) e;

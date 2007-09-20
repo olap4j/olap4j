@@ -14,19 +14,8 @@ import org.olap4j.type.Type;
 /**
  * Node in a parse tree representing a parsed MDX statement.
  *
- * <p>To convert a parse tree to an MDX string, use a {@link ParseTreeWriter} as
- * follows:
- * <blockquote>
- * <pre>
- * ParseTreeNode node;
- * StringWriter sw = new StringWriter();
- * PrintWriter pw = new PrintWriter(sw);
- * ParseTreeWriter mdxWriter = new ParseTreeWriter(pw);
- * node.unparse(mdxWriter);
- * pw.flush();
- * String mdx = sw.toString();
- * </pre>
- * </blockquote>
+ * <p>To convert a parse tree to an MDX string, use a {@link ParseTreeWriter}
+ * and the {@link #unparse(ParseTreeWriter)} method.
  *
  * @author jhyde
  * @version $Id$
