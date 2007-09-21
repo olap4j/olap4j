@@ -107,7 +107,7 @@ public interface Dimension extends MetadataElement {
         CUSTOMERS(7),
         PRODUCTS(8),
         SCENARIO(9),
-        UTILIY(10),
+        UTILITY(10),
         CURRENCY(11),
         RATES(12),
         CHANNEL(13),

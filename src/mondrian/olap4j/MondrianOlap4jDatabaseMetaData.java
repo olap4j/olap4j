@@ -814,7 +814,9 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public ResultSet getDatabaseProperties(
-        String dataSourceName, String propertyNamePattern) throws OlapException {
+        String dataSourceName,
+        String propertyNamePattern) throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
@@ -861,7 +863,9 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getFunctions() throws OlapException {
+    public ResultSet getFunctions(
+        String functionNamePattern) throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
@@ -876,7 +880,13 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getMeasures(String catalog, String schemaPattern, String cubeNamePattern, String measureNamePattern, String measureUniqueName) throws OlapException {
+    public ResultSet getMeasures(
+        String catalog,
+        String schemaPattern,
+        String cubeNamePattern,
+        String measureNamePattern,
+        String measureUniqueName) throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 

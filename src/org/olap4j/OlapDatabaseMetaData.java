@@ -66,6 +66,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *         action description
      *
      * @exception OlapException if a database access error occurs
+     *
+     * @see #getSearchStringEscape
      */
     ResultSet getActions(
         String catalog,
@@ -127,6 +129,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *         the description of a database property
      *
      * @exception OlapException if a database access error occurs
+     *
+     * @see #getSearchStringEscape
      */
     ResultSet getDatabaseProperties(
         String dataSourceName,
@@ -184,6 +188,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *         description of a member or cell property
      *
      * @exception OlapException if a database access error occurs
+     *
+     * @see #getSearchStringEscape
      */
     ResultSet getProperties(
         String catalog,
@@ -228,6 +234,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @return <code>ResultSet</code> in which each row is a cube description
      *
      * @exception OlapException if a database access error occurs
+     *
+     * @see #getSearchStringEscape
      */
     public ResultSet getCubes(
         String catalog,
@@ -267,6 +275,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *         dimension description
      *
      * @exception OlapException if a database access error occurs
+     *
+     * @see #getSearchStringEscape
      */
     ResultSet getDimensions(
         String catalog,
@@ -282,12 +292,19 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *
      * <p>todo: document parameters and result set columns
      *
+     * @param functionNamePattern a function name pattern; must match the
+     *        function name as it is stored in the database; <code>null</code>
+     *        means that the function name should not be used to narrow the
+     *        search
+     * 
      * @return a <code>ResultSet</code> object in which each row is a
      *         function description
      *
      * @exception OlapException if a database access error occurs
+     *
+     * @see #getSearchStringEscape
      */
-    ResultSet getFunctions() throws OlapException;
+    ResultSet getFunctions(String functionNamePattern) throws OlapException;
 
     /**
      * Retrieves a result set describing each hierarchy within a particular
@@ -326,6 +343,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *         hierarchy description
      *
      * @exception OlapException if a database access error occurs
+     *
+     * @see #getSearchStringEscape
      */
     ResultSet getHierarchies(
         String catalog,
@@ -369,6 +388,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *         measure description
      *
      * @exception OlapException if a database access error occurs
+     *
+     * @see #getSearchStringEscape
      */
     ResultSet getMeasures(
         String catalog,
@@ -419,19 +440,25 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *        the search
      *
      * @param treeOp Only applies to a single member.
-     *       {@link org.olap4j.metadata.Member.TreeOp#ANCESTORS} returns all of the ancestors;
-     *       {@link org.olap4j.metadata.Member.TreeOp#CHILDREN} returns only the immediate
-     *       children;
-     *       {@link org.olap4j.metadata.Member.TreeOp#SIBLINGS} returns members on the same level;
-     *       {@link org.olap4j.metadata.Member.TreeOp#PARENT} returns only the immediate parent;
-     *       {@link org.olap4j.metadata.Member.TreeOp#SELF} returns itself in the list of returned
-     *       rows;
-     *       {@link org.olap4j.metadata.Member.TreeOp#DESCENDANTS} returns all of the descendants.
+     *       {@link org.olap4j.metadata.Member.TreeOp#ANCESTORS}
+     *       returns all of the ancestors;
+     *       {@link org.olap4j.metadata.Member.TreeOp#CHILDREN}
+     *       returns only the immediate children;
+     *       {@link org.olap4j.metadata.Member.TreeOp#SIBLINGS}
+     *       returns members on the same level;
+     *       {@link org.olap4j.metadata.Member.TreeOp#PARENT}
+     *       returns only the immediate parent;
+     *       {@link org.olap4j.metadata.Member.TreeOp#SELF}
+     *       returns itself in the list of returned rows;
+     *       {@link org.olap4j.metadata.Member.TreeOp#DESCENDANTS}
+     *       returns all of the descendants.
      *
      * @return a <code>ResultSet</code> object in which each row is a
      *         member description
      *
      * @exception OlapException if a database access error occurs
+     *
+     * @see #getSearchStringEscape
      */
     ResultSet getMembers(
         String catalog,
@@ -484,7 +511,9 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @return a <code>ResultSet</code> object in which each row is a
      *         level description
      *
-     * @exception OlapException if a database access error occurs @param catalog
+     * @exception OlapException if a database access error occurs
+     *
+     * @see #getSearchStringEscape
      */
     ResultSet getLevels(
         String catalog,
@@ -525,6 +554,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *         description of a named set
      *
      * @exception OlapException if a database access error occurs
+     *
+     * @see #getSearchStringEscape
      */
     ResultSet getSets(
         String catalog,

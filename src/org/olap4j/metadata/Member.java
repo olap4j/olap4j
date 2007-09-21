@@ -203,34 +203,63 @@ public interface Member extends MetadataElement {
      */
     Member getDataMember();
 
-    enum TreeOp {
-        CHILDREN("MDTREEOP_CHILDREN", 1, "Returns only the immediate children"),
-        SIBLINGS("MDTREEOP_SIBLINGS", 2, "Returns members on the same level"),
-        PARENT("MDTREEOP_PARENT", 4, "Returns only the immediate parent"),
-        SELF("MDTREEOP_SELF", 8, "Returns the immediate member in the list of returned rows"),
-        DESCENDANTS("MDTREEOP_DESCENDANTS", 16, "Returns all descendants"),
-        ANCESTORS("MDTREEOP_ANCESTORS", 32, "Returns all ancestors");
+    /**
+     * Enumeration of tree operations which can be used when querying
+     * members.
+     *
+     * <p>Some of the values are as specified by XMLA.
+     * For example, XMLA specifies MDTREEOP_CHILDREN with ordinal 1,
+     * which corresponds to the value {@link #CHILDREN}.
+     *
+     * @see org.olap4j.OlapDatabaseMetaData#getMembers
+     */
+    public enum TreeOp {
+        /**
+         * Tree operation which returns only the immediate children.
+         */
+        CHILDREN(1),
 
-        private final String userName;
-        private final int userOrdinal;
-        private final String description;
+        /**
+         * Tree operation which returns members on the same level.
+         */
+        SIBLINGS(2),
 
-        TreeOp(String userName, int userOrdinal, String description) {
-            this.userName = userName;
-            this.userOrdinal = userOrdinal;
-            this.description = description;
+        /**
+         * Tree operation which returns only the immediate parent.
+         */
+        PARENT(4),
+
+        /**
+         * Tree operation which returns itself in the list of returned rows.
+         */
+        SELF(8),
+
+        /**
+         * Tree operation which returns all of the descendants.
+         */
+        DESCENDANTS(16),
+
+        /**
+         * Tree operation which returns all of the ancestors.
+         */
+        ANCESTORS(32);
+
+        private final int xmlaOrdinal;
+
+        private TreeOp(int userOrdinal) {
+            this.xmlaOrdinal = userOrdinal;
         }
 
-        public int userOrdinal() {
-            return userOrdinal;
-        }
-
-        public String userName() {
-            return userName;
-        }
-
-        public String getDescription() {
-            return description;
+        /**
+         * Returns the ordinal code as specified by XMLA.
+         *
+         * <p>For example, the XMLA specification says that the ordinal of
+         * {@link #ANCESTORS} is 32.
+         *
+         * @return ordinal code as specified by XMLA.
+         */
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
         }
     }
 }

@@ -843,7 +843,9 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getFunctions() throws OlapException {
+    public ResultSet getFunctions(
+        String functionNamePattern) throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
@@ -857,7 +859,13 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getMeasures(String catalog, String schemaPattern, String cubeNamePattern, String measureNamePattern, String measureUniqueName) throws OlapException {
+    public ResultSet getMeasures(
+        String catalog,
+        String schemaPattern,
+        String cubeNamePattern,
+        String measureNamePattern,
+        String measureUniqueName) throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
@@ -867,7 +875,9 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String cubeNamePattern,
         String dimensionNamePattern,
         String hierarchyNamePattern,
-        String levelNamePattern, String memberUniqueName, Member.TreeOp treeOp) throws OlapException
+        String levelNamePattern,
+        String memberUniqueName,
+        Member.TreeOp treeOp) throws OlapException
     {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }

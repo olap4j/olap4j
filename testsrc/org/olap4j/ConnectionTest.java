@@ -297,6 +297,7 @@ public class ConnectionTest extends TestCase {
         String measureNamePattern = null;
         String measureUniqueName = null;
         Member.TreeOp treeOp = null;
+        String functionNamePattern = null;
 
         checkResultSet(
             olapDatabaseMetaData.getActions(
@@ -354,27 +355,29 @@ public class ConnectionTest extends TestCase {
         assertTrue(k > 0);
 
         checkResultSet(
-            olapDatabaseMetaData.getDatabaseProperties(dataSourceName, propertyNamePattern));
+            olapDatabaseMetaData.getDatabaseProperties(
+                dataSourceName, propertyNamePattern));
 
         checkResultSet(
             olapDatabaseMetaData.getDatasources(dataSourceName));
 
         checkResultSet(
             olapDatabaseMetaData.getDimensions(
-                catalogNamePattern, schemaPattern, cubeNamePattern, dimensionNamePattern));
+                catalogNamePattern, schemaPattern, cubeNamePattern,
+                dimensionNamePattern));
 
         checkResultSet(
-            olapDatabaseMetaData.getFunctions());
+            olapDatabaseMetaData.getFunctions(functionNamePattern));
 
         checkResultSet(
             olapDatabaseMetaData.getHierarchies(
-                catalogNamePattern, schemaPattern, cubeNamePattern, dimensionNamePattern,
-                hierarchyNamePattern));
+                catalogNamePattern, schemaPattern, cubeNamePattern,
+                dimensionNamePattern, hierarchyNamePattern));
 
         checkResultSet(
             olapDatabaseMetaData.getLevels(
-                catalogNamePattern, schemaPattern, cubeNamePattern, dimensionNamePattern,
-                hierarchyNamePattern, levelNamePattern));
+                catalogNamePattern, schemaPattern, cubeNamePattern,
+                dimensionNamePattern, hierarchyNamePattern, levelNamePattern));
 
         checkResultSet(
             olapDatabaseMetaData.getLiterals());
@@ -398,7 +401,8 @@ public class ConnectionTest extends TestCase {
 
         checkResultSet(
             olapDatabaseMetaData.getSets(
-                catalogNamePattern, schemaPattern, cubeNamePattern, setNamePattern));
+                catalogNamePattern, schemaPattern, cubeNamePattern,
+                setNamePattern));
 
         // todo: More tests required for other methods on DatabaseMetaData
     }
@@ -630,6 +634,7 @@ public class ConnectionTest extends TestCase {
         assertIsClosed(cellSet6, true);
 
         // todo: test all of the PreparedOlapStatement.setXxx methods
+        if (false) pstmt.getCube();
     }
 
     public void testCellSetMetaData() throws SQLException {
