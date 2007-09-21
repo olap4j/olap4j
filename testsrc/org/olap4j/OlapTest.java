@@ -103,7 +103,7 @@ public class OlapTest {
             // Get a list of dimension objects and dump their names, hierarchies, levels
             NamedList<Dimension> dimensions = cube.getDimensions();
             for (Dimension dimension : dimensions) {
-                if (dimension.getDimensionType() == Dimension.Type.Measures) {
+                if (dimension.getDimensionType() == Dimension.Type.MEASURE) {
                     System.out.println("measures dimension name="+dimension.getName());
                 } else {
                     System.out.println("dimension name="+dimension.getName());
@@ -464,7 +464,7 @@ public class OlapTest {
             dimensionNode.appendChild(nameNode);
             attr = doc.createAttribute("isMeasure");
             boolean isMeasures =
-                dimension.getDimensionType() == Dimension.Type.Measures;
+                dimension.getDimensionType() == Dimension.Type.MEASURE;
             attr.setTextContent(Boolean.toString(isMeasures));
             dimensionNode.setAttribute("isMeasures", Boolean.toString(isMeasures));
 

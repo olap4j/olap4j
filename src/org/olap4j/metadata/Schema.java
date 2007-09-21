@@ -60,7 +60,7 @@ public interface Schema {
      * <p>The caller should assume that the list is immutable;
      * if the caller modifies the list, behavior is undefined.</p>
      *
-     * @see org.olap4j.OlapDatabaseMetaData#getDimensions()
+     * @see org.olap4j.OlapDatabaseMetaData#getDimensions(String,String,String,String)
      *
      * @return list of shared dimensions
      * 

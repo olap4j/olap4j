@@ -38,7 +38,7 @@ public interface Cube extends MetadataElement {
      * <p>The caller should assume that the list is immutable;
      * if the caller modifies the list, behavior is undefined.</p>
      *
-     * @see org.olap4j.OlapDatabaseMetaData#getDimensions()
+     * @see org.olap4j.OlapDatabaseMetaData#getDimensions(String,String,String,String)
      *
      * @return list of Dimensions
      */
@@ -47,7 +47,7 @@ public interface Cube extends MetadataElement {
     /**
      * Returns a list of {@link Measure} objects in this Cube.
      *
-     * @see org.olap4j.OlapDatabaseMetaData#getMeasures()
+     * @see org.olap4j.OlapDatabaseMetaData#getMeasures(String,String,String,String,String)
      *
      * @return list of Measures
      */
@@ -59,7 +59,7 @@ public interface Cube extends MetadataElement {
      * <p>The caller should assume that the list is immutable;
      * if the caller modifies the list, behavior is undefined.</p>
      *
-     * @see org.olap4j.OlapDatabaseMetaData#getSets()
+     * @see org.olap4j.OlapDatabaseMetaData#getSets(String,String,String,String)
      *
      * @return list of NamedSets
      */

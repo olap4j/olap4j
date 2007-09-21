@@ -82,7 +82,7 @@ TABLE TD {
 Version: 0.89.1-dev (draft)<br>
 Revision: $Id$
 (<a href="http://svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
-Last modified: June 10<sup>th</sup>, 2007.</p>
+Last modified: September 20<sup>th</sup>, 2007.</p>
 <hr noshade="noshade">
 
 <h2><a name="Contents">Contents</a></h2>
@@ -642,7 +642,10 @@ wrong hierarchy.</p>
 is because OLAP parameters have a default value. Parameters have their default
 value until they are set, and then retain their new values for each subsequent
 execution of this <code>PreparedOlapStatement</code>.</p>
-<p>[How to find out what cube a prepared statement relates to?]</p>
+<p>The
+<a class="javadoc" href="api/org/olap4j/PreparedOlapStatement.html#getCube()">
+getCube()</a> method returns the cube (or virtual cube) the prepared statement 
+relates to.</p>
 <h4>2.3.3. <a name="OlapParameterMetaData">The OlapParameterMetaData interface</a></h4>
 <p><a class="javadoc" href="api/org/olap4j/OlapParameterMetaData.html">OlapParameterMetaData</a>
 (extends
@@ -1405,19 +1408,6 @@ column.</p>
 		<td>A brief description of the purpose of the column.</td>
 	</tr>
 </tbody></table>
-<p>[Need to clean up data types in the following tables. Types should all be
-JDBC types.]</p>
-<p>[Need to clean up column names in the following tables. Columns should be
-UPPER_CASE, not CamelCase.]</p>
-<p>[It would be useful to define enum types for the various attributes, such as
-the ProviderType and AuthenticationMode attributes of getDatasources, and the
-DIMENSION_TYPE attribute of getDimensions. In some cases those enums already
-exist, but need to be extended.]</p>
-<p>[Mapping from OLE DB- and XML/A-style column sets to JDBC-style. Types: 
-DBTYPE_WSTR to String, DBTYPE_GUID to String, DBTYPE_DBTIMESTAMP to Timestamp, 
-DBTYPE_BOOL to boolean; DBTYPE_I4, DBTYPE_UI4, DBTYPE_I2 and DBTYPE_UI2 all map 
-to int. Column names: mapped CamelCase to UPPER_CASE.]</p>
-
 <h5>2.7.3.1. <a name="getDatasources">getDatasources</a></h5>
 <p>Specified by the <code>DISCOVER_DATASOURCES</code> XML for Analysis method.</p>
 <p>The returned result set contains the following columns.</p>
@@ -1430,9 +1420,9 @@ to int. Column names: mapped CamelCase to UPPER_CASE.]</p>
 	</tr>
 	<tr>
 		<td>DATA_SOURCE_NAME</td>
-		<td width="74">String not null</td>
+		<td width="74">String</td>
 		<td>The name of the data source, such as <b>
-		FoodMart 2000</b>.</td>
+		FoodMart 2000</b>. Never null.</td>
 	</tr>
 	<tr>
 
@@ -1477,10 +1467,10 @@ to int. Column names: mapped CamelCase to UPPER_CASE.]</p>
 
 		<td>PROVIDER_TYPE</td>
 
-		<td width="74">array [todo] not null</td>
+		<td width="74">String</td>
 
 		<td>
-            <p>The types of data supported by the
+            <p>Comma-separated list of the types of data supported by the
 		provider. May include one or more of the following types. Example
 		follows this table.</p>
             <ul>
@@ -1495,11 +1485,12 @@ to int. Column names: mapped CamelCase to UPPER_CASE.]</p>
 
 		<td>AUTHENTICATION_MODE</td>
 
-		<td width="74">EnumString [todo] not null</td>
+		<td width="74">String</td>
 
 		<td>
             Specification of what type of
-		security mode the data source uses. Values can be one of the following:
+		security mode the data source uses. Values can be one of the following, 
+			never null:
         <ul>
         <li><b>Unauthenticated</b>: no user ID or password needs to be sent.</li>
         <li><b>Authenticated</b>: User ID and
@@ -1520,7 +1511,9 @@ to int. Column names: mapped CamelCase to UPPER_CASE.]</p>
 information about the standard and provider-specific properties supported by an
 olap4j provider. Properties that are not supported by a provider are
 not listed in the return result set.</p>
-<p>Specified by the <code>DISCOVER_PROPERTIES</code> XML for Analysis method.</p>
+<p>Specified by the <code>DISCOVER_PROPERTIES</code> XML for Analysis method, 
+except that we rename the VALUE property to PROPERTY_VALUE because &quot;VALUE&quot; is a 
+SQL:2003 reserved word.</p>
 <p>The returned result set contains the following columns.</p>
 
 <table>
@@ -1531,8 +1524,8 @@ not listed in the return result set.</p>
 	</tr>
 	<tr>
 		<td>PROPERTY_NAME</td>
-		<td>String not null</td>
-		<td>The name of the property. </td>
+		<td>String</td>
+		<td>The name of the property. Never null.</td>
 	</tr>
 	<tr>
 		<td>PROPERTY_DESCRIPTION</td>
@@ -1555,10 +1548,10 @@ not listed in the return result set.</p>
 
 		<td>PROPERTY_ACCESS_TYPE</td>
 
-		<td>EnumString [todo] not null</td>
+		<td>String</td>
 
 		<td>Access for the property. The value can be Read, Write,
-		or ReadWrite.</td>
+		or ReadWrite. Never null.</td>
 
 	</tr>
 	<tr>
@@ -1573,16 +1566,16 @@ not listed in the return result set.</p>
 	</tr>
 	<tr>
 
-		<td>VALUE</td>
+		<td>PROPERTY_VALUE</td>
 
 		<td>String</td>
 
-		<td>The current value of the property.</td>
+		<td>The current value of the property.<p>This property is named VALUE in 
+		XMLA.</td>
 
 	</tr>
 </tbody></table>
 
-<p>[Is VALUE a JDBC reserved word? If so, change it.]</p>
 <h5>2.7.3.3 <a name="getLiterals">getLiterals</a></h5>
 <p>Retrieves a list of information on supported literals, including data types
 and values.</p>
@@ -1597,16 +1590,16 @@ and values.</p>
 	</tr>
 	<tr>
 		<td>LITERAL_NAME</td>
-		<td>String not null</td>
-		<td><p>The name of the literal described in the row.</p>
+		<td>String</td>
+		<td><p>The name of the literal described in the row. Never null.</p>
 		<p>Example: DBLITERAL_LIKE_PERCENT</p></td>
 	</tr>
 	<tr>
 		<td>LITERAL_VALUE</td>
 		<td>String</td>
         <td>
-        <p>Contains the actual literal value. </p>
-        <p>Example, if <b>LiteralName</b> is
+        <p>Contains the actual literal value.</p>
+        <p>Example, if <code>LITERAL_NAME</code> is
             DBLITERAL_LIKE_PERCENT and the percent character (%) is used to match
             zero or more characters in a LIKE clause, this column’s value would be
             "%".</p>
@@ -1680,7 +1673,7 @@ and values.</p>
     <td>CUBE_TYPE</td>
     <td>String</td>
     <td>The type of the cube. Valid values are:<ul>
-        <li><b>CUBE</b> </li>
+        <li><b>CUBE</b></li>
         <li><b>DIMENSION</b></li>
     </ul>
     </td>
@@ -1761,8 +1754,7 @@ and values.</p>
 </tr>
 </tbody></table>
 
-<p>The rowset is sorted on <b>CATALOG_NAME</b>, <b>
-    SCHEMA_NAME</b>, <b>CUBE_NAME</b>.</p>
+<p>The rowset is sorted on <b>CATALOG_NAME</b>, <b>SCHEMA_NAME</b>, <b>CUBE_NAME</b>.</p>
 
 <h5>2.7.3.5. <a name="getDimensions">getDimensions</a></h5>
 
@@ -1824,26 +1816,10 @@ and values.</p>
 <tr>
     <td>DIMENSION_TYPE</td>
     <td>int</td>
-    <td>The type of the dimension. Valid values include:<ul>
-        <li><b>MD_DIMTYPE_UNKNOWN</b> (<b>0</b>)</li>
-        <li><b>MD_DIMTYPE_TIME</b> (<b>1</b>)</li>
-        <li><b>MD_DIMTYPE_MEASURE</b> (<b>2</b>)</li>
-        <li><b>MD_DIMTYPE_OTHER</b> (<b>3</b>)</li>
-        <li><b>MD_DIMTYPE_QUANTITATIVE</b> (<b>5</b>)</li>
-        <li><b>MD_DIMTYPE_ACCOUNTS</b> (<b>6</b>)</li>
-        <li><b>MD_DIMTYPE_CUSTOMERS</b> (<b>7</b>)</li>
-        <li><b>MD_DIMTYPE_PRODUCTS</b> (<b>8</b>)</li>
-        <li><b>MD_DIMTYPE_SCENARIO</b> (<b>9</b>)</li>
-        <li><b>MD_DIMTYPE_UTILIY</b> (<b>10</b>)</li>
-        <li><b>MD_DIMTYPE_CURRENCY</b> (<b>11</b>)</li>
-        <li><b>MD_DIMTYPE_RATES</b> (<b>12</b>)</li>
-        <li><b>MD_DIMTYPE_CHANNEL</b> (<b>13</b>)</li>
-        <li><b>MD_DIMTYPE_PROMOTION</b> (<b>14</b>)</li>
-        <li><b>MD_DIMTYPE_ORGANIZATION</b> (<b>15</b>)</li>
-        <li><b>MD_DIMTYPE_BILL_OF_MATERIALS</b> (<b>16</b>)</li>
-        <li><b>MD_DIMTYPE_GEOGRAPHY</b> (<b>17</b>)</li>
-    </ul>
-    </td>
+    <td>The type of the dimension. Valid values include the values of the <code>
+	xmlaOrdinal</code> attribute of the
+	<a class="javadoc" href="api/org/olap4j/metadata/Dimension.Type.html">org.olap4j.Dimension.Type</a> 
+	enum.</td>
 </tr>
 <tr>
     <td>DIMENSION_CARDINALITY</td>
@@ -1864,7 +1840,7 @@ and values.</p>
 <tr>
     <td>IS_VIRTUAL</td>
     <td>boolean</td>
-    <td>Always <b>FALSE</b>.</td>
+    <td>Always <code>false</code>.</td>
 </tr>
 <tr>
     <td>IS_READWRITE</td>
@@ -1872,7 +1848,7 @@ and values.</p>
     <td>A Boolean that indicates whether the dimension
         is write-enabled.
 
-        <p><b>TRUE</b> if the dimension is
+        <p><code>true</code> if the dimension is
         write-enabled.</p></td>
 </tr>
 <tr>
@@ -1881,9 +1857,9 @@ and values.</p>
     <td>A bitmap that specifies which columns contain
         unique values if the dimension contains only members
         with unique names. The following bit value constants
-        are defined in Msmd.h for this bitmap:
+        are defined for this bitmap:
         <ul>
-            <li><b>MDDIMENSIONS_MEMBER_KEY_UNIQUE</b></li>
+            <li><b>MDDIMENSIONS_MEMBER_KEY_UNIQUE (1)</b></li>
         </ul>
     </td>
 </tr>
@@ -1891,12 +1867,12 @@ and values.</p>
     <td>DIMENSION_MASTER_<br>
     UNIQUE_NAME</td>
     <td>String</td>
-    <td>Always <b>NULL</b>.</td>
+    <td>Always <code>null</code>.</td>
 </tr>
 <tr>
     <td>DIMENSION_IS_VISIBLE</td>
     <td>boolean</td>
-    <td>Always <b>TRUE</b>.</td>
+    <td>Always <code>true</code>.</td>
 </tr>
 </tbody></table>
 
@@ -1959,21 +1935,20 @@ and values.</p>
         <td>LIBRARY_NAME</td>
         <td>String</td>
         <td>The name of the type library for user-defined
-            functions. <b>NULL</b> for MDX functions. </td>
+            functions. <code>null</code> for MDX functions. </td>
     </tr>
     <tr>
         <td>DLL_NAME</td>
         <td>String</td>
         <td>(Optional) The name of the assembly that
-            implements the user-defined function.<p>Returns <b>
-            VT_NULL</b> for MDX functions.</p></td>
+            implements the user-defined function.<p>Returns <code>null</code> for MDX functions.</p></td>
     </tr>
     <tr>
         <td>HELP_FILE</td>
         <td>String</td>
         <td>(Optional) The name of the file that contains
             the help documentation for the user-defined
-            function.<p>Returns <b>VT_NULL</b> for MDX
+            function.<p>Returns <code>null</code> for MDX
             functions.</p></td>
     </tr>
     <tr>
@@ -1988,7 +1963,7 @@ and values.</p>
         <td>(Optional) The generic name of the object class
             to which a property applies. For example, the rowset
             corresponding to the &lt;level_name&gt;.Members function
-            returns "<b>Level</b>".<p>Returns <b>VT_NULL</b> for
+            returns "<b>Level</b>".<p>Returns <code>null</code> for
             user-defined functions, or non-property MDX
             functions.</p></td>
     </tr>
@@ -2018,7 +1993,7 @@ dimension.</p>
     <td>CATALOG_NAME</td>
     <td>String</td>
     <td>The name of the catalog to which this hierarchy
-        belongs. <b>NULL</b> if the provider does not
+        belongs. <code>null</code> if the provider does not
         support catalogs.</td>
 </tr>
 <tr>
@@ -2070,28 +2045,9 @@ dimension.</p>
 </tr>
 <tr>
     <td>DIMENSION_TYPE</td>
-    <td>int [define enum]</td>
-    <td>The type of the dimension. Valid values include
-        the following values:<ul>
-        <li><b>MD_DIMTYPE_UNKNOWN</b> (<b>0</b>)</li>
-        <li><b>MD_DIMTYPE_TIME</b> (<b>1</b>)</li>
-        <li><b>MD_DIMTYPE_MEASURE</b> (<b>2</b>)</li>
-        <li><b>MD_DIMTYPE_OTHER</b> (<b>3</b>)</li>
-        <li><b>MD_DIMTYPE_QUANTITATIVE</b> (<b>5</b>)</li>
-        <li><b>MD_DIMTYPE_ACCOUNTS</b> (<b>6</b>)</li>
-        <li><b>MD_DIMTYPE_CUSTOMERS</b> (<b>7</b>)</li>
-        <li><b>MD_DIMTYPE_PRODUCTS</b> (<b>8</b>)</li>
-        <li><b>MD_DIMTYPE_SCENARIO</b> (<b>9</b>)</li>
-        <li><b>MD_DIMTYPE_UTILIY</b> (<b>10</b>)</li>
-        <li><b>MD_DIMTYPE_CURRENCY</b> (<b>11</b>)</li>
-        <li><b>MD_DIMTYPE_RATES</b> (<b>12</b>)</li>
-        <li><b>MD_DIMTYPE_CHANNEL</b> (<b>13</b>)</li>
-        <li><b>MD_DIMTYPE_PROMOTION</b> (<b>14</b>)</li>
-        <li><b>MD_DIMTYPE_ORGANIZATION</b> (<b>15</b>)</li>
-        <li><b>MD_DIMTYPE_BILL_OF_MATERIALS</b> (<b>16</b>)</li>
-        <li><b>MD_DIMTYPE_GEOGRAPHY</b> (<b>17</b>)</li>
-    </ul>
-    </td>
+    <td>int</td>
+    <td>The type of the dimension. Valid values include the values of the 
+	xmlaOrdinal attribute of .</td>
 </tr>
 <tr>
     <td>HIERARCHY_CARDINALITY</td>
@@ -2114,7 +2070,7 @@ dimension.</p>
     <td>DESCRIPTION</td>
     <td>String</td>
     <td>A human-readable description of the hierarchy.
-        <b>NULL</b> if no description exists.</td>
+        <code>null</code> if no description exists.</td>
 </tr>
 <tr>
     <td>STRUCTURE</td>
@@ -2131,13 +2087,13 @@ dimension.</p>
 <tr>
     <td>IS_VIRTUAL</td>
     <td>boolean</td>
-    <td>Always returns <b>False</b>.</td>
+    <td>Always returns <code>false</code>.</td>
 </tr>
 <tr>
     <td>IS_READWRITE</td>
     <td>boolean</td>
     <td>A Boolean that indicates whether the Write Back
-        to dimension column is enabled.<p>Returns <b>TRUE</b>
+        to dimension column is enabled.<p>Returns <code>true</code>
         if the <b>Write Back to dimension</b> column that
         represents this hierarchy is enabled.</p></td>
 </tr>
@@ -2151,12 +2107,12 @@ dimension.</p>
     <td>DIMENSION_MASTER_<br>
     UNIQUE_NAME</td>
     <td>String</td>
-    <td>Always returns <b>NULL</b>.</td>
+    <td>Always returns <code>null</code>.</td>
 </tr>
 <tr>
     <td>DIMENSION_IS_VISIBLE</td>
     <td>boolean</td>
-    <td>Always returns <b>true</b>. If the dimension is
+    <td>Always returns <code>true</code>. If the dimension is
         not visible, it will not appear in the schema
         rowset.</td>
 </tr>
@@ -2169,14 +2125,14 @@ dimension.</p>
 <tr>
     <td>DIMENSION_IS_SHARED</td>
     <td>boolean</td>
-    <td>Always returns <b>TRUE</b>.</td>
+    <td>Always returns <code>true</code>.</td>
 </tr>
 <tr>
     <td>HIERARCHY_IS_VISIBLE</td>
     <td>boolean</td>
     <td>A Boolean that indicates whether the hieararchy
-        is visible.<p>Returns <b>TRUE</b> if the hierarchy
-        is visible; otherwise, <b>FALSE</b>.</p></td>
+        is visible.<p>Returns <code>true</code> if the hierarchy
+        is visible; otherwise, <code>false</code>.</p></td>
 </tr>
 <tr>
     <td>HIERARCHY_ORIGIN</td>
@@ -2216,7 +2172,7 @@ dimension.</p>
         <li><b>MD_INSTANCE_SELECTION_FILTEREDLIST</b></li>
         <li><b>MD_INSTANCE_SELECTION_MANDATORYFILTER</b></li>
     </ul>
-    </td>
+    <p>[todo: find the ordinals corresponding to these values]</td>
 </tr>
 </tbody></table>
 
@@ -2238,14 +2194,14 @@ dimension.</p>
     <td>CATALOG_NAME</td>
     <td>String</td>
     <td>The name of the catalog to which this level
-        belongs. <b>NULL</b> if the provider does not
+        belongs. <code>null</code> if the provider does not
         support catalogs.</td>
 </tr>
 <tr>
     <td>SCHEMA_NAME</td>
     <td>String</td>
     <td>The name of the schema to which this level
-        belongs. <b>NULL</b> if the provider does not
+        belongs. <code>null</code> if the provider does not
         support schemas.</td>
 </tr>
 <tr>
@@ -2309,40 +2265,14 @@ dimension.</p>
 <tr>
     <td>LEVEL_TYPE</td>
     <td>int</td>
-    <td>Type of the level:<ul>
-        <li><b>MDLEVEL_TYPE_GEO_CONTINENT</b> (<b>0x2001</b>)</li>
-        <li><b>MDLEVEL_TYPE_GEO_REGION</b> (<b>0x2002</b>)</li>
-        <li><b>MDLEVEL_TYPE_GEO_COUNTRY</b> (<b>0x2003</b>)</li>
-        <li><b>MDLEVEL_TYPE_GEO_STATE_OR_PROVINCE</b> (<b>0x2004</b>)</li>
-        <li><b>MDLEVEL_TYPE_GEO_COUNTY</b> (<b>0x2005</b>)</li>
-        <li><b>MDLEVEL_TYPE_GEO_CITY</b> (<b>0x2006</b>)</li>
-        <li><b>MDLEVEL_TYPE_GEO_POSTALCODE</b> (<b>0x2007</b>)</li>
-        <li><b>MDLEVEL_TYPE_GEO_POINT</b> (<b>0x2008</b>)</li>
-        <li><b>MDLEVEL_TYPE_ORG_UNIT</b> (<b>0x1011</b>)</li>
-        <li><b>MDLEVEL_TYPE_BOM_RESOURCE</b> (<b>0x1012</b>)</li>
-        <li><b>MDLEVEL_TYPE_QUANTITATIVE </b>(<b>0x1013</b>)</li>
-        <li><b>MDLEVEL_TYPE_ACCOUNT</b> (<b>0x1014</b>)</li>
-        <li><b>MDLEVEL_TYPE_CUSTOMER</b> (<b>0x1021</b>)</li>
-        <li><b>MDLEVEL_TYPE_CUSTOMER_GROUP</b> (<b>0x1022</b>)</li>
-        <li><b>MDLEVEL_TYPE_CUSTOMER_HOUSEHOLD</b> (<b>0x1023</b>)</li>
-        <li><b>MDLEVEL_TYPE_PRODUCT</b> (<b>0x1031</b>)</li>
-        <li><b>MDLEVEL_TYPE_PRODUCT_GROUP</b> (<b>0x1032</b>)</li>
-        <li><b>MDLEVEL_TYPE_SCENARIO</b> (<b>0x1015</b>)</li>
-        <li><b>MDLEVEL_TYPE_UTILITY</b> (<b>0x1016</b>)</li>
-        <li><b>MDLEVEL_TYPE_PERSON</b> (<b>0x1041</b>)</li>
-        <li><b>MDLEVEL_TYPE_COMPANY</b> (<b>0x1042</b>)</li>
-        <li><b>MDLEVEL_TYPE_CURRENCY_SOURCE</b> (<b>0x1051</b>)</li>
-        <li><b>MDLEVEL_TYPE_CURRENCY_DESTINATION</b> (<b>0x1052</b>)</li>
-        <li><b>MDLEVEL_TYPE_CHANNEL</b> (<b>0x1061</b>)</li>
-        <li><b>MDLEVEL_TYPE_REPRESENTATIVE</b> (<b>0x1062</b>)</li>
-        <li><b>MDLEVEL_TYPE_PROMOTION</b> (<b>0x1071</b>)</li>
-    </ul>
-    </td>
+    <td>Type of the level. Values are as allowed by the <code>xmlaOrdinal</code> field of the
+	<a class="javadoc" href="api/org/olap4j/metadata/Level.Type.html">org.olap4j.Level.Type</a> 
+	enum.</td>
 </tr>
 <tr>
     <td>DESCRIPTION</td>
     <td>String</td>
-    <td>A human-readable description of the level. NULL
+    <td>A human-readable description of the level. null
         if no description exists.</td>
 </tr>
 <tr>
@@ -2410,7 +2340,7 @@ dimension.</p>
     <td>LEVEL_MASTER_<br>
     UNIQUE_NAME</td>
     <td>String</td>
-    <td>Always returns NULL.</td>
+    <td>Always returns null.</td>
 </tr>
 <tr>
     <td>LEVEL_NAME_<br>
@@ -2481,14 +2411,14 @@ dimension.</p>
     <td>CATALOG_NAME</td>
     <td>String</td>
     <td>The name of the catalog to which this measure
-        belongs. <b>NULL</b> if the provider does not
+        belongs. <code>null</code> if the provider does not
         support catalogs.</td>
 </tr>
 <tr>
     <td>SCHEMA_NAME</td>
     <td>String</td>
     <td>The name of the schema to which this measure
-        belongs. <b>NULL</b> if the provider does not
+        belongs. <code>null</code> if the provider does not
         support schemas.</td>
 </tr>
 <tr>
@@ -2525,27 +2455,9 @@ dimension.</p>
     <td>MEASURE_AGGREGATOR</td>
     <td>int</td>
     <td>An enumeration that identifies how a measure was
-        derived. Can be one of the following values:<ul>
-        <li><b>MDMEASURE_AGGR_SUM</b> (<b>1</b>)</li>
-        <li><b>MDMEASURE_AGGR_COUNT</b> (<b>2</b>)</li>
-        <li><b>MDMEASURE_AGGR_MIN </b>(<b>3</b>)</li>
-        <li><b>MDMEASURE_AGGR_MAX </b>(<b>4</b>)</li>
-        <li><b>MDMEASURE_AGGR_AVG</b> (<b>5</b>)</li>
-        <li><b>MDMEASURE_AGGR_VAR</b> (<b>6</b>)</li>
-        <li><b>MDMEASURE_AGGR_STD</b> (<b>7</b>)
-            identifies that the measure was derived from an
-            aggregation function that was <b>SUM</b>, <b>
-            COUNT</b>, <b>MIN</b>, <b>MAX</b>, <b>AVG</b>,
-            <b>VAR</b>, or <b>STDEV</b>, respectively. </li>
-        <li><b>MDMEASURE_AGGR_CALCULATED</b> (<b>127</b>)
-            identifies that the measure was derived from a
-            formula that was not any single function above.
-        </li>
-        <li><b>MDMEASURE_AGGR_UNKNOWN</b> (<b>0</b>)
-            identifies that the measure was derived from an
-            unknown aggregation function or formula. </li>
-    </ul>
-    </td>
+        derived. Can be one of the values allowed by the <code>xmlaOrdinal</code> field of the
+	<a class="javadoc" href="api/org/olap4j/metadata/Measure.Aggregator.html">org.olap4j.Measure.Aggregator</a> 
+	enum.</td>
 </tr>
 <tr>
     <td>DATA_TYPE</td>
@@ -2556,7 +2468,7 @@ dimension.</p>
     <td>NUMERIC_PRECISION</td>
     <td>int</td>
     <td>The maximum precision of the property if the
-        measure object's data type is exact numeric. <b>NULL</b>
+        measure object's data type is exact numeric. <code>null</code>
         for all other property types. </td>
 </tr>
 <tr>
@@ -2565,7 +2477,7 @@ dimension.</p>
     <td>The number of digits to the right of the decimal
         point if the measure object's type indicator is <b>
         DBTYPE_NUMERIC</b> or <b>DBTYPE_DECIMAL</b>.
-        Otherwise, this value is <b>NULL</b>. </td>
+        Otherwise, this value is <code>null</code>. </td>
 </tr>
 <tr>
     <td>MEASURE_UNITS</td>
@@ -2576,7 +2488,7 @@ dimension.</p>
     <td>DESCRIPTION</td>
     <td>String</td>
     <td>A human-readable description of the measure. <b>
-        NULL</b> if no description exists.</td>
+        null</b> if no description exists.</td>
 </tr>
 <tr>
     <td>EXPRESSION</td>
@@ -2593,7 +2505,7 @@ dimension.</p>
 <tr>
     <td>LEVELS_LIST</td>
     <td>String</td>
-    <td>A string that always returns <b>NULL</b>.</td>
+    <td>A string that always returns <code>null</code>.</td>
 </tr>
 <tr>
     <td>MEASURE_NAME_<br>
@@ -2704,25 +2616,19 @@ dimension.</p>
 <tr>
     <td>MEMBER_TYPE</td>
     <td>int</td>
-    <td>The type of the member:
-        <ul>
-            <li><b>MDMEMBER_TYPE_REGULAR</b> (<b>1</b>)</li>
-            <li><b>MDMEMBER_TYPE_ALL</b> (<b>2</b>)</li>
-            <li><b>MDMEMBER_TYPE_MEASURE</b> (<b>3</b>)</li>
-            <li><b>MDMEMBER_TYPE_FORMULA</b> (<b>4</b>)</li>
-            <li><b>MDMEMBER_TYPE_UNKNOWN</b> (<b>0</b>)</li>
-            <li><b>MDMEMBER_TYPE_FORMULA </b>takes
-                precedence over <b>MDMEMBER_TYPE_MEASURE</b>.
+    <td>The type of the member, one of the values of the <code>ordinal</code> field of the
+	<a class="javadoc" href="api/org/olap4j/metadata/Member.Type.html">org.olap4j.Member.Type</a> 
+	enum.<p><b>FORMULA </b>takes
+                precedence over <b>MEASURE</b>.
                 For example, if there is a formula (calculated)
                 member on the Measures dimension, it is listed
-                as <b>MDMEMBER_TYPE_FORMULA</b>. </li>
-        </ul>
+                as <b>FORMULA</b>. 
     </td>
 </tr>
 <tr>
     <td>MEMBER_GUID</td>
     <td>String</td>
-    <td>The GUID of the member. <b>NULL</b> if no GUID
+    <td>The GUID of the member. <code>null</code> if no GUID
         exists.</td>
 </tr>
 <tr>
@@ -2750,7 +2656,7 @@ dimension.</p>
 <tr>
     <td>PARENT_UNIQUE_NAME</td>
     <td>String</td>
-    <td>The unique name of the member's parent. <b>NULL</b>
+    <td>The unique name of the member's parent. <code>null</code>
         is returned for any members at the root level.</td>
 </tr>
 <tr>
@@ -2761,7 +2667,7 @@ dimension.</p>
 <tr>
     <td>DESCRIPTION</td>
     <td>String</td>
-    <td>Always returns <b>NULL</b>.</td>
+    <td>Always returns <code>null</code>.</td>
 </tr>
 <tr>
     <td>EXPRESSION</td>
@@ -2773,7 +2679,7 @@ dimension.</p>
     <td>MEMBER_KEY</td>
     <td>String</td>
     <td>The value of the member's key column. Returns <b>
-        NULL</b> if the member has a composite key.</td>
+        null</b> if the member has a composite key.</td>
 </tr>
 <tr>
     <td>IS_PLACEHOLDERMEMBER</td>
@@ -2836,7 +2742,7 @@ dimension.</p>
     <td>SCHEMA_NAME</td>
     <td>String</td>
     <td>The name of the schema to which this property
-        belongs. <b>NULL</b> if the provider does not
+        belongs. <code>null</code> if the provider does not
         support schemas.</td>
 </tr>
 <tr>
@@ -2876,7 +2782,7 @@ dimension.</p>
         property belongs. Used for data stores that do not
         support named levels or have properties on a
         member-by-member basis. If the property applies to
-        all members in a level, this column is <b>NULL</b>.
+        all members in a level, this column is <code>null</code>.
         For providers that generate unique names by
         qualification, each component of this name is
         delimited. </td>
@@ -2930,7 +2836,7 @@ dimension.</p>
 
         <p>Zero indicates there is no defined maximum length.</p>
 
-        <p>Returns <b>NULL</b> for all other data types.</p></td>
+        <p>Returns <code>null</code> for all other data types.</p></td>
 </tr>
 <tr>
     <td>CHARACTER_OCTET_LENGTH</td>
@@ -2940,7 +2846,7 @@ dimension.</p>
 
         <p>Zero indicates there is no defined maximum length.</p>
 
-        <p>Returns <b>NULL</b> for all other data types.</p></td>
+        <p>Returns <code>null</code> for all other data types.</p></td>
 </tr>
 <tr>
     <td>NUMERIC_PRECISION</td>
@@ -2948,7 +2854,7 @@ dimension.</p>
     <td>The maximum precision of the property, if it is
         a numeric data type.
 
-        <p>Returns <b>NULL</b> for all
+        <p>Returns <code>null</code> for all
         other data types.</p></td>
 </tr>
 <tr>
@@ -2958,92 +2864,25 @@ dimension.</p>
         point, if it is a <b>DBTYPE_NUMERIC</b> or <b>
         DBTYPE_DECIMAL</b> type.
 
-        <p>Returns <b>NULL</b> for all other data types.</p></td>
+        <p>Returns <code>null</code> for all other data types.</p></td>
 </tr>
 <tr>
     <td>DESCRIPTION</td>
     <td>String</td>
-    <td>A human readable description of the property. <b>
-        NULL</b> if no description exists.</td>
+    <td>A human readable description of the property. <code>null</code> if no description exists.</td>
 </tr>
 <tr>
     <td>PROPERTY_CONTENT_TYPE</td>
     <td>int</td>
-    <td>The type of the property. Can be one of the
-        following enumerations:<ul>
-        <li><b>MD_PROPTYPE_REGULAR </b>(<b>0x00</b>)</li>
-        <li><b>MD_PROPTYPE_ID </b>(<b>0x01</b>)</li>
-        <li><b>MD_PROPTYPE_RELATION_TO_PARENT </b>(<b>0x02</b>)</li>
-        <li><b>MD_PROPTYPE_ROLLUP_OPERATOR </b>(<b>0x03</b>)</li>
-        <li><b>MD_PROPTYPE_ORG_TITLE </b>(<b>0x11</b>)</li>
-        <li><b>MD_PROPTYPE_CAPTION </b>(<b>0x21</b>)</li>
-        <li><b>MD_PROPTYPE_CAPTION_SHORT </b>(<b>0x22</b>)</li>
-        <li><b>MD_PROPTYPE_CAPTION_DESCRIPTION </b>(<b>0x23</b>)</li>
-        <li><b>MD_PROPTYPE_CAPTION_ABREVIATION </b>(<b>0x24</b>)</li>
-        <li><b>MD_PROPTYPE_WEB_URL </b>(<b>0x31</b>)</li>
-        <li><b>MD_PROPTYPE_WEB_HTML </b>(<b>0x32</b>)</li>
-        <li><b>MD_PROPTYPE_WEB_XML_OR_XSL </b>(<b>0x33</b>)</li>
-        <li><b>MD_PROPTYPE_WEB_MAIL_ALIAS </b>(<b>0x34</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS </b>(<b>0x41</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_STREET </b>(<b>0x42</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_HOUSE </b>(<b>0x43</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_CITY </b>(<b>0x44</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_STATE_OR_PROVINCE </b>(<b>0x45</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_ZIP </b>(<b>0x46</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_QUARTER </b>(<b>0x47</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_COUNTRY </b>(<b>0x48</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_BUILDING </b>(<b>0x49</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_ROOM </b>(<b>0x4A</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_FLOOR </b>(<b>0x4B</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_FAX </b>(<b>0x4C</b>)</li>
-        <li><b>MD_PROPTYPE_ADDRESS_PHONE </b>(<b>0x4D</b>)</li>
-        <li><b>MD_PROPTYPE_GEO_CENTROID_X </b>(<b>0x61</b>)</li>
-        <li><b>MD_PROPTYPE_GEO_CENTROID_Y </b>(<b>0x62</b>)</li>
-        <li><b>MD_PROPTYPE_GEO_CENTROID_Z </b>(<b>0x63</b>)</li>
-        <li><b>MD_PROPTYPE_GEO_BOUNDARY_TOP </b>(<b>0x64</b>)</li>
-        <li><b>MD_PROPTYPE_GEO_BOUNDARY_LEFT </b>(<b>0x65</b>)</li>
-        <li><b>MD_PROPTYPE_GEO_BOUNDARY_BOTTOM </b>(<b>0x66</b>)</li>
-        <li><b>MD_PROPTYPE_GEO_BOUNDARY_RIGHT </b>(<b>0x67</b>)</li>
-        <li><b>MD_PROPTYPE_GEO_BOUNDARY_FRONT </b>(<b>0x68</b>)</li>
-        <li><b>MD_PROPTYPE_GEO_BOUNDARY_REAR </b>(<b>0x69</b>)</li>
-        <li><b>MD_PROPTYPE_GEO_BOUNDARY_POLYGON </b>(<b>0x6A</b>)</li>
-        <li><b>MD_PROPTYPE_PHYSICAL_SIZE </b>(<b>0x71</b>)</li>
-        <li><b>MD_PROPTYPE_PHYSICAL_COLOR </b>(<b>0x72</b>)</li>
-        <li><b>MD_PROPTYPE_PHYSICAL_WEIGHT </b>(<b>0x73</b>)</li>
-        <li><b>MD_PROPTYPE_PHYSICAL_HEIGHT </b>(<b>0x74</b>)</li>
-        <li><b>MD_PROPTYPE_PHYSICAL_WIDTH </b>(<b>0x75</b>)</li>
-        <li><b>MD_PROPTYPE_PHYSICAL_DEPTH </b>(<b>0x76</b>)</li>
-        <li><b>MD_PROPTYPE_PHYSICAL_VOLUME </b>(<b>0x77</b>)</li>
-        <li><b>MD_PROPTYPE_PHYSICAL_DENSITY </b>(<b>0x78</b>)</li>
-        <li><b>MD_PROPTYPE_PERSON_FULL_NAME </b>(<b>0x82</b>)</li>
-        <li><b>MD_PROPTYPE_PERSON_FIRST_NAME </b>(<b>0x83</b>)</li>
-        <li><b>MD_PROPTYPE_PERSON_LAST_NAME </b>(<b>0x84</b>)</li>
-        <li><b>MD_PROPTYPE_PERSON_MIDDLE_NAME </b>(<b>0x85</b>)</li>
-        <li><b>MD_PROPTYPE_PERSON_DEMOGRAPHIC </b>(<b>0x86</b>)</li>
-        <li><b>MD_PROPTYPE_PERSON_CONTACT </b>(<b>0x87</b>)</li>
-        <li><b>MD_PROPTYPE_QTY_RANGE_LOW </b>(<b>0x91</b>)</li>
-        <li><b>MD_PROPTYPE_QTY_RANGE_HIGH </b>(<b>0x92</b>)</li>
-        <li><b>MD_PROPTYPE_FORMATTING_COLOR </b>(<b>0xA1</b>)</li>
-        <li><b>MD_PROPTYPE_FORMATTING_ORDER </b>(<b>0xA2</b>)</li>
-        <li><b>MD_PROPTYPE_FORMATTING_FONT </b>(<b>0xA3</b>)</li>
-        <li><b>MD_PROPTYPE_FORMATTING_FONT_EFFECTS </b>(<b>0xA4</b>)</li>
-        <li><b>MD_PROPTYPE_FORMATTING_FONT_SIZE </b>(<b>0xA5</b>)</li>
-        <li><b>MD_PROPTYPE_FORMATTING_SUB_TOTAL </b>(<b>0xA6</b>)</li>
-        <li><b>MD_PROPTYPE_DATE </b>(<b>0xB1</b>)</li>
-        <li><b>MD_PROPTYPE_DATE_START </b>(<b>0xB2</b>)</li>
-        <li><b>MD_PROPTYPE_DATE_ENDED </b>(<b>0xB3</b>)</li>
-        <li><b>MD_PROPTYPE_DATE_CANCELED </b>(<b>0xB4</b>)</li>
-        <li><b>MD_PROPTYPE_DATE_MODIFIED </b>(<b>0xB5</b>)</li>
-        <li><b>MD_PROPTYPE_DATE_DURATION </b>(<b>0xB6</b>)</li>
-        <li><b>MD_PROPTYPE_VERSION </b>(<b>0xC1</b>)</li>
-    </ul>
-    </td>
+    <td>The type of the property. Can be one of the values of the <code>xmlaOrdinal</code> field of the
+	<a class="javadoc" href="api/org/olap4j/metadata/Property.ContentType.html">org.olap4j.Property.ContentType</a> 
+	enum.</td>
 </tr>
 <tr>
     <td>SQL_COLUMN_NAME</td>
     <td>String</td>
     <td>The name of the property used in SQL queries
-        from the cube dimension or database dDimension.</td>
+        from the cube dimension or database dimension.</td>
 </tr>
 <tr>
     <td>LANGUAGE</td>
@@ -3095,8 +2934,8 @@ dimension.</p>
     <td>A Boolean that indicates whether the property is
         visible.
 
-        <p><b>TRUE</b> if the property is visible;
-        otherwise, <b>FALSE</b>.</p></td>
+        <p><code>true</code> if the property is visible;
+        otherwise, <code>false</code>.</p></td>
 </tr>
 </tbody></table>
 

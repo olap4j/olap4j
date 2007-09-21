@@ -14,8 +14,7 @@ import mondrian.olap.MondrianServer;
 import org.olap4j.OlapDatabaseMetaData;
 import org.olap4j.OlapException;
 import org.olap4j.OlapConnection;
-import org.olap4j.metadata.Catalog;
-import org.olap4j.metadata.NamedList;
+import org.olap4j.metadata.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -796,7 +795,12 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
 
     // implement OlapDatabaseMetaData
 
-    public ResultSet getActions() throws OlapException {
+    public ResultSet getActions(
+        String catalog,
+        String schemaPattern,
+        String cubeNamePattern,
+        String actionNamePattern) throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
@@ -810,11 +814,20 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public ResultSet getDatabaseProperties(
-        String dataSourceName) throws OlapException {
+        String dataSourceName, String propertyNamePattern) throws OlapException {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getProperties() throws OlapException {
+    public ResultSet getProperties(
+        String catalog,
+        String schemaPattern,
+        String cubeNamePattern,
+        String dimensionNamePattern,
+        String hierarchyNamePattern,
+        String levelNamePattern,
+        String memberUniqueName,
+        String propertyNamePattern) throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
@@ -832,11 +845,19 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     public ResultSet getCubes(
         String catalog,
         String schemaPattern,
-        String cubeNamePattern) throws OlapException {
+        String cubeNamePattern)
+        throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getDimensions() throws OlapException {
+    public ResultSet getDimensions(
+        String catalog,
+        String schemaPattern,
+        String cubeNamePattern,
+        String dimensionNamePattern)
+        throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
@@ -844,23 +865,51 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getHierarchies() throws OlapException {
+    public ResultSet getHierarchies(
+        String catalog,
+        String schemaPattern,
+        String cubeNamePattern,
+        String dimensionNamePattern,
+        String hierarchyNamePattern) 
+        throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getMeasures() throws OlapException {
+    public ResultSet getMeasures(String catalog, String schemaPattern, String cubeNamePattern, String measureNamePattern, String measureUniqueName) throws OlapException {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getMembers() throws OlapException {
+    public ResultSet getMembers(
+        String catalog,
+        String schemaPattern,
+        String cubeNamePattern,
+        String dimensionNamePattern,
+        String hierarchyNamePattern,
+        String levelNamePattern,
+        String memberUniqueName,
+        Member.TreeOp treeOp) throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getLevels() throws OlapException {
+    public ResultSet getLevels(
+        String catalog,
+        String schemaPattern,
+        String cubeNamePattern,
+        String dimensionNamePattern,
+        String hierarchyNamePattern,
+        String levelNamePattern) throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getSets() throws OlapException {
+    public ResultSet getSets(
+        String catalog,
+        String schemaPattern,
+        String cubeNamePattern,
+        String setNamePattern) throws OlapException
+    {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 }

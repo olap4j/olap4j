@@ -85,6 +85,8 @@ public interface PreparedOlapStatement
 
     /**
      * Returns the cube (or virtual cube) which this statement is based upon.
+     *
+     * @return cube this statement is based upon
      */
     Cube getCube();
 

@@ -76,6 +76,11 @@ public interface Dimension extends MetadataElement {
     /**
      * Enumeration of the types of a <code>Dimension</code>.
      *
+     * <p>Some of the values are as specified by XMLA.
+     * For example, XMLA specifies MD_DIMTYPE_PRODUCTS with ordinal 8,
+     * which corresponds to the value {@link #PRODUCTS},
+     * whose {@link #xmlaOrdinal} is 8.
+     *
      * @see Level.Type
      * @see Member.Type
      * @see Dimension#getDimensionType
@@ -84,17 +89,50 @@ public interface Dimension extends MetadataElement {
         /**
          * Indicates that the dimension is not related to time.
          */
-        Standard,
+        UNKNOWN(0),
 
         /**
          * Indicates that a dimension is a time dimension.
          */
-        Time,
+        TIME(1),
 
         /**
          * Indicates that a dimension is the Measures dimension.
          */
-        Measures,
+        MEASURE(2),
+
+        OTHER(3),
+        QUANTITATIVE(5),
+        ACCOUNTS(6),
+        CUSTOMERS(7),
+        PRODUCTS(8),
+        SCENARIO(9),
+        UTILIY(10),
+        CURRENCY(11),
+        RATES(12),
+        CHANNEL(13),
+        PROMOTION(14),
+        ORGANIZATION(15),
+        BILL_OF_MATERIALS(16),
+        GEOGRAPHY(17);
+
+        private final int xmlaOrdinal;
+
+        private Type(int xmlaOrdinal) {
+            this.xmlaOrdinal = xmlaOrdinal;
+        }
+
+        /**
+         * Returns the ordinal code as specified by XMLA.
+         *
+         * <p>For example, the XMLA specification says that the ordinal of
+         * {@link #PRODUCTS} is 8.
+         *
+         * @return ordinal code as specified by XMLA.
+         */
+        public final int xmlaOrdinal() {
+            return xmlaOrdinal;
+        }
     }
 }
 

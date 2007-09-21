@@ -284,16 +284,40 @@ public class ConnectionTest extends TestCase {
         final Schema schema1 = olapConnection.getSchema();
         assertEquals(schema1.getName(), "FoodMart");
 
-        checkResultSet(olapDatabaseMetaData.getActions());
+        String schemaPattern = "xx";
+        String cubeNamePattern = "SALES";
+        String dimensionNamePattern = null;
+        String hierarchyNamePattern = null;
+        String levelNamePattern = null;
+        String memberUniqueName = null;
+        String setNamePattern = null;
+        String catalogNamePattern = null;
+        String schemaNamePattern = null;
+        String actionNamePattern = null;
+        String measureNamePattern = null;
+        String measureUniqueName = null;
+        Member.TreeOp treeOp = null;
+
+        checkResultSet(
+            olapDatabaseMetaData.getActions(
+                catalogName, schemaNamePattern, cubeNamePattern,
+                actionNamePattern));
 
         String dataSourceName = "xx";
         checkResultSet(olapDatabaseMetaData.getDatasources(dataSourceName));
 
         checkResultSet(olapDatabaseMetaData.getLiterals());
 
-        checkResultSet(olapDatabaseMetaData.getDatabaseProperties(dataSourceName));
+        String propertyNamePattern = null;
+        checkResultSet(
+            olapDatabaseMetaData.getDatabaseProperties(
+                dataSourceName, propertyNamePattern));
 
-        checkResultSet(olapDatabaseMetaData.getProperties());
+        checkResultSet(
+            olapDatabaseMetaData.getProperties(
+                catalogName, schemaNamePattern, cubeNamePattern,
+                dimensionNamePattern, hierarchyNamePattern, levelNamePattern,
+                memberUniqueName, propertyNamePattern));
 
         String keywords = olapDatabaseMetaData.getMdxKeywords();
         assertNotNull(keywords);
@@ -302,8 +326,6 @@ public class ConnectionTest extends TestCase {
 
         // todo: call getCubes with a different schema
 
-        String schemaPattern = "xx";
-        String cubeNamePattern = "SALES";
         checkResultSet(
             olapDatabaseMetaData.getCubes(
                 catalogName,
@@ -332,37 +354,51 @@ public class ConnectionTest extends TestCase {
         assertTrue(k > 0);
 
         checkResultSet(
-            olapDatabaseMetaData.getDatabaseProperties(dataSourceName));
+            olapDatabaseMetaData.getDatabaseProperties(dataSourceName, propertyNamePattern));
 
         checkResultSet(
             olapDatabaseMetaData.getDatasources(dataSourceName));
 
         checkResultSet(
-            olapDatabaseMetaData.getDimensions());
+            olapDatabaseMetaData.getDimensions(
+                catalogNamePattern, schemaPattern, cubeNamePattern, dimensionNamePattern));
 
         checkResultSet(
             olapDatabaseMetaData.getFunctions());
 
         checkResultSet(
-            olapDatabaseMetaData.getHierarchies());
+            olapDatabaseMetaData.getHierarchies(
+                catalogNamePattern, schemaPattern, cubeNamePattern, dimensionNamePattern,
+                hierarchyNamePattern));
 
         checkResultSet(
-            olapDatabaseMetaData.getLevels());
+            olapDatabaseMetaData.getLevels(
+                catalogNamePattern, schemaPattern, cubeNamePattern, dimensionNamePattern,
+                hierarchyNamePattern, levelNamePattern));
 
         checkResultSet(
             olapDatabaseMetaData.getLiterals());
 
         checkResultSet(
-            olapDatabaseMetaData.getMeasures());
+            olapDatabaseMetaData.getMeasures(
+                catalogName, schemaNamePattern, cubeNamePattern,
+                measureNamePattern, measureUniqueName));
 
         checkResultSet(
-            olapDatabaseMetaData.getMembers());
+            olapDatabaseMetaData.getMembers(
+                catalogName, schemaPattern, cubeNamePattern,
+                dimensionNamePattern, hierarchyNamePattern, levelNamePattern,
+                memberUniqueName, treeOp));
 
         checkResultSet(
-            olapDatabaseMetaData.getProperties());
+            olapDatabaseMetaData.getProperties(
+                catalogName, schemaPattern, cubeNamePattern,
+                dimensionNamePattern, hierarchyNamePattern, levelNamePattern,
+                memberUniqueName, propertyNamePattern));
 
         checkResultSet(
-            olapDatabaseMetaData.getSets());
+            olapDatabaseMetaData.getSets(
+                catalogNamePattern, schemaPattern, cubeNamePattern, setNamePattern));
 
         // todo: More tests required for other methods on DatabaseMetaData
     }

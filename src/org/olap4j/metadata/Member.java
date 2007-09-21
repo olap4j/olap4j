@@ -34,7 +34,7 @@ public interface Member extends MetadataElement {
      * <p>The caller should assume that the list is immutable;
      * if the caller modifies the list, behavior is undefined.</p>
      *
-     * @see org.olap4j.OlapDatabaseMetaData#getMembers()
+     * @see org.olap4j.OlapDatabaseMetaData#getMembers
      *
      * @return children of this member
      */
@@ -78,8 +78,14 @@ public interface Member extends MetadataElement {
     /**
      * Enumeration of types of members.
      *
-     * @see Dimension.Type
-     * @see Level.Type
+     * <p>The values are as specified by XMLA,
+     * plus the additional {@link #NULL} value not used by XMLA.
+     * For example, XMLA specifies <code>MDMEMBER_TYPE_REGULAR</code> with
+     * ordinal 1, which corresponds to value {@link #REGULAR}.
+     *
+     * <p>The {@link #FORMULA} value takes precedence over {@link #MEASURE}.
+     * For example, if there is a formula (calculated) member on the Measures
+     * dimension, it is listed as <code>FORMULA</code>.
      */
     enum Type {
         UNKNOWN(0),
@@ -98,7 +104,6 @@ public interface Member extends MetadataElement {
             assert ordinal == ordinal();
         }
     }
-
 
     /**
      * Returns whether <code>member</code> is equal to, a child of, or a
@@ -197,6 +202,37 @@ public interface Member extends MetadataElement {
      * nonleaf member does not have an associated data member.</p>
      */
     Member getDataMember();
+
+    enum TreeOp {
+        CHILDREN("MDTREEOP_CHILDREN", 1, "Returns only the immediate children"),
+        SIBLINGS("MDTREEOP_SIBLINGS", 2, "Returns members on the same level"),
+        PARENT("MDTREEOP_PARENT", 4, "Returns only the immediate parent"),
+        SELF("MDTREEOP_SELF", 8, "Returns the immediate member in the list of returned rows"),
+        DESCENDANTS("MDTREEOP_DESCENDANTS", 16, "Returns all descendants"),
+        ANCESTORS("MDTREEOP_ANCESTORS", 32, "Returns all ancestors");
+
+        private final String userName;
+        private final int userOrdinal;
+        private final String description;
+
+        TreeOp(String userName, int userOrdinal, String description) {
+            this.userName = userName;
+            this.userOrdinal = userOrdinal;
+            this.description = description;
+        }
+
+        public int userOrdinal() {
+            return userOrdinal;
+        }
+
+        public String userName() {
+            return userName;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
 }
 
 // End Member.java

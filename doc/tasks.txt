@@ -21,15 +21,8 @@ Specification
 * D.1 add discussion of compliance levels 
 * D.1 describe how members of axis can be accessed via iterator or list, with code examples 
 * 2.1.5 internationalization: move section elsewhere; what is the behavior of locale? does it belong to connection? fix and test Query.getLocale(). document that all methods which return localized strings take a locale parameter; that parameter may be null, in which case the connection's locale is used 
-* 2.3.2 how to find out what cube a prepared statement relates to 
 * 2.7.2 diagram of object model 
-* 2.7.2.x define Schema, Cube, Dimension, Hierarchy, Level, Member, Measure, Property, NamedSet. 
-* 2.7.3 The OlapDatabaseMetaData interface: 
-** clean up data types (should be JDBC types)  
-** clean up column names (should be UPPER_CASE) 
-** define enum types 
-* 2.7.3.2 is VALUE a SQL reserved word? if so, rename the property 
-* 2.8 query model - barry and/or james complete? 
+* 2.8 query model - barry and/or james complete?
 * 2.9 layout - remove from spec? 
 * add mdx parser and mdx parse tree model to specification 
 * discuss access-control (each provider can have their own rules. can set access-control on the connection. metadata methods should be consistent with that.) 
@@ -40,8 +33,7 @@ Javadoc
 * change ant task so it doesn't generate mondrian.olap4j.* or olap4j.test.* or org.olap4j.mdx.parser.impl or package-protected classes (E.g. org.olap4j.mdx.MdxValidator) in public api; remove class OlapTest, class Todo
 * package mdx.parser.impl - comment that this package is not part of the spec, and implementation may change at any time 
 * ensure that every public method has a javadoc description, including @param, @return and @throws declarations 
-* document OlapDatabaseMetadata.getXxx methods 
-* Review olap4j.type package. Document all public methods. Make non-essential methods (E.g. MemberType.forType) package-private. If in doubt, leave it out 
+* Review olap4j.type package. Document all public methods. Make non-essential methods (E.g. MemberType.forType) package-private. If in doubt, leave it out
  
 Code
 ----
