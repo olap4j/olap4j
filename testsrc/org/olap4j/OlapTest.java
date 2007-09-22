@@ -24,6 +24,8 @@ import java.sql.DriverManager;
 import java.util.List;
 import java.io.StringWriter;
 
+import junit.framework.TestCase;
+
 /**
  * Unit test illustrating sequence of calls to olap4j API from a graphical
  * client.
@@ -32,7 +34,7 @@ import java.io.StringWriter;
  * @author James Dixon
  * @version $Id$
  */
-public class OlapTest {
+public class OlapTest extends TestCase {
 
     public OlapTest() {
         super();
@@ -125,7 +127,8 @@ public class OlapTest {
 
             listMembers(storeQuery.getDimension().getHierarchies().get("Store").getLevels().get("Store Country"));
 
-            Selection selection = productQuery.createSelection("Product", "Product Family", "Drink", Selection.Operator.CHILDREN);
+            Member productMember = cube.lookupMember("Product", "Drink");
+            Selection selection = productQuery.createSelection(productMember, Selection.Operator.CHILDREN);
 
             // Create an XML doc to represent the resolved selection and print it out
             // This would be used by a client application to enable hierarchy navigation
@@ -133,24 +136,35 @@ public class OlapTest {
             System.out.println(Olap4jXml.xmlToString(Olap4jXml.selectionToDoc(selection, members)));
 
             // create some selections for Store
-            Selection usa = storeQuery.createSelection("Store", "Store Country", "USA", Selection.Operator.CHILDREN);
-            storeQuery.addSelection(usa);
+            Member usaMember = cube.lookupMember("Store", "USA");
+            Selection usa = storeQuery.createSelection(usaMember, Selection.Operator.CHILDREN);
+            storeQuery.getSelections().add(usa);
 
             // create some selections for Product
-            productQuery.clearSelections();
-            Selection productSelection1 = productQuery.createSelection("Product", "Product Family", "Drink", Selection.Operator.CHILDREN);
-            Selection productSelection2 = productQuery.createSelection("Product", "Product Family", "Food", Selection.Operator.CHILDREN);
-            productQuery.addSelection(productSelection1);
-            productQuery.addSelection(productSelection2);
+            productQuery.getSelections().clear();
+            Selection productSelection1 = productQuery.createSelection(productMember, Selection.Operator.CHILDREN);
+            Member productFoodMember = cube.lookupMember("Product", "Food");
+            Selection productSelection2 = productQuery.createSelection(productFoodMember, Selection.Operator.CHILDREN);
+            productQuery.getSelections().add(productSelection1);
+            productQuery.getSelections().add(productSelection2);
 
             // create some selections for Time
-            Selection year97 = timeQuery.createSelection("Time", "Year", "1997", Selection.Operator.CHILDREN);
-            timeQuery.addSelection(year97);
+            Member timeMember = cube.lookupMember("Time", "1997");
+            Selection year97 = timeQuery.createSelection(timeMember, Selection.Operator.CHILDREN);
+            timeQuery.getSelections().add(year97);
 
             // place our dimensions on the axes
-            query.getAxes().get(Axis.COLUMNS).appendDimension(productQuery);
-            query.getAxes().get(Axis.ROWS).appendDimension(storeQuery);
-            query.getAxes().get(Axis.ROWS).appendDimension(timeQuery);
+            query.getAxes().get(Axis.COLUMNS).getDimensions().add(productQuery);
+            assert productQuery.getAxis() == query.getAxes().get(Axis.COLUMNS); 
+            query.getAxes().get(Axis.ROWS).getDimensions().add(storeQuery);
+            query.getAxes().get(Axis.ROWS).getDimensions().add(timeQuery);
+
+            try {
+                query.getAxes().get(Axis.ROWS).getDimensions().add(storeQuery);
+                fail("expected exception");
+            } catch (Exception e) {
+                assertTrue(e.getMessage().contains("dimension already on this axis"));
+            }
 
             // Create an XML doc to represent the query and print it out
             // This XML would be used by a client application to persist a query

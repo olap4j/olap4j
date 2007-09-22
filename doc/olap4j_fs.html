@@ -1,6 +1,5 @@
 <html><head>
 
-
 <meta http-equiv="Content-Language" content="en-us">
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><title>olap4j Functional Specification</title>
 
@@ -16,7 +15,7 @@ A.javadoc {
     font-size: 80%;
     font-weight: bold;
     color: maroon;
-    text-decoration: none;
+    text-decoration: underline;
 }
 A:hover.javadoc, A:active.javadoc {
 	color: black;
@@ -78,11 +77,11 @@ TABLE TD {
 
 <h1>olap4j Functional Specification</h1>
 
-<p>Author(s): Julian Hyde, Barry Klawans<br>
-Version: 0.89.1-dev (draft)<br>
+<p>Authors: Julian Hyde, Barry Klawans<br>
+Version: 0.89.2-dev (draft)<br>
 Revision: $Id$
 (<a href="http://svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
-Last modified: September 20<sup>th</sup>, 2007.</p>
+Last modified: September 21<sup>st</sup>, 2007.</p>
 <hr noshade="noshade">
 
 <h2><a name="Contents">Contents</a></h2>
@@ -369,19 +368,20 @@ open-source efforts to build providers for their servers.</p>
 
 <p>olap4j requires JDK 1.5 or higher, in particular because it uses the generics
 and enum features introduced in JDK 1.5.0.</p>
+<p>olap4j works best against JDK 1.6 or higher, because it makes use of the
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/Wrapper.html">
+java.sql.Wrapper</a> interface. In earlier Java versions, the same functionality 
+is available by casting objects to the built-in
+<a class="javadoc" href="api/org/olap4j/OlapWrapper.html">OlapWrapper</a> interface.</p>
 
-<p>JDK 1.4 compability will be available on demand, using the
+<p>JDK 1.4 compatibility will be available on demand, using the 
 <a href="http://retroweaver.sourceforge.net/">Retroweaver</a> utility. This will
 consist of a retrowoven JAR file, <code>olap4j-jdk1.4.jar</code> and
 retroweaver's runtime library <code>retroweaver-rt-1.2.4.jar</code>. (See
 <a href="#JDK">design note</a>.)</p>
 
-<p>jdbc is consistent with JDBC version 3.0 (which was introduced in JDK 1.4 and
-is also in JDK 1.5).</p>
-
-<p>JDBC version 4.0 is expected to be introduced in JDK 1.6.0. We expect JDBC
-4.0 will add new methods to existing JDBC classes, and therefore compatibility
-with JDBC 4.0 will require a new release of olap4j.</p>
+<p>olap4j's JDBC support is consistent with JDBC version 3.0 (which was introduced in JDK 1.4 and
+is also in JDK 1.5) and also with JDBC version 4.0 (introduced in JDK 1.6).</p>
 
 <h2>
 2.
@@ -400,31 +400,34 @@ connection pooling, driver registration.</p>
 
 <p>Classes:</p>
 <ul>
-  <li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Driver.html">java.sql.Driver</a></li>
+  <li><a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/Driver.html">java.sql.Driver</a></li>
   <li>
-	<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DriverManager.html">java.sql.DriverManager</a></li>
+	<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/DriverManager.html">java.sql.DriverManager</a></li>
   <li>
-	<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/javax/sql/DataSource.html">javax.sql.DataSource</a></li>
+	<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/javax/sql/DataSource.html">javax.sql.DataSource</a></li>
 </ul>
 
 <h4>2.1.1. <a name="The_Driver_class">The Driver class</a></h4>
+
 <p>Same functionality as JDBC.</p>
 <p>Here is an example of registering an olap4j driver:</p>
-<div class="code">
-	Class.forName("mondrian.olap4j.Driver");</div>
+
+<div class="code">Class.forName("mondrian.olap4j.Driver");</div>
+
 <h4>2.1.2. <a name="The_DriverManager_class">The DriverManager class</a></h4>
+
 <p>Same functionality as JDBC.</p>
 <h4>2.1.3. <a name="The_DataSource_interface">The DataSource interface</a></h4>
 <p>Same functionality as JDBC.</p>
 <h4>2.1.4 <a name="The_OlapException_class">The OlapException class</a></h4>
 <p><a class="javadoc" href="api/org/olap4j/OlapException.html">OlapException</a> 
 (extends
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/SQLException.html">
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/SQLException.html">
 java.sql.SQLException</a>) describes an error which occurred while accessing an 
 OLAP server.</p>
 <p>Since olap4j extends JDBC, it is natural that OlapException should extend 
 JDBC's
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/SQLException.html">
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/SQLException.html">
 SQLException</a>. The implementation by an olap4j <br>
 driver of a JDBC method which is declared to throw a SQLException may, if the 
 driver chooses, throw instead an OlapException.<br>
@@ -435,10 +438,10 @@ or Position object where the error occurred. The <code>region</code> is an
 object representing the textual region in the MDX statement.</p>
 <p>Methods:</p>
 <ul>
-    <li>getRegion</li>
-    <li>setRegion</li>
-    <li>getContext</li>
-    <li>setContext</li>
+    <li><code>Region getRegion()</code></li>
+    <li><code>setRegion(Region region)</code></li>
+    <li><code>Object getContext()</code></li>
+    <li><code>void setContext(Object context)</code></li>
 </ul>
 
 <h4>2.1.5. <a name="Internationalization">Internationalization</a></h4>
@@ -460,8 +463,7 @@ JDBC interfaces Connection and Statement.</p>
 <p>For example, the following code registers a driver, connects to Mondrian and
 executes a statement:</p>
 
-
-  <div class="code">
+<div class="code">
 	import org.olap4j.*;<br>
   <br>
   Class.forName(&quot;mondrian.olap4j.Driver&quot;);<br>
@@ -554,7 +556,7 @@ interfaces also extend <code>OlapWrapper</code>, and can be accessed similarly.<
 driver will be an <code>OlapConnection</code> and will therefore trivially 
 implement <code>OlapWrapper</code> (because the <code>OlapConnection</code> 
 interface extends <code>OlapWrapper</code>). If connection pooling is being 
-used, the code will work provided that the implementor of the connection pool 
+used, the code will work provided that the implementer of the connection pool 
 has ensured that the pooled connection object implements the <code>OlapWrapper</code> 
 interface. This is a minor change to the connection pool, and we hope that 
 popular connection pools will utilize this method in the near future.</p>
@@ -586,13 +588,13 @@ will work with any JDBC 4.0-compliant connection pool.</p>
 
 <p>
 <a class="javadoc" href="api/org/olap4j/OlapConnection.html">OlapConnection</a> (extends
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Connection.html">
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/Connection.html">
 java.sql.Connection</a>) is a
 connection to an OLAP data source.</p>
 <p>
 Methods:</p>
 <ul>
-    <li>NamedList&lt;Catalog&gt; getCatalogs()</li>
+    <li><code>NamedList&lt;Catalog&gt; getCatalogs()</code></li>
 </ul>
 
 <h4>2.2.3. <a name="The_OlapWrapper_interface">The OlapWrapper interface</a></h4>
@@ -611,27 +613,34 @@ can be ignored.</p>
 <p>
 Methods:</p>
 <ul>
-    <li>boolean isWrapper()</li>
-	<li>T unwrap(Class&lt;T&gt;)</li>
+    <li><code>boolean isWrapper()</code></li>
+	<li><code>T unwrap(Class&lt;T&gt;)</code></li>
 </ul>
 
 <h3>2.3. <a name="Statements">Statements</a></h3>
 
 <h4>2.3.1. <a name="OlapStatement">The OlapStatement interface</a></h4>
 <p><a class="javadoc" href="api/org/olap4j/OlapStatement.html">OlapStatement</a>&nbsp; (extends
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Statement.html">java.sql.Statement</a>)
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/Statement.html">java.sql.Statement</a>)
 is an object used to execute a static MDX statement and return the result it
 produces.</p>
+<p>It has methods to execute an MDX query represented both as a string and as a 
+parse tree.</p>
+<p>Methods:</p>
+<ul>
+	<li><code>CellSet executeOlapQuery(String mdx)</code></li>
+	<li><code>CellSet executeOlapQuery(SelectNode selectNode)</code></li>
+</ul>
 <h4>2.3.2. <a name="PreparedOlapStatement">The PreparedOlapStatement interface</a></h4>
 <p><a class="javadoc" href="api/org/olap4j/PreparedOlapStatement.html">PreparedOlapStatement</a>
 (extends
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/PreparedStatement.html">
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/PreparedStatement.html">
 java.sql.PreparedStatement</a>) represents a precompiled MDX statement.</p>
 <p>An MDX statement is precompiled and stored in a <code>PreparedOlapStatement</code>
 object. This object can then be used to efficiently execute this statement
 multiple times.</p>
 <p>The method
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/PreparedStatement.html#getParameterMetaData()">
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/PreparedStatement.html#getParameterMetaData()">
 PreparedStatement.getParameterMetaData()</a> returns a description of the
 parameters, as in JDBC. The result is an OlapParameterMetaData.</p>
 <p>To set values of parameters, use the <code>set<i>Type</i>(int, <i>type</i>)</code>
@@ -646,10 +655,17 @@ execution of this <code>PreparedOlapStatement</code>.</p>
 <a class="javadoc" href="api/org/olap4j/PreparedOlapStatement.html#getCube()">
 getCube()</a> method returns the cube (or virtual cube) the prepared statement 
 relates to.</p>
+<p>Methods:</p>
+<ul>
+	<li><code>CellSet executeQuery()</code></li>
+	<li><code>Cube getCube()</code></li>
+	<li><code>CellSetMetaData getMetaData()</code></li>
+	<li><code>OlapParameterMetaData getParameterMetaData()</code></li>
+</ul>
 <h4>2.3.3. <a name="OlapParameterMetaData">The OlapParameterMetaData interface</a></h4>
 <p><a class="javadoc" href="api/org/olap4j/OlapParameterMetaData.html">OlapParameterMetaData</a>
 (extends
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ParameterMetaData.html">
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/ParameterMetaData.html">
 java.sql.ParameterMetaData</a>) describes parameters of a <code>
 PreparedOlapStatement</code>.</p>
 <p>Additional methods:</p>
@@ -660,25 +676,25 @@ PreparedOlapStatement</code>.</p>
 
 <h4>2.3.4. <a name="CellSet">The CellSet interface</a></h4>
 <p><a class="javadoc" href="api/org/olap4j/CellSet.html">CellSet</a> (extends
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html">
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/ResultSet.html">
 java.sql.ResultSet</a>) is the result of executing an <a class="javadoc" href="api/org/olap4j/OlapStatement.html">OlapStatement</a>
 or <a class="javadoc" href="api/org/olap4j/PreparedOlapStatement.html">PreparedOlapStatement</a>.</p>
-<p>It extends ResultSet, but since most of these methods are concerned with rows
+<p>It extends <code>ResultSet</code>, but since most of these methods are concerned with rows
 and columns, only a few of the base class's methods are applicable. The following methods
 are applicable:</p>
 <ul>
-	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#clearWarnings%28%29">clearWarnings()</a></li>
-	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#close%28%29">close()</a></li>
-	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getConcurrency%28%29">	getConcurrency()</a></li>
-	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getStatement%28%29">getStatement()</a></li>
-	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getType%28%29">getType()</a></li>
-	<li><a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSet.html#getWarnings%28%29">getWarnings()</a></li>
+	<li><a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/ResultSet.html#clearWarnings%28%29">clearWarnings()</a></li>
+	<li><a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/ResultSet.html#close%28%29">close()</a></li>
+	<li><a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/ResultSet.html#getConcurrency%28%29">	getConcurrency()</a></li>
+	<li><a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/ResultSet.html#getStatement%28%29">getStatement()</a></li>
+	<li><a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/ResultSet.html#getType%28%29">getType()</a></li>
+	<li><a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/ResultSet.html#getWarnings%28%29">getWarnings()</a></li>
 </ul>
 <p>Additional methods to retrieve the axes of the multidimensional result:</p>
 <ul>
-    <li>List&lt;CellSetAxis&gt; getAxes()</li>
-    <li>CellSetAxis getFilterAxis()</li>
-<li>Cell getCell(List&lt;Integer&gt; coordinates)</li>
+    <li><code>List&lt;CellSetAxis&gt; getAxes()</code></li>
+    <li><code>CellSetAxis getFilterAxis()</code></li>
+<li><code>Cell getCell(List&lt;Integer&gt; coordinates)</code></li>
 </ul>
 
 <p>An OlapStatement can have no more than one CellSet open. Closing an 
@@ -705,21 +721,26 @@ method to obtain an iterator for sequential access.</p>
 
 <p>Methods:</p>
 <ul>
-    <li>int getOrdinal()</li>
-    <li>CellSet getCellSet()</li>
-    <li>CellSetAxisMetaData getAxisMetaData()</li>
-    <li>List&lt;Position&gt; getPositions()</li>
-    <li>int getPositionCount()</li>
-    <li>ListIterator&lt;Position&gt; iterate()</li>
+    <li><code>int getOrdinal()</code></li>
+    <li><code>CellSet getCellSet()</code></li>
+    <li><code>CellSetAxisMetaData getAxisMetaData()</code></li>
+    <li><code>List&lt;Position&gt; getPositions()</code></li>
+    <li><code>int getPositionCount()</code></li>
+    <li><code>ListIterator&lt;Position&gt; iterate()</code></li>
 </ul>
 
 <h4>2.3.6. <a name="The_CellSetAxisMetaData_interface">The CellSetAxisMetaData interface</a></h4>
 
+<p>A <a class="javadoc" href="api/org/olap4j/CellSetAxisMetaData.html">
+CellSetAxisMetaData</a> is
+describes a <a class="javadoc" href="api/org/olap4j/CellSetAxis.html">
+CellSetAxis</a>.</p>
+
 <p>Methods:</p>
 <ul>
-    <li>Axis getAxis()</li>
-    <li>List&lt;Hierarchy&gt; getHierarchies()</li>
-    <li>List&lt;Property&gt; getProperties()</li>
+    <li><code>Axis getAxis()</code></li>
+    <li><code>List&lt;Hierarchy&gt; getHierarchies()</code></li>
+    <li><code>List&lt;Property&gt; getProperties()</code></li>
 </ul>
 
 <h4>2.3.7. <a name="The_Position_interface">The Position interface</a></h4>
@@ -727,11 +748,76 @@ method to obtain an iterator for sequential access.</p>
 <p><a class="javadoc" href="api/org/olap4j/Position.html">Position</a>
 is a position on a <a class="javadoc" href="api/org/olap4j/CellSetAxis.html">
 CellSetAxis</a>.</p>
+<p>An axis has a particular dimensionality, that is, a set of one or more 
+dimensions which will appear on that axis, and every position on that axis will 
+have a member of each of those dimensions. For example, in the MDX query</p>
+
+<div class="code">
+	SELECT {[Measures].[Unit Sales], [Measures].[Store Sales]} ON COLUMNS,<br>
+&nbsp;&nbsp;&nbsp; CrossJoin(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {[Gender].Members},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {[Product].[Food], 
+	[Product].[Drink]}) ON ROWS<br>
+	FROM [Sales]</div>
+
+<p>the <code>COLUMNS</code> axis has dimensionality {<code>[Measures]</code>} and the <code>
+ROWS</code> 
+axis has dimensionality {<code>[Gender]</code>, <code>[Product]</code>}. In the result 
+of this query,</p>
+<blockquote>
+	<table border="1" id="table1" cellpadding="3">
+		<tr>
+			<td bgcolor="#E0E0E0"><b><i>Gender</i></b></td>
+			<td bgcolor="#E0E0E0"><b><i>Product</i></b></td>
+			<td bgcolor="#E0E0E0"><b>Unit Sales</b></td>
+			<td bgcolor="#E0E0E0"><b>Store Sales</b></td>
+		</tr>
+		<tr>
+			<td bgcolor="#E0E0E0"><b>All Gender</b></td>
+			<td bgcolor="#E0E0E0"><b>Food</b></td>
+			<td align="right">191,940</td>
+			<td align="right">409,035.59</td>
+		</tr>
+		<tr>
+			<td bgcolor="#E0E0E0"><b>All Gender</b></td>
+			<td bgcolor="#E0E0E0"><b>Drink</b></td>
+			<td align="right">24,597</td>
+			<td align="right">48,836.21</td>
+		</tr>
+		<tr>
+			<td bgcolor="#E0E0E0"><b>F</b></td>
+			<td bgcolor="#E0E0E0"><b>Food</b></td>
+			<td align="right">94,814</td>
+			<td align="right">203,094.17</td>
+		</tr>
+		<tr>
+			<td bgcolor="#E0E0E0"><b>F</b></td>
+			<td bgcolor="#E0E0E0"><b>Drink</b></td>
+			<td align="right">12,202</td>
+			<td align="right">24,457.37</td>
+		</tr>
+		<tr>
+			<td bgcolor="#E0E0E0"><b>M</b></td>
+			<td bgcolor="#E0E0E0"><b>Food</b></td>
+			<td align="right">97,126</td>
+			<td align="right">205,941.42</td>
+		</tr>
+		<tr>
+			<td bgcolor="#E0E0E0"><b>M</b></td>
+			<td bgcolor="#E0E0E0"><b>Drink</b></td>
+			<td align="right">12,395</td>
+			<td align="right">24,378.84</td>
+		</tr>
+	</table>
+</blockquote>
+<p>each of the 5 positions on the <code>ROWS</code> axis has two members, 
+consistent with its dimensionality of 2. The <code>COLUMNS</code> axis has two 
+positions, each with one member.</p>
 
 <p>Methods:</p>
 <ul>
-    <li>List&lt;Member&gt; getMembers()</li>
-    <li>int getOrdinal()</li>
+    <li><code>List&lt;Member&gt; getMembers()</code></li>
+    <li><code>int getOrdinal()</code></li>
 </ul>
 
 <h4>2.3.8. <a name="Cell">The Cell interface</a></h4>
@@ -742,36 +828,49 @@ CellSet</a>.</p>
 
 <p>Methods:</p>
 <ul>
-    <li>getCellSet()</li>
-    <li>getOrdinal()</li>
-    <li>getCoordinateList()</li>
-    <li>getPropertyValue(Property)</li>
-    <li>isError()</li>
-    <li>isNull()</li>
-    <li>isEmpty()</li>
-    <li>getDoubleValue()</li>
-    <li>getErrorText()</li>
-    <li>getValue()</li>
-    <li>getFormattedValue()</li>
+    <li><code>CellSet getCellSet()</code></li>
+    <li><code>int getOrdinal()</code></li>
+    <li><code>List&lt;Integer&gt; getCoordinateList()</code></li>
+    <li><code>Object getPropertyValue(Property)</code></li>
+    <li><code>boolean isError()</code></li>
+    <li><code>boolean isNull()</code></li>
+    <li><code>boolean isEmpty()</code></li>
+    <li><code>double getDoubleValue()</code></li>
+    <li><code>String getErrorText()</code></li>
+    <li><code>Object getValue()</code></li>
+    <li><code>String getFormattedValue()</code></li>
 </ul>
 
 <h4>2.3.9. <a name="The_CellSetMetaData_interface">The CellSetMetaData interface</a></h4>
 
-<p>Extends 
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/ResultSetMetaData.html">
-java.sql.ResultSetMetaData</a>. </p>
+<p><a class="javadoc" href="api/org/olap4j/CellSetMetaData.html">CellSetMetaData</a> 
+(extends 
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/ResultSetMetaData.html">
+java.sql.ResultSetMetaData</a>) describes a
+<a class="javadoc" href="api/org/olap4j/CellSet.html">CellSet</a>.</p>
 <p>Methods:</p>
 <ul>
-    <li>List&lt;Property&gt; getCellProperties()</li>
-    <li>Cube getCube()</li>
-    <li>List&lt;CellSetAxisMetaData&gt; getAxesMetaData()</li>
+    <li><code>List&lt;Property&gt; getCellProperties()</code></li>
+    <li><code>Cube getCube()</code></li>
+    <li><code>List&lt;CellSetAxisMetaData&gt; getAxesMetaData()</code></li>
 </ul>
 
 <h4>2.3.10. <a name="The_OlapDatabaseMetaData_interface">The OlapDatabaseMetaData interface</a></h4>
 
-<p>Extends 
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DatabaseMetaData.html">
-java.sql.DatabaseMetaData</a>.</p>
+<p><a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html">
+OlapDatabaseMetaData</a> (extends 
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/DatabaseMetaData.html">
+java.sql.DatabaseMetaData</a>) provides information about an OLAP database.</p>
+<p>Just as 
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/DatabaseMetaData.html">
+DatabaseMetaData</a> provides a method to query the each kind of metadata 
+element in a relational database (tables, columns, and so forth), returning 
+the rows as a
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/ResultSet.html">
+ResultSet</a>, <code>OlapDatabaseMetaData</code> provides methods for OLAP 
+metadata elements (cubes, dimensions, hierarchies, levels, members, measures).</p>
+<p>These methods are described in the section &quot;<a href="#The_OlapDatabaseMetaData_interface_and_methods_which_return_schema_rowsets">The 
+<code>OlapDatabaseMetaData</code> interface and methods which return schema rowsets</a>&quot;.</p>
 
 <h3>2.4. <a name="MDX_query_model">MDX query model</a></h3>
 
@@ -785,8 +884,8 @@ java.sql.DatabaseMetaData</a>.</p>
   graphical operations.</li>
 </ul>
 
-<p>An MDX query model can exist in an <i>unvalidated</i> and <i>validated</i>
-state. In the unvalidated state, identifiers and function calls exist as raw
+<p>An MDX query model can exist in an <i>un-validated</i> and <i>validated</i>
+state. In the un-validated state, identifiers and function calls exist as raw
 strings, and no type information has been assigned. During validation,
 identifiers are resolved to specific MDX objects (members, etc.), type
 information is assigned, and if a function exists in several overloaded forms, a
@@ -797,7 +896,6 @@ specific instance is chosen based upon the types of its arguments.</p>
 <p>An MDX query model can be converted into a statement. For example,</p>
 
 <div class="code">
-
   // Create a query model.<br>
   SelectNode query = new SelectNode();<br>
   query.setCubeName(<br>
@@ -835,26 +933,42 @@ specific instance is chosen based upon the types of its arguments.</p>
 &nbsp;&nbsp;&nbsp; cset = stmt.executeOlapQuery(query);<br>
   } catch (OlapException e) {<br>
 &nbsp;&nbsp;&nbsp; System.out.println(&quot;Execution failed: &quot; + e);<br>
-  }<br>
-&nbsp;</div>
+  }</div>
 
 <p>Package name: <a class="javadoc" href="api/org/olap4j/mdx/package-summary.html">org.olap4j.mdx</a></p>
 
 <p>Classes:</p>
 <ul>
-  <li>ParseTreeNode</li>
-  <li>SelectNode</li>
-  <li>AxisNode</li>
-  <li>CallNode</li>
-  <li>IdentifierNode</li>
-  <li>LiteralNode</li>
-  <li>MemberNode</li>
-  <li>LevelNode</li>
-  <li>HierarchyNode</li>
-  <li>DimensionNode</li>
-  <li>WithMemberNode</li>
-  <li>WithSetNode</li>
-  <li>PropertyValueNode</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/ParseTreeNode.html">ParseTreeNode</a> is a node in a parse tree representing a parsed
+	MDX statement.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/SelectNode.html">SelectNode</a> 
+	represents a <code>SELECT</code> statement, including <code>FROM</code> and
+	<code>WHERE</code> 
+	clauses if present.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/AxisNode.html">AxisNode</a> 
+	represents an axis expression.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/CallNode.html">CallNode</a> 
+	represents a call to a function or operator.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/IdentifierNode.html">IdentifierNode</a> 
+	represents an identifier, such as <code>Sales</code> or <code>
+	[Measures].[Unit Sales]</code>.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/LiteralNode.html">LiteralNode</a> 
+	represents a literal, such as <code>123</code> or <code>&quot;Hello, world!&quot;</code>.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/MemberNode.html">MemberNode</a> 
+	represents a use of a member name in an expression.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/LevelNode.html">LevelNode</a> 
+	represents a use of a level name in an expression.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/HierarchyNode.html">HierarchyNode</a> 
+	represents a use of a hierarchy name in an expression.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/DimensionNode.html">DimensionNode</a> 
+	represents a use of a dimension name in an expression.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/WithMemberNode.html">WithMemberNode</a> 
+	represents a <code>WITH MEMBER</code> clause defining a calculated member.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/WithSetNode.html">WithSetNode</a> 
+	represents a <code>WITH SET</code> clause defining a calculated set.</li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/PropertyValueNode.html">PropertyValueNode</a> 
+	represents <i>property = value</i> pair as part of a the declaration of a 
+	calculated member or set.</li>
 </ul>
 
 <h4>2.4.1 <a name="The_ParseTreeWriter_class">The ParseTreeWriter class</a></h4>
@@ -868,18 +982,19 @@ MDX code.</p>
 
 <p>Package name: <a class="javadoc" href="api/org/olap4j/type/package-summary.html">org.olap4j.mdx.parser</a></p>
 
-<p>Represents the types of nodes in an MDX query model.</p>
+<p>Provides an MDX parser.</p>
+<p>Classes:</p>
 
 <ul>
-  <li>MdxParserFactory</li>
-  <li>MdxParser</li>
+  <li><code>MdxParserFactory</code></li>
+  <li><code>MdxParser</code></li>
 </ul>
 
 <h3 align="left">2.6. <a name="MDX_type_model">MDX type model</a></h3>
 
 <p>Package name: <a class="javadoc" href="api/org/olap4j/type/package-summary.html">org.olap4j.type</a></p>
 
-<p>Represents the types of nodes in an MDX query model.</p>
+<p>Represents the MDX type system.</p>
 
 <p>Here are some examples:</p>
 
@@ -916,9 +1031,7 @@ MDX code.</p>
 <p>Since MDX is a late-binding language, some expressions will have unknown
 types, or only partial type information. For example, the expression</p>
 
-<div class="code">
-
-  	[Store].Levels("Sta" + "te")</div>
+<div class="code">[Store].Levels("Sta" + "te")</div>
 
 <p>will have type <code>Level&lt;dimension=[Store], level=unknown&gt;</code>. The
 validator knows that the <code>&lt;hierarchy&gt;.Levels(&lt;string expr&gt;)</code> function
@@ -943,7 +1056,7 @@ evaluated at runtime.</p>
     represents the type of an expression which has a string value.</li>
 	<li><a class="javadoc" href="api/org/olap4j/type/SymbolType.html">SymbolType</a>
     (extends <a class="javadoc" href="api/org/olap4j/type/ScalarType.html">ScalarType</a>)
-    represents the type of a symbol, or flag, argument to a builtin function.
+    represents the type of a symbol, or flag, argument to a built-in function.
     For example, the <code>ASC</code>
 	keyword in the expression <code>Order(Gender.MEMBERS, Measures.[Unit Sales],
 	ASC)</code> is a symbol. Symbol types are rarely used except if you are
@@ -969,7 +1082,7 @@ example, <code>LevelType(hierarchy=[Time])</code> indicates that the expression
 must evaluate to one of the levels of the <code>[Time]</code> hierarchy, that
 is, one of the values <code>[Time].[Year]</code>, <code>[Time].[Quarter]</code>,
 or <code>[Time].[Month]</code>.</p>
-<p>Composite types</p>
+<p>Composite types:</p>
 <ul>
 	<li><a class="javadoc" href="api/org/olap4j/type/SetType.html">SetType</a> represents the type of an expression which is a
 	set. It has a component type, for example, the type of the expression <code>
@@ -998,7 +1111,8 @@ org.olap4j.metadata.Cube</a>.</li>
     OlapDatabaseMetaData</a> interface to create a schema result set for each metadata class. Some
 	of these methods accept parameters to filter the rows returned. For example,
 	<a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html#getCubes(java.lang.String, java.lang.String, java.lang.String)">
-	OlapDatabaseMetaData.getCubes(&lt;schemaName&gt;, &lt;cubeName&gt;)</a>.</li>
+	OlapDatabaseMetaData.getCubes(String catalog, String schemaNamePattern, 
+	String cubeNamePattern)</a>.</li>
 </ul>
 <h4>2.7.1. <a name="Access_control">Access control</a></h4>
 
@@ -1027,15 +1141,15 @@ description</code>.</p>
 (for example, the list of dimensions in a cube), the return type is the
 <a class="javadoc" href="api/org/olap4j/metadata/NamedList.html">NamedList</a> 
 extension to
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/List.html">
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/util/List.html">
 java.util.List</a>.</p>
 <p>Providers are at liberty to implement metadata objects using a cache, and 
 therefore over the course of time, different java objects may represent the same 
 underlying metadata object. Always use
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/lang/Object.html#equals(java.lang.Object)">
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/lang/Object.html#equals(java.lang.Object)">
 equals()</a>, not the <code>=</code> operator, when comparing metadata objects, 
 and do not use
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/IdentityHashMap.html">
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/util/IdentityHashMap.html">
 IdentityHashMap</a>.</p>
 <h5>2.7.2.1. <a name="MetadataElement">The MetadataElement interface</a></h5>
 <p>A <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
@@ -1046,10 +1160,10 @@ MetadataElement provides
 name and unique-name properties (not localized), and localized caption and
 description.</p>
 <ul>
-	<li>String getName()</li>
-	<li>String getUniqueName()</li>
-	<li>String getCaption(Locale locale)</li>
-	<li>String getDescription(Locale locale)</li>
+	<li><code>String getName()</code></li>
+	<li><code>String getUniqueName()</code></li>
+	<li><code>String getCaption(Locale locale)</code></li>
+	<li><code>String getDescription(Locale locale)</code></li>
 </ul>
 <h5>2.7.2.2. <a name="Catalog">The Catalog interface</a></h5>
 <p>A <a class="javadoc" href="api/org/olap4j/metadata/Catalog.html">Catalog</a> 
@@ -1064,9 +1178,9 @@ OlapConnection.getCatalogs()</code> method.</p>
 
 <p>Methods:</p>
 <ul>
-	<li>String getName()</li>
-    <li>NamedList&lt;Schema&gt; getSchemas()</li>
-	<li>OlapDatabaseMetaData getMetaData()</li>
+	<li><code>String getName()</code></li>
+    <li><code>NamedList&lt;Schema&gt; getSchemas()</code></li>
+	<li><code>OlapDatabaseMetaData getMetaData()</code></li>
 </ul>
 
 <h5>2.7.2.3. <a name="Schema">The Schema interface</a></h5>
@@ -1077,10 +1191,10 @@ metadata, about a database.</p>
 
 <p>It belongs to a catalog and contains a number of cubes and shared dimensions.</p>
 <ul>
-	<li>String getName()</li>
-    <li>List&lt;Dimension&gt; getSharedDimensions()</li>
-    <li>List&lt;Cube&gt; getCubes()</li>
-    <li>getSupportedLocales() (see <a href="#Internationalization">
+	<li><code>String getName()</code></li>
+    <li><code>List&lt;Dimension&gt; getSharedDimensions()</code></li>
+    <li><code>List&lt;Cube&gt; getCubes()</code></li>
+    <li><code>List&lt;Locale&gt; getSupportedLocales()</code> (see <a href="#Internationalization">
     Internationalization</a>)</li>
 </ul>
 
@@ -1094,12 +1208,12 @@ of measures. It may also have a collection of named sets, each defined by a
 formula.</p>
 
 <ul>
-	<li>List&lt;Dimension&gt; getDimensions()</li>
-	<li>List&lt;Measure&gt; getMeasures()</li>
-	<li>NamedList&lt;NamedSet&gt; getSets();</li>
-	<li>Schema getSchema()</li>
-	<li>String getName()</li>
-    <li>getSupportedLocales() (see <a href="#Internationalization">
+	<li><code>List&lt;Dimension&gt; getDimensions()</code></li>
+	<li><code>List&lt;Measure&gt; getMeasures()</code></li>
+	<li><code>NamedList&lt;NamedSet&gt; getSets()</code></li>
+	<li><code>Schema getSchema()</code></li>
+	<li><code>String getName()</code></li>
+    <li><code>List&lt;Locale&gt; getSupportedLocales()</code> (see <a href="#Internationalization">
     Internationalization</a>)</li>
 </ul>
 
@@ -1115,10 +1229,10 @@ wants to base an analysis.</p>
 but most have exactly one hierarchy.</p>
 
 <ul>
-	<li>String getName()</li>
-	<li>List&lt;Hierarchy&gt; getHierarchies()</li>
-	<li>List&lt;Member&gt; getRootMembers()</li>
-	<li>Dimension.Type getDimensionType()</li>
+	<li><code>String getName()</code></li>
+	<li><code>List&lt;Hierarchy&gt; getHierarchies()</code></li>
+	<li><code>List&lt;Member&gt; getRootMembers()</code></li>
+	<li><code>Dimension.Type getDimensionType()</code></li>
 </ul>
 <h5>2.7.2.6. <a name="Hierarchy">The Hierarchy interface</a></h5>
 <p>A <a class="javadoc" href="api/org/olap4j/metadata/Hierarchy.html">Hierarchy</a>&nbsp; 
@@ -1128,11 +1242,11 @@ their positions relative to one another.</p>
 <p>A hierarchy is a collection of levels, each of which is a category of similar 
 members.</p>
 <ul>
-	<li>Dimension getDimension()</li>
-	<li>String getName()</li>
-	<li>List&lt;Level&gt; getLevels()</li>
-	<li>boolean hasAll()</li>
-    <li>Member getDefaultMember()</li>
+	<li><code>Dimension getDimension()</code></li>
+	<li><code>String getName()</code></li>
+	<li><code>List&lt;Level&gt; getLevels()</code></li>
+	<li><code>boolean hasAll()</code></li>
+    <li><code>Member getDefaultMember()</code></li>
 </ul>
 <h5>2.7.2.7. <a name="Level">The Level interface</a></h5>
 <p>A <a class="javadoc" href="api/org/olap4j/metadata/Level.html">Level</a>&nbsp; 
@@ -1140,35 +1254,34 @@ members.</p>
 MetadataElement</a>) is a group of members in a hierarchy, all with the same 
 attributes and at the same depth in the hierarchy.</p>
 <ul>
-	<li>int getDepth()</li>
-	<li>Hierarchy getHierarchy()</li>
-	<li>Level.Type getLevelType()</li>
-	<li>List&lt;Property&gt; getProperties()</li>
-	<li>List&lt;Member&gt; getMembers()</li>
-	<li>Member findMember(String name)</li>
+	<li><code>int getDepth()</code></li>
+	<li><code>Hierarchy getHierarchy()</code></li>
+	<li><code>Level.Type getLevelType()</code></li>
+	<li><code>List&lt;Property&gt; getProperties()</code></li>
+	<li><code>List&lt;Member&gt; getMembers()</code></li>
 </ul>
 <h5>2.7.2.8. <a name="Member">The Member interface</a></h5>
 <p>A <a class="javadoc" href="api/org/olap4j/metadata/Member.html">Member</a>&nbsp; 
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>) is a data value in an OLAP dimension.</p>
 <ul>
-	<li>String getName()</li>
-	<li>List&lt;Member&gt; getChildMembers()</li>
-	<li>Member getParentMember()</li>
-	<li>Level getLevel()</li>
-	<li>Hierarchy getHierarchy()</li>
-	<li>boolean isChildOrEqualTo(Member member)</li>
-	<li>boolean isCalculated()</li>
-	<li>boolean isCalculatedInQuery()</li>
-	<li>int solveOrder()</li>
-	<li>List&lt;Member&gt; getAncestorMembers()</li>
-	<li>Object getPropertyValue(String propertyName)</li>
-	<li>String getPropertyFormattedValue(String propertyName)</li>
-	<li>void setProperty(String name, Object value)</li>
-	<li>List&lt;Property&gt; getProperties()</li>
-	<li>int getOrdinal()</li>
-	<li>boolean isHidden()</li>
-	<li>Member getDataMember()</li>
+	<li><code>String getName()</code></li>
+	<li><code>List&lt;Member&gt; getChildMembers()</code></li>
+	<li><code>Member getParentMember()</code></li>
+	<li><code>Level getLevel()</code></li>
+	<li><code>Hierarchy getHierarchy()</code></li>
+	<li><code>boolean isChildOrEqualTo(Member member)</code></li>
+	<li><code>boolean isCalculated()</code></li>
+	<li><code>boolean isCalculatedInQuery()</code></li>
+	<li><code>int solveOrder()</code></li>
+	<li><code>List&lt;Member&gt; getAncestorMembers()</code></li>
+	<li><code>Object getPropertyValue(Property property)</code></li>
+	<li><code>String getPropertyFormattedValue(Property property)</code></li>
+	<li><code>void setProperty(Property property, Object value)</code></li>
+	<li><code>List&lt;Property&gt; getProperties()</code></li>
+	<li><code>int getOrdinal()</code></li>
+	<li><code>boolean isHidden()</code></li>
+	<li><code>Member getDataMember()</code></li>
 </ul>
 <h5>2.7.2.9. <a name="Measure">The Measure interface</a></h5>
 
@@ -1182,16 +1295,29 @@ value of each cell, and is usually numeric.</p>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Property.html">Property</a>&nbsp; 
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>) is the definition of a property of a member or a cell.</p>
+<p><code>Property</code> contains two enumerated types
+<a class="javadoc" href="api/org/olap4j/metadata/Property.StandardMemberProperty.html">
+StandardMemberProperty</a> and
+<a class="javadoc" href="api/org/olap4j/metadata/Property.StandardCellProperty.html">
+StandardCellProperty</a> whose values are the built-in properties of members and 
+cells. Because these types implement the Property interface, you can use them as 
+properties; for example:</p>
+
+<div class="code">
+	Member member;<br>
+	Object o =
+	member.getPropertyValue(<br>
+&nbsp;&nbsp;&nbsp; Property.StandardMemberProperty.CATALOG_NAME);</div>
+<p>Members:</p>
 <ul>
-	<li>Datatype getType()</li>
-	<li>Scope getScope()</li>
-	<li>String getCaption()</li>
-	<li>boolean isInternal()</li>
-	<li>enum Scope { MEMBER, CELL }</li>
-	<li>enum Datatype { STRING, OTHER, NUMERIC, BOOLEAN }</li>
-	<li>enum StandardMemberProperty { CATALOG_NAME, SCHEMA_NAME, CUBE_NAME, ...
-	}</li>
-	<li>enum StandardCellProperty { BACK_COLOR, CELL_EVALUATION_LIST, ... }</li>
+	<li><code>Datatype getType()</code></li>
+	<li><code>Scope getScope()</code></li>
+	<li><code>boolean isInternal()</code></li>
+	<li><code>enum Scope { MEMBER, CELL }</code></li>
+	<li><code>enum Datatype { STRING, OTHER, NUMERIC, BOOLEAN }</code></li>
+	<li><code>enum StandardMemberProperty implements Property { CATALOG_NAME, SCHEMA_NAME, CUBE_NAME, ...
+	}</code></li>
+	<li><code>enum StandardCellProperty implements Property { BACK_COLOR, CELL_EVALUATION_LIST, ... }</code></li>
 </ul>
 <h5>2.7.2.11. <a name="The_NamedSet_interface">The NamedSet interface</a></h5>
 <p>A <a class="javadoc" href="api/org/olap4j/metadata/NamedSet.html">NamedSet</a> 
@@ -1199,14 +1325,14 @@ MetadataElement</a>) is the definition of a property of a member or a cell.</p>
 MetadataElement</a>) describes a set whose value is determined by an MDX 
 expression. It belongs to a cube.</p>
 <ul>
-	<li>Cube getCube()</li>
+	<li><code>Cube getCube()</code></li>
 </ul>
 <h4>2.7.3. 
 <a name="The_OlapDatabaseMetaData_interface_and_methods_which_return_schema_rowsets">The OlapDatabaseMetaData 
 interface, and methods which return schema rowsets</a></h4>
 <p><a class="javadoc" href="api/org/olap4j/OlapDatabaseMetaData.html">
 OlapDatabaseMetaData</a> (extends
-<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DatabaseMetaData.html">
+<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/DatabaseMetaData.html">
 java.sql.DatabaseMetaData</a>) contains methods which return schema result sets.</p>
 <p>Schema result sets are specified as in [<a href="#XMLA">XML for Analysis
 specification</a>]. Here is a table of the XML/A methods and the corresponding 
@@ -1229,7 +1355,7 @@ olap4j method and element type.</p>
 	<tr>
 		<td>not supported</td>
 		<td>
-		<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DatabaseMetaData.html#getCatalogs()">
+		<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/DatabaseMetaData.html#getCatalogs()">
         DatabaseMetaData.getCatalogs</a></td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/metadata/Catalog.html">Catalog</a></td>
@@ -1237,7 +1363,7 @@ olap4j method and element type.</p>
 	<tr>
 		<td>not supported</td>
 		<td>
-		<a class="javadoc" href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/DatabaseMetaData.html#getSchemas()">
+		<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/DatabaseMetaData.html#getSchemas()">
         DatabaseMetaData.getSchemas</a></td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/metadata/Schema.html">Schema</a></td>
@@ -1592,7 +1718,7 @@ and values.</p>
 		<td>LITERAL_NAME</td>
 		<td>String</td>
 		<td><p>The name of the literal described in the row. Never null.</p>
-		<p>Example: DBLITERAL_LIKE_PERCENT</p></td>
+		<p>Example: DBLITERAL_LIKE_PERCENT.</p></td>
 	</tr>
 	<tr>
 		<td>LITERAL_VALUE</td>
@@ -3081,7 +3207,7 @@ outside of the cube.</p>
 </ul>
 
 <h4>2.8.1. <a name="Query_Model_Details">Query Model Details</a></h4>
-<p><b>This section should probably be moved into Section 2.4</b></p>
+<p><b>This section should probably be moved into Section 2.4.</b></p>
 
 <p>The MDX query language uses a data model based on cubes, dimensions, tuples
 and sets.  The transformation package allows direct manipulation of a query
@@ -3208,7 +3334,7 @@ are not part of the API.</p>
 
 <h3>3.1. <a name="Test_suite">Test suite</a></h3>
 
-<p>The olap4j project contains a TCK (Test Compatability Kit). The TCK is a suite
+<p>The olap4j project contains a TCK (Test Compatibility Kit). The TCK is a suite
 of tests which can be used to verify the compliance of an implementation of the
 API.</p>
 
@@ -3220,6 +3346,9 @@ generic XML/A provider.</p>
 <p>Since there are many XML/A providers, and some of them require requests in a
 particular format and/or produce idiosyncratic responses, the XML/A provider
 will come in several flavors.</p>
+<p>The XML/A provider is being developed in the same source-code repository as 
+olap4j, in a Java package <code>org.olap4j.driver.xmla</code>, but is not part 
+of the olap4j specification or release.</p>
 
 <h2>4. <a name="Non-functionality">Non-functionality</a></h2>
 
@@ -3244,8 +3373,8 @@ the Mondrian OLAP engine.</p>
 <p>This code is currently being developed the same source-code repository as 
 olap4j, and is the reference implementation of olap4j. The code will be 
 contributed to the mondrian project in the mondrian-3.0 release, when olap4j 
-will become mondrian's primary API, and the mondrian team will take over its 
-development.</p>
+will become mondrian's primary API, and the mondrian team will take over the development 
+of the mondrian provider.</p>
 
 <h3>5.2. <a name="XMLA_provider">XML for Analysis provider</a></h3>
 <p>We intend to create an a driver which implements the olap4j API on top of any 

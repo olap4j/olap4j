@@ -68,9 +68,6 @@ public interface Level extends MetadataElement {
      */
     NamedList<Property> getProperties();
 
-    // todo: needs specification
-    Member findMember(String memberName);
-
     /**
      * Returns a list of Member objects which belong to this Level.
      *

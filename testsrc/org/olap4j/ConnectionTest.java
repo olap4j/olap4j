@@ -850,6 +850,27 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
+     * Tests metadata browsing
+     */
+    public void testMetadata() {
+        if (true) return;
+        Cube cube = null;
+        for (Dimension dimension : cube.getDimensions()) {
+            for (Hierarchy hierarchy : dimension.getHierarchies()) {
+                for (Level level : hierarchy.getLevels()) {
+                    for (Member member : level.getMembers()) {
+                        ;
+                    }
+                }
+            }
+        }
+        for (NamedSet namedSet : cube.getSets()) {
+            ;
+        }
+        Member member1 = cube.lookupMember("Product", "Food", "Marshmallows");
+    }
+
+    /**
      * Abstracts the information about specific drivers and database instances
      * needed by this test. This allows the same test suite to be used for
      * multiple implementations of olap4j.

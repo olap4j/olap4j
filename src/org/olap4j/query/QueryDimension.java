@@ -13,6 +13,7 @@ import org.olap4j.metadata.*;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.AbstractList;
 
 /**
  * Usage of a dimension for an OLAP query.
@@ -23,17 +24,13 @@ import java.util.ArrayList;
  * Dimension object in any way so a single Dimension object
  * can be referenced by many QueryDimension objects.
  *
- * <p>TODO: Make the list returned from {@link #getSelections()} mutable,
- * and obsolete methods such as {@link #addSelection(Selection)}. But
- * must still remember to test all of the ways selections can be added/removed.
- *
  * @author jdixon, jhyde
  * @version $Id$
  * @since May 29, 2007
  */
 public class QueryDimension {
     protected QueryAxis axis;
-    protected List<Selection> selections = new ArrayList<Selection>();
+    protected final List<Selection> selections = new SelectionList();
     private final Query query;
     protected Dimension dimension;
 
@@ -41,6 +38,10 @@ public class QueryDimension {
         super();
         this.query = query;
         this.dimension = dimension;
+    }
+
+    public Query getQuery() {
+        return query;
     }
 
     public void setAxis(QueryAxis axis) {
@@ -55,69 +56,17 @@ public class QueryDimension {
         return dimension.getName();
     }
 
-
-    public void addSelection(Selection selection) {
-        if (selection.getDimension() != dimension) {
-            // TODO raise an exception
-            return;
-        }
-        selections.add(selection);
-    }
-
-    public void addMemberSelection(Member member) {
-        assert member.getDimension() == dimension : "pre";
-        selections.add(query.getSelectionFactory().createMemberSelection(member));
-    }
-
-    // todo: make selection list mutable and remove this method
-    public void addSelections(List<Selection> selections) {
-        this.selections.addAll(selections);
-    }
-
-    public void addMemberSelections(List<Member> members) {
-        for (Member member : members) {
-            addMemberSelection(member);
-        }
-    }
-
-    // todo: make selection list mutable and remove this method
-    public void clearSelections() {
-        selections.clear();
-    }
-
-    public Selection createSelection(
-        String hierarchyName,
-        String levelName,
-        String memberName)
+    public Selection createSelection(Member member)
     {
-        return createSelection(
-            hierarchyName, levelName, memberName, Selection.Operator.MEMBER);
+        return createSelection(member, Selection.Operator.MEMBER);
     }
 
     public Selection createSelection(
-        String hierarchyName,
-        String levelName,
-        String memberName,
+        Member member,
         Selection.Operator operator)
     {
-        Selection selection = null;
-        Hierarchy hierarchy = dimension.getHierarchies().get(hierarchyName);
-        if (hierarchy != null) {
-            Level level = hierarchy.getLevels().get(levelName);
-            if (level != null) {
-                Member member = level.findMember(memberName);
-                if (member != null) {
-                    selection =
-                        query.getSelectionFactory()
-                            .createMemberSelection(member);
-                }
-            }
-        }
-
-        if (selection != null) {
-            selection.setOperator(operator);
-        }
-        return selection;
+        return query.getSelectionFactory().createMemberSelection(
+            member, operator);
     }
 
     public List<Member> resolve(Selection selection)
@@ -140,6 +89,16 @@ public class QueryDimension {
         }
     }
 
+    /**
+     * Returns a list of the selections within this
+     * <code>QueryDimension</code>.
+     *
+     * <p>The list is mutable; you may call
+     * <code>getSelections().clear()</code>,
+     * or <code>getSelections().add(dimension)</code>, for instance.</p>
+     *
+     * @return list of selections
+     */
     public List<Selection> getSelections() {
         return selections;
     }
@@ -150,6 +109,34 @@ public class QueryDimension {
 
     public void setDimension(Dimension dimension) {
         this.dimension = dimension;
+    }
+
+    private class SelectionList extends AbstractList<Selection> {
+        private final List<Selection> list = new ArrayList<Selection>();
+
+        public Selection get(int index) {
+            return list.get(index);
+        }
+
+        public int size() {
+            return list.size();
+        }
+
+        public Selection set(int index, Selection selection) {
+            return list.set(index, selection);
+        }
+
+        public void add(int index, Selection selection) {
+            if (selection.getDimension() != dimension) {
+                // TODO raise an exception
+                return;
+            }
+            list.add(index, selection);
+        }
+
+        public Selection remove(int index) {
+            return list.remove(index);
+        }
     }
 }
 

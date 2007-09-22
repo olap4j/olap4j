@@ -70,6 +70,11 @@ public interface Cell {
      * {@link org.olap4j.CellSet#getMetaData()} followed by
      * {@link CellSetMetaData#getCellProperties()}.</p>
      *
+     * <p>Every cell has certain system properties such as "VALUE" and
+     * "FORMAT_STRING" (the full list is described in the
+     * {@link org.olap4j.metadata.Property.StandardCellProperty}
+     * enumeration), as well as extra properties defined by the query.</p>
+     *
      * @param property Property whose value to retrieve
      *
      * @return Value of the given property for this Cell; if the property is

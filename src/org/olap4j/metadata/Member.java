@@ -140,34 +140,60 @@ public interface Member extends MetadataElement {
     boolean isCalculatedInQuery();
 
     /**
-     * Returns the value of the property named <code>propertyName</code>.
+     * Returns the value of a given property.
      *
-     * @see #getPropertyFormattedValue(String)
-     */
-    Object getPropertyValue(String propertyName);
-
-    /**
-     * Returns the formatted value of the property named
-     * <code>propertyName</code>.
+     * <p>Returns null if the property is not set.</p>
      *
      * <p>Every member has certain system properties such as "name" and
-     * "caption" (the full list is described in the {@link Property}
+     * "caption" (the full list is described in the
+     * {@link org.olap4j.metadata.Property.StandardMemberProperty}
      * enumeration), as well as extra properties defined for its Level
      * (see {@link Level#getProperties()}).</p>
      *
-     * @see #getPropertyValue(String)
+     * @param property Property
+     *
+     * @return formatted value of the given property
+     *
+     * @see #getPropertyFormattedValue(Property)
      */
-    String getPropertyFormattedValue(String propertyName);
+    Object getPropertyValue(Property property);
+
+    /**
+     * Returns the formatted value of a given property.
+     *
+     * <p>Returns null if the property is not set.</p>
+     *
+     * <p>Every member has certain system properties such as "name" and
+     * "caption" (the full list is described in the
+     * {@link org.olap4j.metadata.Property.StandardMemberProperty}
+     * enumeration), as well as extra properties defined for its Level
+     * (see {@link Level#getProperties()}).</p>
+     *
+     * @param property Property
+     *
+     * @return formatted value of the given property
+     *
+     * @see #getPropertyValue(Property)
+     */
+    String getPropertyFormattedValue(Property property);
 
     /**
      * Sets a property of this member to a given value.
      *
-     * @param name Property name
+     * <p>Every member has certain system properties such as "name" and
+     * "caption" (the full list is described in the
+     * {@link org.olap4j.metadata.Property.StandardMemberProperty}
+     * enumeration), as well as extra properties defined for its Level
+     * (see {@link Level#getProperties()}).</p>
+     * 
+     * @param property property
+     *
      * @param value Property value
+     *
      * @throws OlapException if the value not valid for this property
      *   (for example, a String value assigned to a Boolean property)
      */
-    void setProperty(String name, Object value) throws OlapException;
+    void setProperty(Property property, Object value) throws OlapException;
 
     /**
      * Returns the definitions of the properties this member may have.

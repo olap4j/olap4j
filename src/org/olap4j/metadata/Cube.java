@@ -87,6 +87,7 @@ public interface Cube extends MetadataElement {
      */
     Collection<Locale> getSupportedLocales();
 
+    Member lookupMember(String... nameParts);
 }
 
 // End Cube.java

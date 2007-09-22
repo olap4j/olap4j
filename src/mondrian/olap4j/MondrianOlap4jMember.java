@@ -112,15 +112,15 @@ class MondrianOlap4jMember implements Member, Named {
         throw new UnsupportedOperationException();
     }
 
-    public Object getPropertyValue(String propertyName) {
+    public Object getPropertyValue(Property property) {
         throw new UnsupportedOperationException();
     }
 
-    public String getPropertyFormattedValue(String propertyName) {
+    public String getPropertyFormattedValue(Property property) {
         throw new UnsupportedOperationException();
     }
 
-    public void setProperty(String name, Object value) throws OlapException {
+    public void setProperty(Property property, Object value) throws OlapException {
         throw new UnsupportedOperationException();
     }
 

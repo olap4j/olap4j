@@ -63,10 +63,6 @@ class MondrianOlap4jLevel implements Level {
         throw new UnsupportedOperationException();
     }
 
-    public Member findMember(String memberName) {
-        throw new UnsupportedOperationException();
-    }
-
     public List<Member> getMembers() {
         throw new UnsupportedOperationException();
     }

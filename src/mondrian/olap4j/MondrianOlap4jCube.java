@@ -14,6 +14,7 @@ import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.NamedSet;
 import org.olap4j.metadata.Schema;
+import org.olap4j.metadata.Member;
 
 import java.util.List;
 import java.util.Locale;
@@ -84,6 +85,10 @@ class MondrianOlap4jCube implements Cube, Named {
     public String getDescription(Locale locale) {
         // todo: i81n
         return cube.getDescription();
+    }
+
+    public Member lookupMember(String... nameParts) {
+        throw new UnsupportedOperationException();
     }
 }
 

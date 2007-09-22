@@ -51,7 +51,7 @@ public class Query {
         for (Dimension dimension : cube.getDimensions()) {
             QueryDimension queryDimension = new QueryDimension(
                 this, dimension);
-            unused.appendDimension(queryDimension);
+            unused.getDimensions().add(queryDimension);
             dimensionMap.put(queryDimension.getName(), queryDimension);
         }
         across = new QueryAxis(this, Axis.COLUMNS);
@@ -90,10 +90,10 @@ public class Query {
         QueryAxis columnsAxis = axes.get(Axis.COLUMNS);
         QueryAxis rowsAxis = axes.get(Axis.ROWS);
         tmp.addAll(this.across.getDimensions());
-        columnsAxis.clearDimensions();
-        columnsAxis.appendDimensions(rowsAxis.getDimensions());
-        rowsAxis.clearDimensions();
-        rowsAxis.appendDimensions(tmp);
+        columnsAxis.getDimensions().clear();
+        columnsAxis.getDimensions().addAll(rowsAxis.getDimensions());
+        rowsAxis.getDimensions().clear();
+        rowsAxis.getDimensions().addAll(tmp);
     }
 
     public Map<Axis, QueryAxis> getAxes() {
@@ -115,11 +115,11 @@ public class Query {
             Member member = dimension.getDefaultHierarchy().getDefaultMember();
             if (queryDimension.getAxis() == null ||
                 queryDimension.getAxis().getLocation() == null) {
-                queryDimension.clearSelections();
-                queryDimension.addMemberSelection(member);
+                queryDimension.getSelections().clear();
+                queryDimension.getSelections().add(queryDimension.createSelection(member));
             } else {
                 if (queryDimension.getSelections().size() == 0) {
-                    queryDimension.addMemberSelection(member);
+                    queryDimension.getSelections().add(queryDimension.createSelection(member));
                 }
             }
         }

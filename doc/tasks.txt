@@ -38,10 +38,8 @@ Javadoc
 Code
 ----
  
-* Write javadoc for, implement and test Level.findMember 
-* in QueryAxis, make dimension list mutable; remove methods QueryAxis.clearDimensions, appendDimensions, appendDimension, insertDimension, removeDimension; and add tests for the functionality of these methods; remove methods from spec. 
-* in QueryDimension, make selection list mutable; remove methods addSelection, addMemberSelection, addSelections, clearSelections; add tests; remove from spec. 
 * fix 4 TODOs in ParserTest 
+* document/implement Cube.lookupMember
  
 Testing
 -------

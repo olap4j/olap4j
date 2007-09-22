@@ -32,7 +32,7 @@ public class SelectionFactory {
         this.query = query;
     }
 
-    Selection createMemberSelection(Member member) {
+    Selection createMemberSelection(Member member, Selection.Operator operator) {
         throw new UnsupportedOperationException();
     }
 }
