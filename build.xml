@@ -23,6 +23,7 @@
   <property name="classes.dir" value="classes"/>
   <property name="testsrc.dir" value="testsrc"/>
   <property name="testlib.dir" value="testlib"/>
+  <property name="testlog.dir" value="testlog"/>
   <property name="testclasses.dir" value="testclasses"/>
   <property name="build.dir" value="build"/>
   <property name="doc.dir" value="doc"/>
@@ -53,6 +54,15 @@
     <pathelement location="${mondrian.dir}/classes"/>
     <pathelement location="${mondrian.dir}/testclasses"/>
     <pathelement location="${mondrian.dir}/lib/eigenbase-xom.jar"/>
+    <pathelement location="${mondrian.dir}/lib/eigenbase-properties.jar"/>
+    <pathelement location="${mondrian.dir}/lib/eigenbase-resgen.jar"/>
+    <pathelement location="${mondrian.dir}/lib/commons-dbcp.jar"/>
+    <pathelement location="${mondrian.dir}/lib/commons-pool.jar"/>
+    <pathelement location="${mondrian.dir}/lib/commons-collections.jar"/>
+    <pathelement location="${mondrian.dir}/lib/commons-vfs.jar"/>
+    <pathelement location="${mondrian.dir}/lib/commons-logging.jar"/>
+    <pathelement location="${mondrian.dir}/lib/commons-math-1.0.jar"/>
+    <pathelement location="${mondrian.dir}/testlib/derby.jar"/>
     <!-- We depend on spring, but only for examples. -->
     <pathelement location="${lib.dir}/spring.jar"/>
 
@@ -60,6 +70,7 @@
 
   <path id="project.test.classpath">
     <path refid="project.classpath"/>
+    <pathelement location="${testclasses.dir}"/>
   </path>
 
   <!-- verify that required dependencies are defined -->
@@ -95,6 +106,7 @@
     <mkdir dir="${build.dir}"/>
     <mkdir dir="${testlib.dir}"/>
     <mkdir dir="${testsrc.dir}"/>
+    <mkdir dir="${testlog.dir}"/>
   </target>
 
   <target name="compile" depends="prepare,parser,compile.java"/>
@@ -410,7 +422,19 @@ META-INF/**"/>
     </javadoc>
   </target>
 
-  <target name="test" />
+  <target name="test" depends="prepare, compile.tests">
+    <junit printsummary="yes" fork="no" failureproperty="junit.failure"
+      tempdir="${testlog.dir}">
+      <formatter type="plain"/>
+      <formatter type="xml"/>
+      <batchtest todir="${testlog.dir}">
+        <fileset dir="${testclasses.dir}">
+          <include name="**/*Test.class"/>
+        </fileset>
+      </batchtest>
+      <classpath refid="project.test.classpath"/>
+    </junit>
+  </target>
 
   <taskdef name="retroweaver"
       classname="com.rc.retroweaver.ant.RetroWeaverTask">
