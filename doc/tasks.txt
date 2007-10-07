@@ -44,7 +44,7 @@ Code
 Testing
 -------
 
-* Make "ant test" work. 
+* Remove site-specifics from test code.
 * Ensure that there is a unit test for every method in every public class or interface. 
 * Write unit test for metadata classes. 
 * Write unit test for OlapDatabaseMetadata.getXxx methods 
