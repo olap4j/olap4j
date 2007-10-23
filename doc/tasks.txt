@@ -47,13 +47,9 @@ Testing
 * Remove site-specifics from test code.
 * Ensure that there is a unit test for every method in every public class or interface. 
 * Write unit test for metadata classes. 
-* Write unit test for OlapDatabaseMetadata.getXxx methods 
-* Internationalization test, including Connection.getLocale(), Query.getLocale(), and all methods with Locale methods or results 
+* Internationalization test, including Connection.getLocale(), Query.getLocale(), and all methods with Locale methods or results
 * Test access control. The metadata (e.g. members & hierarchies) should reflect what the current user/role can see. For example, USA.CA.SF has no children. This test should test every method which returns a metadata element or collection of metadata elements. 
-* ConnectionTest (301, 12) // todo: call getCubes with a pattern for cube name and schema name  
-* ConnectionTest (303, 12) // todo: call getCubes with a different schema  
-* ConnectionTest (367, 12) // todo: More tests required for other methods on DatabaseMetaData  
-* ConnectionTest (428, 8) // todo: test statement with no slicer  
+* ConnectionTest (428, 8) // todo: test statement with no slicer
 * ConnectionTest (596, 12) // todo: test all of the PreparedOlapStatement.setXxx methods 
 * Test methods in class Cell. (see ConnectionTest.testCell) 
 * Test methods in class CellSetAxis. (see ConnectionTest.testCellSetAxis) 

@@ -10,6 +10,7 @@
 package mondrian.olap4j;
 
 import mondrian.olap.MondrianServer;
+import mondrian.xmla.XmlaUtil;
 
 import org.olap4j.OlapDatabaseMetaData;
 import org.olap4j.OlapException;
@@ -18,6 +19,7 @@ import org.olap4j.metadata.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Implementation of {@link org.olap4j.OlapDatabaseMetaData}
@@ -41,6 +43,53 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         this.olap4jConnection = olap4jConnection;
         mondrianServer =
             MondrianServer.forConnection(olap4jConnection.connection);
+    }
+
+    // helpers
+
+    /**
+     * Executes a metadata query and returns the result as a JDBC
+     * {@link ResultSet}.
+     *
+     * @param methodName Name of the metadata request. Corresponds to the XMLA
+     * method name, e.g. "MDSCHEMA_CUBES"
+     *
+     * @param patternValues Array of alternating parameter name and value
+     * pairs. If the parameter value is null, it is ignored.
+     *
+     * @return Result set of metadata
+     */
+    private ResultSet getMetadata(
+        String methodName,
+        Object... patternValues)
+    {
+        Map<String, Object> restrictionMap =
+            new HashMap<String, Object>();
+        assert patternValues.length % 2 == 0;
+        for (int i = 0; i < patternValues.length / 2; ++i) {
+            final String key = (String) patternValues[i * 2];
+            Object value = patternValues[i * 2 + 1];
+            if (value != null) {
+                if (value instanceof String) {
+                    value = Collections.singletonList((String) value);
+                }
+                restrictionMap.put(key, value);
+            }
+        }
+        XmlaUtil.MetadataRowset rowset =
+            XmlaUtil.getMetadataRowset(
+                olap4jConnection.connection,
+                MondrianOlap4jConnection.LOCALDB_CATALOG_NAME,
+                methodName,
+                restrictionMap);
+        return olap4jConnection.factory.newFixedResultSet(
+            olap4jConnection, rowset.headerList, rowset.rowList);
+    }
+
+    private XmlaUtil.Wildcard wildcard(String pattern) {
+        return pattern == null
+            ? null
+            : new XmlaUtil.Wildcard(pattern);
     }
 
     // package-protected
@@ -552,11 +601,34 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public ResultSet getSchemas() throws SQLException {
-        throw new UnsupportedOperationException();
+        // No XMLA method exists for this.
+        List<String> headerList =
+            Arrays.asList("TABLE_SCHEM", "TABLE_CAT");
+        List<List<Object>> rowList = new ArrayList<List<Object>>();
+        for (Schema schema : olap4jCatalog.getSchemas()) {
+            rowList.add(
+                Arrays.asList(
+                    (Object) schema.getName(),
+                    schema.getCatalog().getName()));
+        }
+        return olap4jConnection.factory.newFixedResultSet(
+            olap4jConnection, headerList, rowList);
     }
 
     public ResultSet getCatalogs() throws SQLException {
-        throw new UnsupportedOperationException();
+        if (false) {
+            // Do not use DBSCHEMA_CATALOGS: it has different columns than the
+            // JDBC spec requires
+            return getMetadata("DBSCHEMA_CATALOGS");
+        }
+
+        List<String> headerList =
+            Arrays.asList("TABLE_CAT");
+        List<List<Object>> rowList = 
+            Collections.singletonList(
+                Arrays.asList((Object) olap4jCatalog.getName()));
+        return olap4jConnection.factory.newFixedResultSet(
+            olap4jConnection, headerList, rowList);
     }
 
     public ResultSet getTableTypes() throws SQLException {
@@ -801,36 +873,48 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String cubeNamePattern,
         String actionNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            "MDSCHEMA_ACTIONS",
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "ACTION_NAME", wildcard(actionNamePattern));
     }
 
-    public ResultSet getDatasources(
-        String dataSourceName) throws OlapException {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+    public ResultSet getDatasources() throws OlapException {
+        return getMetadata("DISCOVER_DATASOURCES");
     }
 
     public ResultSet getLiterals() throws OlapException {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata("DISCOVER_LITERALS");
     }
 
     public ResultSet getDatabaseProperties(
         String dataSourceName,
         String propertyNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata("DISCOVER_PROPERTIES");
     }
 
     public ResultSet getProperties(
         String catalog,
         String schemaPattern,
         String cubeNamePattern,
-        String dimensionNamePattern,
-        String hierarchyNamePattern,
-        String levelNamePattern,
+        String dimensionUniqueName,
+        String hierarchyUniqueName,
+        String levelUniqueName,
         String memberUniqueName,
         String propertyNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            "MDSCHEMA_PROPERTIES",
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "DIMENSION_UNIQUE_NAME", dimensionUniqueName,
+            "HIERARCHY_UNIQUE_NAME", hierarchyUniqueName,
+            "LEVEL_UNIQUE_NAME", levelUniqueName,
+            "MEMBER_UNIQUE_NAME", memberUniqueName,
+            "PROPERTY_NAME", wildcard(propertyNamePattern));
     }
 
     public String getMdxKeywords() throws OlapException {
@@ -850,7 +934,11 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String cubeNamePattern)
         throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            "MDSCHEMA_CUBES",
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern));
     }
 
     public ResultSet getDimensions(
@@ -860,13 +948,19 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String dimensionNamePattern)
         throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            "MDSCHEMA_DIMENSIONS",
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "DIMSENSION_NAME", wildcard(dimensionNamePattern));
     }
 
-    public ResultSet getFunctions(
+    public ResultSet getOlapFunctions(
         String functionNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            "MDSCHEMA_FUNCTIONS",
+            "FUNCTION_NAME", wildcard(functionNamePattern));
     }
 
     public ResultSet getHierarchies(
@@ -877,7 +971,13 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String hierarchyNamePattern) 
         throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            "MDSCHEMA_HIERARCHIES",
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "DIMENSION_NAME", wildcard(dimensionNamePattern),
+            "HIERARCHY_NAME", wildcard(hierarchyNamePattern));
     }
 
     public ResultSet getMeasures(
@@ -887,31 +987,63 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String measureNamePattern,
         String measureUniqueName) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            "MDSCHEMA_MEASURES",
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "MEASURE_NAME", wildcard(measureNamePattern),
+            "MEASURE_UNIQUE_NAME", measureUniqueName);
     }
 
     public ResultSet getMembers(
         String catalog,
         String schemaPattern,
         String cubeNamePattern,
-        String dimensionNamePattern,
-        String hierarchyNamePattern,
-        String levelNamePattern,
+        String dimensionUniqueName,
+        String hierarchyUniqueName,
+        String levelUniqueName,
         String memberUniqueName,
-        Member.TreeOp treeOp) throws OlapException
+        Set<Member.TreeOp> treeOps) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        String treeOpString;
+        if (treeOps != null) {
+            int op = 0;
+            for (Member.TreeOp treeOp : treeOps) {
+                op |= treeOp.xmlaOrdinal();
+            }
+            treeOpString = String.valueOf(op);
+        } else {
+            treeOpString = null;
+        }
+        return getMetadata(
+            "MDSCHEMA_MEMBERS",
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "DIMENSION_UNIQUE_NAME", dimensionUniqueName,
+            "HIERARCHY_UNIQUE_NAME", hierarchyUniqueName,
+            "LEVEL_UNIQUE_NAME", levelUniqueName,
+            "MEMBER_UNIQUE_NAME", memberUniqueName,
+            "TREE_OP", treeOpString);
     }
 
     public ResultSet getLevels(
         String catalog,
         String schemaPattern,
         String cubeNamePattern,
-        String dimensionNamePattern,
-        String hierarchyNamePattern,
+        String dimensionUniqueName,
+        String hierarchyUniqueName,
         String levelNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            "MDSCHEMA_LEVELS",
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "DIMENSION_UNIQUE_NAME", dimensionUniqueName,
+            "HIERARCHY_UNIQUE_NAME", hierarchyUniqueName,
+            "LEVEL_NAME", wildcard(levelNamePattern));
     }
 
     public ResultSet getSets(
@@ -920,7 +1052,12 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String cubeNamePattern,
         String setNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            "MDSCHEMA_SETS",
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "SET_NAME", wildcard(setNamePattern));
     }
 }
 

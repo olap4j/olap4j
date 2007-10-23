@@ -18,6 +18,7 @@ import mondrian.olap.Util;
 
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.util.Set;
 
 /**
  * Implementation of {@link org.olap4j.OlapDatabaseMetaData}
@@ -795,7 +796,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public ResultSet getDatasources(
-        String dataSourceName) throws OlapException {
+    ) throws OlapException {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
@@ -843,7 +844,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }
 
-    public ResultSet getFunctions(
+    public ResultSet getOlapFunctions(
         String functionNamePattern) throws OlapException
     {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
@@ -877,7 +878,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String hierarchyNamePattern,
         String levelNamePattern,
         String memberUniqueName,
-        Member.TreeOp treeOp) throws OlapException
+        Set<Member.TreeOp> treeOps) throws OlapException
     {
         return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
     }

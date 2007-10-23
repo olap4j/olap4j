@@ -25,7 +25,7 @@ class StringScanner extends Scanner {
      * Creates a StringScanner.
      *
      * @param s Input string
-     * @param debug Whether to emit debug messages
+     * @param debug Whether to populate debug messages
      */
     StringScanner(String s, boolean debug) {
         super(debug);

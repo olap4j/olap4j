@@ -12,7 +12,7 @@ package mondrian.olap4j;
 import org.olap4j.OlapConnection;
 
 import java.sql.*;
-import java.util.Properties;
+import java.util.*;
 import java.io.Reader;
 import java.io.InputStream;
 
@@ -37,7 +37,19 @@ class FactoryJdbc4Impl implements Factory {
     public EmptyResultSet newEmptyResultSet(
         MondrianOlap4jConnection olap4jConnection)
     {
-        return new EmptyResultSetJdbc4(olap4jConnection);
+        List<String> headerList = Collections.emptyList();
+        List<List<Object>> rowList = Collections.emptyList();
+        return new EmptyResultSetJdbc4(
+            olap4jConnection, headerList, rowList);
+    }
+
+    public ResultSet newFixedResultSet(
+        MondrianOlap4jConnection olap4jConnection,
+        List<String> headerList,
+        List<List<Object>> rowList)
+    {
+        return new EmptyResultSetJdbc4(
+            olap4jConnection, headerList, rowList);
     }
 
     public MondrianOlap4jCellSet newCellSet(
@@ -63,8 +75,12 @@ class FactoryJdbc4Impl implements Factory {
     // Inner classes
 
     private static class EmptyResultSetJdbc4 extends EmptyResultSet {
-        public EmptyResultSetJdbc4(MondrianOlap4jConnection olap4jConnection) {
-            super(olap4jConnection);
+        public EmptyResultSetJdbc4(
+            MondrianOlap4jConnection olap4jConnection,
+            List<String> headerList,
+            List<List<Object>> rowList)
+        {
+            super(olap4jConnection, headerList, rowList);
         }
 
         // implement java.sql.ResultSet methods

@@ -80,7 +80,7 @@ TABLE TD {
 <p>Authors: Julian Hyde, Barry Klawans<br>
 Version: 0.89.2-dev (draft)<br>
 Revision: $Id$
-(<a href="http://svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
+(<a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
 Last modified: September 21<sup>st</sup>, 2007.</p>
 <hr noshade="noshade">
 
@@ -548,8 +548,8 @@ connection. For instance,</p>
   	OlapStatement statement = olapConnection.createOlapStatement();</div>
 
 <p>The <a class="javadoc" href="api/org/olap4j/OlapStatement.html">OlapStatement</a>,
-<a class="javadoc" href="api/org/olap4j/OlapPreparedStatement.html">OlapPreparedStatement</a>, 
-and <a class="javadoc" href="api/org/olap4j/OlapResult.html">OlapResult</a> 
+<a class="javadoc" href="api/org/olap4j/PreparedOlapStatement.html">PreparedOlapStatement</a>, 
+and <a class="javadoc" href="api/org/olap4j/CellSet.html">CellSet</a> 
 interfaces also extend <code>OlapWrapper</code>, and can be accessed similarly.</p>
 
 <p>If connection pooling is not being used, then the object returned by the
@@ -1346,17 +1346,9 @@ olap4j method and element type.</p>
 		<th>Metadata element</th>
 	</tr>
 	<tr>
-		<td>not supported</td>
+		<td>DBSCHEMA_CATALOGS</td>
 		<td>
-		not supported</td>
-		<td>
-		<a class="javadoc" href="api/org/olap4j/metadata/Database.html">Database</a></td>
-	</tr>
-	<tr>
-		<td>not supported</td>
-		<td>
-		<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/DatabaseMetaData.html#getCatalogs()">
-        DatabaseMetaData.getCatalogs</a></td>
+		<a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/DatabaseMetaData.html#getCatalogs()">DatabaseMetaData.getCatalogs</a></td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/metadata/Catalog.html">Catalog</a></td>
 	</tr>
@@ -1367,6 +1359,26 @@ olap4j method and element type.</p>
         DatabaseMetaData.getSchemas</a></td>
 		<td>
 		<a class="javadoc" href="api/org/olap4j/metadata/Schema.html">Schema</a></td>
+	</tr>
+	<tr>
+		<td>DBSCHEMA_COLUMNS</td>
+		<td>not supported</td>
+		<td>not supported</td>
+	</tr>
+	<tr>
+		<td>DBSCHEMA_PROVIDER_TYPES</td>
+		<td>not supported</td>
+		<td>not supported</td>
+	</tr>
+	<tr>
+		<td>DBSCHEMA_TABLES</td>
+		<td>not supported</td>
+		<td>not supported</td>
+	</tr>
+	<tr>
+		<td>DBSCHEMA_TABLES_INFO</td>
+		<td>not supported</td>
+		<td>not supported</td>
 	</tr>
 	<tr>
 		<td>DISCOVER_DATASOURCES</td>

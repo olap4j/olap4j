@@ -12,8 +12,8 @@ package mondrian.olap4j;
 import mondrian.olap.Result;
 
 import java.util.Properties;
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.util.List;
+import java.sql.*;
 
 /**
  * Instantiates classes to implement the olap4j API against the
@@ -29,7 +29,13 @@ import java.sql.SQLException;
 interface Factory {
     Connection newConnection(String url, Properties info) throws SQLException;
 
-    EmptyResultSet newEmptyResultSet(MondrianOlap4jConnection olap4jConnection);
+    EmptyResultSet newEmptyResultSet(
+        MondrianOlap4jConnection olap4jConnection);
+
+    ResultSet newFixedResultSet(
+        MondrianOlap4jConnection olap4jConnection,
+        List<String> headerList,
+        List<List<Object>> rowList);
 
     MondrianOlap4jCellSet newCellSet(
         MondrianOlap4jStatement olap4jStatement,

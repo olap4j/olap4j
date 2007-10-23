@@ -80,7 +80,7 @@ class Scanner {
     /**
      * Creates a Scanner.
      *
-     * @param debug Whether to emit debug messages.
+     * @param debug Whether to populate debug messages.
      */
     Scanner(boolean debug) {
         this.debug = debug;

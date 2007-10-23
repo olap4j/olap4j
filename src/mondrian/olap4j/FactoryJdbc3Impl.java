@@ -11,9 +11,8 @@ package mondrian.olap4j;
 
 import mondrian.olap.Result;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Properties;
+import java.sql.*;
+import java.util.*;
 
 /**
  * Implementation of {@link mondrian.olap4j.Factory} for JDBC 3.0.
@@ -34,7 +33,19 @@ class FactoryJdbc3Impl implements Factory {
     public EmptyResultSet newEmptyResultSet(
         MondrianOlap4jConnection olap4jConnection)
     {
-        return new EmptyResultSetJdbc3(olap4jConnection);
+        List<String> headerList = Collections.emptyList();
+        List<List<Object>> rowList = Collections.emptyList();
+        return new EmptyResultSetJdbc3(
+            olap4jConnection, headerList, rowList);
+    }
+
+    public ResultSet newFixedResultSet(
+        MondrianOlap4jConnection olap4jConnection,
+        List<String> headerList,
+        List<List<Object>> rowList)
+    {
+        return new EmptyResultSetJdbc3(
+            olap4jConnection, headerList, rowList);
     }
 
     public MondrianOlap4jCellSet newCellSet(
@@ -82,9 +93,11 @@ class FactoryJdbc3Impl implements Factory {
 
     private static class EmptyResultSetJdbc3 extends EmptyResultSet {
         public EmptyResultSetJdbc3(
-            MondrianOlap4jConnection olap4jConnection)
+            MondrianOlap4jConnection olap4jConnection,
+            List<String> headerList,
+            List<List<Object>> rowList)
         {
-            super(olap4jConnection);
+            super(olap4jConnection, headerList, rowList);
         }
     }
 
