@@ -56,7 +56,6 @@ Testing
 * Test methods in OlapResultAxisMetaData (see ConnectionTest.testOlapResultAxisMetaData) 
 * Test cell and dimension properties (in ConnectionTest, see "todo: submit a query with cell and dimension properties, and make sure the properties appear in the result set") 
 * Test scrolling (in ConnectionTest, see "todo: submit a query where you ask for different scrolling") 
-* Test building parse tree (in ConnectionTest see "build parse tree (todo) ") 
 * Test axis name uniqueness (in ConnectionTest, see "test that get error if axes do not have unique names (todo)") 
  
 Not in scope for olap4j 0.9

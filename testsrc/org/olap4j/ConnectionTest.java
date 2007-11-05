@@ -24,11 +24,10 @@ import org.olap4j.metadata.*;
 import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Schema;
-import org.olap4j.mdx.SelectNode;
-import org.olap4j.mdx.ParseTreeWriter;
+import org.olap4j.mdx.*;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.test.TestContext;
-import org.olap4j.type.Type;
+import org.olap4j.type.*;
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.xml.sax.SAXException;
 import mondrian.tui.XmlaSupport;
@@ -648,7 +647,12 @@ public class ConnectionTest extends TestCase {
             "where [Time].[1997].[Q4]");
 
         // unparse
+        checkUnparsedMdx(select);
 
+        // test that get error if axes do not have unique names (todo)
+    }
+
+    private void checkUnparsedMdx(SelectNode select) {
         StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter(sw);
         ParseTreeWriter parseTreeWriter = new ParseTreeWriter(pw);
@@ -665,9 +669,6 @@ public class ConnectionTest extends TestCase {
                 "WHERE [Time].[1997].[Q4]"),
             mdx);
 
-        // build parse tree (todo)
-
-        // test that get error if axes do not have unique names (todo)
     }
 
     /**
@@ -675,7 +676,77 @@ public class ConnectionTest extends TestCase {
      * programmatically.
      */
     public void testUnparsing() {
-
+        // Note that the select statement constructed here is equivalent
+        // to the one in testParsing.
+        SelectNode select = new SelectNode(
+            null,
+            new ArrayList<ParseTreeNode>(),
+            new ArrayList<AxisNode>(),
+            new IdentifierNode(new IdentifierNode.Segment("sales")),
+            new AxisNode(
+                null,
+                false,
+                null,
+                Axis.SLICER,
+                new ArrayList<IdentifierNode>()),
+            new ArrayList<IdentifierNode>());
+        select.getWithList().add(
+            new WithMemberNode(
+                null,
+                new IdentifierNode(
+                    new IdentifierNode.Segment("Measures"),
+                    new IdentifierNode.Segment("Foo")),
+                new IdentifierNode(
+                    new IdentifierNode.Segment("Measures"),
+                    new IdentifierNode.Segment("Bar")),
+                Arrays.asList(
+                    new PropertyValueNode [] {
+                        new PropertyValueNode(
+                            null,
+                            "FORMAT_STRING",
+                            LiteralNode.createString(
+                                null,
+                                "xxx"))
+                    })));
+        select.getAxisList().add(
+            new AxisNode(
+                null,
+                false,
+                new CallNode(
+                    null,
+                    "{}",
+                    Syntax.Braces,
+                    Arrays.asList(
+                    new ParseTreeNode [] {
+                        new IdentifierNode(
+                            new IdentifierNode.Segment("Gender"))
+                    })),
+                Axis.COLUMNS,
+                new ArrayList<IdentifierNode>()));
+        select.getAxisList().add(
+            new AxisNode(
+                null,
+                false,
+                new CallNode(
+                    null,
+                    "{}",
+                    Syntax.Braces,
+                    new CallNode(
+                        null,
+                        "Children",
+                        Syntax.Property,
+                        new IdentifierNode(
+                            new IdentifierNode.Segment("Store"))
+                        )),
+                Axis.ROWS,
+                new ArrayList<IdentifierNode>()));
+        select.getSlicerAxis().setExpression(
+            new IdentifierNode(
+                new IdentifierNode.Segment("Time"),
+                new IdentifierNode.Segment("1997"),
+                new IdentifierNode.Segment("Q4")));
+        
+        checkUnparsedMdx(select);
     }
 
     /**
@@ -758,6 +829,9 @@ public class ConnectionTest extends TestCase {
         }
 
         public static String getDefaultConnectString() {
+            if (false) {
+                return "jdbc:mondrian:Jdbc='jdbc:derby:/home/jvs/open/mondrian/demo/derby/foodmart';JdbcUser=sa;JdbcPassword=sa;Catalog='file:///home/jvs/open/mondrian/demo/FoodMart.xml';JdbcDrivers=org.apache.derby.jdbc.EmbeddedDriver;";
+            }
             if (true) {
                 return "jdbc:mondrian:Jdbc='jdbc:odbc:MondrianFoodMart';Catalog='file://c:/open/mondrian/demo/FoodMart.xml';JdbcDrivers=sun.jdbc.odbc.JdbcOdbcDriver;";
             } else {
@@ -768,8 +842,8 @@ public class ConnectionTest extends TestCase {
         public static final String DRIVER_CLASS_NAME = "mondrian.olap4j.MondrianOlap4jDriver";
 
         public static final String DRIVER_URL_PREFIX = "jdbc:mondrian:";
-        private static final String USER = "user";
-        private static final String PASSWORD = "password";
+        private static final String USER = "sa";
+        private static final String PASSWORD = "sa";
     }
 
     /**
