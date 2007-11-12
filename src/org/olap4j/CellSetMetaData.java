@@ -41,17 +41,23 @@ import java.util.List;
  */
 public interface CellSetMetaData extends ResultSetMetaData, OlapWrapper {
     /**
-     * Returns a list of properties which each Cell may have.
+     * Returns a list of Property objects which each Cell may have.
+     *
+     * @return list of cell properties
      */
     List<Property> getCellProperties();
 
     /**
      * Returns the Cube which was referenced in this statement.
+     *
+     * @return cube referenced in this statement
      */
     Cube getCube();
 
     /**
-     * Returns a list of metadata describing each result axis.
+     * Returns a list of CellSetAxisMetaData describing each result axis.
+     *
+     * @return list of metadata describing each result axis
      */
     List<CellSetAxisMetaData> getAxesMetaData();
 }

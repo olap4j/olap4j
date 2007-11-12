@@ -26,24 +26,44 @@ import java.sql.Connection;
 public interface OlapConnection extends Connection, OlapWrapper {
 
     // overrides Connection, with refined return type and throws list
+    /**
+     * {@inheritDoc}
+     * @throws OlapException if database error occurs
+     */
     OlapDatabaseMetaData getMetaData() throws OlapException;
 
     /**
      * Creates a prepared OLAP Statement.
+     *
+     * <p>This method is the equivalent, for OLAP, of the
+     * {@link Connection#prepareStatement(String)} JDBC method.</p>
+     *
+     * @param mdx MDX query string
+     * @return prepared statement
+     * @throws OlapException if database error occurs
      */
     PreparedOlapStatement prepareOlapStatement(String mdx) throws OlapException;
 
     /**
      * Returns the factory used to create MDX parsers in this connection.
+     *
+     * @return MDX parser factory
      */
     MdxParserFactory getParserFactory();
 
     // overrides Connection, with refined return type and throws list
+    /**
+     * {@inheritDoc}
+     * @throws OlapException if database error occurs
+     */
     OlapStatement createStatement() throws OlapException;
 
     /**
      * Returns the current {@link org.olap4j.metadata.Schema} of this
      * connection.
+     *
+     * @return current Schema
+     * @throws OlapException if database error occurs
      */
     Schema getSchema() throws OlapException;
 

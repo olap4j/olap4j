@@ -59,10 +59,10 @@ EOF
 
 else
 
-  scp -oPort=8022 dist/doc.tar.gz jhyde@olap4j.org:/home/jhyde
+  scp -oPort=7022 dist/doc.tar.gz jhyde@olap4j.org:/home/jhyde
   GROUP_DIR=/home/jhyde/olap4j
 
-  ssh -p 8022 -T jhyde@olap4j.org <<EOF
+  ssh -oPort=7022 -T jhyde@olap4j.org <<EOF
 set -e
 set -v
 cd /home/jhyde

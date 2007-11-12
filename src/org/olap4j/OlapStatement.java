@@ -14,7 +14,7 @@ import java.sql.Statement;
 import org.olap4j.mdx.SelectNode;
 
 /**
- * Object used for statically executing an MDX statement and returning an
+ * Object used for statically executing an MDX statement and returning a
  * {@link CellSet}.
  *
  * @see PreparedOlapStatement

@@ -74,12 +74,15 @@ public class OlapException extends SQLException {
     }
 
     /**
-     *  Constructs an <code>OlapException</code> object with a given
+     * Constructs an <code>OlapException</code> object with a given
      * <code>reason</code> and <code>cause</code>.
-     * <p>
-     * @param cause the underlying reason for this <code>SQLException</code>
-     * (which is saved for later retrieval by the <code>getCause()</code> method);
-     * may be null indicating the cause is non-existent or unknown.
+     *
+     * @param  reason the detail message (which is saved for later retrieval
+     *         by the {@link #getMessage()} method).
+     * @param  cause the cause (which is saved for later retrieval by the
+     *         {@link #getCause()} method).  (A <tt>null</tt> value is
+     *         permitted, and indicates that the cause is nonexistent or
+     *         unknown.)
      */
     public OlapException(String reason, Throwable cause) {
         // Cannot call super(reason, cause) because
@@ -90,6 +93,8 @@ public class OlapException extends SQLException {
 
     /**
      * Sets the textual region where the exception occurred.
+     *
+     * @param region Textual region
      */
     public void setRegion(Region region) {
         this.region = region;
@@ -98,6 +103,8 @@ public class OlapException extends SQLException {
     /**
      * Returns the textual region where the exception occurred, or null if no
      * region can be identified.
+     *
+     * @return Region where the exception occurred
      */
     public Region getRegion() {
         return region;
@@ -122,6 +129,8 @@ public class OlapException extends SQLException {
     /**
      * Returns the context where the exception occurred.
      * Typically a {@link Cell} or a {@link Position}, or null.
+     *
+     * @return context where the exception occurred, or null
      */
     public Object getContext() {
         return context;
@@ -132,15 +141,19 @@ public class OlapException extends SQLException {
      * MDX string.
      *
      * <p>Row and column positions are 1-based and inclusive. For example,
-     * in
+     * in</p>
      *
      * <blockquote>
-     * SELECT { [Measures].MEMBERS } ON COLUMNS, { } ON ROWS FROM [Sales]
+     * <pre>
+     * SELECT { [Measures].MEMBERS } ON COLUMNS,
+     *    { } ON ROWS
+     * FROM [Sales]
+     * </pre>
      * </blockquote>
      *
-     * the <code>SELECT</code> keyword occupies positions (1, 1) through (1, 6),
-     * and would have a <code>Region(startLine=1, startColumn=1, endColumn=1,
-     * endLine=6)</code>.
+     * <p>the <code>SELECT</code> keyword occupies positions (1, 1) through
+     * (1, 6), and would have a <code>Region(startLine=1, startColumn=1,
+     * endColumn=1, endLine=6)</code>.</p>
      */
     public static final class Region {
         public final int startLine;

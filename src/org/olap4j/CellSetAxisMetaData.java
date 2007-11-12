@@ -17,21 +17,22 @@ import java.util.List;
 /**
  * Description of structure of a particular axis of an {@link CellSet}.
  *
- * <p>For example, in the MDX statement
+ * <p>For example, in the MDX statement</p>
+ *
  * <blockquote>
- * <code>
- * SELECT<br/>
- *   {[Measures].Members} ON COLUMNS,<br/>
- *   CrossJoin([Store].Members, [Gender].Children)<br/>
- *   DIMENSION PROPERTIES <br/>
- *      MEMBER_ORDINAL,<br/>
- *      MEMBER_UNIQUE_NAME, <br/>
- *      DISPLAY_INFO ON ROWS<br/>
+ * <pre>
+ * SELECT
+ *   {[Measures].Members} ON COLUMNS,
+ *   CrossJoin([Store].Members, [Gender].Children)
+ *   DIMENSION PROPERTIES
+ *      MEMBER_ORDINAL,
+ *      MEMBER_UNIQUE_NAME,
+ *      DISPLAY_INFO ON ROWS
  * FROM [Sales]
- * </code>
+ * </pre>
  * </blockquote>
  *
- * the ROWS axis is described by the following metadata:
+ * <p>the ROWS axis is described by the following metadata:</p>
  *
  * <table border="1">
  * <tr>

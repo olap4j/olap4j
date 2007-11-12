@@ -318,15 +318,16 @@ META-INF/**"/>
       <fileset dir="${classes.dir}" includes="**/package.html"/>
     </delete>
     <delete quiet="true" file="${javadoc.dir}/index.html"/>
-    <javadoc sourcepath="${src.dir}:${testsrc.dir}"
+    <javadoc sourcepath="${src.dir}"
         classpathref="project.test.classpath"
         destdir="${javadoc.dir}"
-        packagenames="org.olap4j.*,mondrian.olap4j.*"
+        packagenames="org.olap4j.*"
+        excludepackagenames="org.olap4j.mdx.parser.impl.*"
         overview="${src.dir}/overview.html"
         footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=35302&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
         author="true"
         source="1.5"
-        access="package"
+        access="public"
         Windowtitle="olap4j, version ${version}"
         additionalparam="-linksource"
       >
@@ -338,9 +339,40 @@ META-INF/**"/>
            scope="constructors,methods,types"/>
       <link href="http://java.sun.com/javase/6/docs/api/"/>
       <link href="http://mondrian.pentaho.org/api/"/>
-      <link href="http://www.junit.org/junit/javadoc/3.8/"/>
     </javadoc>
   </target>
+
+    <!-- Strict javadoc for testing purposes. Includes all packages and
+         non-public classes and methods. -->
+    <target name="javadoc-strict">
+      <mkdir dir="${javadoc.dir}" />
+      <!-- remove stray package.html files under classes to avoid 'multiple
+           sources of package comments' errors -->
+      <delete includeEmptyDirs="false" quiet="true">
+        <fileset dir="${classes.dir}" includes="**/package.html"/>
+      </delete>
+      <delete quiet="true" file="${javadoc.dir}/index.html"/>
+      <javadoc sourcepath="${src.dir}:${testsrc.dir}"
+          classpathref="project.test.classpath"
+          destdir="${javadoc.dir}"
+          packagenames="org.olap4j.*,mondrian.olap4j.*"
+          overview="${src.dir}/overview.html"
+          footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=35302&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
+          author="true"
+          source="1.5"
+          access="private"
+          Windowtitle="olap4j, version ${version}"
+        >
+        <tag name="pre" description="Pre-condition:"
+             scope="constructors,methods"/>
+        <tag name="post" description="Post-condition:"
+             scope="constructors,methods"/>
+        <tag name="testcase" description="Test-case:"
+             scope="constructors,methods,types"/>
+        <link href="http://java.sun.com/javase/6/docs/api/"/>
+        <link href="http://mondrian.pentaho.org/api/"/>
+      </javadoc>
+    </target>
 
   <!-- Generate javadoc with embedded UML diagrams using the yDoc doclet from
        yWorks.com. Set ydoc.home in build.properties, then replace
@@ -399,7 +431,7 @@ META-INF/**"/>
     <delete includeEmptyDirs="false" quiet="true">
       <fileset dir="${classes.dir}" includes="**/package.html"/>
     </delete>
-    <javadoc sourcepath="${src.dir}:${testsrc.dir}"
+    <javadoc sourcepath="${src.dir}"
         classpathref="project.test.classpath"
         packagenames="org.olap4j.*"
         excludepackagenames="org.olap4j.sample.*"
@@ -408,12 +440,6 @@ META-INF/**"/>
         source="1.5"
         access="package"
       >
-        <!--
-        doclet="com.tarsec.javadoc.pdfdoclet.PDFDoclet"
-        docletpath="lib/pdfdoclet-1.0.2-all.jar"
-        additionalparam="-pdf doc/olap4j_api.pdf -config doc/pdfdoclet.properties"
-
-        -->
       <doclet name="com.tarsec.javadoc.pdfdoclet.PDFDoclet"
             path="lib/pdfdoclet-1.0.2-all.jar">
           <param name="-pdf" value="doc/olap4j_api.pdf"/>

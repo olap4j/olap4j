@@ -93,11 +93,12 @@ public interface CellSet extends ResultSet, OlapWrapper {
     Cell getCell(List<Integer> coordinates);
 
     /**
-     * Returns the Cell at a ordinal.
+     * Returns the Cell at an ordinal.
      *
      * <p>Equivalent to
+     *
      * <blockquote><code>
-     * getCellFromStar(ordinalToCoordinates(ordinal)
+     * getCell(ordinalToCoordinates(ordinal))
      * </code></blockquote>
      *
      * @param ordinal 0-based ordinal of the cell
@@ -116,7 +117,6 @@ public interface CellSet extends ResultSet, OlapWrapper {
     /**
      * Converts a list of cell coordinates to a cell ordinal.
      *
-     * <p>The mapping
      * @param coordinates Cell coordinates
      * @return Cell ordinal
      */

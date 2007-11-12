@@ -33,10 +33,13 @@ import java.util.Set;
 public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
 
     // override return type
+    /**
+     * {@inheritDoc}
+     */
     OlapConnection getConnection() throws SQLException;
 
     /**
-     * Retrieves a list of descriptions of an Action.
+     * Retrieves a result set describing the Actions in this database.
      *
      * <p>Specification as for XML/A MDSCHEMA_ACTIONS schema rowset.
      *
@@ -206,7 +209,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
         String propertyNamePattern) throws OlapException;
 
     /**
-     * Retrieves a list of descriptions of member and cell Properties.
+     * Retrieves a result set describing member and cell Properties.
      *
      * <p>Specification as for XML/A MDSCHEMA_PROPERTIES schema rowset.
      *
@@ -285,6 +288,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @exception OlapException if a database access error occurs
      *
      * @see #getSearchStringEscape
+     * @see org.olap4j.metadata.Property
      */
     ResultSet getProperties(
         String catalog,
@@ -306,7 +310,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
     String getMdxKeywords() throws OlapException;
 
     /**
-     * Retrieves a description of a cube.
+     * Retrieves a result set describing the Cubes in this database.
      *
      * <p>Specification as for XML/A MDSCHEMA_CUBES schema rowset.
      *
@@ -360,6 +364,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @exception OlapException if a database access error occurs
      *
      * @see #getSearchStringEscape
+     * @see org.olap4j.metadata.Cube
      */
     public ResultSet getCubes(
         String catalog,
@@ -367,8 +372,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
         String cubeNamePattern) throws OlapException;
 
     /**
-     * Retrieves a result set describing the shared and private dimensions
-     * within a database.
+     * Retrieves a result set describing the shared and private Dimensions
+     * in this database.
      *
      * <p>Specification as for XML/A MDSCHEMA_DIMENSIONS schema rowset.
      *
@@ -435,6 +440,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @exception OlapException if a database access error occurs
      *
      * @see #getSearchStringEscape
+     * @see org.olap4j.metadata.Dimension
      */
     ResultSet getDimensions(
         String catalog,
@@ -443,7 +449,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
         String dimensionNamePattern) throws OlapException;
 
     /**
-     * Retrieves a result set describing the functions available to client
+     * Retrieves a result set describing the Functions available to client
      * applications connected to the database.
      *
      * <p>Specification as for XML/A MDSCHEMA_FUNCTIONS schema rowset.
@@ -484,8 +490,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
         String functionNamePattern) throws OlapException;
 
     /**
-     * Retrieves a result set describing each hierarchy within a particular
-     * dimension.
+     * Retrieves a result set describing the Hierarchies in this database.
      *
      * <p>Specification as for XML/A MDSCHEMA_HIERARCHIES schema rowset.
      *
@@ -561,6 +566,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @exception OlapException if a database access error occurs
      *
      * @see #getSearchStringEscape
+     * @see org.olap4j.metadata.Hierarchy
      */
     ResultSet getHierarchies(
         String catalog,
@@ -570,8 +576,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
         String hierarchyNamePattern) throws OlapException;
 
     /**
-     * Retrieves a result set describing each level within a particular
-     * hierarchy.
+     * Retrieves a result set describing the Levels in this database.
      *
      * <p>Specification as for XML/A MDSCHEMA_LEVELS schema rowset.
      *
@@ -650,6 +655,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @exception OlapException if a database access error occurs
      *
      * @see #getSearchStringEscape
+     * @see org.olap4j.metadata.Level
      */
     ResultSet getLevels(
         String catalog,
@@ -660,7 +666,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
         String levelNamePattern) throws OlapException;
 
     /**
-     * Retrieves a result set describing each measure within a cube.
+     * Retrieves a result set describing the Measures in this database.
      *
      * <p>Specification as for XML/A MDSCHEMA_MEASURES schema rowset.
      *
@@ -721,6 +727,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @exception OlapException if a database access error occurs
      *
      * @see #getSearchStringEscape
+     * @see org.olap4j.metadata.Measure
      */
     ResultSet getMeasures(
         String catalog,
@@ -730,7 +737,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
         String measureUniqueName) throws OlapException;
 
     /**
-     * Retrieves a result set describing the members within a database.
+     * Retrieves a result set describing the Members in this database.
      *
      * <p>Specification as for XML/A MDSCHEMA_MEMBERS schema rowset.
      *
@@ -839,6 +846,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @exception OlapException if a database access error occurs
      *
      * @see #getSearchStringEscape
+     * @see org.olap4j.metadata.Member
      */
     ResultSet getMembers(
         String catalog,
@@ -851,7 +859,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
         Set<Member.TreeOp> treeOps) throws OlapException;
 
     /**
-     * Retrieves a result set describing each named set.
+     * Retrieves a result set describing the named Sets in this database.
      *
      * <p>Specification as for XML/A MDSCHEMA_SETS schema rowset.
      *
@@ -889,6 +897,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @exception OlapException if a database access error occurs
      *
      * @see #getSearchStringEscape
+     * @see org.olap4j.metadata.NamedSet
      */
     ResultSet getSets(
         String catalog,
