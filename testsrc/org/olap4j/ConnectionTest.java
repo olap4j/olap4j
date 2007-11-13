@@ -764,7 +764,7 @@ public class ConnectionTest extends TestCase {
         Class.forName(helper.getDriverClassName());
         Connection connection = helper.createConnection();
         OlapConnection olapConnection =
-            ((Wrapper) connection).unwrap(OlapConnection.class);
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
         Cube cube = olapConnection.getSchema().getCubes().get("Sales");
 
         Member member =
@@ -797,7 +797,7 @@ public class ConnectionTest extends TestCase {
         Class.forName(helper.getDriverClassName());
         Connection connection = helper.createConnection();
         OlapConnection olapConnection =
-            ((Wrapper) connection).unwrap(OlapConnection.class);
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
         Cube cube = olapConnection.getSchema().getCubes().get("Sales");
 
         List<Member> memberList =
@@ -875,7 +875,7 @@ public class ConnectionTest extends TestCase {
         Class.forName(helper.getDriverClassName());
         Connection connection = helper.createConnection();
         OlapConnection olapConnection =
-            ((Wrapper) connection).unwrap(OlapConnection.class);
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
         Cube cube = olapConnection.getSchema().getCubes().get("Sales");
 
         for (Dimension dimension : cube.getDimensions()) {
@@ -984,7 +984,7 @@ public class ConnectionTest extends TestCase {
         Class.forName(helper.getDriverClassName());
         Connection connection = helper.createConnection();
         OlapConnection olapConnection =
-            ((Wrapper) connection).unwrap(OlapConnection.class);
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
 
         final MdxParserFactory parserFactory =
             olapConnection.getParserFactory();
@@ -1048,7 +1048,8 @@ public class ConnectionTest extends TestCase {
 
         // connect using properties and no username/password
         Connection connection = helper.createConnection();
-        OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
 
         final MdxParserFactory parserFactory =
             olapConnection.getParserFactory();
