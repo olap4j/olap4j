@@ -10,10 +10,7 @@
 package mondrian.olap4j;
 
 import org.olap4j.*;
-import org.olap4j.Position;
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.Member;
-import org.olap4j.metadata.Property;
+import org.olap4j.metadata.*;
 
 import java.util.*;
 
@@ -87,7 +84,7 @@ class MondrianOlap4jCellSetAxis implements CellSetAxis, CellSetAxisMetaData {
         throw new UnsupportedOperationException();
     }
 
-    public List<Property> getProperties() {
+    public NamedList<Property> getProperties() {
         throw new UnsupportedOperationException();
     }
 

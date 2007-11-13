@@ -11,9 +11,9 @@ package org.olap4j.mdx;
 
 import org.olap4j.type.Type;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parse tree model for an MDX SELECT statement.
@@ -28,29 +28,31 @@ public class SelectNode implements ParseTreeNode {
     private final List<AxisNode> axisList;
     private final AxisNode slicerAxis;
     private final List<IdentifierNode> cellPropertyList;
-    private IdentifierNode cubeName;
+    private ParseTreeNode from;
 
     /**
      * Creates a SelectNode.
      *
+     * @param region Region of source code from which this node was created
      * @param withList List of members and sets defined in this query using
      *   a <code>WITH</code> clause
      * @param axisList List of axes
-     * @param cubeName Name of cube
+     * @param from Name of cube
      * @param slicerAxis Slicer axis
+     * @param cellPropertyList List of properties
      */
     public SelectNode(
         ParseRegion region,
         List<ParseTreeNode> withList,
         List<AxisNode> axisList,
-        IdentifierNode cubeName,
+        ParseTreeNode from,
         AxisNode slicerAxis,
         List<IdentifierNode> cellPropertyList)
     {
         this.region = region;
         this.withList = withList;
         this.axisList = axisList;
-        this.cubeName = cubeName;
+        this.from = from;
         this.slicerAxis = slicerAxis;
         this.cellPropertyList = cellPropertyList;
     }
@@ -74,7 +76,8 @@ public class SelectNode implements ParseTreeNode {
     }
 
     public Type getType() {
-        throw new UnsupportedOperationException();
+        // not an expression, so has no type
+        return null;
     }
 
     public void unparse(ParseTreeWriter writer) {
@@ -98,7 +101,7 @@ public class SelectNode implements ParseTreeNode {
         }
         pw.println();
         pw.print("FROM ");
-        cubeName.unparse(writer);
+        from.unparse(writer);
         if (slicerAxis != null) {
             pw.println();
             pw.print("WHERE ");
@@ -129,12 +132,28 @@ public class SelectNode implements ParseTreeNode {
         return slicerAxis;
     }
 
-    public IdentifierNode getCubeName() {
-        return cubeName;
+    /**
+     * Returns the node representing the FROM clause of this SELECT statement.
+     * The node is typically an {@link IdentifierNode} or a {@link CubeNode}.
+     *
+     * @return FROM clause
+     */
+    public ParseTreeNode getFrom() {
+        return from;
     }
 
-    public void setCubeName(IdentifierNode cubeName) {
-        this.cubeName = cubeName;
+    /**
+     * Sets the FROM clause of this SELECT statement.
+     *
+     * <p><code>fromNode</code> should typically by an
+     * {@link org.olap4j.mdx.IdentifierNode} containing the cube name, or
+     * a {@link org.olap4j.mdx.CubeNode} referencing an explicit
+     * {@link org.olap4j.metadata.Cube} object.
+     *
+     * @param fromNode FROM clause
+     */
+    public void setFrom(ParseTreeNode fromNode) {
+        this.from = fromNode;
     }
 }
 

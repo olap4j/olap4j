@@ -14,6 +14,8 @@ import java.util.Stack;
 
 import org.olap4j.type.TypeUtil;
 import org.olap4j.type.Type;
+import org.olap4j.mdx.parser.MdxValidator;
+import org.olap4j.OlapException;
 
 /**
  * Visitor which passes over a tree of MDX nodes, checks that they are valid,
@@ -25,12 +27,18 @@ import org.olap4j.type.Type;
  * @version $Id$
  * @since Jun 4, 2007
  */
-class MdxValidator implements ParseTreeVisitor<ParseTreeNode> {
+class DefaultMdxValidatorImpl
+    implements ParseTreeVisitor<ParseTreeNode>, MdxValidator
+{
     private Stack<Boolean> scalarStack = new Stack<Boolean>();
     private final SelectNode selectNode;
 
-    MdxValidator(SelectNode selectNode) {
+    protected DefaultMdxValidatorImpl(SelectNode selectNode) {
         this.selectNode = selectNode;
+    }
+
+    public SelectNode validateSelect(SelectNode selectNode) throws OlapException {
+        return null;
     }
 
     public ParseTreeNode visit(SelectNode selectNode) {
@@ -47,10 +55,6 @@ class MdxValidator implements ParseTreeVisitor<ParseTreeNode> {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Resolves identifiers into objects.
-     *
-     */
     public ParseTreeNode visit(WithMemberNode withMemberNode) {
         ParseTreeNode expression = acceptScalar(withMemberNode.getExpression());
         withMemberNode.setExpression(expression);
@@ -66,10 +70,6 @@ class MdxValidator implements ParseTreeVisitor<ParseTreeNode> {
         return withMemberNode;
     }
 
-    /**
-     * Resolves identifiers into objects.
-     *
-     */
     public ParseTreeNode visit(WithSetNode withSetNode) {
         ParseTreeNode expression = acceptScalar(withSetNode.getExpression());
         withSetNode.setExpression(expression);
@@ -99,6 +99,13 @@ class MdxValidator implements ParseTreeVisitor<ParseTreeNode> {
     }
 
     public ParseTreeNode visit(ParameterNode parameterNode) {
+        if (false) {
+            return null;
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    public ParseTreeNode visit(CubeNode cubeNode) {
         if (false) {
             return null;
         }
@@ -206,4 +213,4 @@ class MdxValidator implements ParseTreeVisitor<ParseTreeNode> {
     }
 }
 
-// End MdxValidator.java
+// End DefaultMdxValidatorImpl.java

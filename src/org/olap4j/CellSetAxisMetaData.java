@@ -9,8 +9,7 @@
 */
 package org.olap4j;
 
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.Property;
+import org.olap4j.metadata.*;
 
 import java.util.List;
 
@@ -68,7 +67,7 @@ public interface CellSetAxisMetaData {
     /**
      * Returns the member properties which are returned on this axis.
      */
-    List<Property> getProperties();
+    NamedList<Property> getProperties();
 }
 
 // End CellSetAxisMetaData.java

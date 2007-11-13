@@ -25,7 +25,7 @@ public interface Property extends MetadataElement {
      *
      * @return datatype of this Property
      */
-    Datatype getType();
+    Datatype getDatatype();
 
     /**
      * Returns the scope of this property.
@@ -33,8 +33,6 @@ public interface Property extends MetadataElement {
      * @return scope of this Property
      */
     Scope getScope();
-
-    boolean isInternal();
 
     /**
      * Enumeration of the scope of a Property: whether it belongs to a member
@@ -231,7 +229,7 @@ public interface Property extends MetadataElement {
             int ordinal,
             boolean internal,
             String description) {
-            assert ordinal == ordinal();
+//            assert ordinal == ordinal();
             this.internal = internal;
             this.type = type;
             this.description = description;
@@ -253,7 +251,7 @@ public interface Property extends MetadataElement {
             return name();
         }
 
-        public Datatype getType() {
+        public Datatype getDatatype() {
             return type;
         }
 
@@ -356,7 +354,7 @@ public interface Property extends MetadataElement {
             this.description = description;
         }
 
-        public Datatype getType() {
+        public Datatype getDatatype() {
             return type;
         }
 

@@ -36,7 +36,7 @@ public interface ParseTreeNode {
     /**
      * Returns the type of this expression.
      *
-     * <p>Returns null if this is not an expression, for instance a
+     * <p>Returns null if this node is not an expression, for instance a
      * <code>SELECT</code> node.
      *
      * @return type of this expression

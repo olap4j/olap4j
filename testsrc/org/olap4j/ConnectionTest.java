@@ -9,30 +9,23 @@
 */
 package org.olap4j;
 
-import junit.framework.TestCase;
 import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
+import mondrian.tui.XmlaSupport;
+import org.olap4j.driver.xmla.XmlaOlap4jDriver;
+import org.olap4j.mdx.*;
+import org.olap4j.mdx.parser.*;
+import org.olap4j.metadata.*;
+import org.olap4j.test.TestContext;
+import org.olap4j.type.*;
+import org.xml.sax.SAXException;
 
-import java.sql.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.*;
+import javax.servlet.ServletException;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-
-import org.olap4j.metadata.*;
-import org.olap4j.metadata.Cube;
-import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Schema;
-import org.olap4j.mdx.*;
-import org.olap4j.mdx.parser.MdxParser;
-import org.olap4j.test.TestContext;
-import org.olap4j.type.*;
-import org.olap4j.driver.xmla.XmlaOlap4jDriver;
-import org.xml.sax.SAXException;
-import mondrian.tui.XmlaSupport;
-
-import javax.servlet.ServletException;
+import java.sql.*;
+import java.util.*;
 
 /**
  * Unit test for olap4j Driver and Connection classes.
@@ -649,7 +642,22 @@ public class ConnectionTest extends TestCase {
         // unparse
         checkUnparsedMdx(select);
 
-        // test that get error if axes do not have unique names (todo)
+        // test that get error if axes do not have unique names
+        select =
+            mdxParser.parseSelect(
+                "select {[Gender]} on columns, {[Store].Children} on columns\n" +
+                    "from [sales]");
+        MdxValidator validator =
+            olapConnection.getParserFactory().createMdxValidator(
+                olapConnection);
+        try {
+            select = validator.validateSelect(select);
+            fail("expected exception, got " + select);
+        } catch (Exception e) {
+            assertTrue(
+                getStackTrace(e).indexOf("Duplicate axis name 'COLUMNS'.") 
+                >= 0);
+        }
     }
 
     private void checkUnparsedMdx(SelectNode select) {
@@ -750,24 +758,400 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
-     * Tests metadata browsing
+     * Tests the {@link Cube#lookupMember(String[])} method.
      */
-    public void testMetadata() {
-        if (true) return;
-        Cube cube = null;
+    public void testCubeLookupMember() throws Exception {
+        Class.forName(helper.getDriverClassName());
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection =
+            ((Wrapper) connection).unwrap(OlapConnection.class);
+        Cube cube = olapConnection.getSchema().getCubes().get("Sales");
+
+        Member member =
+            cube.lookupMember(
+                "Time", "1997", "Q2");
+        assertEquals("[Time].[1997].[Q2]", member.getUniqueName());
+
+        member =
+            cube.lookupMember(
+                "Time", "1997", "Q5");
+        assertNull(member);
+
+        // arguably this should return [Customers].[All Customers]; but it
+        // makes a bit more sense for it to return null
+        member =
+            cube.lookupMember(
+                "Customers");
+        assertNull(member);
+
+        member =
+            cube.lookupMember(
+                "Customers", "All Customers");
+        assertTrue(member.isAll());
+    }
+
+    /**
+     * Tests the {@link Cube#lookupMembers(java.util.Set, String[])} method.
+     */
+    public void testCubeLookupMembers() throws Exception {
+        Class.forName(helper.getDriverClassName());
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection =
+            ((Wrapper) connection).unwrap(OlapConnection.class);
+        Cube cube = olapConnection.getSchema().getCubes().get("Sales");
+
+        List<Member> memberList =
+            cube.lookupMembers(
+                EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.CHILDREN),
+                "Time", "1997", "Q2");
+        assertEquals(TestContext.fold("[Time].[1997]\n"
+            + "[Time].[1997].[Q2].[4]\n"
+            + "[Time].[1997].[Q2].[5]\n"
+            + "[Time].[1997].[Q2].[6]\n"),
+            memberListToString(memberList));
+
+        // ask for non-existent member; list should be empty
+        memberList =
+            cube.lookupMembers(
+                EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.CHILDREN),
+                "Time", "1997", "Q5");
+        assertTrue(memberList.isEmpty());
+
+        // ask for parent & ancestors; should not get duplicates
+        memberList =
+            cube.lookupMembers(
+                EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
+                "Time", "1997", "Q2");
+        assertEquals(
+            TestContext.fold("[Time].[1997]\n"),
+            memberListToString(memberList));
+
+        // ask for parent of root member, should not get null member in list
+        memberList =
+            cube.lookupMembers(
+                EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
+                "Product");
+        assertTrue(memberList.isEmpty());
+
+        // ask for siblings and children, and the results should be
+        // hierarchically ordered (as always)
+        memberList =
+            cube.lookupMembers(
+                EnumSet.of(Member.TreeOp.SIBLINGS, Member.TreeOp.CHILDREN),
+                "Time", "1997", "Q2");
+        assertEquals(
+            TestContext.fold("[Time].[1997].[Q1]\n"
+                + "[Time].[1997].[Q2].[4]\n"
+                + "[Time].[1997].[Q2].[5]\n"
+                + "[Time].[1997].[Q2].[6]\n"
+                + "[Time].[1997].[Q3]\n"
+                + "[Time].[1997].[Q4]\n"),
+            memberListToString(memberList));
+
+        // siblings of the root member - potentially tricky
+        memberList =
+            cube.lookupMembers(
+                EnumSet.of(Member.TreeOp.SIBLINGS),
+                "Time", "1997");
+        assertEquals(
+            TestContext.fold("[Time].[1998]\n"),
+            memberListToString(memberList));
+
+        memberList =
+            cube.lookupMembers(
+                EnumSet.of(Member.TreeOp.SIBLINGS, Member.TreeOp.SELF),
+                "Customers", "USA", "OR");
+        assertEquals(
+            TestContext.fold("[Customers].[All Customers].[USA].[CA]\n"
+                + "[Customers].[All Customers].[USA].[OR]\n"
+                + "[Customers].[All Customers].[USA].[WA]\n"),
+            memberListToString(memberList));        
+    }
+
+    /**
+     * Tests metadata browsing.
+     */
+    public void testMetadata() throws Exception {
+        Class.forName(helper.getDriverClassName());
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection =
+            ((Wrapper) connection).unwrap(OlapConnection.class);
+        Cube cube = olapConnection.getSchema().getCubes().get("Sales");
+
         for (Dimension dimension : cube.getDimensions()) {
+            // Call every method of Dimension
+            assertNotNull(dimension.getCaption(Locale.getDefault()));
+            dimension.getDescription(Locale.getDefault());
+            assertNotNull(dimension.getDefaultHierarchy());
+            assertEquals(
+                dimension.getName().equals("Time")
+                    ? Dimension.Type.TIME 
+                    : Dimension.Type.OTHER,
+                dimension.getDimensionType());
+            assertNotNull(dimension.getName());
+            assertNotNull(dimension.getUniqueName());
+
             for (Hierarchy hierarchy : dimension.getHierarchies()) {
+                // Call every method of Hierarchy
+                final NamedList<Member> rootMemberList =
+                    hierarchy.getRootMembers();
+                if (hierarchy.hasAll()) {
+                    assertEquals(1, rootMemberList.size());
+                }
+                for (Member rootMember : rootMemberList) {
+                    assertNull(rootMember.getParentMember());
+                }
+                assertNotNull(hierarchy.getDefaultMember());
+                assertNotNull(hierarchy.getName());
+                assertNotNull(hierarchy.getUniqueName());
+                hierarchy.getDescription(Locale.getDefault());
+                assertNotNull(hierarchy.getCaption(Locale.getDefault()));
+                assertEquals(dimension, hierarchy.getDimension());
+
                 for (Level level : hierarchy.getLevels()) {
+                    int k = 0;
                     for (Member member : level.getMembers()) {
-                        ;
+                        assertNotNull(member.getName());
+                        if (++k > 3) {
+                            break;
+                        }
                     }
                 }
             }
         }
+
+        cube = olapConnection.getSchema().getCubes().get("Warehouse");
+        int count = 0;
         for (NamedSet namedSet : cube.getSets()) {
-            ;
+            ++count;
+            assertNotNull(namedSet.getName());
+            assertNotNull(namedSet.getUniqueName());
+            assertNotNull(namedSet.getCaption(Locale.getDefault()));
+            namedSet.getDescription(Locale.getDefault());
+            assertTrue(namedSet.getExpression().getType() instanceof SetType);
         }
-        Member member1 = cube.lookupMember("Product", "Food", "Marshmallows");
+        assertTrue(count > 0);
+
+        // ~ Member
+
+        Member member = cube.lookupMember("Product", "Food", "Marshmallows");
+        assertNull(member); // we don't sell marshmallows!
+        member = cube.lookupMember("Product", "Food");
+        assertNotNull(member);
+        Member member2 = cube.lookupMember("Product", "All Products", "Food");
+        assertEquals(member, member2);
+        assertEquals("[Product].[All Products].[Food]", 
+            member.getUniqueName());
+        assertEquals("Food", member.getName());
+        assertEquals("[Product].[Product Family]",
+            member.getLevel().getUniqueName());
+        assertEquals(Member.Type.REGULAR, member.getMemberType());
+        // mondrian does not set ordinals correctly
+        assertEquals(-1, member.getOrdinal());
+        final NamedList<Property> propertyList = member.getProperties();
+        assertEquals(22, propertyList.size());
+        final Property property = propertyList.get("MEMBER_CAPTION");
+        assertEquals("Food", member.getPropertyFormattedValue(property));
+        assertEquals("Food", member.getPropertyValue(property));
+        assertFalse(member.isAll());
+
+        // All member
+        final Member allProductsMember = member.getParentMember();
+        assertEquals("[Product].[All Products]",
+            allProductsMember.getUniqueName());
+        assertEquals("(All)", allProductsMember.getLevel().getName());
+        assertEquals("[Product].[(All)]", allProductsMember.getLevel().getUniqueName());
+        assertEquals(1, allProductsMember.getLevel().getMembers().size());
+        assertTrue(allProductsMember.isAll());
+        assertNull(allProductsMember.getParentMember());
+
+        // ~ Property
+
+        assertEquals("MEMBER_CAPTION", property.getName());
+        assertEquals("MEMBER_CAPTION", property.getUniqueName());
+        assertEquals(Property.Scope.MEMBER, property.getScope());
+        assertEquals(Property.Datatype.TYPE_STRING, property.getDatatype());
+    }
+
+    /**
+     * Tests the type-derivation for
+     * {@link org.olap4j.mdx.SelectNode#getFrom()} and the {@link CubeType}
+     * class.
+     *
+     * @throws Throwable on error
+     */
+    public void testCubeType() throws Throwable {
+        Class.forName(helper.getDriverClassName());
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection =
+            ((Wrapper) connection).unwrap(OlapConnection.class);
+
+        final MdxParserFactory parserFactory =
+            olapConnection.getParserFactory();
+        MdxParser mdxParser =
+            parserFactory.createMdxParser(olapConnection);
+        MdxValidator mdxValidator =
+            parserFactory.createMdxValidator(olapConnection);
+
+        SelectNode select =
+            mdxParser.parseSelect(
+                "select {[Gender]} on columns from [sales]\n" +
+                    "where [Time].[1997].[Q4]");
+
+        // CubeType
+
+        // Before validation, we cannot ask for type
+        try {
+            final ParseTreeNode from = select.getFrom();
+            assertTrue(from instanceof IdentifierNode);
+            Type type = from.getType();
+            fail("expected error");
+        } catch (UnsupportedOperationException e) {
+            // ignore
+        }
+
+        select = mdxValidator.validateSelect(select);
+        CubeType cubeType = (CubeType) select.getFrom().getType();
+        assertEquals("Sales", cubeType.getCube().getName());
+        assertNull(cubeType.getDimension());
+        assertNull(cubeType.getHierarchy());
+        assertNull(cubeType.getLevel());
+
+        // Different query based on same cube should have equal CubeType
+        select =
+            mdxParser.parseSelect(
+                "select from [sales]");
+        select = mdxValidator.validateSelect(select);
+        assertEquals(cubeType, select.getFrom().getType());
+
+        // Different query based on different cube should have different
+        // CubeType
+        select =
+            mdxParser.parseSelect(
+                "select from [warehouse and sales]");
+        select = mdxValidator.validateSelect(select);
+        assertNotSame(cubeType, select.getFrom().getType());
+    }
+
+    /**
+     * Tests the type-derivation for query axes 
+     * ({@link org.olap4j.mdx.SelectNode#getAxisList()} and
+     * {@link org.olap4j.mdx.SelectNode#getSlicerAxis()}), and the
+     * {@link org.olap4j.type.SetType},
+     * {@link org.olap4j.type.TupleType},
+     * {@link org.olap4j.type.MemberType} type subclasses.
+     *
+     * @throws Throwable on error
+     */
+    public void testAxisType() throws Throwable {
+        Class.forName(helper.getDriverClassName());
+
+        // connect using properties and no username/password
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
+
+        final MdxParserFactory parserFactory =
+            olapConnection.getParserFactory();
+        MdxParser mdxParser =
+            parserFactory.createMdxParser(olapConnection);
+        MdxValidator mdxValidator =
+            parserFactory.createMdxValidator(olapConnection);
+
+        SelectNode select =
+            mdxParser.parseSelect(
+                "select ([Gender], [Store]) on columns\n,"
+                    + "{[Customers].[City].Members} on rows\n"
+                    + "from [sales]\n" +
+                    "where ([Time].[1997].[Q4], [Marital Status].[S])");
+        select = mdxValidator.validateSelect(select);
+
+        // a query is not an expression, so does not have a type
+        assertNull(select.getType());
+
+        final AxisNode columnsAxis = select.getAxisList().get(0);
+        // an axis is not an expression, so does not have a type
+        assertNull(columnsAxis.getType());
+
+        // ~ SetType
+
+        final SetType setType = (SetType) columnsAxis.getExpression().getType();
+        assertNull(setType.getDimension());
+        assertNull(setType.getHierarchy());
+        assertNull(setType.getLevel());
+        assertNotNull(setType.toString());
+
+        final Type elementType = setType.getElementType();
+
+        // ~ TupleType
+
+        assertTrue(elementType instanceof TupleType);
+        TupleType tupleType = (TupleType) elementType;
+        assertNotNull(tupleType.toString());
+        assertNull(tupleType.getDimension());
+        assertNull(tupleType.getHierarchy());
+        assertNull(tupleType.getLevel());
+        final Cube cube = ((CubeType) select.getFrom().getType()).getCube();
+        final Dimension storeDimension = cube.getDimensions().get("Store");
+        final Dimension genderDimension = cube.getDimensions().get("Gender");
+        final Dimension measuresDimension = cube.getDimensions().get("Measures");
+        final Dimension customersDimension = cube.getDimensions().get("Customers");
+        assertTrue(tupleType.usesDimension(storeDimension, false));
+        assertTrue(tupleType.usesDimension(genderDimension, false));
+        assertFalse(tupleType.usesDimension(measuresDimension, false));
+
+        // Other axis is a set of members
+
+        // ~ MemberType
+        final AxisNode rowsAxis = select.getAxisList().get(1);
+        final Type rowsType = rowsAxis.getExpression().getType();
+        assertTrue(rowsType instanceof SetType);
+        MemberType memberType = (MemberType) ((SetType) rowsType).getElementType();
+        assertNotNull(memberType.toString());
+        // MemberType.getMember is null because we know it belongs to the City
+        // level, but no particular member of that level.
+        assertNull("Customers", memberType.getMember());
+        assertEquals("City", memberType.getLevel().getName());
+        assertEquals("Customers", memberType.getHierarchy().getName());
+        assertEquals("Customers", memberType.getDimension().getName());
+        assertFalse(memberType.usesDimension(storeDimension, false));
+        assertTrue(memberType.usesDimension(customersDimension, false));
+        assertTrue(memberType.usesDimension(customersDimension, true));
+        
+        // Slicer
+
+        final AxisNode slicerAxis = select.getSlicerAxis();
+        assertNull(slicerAxis.getType());
+        final Type slicerType = slicerAxis.getExpression().getType();
+        assertTrue(slicerType instanceof TupleType);
+        assertEquals(
+            "TupleType<MemberType<member=[Time].[1997].[Q4]>, MemberType<member=[Marital Status].[All Marital Status].[S]>>",
+            slicerType.toString());
+    }
+
+    // TODO: test for HierarchyType
+    // TODO: test for DimensionType
+    // TODO: test for LevelType
+
+    /**
+     * Converts a {@link Throwable} to a stack trace.
+     */
+    static String getStackTrace(Throwable e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        pw.flush();
+        return sw.toString();
+    }
+
+    /**
+     * Converts a list of members to a string, one per line.
+     */
+    static String memberListToString(List<Member> list) {
+        final StringBuilder buf = new StringBuilder();
+        for (Member member : list) {
+            buf.append(member.getUniqueName()).append(TestContext.NL);
+        }
+        return buf.toString();
     }
 
     /**

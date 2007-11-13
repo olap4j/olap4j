@@ -26,9 +26,20 @@ public class CubeType implements Type {
 
     /**
      * Creates a type representing a cube.
+     *
+     * @param cube Cube
      */
     public CubeType(Cube cube) {
         this.cube = cube;
+    }
+
+    /**
+     * Returns the cube.
+     *
+     * @return the cube
+     */
+    public Cube getCube() {
+        return cube;
     }
 
     public boolean usesDimension(Dimension dimension, boolean maybe) {
@@ -45,6 +56,21 @@ public class CubeType implements Type {
 
     public Level getLevel() {
         return null;
+    }
+
+    public boolean equals(Object obj) {
+        if (obj instanceof CubeType) {
+            CubeType that = (CubeType) obj;
+            return TypeUtil.equal(this.cube, that.cube);
+        } else {
+            return false;
+        }
+    }
+
+    public int hashCode() {
+        return cube == null
+            ? 0
+            : cube.hashCode();
     }
 }
 

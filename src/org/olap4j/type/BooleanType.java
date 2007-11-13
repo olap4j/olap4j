@@ -12,6 +12,12 @@ package org.olap4j.type;
 /**
  * The type of a boolean expression.
  *
+ * <p>An example of a boolean expression is the predicate
+ *
+ * <blockquote>
+ * <code>[Measures].[Unit Sales] &gt; 1000</code>
+ * </blockquote>
+ *
  * @author jhyde
  * @since Feb 17, 2005
  * @version $Id$

@@ -68,6 +68,13 @@ public interface ParseTreeVisitor<T> {
     T visit(ParameterNode parameterNode);
 
     /**
+     * Visits a usage of a {@link org.olap4j.metadata.Cube} in a query.
+     *
+     * @see CubeNode#accept(ParseTreeVisitor)
+     */
+    T visit(CubeNode cubeNode);
+
+    /**
      * Visits a usage of a {@link org.olap4j.metadata.Dimension} in a query.
      *
      * @see DimensionNode#accept(ParseTreeVisitor)

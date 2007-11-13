@@ -12,7 +12,6 @@ package org.olap4j.type;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Hierarchy;
 import org.olap4j.metadata.Level;
-import org.olap4j.OlapException;
 
 /**
  * Set type.
@@ -39,6 +38,8 @@ public class SetType implements Type {
 
     /**
      * Returns the type of the elements of this set.
+     *
+     * @return element type
      */
     public Type getElementType() {
         return elementType;
@@ -56,7 +57,7 @@ public class SetType implements Type {
                 elementType.getDimension();
     }
 
-    public Hierarchy getHierarchy() throws OlapException {
+    public Hierarchy getHierarchy() {
         return elementType == null ? null :
                 elementType.getHierarchy();
     }

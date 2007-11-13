@@ -76,6 +76,21 @@ public interface Member extends MetadataElement {
     Type getMemberType();
 
     /**
+     * Returns whether this Member represents the aggregation of all members
+     * in its Dimension.
+     *
+     * <p>An 'all' member is always the root of its Hierarchy; that is,
+     * its parent member is the null member, and
+     * {@link Hierarchy#getRootMembers()} returns the 'all'
+     * member and no others. Some hierarchies do not have an 'all' member.
+     *
+     * @see Hierarchy#hasAll()
+     *
+     * @return whether this Member is the 'all' member of its Dimension
+     */
+    boolean isAll();
+
+    /**
      * Enumeration of types of members.
      *
      * <p>The values are as specified by XMLA,
@@ -197,8 +212,14 @@ public interface Member extends MetadataElement {
 
     /**
      * Returns the definitions of the properties this member may have.
+     *
+     * <p>For many providers, properties are defined against a Level, so result
+     * of this method will be identical to
+     * <code>member.getLevel().{@link Level#getProperties() getProperties}()</code>.
+     *
+     * @return properties of this Member
      */
-    List<Property> getProperties();
+    NamedList<Property> getProperties();
 
     /**
      * Returns the ordinal of the member.

@@ -9,31 +9,23 @@
 */
 package mondrian.olap4j;
 
+import mondrian.mdx.*;
 import mondrian.olap.*;
-
-import java.sql.*;
-import java.util.*;
-
-import org.olap4j.*;
-import org.olap4j.Cell;
 import org.olap4j.Axis;
-import org.olap4j.type.BooleanType;
-import org.olap4j.type.CubeType;
-import org.olap4j.type.DecimalType;
-import org.olap4j.type.DimensionType;
-import org.olap4j.type.SymbolType;
-import org.olap4j.type.TupleType;
-import org.olap4j.type.Type;
-import org.olap4j.type.StringType;
-import org.olap4j.type.SetType;
-import org.olap4j.type.NumericType;
-import org.olap4j.type.NullType;
-import org.olap4j.type.MemberType;
+import org.olap4j.Cell;
+import org.olap4j.*;
+import org.olap4j.mdx.*;
+import org.olap4j.mdx.parser.*;
+import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
 import org.olap4j.metadata.*;
 import org.olap4j.metadata.Schema;
-import org.olap4j.mdx.parser.MdxParserFactory;
-import org.olap4j.mdx.parser.MdxParser;
-import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
+import org.olap4j.type.*;
+import org.olap4j.type.DimensionType;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.sql.*;
+import java.util.*;
 
 /**
  * Implementation of {@link org.olap4j.OlapConnection}
@@ -323,6 +315,10 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
             public MdxParser createMdxParser(OlapConnection connection) {
                 return new DefaultMdxParserImpl(connection);
             }
+
+            public MdxValidator createMdxValidator(OlapConnection connection) {
+                return new MondrianOlap4jMdxValidator(connection);
+            }
         };
     }
 
@@ -331,7 +327,7 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
     }
 
     MondrianOlap4jCube toOlap4j(mondrian.olap.Cube cube) {
-        MondrianOlap4jSchema schema  = toOlap4j(cube.getSchema());
+        MondrianOlap4jSchema schema = toOlap4j(cube.getSchema());
         return new MondrianOlap4jCube(cube, schema);
     }
 
@@ -412,7 +408,9 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
         if (member == null) {
             return null;
         }
-        throw new UnsupportedOperationException();
+        return new MondrianOlap4jMember(
+            toOlap4j(member.getDimension().getSchema()),
+            member);
     }
 
     MondrianOlap4jLevel toOlap4j(mondrian.olap.Level level) {
@@ -441,10 +439,6 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
         return types;
     }
 
-    Axis toOlap4j(mondrian.olap.AxisOrdinal axisOrdinal) {
-        throw new UnsupportedOperationException();
-    }
-
     /**
      * Converts a Properties object to a Map with String keys and values.
      *
@@ -457,6 +451,26 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
                 return (Set) properties.entrySet();
             }
         };
+    }
+
+    MondrianOlap4jNamedSet toOlap4j(
+        mondrian.olap.Cube cube,
+        mondrian.olap.NamedSet namedSet)
+    {
+        if (namedSet == null) {
+            return null;
+        }
+        return new MondrianOlap4jNamedSet(
+            toOlap4j(cube),
+            namedSet);
+    }
+
+    ParseTreeNode toOlap4j(Exp exp) {
+        return new MondrianToOlap4jNodeConverter(this).toOlap4j(exp);
+    }
+
+    SelectNode toOlap4j(Query query) {
+        return new MondrianToOlap4jNodeConverter(this).toOlap4j(query);
     }
 
     // inner classes
@@ -518,6 +532,202 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
             } else {
                 return new OlapException(null, e);
             }
+        }
+    }
+
+    private static class MondrianOlap4jMdxValidator implements MdxValidator {
+        private final OlapConnection connection;
+
+        public MondrianOlap4jMdxValidator(OlapConnection connection) {
+            this.connection = connection;
+        }
+
+        public SelectNode validateSelect(SelectNode selectNode) throws OlapException {
+            StringWriter sw = new StringWriter();
+            selectNode.unparse(new ParseTreeWriter(new PrintWriter(sw)));
+            String mdx = sw.toString();
+            final MondrianOlap4jConnection olap4jConnection =
+                (MondrianOlap4jConnection) connection;
+            Query query =
+                olap4jConnection.connection
+                    .parseQuery(mdx);
+            query.resolve();
+            return olap4jConnection.toOlap4j(query);
+        }
+    }
+
+    private static class MondrianToOlap4jNodeConverter {
+        private final MondrianOlap4jConnection olap4jConnection;
+
+        MondrianToOlap4jNodeConverter(
+            MondrianOlap4jConnection olap4jConnection)
+        {
+            this.olap4jConnection = olap4jConnection;
+        }
+
+        public SelectNode toOlap4j(Query query) {
+            List<IdentifierNode> list = Collections.emptyList();
+            return new SelectNode(
+                null,
+                toOlap4j(query.getFormulas()),
+                toOlap4j(query.getAxes()),
+                new CubeNode(
+                    null,
+                    olap4jConnection.toOlap4j(query.getCube())),
+                query.getSlicerAxis() == null
+                    ? null
+                    : toOlap4j(query.getSlicerAxis()),
+                list);
+        }
+
+        private AxisNode toOlap4j(QueryAxis axis) {
+            return new AxisNode(
+                null,
+                axis.isNonEmpty(),
+                toOlap4j(axis.getSet()),
+                Axis.valueOf(axis.getAxisName()),
+                toOlap4j(axis.getDimensionProperties()));
+        }
+
+        private List<IdentifierNode> toOlap4j(Id[] dimensionProperties) {
+            final List<IdentifierNode> list = new ArrayList<IdentifierNode>();
+            for (Id property : dimensionProperties) {
+                list.add(toOlap4j(property));
+            }
+            return list;
+        }
+
+        private ParseTreeNode toOlap4j(Exp exp) {
+            if (exp instanceof Id) {
+                Id id = (Id) exp;
+                return toOlap4j(id);
+            }
+            if (exp instanceof ResolvedFunCall) {
+                ResolvedFunCall call = (ResolvedFunCall) exp;
+                return toOlap4j(call);
+            }
+            if (exp instanceof DimensionExpr) {
+                DimensionExpr dimensionExpr = (DimensionExpr) exp;
+                return new DimensionNode(
+                    null,
+                    olap4jConnection.toOlap4j(dimensionExpr.getDimension()));
+            }
+            if (exp instanceof HierarchyExpr) {
+                HierarchyExpr hierarchyExpr = (HierarchyExpr) exp;
+                return new HierarchyNode(
+                    null,
+                    olap4jConnection.toOlap4j(hierarchyExpr.getHierarchy()));
+            }
+            if (exp instanceof LevelExpr) {
+                LevelExpr levelExpr = (LevelExpr) exp;
+                return new LevelNode(
+                    null,
+                    olap4jConnection.toOlap4j(levelExpr.getLevel()));
+            }
+            if (exp instanceof MemberExpr) {
+                MemberExpr memberExpr = (MemberExpr) exp;
+                return new MemberNode(
+                    null,
+                    olap4jConnection.toOlap4j(memberExpr.getMember()));
+            }
+            if (exp instanceof Literal) {
+                Literal literal = (Literal) exp;
+                final Object value = literal.getValue();
+                if (literal.getCategory() == Category.Symbol) {
+                    return LiteralNode.createSymbol(
+                        null, (String) literal.getValue());
+                } else if (value instanceof Double) {
+                    return LiteralNode.create(null, (Double) value);
+                } else if (value instanceof Integer) {
+                    return LiteralNode.create(null, (Integer) value);
+                } else if (value instanceof String) {
+                    return LiteralNode.createString(null, (String) value);
+                } else if (value == null) {
+                   return LiteralNode.createNull(null);
+                } else {
+                    throw new RuntimeException("unknown literal " + literal);
+                }
+            }
+            throw Util.needToImplement(exp.getClass());
+        }
+
+        private ParseTreeNode toOlap4j(ResolvedFunCall call) {
+            final CallNode callNode = new CallNode(
+                null,
+                call.getFunName(),
+                toOlap4j(call.getSyntax()),
+                toOlap4j(Arrays.asList(call.getArgs())));
+            if (call.getType() != null) {
+                callNode.setType(olap4jConnection.toOlap4j(call.getType()));
+            }
+            return callNode;
+        }
+
+        private List<ParseTreeNode> toOlap4j(List<Exp> exprList) {
+            final List<ParseTreeNode> result = new ArrayList<ParseTreeNode>();
+            for (Exp expr : exprList) {
+                result.add(toOlap4j(expr));
+            }
+            return result;
+        }
+
+        private org.olap4j.mdx.Syntax toOlap4j(mondrian.olap.Syntax syntax) {
+            return org.olap4j.mdx.Syntax.valueOf(syntax.name());
+        }
+
+        private List<AxisNode> toOlap4j(QueryAxis[] axes) {
+            final ArrayList<AxisNode> axisList = new ArrayList<AxisNode>();
+            for (QueryAxis axis : axes) {
+                axisList.add(toOlap4j(axis));
+            }
+            return axisList;
+        }
+
+        private List<ParseTreeNode> toOlap4j(Formula[] formulas) {
+            final List<ParseTreeNode> list = new ArrayList<ParseTreeNode>();
+            for (Formula formula : formulas) {
+                if (formula.isMember()) {
+                    List<PropertyValueNode> memberPropertyList =
+                        new ArrayList<PropertyValueNode>();
+                    for (Object child : formula.getChildren()) {
+                        if (child instanceof MemberProperty) {
+                            MemberProperty memberProperty =
+                                (MemberProperty) child;
+                            memberPropertyList.add(
+                                new PropertyValueNode(
+                                    null,
+                                    memberProperty.getName(),
+                                    toOlap4j(memberProperty.getExp())));
+                        }
+                    }
+                    list.add(
+                        new WithMemberNode(
+                            null,
+                            toOlap4j(formula.getIdentifier()),
+                            toOlap4j(formula.getExpression()),
+                            memberPropertyList));
+                }
+            }
+            return list;
+        }
+
+        private IdentifierNode toOlap4j(Id id) {
+            List<IdentifierNode.Segment> list =
+                new ArrayList<IdentifierNode.Segment>();
+            for (Id.Segment segment : id.getSegments()) {
+                list.add(
+                    new IdentifierNode.Segment(
+                        null,
+                        segment.name,
+                        toOlap4j(segment.quoting)));
+            }
+            return new IdentifierNode(
+                list.toArray(
+                    new IdentifierNode.Segment[list.size()]));
+        }
+
+        private IdentifierNode.Quoting toOlap4j(Id.Quoting quoting) {
+            return IdentifierNode.Quoting.valueOf(quoting.name());
         }
     }
 }

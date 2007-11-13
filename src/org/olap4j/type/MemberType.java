@@ -29,21 +29,27 @@ public class MemberType implements Type {
     private final Member member;
     private final String digest;
 
-    public static final MemberType Unknown = new MemberType(null, null, null, null);
+    // not part of public olap4j public API
+    private static final MemberType Unknown =
+        new MemberType(null, null, null, null);
 
     /**
      * Creates a type representing a member.
      *
-     * @param dimension
+     * @param dimension Dimension the member belongs to, or null if not known.
+     * 
      * @param hierarchy Hierarchy the member belongs to, or null if not known.
+     *
      * @param level Level the member belongs to, or null if not known
+     *
      * @param member The precise member, or null if not known
      */
     public MemberType(
-            Dimension dimension,
-            Hierarchy hierarchy,
-            Level level,
-            Member member) {
+        Dimension dimension,
+        Hierarchy hierarchy,
+        Level level,
+        Member member)
+    {
         this.dimension = dimension;
         this.hierarchy = hierarchy;
         this.level = level;
@@ -74,34 +80,6 @@ public class MemberType implements Type {
         this.digest = buf.toString();
     }
 
-    public static MemberType forDimension(Dimension dimension) {
-        return new MemberType(dimension, null, null, null);
-    }
-
-    public static MemberType forHierarchy(Hierarchy hierarchy) {
-        return new MemberType(
-            hierarchy.getDimension(),
-            hierarchy,
-            null,
-            null);
-    }
-
-    public static MemberType forLevel(Level level) {
-        return new MemberType(
-            level.getDimension(),
-            level.getHierarchy(),
-            level,
-            null);
-    }
-
-    public static MemberType forMember(Member member) {
-        return new MemberType(
-            member.getDimension(),
-            member.getHierarchy(),
-            member.getLevel(),
-            member);
-    }
-
     public String toString() {
         return digest;
     }
@@ -114,16 +92,25 @@ public class MemberType implements Type {
         return level;
     }
 
+    /**
+     * Returns the member of this type, or null if not known.
+     *
+     * @return member of this type
+     */
+    public Member getMember() {
+        return member;
+    }
+
     public boolean usesDimension(Dimension dimension, boolean maybe) {
         if (this.dimension == null) {
             return maybe;
         } else {
-            return this.dimension == dimension ||
-                    (maybe && this.dimension == null);
+            return this.dimension.equals(dimension);
         }
     }
 
-    public Type getValueType() {
+    // not part of public olap4j API
+    Type getValueType() {
         // todo: when members have more type information (double vs. integer
         // vs. string), return better type if member != null.
         return new ScalarType();
@@ -133,7 +120,8 @@ public class MemberType implements Type {
         return dimension;
     }
 
-    public static MemberType forType(Type type) throws OlapException {
+    // not part of public olap4j API
+    static MemberType forType(Type type) throws OlapException {
         if (type instanceof MemberType) {
             return (MemberType) type;
         } else {

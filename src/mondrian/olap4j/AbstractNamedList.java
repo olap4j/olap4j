@@ -17,21 +17,24 @@ import java.util.AbstractList;
  * Partial implementation of {@link org.olap4j.metadata.NamedList}.
  *
  * <p>Derived class must implement {@link #get(int)} and {@link #size()}, as
- * per {@link java.util.AbstractList}.
+ * per {@link java.util.AbstractList}; and must implement
+ * {@link #getName(Object)}, to indicate how elements are named.
  *
- * @see mondrian.olap4j.NamedListImpl
+ * @see ArrayNamedListImpl
  *
  * @author jhyde
  * @version $Id$
  * @since May 25, 2007
  */
-abstract class AbstractNamedList<T extends Named>
+abstract class AbstractNamedList<T>
     extends AbstractList<T>
     implements NamedList<T>
 {
+    protected abstract String getName(T t);
+
     public T get(String name) {
         for (T t : this) {
-            if (t.getName().equals(name)) {
+            if (getName(t).equals(name)) {
                 return t;
             }
         }
@@ -41,13 +44,12 @@ abstract class AbstractNamedList<T extends Named>
     public int indexOfName(String name) {
         for (int i = 0; i < size(); ++i) {
             T t = get(i);
-            if (t.getName().equals(name)) {
+            if (getName(t).equals(name)) {
                 return i;
             }
         }
         return -1;
     }
-
 }
 
 // End AbstractNamedList.java

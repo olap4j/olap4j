@@ -9,28 +9,34 @@
 */
 package org.olap4j.mdx;
 
-import org.olap4j.metadata.Level;
+import org.olap4j.metadata.Cube;
+import org.olap4j.type.CubeType;
 import org.olap4j.type.Type;
-import org.olap4j.type.LevelType;
 
 /**
- * Usage of a {@link org.olap4j.metadata.Member} as an expression in an MDX
+ * Usage of a {@link org.olap4j.metadata.Cube} as an expression in an MDX
  * parse tree.
  *
  * @author jhyde
  * @version $Id$
  * @since Jun 4, 2007
  */
-public class LevelNode implements ParseTreeNode {
+public class CubeNode implements ParseTreeNode {
     private final ParseRegion region;
-    private final Level level;
+    private final Cube cube;
 
-    public LevelNode(
+    /**
+     * Creates a CubeNode.
+     *
+     * @param region Region of source code
+     * @param cube Cube
+     */
+    public CubeNode(
         ParseRegion region,
-        Level level)
+        Cube cube)
     {
         this.region = region;
-        this.level = level;
+        this.cube = cube;
     }
 
     public ParseRegion getRegion() {
@@ -38,12 +44,12 @@ public class LevelNode implements ParseTreeNode {
     }
 
     /**
-     * Returns the Level used in this expression.
+     * Returns the Cube used in this expression.
      *
-     * @return level used in this expression
+     * @return cube used in this expression
      */
-    public Level getLevel() {
-        return level;
+    public Cube getCube() {
+        return cube;
     }
 
     public <T> T accept(ParseTreeVisitor<T> visitor) {
@@ -51,19 +57,16 @@ public class LevelNode implements ParseTreeNode {
     }
 
     public Type getType() {
-        return new LevelType(
-            level.getDimension(),
-            level.getHierarchy(),
-            level);
+        return new CubeType(cube);
     }
 
     public void unparse(ParseTreeWriter writer) {
-        writer.getPrintWriter().print(level.getUniqueName());
+        writer.getPrintWriter().print(cube.getUniqueName());
     }
 
     public String toString() {
-        return level.getUniqueName();
+        return cube.getUniqueName();
     }
 }
 
-// End LevelNode.java
+// End CubeNode.java

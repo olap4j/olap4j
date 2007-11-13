@@ -140,7 +140,8 @@ public class AxisNode implements ParseTreeNode {
     }
 
     public Type getType() {
-        // not an expression
+        // An axis is not an expression, so does not have a type.
+        // Try AxisNode.getExpression().getType() instead.
         return null;
     }
 }

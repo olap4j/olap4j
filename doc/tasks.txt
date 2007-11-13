@@ -30,22 +30,19 @@ Specification
 Javadoc
 -------
 
-* change ant task so it doesn't generate mondrian.olap4j.* or olap4j.test.* or org.olap4j.mdx.parser.impl or package-protected classes (E.g. org.olap4j.mdx.MdxValidator) in public api; remove class OlapTest, class Todo
+* remove class OlapTest
 * ensure that every public method has a javadoc description, including @param, @return and @throws declarations 
-* Review olap4j.type package. Document all public methods. Make non-essential methods (E.g. MemberType.forType) package-private. If in doubt, leave it out
- 
+
 Code
 ----
  
 * fix 4 TODOs in ParserTest 
-* document/implement Cube.lookupMember
- 
+
 Testing
 -------
 
 * Remove site-specifics from test code.
 * Ensure that there is a unit test for every method in every public class or interface. 
-* Write unit test for metadata classes. 
 * Internationalization test, including Connection.getLocale(), Query.getLocale(), and all methods with Locale methods or results
 * Test access control. The metadata (e.g. members & hierarchies) should reflect what the current user/role can see. For example, USA.CA.SF has no children. This test should test every method which returns a metadata element or collection of metadata elements. 
 * ConnectionTest (428, 8) // todo: test statement with no slicer
@@ -55,8 +52,7 @@ Testing
 * Test methods in OlapResultAxisMetaData (see ConnectionTest.testOlapResultAxisMetaData) 
 * Test cell and dimension properties (in ConnectionTest, see "todo: submit a query with cell and dimension properties, and make sure the properties appear in the result set") 
 * Test scrolling (in ConnectionTest, see "todo: submit a query where you ask for different scrolling") 
-* Test axis name uniqueness (in ConnectionTest, see "test that get error if axes do not have unique names (todo)") 
- 
+
 Not in scope for olap4j 0.9
 ---------------------------
  

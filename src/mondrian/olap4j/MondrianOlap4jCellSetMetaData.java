@@ -9,22 +9,15 @@
 */
 package mondrian.olap4j;
 
-import org.olap4j.CellSetMetaData;
-import org.olap4j.CellSetAxisMetaData;
-import org.olap4j.Axis;
-import org.olap4j.metadata.Property;
-import org.olap4j.metadata.Cube;
-import org.olap4j.metadata.Hierarchy;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.sql.SQLException;
-
 import mondrian.olap.Query;
 import mondrian.olap.QueryAxis;
-import mondrian.olap.type.Type;
-import mondrian.olap.type.SetType;
-import mondrian.olap.type.TupleType;
+import mondrian.olap.type.*;
+import org.olap4j.*;
+import org.olap4j.metadata.*;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of {@link org.olap4j.CellSetMetaData}
@@ -48,7 +41,7 @@ class MondrianOlap4jCellSetMetaData implements CellSetMetaData {
 
     // implement CellSetMetaData
 
-    public List<Property> getCellProperties() {
+    public NamedList<Property> getCellProperties() {
         throw new UnsupportedOperationException();
     }
 
@@ -56,17 +49,20 @@ class MondrianOlap4jCellSetMetaData implements CellSetMetaData {
         return olap4jStatement.olap4jConnection.toOlap4j(query.getCube());
     }
 
-    public List<CellSetAxisMetaData> getAxesMetaData() {
-        final List<CellSetAxisMetaData> list =
-            new ArrayList<CellSetAxisMetaData>();
+    public NamedList<CellSetAxisMetaData> getAxesMetaData() {
+        final NamedList<CellSetAxisMetaData> list =
+            new ArrayNamedListImpl<CellSetAxisMetaData>() {
+                protected String getName(CellSetAxisMetaData axisMetaData) {
+                    return axisMetaData.getAxis().name();
+                }
+            };
         final MondrianOlap4jConnection olap4jConnection =
             olap4jStatement.olap4jConnection;
         for (final QueryAxis queryAxis : query.getAxes()) {
             list.add(
                 new CellSetAxisMetaData() {
                     public Axis getAxis() {
-                        return olap4jConnection.toOlap4j(
-                            queryAxis.getAxisOrdinal());
+                        return Axis.valueOf(queryAxis.getAxisOrdinal().name());
                     }
 
                     public List<Hierarchy> getHierarchies() {
@@ -89,7 +85,7 @@ class MondrianOlap4jCellSetMetaData implements CellSetMetaData {
                         return hierarchyList;
                     }
 
-                    public List<Property> getProperties() {
+                    public NamedList<Property> getProperties() {
                         throw new UnsupportedOperationException();
                     }
                 }

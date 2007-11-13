@@ -9,11 +9,10 @@
 */
 package mondrian.olap4j;
 
-import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.NamedList;
-import org.olap4j.metadata.Member;
+import mondrian.olap.DimensionType;
+import mondrian.olap.Util;
 import org.olap4j.OlapException;
+import org.olap4j.metadata.*;
 
 import java.util.Locale;
 
@@ -47,35 +46,48 @@ class MondrianOlap4jDimension implements Dimension, Named {
     }
 
     public NamedList<Hierarchy> getHierarchies() {
-        throw new UnsupportedOperationException();
+        final NamedList<MondrianOlap4jHierarchy> list =
+            new NamedListImpl<MondrianOlap4jHierarchy>();
+        final MondrianOlap4jConnection olap4jConnection =
+            olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection;
+        for (mondrian.olap.Hierarchy hierarchy : dimension.getHierarchies()) {
+            list.add(olap4jConnection.toOlap4j(hierarchy));
+        }
+        return (NamedList) list;
     }
 
     public Hierarchy getDefaultHierarchy() {
         return getHierarchies().get(0);
     }
 
-    public NamedList<Member> getRootMembers() throws OlapException {
-        throw new UnsupportedOperationException();
-    }
-
     public Type getDimensionType() throws OlapException {
-        throw new UnsupportedOperationException();
+        final DimensionType dimensionType = dimension.getDimensionType();
+        switch (dimensionType) {
+        case StandardDimension:
+            return Type.OTHER;
+        case TimeDimension:
+            return Type.TIME;
+        default:
+            throw Util.unexpected(dimensionType);
+        }
     }
 
     public String getName() {
-        throw new UnsupportedOperationException();
+        return dimension.getName();
     }
 
     public String getUniqueName() {
-        throw new UnsupportedOperationException();
+        return dimension.getUniqueName();
     }
 
     public String getCaption(Locale locale) {
-        throw new UnsupportedOperationException();
+        // TODO: locale caption
+        return dimension.getCaption();
     }
 
     public String getDescription(Locale locale) {
-        throw new UnsupportedOperationException();
+        // TODO: locale description
+        return dimension.getDescription();
     }
 }
 

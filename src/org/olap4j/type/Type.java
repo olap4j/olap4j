@@ -12,7 +12,6 @@ package org.olap4j.type;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Hierarchy;
 import org.olap4j.metadata.Level;
-import org.olap4j.OlapException;
 
 /**
  * Type of an MDX expression.
@@ -44,21 +43,30 @@ public interface Type {
      * @param dimension Dimension
      * @param maybe If true, returns true only if this type definitely
      *    uses the dimension
+     *
+     * @return whether this type definitely (or if <code>maybe</code> is true,
+     * possibly) uses the given dimension
      */
     boolean usesDimension(Dimension dimension, boolean maybe);
 
     /**
      * Returns the dimension of this type, or null if not known.
+     *
+     * @return dimension of this type
      */
     Dimension getDimension();
 
     /**
      * Returns the hierarchy of this type. If not applicable, throws.
+     *
+     * @return hierarchy of this type
      */
-    Hierarchy getHierarchy() throws OlapException;
+    Hierarchy getHierarchy();
 
     /**
      * Returns the level of this type, or null if not known.
+     *
+     * @return level of this type
      */
     Level getLevel();
 

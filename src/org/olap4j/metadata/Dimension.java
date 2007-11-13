@@ -43,21 +43,6 @@ public interface Dimension extends MetadataElement {
     NamedList<Hierarchy> getHierarchies();
 
     /**
-     * Returns the root member or members of this Dimension.
-     *
-     * <p>If the dimension has an 'all' member, then this will be the sole
-     * root member.
-     *
-     * <p>The caller should assume that the list is immutable;
-     * if the caller modifies the list, behavior is undefined.</p>
-     *
-     * @return root members of this hierarchy
-     *
-     * @throws OlapException if database error occurs
-     */
-    NamedList<Member> getRootMembers() throws OlapException;
-
-    /**
      * Returns the type of this Dimension.
      *
      * @return dimension type

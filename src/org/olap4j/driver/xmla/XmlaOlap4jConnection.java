@@ -9,8 +9,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
-import org.olap4j.mdx.parser.MdxParserFactory;
-import org.olap4j.mdx.parser.MdxParser;
+import org.olap4j.mdx.parser.*;
 import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
 import org.olap4j.metadata.Catalog;
 import org.olap4j.metadata.NamedList;
@@ -314,6 +313,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return new MdxParserFactory() {
             public MdxParser createMdxParser(OlapConnection connection) {
                 return new DefaultMdxParserImpl(connection);
+            }
+
+            public MdxValidator createMdxValidator(OlapConnection connection) {
+                throw Util.needToImplement(this);
             }
         };
     }

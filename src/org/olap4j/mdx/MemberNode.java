@@ -51,7 +51,11 @@ public class MemberNode implements ParseTreeNode {
     }
 
     public Type getType() {
-        return MemberType.forMember(member);
+        return new MemberType(
+            member.getDimension(),
+            member.getHierarchy(),
+            member.getLevel(),
+            member);
     }
 
     public void unparse(ParseTreeWriter writer) {

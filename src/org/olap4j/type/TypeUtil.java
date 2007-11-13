@@ -15,6 +15,8 @@ import org.olap4j.OlapException;
 /**
  * Utility methods relating to types.
  *
+ * <p>NOTE: This class is experimental. Not part of the public olap4j API.
+ *
  * @author jhyde
  * @since Feb 17, 2005
  * @version $Id$
@@ -25,7 +27,7 @@ public class TypeUtil {
      * Given a set type, returns the element type. Or its element type, if it
      * is a set type. And so on.
      */
-    public static Type stripSetType(Type type) {
+    private static Type stripSetType(Type type) {
         while (type instanceof SetType) {
             type = ((SetType) type).getElementType();
         }
@@ -36,7 +38,7 @@ public class TypeUtil {
      * Converts a type to a member or tuple type.
      * If it cannot, returns null.
      */
-    public static Type toMemberOrTupleType(Type type) throws OlapException {
+    private static Type toMemberOrTupleType(Type type) throws OlapException {
         type = stripSetType(type);
         if (type instanceof TupleType) {
             return (TupleType) type;
@@ -53,7 +55,7 @@ public class TypeUtil {
      * a member type.
      * If it is a tuple, number, string, or boolean, returns null.
      */
-    public static MemberType toMemberType(Type type) throws OlapException {
+    static MemberType toMemberType(Type type) throws OlapException {
         type = stripSetType(type);
         if (type instanceof MemberType) {
             return (MemberType) type;
@@ -70,25 +72,21 @@ public class TypeUtil {
      * Returns whether this type is union-compatible with another.
      * In general, to be union-compatible, types must have the same
      * dimensionality.
+     *
+     * @param type1 First type
+     * @param type2 Second type
+     * @return Whether types are union-compatible
+     * @throws OlapException on error
      */
-    public static boolean isUnionCompatible(Type type1, Type type2) throws OlapException {
+    static boolean isUnionCompatible(
+        Type type1,
+        Type type2)
+        throws OlapException
+    {
         if (type1 instanceof TupleType) {
-            TupleType tupleType1 = (TupleType) type1;
-            if (type2 instanceof TupleType) {
-                TupleType tupleType2 = (TupleType) type2;
-                if (tupleType1.elementTypes.length ==
-                        tupleType2.elementTypes.length) {
-                    for (int i = 0; i < tupleType1.elementTypes.length; i++) {
-                        if (!isUnionCompatible(
-                                tupleType1.elementTypes[i],
-                                tupleType2.elementTypes[i])) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-            }
-            return false;
+            return type2 instanceof TupleType
+                && ((TupleType) type1).isUnionCompatibleWith(
+                (TupleType) type2);
         } else {
             final MemberType memberType1 = toMemberType(type1);
             if (memberType1 == null) {
@@ -152,10 +150,14 @@ public class TypeUtil {
         return type instanceof SetType;
     }
 
-    public static boolean couldBeMember(Type type) {
+    private static boolean couldBeMember(Type type) {
         return type instanceof MemberType ||
                 type instanceof HierarchyType ||
                 type instanceof DimensionType;
+    }
+
+    static boolean equal(Object o, Object p) {
+        return o == null ? p == null : p != null && o.equals(p);
     }
 }
 

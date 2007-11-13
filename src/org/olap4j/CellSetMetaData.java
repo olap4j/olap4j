@@ -9,8 +9,7 @@
 */
 package org.olap4j;
 
-import org.olap4j.metadata.Property;
-import org.olap4j.metadata.Cube;
+import org.olap4j.metadata.*;
 
 import java.sql.ResultSetMetaData;
 import java.util.List;
@@ -45,7 +44,7 @@ public interface CellSetMetaData extends ResultSetMetaData, OlapWrapper {
      *
      * @return list of cell properties
      */
-    List<Property> getCellProperties();
+    NamedList<Property> getCellProperties();
 
     /**
      * Returns the Cube which was referenced in this statement.
@@ -59,7 +58,7 @@ public interface CellSetMetaData extends ResultSetMetaData, OlapWrapper {
      *
      * @return list of metadata describing each result axis
      */
-    List<CellSetAxisMetaData> getAxesMetaData();
+    NamedList<CellSetAxisMetaData> getAxesMetaData();
 }
 
 // End CellSetMetaData.java

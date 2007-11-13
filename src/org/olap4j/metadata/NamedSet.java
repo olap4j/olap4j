@@ -9,6 +9,8 @@
 */
 package org.olap4j.metadata;
 
+import org.olap4j.mdx.ParseTreeNode;
+
 /**
  * Metadata object describing a named set defined against a {@link Cube}.
  *
@@ -24,6 +26,13 @@ public interface NamedSet extends MetadataElement {
      * @return cube this named set belongs to
      */
     Cube getCube();
+
+    /**
+     * Returns the expression which gives the value of this NamedSet.
+     *
+     * @return expression
+     */
+    ParseTreeNode getExpression();
 }
 
 // End NamedSet.java

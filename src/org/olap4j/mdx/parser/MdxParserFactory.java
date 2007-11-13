@@ -26,6 +26,14 @@ public interface MdxParserFactory {
      * @return MDX parser
      */
     MdxParser createMdxParser(OlapConnection connection);
+
+    /**
+     * Creates an MDX validator.
+     *
+     * @param connection Connection in which to resolve identifiers
+     * @return MDX validator
+     */
+    MdxValidator createMdxValidator(OlapConnection connection);
 }
 
 // End MdxParserFactory.java

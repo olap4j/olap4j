@@ -9,6 +9,8 @@
 */
 package org.olap4j.metadata;
 
+import org.olap4j.OlapException;
+
 /**
  * An organization of the set of {@link Member}s in a {@link Dimension} and
  * their positions relative to one another.
@@ -60,6 +62,19 @@ public interface Hierarchy extends MetadataElement {
      * @return the default member of this hierarchy
      */
     Member getDefaultMember();
+
+    /**
+     * Returns the root member or members of this Dimension.
+     *
+     * <p>If the dimension has an 'all' member, then this will be the sole
+     * root member.
+     *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.</p>
+     *
+     * @return root members of this hierarchy
+     */
+    NamedList<Member> getRootMembers();
 }
 
 // End Hierarchy.java

@@ -30,12 +30,20 @@ public class LevelType implements Type {
     /**
      * Creates a type representing a level.
      *
-     * @param dimension
+     * @param dimension Dimension which values of this type must belong to, or
+     *   null if not known
+     *
      * @param hierarchy Hierarchy which values of this type must belong to, or
      *   null if not known
+     *
      * @param level Level which values of this type must belong to, or null if
+     *   not known
      */
-    public LevelType(Dimension dimension, Hierarchy hierarchy, Level level) {
+    public LevelType(
+        Dimension dimension,
+        Hierarchy hierarchy, 
+        Level level)
+    {
         this.dimension = dimension;
         this.hierarchy = hierarchy;
         this.level = level;
@@ -61,26 +69,19 @@ public class LevelType implements Type {
         this.digest = buf.toString();
     }
 
-    public static LevelType forType(Type type) throws OlapException {
+    // not part of public olap4j API
+    private static LevelType forType(Type type) throws OlapException {
         return new LevelType(
                 type.getDimension(),
                 type.getHierarchy(),
                 type.getLevel());
-
-    }
-
-    public static LevelType forLevel(Level level) {
-        return new LevelType(
-                level.getDimension(),
-                level.getHierarchy(),
-                level);
     }
 
     public boolean usesDimension(Dimension dimension, boolean maybe) {
         if (this.dimension == null) {
             return maybe;
         } else {
-            return this.dimension == dimension;
+            return this.dimension.equals(dimension);
         }
     }
 

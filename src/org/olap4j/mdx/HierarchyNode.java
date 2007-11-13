@@ -51,7 +51,9 @@ public class HierarchyNode implements ParseTreeNode {
     }
 
     public Type getType() {
-        return HierarchyType.forHierarchy(hierarchy);
+        return new HierarchyType(
+            hierarchy.getDimension(),
+            hierarchy);
     }
 
     public void unparse(ParseTreeWriter writer) {

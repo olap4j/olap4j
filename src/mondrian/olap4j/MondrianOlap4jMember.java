@@ -14,11 +14,14 @@ import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Hierarchy;
 import org.olap4j.metadata.Level;
 import org.olap4j.metadata.Member;
+import org.olap4j.metadata.Property;
 import org.olap4j.OlapException;
 import org.olap4j.mdx.ParseTreeNode;
 
 import java.util.List;
 import java.util.Locale;
+
+import mondrian.olap.*;
 
 /**
  * Implementation of {@link Member}
@@ -38,6 +41,7 @@ class MondrianOlap4jMember implements Member, Named {
         MondrianOlap4jSchema olap4jSchema,
         mondrian.olap.Member mondrianMember)
     {
+        assert mondrianMember != null;
         this.olap4jSchema = olap4jSchema;
         this.member = mondrianMember;
     }
@@ -56,6 +60,10 @@ class MondrianOlap4jMember implements Member, Named {
             olap4jSchema.schemaReader.getMemberChildren(
                 member);
         return new AbstractNamedList<MondrianOlap4jMember>() {
+            protected String getName(MondrianOlap4jMember member) {
+                return member.getName();
+            }
+
             public MondrianOlap4jMember get(int index) {
                 return new MondrianOlap4jMember(olap4jSchema, children[index]);
             }
@@ -67,7 +75,11 @@ class MondrianOlap4jMember implements Member, Named {
     }
 
     public Member getParentMember() {
-        return new MondrianOlap4jMember(olap4jSchema, member);
+        final mondrian.olap.Member parentMember = member.getParentMember();
+        if (parentMember == null) {
+            return null;
+        }
+        return new MondrianOlap4jMember(olap4jSchema, parentMember);
     }
 
     public Level getLevel() {
@@ -85,7 +97,11 @@ class MondrianOlap4jMember implements Member, Named {
     }
 
     public Type getMemberType() {
-        throw new UnsupportedOperationException();
+        return Type.valueOf(member.getMemberType().name());
+    }
+
+    public boolean isAll() {
+        return member.isAll();
     }
 
     public boolean isChildOrEqualTo(Member member) {
@@ -113,23 +129,26 @@ class MondrianOlap4jMember implements Member, Named {
     }
 
     public Object getPropertyValue(Property property) {
-        throw new UnsupportedOperationException();
+        return member.getPropertyValue(property.getName());
     }
 
     public String getPropertyFormattedValue(Property property) {
-        throw new UnsupportedOperationException();
+        return member.getPropertyFormattedValue(property.getName());
     }
 
     public void setProperty(Property property, Object value) throws OlapException {
-        throw new UnsupportedOperationException();
+        member.setProperty(property.getName(), value);
     }
 
-    public List<Property> getProperties() {
-        throw new UnsupportedOperationException();
+    public NamedList<Property> getProperties() {
+        return getLevel().getProperties();
     }
 
     public int getOrdinal() {
-        throw new UnsupportedOperationException();
+        final Number ordinal =
+            (Number) member.getPropertyValue(
+                Property.StandardMemberProperty.MEMBER_ORDINAL.getName());
+        return ordinal.intValue();
     }
 
     public boolean isHidden() {
@@ -145,7 +164,7 @@ class MondrianOlap4jMember implements Member, Named {
     }
 
     public String getName() {
-        throw new UnsupportedOperationException();
+        return member.getName();
     }
 
     public String getUniqueName() {
@@ -159,7 +178,6 @@ class MondrianOlap4jMember implements Member, Named {
     public String getDescription(Locale locale) {
         throw new UnsupportedOperationException();
     }
-
 }
 
 // End MondrianOlap4jMember.java

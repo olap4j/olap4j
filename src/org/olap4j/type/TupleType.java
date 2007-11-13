@@ -22,14 +22,32 @@ import org.olap4j.OlapException;
  * @version $Id$
  */
 public class TupleType implements Type {
-    public final Type[] elementTypes;
+    final Type[] elementTypes;
+    private final String digest;
 
     /**
      * Creates a type representing a tuple whose fields are the given types.
+     *
+     * @param elementTypes Array of field types
      */
     public TupleType(Type[] elementTypes) {
         assert elementTypes != null;
         this.elementTypes = elementTypes.clone();
+
+        final StringBuilder buf = new StringBuilder("TupleType<");
+        for (int i = 0; i < elementTypes.length; i++) {
+            Type elementType = elementTypes[i];
+            if (i > 0) {
+                buf.append(", ");
+            }
+            buf.append(elementType.toString());
+        }
+        buf.append(">");
+        digest = buf.toString();
+    }
+
+    public String toString() {
+        return digest;
     }
 
     public boolean usesDimension(Dimension dimension, boolean maybe) {
@@ -42,18 +60,19 @@ public class TupleType implements Type {
     }
 
     public Dimension getDimension() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     public Hierarchy getHierarchy() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     public Level getLevel() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
-    public Type getValueType() throws OlapException {
+    // not part of public olap4j API
+    private Type getValueType() throws OlapException {
         for (Type elementType : elementTypes) {
             if (elementType instanceof MemberType) {
                 MemberType memberType = (MemberType) elementType;
@@ -63,6 +82,21 @@ public class TupleType implements Type {
             }
         }
         return new ScalarType();
+    }
+
+    // not part of public olap4j API
+    boolean isUnionCompatibleWith(TupleType that) throws OlapException {
+        if (this.elementTypes.length != that.elementTypes.length) {
+            return false;
+        }
+        for (int i = 0; i < this.elementTypes.length; i++) {
+            if (!TypeUtil.isUnionCompatible(
+                    this.elementTypes[i],
+                    that.elementTypes[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 

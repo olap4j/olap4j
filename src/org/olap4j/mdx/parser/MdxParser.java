@@ -20,7 +20,6 @@ import org.olap4j.mdx.ParseTreeNode;
  * from different threads.
  *
  * @see MdxParserFactory
- * @see org.olap4j.mdx.parser.impl.DefaultMdxParserImpl
  *
  * @author jhyde
  * @version $Id$

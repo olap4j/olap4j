@@ -14,7 +14,7 @@
   <property file="${project.location}/build.properties"/>
   <property name="project.build.debug" value="on"/>
   <property name="name" value="olap4j"/>
-  <property name="version" value="0.6"/>
+  <property name="version" value="0.89.3"/>
   <property name="dist.name" value="${name}-${version}" />
 
   <!-- properties related to paths -->

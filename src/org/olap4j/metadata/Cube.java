@@ -9,9 +9,7 @@
 */
 package org.olap4j.metadata;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Central metadata object for representation of multidimensional data.
@@ -87,7 +85,71 @@ public interface Cube extends MetadataElement {
      */
     Collection<Locale> getSupportedLocales();
 
+    /**
+     * Finds a member in the current Cube based upon its fully-qualified name.
+     * Returns the member, or null if there is no member with this name.
+     *
+     * <p>The fully-qualified name starts with the name of the dimension,
+     * followed by the name of a root member, and continues with the name of
+     * each successive member on the path from the root member. If a member's
+     * name is unique within its level, preceding member name can be omitted.
+     *
+     * <p>For example,
+     * <code>lookupMember("Product", "Food")</code>
+     * and
+     * <code>lookupMember("Product", "All Products", "Food")</code>
+     * are both valid ways to locate the "Food" member of the "Product"
+     * dimension.
+     *
+     * @param nameParts Components of the fully-qualified member name
+     * @return member with the given name, or null if not found
+     */
     Member lookupMember(String... nameParts);
+
+    /**
+     * Finds a collection of members in the current Cube related to a given
+     * member.
+     *
+     * <p>The method first looks up a member with the given fully-qualified
+     * name as for {@link #lookupMember(String[])}, then applies the set of
+     * tree-operations to find related members.
+     *
+     * <p>The returned collection is sorted in hierarchical order. If no member
+     * is found with the given name, the collection is empty.
+     *
+     * <p>For example,
+     *
+     * <blockquote>
+     * <code>lookupMembers(
+     *     EnumSet.of(TreeOp.ANCESTORS, TreeOp.CHILDREN),
+     *     "Time", "1997", "Q2")</code>
+     * </blockquote>
+     *
+     * returns
+     *
+     * <blockquote>
+     * [Time].[1997], [Time].[1997].[Q2].[4],
+     * [Time].[1997].[Q2].[5], [Time].[1997].[Q2].[6]
+     * </blockquote>
+     *
+     * <p>The fully-qualified name starts with the name of the dimension,
+     * followed by the name of a root member, and continues with the name of
+     * each successive member on the path from the root member. If a member's
+     * name is unique within its level, preceding member name can be omitted.
+     *
+     * <p>For example,
+     * <code>lookupMember("Product", "Food")</code>
+     * and
+     * <code>lookupMember("Product", "All Products", "Food")</code>
+     * are both valid ways to locate the "Food" member of the "Product"
+     * dimension.
+     *
+     * @param nameParts Components of the fully-qualified member name
+     * @return member with the given name, or null if not found
+     */
+    List<Member> lookupMembers(
+        Set<Member.TreeOp> treeOps,
+        String... nameParts);
 }
 
 // End Cube.java

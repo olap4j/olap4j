@@ -21,7 +21,7 @@ import java.util.Locale;
  * @version $Id$
  * @since May 25, 2007
  */
-class MondrianOlap4jHierarchy implements Hierarchy {
+class MondrianOlap4jHierarchy implements Hierarchy, Named {
     private final MondrianOlap4jSchema olap4jSchema;
     private final mondrian.olap.Hierarchy hierarchy;
 
@@ -48,31 +48,49 @@ class MondrianOlap4jHierarchy implements Hierarchy {
     }
 
     public NamedList<Level> getLevels() {
-        if (false) {
-            return null;
+        final NamedList<MondrianOlap4jLevel> list =
+            new NamedListImpl<MondrianOlap4jLevel>();
+        final MondrianOlap4jConnection olap4jConnection =
+            olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection;
+        for (mondrian.olap.Level level : hierarchy.getLevels()) {
+            list.add(olap4jConnection.toOlap4j(level));
         }
-        throw new UnsupportedOperationException();
+        return (NamedList) list;
     }
 
     public boolean hasAll() {
-        if (false) {
-            return false;
-        }
-        throw new UnsupportedOperationException();
+        return hierarchy.hasAll();
     }
 
     public Member getDefaultMember() {
-        if (false) {
-            return null;
-        }
-        throw new UnsupportedOperationException();
+        final MondrianOlap4jConnection olap4jConnection =
+            olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection;
+        return olap4jConnection.toOlap4j(hierarchy.getDefaultMember());
+    }
+
+    public NamedList<Member> getRootMembers() {
+        final MondrianOlap4jConnection olap4jConnection =
+            olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection;
+        final mondrian.olap.Member[] levelMembers =
+            olap4jConnection.connection.getSchemaReader().getLevelMembers(
+                hierarchy.getLevels()[0], false);
+        return new AbstractNamedList<Member>() {
+            protected String getName(Member member) {
+                return member.getName();
+            }
+
+            public Member get(int index) {
+                return olap4jConnection.toOlap4j(levelMembers[index]);
+            }
+
+            public int size() {
+                return levelMembers.length;
+            }
+        };
     }
 
     public String getName() {
-        if (false) {
-            return null;
-        }
-        throw new UnsupportedOperationException();
+        return hierarchy.getName();
     }
 
     public String getUniqueName() {
@@ -80,17 +98,13 @@ class MondrianOlap4jHierarchy implements Hierarchy {
     }
 
     public String getCaption(Locale locale) {
-        if (false) {
-            return null;
-        }
-        throw new UnsupportedOperationException();
+        // todo: localize caption
+        return hierarchy.getCaption();
     }
 
     public String getDescription(Locale locale) {
-        if (false) {
-            return null;
-        }
-        throw new UnsupportedOperationException();
+        // todo: localize description
+        return hierarchy.getDescription();
     }
 }
 

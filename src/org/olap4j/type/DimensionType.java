@@ -12,7 +12,6 @@ package org.olap4j.type;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Hierarchy;
 import org.olap4j.metadata.Level;
-import org.olap4j.OlapException;
 
 /**
  * The type of an expression which represents a Dimension.
@@ -30,8 +29,8 @@ public class DimensionType implements Type {
     /**
      * Creates a type representing a dimension.
      *
-     * @param dimension Dimension that values of this type must belong to.
-     *   Null if the dimension is unknown.
+     * @param dimension Dimension which values of this type must belong to, or
+     *   null if not known
      */
     public DimensionType(Dimension dimension) {
         this.dimension = dimension;
@@ -52,11 +51,14 @@ public class DimensionType implements Type {
     }
 
     public boolean usesDimension(Dimension dimension, boolean maybe) {
-        return this.dimension == dimension ||
-                (maybe && this.dimension == null);
+        if (this.dimension == null) {
+            return maybe;
+        } else {
+            return this.dimension.equals(dimension);
+        }
     }
 
-    public Hierarchy getHierarchy() throws OlapException {
+    public Hierarchy getHierarchy() {
         return dimension == null ?
                 null :
                 dimension.getHierarchies().size() > 1 ?

@@ -8,15 +8,13 @@
 */
 package org.olap4j.driver.xmla;
 
-import org.olap4j.CellSetMetaData;
-import org.olap4j.CellSetAxisMetaData;
-import org.olap4j.metadata.Property;
-import org.olap4j.metadata.Cube;
-
-import java.util.List;
-import java.sql.SQLException;
-
 import mondrian.olap.Util;
+import org.olap4j.CellSetAxisMetaData;
+import org.olap4j.CellSetMetaData;
+import org.olap4j.metadata.*;
+
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Implementation of {@link org.olap4j.CellSetMetaData}
@@ -37,15 +35,15 @@ class XmlaOlap4jCellSetMetaData implements CellSetMetaData {
 
     // implement CellSetMetaData
 
-    public List<Property> getCellProperties() {
-        throw new UnsupportedOperationException();
+    public NamedList<Property> getCellProperties() {
+        throw Util.needToImplement(this);
     }
 
     public Cube getCube() {
         throw Util.needToImplement(this);
     }
 
-    public List<CellSetAxisMetaData> getAxesMetaData() {
+    public NamedList<CellSetAxisMetaData> getAxesMetaData() {
         throw Util.needToImplement(this);
     }
 

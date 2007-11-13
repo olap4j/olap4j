@@ -9,10 +9,15 @@
 */
 package mondrian.olap4j;
 
+import mondrian.olap.*;
 import org.olap4j.metadata.*;
+import org.olap4j.metadata.Dimension;
+import org.olap4j.metadata.Hierarchy;
+import org.olap4j.metadata.Level;
+import org.olap4j.metadata.Member;
+import org.olap4j.metadata.Property;
 
-import java.util.Locale;
-import java.util.List;
+import java.util.*;
 
 /**
  * Implementation of {@link Level}
@@ -22,7 +27,7 @@ import java.util.List;
  * @version $Id$
  * @since May 25, 2007
  */
-class MondrianOlap4jLevel implements Level {
+class MondrianOlap4jLevel implements Level, Named {
     private final MondrianOlap4jSchema olap4jSchema;
     private final mondrian.olap.Level level;
 
@@ -60,23 +65,50 @@ class MondrianOlap4jLevel implements Level {
     }
 
     public NamedList<Property> getProperties() {
-        throw new UnsupportedOperationException();
+        final NamedList<Property> list = new ArrayNamedListImpl<Property>() {
+            protected String getName(Property property) {
+                return property.getName();
+            }
+        };
+        // standard properties first
+        list.addAll(
+            Arrays.asList(Property.StandardMemberProperty.values()));
+        // then level-specific properties
+        for (mondrian.olap.Property property : level.getProperties()) {
+            list.add(new MondrianOlap4jProperty(property));
+        }
+        return list;
     }
 
     public List<Member> getMembers() {
-        throw new UnsupportedOperationException();
+        final MondrianOlap4jConnection olap4jConnection =
+            olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection;
+        final SchemaReader schemaReader =
+            olap4jConnection.connection.getSchemaReader();
+        final mondrian.olap.Member[] levelMembers =
+            schemaReader.getLevelMembers(level, true);
+        return new AbstractList<Member>() {
+            public Member get(int index) {
+                return olap4jConnection.toOlap4j(levelMembers[index]);
+            }
+
+            public int size() {
+                return levelMembers.length;
+            }
+        };
     }
 
     public String getName() {
-        throw new UnsupportedOperationException();
+        return level.getName();
     }
 
     public String getUniqueName() {
-        throw new UnsupportedOperationException();
+        return level.getUniqueName();
     }
 
     public String getCaption(Locale locale) {
-        throw new UnsupportedOperationException();
+        // todo: localized captions
+        return level.getCaption();
     }
 
     public String getDescription(Locale locale) {

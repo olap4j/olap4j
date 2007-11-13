@@ -41,9 +41,10 @@ public class CallNode implements ParseTreeNode {
     private final Syntax syntax;
     private final List<ParseTreeNode> argList;
     private final ParseRegion region;
+    private Type type;
 
     /**
-     * Creates an CallNode.
+     * Creates a CallNode.
      *
      * <p>The <code>syntax</code> argument determines whether this is a prefix,
      * infix or postfix operator, a function call, and so forth.
@@ -51,6 +52,10 @@ public class CallNode implements ParseTreeNode {
      * <p>The list of arguuments <code>args</code> must be specified, even if
      * there are zero arguments, and each argument must be not null.
      *
+     * <p>The type is initially null, but can be set using {@link #setType}
+     * after validation.
+     *
+     * @param region Region of source code
      * @param name Name of operator or function
      * @param syntax Syntax of call
      * @param args List of zero or more arguments
@@ -97,6 +102,7 @@ public class CallNode implements ParseTreeNode {
      * <p>The list of arguuments <code>args</code> must be specified, even if
      * there are zero arguments, and each argument must be not null.
      *
+     * @param region Region of source code
      * @param name Name of operator or function
      * @param syntax Syntax of call
      * @param args List of zero or more arguments
@@ -114,8 +120,22 @@ public class CallNode implements ParseTreeNode {
         return region;
     }
 
+    /**
+     * Sets the type of this CallNode.
+     *
+     * <p>Typically, this method would be called by the validator when it has
+     * deduced the argument types, chosen between any overloaded functions
+     * or operators, and determined the result type of the function or
+     * operator.
+     *
+     * @param type Result type of this call
+     */
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     public Type getType() {
-        throw new UnsupportedOperationException();
+        return type;
     }
 
     public void unparse(ParseTreeWriter writer) {

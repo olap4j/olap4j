@@ -64,7 +64,7 @@ public interface Level extends MetadataElement {
      *
      * @see org.olap4j.OlapDatabaseMetaData#getProperties
      *
-     * @return properties of this level
+     * @return properties of this Level
      */
     NamedList<Property> getProperties();
 
@@ -74,7 +74,12 @@ public interface Level extends MetadataElement {
      * <p>Some levels have a very many members. In this case, calling this
      * method may be expensive in space and/or time and is not recommended.
      *
-     * @return List of members in this level
+     * <p>The members of a level do not have unique names, so unlike
+     * {@link Hierarchy#getRootMembers()} and
+     * {@link Member#getChildMembers()} the result type
+     * is a {@link List} not a {@link NamedList}. 
+     *
+     * @return List of members in this Level
      */
     List<Member> getMembers();
 

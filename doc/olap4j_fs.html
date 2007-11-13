@@ -78,10 +78,10 @@ TABLE TD {
 <h1>olap4j Functional Specification</h1>
 
 <p>Authors: Julian Hyde, Barry Klawans<br>
-Version: 0.89.2-dev (draft)<br>
+Version: 0.89.3-dev (draft)<br>
 Revision: $Id$
 (<a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
-Last modified: September 21<sup>st</sup>, 2007.</p>
+Last modified: November 12<sup>th</sup>, 2007.</p>
 <hr noshade="noshade">
 
 <h2><a name="Contents">Contents</a></h2>
@@ -898,7 +898,7 @@ specific instance is chosen based upon the types of its arguments.</p>
 <div class="code">
   // Create a query model.<br>
   SelectNode query = new SelectNode();<br>
-  query.setCubeName(<br>
+  query.setFrom(<br>
 &nbsp;&nbsp;&nbsp; new IdentifierNode(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new 
   IdentifierNode.Segment(&quot;Sales&quot;)));<br>
@@ -982,12 +982,36 @@ MDX code.</p>
 
 <p>Package name: <a class="javadoc" href="api/org/olap4j/type/package-summary.html">org.olap4j.mdx.parser</a></p>
 
-<p>Provides an MDX parser.</p>
+<p>Provides an MDX parser and validator.</p>
+<p>Parser and validator are both allocated via a parser factory, which is 
+obtained from a connection:</p>
+
+<div class="code">
+  OlapConnection connection;<br>
+	MdxParserFactory parserFactory =<br>
+&nbsp;&nbsp;&nbsp; connection.getParserFactory();<br>
+	MdxParser parser =<br>
+&nbsp;&nbsp;&nbsp; parserFactory.createMdxParser(connection);<br>
+	SelectNode select =<br>
+&nbsp;&nbsp;&nbsp; parser.parse(&quot;SELECT FROM [Sales]&quot;);<br>
+	MdxValidator validator =<br>
+&nbsp;&nbsp;&nbsp; parserFactory.createMdxValidator(connection);<br>
+	select = validator.validate(select);</div>
+
+<p>Parser and validator are not thread-safe (they cannot be used by more than 
+one thread simultaneously) but they can be re-used for multiple statements.</p>
+<p>One of the chief purposes of validation is to assign a type to every 
+expression within the parse tree. Before validation, any node's
+<a class="javadoc" href="api/org/olap4j/mdx/ParseTreeNode.html#getType()">
+ParseTreeNode.getType()</a> method may throw an exception, but after validation 
+the <code>getType()</code> method will return a type. Nodes which are not 
+expressions do not have types, and will always return <code>null</code>.</p>
 <p>Classes:</p>
 
 <ul>
-  <li><code>MdxParserFactory</code></li>
-  <li><code>MdxParser</code></li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/parser/MdxParserFactory.html">MdxParserFactory</a></li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/parser/MdxParser.html">MdxParser</a></li>
+  <li><a class="javadoc" href="api/org/olap4j/mdx/parser/MdxValidator.html">MdxValidator</a></li>
 </ul>
 
 <h3 align="left">2.6. <a name="MDX_type_model">MDX type model</a></h3>
@@ -1208,13 +1232,15 @@ of measures. It may also have a collection of named sets, each defined by a
 formula.</p>
 
 <ul>
-	<li><code>List&lt;Dimension&gt; getDimensions()</code></li>
+	<li><code>NamedList&lt;Dimension&gt; getDimensions()</code></li>
 	<li><code>List&lt;Measure&gt; getMeasures()</code></li>
 	<li><code>NamedList&lt;NamedSet&gt; getSets()</code></li>
 	<li><code>Schema getSchema()</code></li>
 	<li><code>String getName()</code></li>
     <li><code>List&lt;Locale&gt; getSupportedLocales()</code> (see <a href="#Internationalization">
     Internationalization</a>)</li>
+	<li><code>Member lookupMember(String... nameParts)</code></li>
+	<li><code>Member lookupMembers(Set&lt;TreeOp&gt; treeOps, String... nameParts)</code></li>
 </ul>
 
 <h5>2.7.2.5. <a name="Dimension">The Dimension interface</a></h5>
@@ -1230,8 +1256,7 @@ but most have exactly one hierarchy.</p>
 
 <ul>
 	<li><code>String getName()</code></li>
-	<li><code>List&lt;Hierarchy&gt; getHierarchies()</code></li>
-	<li><code>List&lt;Member&gt; getRootMembers()</code></li>
+	<li><code>NamedList&lt;Hierarchy&gt; getHierarchies()</code></li>
 	<li><code>Dimension.Type getDimensionType()</code></li>
 </ul>
 <h5>2.7.2.6. <a name="Hierarchy">The Hierarchy interface</a></h5>
@@ -1244,9 +1269,10 @@ members.</p>
 <ul>
 	<li><code>Dimension getDimension()</code></li>
 	<li><code>String getName()</code></li>
-	<li><code>List&lt;Level&gt; getLevels()</code></li>
+	<li><code>NamedList&lt;Level&gt; getLevels()</code></li>
 	<li><code>boolean hasAll()</code></li>
     <li><code>Member getDefaultMember()</code></li>
+	<li><code>NamedList&lt;Member&gt; getRootMembers()</code></li>
 </ul>
 <h5>2.7.2.7. <a name="Level">The Level interface</a></h5>
 <p>A <a class="javadoc" href="api/org/olap4j/metadata/Level.html">Level</a>&nbsp; 
@@ -1257,7 +1283,7 @@ attributes and at the same depth in the hierarchy.</p>
 	<li><code>int getDepth()</code></li>
 	<li><code>Hierarchy getHierarchy()</code></li>
 	<li><code>Level.Type getLevelType()</code></li>
-	<li><code>List&lt;Property&gt; getProperties()</code></li>
+	<li><code>NamedList&lt;Property&gt; getProperties()</code></li>
 	<li><code>List&lt;Member&gt; getMembers()</code></li>
 </ul>
 <h5>2.7.2.8. <a name="Member">The Member interface</a></h5>
@@ -1266,10 +1292,11 @@ attributes and at the same depth in the hierarchy.</p>
 MetadataElement</a>) is a data value in an OLAP dimension.</p>
 <ul>
 	<li><code>String getName()</code></li>
-	<li><code>List&lt;Member&gt; getChildMembers()</code></li>
+	<li><code>NamedList&lt;Member&gt; getChildMembers()</code></li>
 	<li><code>Member getParentMember()</code></li>
 	<li><code>Level getLevel()</code></li>
 	<li><code>Hierarchy getHierarchy()</code></li>
+	<li><code>boolean isAll()</code></li>
 	<li><code>boolean isChildOrEqualTo(Member member)</code></li>
 	<li><code>boolean isCalculated()</code></li>
 	<li><code>boolean isCalculatedInQuery()</code></li>
@@ -1278,11 +1305,12 @@ MetadataElement</a>) is a data value in an OLAP dimension.</p>
 	<li><code>Object getPropertyValue(Property property)</code></li>
 	<li><code>String getPropertyFormattedValue(Property property)</code></li>
 	<li><code>void setProperty(Property property, Object value)</code></li>
-	<li><code>List&lt;Property&gt; getProperties()</code></li>
+	<li><code>NamedList&lt;Property&gt; getProperties()</code></li>
 	<li><code>int getOrdinal()</code></li>
 	<li><code>boolean isHidden()</code></li>
 	<li><code>Member getDataMember()</code></li>
 </ul>
+
 <h5>2.7.2.9. <a name="Measure">The Measure interface</a></h5>
 
 <p>A <a class="javadoc" href="api/org/olap4j/metadata/Measure.html">Measure</a>&nbsp;(extends
@@ -1312,7 +1340,6 @@ properties; for example:</p>
 <ul>
 	<li><code>Datatype getType()</code></li>
 	<li><code>Scope getScope()</code></li>
-	<li><code>boolean isInternal()</code></li>
 	<li><code>enum Scope { MEMBER, CELL }</code></li>
 	<li><code>enum Datatype { STRING, OTHER, NUMERIC, BOOLEAN }</code></li>
 	<li><code>enum StandardMemberProperty implements Property { CATALOG_NAME, SCHEMA_NAME, CUBE_NAME, ...
@@ -3451,8 +3478,9 @@ they will generally be put into the spec.</p>
 
 <h3>D.1. To be specified</h3>
 
+<p>[Method for richer query of members, analogous to OlapDatabaseMetaData.getMembers(). Maybe extend Cube.lookupMember. Something with a treeop.]</p>
 <p>[Discuss thread safety of connections, statements, result sets.]</p>
-<p>[API for cancelling statements.]</p>
+<p>[API for canceling statements.]</p>
 <p>[2006/10/20#1. Specification should include compliance levels, like the SQL 
 specification does. In particular, we will allow providers to comply with a 
 limited subset of MDX.]</p>
@@ -3476,10 +3504,12 @@ memory. No specific change to the specification, but decided to add memory
 efficiency as a design goal.]</p>
 <h3>D.2. Design notes</h3>
 
-<p><a name="JDK">JDK</a>. We are targeting JDK 1.5, and running retroweaver for
+<p><a name="JDK">JDK</a>.</p>
+<p>We are targeting JDK 1.5, and running retroweaver for
 backward compatibility for JDK 1.4. See forum thread:
 <a href="http://sourceforge.net/forum/forum.php?thread_id=1560764&amp;forum_id=577988">
-olap4j, JDK 1.5 and generics</a>. </p>
+olap4j, JDK 1.5 and generics</a>.</p>
+<p>We also support JDK 1.6, and with it JDBC 4.0. </p>
 <h4>Result sets, random access, and memory usage</h4>
 <p>Should result sets return their axes as cursors or collections? Cursors 
 require less memory, but collections provide an easier programming model.</p>

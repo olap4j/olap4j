@@ -144,7 +144,8 @@ public class SimpleQuerySample {
         MemberType type = (MemberType) parameterMetaData.getParameterOlapType(1);
         Dimension dimension = type.getDimension();
         assert dimension.getName().equals("Store");
-        Member allStores = dimension.getRootMembers().get(0);
+        Member allStores =
+            dimension.getDefaultHierarchy().getRootMembers().get(0);
         Member memberUsa = allStores.getChildMembers().get("USA");
         Member memberWa = memberUsa.getChildMembers().get("WA");
         Member memberSeattle = memberWa.getChildMembers().get("Seattle");
@@ -236,7 +237,7 @@ public class SimpleQuerySample {
     void executeSelectNode(OlapConnection connection) {
         // Create a query model.
         SelectNode query = new SelectNode();
-        query.setCubeName(
+        query.setFrom(
             new IdentifierNode(
                 new IdentifierNode.Segment("Sales")));
         query.getAxisList().add(
