@@ -228,7 +228,8 @@ public interface Property extends MetadataElement {
             Datatype type,
             int ordinal,
             boolean internal,
-            String description) {
+            String description)
+        {
 //            assert ordinal == ordinal();
             this.internal = internal;
             this.type = type;
@@ -347,8 +348,9 @@ public interface Property extends MetadataElement {
             Datatype type,
             int ordinal,
             boolean internal,
-            String description) {
-            assert ordinal == ordinal();
+            String description)
+        {
+//            assert ordinal == ordinal();
             this.type = type;
             this.internal = internal;
             this.description = description;

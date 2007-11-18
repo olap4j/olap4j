@@ -106,6 +106,8 @@ public interface Position {
     /**
      * Returns the zero-based ordinal of this Position on its
      * {@link CellSetAxis}.
+     *
+     * @return ordinal of this Position
      */
     int getOrdinal();
 }

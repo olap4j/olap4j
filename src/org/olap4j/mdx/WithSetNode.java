@@ -14,7 +14,7 @@ import org.olap4j.type.Type;
 import java.io.PrintWriter;
 
 /**
- * Parse tree node which declares a calculated member. Represented as the
+ * Parse tree node which declares a calculated set. Represented as the
  * <code>WITH SET</code> clause of an MDX <code>SELECT</code> statement.
  *
  * @version $Id$

@@ -26,7 +26,7 @@ public class SelectNode implements ParseTreeNode {
     private final ParseRegion region;
     private final List<ParseTreeNode> withList;
     private final List<AxisNode> axisList;
-    private final AxisNode slicerAxis;
+    private final AxisNode filterAxis;
     private final List<IdentifierNode> cellPropertyList;
     private ParseTreeNode from;
 
@@ -38,7 +38,7 @@ public class SelectNode implements ParseTreeNode {
      *   a <code>WITH</code> clause
      * @param axisList List of axes
      * @param from Name of cube
-     * @param slicerAxis Slicer axis
+     * @param filterAxis Filter axis
      * @param cellPropertyList List of properties
      */
     public SelectNode(
@@ -46,17 +46,23 @@ public class SelectNode implements ParseTreeNode {
         List<ParseTreeNode> withList,
         List<AxisNode> axisList,
         ParseTreeNode from,
-        AxisNode slicerAxis,
+        AxisNode filterAxis,
         List<IdentifierNode> cellPropertyList)
     {
         this.region = region;
         this.withList = withList;
         this.axisList = axisList;
         this.from = from;
-        this.slicerAxis = slicerAxis;
+        this.filterAxis = filterAxis;
         this.cellPropertyList = cellPropertyList;
     }
 
+    /**
+     * Creates an empty SelectNode.
+     *
+     * <p>The contents of the SelectNode, such as the axis list, can be
+     * populated after construction.
+     */
     public SelectNode() {
         this(
             null,
@@ -102,10 +108,10 @@ public class SelectNode implements ParseTreeNode {
         pw.println();
         pw.print("FROM ");
         from.unparse(writer);
-        if (slicerAxis != null) {
+        if (filterAxis != null) {
             pw.println();
             pw.print("WHERE ");
-            slicerAxis.unparse(writer);
+            filterAxis.unparse(writer);
         }
         if (!cellPropertyList.isEmpty()) {
             pw.println();
@@ -120,16 +126,48 @@ public class SelectNode implements ParseTreeNode {
         }
     }
 
+    /**
+     * Returns a list of calculated members and sets defined as the WITH
+     * clause of this SelectNode.
+     *
+     * <p>For example, the WITH clause of query
+     *
+     * <blockquote>
+     * <code>WITH MEMBER [Measures].[Foo] AS ' [Measures].[Unit Sales] * 2 '
+     *   SET [Customers].[Top] AS ' TopCount([Customers].Members, 10) '
+     * SELECT FROM [Sales]</code>
+     * </blockquote>
+     *
+     * contains one {@link org.olap4j.mdx.WithMemberNode} and one
+     * {@link org.olap4j.mdx.WithSetNode}.
+     *
+     * <p>The returned list is mutable.
+     *
+     * @return list of calculated members and sets
+     */
     public List<ParseTreeNode> getWithList() {
         return withList;
     }
 
+    /**
+     * Returns a list of axes in this SelectNode.
+     *
+     * <p>The returned list is mutable.
+     *
+     * @return list of axes
+     */
     public List<AxisNode> getAxisList() {
         return axisList;
     }
 
-    public AxisNode getSlicerAxis() {
-        return slicerAxis;
+    /**
+     * Returns the filter axis defined by the WHERE clause of this SelectNode,
+     * or null if there is no filter axis.
+     *
+     * @return filter axis
+     */
+    public AxisNode getFilterAxis() {
+        return filterAxis;
     }
 
     /**

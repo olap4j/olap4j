@@ -21,11 +21,31 @@ import org.olap4j.mdx.ParseRegion;
 public class MdxParseException extends RuntimeException {
     private final ParseRegion region;
 
+    /**
+     * Creates an MdxParseException with a region of the source code and a
+     * specified cause.
+     *
+     * @param region Region of source code which contains the error
+     *
+     * @param  cause the cause (which is saved for later retrieval by the
+     *         {@link #getCause()} method).  (A <tt>null</tt> value is
+     *         permitted, and indicates that the cause is nonexistent or
+     *         unknown.)
+     */
     public MdxParseException(ParseRegion region, Throwable cause) {
         super(cause);
         this.region = region;
     }
 
+    /**
+     * Creates an MdxParseException with a region of the source code and a
+     * specified detail message.
+     *
+     * @param region Region of source code which contains the error
+     *
+     * @param   message   the detail message. The detail message is saved for
+     *          later retrieval by the {@link #getMessage()} method.
+     */
     public MdxParseException(ParseRegion region, String message) {
         super(message);
         this.region = region;

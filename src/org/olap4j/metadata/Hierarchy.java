@@ -9,8 +9,6 @@
 */
 package org.olap4j.metadata;
 
-import org.olap4j.OlapException;
-
 /**
  * An organization of the set of {@link Member}s in a {@link Dimension} and
  * their positions relative to one another.

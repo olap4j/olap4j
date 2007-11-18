@@ -14,6 +14,8 @@ import org.olap4j.metadata.*;
 
 import java.util.*;
 
+import mondrian.olap.AxisOrdinal;
+
 /**
  * Implementation of {@link org.olap4j.CellSetAxis}
  * for the Mondrian OLAP engine.
@@ -22,7 +24,7 @@ import java.util.*;
  * @version $Id$
  * @since May 24, 2007
  */
-class MondrianOlap4jCellSetAxis implements CellSetAxis, CellSetAxisMetaData {
+class MondrianOlap4jCellSetAxis implements CellSetAxis {
     private final MondrianOlap4jCellSet olap4jCellSet;
     private final mondrian.olap.QueryAxis queryAxis;
     private final mondrian.olap.Axis axis;
@@ -40,8 +42,13 @@ class MondrianOlap4jCellSetAxis implements CellSetAxis, CellSetAxisMetaData {
         this.axis = axis;
     }
 
-    public int getOrdinal() {
-        return queryAxis.getAxisOrdinal().logicalOrdinal();
+    public Axis getAxisOrdinal() {
+        switch (queryAxis.getAxisOrdinal()) {
+        case SLICER:
+            return Axis.FILTER;
+        default:
+            return Axis.valueOf(queryAxis.getAxisOrdinal().name());
+        }
     }
 
     public CellSet getCellSet() {
@@ -49,7 +56,14 @@ class MondrianOlap4jCellSetAxis implements CellSetAxis, CellSetAxisMetaData {
     }
 
     public CellSetAxisMetaData getAxisMetaData() {
-        throw new UnsupportedOperationException();
+        final AxisOrdinal axisOrdinal = queryAxis.getAxisOrdinal();
+        switch (axisOrdinal) {
+        case SLICER:
+            return olap4jCellSet.getMetaData().getFilterAxisMetaData();
+        default:
+            return olap4jCellSet.getMetaData().getAxesMetaData().get(
+                axisOrdinal.logicalOrdinal());
+        }
     }
 
     public List<Position> getPositions() {
@@ -67,25 +81,11 @@ class MondrianOlap4jCellSetAxis implements CellSetAxis, CellSetAxisMetaData {
     }
 
     public int getPositionCount() {
-        throw new UnsupportedOperationException();
+        return getPositions().size();
     }
 
-    public ListIterator<Position> iterate() {
-        throw new UnsupportedOperationException();
-    }
-
-    // implement CellSetAxisMetaData
-
-    public org.olap4j.Axis getAxis() {
-        throw new UnsupportedOperationException();
-    }
-
-    public List<Hierarchy> getHierarchies() {
-        throw new UnsupportedOperationException();
-    }
-
-    public NamedList<Property> getProperties() {
-        throw new UnsupportedOperationException();
+    public ListIterator<Position> iterator() {
+        return getPositions().listIterator();
     }
 
     private class MondrianOlap4jPosition implements Position {

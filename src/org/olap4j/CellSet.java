@@ -88,7 +88,11 @@ public interface CellSet extends ResultSet, OlapWrapper {
      * Returns the Cell at a given set of coordinates.
      *
      * @param coordinates List of 0-based coordinates of the cell
+     *
      * @return Cell
+     *
+     * @throws IndexOutOfBoundsException if coordinates are outside CellSet
+     * bounds
      */
     Cell getCell(List<Integer> coordinates);
 
@@ -102,9 +106,33 @@ public interface CellSet extends ResultSet, OlapWrapper {
      * </code></blockquote>
      *
      * @param ordinal 0-based ordinal of the cell
+     *
      * @return Cell
+     *
+     * @throws IndexOutOfBoundsException if ordinal lies outside CellSet bounds
      */
     Cell getCell(int ordinal);
+
+    /**
+     * Returns the Cell at the intersection of a set of axis positions.
+     *
+     * <p>Equivalent to
+     *
+     * <blockquote><pre><code>
+     * getCell(
+     *     Arrays.asList(
+     *         positions[0].ordinal(),
+     *         positions[1].ordinal() [, ...]))
+     * </code></pre></blockquote>
+     *
+     * @param positions Array of positions
+     *
+     * @return Cell
+     *
+     * @throws IndexOutOfBoundsException if positions lie outside CellSet
+     * bounds
+     */
+    Cell getCell(Position... positions);
 
     /**
      * Converts a cell ordinal to a list of cell coordinates.

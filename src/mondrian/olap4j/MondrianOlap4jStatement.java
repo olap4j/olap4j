@@ -21,7 +21,6 @@ import java.io.StringWriter;
 import java.io.PrintWriter;
 
 import mondrian.olap.Query;
-import mondrian.olap.Result;
 
 /**
  * Implementation of {@link org.olap4j.OlapStatement}
@@ -34,7 +33,14 @@ import mondrian.olap.Result;
 class MondrianOlap4jStatement implements OlapStatement {
     final MondrianOlap4jConnection olap4jConnection;
     private boolean closed;
+
+    /**
+     * Current cell set, or null if the statement is not executing anything.
+     * Any method which modifies this member must synchronize
+     * on the MondrianOlap4jStatement.
+     */
     MondrianOlap4jCellSet openCellSet;
+    int timeoutSeconds;
 
     MondrianOlap4jStatement(
         MondrianOlap4jConnection olap4jConnection)
@@ -60,7 +66,7 @@ class MondrianOlap4jStatement implements OlapStatement {
         throw new UnsupportedOperationException();
     }
 
-    public void close() throws SQLException {
+    public synchronized void close() throws SQLException {
         if (!closed) {
             closed = true;
             if (openCellSet != null) {
@@ -92,15 +98,21 @@ class MondrianOlap4jStatement implements OlapStatement {
     }
 
     public int getQueryTimeout() throws SQLException {
-        throw new UnsupportedOperationException();
+        return timeoutSeconds;
     }
 
     public void setQueryTimeout(int seconds) throws SQLException {
-        throw new UnsupportedOperationException();
+        if (seconds < 0) {
+            throw olap4jConnection.helper.createException(
+                "illegal timeout value " + seconds);
+        }
+        this.timeoutSeconds = seconds;
     }
 
-    public void cancel() throws SQLException {
-        throw new UnsupportedOperationException();
+    public synchronized void cancel() throws SQLException {
+        if (openCellSet != null) {
+            openCellSet.query.cancel();
+        }
     }
 
     public SQLWarning getWarnings() throws SQLException {
@@ -253,20 +265,27 @@ class MondrianOlap4jStatement implements OlapStatement {
      * @return Cell set
      * @throws OlapException if a database error occurs
      */
-    protected CellSet executeOlapQueryInternal(Query query) throws OlapException {
+    protected CellSet executeOlapQueryInternal(
+        Query query) throws OlapException
+    {
         // Close the previous open CellSet, if there is one.
-        if (openCellSet != null) {
-            final MondrianOlap4jCellSet cs = openCellSet;
-            openCellSet = null;
-            try {
-                cs.close();
-            } catch (SQLException e) {
-                throw olap4jConnection.helper.createException(
-                    null, "Error while closing previous CellSet", e);
+        synchronized (this) {
+            if (openCellSet != null) {
+                final MondrianOlap4jCellSet cs = openCellSet;
+                openCellSet = null;
+                try {
+                    cs.close();
+                } catch (SQLException e) {
+                    throw olap4jConnection.helper.createException(
+                        null, "Error while closing previous CellSet", e);
+                }
             }
+
+            openCellSet = olap4jConnection.factory.newCellSet(this, query);
         }
-        Result result = olap4jConnection.connection.execute(query);
-        openCellSet = olap4jConnection.factory.newCellSet(this, result);
+        // Release the monitor before executing, to give another thread the
+        // opportunity to call cancel.
+        openCellSet.execute();
         return openCellSet;
     }
 

@@ -57,7 +57,15 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         return metaData;
     }
 
+    public Cell getCell(List<Integer> coordinates) {
+        throw Util.needToImplement(this);
+    }
+
     public Cell getCell(int ordinal) {
+        throw Util.needToImplement(this);
+    }
+
+    public Cell getCell(Position... positions) {
         throw Util.needToImplement(this);
     }
 
@@ -66,10 +74,6 @@ abstract class XmlaOlap4jCellSet implements CellSet {
     }
 
     public CellSetAxis getFilterAxis() {
-        throw Util.needToImplement(this);
-    }
-
-    public Cell getCell(List<Integer> coordinates) {
         throw Util.needToImplement(this);
     }
 

@@ -10,7 +10,7 @@
 package org.olap4j.type;
 
 /**
- * The type of a boolean expression.
+ * The type of a boolean (logical) expression.
  *
  * <p>An example of a boolean expression is the predicate
  *
@@ -23,6 +23,12 @@ package org.olap4j.type;
  * @version $Id$
  */
 public class BooleanType extends ScalarType {
+    /**
+     * Creates a boolean type.
+     */
+    public BooleanType() {
+    }
+
     public String toString() {
         return "BOOLEAN";
     }

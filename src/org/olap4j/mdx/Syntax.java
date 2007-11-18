@@ -297,6 +297,13 @@ public enum Syntax {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Returns whether a collection of parse tree nodes need to be enclosed
+     * in parentheses.
+     *
+     * @param args Parse tree nodes
+     * @return Whether nodes need to be enclosed in parentheses
+     */
     private static boolean needParen(List<ParseTreeNode> args) {
         return !(args.size() == 1 &&
             args.get(0) instanceof CallNode &&

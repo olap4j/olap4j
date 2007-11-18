@@ -229,6 +229,25 @@ public class ConnectionTest extends TestCase {
             assertTrue(e.getMessage().contains("does not implement"));
         }
 
+        // Unwrap and get locale
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+        final Locale locale = olapConnection.getLocale();
+        assertEquals(locale, Locale.getDefault());
+
+        // Set locale to something else.
+        olapConnection.setLocale(Locale.CANADA_FRENCH);
+        assertEquals(olapConnection.getLocale(), Locale.CANADA_FRENCH);
+
+        // Try to set locale to null, should get error.
+        try {
+            olapConnection.setLocale(null);
+            fail("expected exception");
+        } catch (IllegalArgumentException e) {
+            // Set if back
+            olapConnection.setLocale(Locale.getDefault());
+        }
+
         // Unwrap the mondrian connection.
         if (helper.isMondrian()) {
             final mondrian.olap.Connection mondrianConnection =
@@ -285,8 +304,6 @@ public class ConnectionTest extends TestCase {
         // Close the connection.
         connection.close();
     }
-
-    // todo: test statement with no slicer
 
     private enum Method { ClassName, Mode, Type, TypeName, OlapType }
 
@@ -470,16 +487,16 @@ public class ConnectionTest extends TestCase {
         PreparedOlapStatement pstmt =
             olapConnection.prepareOlapStatement(mdx);
         final CellSetMetaData cellSetMetaData = pstmt.getMetaData();
-        checkCellSetMetaData(cellSetMetaData);
+        checkCellSetMetaData(cellSetMetaData, 1, null);
 
         // Metadata of its cellset
         final CellSet cellSet = pstmt.executeQuery();
-        checkCellSetMetaData(cellSet.getMetaData());
+        checkCellSetMetaData(cellSet.getMetaData(), 1, cellSet);
 
         // Metadata of regular statement executing string.
         final OlapStatement stmt = olapConnection.createStatement();
         final CellSet cellSet1 = stmt.executeOlapQuery(mdx);
-        checkCellSetMetaData(cellSet1.getMetaData());
+        checkCellSetMetaData(cellSet1.getMetaData(), 1, cellSet1);
 
         // Metadata of regular statement executing parse tree.
         MdxParser mdxParser =
@@ -487,13 +504,91 @@ public class ConnectionTest extends TestCase {
         SelectNode select = mdxParser.parseSelect(mdx);
         final OlapStatement stmt2 = olapConnection.createStatement();
         CellSet cellSet2 = stmt2.executeOlapQuery(select);
-        checkCellSetMetaData(cellSet2.getMetaData());
+        checkCellSetMetaData(cellSet2.getMetaData(), 1, cellSet2);
     }
 
-    private void checkCellSetMetaData(CellSetMetaData cellSetMetaData) {
+    private void checkCellSetMetaData(
+        CellSetMetaData cellSetMetaData,
+        int axesCount, CellSet cellSet)
+    {
         assertNotNull(cellSetMetaData);
-        assertEquals(1, cellSetMetaData.getAxesMetaData().size());
+        assertEquals(axesCount, cellSetMetaData.getAxesMetaData().size());
         assertEquals("Sales", cellSetMetaData.getCube().getName());
+
+        int k = -1;
+        for (CellSetAxisMetaData axisMetaData : cellSetMetaData.getAxesMetaData()) {
+            ++k;
+            assertEquals(Axis.forOrdinal(k), axisMetaData.getAxisOrdinal());
+            assertEquals(k, axisMetaData.getAxisOrdinal().axisOrdinal());
+            assertTrue(axisMetaData.getHierarchies().size() > 0);
+            assertTrue(axisMetaData.getProperties().size() == 0);
+            if (cellSet != null) {
+                final CellSetAxisMetaData cellSetAxisMetaData = cellSet.getAxes().get(k).getAxisMetaData();
+                assertEquals(
+                    cellSetAxisMetaData, axisMetaData);
+            }
+        }
+
+        CellSetAxisMetaData axisMetaData = cellSetMetaData.getFilterAxisMetaData();
+        assertNotNull(axisMetaData);
+        assertEquals(Axis.FILTER, axisMetaData.getAxisOrdinal());
+        assertTrue(axisMetaData.getHierarchies().size() > 0);
+        assertTrue(axisMetaData.getProperties().size() == 0);
+        if (cellSet != null) {
+            assertEquals(
+                cellSet.getFilterAxis().getAxisMetaData(), axisMetaData);
+        }
+    }
+
+    /**
+     * Tests the {@link CellSetAxisMetaData} class, based on an example
+     * in the javadoc of same class.
+     *
+     * @throws Exception on error
+     */
+    public void testCellSetAxisMetaData() throws Exception {
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+        final String mdx = "SELECT\n"
+            + "   {[Measures].Members} ON COLUMNS,\n"
+            + "   CrossJoin([Store].Members, [Gender].Children)\n"
+            + "   DIMENSION PROPERTIES\n"
+            + "      MEMBER_ORDINAL,\n"
+            + "      MEMBER_UNIQUE_NAME,\n"
+            + "      DISPLAY_INFO ON ROWS\n"
+            + " FROM [Sales]";
+
+        // first via prepared statement
+        final PreparedOlapStatement preparedStmt =
+            olapConnection.prepareOlapStatement(mdx);
+        final CellSetMetaData cellSetMetaData = preparedStmt.getMetaData();
+        checkAxisMetaData(cellSetMetaData.getAxesMetaData().get(1));
+
+        // second via directly executed statement
+        OlapStatement olapStatement = olapConnection.createStatement();
+        final CellSet cellSet =
+            olapStatement.executeOlapQuery(mdx);
+        checkAxisMetaData(cellSet.getAxes().get(1).getAxisMetaData());
+
+        // third via metadata of direct statement
+        checkAxisMetaData(cellSet.getMetaData().getAxesMetaData().get(1));
+    }
+
+    private void checkAxisMetaData(CellSetAxisMetaData cellSetAxisMetaData) {
+        final List<Hierarchy> hierarchies =
+            cellSetAxisMetaData.getHierarchies();
+        assertEquals(2, hierarchies.size());
+        assertEquals("Store", hierarchies.get(0).getName());
+        assertEquals("Gender", hierarchies.get(1).getName());
+        final NamedList<Property> properties =
+            cellSetAxisMetaData.getProperties();
+        assertEquals(3, properties.size());
+        assertEquals("MEMBER_ORDINAL", properties.get(0).getName());
+        assertEquals("MEMBER_UNIQUE_NAME", properties.get(1).getName());
+        assertEquals("DISPLAY_INFO", properties.get(2).getName());
+        assertNotNull(properties.get("DISPLAY_INFO"));
+        assertNull(properties.get("FOO_BAR"));
     }
 
     public void testCellSet() throws SQLException {
@@ -529,29 +624,118 @@ public class ConnectionTest extends TestCase {
             s);
     }
 
-    public void testCell() {
-        // todo: test Cell methods
+    public void testCell() throws Exception {
+        Connection connection = helper.createConnection();
+        Statement statement = connection.createStatement();
+        final OlapStatement olapStatement =
+            ((OlapWrapper) statement).unwrap(OlapStatement.class);
+        CellSet cellSet =
+            olapStatement.executeOlapQuery(
+                "SELECT\n" +
+                    " {[Measures].[Unit Sales],\n" +
+                    "    [Measures].[Store Sales]} ON COLUMNS\n," +
+                    " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n" +
+                    "FROM [Sales]\n" +
+                    "WHERE [Time].[1997].[Q2]");
 
-        /*
-             public CellSet getCellSet() {
-    public int getOrdinal() {
-    public List<Integer> getCoordinateList() {
-    public Object getPropertyValue(Property property) {
-    public boolean isEmpty() {
-    public boolean isError() {
-    public boolean isNull() {
-    public double getDoubleValue() throws OlapException {
-    public String getErrorText() {
-    public Object getValue() {
-    public String getFormattedValue() {
-    public ResultSet drillThrough() {
-*/
-        // in particular, create a result set with null, empty and error cells,
-        // and make sure they look different
+        // cell column#1, row#2
+        // cellOrdinal = colOrdinal + rowOrdinal * columnCount
+        //     = 1 + 2 * 2
+        //     = 5
+
+        // access method 1
+        Cell cell = cellSet.getCell(5);
+        assertEquals(5, cell.getOrdinal());
+        assertEquals(12935.16, cell.getValue());
+        assertEquals(12935.16, cell.getDoubleValue());
+        assertEquals("12,935.16", cell.getFormattedValue());
+        assertEquals(cellSet, cell.getCellSet());
+
+        // access method 2
+        cell = cellSet.getCell(Arrays.asList(1, 2));
+        assertEquals(5, cell.getOrdinal());
+
+        // access method 3
+        cell = cellSet.getCell(
+            cellSet.getAxes().get(0).getPositions().get(1),
+            cellSet.getAxes().get(1).getPositions().get(2));
+        assertEquals(5, cell.getOrdinal());
+
+        assertEquals(Arrays.asList(1, 2), cell.getCoordinateList());
+        assertEquals("#,###.00",
+            cell.getPropertyValue(Property.StandardCellProperty.FORMAT_STRING));
+        assertFalse(cell.isEmpty());
+        assertFalse(cell.isError());
+        assertFalse(cell.isNull());
+        assertNull(cell.getErrorText());
+
+        final ResultSet resultSet = cell.drillThrough();
+        assertEquals(5, resultSet.getMetaData().getColumnCount());
+        resultSet.close();
+
+        // cell out of range
+        try {
+            cellSet.getCell(-5);
+            fail("expected exception");
+        } catch (IndexOutOfBoundsException e) {
+            // ok
+        }
+        try {
+            cellSet.getCell(105);
+            fail("expected exception");
+        } catch (IndexOutOfBoundsException e) {
+            // ok
+        }
+        try {
+            cellSet.getCell(Arrays.asList(2, 1));
+            fail("expected exception");
+        } catch (IndexOutOfBoundsException e) {
+            // ok
+        }
+
+        // We provide positions from the wrong axes, but the provider doesn't
+        // notice that they're wrong. That's OK.
+        cell =
+            cellSet.getCell(
+                cellSet.getAxes().get(1).getPositions().get(1),
+                cellSet.getAxes().get(0).getPositions().get(1));
+        assertEquals(3, cell.getOrdinal());
+
+        // Null cell
+        cellSet =
+            olapStatement.executeOlapQuery(
+                "with member [Measures].[X] as 'IIF([Measures].[Store Sales]>10000,[Measures].[Store Sales],Null)'\n" +
+                    "select\n" +
+                    "{[Measures].[X]} on columns,\n" +
+                    "{[Product].[Product Department].members} on rows\n" +
+                    "from Sales");
+        cell = cellSet.getCell(0);
+        assertFalse(cell.isNull());
+        cell = cellSet.getCell(2);
+        assertTrue(cell.isNull());
+
+        // Empty cell
+        cellSet =
+            olapStatement.executeOlapQuery(
+                "select from [Sales]\n"
+                    + "where ([Time].[1997].[Q4].[12],\n"
+                    + "  [Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Portsmouth].[Portsmouth Imported Beer],\n"
+                    + "  [Store].[All Stores].[USA].[WA].[Bellingham])");
+        cell = cellSet.getCell(0);
+        assertTrue(cell.isEmpty());
+
+        // Error cell
+        cellSet =
+            olapStatement.executeOlapQuery(
+                "with member [Measures].[Foo] as ' Dimensions(-1).Name '\n"
+                    + "select {[Measures].[Foo]} on columns from [Sales]");
+        cell = cellSet.getCell(0);
+        assertTrue(cell.isError());
+        assertEquals("Index '-1' out of bounds", cell.getErrorText());
 
         // todo: test CellSetAxis methods
         /*
-    public int getOrdinal() {
+    public int getAxisOrdinal() {
     public CellSet getCellSet() {
     public CellSetAxisMetaData getAxisMetaData() {
     public List<Position> getPositions() {
@@ -560,15 +744,10 @@ public class ConnectionTest extends TestCase {
 
     todo: test OlapResultAxisMetaData methods
 
-    public org.olap4j.Axis getAxis() {
+    public org.olap4j.Axis getAxisOrdinal() {
     public List<Hierarchy> getHierarchies() {
     public List<Property> getProperties() {
          */
-    }
-
-    public void testProperty() {
-        // todo: submit a query with cell and dimension properties, and make
-        // sure the properties appear in the result set
     }
 
     /**
@@ -579,8 +758,8 @@ public class ConnectionTest extends TestCase {
      *  {@link CellSetAxis#getPositions()}.
      *
      * <p>In another mode, you can iterate over the positions, calling
-     * {@link CellSetAxis#iterate()}. Note that this method returns a
-     * {@link java.util.ListIterator}, which has
+     * {@link org.olap4j.CellSetAxis#iterator()}. Note that this method returns
+     * a {@link java.util.ListIterator}, which has
      * {@link java.util.ListIterator#nextIndex()}. We could maybe extend this
      * interface further, to allow to jump forwards/backwards by N.
      *
@@ -695,7 +874,7 @@ public class ConnectionTest extends TestCase {
                 null,
                 false,
                 null,
-                Axis.SLICER,
+                Axis.FILTER,
                 new ArrayList<IdentifierNode>()),
             new ArrayList<IdentifierNode>());
         select.getWithList().add(
@@ -708,14 +887,12 @@ public class ConnectionTest extends TestCase {
                     new IdentifierNode.Segment("Measures"),
                     new IdentifierNode.Segment("Bar")),
                 Arrays.asList(
-                    new PropertyValueNode [] {
-                        new PropertyValueNode(
+                    new PropertyValueNode(
+                        null,
+                        "FORMAT_STRING",
+                        LiteralNode.createString(
                             null,
-                            "FORMAT_STRING",
-                            LiteralNode.createString(
-                                null,
-                                "xxx"))
-                    })));
+                            "xxx")))));
         select.getAxisList().add(
             new AxisNode(
                 null,
@@ -725,10 +902,9 @@ public class ConnectionTest extends TestCase {
                     "{}",
                     Syntax.Braces,
                     Arrays.asList(
-                    new ParseTreeNode [] {
-                        new IdentifierNode(
-                            new IdentifierNode.Segment("Gender"))
-                    })),
+                        (ParseTreeNode)
+                            new IdentifierNode(
+                                new IdentifierNode.Segment("Gender")))),
                 Axis.COLUMNS,
                 new ArrayList<IdentifierNode>()));
         select.getAxisList().add(
@@ -748,7 +924,7 @@ public class ConnectionTest extends TestCase {
                         )),
                 Axis.ROWS,
                 new ArrayList<IdentifierNode>()));
-        select.getSlicerAxis().setExpression(
+        select.getFilterAxis().setExpression(
             new IdentifierNode(
                 new IdentifierNode.Segment("Time"),
                 new IdentifierNode.Segment("1997"),
@@ -1036,7 +1212,7 @@ public class ConnectionTest extends TestCase {
     /**
      * Tests the type-derivation for query axes 
      * ({@link org.olap4j.mdx.SelectNode#getAxisList()} and
-     * {@link org.olap4j.mdx.SelectNode#getSlicerAxis()}), and the
+     * {@link org.olap4j.mdx.SelectNode#getFilterAxis()}), and the
      * {@link org.olap4j.type.SetType},
      * {@link org.olap4j.type.TupleType},
      * {@link org.olap4j.type.MemberType} type subclasses.
@@ -1118,15 +1294,52 @@ public class ConnectionTest extends TestCase {
         assertTrue(memberType.usesDimension(customersDimension, false));
         assertTrue(memberType.usesDimension(customersDimension, true));
         
-        // Slicer
+        // Filter
 
-        final AxisNode slicerAxis = select.getSlicerAxis();
-        assertNull(slicerAxis.getType());
-        final Type slicerType = slicerAxis.getExpression().getType();
-        assertTrue(slicerType instanceof TupleType);
+        final AxisNode filterAxis = select.getFilterAxis();
+        assertNull(filterAxis.getType());
+        final Type filterType = filterAxis.getExpression().getType();
+        assertTrue(filterType instanceof TupleType);
         assertEquals(
             "TupleType<MemberType<member=[Time].[1997].[Q4]>, MemberType<member=[Marital Status].[All Marital Status].[S]>>",
-            slicerType.toString());
+            filterType.toString());
+    }
+
+    public void testParseQueryWithNoFilter() throws Exception {
+        Class.forName(helper.getDriverClassName());
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+
+        final MdxParserFactory parserFactory =
+            olapConnection.getParserFactory();
+        MdxParser mdxParser =
+            parserFactory.createMdxParser(olapConnection);
+        MdxValidator mdxValidator =
+            parserFactory.createMdxValidator(olapConnection);
+
+        SelectNode select =
+            mdxParser.parseSelect(
+                "select ([Gender], [Store]) on columns\n,"
+                    + "{[Customers].[City].Members} on rows\n"
+                    + "from [sales]");
+        select = mdxValidator.validateSelect(select);
+        AxisNode filterAxis = select.getFilterAxis();
+        assertNull(filterAxis);
+
+        try {
+            select =
+                mdxParser.parseSelect(
+                    "select ([Gender], [Store]) on columns\n,"
+                        + "{[Customers].[City].Members} on rows\n"
+                        + "from [sales]\n"
+                        + "where ()");
+            fail("expected parse error, got " + select);
+        } catch (RuntimeException e) {
+            assertTrue(
+                getStackTrace(e).indexOf(
+                    "Syntax error at [4:10], token ')'") >= 0);
+        }
     }
 
     // TODO: test for HierarchyType
@@ -1153,6 +1366,66 @@ public class ConnectionTest extends TestCase {
             buf.append(member.getUniqueName()).append(TestContext.NL);
         }
         return buf.toString();
+    }
+
+    public void testStatementCancel() throws Throwable {
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+        final OlapStatement olapStatement = olapConnection.createStatement();
+        final Throwable[] exceptions = {null};
+        new Thread(
+            new Runnable() {
+                public void run() {
+                    try {
+                        Thread.sleep(1000);
+                        olapStatement.cancel();
+                    } catch (Throwable e) {
+                        exceptions[0] = e;
+                    }
+                }
+            }
+        ).start();
+        final CellSet cellSet;
+        try {
+            cellSet = olapStatement.executeOlapQuery(
+                "SELECT [Store].Members * \n"
+                    + " [Customers].Members * \n"
+                    + " [Time].Members on columns\n"
+                    + "from [Sales]");
+            fail("expected exception indicating stmt had been canceled, got cellSet " + cellSet);
+        } catch (RuntimeException e) {
+            assertTrue(e.getMessage().indexOf("Query canceled") >= 0);
+        }
+        if (exceptions[0] != null) {
+            throw exceptions[0];
+        }
+    }
+
+    public void testStatementTimeout() throws Throwable {
+        Connection connection = helper.createConnection();
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+        final OlapStatement olapStatement = olapConnection.createStatement();
+
+        try {
+            olapStatement.setQueryTimeout(-1);
+            fail("expected exception");
+        } catch (SQLException e) {
+            assertTrue(e.getMessage().indexOf("illegal timeout value ") >= 0);
+        }
+        olapStatement.setQueryTimeout(1);
+        try {
+            final CellSet cellSet =
+                olapStatement.executeOlapQuery(
+                    "SELECT [Store].Members * \n"
+                        + " [Customers].Members * \n"
+                        + " [Time].Members on columns\n"
+                        + "from [Sales]");
+            fail("expected exception indicating timeout, got cellSet " + cellSet);
+        } catch (RuntimeException e) {
+            assertTrue(e.getMessage().indexOf("Query timeout of ") >= 0);
+        }
     }
 
     /**

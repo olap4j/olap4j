@@ -410,7 +410,8 @@ public class ParserTest extends TestCase {
         CallNode fun = (CallNode)colsSetExpr;
         IdentifierNode identifier = (IdentifierNode) (fun.getArgList().get(0));
         assertEquals(1, identifier.getSegmentList().size());
-        assertEquals("Correct member on axis", "axis0mbr", identifier.getSegmentList().get(0).name);
+        assertEquals("Correct member on axis", "axis0mbr",
+            identifier.getSegmentList().get(0).getName());
 
         ParseTreeNode rowsSetExpr = axes.get(1).getExpression();
         assertNotNull("Row tuples", rowsSetExpr);
@@ -418,7 +419,8 @@ public class ParserTest extends TestCase {
         fun = (CallNode) rowsSetExpr;
         identifier = (IdentifierNode) (fun.getArgList().get(0));
         assertEquals(1, identifier.getSegmentList().size());
-        assertEquals("Correct member on axis", "axis1mbr", identifier.getSegmentList().get(0).name);
+        assertEquals("Correct member on axis", "axis1mbr",
+            identifier.getSegmentList().get(0).getName());
     }
 
     public void testCaseTest() {

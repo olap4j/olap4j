@@ -31,7 +31,7 @@ public class Query {
     protected Map<Axis, QueryAxis> axes = new HashMap<Axis, QueryAxis>();
     protected QueryAxis across;
     protected QueryAxis down;
-    protected QueryAxis slicer;
+    protected QueryAxis filter;
     protected QueryAxis unused;
     protected final Cube cube;
     protected Map<String, QueryDimension> dimensionMap =
@@ -56,11 +56,11 @@ public class Query {
         }
         across = new QueryAxis(this, Axis.COLUMNS);
         down = new QueryAxis(this, Axis.ROWS);
-        slicer = new QueryAxis(this, Axis.SLICER);
+        filter = new QueryAxis(this, Axis.FILTER);
         axes.put(null, unused);
         axes.put(Axis.COLUMNS, across);
         axes.put(Axis.ROWS, down);
-        axes.put(Axis.SLICER, slicer);
+        axes.put(Axis.FILTER, filter);
     }
 
     /**
@@ -82,7 +82,7 @@ public class Query {
      * Swaps rows and columns axes. Only applicable if there are two axes.
      */
     public void swapAxes() {
-        // Only applicable if there are two axes - plus slicer and unused.
+        // Only applicable if there are two axes - plus filter and unused.
         if (axes.size() != 4) {
             throw new IllegalArgumentException();
         }

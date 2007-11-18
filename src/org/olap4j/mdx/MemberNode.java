@@ -25,6 +25,12 @@ public class MemberNode implements ParseTreeNode {
     private final ParseRegion region;
     private final Member member;
 
+    /**
+     * Creates a MemberNode.
+     *
+     * @param region Region of source code
+     * @param member Member which is used in the expression
+     */
     public MemberNode(
         ParseRegion region,
         Member member)

@@ -48,6 +48,8 @@ public class DecimalType extends NumericType {
     /**
      * Returns the maximum number of decimal digits which a value of
      * this type can have.
+     *
+     * @return maximum precision allowed for values of this type
      */
     public int getPrecision() {
         return precision;
@@ -55,6 +57,8 @@ public class DecimalType extends NumericType {
 
     /**
      * Returns the number of digits to the right of the decimal point.
+     *
+     * @return number of digits to the right of the decimal point
      */
     public int getScale() {
         return scale;

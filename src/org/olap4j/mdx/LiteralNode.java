@@ -36,7 +36,7 @@ public class LiteralNode implements ParseTreeNode {
      *
      * <p>Use the creation methods {@link #createString} etc.
      *
-     * @param region Region
+     * @param region Region of source code
      * @param type Type of this literal; must not be null
      * @param value Value of this literal, must be null only if this is the
      *   null literal
@@ -56,7 +56,7 @@ public class LiteralNode implements ParseTreeNode {
     /**
      * Creates a literal with the NULL value.
      *
-     * @param region Region
+     * @param region Region of source code
      * @return literal representing the NULL value
      */
     public static LiteralNode createNull(ParseRegion region) {
@@ -66,17 +66,30 @@ public class LiteralNode implements ParseTreeNode {
     /**
      * Creates a string literal.
      *
+     * @param region Region of source code
+     * @param value String value
+     *
+     * @return literal representing the string value
+     *
      * @see #createSymbol
      */
     public static LiteralNode createString(
         ParseRegion region,
         String value)
     {
+        if (value == null) {
+            throw new IllegalArgumentException("value must not be null");
+        }
         return new LiteralNode(region, new StringType(), value);
     }
 
     /**
      * Creates a symbol literal.
+     *
+     * @param region Region of source code
+     * @param value Name of symbol
+     *
+     * @return literal representing the symbol value
      *
      * @see #createString
      */
@@ -84,32 +97,45 @@ public class LiteralNode implements ParseTreeNode {
         ParseRegion region,
         String value)
     {
+        if (value == null) {
+            throw new IllegalArgumentException("value must not be null");
+        }
         return new LiteralNode(region, new SymbolType(), value);
     }
 
     /**
      * Creates a floating-point numeric literal.
      *
+     * @param region Region of source code
      * @param value Value of literal; must not be null
+     *
+     * @return literal representing the floating-point value
      */
     public static LiteralNode create(
         ParseRegion region,
         Double value)
     {
-        assert value != null;
+        if (value == null) {
+            throw new IllegalArgumentException("value must not be null");
+        }
         return new LiteralNode(region, new NumericType(), value);
     }
 
     /**
      * Creates an integer literal.
      *
+     * @param region Region of source code
      * @param value Value of literal; must not be null
+     *
+     * @return literal representing the integer value
      */
     public static LiteralNode create(
         ParseRegion region,
         Integer value)
     {
-        assert value != null;
+        if (value == null) {
+            throw new IllegalArgumentException("value must not be null");
+        }
         return new LiteralNode(region, new NumericType(), value);
     }
 

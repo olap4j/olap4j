@@ -42,14 +42,6 @@ public class DimensionType implements Type {
         this.digest = buf.toString();
     }
 
-    public static DimensionType forDimension(Dimension dimension) {
-        return new DimensionType(dimension);
-    }
-
-    public static DimensionType forType(Type type) {
-        return new DimensionType(type.getDimension());
-    }
-
     public boolean usesDimension(Dimension dimension, boolean maybe) {
         if (this.dimension == null) {
             return maybe;

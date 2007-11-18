@@ -14,9 +14,10 @@ import org.olap4j.CellSet;
 import org.olap4j.OlapException;
 import org.olap4j.metadata.Property;
 
+import javax.sql.DataSource;
 import java.util.List;
 import java.util.ArrayList;
-import java.sql.ResultSet;
+import java.sql.*;
 
 /**
  * Implementation of {@link Cell}
@@ -55,8 +56,8 @@ class MondrianOlap4jCell implements Cell {
 
     public List<Integer> getCoordinateList() {
         ArrayList<Integer> list = new ArrayList<Integer>(coordinates.length);
-        for (int i = 0; i < coordinates.length; i++) {
-            list.add(coordinates[i]);
+        for (int coordinate : coordinates) {
+            list.add(coordinate);
         }
         return list;
     }
@@ -107,8 +108,26 @@ class MondrianOlap4jCell implements Cell {
         return cell.getFormattedValue();
     }
 
-    public ResultSet drillThrough() {
-        throw new UnsupportedOperationException();
+    public ResultSet drillThrough() throws OlapException {
+        // REVIEW: This method returns a ResultSet without closing the
+        // Statement or the Connection. If we closed them, the ResultSet would
+        // be useless. But as it stands, we have a connection leak. Should we
+        // tell the client that they need to close the result set's connection?
+        if (!cell.canDrillThrough()) {
+            return null;
+        }
+        final String sql = cell.getDrillThroughSQL(false);
+        final MondrianOlap4jConnection olap4jConnection =
+            this.olap4jCellSet.olap4jStatement.olap4jConnection;
+        final DataSource dataSource =
+            olap4jConnection.connection.getDataSource();
+        try {
+            final Connection connection = dataSource.getConnection();
+            final Statement statement = connection.createStatement();
+            return statement.executeQuery(sql);
+        } catch (SQLException e) {
+            throw olap4jConnection.helper.toOlapException(e);
+        }
     }
 }
 

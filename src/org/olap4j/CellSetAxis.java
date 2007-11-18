@@ -25,23 +25,24 @@ import java.util.ListIterator;
  *
  * <p>The positions on the cell set axis can be accessed sequentially or
  * random-access. Use the {@link #getPositions()} method to return a list for
- * random access, or the {@link #iterate()} method to obtain an iterator for
+ * random access, or the {@link #iterator()} method to obtain an iterator for
  * sequential access.
  *
  * @author jhyde
  * @version $Id$
  * @since Aug 22, 2006
  */
-public interface CellSetAxis {
+public interface CellSetAxis extends Iterable<Position> {
     /**
-     * Returns the ordinal of this <code>CellSetAxis</code>.
+     * Returns the axis ordinal of this <code>CellSetAxis</code>.
      *
-     * <p>0 = ROWS, 1 = COLUMNS, and so forth, as described by the
+     * <p>The first axis in a CellSet will return {@link Axis#COLUMNS},
+     * the second {@link Axis#ROWS}, and so forth, as described by the
      * {@link Axis#axisOrdinal()} method of the {@link Axis} enumeration.</p>
      *
      * @return the ordinal of this axis
      */
-    int getOrdinal();
+    Axis getAxisOrdinal();
 
     /**
      * Returns the {@link CellSet} which this <code>CellSetAxis</code>
@@ -57,10 +58,13 @@ public interface CellSetAxis {
      *
      * <p>The result is identical to evaluating
      * <blockquote>
-     * <code>
-     * getCellSet().getMetaData().getAxesMetaData(getOrdinal())
-     * </code>
+     * <code>getCellSet().getMetaData().getSlicerAxisMetaData()</code>
      * </blockquote>
+     * for a filter axis, and
+     * <blockquote>
+     * <code>getCellSet().getMetaData().getAxesMetaData().get(getAxisOrdinal().axisOrdinal())</code>
+     * </blockquote>
+     * for other axes.
      *
      * @return metadata describing this CellSetAxis
      */
@@ -90,9 +94,25 @@ public interface CellSetAxis {
     /**
      * Opens an iterator over the positions on this CellSetAxis.
      *
+     * <p>If this axis has very many positions, this method may be more
+     * efficient than {@link #getPositions()}.
+     *
+     * <p>This method allows CellSetAxis to implement the {@link Iterable}
+     * interface, so one might use it in a foreach construct, for example:
+     *
+     * <blockquote>
+     * <pre>
+     * CellSet cellSet;
+     * for (Position rowPos : cellSet.getAxes().get(0)) {
+     *     for (Position colPos : cellSet.getAxes().get(1)) {
+     *          Cell cell = cellSet.getCell(colPos, rowPos);
+     *          ....
+     *     }
+     * }</code></blockquote>
+     *
      * @return iterator over the collection of positions
      */
-    ListIterator<Position> iterate();
+    ListIterator<Position> iterator();
 
 }
 

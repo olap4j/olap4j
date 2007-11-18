@@ -14,7 +14,7 @@ import org.olap4j.type.Type;
 import org.olap4j.type.LevelType;
 
 /**
- * Usage of a {@link org.olap4j.metadata.Member} as an expression in an MDX
+ * Usage of a {@link org.olap4j.metadata.Level} as an expression in an MDX
  * parse tree.
  *
  * @author jhyde
@@ -25,6 +25,12 @@ public class LevelNode implements ParseTreeNode {
     private final ParseRegion region;
     private final Level level;
 
+    /**
+     * Creates a LevelNode.
+     *
+     * @param region Region of source code
+     * @param level Level which is used in the expression
+     */
     public LevelNode(
         ParseRegion region,
         Level level)

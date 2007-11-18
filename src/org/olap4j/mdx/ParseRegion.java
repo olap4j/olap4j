@@ -165,6 +165,9 @@ public class ParseRegion {
      * Combines this region with a list of parse tree nodes to create a
      * region which spans from the first point in the first to the last point
      * in the other.
+     *
+     * @param regions Collection of source code regions
+     * @return region which represents the span of the given regions
      */
     public ParseRegion plusAll(Iterable<ParseRegion> regions)
     {
@@ -179,6 +182,9 @@ public class ParseRegion {
     /**
      * Combines the parser positions of a list of nodes to create a position
      * which spans from the beginning of the first to the end of the last.
+     *
+     * @param nodes Collection of parse tree nodes
+     * @return region which represents the span of the given nodes
      */
     public static ParseRegion sum(
         Iterable<ParseRegion> nodes)
@@ -221,7 +227,7 @@ public class ParseRegion {
     }
 
     /**
-     * Looks for one or two carets in a SQL string, and if present, converts
+     * Looks for one or two carets in an MDX string, and if present, converts
      * them into a parser position.
      *
      * <p>Examples:
@@ -232,37 +238,40 @@ public class ParseRegion {
      * <li>findPos("xxx^yy^y") yields {"xxxyyy", position 3, line 4 column 4
      * through line 1 column 6}
      * </ul>
+     *
+     * @param code Source code
+     * @return object containing source code annotated with region
      */
-    public static RegionAndSource findPos(String sql)
+    public static RegionAndSource findPos(String code)
     {
-        int firstCaret = sql.indexOf('^');
+        int firstCaret = code.indexOf('^');
         if (firstCaret < 0) {
-            return new RegionAndSource(sql, null);
+            return new RegionAndSource(code, null);
         }
-        int secondCaret = sql.indexOf('^', firstCaret + 1);
+        int secondCaret = code.indexOf('^', firstCaret + 1);
         if (secondCaret < 0) {
-            String sqlSansCaret =
-                sql.substring(0, firstCaret)
-                + sql.substring(firstCaret + 1);
-            int [] start = indexToLineCol(sql, firstCaret);
+            String codeSansCaret =
+                code.substring(0, firstCaret)
+                + code.substring(firstCaret + 1);
+            int [] start = indexToLineCol(code, firstCaret);
             return new RegionAndSource(
-                sqlSansCaret,
+                codeSansCaret,
                 new ParseRegion(start[0], start[1]));
         } else {
-            String sqlSansCaret =
-                sql.substring(0, firstCaret)
-                + sql.substring(firstCaret + 1, secondCaret)
-                + sql.substring(secondCaret + 1);
-            int [] start = indexToLineCol(sql, firstCaret);
+            String codeSansCaret =
+                code.substring(0, firstCaret)
+                + code.substring(firstCaret + 1, secondCaret)
+                + code.substring(secondCaret + 1);
+            int [] start = indexToLineCol(code, firstCaret);
 
             // subtract 1 because first caret pushed the string out
             --secondCaret;
 
             // subtract 1 because the col position needs to be inclusive
             --secondCaret;
-            int [] end = indexToLineCol(sql, secondCaret);
+            int [] end = indexToLineCol(code, secondCaret);
             return new RegionAndSource(
-                sqlSansCaret,
+                codeSansCaret,
                 new ParseRegion(start[0], start[1], end[0], end[1]));
         }
     }
@@ -272,15 +281,19 @@ public class ParseRegion {
      * (0-based) offset in a string.
      *
      * <p>Converse of {@link #lineColToIndex(String, int, int)}.
+     *
+     * @param code Source code
+     * @param i Offset within source code
+     * @return 2-element array containing line and column
      */
-    private static int [] indexToLineCol(String sql, int i) {
+    private static int [] indexToLineCol(String code, int i) {
         int line = 0;
         int j = 0;
         while (true) {
             String s;
-            int rn = sql.indexOf("\r\n", j);
-            int r = sql.indexOf("\r", j);
-            int n = sql.indexOf("\n", j);
+            int rn = code.indexOf("\r\n", j);
+            int r = code.indexOf("\r", j);
+            int n = code.indexOf("\n", j);
             int prevj = j;
             if ((r < 0) && (n < 0)) {
                 assert rn < 0;
@@ -299,6 +312,7 @@ public class ParseRegion {
             if ((j < 0) || (j > i)) {
                 return new int[] { line + 1, i - prevj + 1 };
             }
+            assert s != null;
             j += s.length();
             ++line;
         }
@@ -309,14 +323,19 @@ public class ParseRegion {
      * line and column (1-based).
      *
      * <p>Converse of {@link #indexToLineCol(String, int)}.
-     */
-    public static int lineColToIndex(String sql, int line, int column)
+     *
+     * @param code Source code
+     * @param line Line number
+     * @param column Column number
+     * @return Offset within source code
+      */
+    private static int lineColToIndex(String code, int line, int column)
     {
         --line;
         --column;
         int i = 0;
         while (line-- > 0) {
-            i = sql.indexOf(NL, i)
+            i = code.indexOf(NL, i)
                 + NL.length();
         }
         return i + column;
@@ -329,6 +348,9 @@ public class ParseRegion {
      * <p>For example, for the region <code>(1, 9, 1, 12)</code> and source
      * <code>"values (foo)"</code>,
      * yields the string <code>"values (^foo^)"</code>.
+     *
+     * @param source Source code
+     * @return Source code annotated with position
      */
     public String annotate(String source) {
         return addCarets(source, startLine, startColumn, endLine, endColumn);
@@ -338,6 +360,13 @@ public class ParseRegion {
      * Converts a string to a string with one or two carets in it. For example,
      * <code>addCarets("values (foo)", 1, 9, 1, 11)</code> yields "values
      * (^foo^)".
+     *
+     * @param sql Source code
+     * @param line Line number
+     * @param col Column number
+     * @param endLine Line number of end of region
+     * @param endCol Column number of end of region
+     * @return String annotated with region
      */
     private static String addCarets(
         String sql,

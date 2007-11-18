@@ -21,8 +21,11 @@ public class NullType extends ScalarType
     /**
      * Creates a null type.
      */
-    public NullType()
-    {
+    public NullType() {
+    }
+
+    public String toString() {
+        return "NULL";
     }
 }
 // End NullType.java

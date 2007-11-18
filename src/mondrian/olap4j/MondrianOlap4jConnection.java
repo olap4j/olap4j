@@ -66,6 +66,7 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
     private static final String CONNECT_STRING_PREFIX = "jdbc:mondrian:";
 
     final Factory factory;
+    private Locale locale;
 
     /**
      * Creates an Olap4j connection to Mondrian.
@@ -473,6 +474,20 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
         return new MondrianToOlap4jNodeConverter(this).toOlap4j(query);
     }
 
+    public void setLocale(Locale locale) {
+        if (locale == null) {
+            throw new IllegalArgumentException("locale must not be null");
+        }
+        this.locale = locale;
+    }
+
+    public Locale getLocale() {
+        if (locale == null) {
+            return Locale.getDefault();
+        }
+        return locale;
+    }
+
     // inner classes
 
     /**
@@ -556,6 +571,13 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
         }
     }
 
+    static Axis toOlap4j(String axisName) {
+        if (axisName.equals("SLICER")) {
+            axisName = "FILTER";
+        }
+        return Axis.valueOf(axisName);
+    }
+
     private static class MondrianToOlap4jNodeConverter {
         private final MondrianOlap4jConnection olap4jConnection;
 
@@ -585,7 +607,7 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
                 null,
                 axis.isNonEmpty(),
                 toOlap4j(axis.getSet()),
-                Axis.valueOf(axis.getAxisName()),
+                MondrianOlap4jConnection.toOlap4j(axis.getAxisName()),
                 toOlap4j(axis.getDimensionProperties()));
         }
 

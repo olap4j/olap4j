@@ -10,6 +10,7 @@
 package mondrian.olap4j;
 
 import mondrian.olap.Result;
+import mondrian.olap.Query;
 
 import java.util.Properties;
 import java.util.List;
@@ -39,7 +40,7 @@ interface Factory {
 
     MondrianOlap4jCellSet newCellSet(
         MondrianOlap4jStatement olap4jStatement,
-        Result result);
+        Query query);
 
     MondrianOlap4jPreparedStatement newPreparedStatement(
         String mdx, MondrianOlap4jConnection olap4jConnection);

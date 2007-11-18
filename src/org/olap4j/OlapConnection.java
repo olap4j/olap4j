@@ -10,11 +10,10 @@
 package org.olap4j;
 
 import org.olap4j.mdx.parser.MdxParserFactory;
-import org.olap4j.metadata.Schema;
-import org.olap4j.metadata.Catalog;
-import org.olap4j.metadata.NamedList;
+import org.olap4j.metadata.*;
 
 import java.sql.Connection;
+import java.util.Locale;
 
 /**
  * Connection to an OLAP server.
@@ -78,6 +77,25 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * @return List of Catalogs in this connection's OLAP server
      */
     NamedList<Catalog> getCatalogs();
+
+    /**
+     * Sets the current locale of this connection. The value must not be null.
+     * 
+     * <p>If the locale is not set, the JDK's current locale is used (see
+     * {@link java.util.Locale#getDefault()}).
+     *
+     * <p>Most drivers support a <code>Locale</code> connect-string property.
+     *
+     * @param locale Locale
+     */
+    void setLocale(Locale locale);
+
+    /**
+     * Returns this connection's locale. The value is never null.
+     *
+     * @return locale of this connection
+     */
+    Locale getLocale();
 }
 
 // End OlapConnection.java

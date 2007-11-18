@@ -42,6 +42,8 @@ public interface Member extends MetadataElement {
 
     /**
      * Returns the parent of this Member, or null if it has no parent.
+     *
+     * @return Parent member, or null if member has no parent
      */
     Member getParentMember();
 
@@ -49,6 +51,8 @@ public interface Member extends MetadataElement {
      * Returns the Level of this Member.
      *
      * <p>Never returns null.</p>
+     *
+     * @return Level which this Member belongs to
      */
     Level getLevel();
 
@@ -57,6 +61,8 @@ public interface Member extends MetadataElement {
      *
      * <p>Never returns null.
      * Result is always the same as <code>getLevel().getHierarchy()</code>.
+     *
+     * @return Hierarchy which this Member belongs to
      */
     Hierarchy getHierarchy();
 
@@ -65,6 +71,8 @@ public interface Member extends MetadataElement {
      *
      * <p>Never returns null. Result is always the same as
      * <code>getLevel().getHierarchy().getDimension()</code>.
+     *
+     * @return Dimension which this Member belongs to
      */
     Dimension getDimension();
 
@@ -72,6 +80,8 @@ public interface Member extends MetadataElement {
      * Returns the type of this Member.
      *
      * <p>Never returns null.</p>
+     *
+     * @return What kind of member this is
      */
     Type getMemberType();
 
@@ -123,6 +133,9 @@ public interface Member extends MetadataElement {
     /**
      * Returns whether <code>member</code> is equal to, a child of, or a
      * descendent of this Member.
+     *
+     * @param member Member
+     * @return Whether the given Member is a descendent of this Member
      */
     boolean isChildOrEqualTo(Member member);
 
@@ -133,24 +146,43 @@ public interface Member extends MetadataElement {
      * those defined using a <code>WITH MEMBER</code> clause in an MDX query
      * ({@link #getMemberType()} will return {@link Type#FORMULA} for these),
      *  or a calculated member defined in a cube.
+     *
+     * @return Whether this Member is calculated
+     *
+     * @see #isCalculatedInQuery()
      */
     boolean isCalculated();
 
     /**
      * Returns the solve order of this member in a formula.
+     *
+     * @return solve order of this Member
      */
     int getSolveOrder();
 
+    /**
+     * Expression by which this member is derived, if it is a calculated
+     * member. If the member is not calulated, returns null.
+     *
+     * @return expression for this member
+     */
     ParseTreeNode getExpression();
 
     /**
      * Returns array of all members, which are ancestor to <code>this</code>.
+     *
+     * @return ancestor Members
      */
     List<Member> getAncestorMembers();
 
     /**
-     * Returns whether this member is computed from a <code>with member</code>
-     * clause in an mdx query.
+     * Returns whether this member is computed from a <code>WITH MEMBER</code>
+     * clause in an MDX query. (Calculated members can also be calculated in a
+     * cube.)
+     *
+     * @return Whether this member is calculated in a query
+     *
+     * @see #isCalculated()
      */
     boolean isCalculatedInQuery();
 
@@ -223,12 +255,16 @@ public interface Member extends MetadataElement {
 
     /**
      * Returns the ordinal of the member.
+     *
+     * @return ordinal of this Member
      */
     int getOrdinal();
 
     /**
      * Returns whether this member is 'hidden', as per the rules which define
      * a ragged hierarchy.
+     *
+     * @return whether this member is a hidden member of a ragged hierarchy
      */
     boolean isHidden();
 
@@ -238,15 +274,19 @@ public interface Member extends MetadataElement {
      * <p>In regular hierarchies, this is as the same as the level's depth,
      * but in parent-child and ragged hierarchies the value may be
      * different.</p>
+     *
+     * @return depth of this Member
      */
     int getDepth();
 
     /**
      * Returns the system-generated data member that is associated with a
-     * nonleaf member of a dimension.
+     * non-leaf member of a dimension.
      *
      * <p>Returns this member if this member is a leaf member, or if the
-     * nonleaf member does not have an associated data member.</p>
+     * non-leaf member does not have an associated data member.</p>
+     *
+     * @return system-generated data member
      */
     Member getDataMember();
 

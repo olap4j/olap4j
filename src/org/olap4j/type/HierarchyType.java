@@ -51,7 +51,8 @@ public class HierarchyType implements Type {
 
     }
 
-    public static HierarchyType forType(Type type) throws OlapException {
+    // not part of public olap4j API
+    private static HierarchyType forType(Type type) throws OlapException {
         return new HierarchyType(type.getDimension(), type.getHierarchy());
     }
 

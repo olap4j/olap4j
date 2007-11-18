@@ -149,13 +149,14 @@ public class IdentifierNode
      * </ul>
      */
     public static class Segment {
-        public final String name;
-        public final IdentifierNode.Quoting quoting;
+        final String name;
+        final IdentifierNode.Quoting quoting;
         private final ParseRegion region;
 
         /**
          * Creates a segment with the given quoting and region.
          *
+         * @param region Region of source code
          * @param name Name
          * @param quoting Quoting style
          */
@@ -181,12 +182,36 @@ public class IdentifierNode
         /**
          * Returns the region of the source code which this Segment was created
          * from, if it was created by parsing.
+         *
+         * @return region of source code
          */
         public ParseRegion getRegion() {
             return region;
         }
+
+        /**
+         * Returns the name of this Segment.
+         *
+         * @return name of this Segment
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Returns how this Segment is quoted.
+         *
+         * @return how this Segment is quoted
+         */
+        public Quoting getQuoting() {
+            return quoting;
+        }
     }
 
+    /**
+     * Enumeration of styles by which the component of an identifier can be
+     * quoted.
+     */
     public enum Quoting {
 
         /**

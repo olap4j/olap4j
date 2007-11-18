@@ -312,7 +312,7 @@ public class OlapTest extends TestCase {
 
                 axisToXml(query.getAxes().get(Axis.COLUMNS), doc, axes);
                 axisToXml(query.getAxes().get(Axis.ROWS), doc, axes);
-                axisToXml(query.getAxes().get(Axis.SLICER), doc, axes);
+                axisToXml(query.getAxes().get(Axis.FILTER), doc, axes);
 
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -357,7 +357,7 @@ public class OlapTest extends TestCase {
                 switch(axis.getLocation()) {
                 case COLUMNS: addAttribute("location", "across", root); break;
                 case ROWS: addAttribute("location", "down", root); break;
-                case SLICER: addAttribute("location", "slicer", root); break;
+                case FILTER: addAttribute("location", "filter", root); break;
                 }
 
                 List<QueryDimension> dimensions = axis.getDimensions();

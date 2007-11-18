@@ -145,7 +145,12 @@ public interface Cube extends MetadataElement {
      * dimension.
      *
      * @param nameParts Components of the fully-qualified member name
-     * @return member with the given name, or null if not found
+     *
+     * @param treeOps Collection of tree operations to travel relative to
+     * given member in order to create list of members
+     *
+     * @return collection of members related to the given member, or empty
+     * set if the member is not found
      */
     List<Member> lookupMembers(
         Set<Member.TreeOp> treeOps,

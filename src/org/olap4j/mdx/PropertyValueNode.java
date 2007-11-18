@@ -33,6 +33,7 @@ public class PropertyValueNode implements ParseTreeNode {
     /**
      * Creates a PropertyValueNode.
      *
+     * @param region Region of source code
      * @param name Name of property
      * @param expression Expression for value of property (often a literal)
      */
@@ -54,10 +55,20 @@ public class PropertyValueNode implements ParseTreeNode {
         return expression.getType();
     }
 
+    /**
+     * Returns the expression by which the value of the property is derived.
+     *
+     * @return the expression by which the value of the property is derived
+     */
     public ParseTreeNode getExpression() {
         return expression;
     }
 
+    /**
+     * Returns the name of the property
+     *
+     * @return name of the property
+     */
     public String getName() {
         return name;
     }

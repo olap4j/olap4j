@@ -147,14 +147,14 @@ parser code {:
         List<ParseTreeNode> withList,
         List<AxisNode> axisList,
         IdentifierNode cubeName,
-        ParseTreeNode slicer,
+        ParseTreeNode filter,
         List<IdentifierNode> cellProps)
     {
-        final AxisNode slicerAxis =
-            slicer == null ?
+        final AxisNode filterAxis =
+            filter == null ?
                 null :
                 new AxisNode(
-                    slicer.getRegion(), false, slicer, Axis.SLICER,
+                    filter.getRegion(), false, filter, Axis.FILTER,
                     Collections.EMPTY_LIST);
         // sort axes by ordinal
         Collections.sort(axisList, new Comparator<AxisNode>() {
@@ -163,7 +163,7 @@ parser code {:
             }
         });
         return new SelectNode(
-            region, withList, axisList, cubeName, slicerAxis, cellProps);
+            region, withList, axisList, cubeName, filterAxis, cellProps);
     }
 
     // Override lr_parser methods for NLS.  With this error handling scheme,
@@ -339,7 +339,7 @@ non terminal ParseTreeNode
     else_clause_opt,
     expression,
     factor,
-    slicer_specification,
+    filter_specification,
     term,
     term2,
     term3,
@@ -821,11 +821,11 @@ value_expression_primary ::=
             RESULT = new IdentifierNode(i);
         :}
     |   value_expression_primary:i DOT unquoted_identifier:j {:
-            if (i instanceof IdentifierNode && !parser.isFunCall(j.name)) {
+            if (i instanceof IdentifierNode && !parser.isFunCall(j.getName())) {
                 RESULT = ((IdentifierNode) i).append(j);
             } else {
                 ParseRegion region = createRegion(ileft, jright);
-                RESULT = new CallNode(region, j.name, Syntax.Property, i);
+                RESULT = new CallNode(region, j.getName(), Syntax.Property, i);
             }
         :}
     |   value_expression_primary:i DOT quoted_identifier:j {:
@@ -834,7 +834,7 @@ value_expression_primary ::=
             } else {
                 ParseRegion region = createRegion(ileft, jright);
                 RESULT = new CallNode(region,
-                    j.name, Syntax.QuotedProperty, i);
+                    j.getName(), Syntax.QuotedProperty, i);
             }
         :}
     |   value_expression_primary:i DOT amp_quoted_identifier:j {:
@@ -843,20 +843,20 @@ value_expression_primary ::=
             } else {
                 ParseRegion region = createRegion(ileft, jright);
                 RESULT = new CallNode(region,
-                    j.name, Syntax.AmpersandQuotedProperty, i);
+                    j.getName(), Syntax.AmpersandQuotedProperty, i);
             }
         :}
     |   value_expression_primary:i DOT identifier:j LPAREN exp_list_opt:lis RPAREN:rparen {:
             lis.add(0, i);
             ParseRegion region = createRegion(ileft, rparenright);
-            RESULT = new CallNode(region, j.name, Syntax.Method, lis);
+            RESULT = new CallNode(region, j.getName(), Syntax.Method, lis);
         :}
     |   identifier:i LPAREN exp_list_opt:lis RPAREN:rparen {:
             ParseRegion region = createRegion(ileft, rparenright);
-            RESULT = new CallNode(region, i.name, Syntax.Function, lis);
+            RESULT = new CallNode(region, i.getName(), Syntax.Function, lis);
         :}
     |   CAST:cast LPAREN expression:e AS identifier:t RPAREN:rparen {:
-            LiteralNode symbol = LiteralNode.createSymbol(t.getRegion(), t.name);
+            LiteralNode symbol = LiteralNode.createSymbol(t.getRegion(), t.getName());
             ParseRegion region = createRegion(castleft, rparenright);
             RESULT = new CallNode(region, "CAST", Syntax.Cast, e, symbol);
         :}
@@ -1252,7 +1252,7 @@ exp_list ::=
 //                         SELECT [<axis_specification>
 //                                [, <axis_specification>...]]
 //                         FROM [<cube_specification>]
-//                         WHERE [<slicer_specification>]
+//                         WHERE [<filter_specification>]
 //                         [<cell_props>]
 // jhyde: The above is wrong... you can omit 'WHERE'.
 statement ::=
@@ -1296,7 +1296,7 @@ axis_specification_list ::=
     ;
 where_clause_opt ::=
         /* empty */
-    |   WHERE slicer_specification:s {: RESULT = s; :};
+    |   WHERE filter_specification:s {: RESULT = s; :};
 cell_props_opt ::=
         /* empty */ {:
             RESULT = new LinkedList();
@@ -1382,7 +1382,7 @@ member_name ::= compound_id;
 member_property_definition ::=
         identifier:id EQ value_expression:e {:
             ParseRegion region = createRegion(idleft, eright);
-            RESULT = new PropertyValueNode(region, id.name, e);
+            RESULT = new PropertyValueNode(region, id.getName(), e);
         :}
     ;
 //
@@ -1457,7 +1457,7 @@ dim_props_opt ::=
 //               | SECTIONS
 //               | AXIS(<index>)
 axis_name ::=
-        identifier:i {: RESULT = i.name; :}
+        identifier:i {: RESULT = i.getName(); :}
     ;
 
 axis_number ::=
@@ -1493,8 +1493,8 @@ cube_specification ::=
         cube_name;
 
 //
-// <slicer_specification> ::= {<set> | <tuple>}
-slicer_specification ::=
+// <filter_specification> ::= {<set> | <tuple>}
+filter_specification ::=
         expression;
 //
 // <cell_props> ::= [CELL] PROPERTIES <cell_property> [, <cell_property>...]
@@ -1547,14 +1547,14 @@ cell_property ::= compound_id;
 // this feature.
 //
 //
-// Support for <set> in <slicer_specification> is optional. Consumers can check
+// Support for <set> in <filter_specification> is optional. Consumers can check
 // the value of the property MDPROP_MDX_SLICER to see whether a provider
 // supports this feature.
 //
 //
 // Support for more than one cube name in <cube_specification> is
 // optional. Support for having no cube name in the FROM clause (that is, the
-// cube is implicitly defined by the axis and slicer dimensions) is also
+// cube is implicitly defined by the axis and filter dimensions) is also
 // optional. Consumers can check the value of the property MDPROP_MDX_JOINCUBES
 // to see whether a provider supports this feature.
 //

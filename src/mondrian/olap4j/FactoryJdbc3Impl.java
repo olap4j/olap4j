@@ -9,7 +9,7 @@
 */
 package mondrian.olap4j;
 
-import mondrian.olap.Result;
+import mondrian.olap.Query;
 
 import java.sql.*;
 import java.util.*;
@@ -50,9 +50,9 @@ class FactoryJdbc3Impl implements Factory {
 
     public MondrianOlap4jCellSet newCellSet(
         MondrianOlap4jStatement olap4jStatement,
-        Result result)
+        Query query)
     {
-        return new MondrianOlap4jCellSetJdbc3(olap4jStatement, result);
+        return new MondrianOlap4jCellSetJdbc3(olap4jStatement, query);
     }
 
     public MondrianOlap4jPreparedStatement newPreparedStatement(
@@ -84,10 +84,9 @@ class FactoryJdbc3Impl implements Factory {
         extends MondrianOlap4jCellSet
     {
         public MondrianOlap4jCellSetJdbc3(
-            MondrianOlap4jStatement olap4jStatement,
-            Result result)
+            MondrianOlap4jStatement olap4jStatement, Query query)
         {
-            super(olap4jStatement, result);
+            super(olap4jStatement);
         }
     }
 

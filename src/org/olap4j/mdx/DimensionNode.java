@@ -25,6 +25,12 @@ public class DimensionNode implements ParseTreeNode {
     private final ParseRegion region;
     private final Dimension dimension;
 
+    /**
+     * Creates a DimensionNode.
+     *
+     * @param region Region of source code
+     * @param dimension Dimension which is used in the expression
+     */
     public DimensionNode(
         ParseRegion region,
         Dimension dimension)
@@ -51,7 +57,7 @@ public class DimensionNode implements ParseTreeNode {
     }
 
     public Type getType() {
-        return DimensionType.forDimension(dimension);
+        return new DimensionType(dimension);
     }
 
     public void unparse(ParseTreeWriter writer) {

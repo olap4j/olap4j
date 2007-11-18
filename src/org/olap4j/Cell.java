@@ -156,9 +156,11 @@ public interface Cell {
      * Drills through from this cell to the underlying fact table data,
      * and returns a {@link java.sql.ResultSet} of the results.
      *
+     * <p>If drill-through is not possible, returns null.
+     *
      * @return result set of the fact rows underlying this Cell
      */
-    ResultSet drillThrough();
+    ResultSet drillThrough() throws OlapException;
 }
 
 // End Cell.java

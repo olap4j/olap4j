@@ -59,6 +59,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      */
     final URL serverUrl;
 
+    private Locale locale;
+
     /**
      * Creates an Olap4j connection an XML/A provider.
      *
@@ -342,7 +344,18 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         throw Util.needToImplement(this);
     }
 
-    // inner classes
+    public void setLocale(Locale locale) {
+        this.locale = locale;
+    }
+
+    public Locale getLocale() {
+        if (locale == null) {
+            return Locale.getDefault();
+        }
+        return locale;
+    }
+
+    // ~ inner classes --------------------------------------------------------
 
     static class Helper {
         SQLException createException(String msg) {

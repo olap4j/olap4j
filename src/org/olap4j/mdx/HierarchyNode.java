@@ -25,6 +25,12 @@ public class HierarchyNode implements ParseTreeNode {
     private final ParseRegion region;
     private final Hierarchy hierarchy;
 
+    /**
+     * Creates a HierarchyNode.
+     *
+     * @param region Region of source code
+     * @param hierarchy Hierarchy which is used in the expression
+     */
     public HierarchyNode(
         ParseRegion region,
         Hierarchy hierarchy)

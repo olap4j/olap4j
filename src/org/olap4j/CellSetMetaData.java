@@ -12,7 +12,6 @@ package org.olap4j;
 import org.olap4j.metadata.*;
 
 import java.sql.ResultSetMetaData;
-import java.util.List;
 
 /**
  * An object that can be used to get information about the axes
@@ -59,6 +58,15 @@ public interface CellSetMetaData extends ResultSetMetaData, OlapWrapper {
      * @return list of metadata describing each result axis
      */
     NamedList<CellSetAxisMetaData> getAxesMetaData();
+
+    /**
+     * Returns a CellSetAxisMetaData describing the filter axis. Never returns
+     * null; if the MDX statement contains no WHERE clause, the description of
+     * the filter contains no hierarchies.
+     *
+     * @return metadata describing filter axis
+     */
+    CellSetAxisMetaData getFilterAxisMetaData();
 }
 
 // End CellSetMetaData.java

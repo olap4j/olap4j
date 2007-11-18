@@ -92,7 +92,7 @@ public class TestContext {
             pw.println("Axis #" + (++i) + ":");
             printAxis(pw, axis);
         }
-        // Usually there are 3 axes: {slicer, columns, rows}. Position is a
+        // Usually there are 3 axes: {filter, columns, rows}. Position is a
         // {column, row} pair. We call printRows with axis=2. When it
         // recurses to axis=-1, it prints.
         List<Integer> pos = new ArrayList<Integer>(axes.size());

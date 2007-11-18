@@ -14,7 +14,11 @@ import java.util.Locale;
 /**
  * Enumeration of axis types.
  *
- * <p>Typically used values are ROWS, COLUMNS, and SLICER.
+ * <p>The most commonly used values are
+ * <code>COLUMNS</code> (the first axis of a 2-dimensional query),
+ * <code>ROWS</code> (the second axis of a 2-dimensional query) and
+ * <code>FILTER</code> (also known as the slicer axis, denoted by a
+ * <code>WHERE</code> clause in an MDX statement).
  *
  * @author jhyde
  * @version $Id$
@@ -22,7 +26,7 @@ import java.util.Locale;
  */
 public enum Axis {
     UNUSED,
-    SLICER,
+    FILTER,
     COLUMNS,
     ROWS,
     PAGES,
@@ -36,7 +40,7 @@ public enum Axis {
      *
      * <p>The axis ordinal is two less than the {@link #ordinal} value which
      * every <code>enum</code> value possesses. Hence, {@link #UNUSED} is -2
-     * and {@link #SLICER} is -1 (because they are not treated the same as the
+     * and {@link #FILTER} is -1 (because they are not treated the same as the
      * other axes), {@link #COLUMNS} is 0, {@link #ROWS} is 1, and so forth.
      *
      * @return Axis ordinal
@@ -47,6 +51,9 @@ public enum Axis {
 
     /**
      * Returns localized name for this Axis.
+     *
+     * @param locale Locale for which to give the name
+     * @return localized name for this Axis
      */
     public String getCaption(Locale locale) {
         // todo: localize
@@ -55,6 +62,9 @@ public enum Axis {
 
     /**
      * Returns the axis with a given {@link #axisOrdinal()}.
+     *
+     * @param axisOrdinal Axis ordinal
+     * @return Axis whose {@link #axisOrdinal()} is as given
      */
     public static Axis forOrdinal(int axisOrdinal) {
         Axis axis = values()[axisOrdinal + 2];

@@ -47,7 +47,11 @@ class XmlaOlap4jCellSetMetaData implements CellSetMetaData {
         throw Util.needToImplement(this);
     }
 
-    // implement ResultSetMetaData
+    public CellSetAxisMetaData getFilterAxisMetaData() {
+        throw Util.needToImplement(this);
+    }
+
+// implement ResultSetMetaData
 
     public int getColumnCount() throws SQLException {
         throw new UnsupportedOperationException();

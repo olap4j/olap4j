@@ -23,7 +23,7 @@ import org.olap4j.OlapConnection;
  */
 public class DefaultMdxParserImpl implements MdxParser {
     private final OlapConnection connection;
-    private boolean debug = true;
+    private boolean debug = false;
     private boolean load = false;
     private final FunTable funTable = new FunTable() {
         public boolean isProperty(String s) {

@@ -36,6 +36,11 @@ public class WithMemberNode implements ParseTreeNode {
 
     /**
      * Constructs a formula specifying a member.
+     *
+     * @param region Source code region
+     * @param name   Name of member being declared
+     * @param exp    Expression for value of member
+     * @param memberPropertyList Collection of properties of member
      */
     public WithMemberNode(
         ParseRegion region,
@@ -73,8 +78,10 @@ public class WithMemberNode implements ParseTreeNode {
      *
      * <p>The name is as specified in the parse tree; it may not be identical
      * to the unique name of the member.
+     *
+     * @return Name of member
      */
-    public IdentifierNode getName() {
+    public IdentifierNode getIdentifier() {
         return name;
     }
 

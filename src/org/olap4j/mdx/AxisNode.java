@@ -33,6 +33,7 @@ public class AxisNode implements ParseTreeNode {
     /**
      * Creates an axis.
      *
+     * @param region Region of source code
      * @param nonEmpty Whether to filter out members of this axis whose cells
      *    are all empty
      * @param expression Expression to populate the axis
@@ -78,6 +79,8 @@ public class AxisNode implements ParseTreeNode {
 
     /**
      * Returns whether the axis has the <code>NON EMPTY</code> property set.
+     *
+     * @return whether the axis is NON EMPTY
      */
     public boolean isNonEmpty() {
         return nonEmpty;
@@ -87,6 +90,8 @@ public class AxisNode implements ParseTreeNode {
      * Sets whether the axis has the <code>NON EMPTY</code> property set.
      *
      * See {@link #isNonEmpty()}.
+     *
+     * @param nonEmpty whether the axis is NON EMPTY
      */
     public void setNonEmpty(boolean nonEmpty) {
         this.nonEmpty = nonEmpty;
@@ -94,6 +99,8 @@ public class AxisNode implements ParseTreeNode {
 
     /**
      * Returns the expression which is used to compute the value of this axis.
+     *
+     * @return the expression which is used to compute the value of this axis
      */
     public ParseTreeNode getExpression() {
         return expression;
@@ -102,6 +109,9 @@ public class AxisNode implements ParseTreeNode {
     /**
      * Sets the expression which is used to compute the value of this axis.
      * See {@link #getExpression()}.
+     *
+     * @param expr the expression which is used to compute the value of this
+     * axis
      */
     public void setExpression(ParseTreeNode expr) {
         this.expression = expr;
@@ -125,7 +135,7 @@ public class AxisNode implements ParseTreeNode {
                 dimensionProperty.unparse(writer);
             }
         }
-        if (axis != Axis.SLICER) {
+        if (axis != Axis.FILTER) {
             pw.print(" ON " + axis);
         }
     }

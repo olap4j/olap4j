@@ -54,18 +54,25 @@ import java.util.List;
  */
 public interface CellSetAxisMetaData {
     /**
-     * Returns the definition of the axis.
-     * ({@link Axis#SLICER}, {@link Axis#ROWS}, and so forth.)
+     * Returns the definition of the axis. Typical values are
+     * ({@link Axis#FILTER}, {@link Axis#COLUMNS}, {@link Axis#ROWS}, and so
+     * forth.)
+     *
+     * @return the Axis
      */
-    Axis getAxis();
+    Axis getAxisOrdinal();
 
     /**
      * Returns the hierarchies which are mapped onto this axis.
+     *
+     * @return list of hierarchies on this Axis
      */
     List<Hierarchy> getHierarchies();
 
     /**
      * Returns the member properties which are returned on this axis.
+     *
+     * @return list of member properties on this Axis
      */
     NamedList<Property> getProperties();
 }

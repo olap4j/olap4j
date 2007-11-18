@@ -11,6 +11,7 @@ package mondrian.olap4j;
 
 import org.olap4j.*;
 import org.olap4j.Cell;
+import org.olap4j.Position;
 import mondrian.olap.*;
 import mondrian.olap.Axis;
 
@@ -32,51 +33,75 @@ import java.net.URL;
  */
 abstract class MondrianOlap4jCellSet implements CellSet {
     final MondrianOlap4jStatement olap4jStatement;
-    private final Result result;
+    final Query query;
+    private Result result;
     protected boolean closed;
     private final MondrianOlap4jCellSetMetaData metaData;
+    private final List<CellSetAxis> axisList =
+        new ArrayList<CellSetAxis>();
+    private CellSetAxis filterAxis;
 
     public MondrianOlap4jCellSet(
         MondrianOlap4jStatement olap4jStatement,
-        Result result)
+        Query query)
     {
         assert olap4jStatement != null;
-        assert result != null;
+        assert query != null;
         this.olap4jStatement = olap4jStatement;
-        this.result = result;
+        this.query = query;
         this.closed = false;
         if (olap4jStatement instanceof MondrianOlap4jPreparedStatement) {
             this.metaData =
-                ((MondrianOlap4jPreparedStatement) olap4jStatement).cellSetMetaData;
+                ((MondrianOlap4jPreparedStatement) olap4jStatement)
+                    .cellSetMetaData;
         } else {
             this.metaData =
                 new MondrianOlap4jCellSetMetaData(
-                    olap4jStatement, result.getQuery());
+                    olap4jStatement, query);
         }
     }
 
-    public CellSetMetaData getMetaData() throws OlapException {
+    /**
+     * Executes a query. Not part of the olap4j API; internal to the mondrian
+     * driver.
+     *
+     * <p>This method may take some time. While it is executing, a client may
+     * execute {@link MondrianOlap4jStatement#cancel()}.
+     */
+    void execute() {
+        query.setQueryTimeoutMillis(olap4jStatement.timeoutSeconds * 1000);
+        result = olap4jStatement.olap4jConnection.connection.execute(query);
+
+        // initialize axes
+        mondrian.olap.Axis[] axes = result.getAxes();
+        QueryAxis[] queryAxes = result.getQuery().getAxes();
+        assert axes.length == queryAxes.length;
+        for (int i = 0; i < axes.length; i++) {
+            Axis axis = axes[i];
+            QueryAxis queryAxis = queryAxes[i];
+            axisList.add(new MondrianOlap4jCellSetAxis(this, queryAxis, axis));
+        }
+
+        // initialize filter axis
+        final QueryAxis queryAxis = result.getQuery().getSlicerAxis();
+        final Axis axis = result.getSlicerAxis();
+        if (queryAxis == null) {
+            filterAxis = null;
+        } else {
+            filterAxis = new MondrianOlap4jCellSetAxis(this, queryAxis, axis);
+        }
+    }
+
+    public CellSetMetaData getMetaData() {
         return metaData;
     }
 
     public List<CellSetAxis> getAxes() {
-        mondrian.olap.Axis[] axes = result.getAxes();
-        QueryAxis[] queryAxes = result.getQuery().getAxes();
-        assert axes.length == queryAxes.length;
-        ArrayList<CellSetAxis> list = new ArrayList<CellSetAxis>(axes.length);
-
-        for (int i = 0; i < axes.length; i++) {
-            Axis axis = axes[i];
-            QueryAxis queryAxis = queryAxes[i];
-            list.add(new MondrianOlap4jCellSetAxis(this, queryAxis, axis));
-        }
-        return list;
+        return axisList;
     }
 
     public CellSetAxis getFilterAxis() {
-        final Axis axis = result.getSlicerAxis();
-        final QueryAxis queryAxis = result.getQuery().getSlicerAxis();
-        return new MondrianOlap4jCellSetAxis(this, queryAxis, axis);
+        return filterAxis;
     }
 
     public Cell getCell(List<Integer> coordinates) {
@@ -84,8 +109,7 @@ abstract class MondrianOlap4jCellSet implements CellSet {
         for (int i = 0; i < coords.length; i++) {
             coords[i] = coordinates.get(i);
         }
-        mondrian.olap.Cell cell = result.getCell(coords);
-        return new MondrianOlap4jCell(coords, this, cell);
+        return getCellInternal(coords);
     }
 
     public Cell getCell(int ordinal) {
@@ -97,8 +121,62 @@ abstract class MondrianOlap4jCellSet implements CellSet {
             modulo *= axes[i].getPositions().size();
             pos[i] = (ordinal % modulo) / prevModulo;
         }
-        mondrian.olap.Cell cell = result.getCell(pos);
+        if (ordinal < 0 || ordinal >= modulo) {
+            throw new IndexOutOfBoundsException(
+                "Cell ordinal " + ordinal
+                    + ") lies outside CellSet bounds ("
+                    + getBoundsAsString() + ")");
+        }
+        return getCellInternal(pos);
+    }
+
+    public Cell getCell(Position... positions) {
+        int[] coords = new int[positions.length];
+        for (int i = 0; i < coords.length; i++) {
+            coords[i] = positions[i].getOrdinal();
+        }
+        return getCellInternal(coords);
+    }
+
+    private Cell getCellInternal(int[] pos) {
+        mondrian.olap.Cell cell;
+        try {
+            cell = result.getCell(pos);
+        } catch (MondrianException e) {
+            if (e.getMessage().indexOf("coordinates out of range") >= 0) {
+                throw new IndexOutOfBoundsException(
+                    "Cell coordinates (" + getCoordsAsString(pos)
+                        + ") fall outside CellSet bounds ("
+                        + getCoordsAsString(pos) + ")");
+            } else {
+                throw e;
+            }
+        }
         return new MondrianOlap4jCell(pos, this, cell);
+    }
+
+    private String getBoundsAsString() {
+        StringBuffer buf = new StringBuffer();
+        Axis[] axes = result.getAxes();
+        for (int i = 0; i < axes.length; i++) {
+            if (i > 0) {
+                buf.append(", ");
+            }
+            buf.append(axes[i].getPositions().size());
+        }
+        return buf.toString();
+    }
+
+    private static String getCoordsAsString(int[] pos) {
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < pos.length; i++) {
+            int po = pos[i];
+            if (i > 0) {
+                buf.append(", ");
+            }
+            buf.append(po);
+        }
+        return buf.toString();
     }
 
     public List<Integer> ordinalToCoordinates(int ordinal) {

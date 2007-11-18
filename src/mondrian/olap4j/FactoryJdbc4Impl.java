@@ -17,6 +17,7 @@ import java.io.Reader;
 import java.io.InputStream;
 
 import mondrian.olap.Result;
+import mondrian.olap.Query;
 
 /**
  * Implementation of {@link Factory} for JDBC 4.0.
@@ -54,9 +55,9 @@ class FactoryJdbc4Impl implements Factory {
 
     public MondrianOlap4jCellSet newCellSet(
         MondrianOlap4jStatement olap4jStatement,
-        Result result)
+        Query query)
     {
-        return new MondrianOlap4jCellSetJdbc4(olap4jStatement, result);
+        return new MondrianOlap4jCellSetJdbc4(olap4jStatement, query);
     }
 
     public MondrianOlap4jPreparedStatement newPreparedStatement(
@@ -381,9 +382,9 @@ class FactoryJdbc4Impl implements Factory {
     private static class MondrianOlap4jCellSetJdbc4 extends MondrianOlap4jCellSet {
         public MondrianOlap4jCellSetJdbc4(
             MondrianOlap4jStatement olap4jStatement,
-            Result result)
+            Query query)
         {
-            super(olap4jStatement, result);
+            super(olap4jStatement, query);
         }
 
         // implement java.sql.CellSet methods
