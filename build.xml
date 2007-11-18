@@ -322,7 +322,7 @@ META-INF/**"/>
         classpathref="project.test.classpath"
         destdir="${javadoc.dir}"
         packagenames="org.olap4j.*"
-        excludepackagenames="org.olap4j.mdx.parser.impl.*"
+        excludepackagenames="org.olap4j.driver.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
         overview="${src.dir}/overview.html"
         footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=35302&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
         author="true"
@@ -387,15 +387,16 @@ META-INF/**"/>
     </delete>
     <delete quiet="true" file="${javadoc.dir}/index.html"/>
     <property name="ps" value="${path.separator}"/>
-    <javadoc sourcepath="${src.dir}:${testsrc.dir}"
+    <javadoc sourcepath="${src.dir}"
         classpathref="project.test.classpath"
         destdir="${javadoc.dir}"
-        packagenames="org.olap4j.*,mondrian.olap4j.*"
+        packagenames="org.olap4j.*"
+        excludepackagenames="org.olap4j.driver.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
         overview="${src.dir}/overview.html"
         footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=35302&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
         author="true"
         source="1.5"
-        access="package"
+        access="public"
         Windowtitle="olap4j, version ${version}"
         additionalparam="-linksource"
       >
@@ -434,11 +435,11 @@ META-INF/**"/>
     <javadoc sourcepath="${src.dir}"
         classpathref="project.test.classpath"
         packagenames="org.olap4j.*"
-        excludepackagenames="org.olap4j.sample.*"
+        excludepackagenames="org.olap4j.driver.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
         overview="${src.dir}/overview.html"
         author="true"
         source="1.5"
-        access="package"
+        access="public"
       >
       <doclet name="com.tarsec.javadoc.pdfdoclet.PDFDoclet"
             path="lib/pdfdoclet-1.0.2-all.jar">
