@@ -14,7 +14,7 @@
   <property file="${project.location}/build.properties"/>
   <property name="project.build.debug" value="on"/>
   <property name="name" value="olap4j"/>
-  <property name="version" value="0.89.3"/>
+  <property name="version" value="0.9.0"/>
   <property name="dist.name" value="${name}-${version}" />
 
   <!-- properties related to paths -->
@@ -29,10 +29,6 @@
   <property name="doc.dir" value="doc"/>
   <property name="javadoc.dir" value="doc/api"/>
   <property name="dist.dir" value="dist"/>
-
-  <!-- for now, assume that mondrian is a sibling directory and contains src,
-       classes, testsrc and testclasses directories -->
-  <property name="mondrian.dir" value="../mondrian"/>
 
   <!-- generated files -->
   <property name="jar.file" value="${lib.dir}/${name}.jar" />
@@ -51,29 +47,32 @@ ${jar-jdk14.file}"/>
 
   <path id="project.classpath">
     <pathelement location="${classes.dir}"/>
-    <!-- <pathelement location="${lib.dir}/retroweaver-1.2.4.jar"/> -->
     <pathelement path="${env.CLASSPATH}"/>
     <pathelement location="${ant.home}/lib/ant.jar"/>
     <pathelement location="${lib.dir}/log4j-1.2.9.jar"/>
     <pathelement location="${lib.dir}/javacup.jar"/>
     <pathelement location="${testlib.dir}/junit.jar"/>
     <pathelement location="${testlib.dir}/servlet.jar"/>
-    <!-- We depend on mondrian right now. Ugh. -->
+
+    <pathelement location="${lib.dir}/mondrian.jar"/>
+    <!-- To develop code against 'live' mondrian source code, remove the
+         previous line and uncomment the next two.
     <pathelement location="${mondrian.dir}/classes"/>
     <pathelement location="${mondrian.dir}/testclasses"/>
-    <pathelement location="${mondrian.dir}/lib/eigenbase-xom.jar"/>
-    <pathelement location="${mondrian.dir}/lib/eigenbase-properties.jar"/>
-    <pathelement location="${mondrian.dir}/lib/eigenbase-resgen.jar"/>
-    <pathelement location="${mondrian.dir}/lib/commons-dbcp.jar"/>
-    <pathelement location="${mondrian.dir}/lib/commons-pool.jar"/>
-    <pathelement location="${mondrian.dir}/lib/commons-collections.jar"/>
-    <pathelement location="${mondrian.dir}/lib/commons-vfs.jar"/>
-    <pathelement location="${mondrian.dir}/lib/commons-logging.jar"/>
-    <pathelement location="${mondrian.dir}/lib/commons-math-1.0.jar"/>
-    <pathelement location="${mondrian.dir}/testlib/derby.jar"/>
-    <!-- We depend on spring, but only for examples. -->
-    <pathelement location="${lib.dir}/spring.jar"/>
-
+      -->
+    <!-- The following libraries are required by mondrian, and therefore olap4j
+         needs them too, for now. When olap4j no longer depends on
+         mondrian, and the mondrian olap4j driver is tested as part of
+         mondrian's test suite, obsolete these libraries. -->
+    <pathelement location="${lib.dir}/eigenbase-xom.jar"/>
+    <pathelement location="${lib.dir}/eigenbase-properties.jar"/>
+    <pathelement location="${lib.dir}/eigenbase-resgen.jar"/>
+    <pathelement location="${lib.dir}/commons-dbcp.jar"/>
+    <pathelement location="${lib.dir}/commons-pool.jar"/>
+    <pathelement location="${lib.dir}/commons-collections.jar"/>
+    <pathelement location="${lib.dir}/commons-vfs.jar"/>
+    <pathelement location="${lib.dir}/commons-logging.jar"/>
+    <pathelement location="${lib.dir}/commons-math-1.0.jar"/>
   </path>
 
   <path id="project.test.classpath">
@@ -104,6 +103,14 @@ ${jar-jdk14.file}"/>
       <fileset dir="." includes="${generated.java.files},${generated.lib.files},VERSION.txt"/>
       <fileset dir="${build.dir}" />
     </delete>
+  </target>
+
+  <target name="clean-deep">
+    <delete includeEmptyDirs="true" quiet="true">
+      <fileset dir="${classes.dir}"/>
+      <fileset dir="${testclasses.dir}"/>
+    </delete>
+    <antcall target="clean"/>
   </target>
 
   <target name="prepare">
@@ -187,14 +194,14 @@ ${jar-jdk14.file}"/>
           prefix="${dist.name}"
           includes="
 ${src.dir}/**/*.java,
+${testsrc.dir}/**/*.java,
 doc/**/*.css,
 doc/**/*.png,
 doc/**/*.html,
 doc/**/*.pdf,
-misc/**/*.mf,
-misc/Meta.xsl,
 build.xml,
 build.properties,
+test.properties.example,
 LICENSE.html,
 README.txt,
 VERSION.txt"
@@ -206,10 +213,10 @@ ${javadoc.dir}/**,
     </zip>
   </target>
 
-  <target name="release" depends="binzip"/>
+  <target name="release" depends="clean-deep, binzip"/>
 
   <target name="binzip"
-      depends="clean,jar,version,srczip,retroweave,jar-jdk14,javadoc">
+      depends="clean,jar,version,srczip,retroweave,jar-jdk14,javadoc,javadoc-pdf">
     <mkdir dir="${dist.dir}" />
     <delete file="${dist.bin.file}"/>
     <zip zipfile="${dist.bin.file}">
@@ -225,6 +232,25 @@ ${doc.dir}/api/**/*.xml,
 ${jar.file},
 ${jar-jdk14.file},
 lib/*.dtd,
+lib/mondrian.jar,
+lib/mondrian-jdk14.jar,
+lib/eigenbase-xom.jar,
+lib/eigenbase-properties.jar,
+lib/eigenbase-resgen.jar,
+lib/commons-dbcp.jar,
+lib/commons-pool.jar,
+lib/commons-collections.jar,
+lib/commons-vfs.jar,
+lib/commons-logging.jar,
+lib/commons-math-1.0.jar,
+lib/javacup.jar,
+lib/log4j-1.2.9.jar,
+lib/asm-2.2.3.jar,
+lib/asm-commons-2.2.3.jar,
+lib/retroweaver-1.2.4.jar,
+lib/retroweaver-rt-1.2.4.jar,
+testlib/junit.jar,
+testlib/servlet.jar,
 LICENSE.html,
 README.txt,
 VERSION.txt"
