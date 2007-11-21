@@ -1,0 +1,25 @@
+# $Id$
+# This software is subject to the terms of the Common Public License
+# Agreement, available at the following URL:
+# http://www.opensource.org/licenses/cpl.html.
+# Copyright (C) 2007-2007 Julian Hyde and others.
+# All Rights Reserved.
+# You must accept the terms of that agreement to use this software.
+#
+# Sample "test.properties" file. Rename to "test.properties" and modify
+# for your environment.
+
+# Connect string olap4j test suite should use to connect to the foodmart
+# database. Examples are shown for mondrian connecting to Apache Derby on
+# Linux, Oracle on Linux, and Microsoft Access on Windows. Must be specified;
+# there is no default.
+#org.olap4j.test.connectUrl=jdbc:mondrian:Jdbc='jdbc:derby:/home/jvs/open/mondrian/demo/derby/foodmart';JdbcUser=sa;JdbcPassword=sa;Catalog='file:///home/jvs/open/mondrian/demo/FoodMart.xml';JdbcDrivers=org.apache.derby.jdbc.EmbeddedDriver;
+#org.olap4j.test.connectUrl=jdbc:mondrian:Jdbc=jdbc:oracle:thin:foodmart/foodmart@//marmalade.hydromatic.net:1521/XE;JdbcUser=foodmart;JdbcPassword=foodmart;Catalog=../mondrian/demo/FoodMart.xml;JdbcDrivers=oracle.jdbc.OracleDriver;
+#org.olap4j.test.connectUrl=jdbc:mondrian:Jdbc='jdbc:odbc:MondrianFoodMart';Catalog='file://c:/open/mondrian/demo/FoodMart.xml';JdbcDrivers=sun.jdbc.odbc.JdbcOdbcDriver;
+
+# Name of class which targets the olap4j test suite to a particular driver
+# implementation. Must implement org.olap4j.test.TestContext.Tester interface.
+# Default is "org.olap4j.MondrianTester".
+org.olap4j.test.helperClassName=org.olap4j.MondrianTester
+
+# End test.properties.example

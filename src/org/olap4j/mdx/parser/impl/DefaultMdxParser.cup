@@ -1427,7 +1427,6 @@ axis_specification ::=
             // Legal axis ordinals run from 0 (COLUMS) to 4 (SECTIONS),
             // inclusive.
             if (index < 0 || index != d || index > Axis.MAX_ORDINAL) {
-                System.out.println("nleft=" + nleft + ", nright=" + nright);
                 throw new MdxParseException(
                     createRegion(nleft, nright),
                     "Invalid axis specification. The axis number must be an integer between 0 and " +

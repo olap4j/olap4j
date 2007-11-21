@@ -42,8 +42,10 @@ public class ParserTest extends TestCase {
 
     private MdxParser createParser() {
         try {
-            OlapConnection olapConnection = TestContext.instance().getConnection();
-            return olapConnection.getParserFactory().createMdxParser(olapConnection);
+            OlapConnection olapConnection =
+                TestContext.instance().getOlapConnection();
+            return olapConnection.getParserFactory()
+                .createMdxParser(olapConnection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -185,7 +187,7 @@ public class ParserTest extends TestCase {
         try {
             final TestContext testContext = TestContext.instance();
 
-            OlapConnection olapConnection = testContext.getConnection();
+            OlapConnection olapConnection = testContext.getOlapConnection();
             MdxParser mdxParser =
                 olapConnection.getParserFactory()
                     .createMdxParser(olapConnection);
@@ -526,7 +528,7 @@ public class ParserTest extends TestCase {
 
     // todo: enable this
     public void _testCloneQuery() throws SQLException {
-        OlapConnection olapConnection = TestContext.instance().getConnection();
+        OlapConnection olapConnection = TestContext.instance().getOlapConnection();
         MdxParser mdxParser =
             olapConnection.getParserFactory()
                 .createMdxParser(olapConnection);

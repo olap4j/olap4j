@@ -11,19 +11,14 @@ package org.olap4j;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-import mondrian.tui.XmlaSupport;
-import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.mdx.*;
 import org.olap4j.mdx.parser.*;
 import org.olap4j.metadata.*;
 import org.olap4j.test.TestContext;
 import org.olap4j.type.*;
-import org.xml.sax.SAXException;
 
-import javax.servlet.ServletException;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.sql.*;
 import java.util.*;
 
@@ -31,37 +26,14 @@ import java.util.*;
  * Unit test for olap4j Driver and Connection classes.
  *
  * <p>The system property "org.olap4j.test.helperClassName" determines the
- * name of the helper class. By default, uses {@link MondrianHelper}, which
- * runs against mondrian; {@link XmlaHelper} is also available.
+ * name of the helper class. By default, uses {@link MondrianTester}, which
+ * runs against mondrian; {@link XmlaTester} is also available.
  *
+ * @author jhyde
  * @version $Id$
  */
 public class ConnectionTest extends TestCase {
-    private final Helper helper = createHelper();
-
-    /**
-     * Factory method for the {@link org.olap4j.ConnectionTest.Helper}
-     * object which determines which driver to test.
-     *
-     * @return a new Helper
-     */
-    static Helper createHelper() {
-        String helperClassName =
-            System.getProperty("org.olap4j.test.helperClassName");
-        if (helperClassName != null) {
-            try {
-                Class<?> clazz = Class.forName(helperClassName);
-                return (Helper) clazz.newInstance();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return new MondrianHelper();
-    }
+    private final TestContext.Tester tester = TestContext.instance().getTester();
 
     private static final boolean IS_JDK_16 =
         System.getProperty("java.version").startsWith("1.6.");
@@ -70,18 +42,18 @@ public class ConnectionTest extends TestCase {
      * Driver basics.
      */
     public void testDriver() throws ClassNotFoundException, SQLException {
-        Class clazz = Class.forName(helper.getDriverClassName());
+        Class clazz = Class.forName(tester.getDriverClassName());
         assertNotNull(clazz);
         assertTrue(Driver.class.isAssignableFrom(clazz));
 
         // driver should have automatically registered itself
-        Driver driver = DriverManager.getDriver(helper.getDriverUrlPrefix());
+        Driver driver = DriverManager.getDriver(tester.getDriverUrlPrefix());
         assertNotNull(driver);
 
         // deregister driver
         DriverManager.deregisterDriver(driver);
         try {
-            Driver driver2 = DriverManager.getDriver(helper.getDriverUrlPrefix());
+            Driver driver2 = DriverManager.getDriver(tester.getDriverUrlPrefix());
             fail("expected error, got " + driver2);
         } catch (SQLException e) {
             assertEquals("No suitable driver", e.getMessage());
@@ -89,7 +61,7 @@ public class ConnectionTest extends TestCase {
 
         // register explicitly
         DriverManager.registerDriver(driver);
-        Driver driver3 = DriverManager.getDriver(helper.getDriverUrlPrefix());
+        Driver driver3 = DriverManager.getDriver(tester.getDriverUrlPrefix());
         assertNotNull(driver3);
 
         // test properties
@@ -102,7 +74,7 @@ public class ConnectionTest extends TestCase {
         // We can't test individual properties in this non-driver-specific test.
         DriverPropertyInfo[] driverPropertyInfos =
             driver.getPropertyInfo(
-                helper.getDriverUrlPrefix(),
+                tester.getDriverUrlPrefix(),
                 new Properties());
         assertTrue(driverPropertyInfos.length > 0);
     }
@@ -170,10 +142,10 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testConnection() throws ClassNotFoundException, SQLException {
-        Class.forName(helper.getDriverClassName());
+        Class.forName(tester.getDriverClassName());
 
         // connect using properties and no username/password
-        Connection connection = helper.createConnection();
+        Connection connection = tester.createConnection();
         assertNotNull(connection);
 
         // check isClosed, isValid
@@ -193,14 +165,14 @@ public class ConnectionTest extends TestCase {
         connection.close();
 
         // connect using username/password
-        connection = helper.createConnectionWithUserPassword();
+        connection = tester.createConnectionWithUserPassword();
         assertNotNull(connection);
 
         connection.close();
         assertTrue(connection.isClosed());
 
         // connect with URL only
-        connection = DriverManager.getConnection(helper.getURL());
+        connection = DriverManager.getConnection(tester.getURL());
         assertNotNull(connection);
 
         connection.close();
@@ -208,7 +180,7 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testConnectionUnwrap() throws SQLException {
-        java.sql.Connection connection = helper.createConnection();
+        java.sql.Connection connection = tester.createConnection();
 
         // Trivial unwrap
         assertTrue(((OlapWrapper) connection).isWrapperFor(Connection.class));
@@ -249,7 +221,7 @@ public class ConnectionTest extends TestCase {
         }
 
         // Unwrap the mondrian connection.
-        if (helper.isMondrian()) {
+        if (tester.isMondrian()) {
             final mondrian.olap.Connection mondrianConnection =
                 ((OlapWrapper) connection).unwrap(mondrian.olap.Connection.class);
             assertNotNull(mondrianConnection);
@@ -257,7 +229,7 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testStatement() throws SQLException {
-        Connection connection = helper.createConnection();
+        Connection connection = tester.createConnection();
         Statement statement = connection.createStatement();
 
         // Closing a statement is idempotent.
@@ -308,7 +280,7 @@ public class ConnectionTest extends TestCase {
     private enum Method { ClassName, Mode, Type, TypeName, OlapType }
 
     public void testPreparedStatement() throws SQLException {
-        Connection connection = helper.createConnection();
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
         PreparedOlapStatement pstmt =
@@ -477,7 +449,7 @@ public class ConnectionTest extends TestCase {
 
     public void testCellSetMetaData() throws SQLException {
         // Metadata of prepared statement
-        Connection connection = helper.createConnection();
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
 
@@ -547,7 +519,7 @@ public class ConnectionTest extends TestCase {
      * @throws Exception on error
      */
     public void testCellSetAxisMetaData() throws Exception {
-        Connection connection = helper.createConnection();
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
         final String mdx = "SELECT\n"
@@ -592,7 +564,7 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testCellSet() throws SQLException {
-        Connection connection = helper.createConnection();
+        Connection connection = tester.createConnection();
         Statement statement = connection.createStatement();
         final OlapStatement olapStatement =
             ((OlapWrapper) statement).unwrap(OlapStatement.class);
@@ -625,7 +597,7 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testCell() throws Exception {
-        Connection connection = helper.createConnection();
+        Connection connection = tester.createConnection();
         Statement statement = connection.createStatement();
         final OlapStatement olapStatement =
             ((OlapWrapper) statement).unwrap(OlapStatement.class);
@@ -806,7 +778,7 @@ public class ConnectionTest extends TestCase {
 
         // parse
 
-        Connection connection = helper.createConnection();
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
         MdxParser mdxParser =
@@ -834,7 +806,7 @@ public class ConnectionTest extends TestCase {
             fail("expected exception, got " + select);
         } catch (Exception e) {
             assertTrue(
-                getStackTrace(e).indexOf("Duplicate axis name 'COLUMNS'.") 
+                TestContext.getStackTrace(e).indexOf("Duplicate axis name 'COLUMNS'.")
                 >= 0);
         }
     }
@@ -937,8 +909,8 @@ public class ConnectionTest extends TestCase {
      * Tests the {@link Cube#lookupMember(String[])} method.
      */
     public void testCubeLookupMember() throws Exception {
-        Class.forName(helper.getDriverClassName());
-        Connection connection = helper.createConnection();
+        Class.forName(tester.getDriverClassName());
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
         Cube cube = olapConnection.getSchema().getCubes().get("Sales");
@@ -970,8 +942,8 @@ public class ConnectionTest extends TestCase {
      * Tests the {@link Cube#lookupMembers(java.util.Set, String[])} method.
      */
     public void testCubeLookupMembers() throws Exception {
-        Class.forName(helper.getDriverClassName());
-        Connection connection = helper.createConnection();
+        Class.forName(tester.getDriverClassName());
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
         Cube cube = olapConnection.getSchema().getCubes().get("Sales");
@@ -1048,8 +1020,8 @@ public class ConnectionTest extends TestCase {
      * Tests metadata browsing.
      */
     public void testMetadata() throws Exception {
-        Class.forName(helper.getDriverClassName());
-        Connection connection = helper.createConnection();
+        Class.forName(tester.getDriverClassName());
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
         Cube cube = olapConnection.getSchema().getCubes().get("Sales");
@@ -1157,8 +1129,8 @@ public class ConnectionTest extends TestCase {
      * @throws Throwable on error
      */
     public void testCubeType() throws Throwable {
-        Class.forName(helper.getDriverClassName());
-        Connection connection = helper.createConnection();
+        Class.forName(tester.getDriverClassName());
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
 
@@ -1220,10 +1192,10 @@ public class ConnectionTest extends TestCase {
      * @throws Throwable on error
      */
     public void testAxisType() throws Throwable {
-        Class.forName(helper.getDriverClassName());
+        Class.forName(tester.getDriverClassName());
 
         // connect using properties and no username/password
-        Connection connection = helper.createConnection();
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
 
@@ -1306,8 +1278,8 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testParseQueryWithNoFilter() throws Exception {
-        Class.forName(helper.getDriverClassName());
-        Connection connection = helper.createConnection();
+        Class.forName(tester.getDriverClassName());
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
 
@@ -1337,7 +1309,7 @@ public class ConnectionTest extends TestCase {
             fail("expected parse error, got " + select);
         } catch (RuntimeException e) {
             assertTrue(
-                getStackTrace(e).indexOf(
+                TestContext.getStackTrace(e).indexOf(
                     "Syntax error at [4:10], token ')'") >= 0);
         }
     }
@@ -1345,17 +1317,6 @@ public class ConnectionTest extends TestCase {
     // TODO: test for HierarchyType
     // TODO: test for DimensionType
     // TODO: test for LevelType
-
-    /**
-     * Converts a {@link Throwable} to a stack trace.
-     */
-    static String getStackTrace(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        pw.flush();
-        return sw.toString();
-    }
 
     /**
      * Converts a list of members to a string, one per line.
@@ -1369,7 +1330,7 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testStatementCancel() throws Throwable {
-        Connection connection = helper.createConnection();
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
         final OlapStatement olapStatement = olapConnection.createStatement();
@@ -1403,7 +1364,7 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testStatementTimeout() throws Throwable {
-        Connection connection = helper.createConnection();
+        Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
         final OlapStatement olapStatement = olapConnection.createStatement();
@@ -1428,172 +1389,6 @@ public class ConnectionTest extends TestCase {
         }
     }
 
-    /**
-     * Abstracts the information about specific drivers and database instances
-     * needed by this test. This allows the same test suite to be used for
-     * multiple implementations of olap4j.
-     */
-    interface Helper {
-        Connection createConnection() throws SQLException;
-
-        String getDriverUrlPrefix();
-
-        String getDriverClassName();
-
-        Connection createConnectionWithUserPassword() throws SQLException;
-
-        String getURL();
-
-        boolean isMondrian();
-    }
-
-    /**
-     * Implementation of {@link Helper} which speaks to the mondrian olap4j
-     * driver.
-     */
-    public static class MondrianHelper implements Helper {
-
-        public Connection createConnection() throws SQLException {
-            try {
-                Class.forName(DRIVER_CLASS_NAME);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException("oops", e);
-            }
-            return
-                DriverManager.getConnection(
-                    getURL(),
-                    new Properties());
-        }
-
-        public Connection createConnectionWithUserPassword() throws SQLException {
-            return DriverManager.getConnection(
-                getURL(), USER, PASSWORD);
-        }
-
-        public String getDriverUrlPrefix() {
-            return DRIVER_URL_PREFIX;
-        }
-
-        public String getDriverClassName() {
-            return DRIVER_CLASS_NAME;
-        }
-
-        public String getURL() {
-            return getDefaultConnectString();
-        }
-
-        public boolean isMondrian() {
-            return true;
-        }
-
-        public static String getDefaultConnectString() {
-            if (false) {
-                return "jdbc:mondrian:Jdbc='jdbc:derby:/home/jvs/open/mondrian/demo/derby/foodmart';JdbcUser=sa;JdbcPassword=sa;Catalog='file:///home/jvs/open/mondrian/demo/FoodMart.xml';JdbcDrivers=org.apache.derby.jdbc.EmbeddedDriver;";
-            }
-            if (true) {
-                return "jdbc:mondrian:Jdbc='jdbc:odbc:MondrianFoodMart';Catalog='file://c:/open/mondrian/demo/FoodMart.xml';JdbcDrivers=sun.jdbc.odbc.JdbcOdbcDriver;";
-            } else {
-                return "jdbc:mondrian:Jdbc=jdbc:oracle:thin:foodmart/foodmart@//marmalade.hydromatic.net:1521/XE;JdbcUser=foodmart;JdbcPassword=foodmart;Catalog=../mondrian/demo/FoodMart.xml;JdbcDrivers=oracle.jdbc.OracleDriver;";
-            }
-        }
-
-        public static final String DRIVER_CLASS_NAME = "mondrian.olap4j.MondrianOlap4jDriver";
-
-        public static final String DRIVER_URL_PREFIX = "jdbc:mondrian:";
-        private static final String USER = "sa";
-        private static final String PASSWORD = "sa";
-    }
-
-    /**
-     * Implementation of {@link Helper} which speaks to the XML/A olap4j
-     * driver.
-     */
-    public static class XmlaHelper implements Helper {
-        XmlaOlap4jDriver.Proxy proxy =
-            new MondrianInprocProxy();
-
-        public Connection createConnection() throws SQLException {
-            try {
-                Class.forName(DRIVER_CLASS_NAME);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException("oops", e);
-            }
-            try {
-                XmlaOlap4jDriver.THREAD_PROXY.set(proxy);
-                Properties info = new Properties();
-                info.setProperty("UseThreadProxy", "true");
-                return
-                    DriverManager.getConnection(
-                        getURL(),
-                        info);
-            } finally {
-                XmlaOlap4jDriver.THREAD_PROXY.set(null);
-            }
-        }
-
-        public Connection createConnectionWithUserPassword() throws SQLException {
-            try {
-                Class.forName(DRIVER_CLASS_NAME);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException("oops", e);
-            }
-            try {
-                XmlaOlap4jDriver.THREAD_PROXY.set(proxy);
-                Properties info = new Properties();
-                info.setProperty("UseThreadProxy", "true");
-                return DriverManager.getConnection(
-                    getURL(), USER, PASSWORD);
-            } finally {
-                XmlaOlap4jDriver.THREAD_PROXY.set(null);
-            }
-        }
-
-        public String getDriverUrlPrefix() {
-            return DRIVER_URL_PREFIX;
-        }
-
-        public String getDriverClassName() {
-            return DRIVER_CLASS_NAME;
-        }
-
-        public String getURL() {
-            return "jdbc:xmla:Server=http://foo;UseThreadProxy=true";
-        }
-
-        public boolean isMondrian() {
-            return false;
-        }
-
-        public static final String DRIVER_CLASS_NAME =
-             "org.olap4j.driver.xmla.XmlaOlap4jDriver";
-
-        public static final String DRIVER_URL_PREFIX = "jdbc:xmla:";
-        private static final String USER = "user";
-        private static final String PASSWORD = "password";
-
-        /**
-         * Proxy which implements XMLA requests by talking to mondrian
-         * in-process. This is more convenient to debug than an inter-process
-         * request using HTTP.
-         */
-        private static class MondrianInprocProxy implements XmlaOlap4jDriver.Proxy {
-            public InputStream get(URL url, String request) throws IOException {
-                try {
-                    Map<String, String> map = new HashMap<String, String>();
-                    String urlString = url.toString();
-                    byte[] bytes = XmlaSupport.processSoapXmla(
-                        request, urlString, map, null);
-                    return new ByteArrayInputStream(bytes);
-                } catch (ServletException e) {
-                    throw new RuntimeException(
-                        "Error while reading '" + url + "'", e);
-                } catch (SAXException e) {
-                    throw new RuntimeException(
-                        "Error while reading '" + url + "'", e);
-                }
-            }
-        }
-    }
 }
 
 // End ConnectionTest.java

@@ -189,7 +189,6 @@ public class OlapTest extends TestCase {
 
         } catch (Throwable t) {
             t.printStackTrace();
-            System.exit(0);
         }
 
     }

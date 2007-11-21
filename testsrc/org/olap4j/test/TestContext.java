@@ -9,14 +9,12 @@
 */
 package org.olap4j.test;
 
-import java.io.StringWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.regex.Pattern;
-import java.sql.SQLException;
-import java.sql.DriverManager;
+import java.sql.*;
 
 import org.olap4j.metadata.Member;
 import org.olap4j.*;
@@ -42,6 +40,15 @@ public class TestContext {
     private static final Pattern LineBreakPattern =
         Pattern.compile("\r\n|\r|\n");
     private static final Pattern TabPattern = Pattern.compile("\t");
+    public static Properties testProperties;
+
+    private final Tester tester = createTester();
+
+    /**
+     * Intentionally private: use {@link #instance()}.
+     */
+    private TestContext() {
+    }
 
     /**
      * Converts a string constant into environment-specific line endings.
@@ -158,56 +165,10 @@ public class TestContext {
         return INSTANCE;
     }
 
-    public OlapConnection getConnection() throws SQLException {
-        java.sql.Connection connection = createConnection();
-        OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
-        return olapConnection;
+    public OlapConnection getOlapConnection() throws SQLException {
+        java.sql.Connection connection = tester.createConnection();
+        return ((OlapWrapper) connection).unwrap(OlapConnection.class);
     }
-
-    public java.sql.Connection createConnection() throws SQLException {
-        try {
-            Class.forName(DRIVER_CLASS_NAME);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("oops", e);
-        }
-        return
-            DriverManager.getConnection(
-                getURL(),
-                new Properties());
-    }
-
-    public java.sql.Connection createConnectionWithUserPassword() throws SQLException {
-        return DriverManager.getConnection(
-            getURL(), USER, PASSWORD);
-    }
-
-    public String getDriverUrlPrefix() {
-        return DRIVER_URL_PREFIX;
-    }
-
-    public String getDriverClassName() {
-        return DRIVER_CLASS_NAME;
-    }
-
-    public String getURL() {
-        return getDefaultConnectString();
-    }
-
-    public boolean isMondrian() {
-        return true;
-    }
-
-    public static String getDefaultConnectString() {
-//            return "jdbc:mondrian:Jdbc='jdbc:odbc:MondrianFoodMart';Catalog='../mondrian/demo/FoodMart.xml';JdbcDrivers=sun.jdbc.odbc.JdbcOdbcDriver;";
-        return "jdbc:mondrian:Jdbc='jdbc:oracle:thin:foodmart/foodmart@//marmalade.hydromatic.net:1521/XE';Catalog='../mondrian/demo/FoodMart.xml';JdbcDrivers=oracle.jdbc.OracleDriver;";
-    }
-
-    public static final String DRIVER_CLASS_NAME = "mondrian.olap4j.MondrianOlap4jDriver";
-
-    public static final String DRIVER_URL_PREFIX = "jdbc:mondrian:";
-    private static final String USER = "user";
-    private static final String PASSWORD = "password";
 
     /**
      * Checks that an actual string matches an expected string. If they do not,
@@ -316,6 +277,105 @@ public class TestContext {
         s = s.replaceAll("\\[", "\\\\[");
         s = s.replaceAll("\\]", "\\\\]");
         return s;
+    }
+
+    /**
+     * Factory method for the {@link Tester}
+     * object which determines which driver to test.
+     *
+     * @return a new Tester
+     */
+    private static Tester createTester() {
+        String helperClassName =
+            getTestProperties().getProperty("org.olap4j.test.helperClassName");
+        if (helperClassName == null) {
+            helperClassName = "org.olap4j.MondrianTester";
+        }
+        try {
+            Class<?> clazz = Class.forName(helperClassName);
+            return (Tester) clazz.newInstance();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Returns an object containing all properties needed by the test suite.
+     *
+     * <p>Consists of system properties, overridden by the contents of
+     * "test.properties" in the current directory, if it exists, and
+     * in any parent or ancestor directory. This allows you to invoke the
+     * test from any sub-directory of the source root and still pick up the
+     * right test parameters.
+     *
+     * @return object containing properties needed by the test suite
+     */
+    public static synchronized Properties getTestProperties() {
+        if (testProperties == null) {
+            testProperties = new Properties(System.getProperties());
+
+            File dir = new File(System.getProperty("user.dir"));
+            while (dir != null) {
+                File file = new File(dir, "test.properties");
+                if (file.exists()) {
+                    try {
+                        testProperties.load(new FileInputStream(file));
+                    } catch (IOException e) {
+                        // ignore
+                    }
+                }
+
+                file = new File(new File(dir, "olap4j"), "test.properties");
+                if (file.exists()) {
+                    try {
+                        testProperties.load(new FileInputStream(file));
+                    } catch (IOException e) {
+                        // ignore
+                    }
+                }
+                
+                dir = dir.getParentFile();
+            }
+        }
+        return testProperties;
+    }
+
+    /**
+     * Converts a {@link Throwable} to a stack trace.
+     */
+    public static String getStackTrace(Throwable e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        pw.flush();
+        return sw.toString();
+    }
+
+    public Tester getTester() {
+        return tester;
+    }
+
+    /**
+     * Abstracts the information about specific drivers and database instances
+     * needed by this test. This allows the same test suite to be used for
+     * multiple implementations of olap4j.
+     */
+    public interface Tester {
+        Connection createConnection() throws SQLException;
+
+        String getDriverUrlPrefix();
+
+        String getDriverClassName();
+
+        Connection createConnectionWithUserPassword() throws SQLException;
+
+        String getURL();
+
+        boolean isMondrian();
     }
 }
 

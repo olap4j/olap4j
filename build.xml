@@ -41,6 +41,14 @@
   <property name="dist.src.file" value="${dist.dir}/${dist.name}-src.zip" />
   <property name="dist.doc.file" value="${dist.dir}/doc.tar.gz" />
 
+  <property name="generated.java.files" value="
+${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParser.java,
+${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java"/>
+
+  <property name="generated.lib.files" value="
+${jar.file},
+${jar-jdk14.file}"/>
+
   <path id="project.classpath">
     <pathelement location="${classes.dir}"/>
     <!-- <pathelement location="${lib.dir}/retroweaver-1.2.4.jar"/> -->
@@ -73,9 +81,6 @@
     <pathelement location="${testclasses.dir}"/>
   </path>
 
-  <!-- verify that required dependencies are defined -->
-  <fail unless="retroweaver.dir" />
-
   <!-- Arguments to the java process spawned by the junit task. -->
   <property name="junit.jvmargs" value="-ea -esa"/>
 
@@ -96,6 +101,7 @@
     <delete includeEmptyDirs="true" quiet="true">
       <fileset dir="${classes.dir}" includes="**/*.class,**/*.properties"/>
       <fileset dir="${testclasses.dir}" includes="**/*.class,**/*.properties"/>
+      <fileset dir="." includes="${generated.java.files},${generated.lib.files},VERSION.txt"/>
       <fileset dir="${build.dir}" />
     </delete>
   </target>

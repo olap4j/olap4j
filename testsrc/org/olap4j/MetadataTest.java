@@ -23,7 +23,6 @@ import java.util.*;
 public class MetadataTest extends TestCase {
     private static final String NL = System.getProperty("line.separator");
 
-    private final ConnectionTest.Helper helper = ConnectionTest.createHelper();
     private final Connection connection;
     private final String catalogName;
     private final OlapConnection olapConnection;
@@ -48,7 +47,7 @@ public class MetadataTest extends TestCase {
     private static final List<String> ACTIONS_COLUMN_NAMES = Arrays.asList("SCHEMA_NAME", "CUBE_NAME", "ACTION_NAME", "COORDINATE", "COORDINATE_TYPE");
 
     public MetadataTest() throws SQLException {
-        connection = helper.createConnection();
+        connection = TestContext.instance().getTester().createConnection();
         catalogName = connection.getCatalog();
         olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
@@ -255,7 +254,7 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getOlapFunctions(null),
             FUNCTIONS_COLUMN_NAMES);
         assertContains("FUNCTION_NAME=Name, DESCRIPTION=Returns the name of a member., PARAMETER_LIST=Member, RETURN_TYPE=8, ORIGIN=1, INTERFACE_NAME=, LIBRARY_NAME=null, CAPTION=Name", s);
-        assertEquals(271, linecount(s));
+        assertEquals(272, linecount(s));
 
         s = checkResultSet(
             olapDatabaseMetaData.getOlapFunctions("%scendants"),
