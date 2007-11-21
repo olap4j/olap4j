@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * for the Mondrian OLAP engine.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
 * @since Nov 17, 2007
 */
 class MondrianOlap4jCellSetAxisMetaData implements CellSetAxisMetaData {

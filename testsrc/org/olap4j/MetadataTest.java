@@ -18,7 +18,7 @@ import java.util.*;
 /**
  * Unit test for olap4j metadata methods.
  *
- * @version $Id: ConnectionTest.java 31 2007-09-22 02:29:21Z jhyde $
+ * @version $Id$
  */
 public class MetadataTest extends TestCase {
     private static final String NL = System.getProperty("line.separator");

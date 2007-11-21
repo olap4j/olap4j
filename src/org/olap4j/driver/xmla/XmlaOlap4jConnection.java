@@ -26,7 +26,7 @@ import mondrian.olap.Util;
  * for XML/A providers.
  *
  * @author jhyde
- * @version $Id: MondrianOlap4jConnection.java 23 2007-06-15 03:53:14Z jhyde $
+ * @version $Id$
  * @since May 23, 2007
  */
 abstract class XmlaOlap4jConnection implements OlapConnection {

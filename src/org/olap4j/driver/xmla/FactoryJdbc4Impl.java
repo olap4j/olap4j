@@ -19,7 +19,7 @@ import org.olap4j.OlapConnection;
  * Implementation of {@link Factory} for JDBC 4.0.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 14, 2007
  */
 class FactoryJdbc4Impl implements Factory {

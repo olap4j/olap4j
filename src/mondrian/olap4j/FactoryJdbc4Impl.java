@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -23,7 +23,7 @@ import mondrian.olap.Query;
  * Implementation of {@link Factory} for JDBC 4.0.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 14, 2007
  */
 class FactoryJdbc4Impl implements Factory {

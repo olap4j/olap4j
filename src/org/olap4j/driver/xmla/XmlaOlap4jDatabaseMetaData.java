@@ -25,7 +25,7 @@ import java.util.Set;
  * for XML/A providers.
  *
  * @author jhyde
- * @version $Id: MondrianOlap4jDatabaseMetaData.java 22 2007-06-15 02:23:07Z jhyde $
+ * @version $Id$
  * @since May 23, 2007
  */
 abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {

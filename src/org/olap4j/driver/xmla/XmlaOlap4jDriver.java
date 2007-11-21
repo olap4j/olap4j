@@ -61,7 +61,7 @@ import java.io.IOException;
  * </table>
  *
  * @author jhyde
- * @version $Id: MondrianOlap4jDriver.java 23 2007-06-15 03:53:14Z jhyde $
+ * @version $Id$
  * @since May 22, 2007
  */
 public class XmlaOlap4jDriver implements Driver {

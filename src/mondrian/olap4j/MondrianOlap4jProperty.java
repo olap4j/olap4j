@@ -19,7 +19,7 @@ import java.util.Locale;
  * {@link mondrian.olap.Property}.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Nov 12, 2007
  */
 class MondrianOlap4jProperty implements Property, Named {

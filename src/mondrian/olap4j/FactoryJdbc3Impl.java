@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -18,7 +18,7 @@ import java.util.*;
  * Implementation of {@link mondrian.olap4j.Factory} for JDBC 3.0.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 14, 2007
  */
 class FactoryJdbc3Impl implements Factory {

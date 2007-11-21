@@ -21,7 +21,7 @@ import java.io.*;
  * for XML/A providers.
  *
  * @author jhyde
- * @version $Id: MondrianOlap4jStatement.java 22 2007-06-15 02:23:07Z jhyde $
+ * @version $Id$
  * @since May 24, 2007
  */
 class XmlaOlap4jStatement implements OlapStatement {

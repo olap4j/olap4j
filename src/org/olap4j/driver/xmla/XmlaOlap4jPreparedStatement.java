@@ -25,7 +25,7 @@ import java.net.URL;
  * for XML/A providers.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 12, 2007
  */
 abstract class XmlaOlap4jPreparedStatement

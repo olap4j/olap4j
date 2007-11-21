@@ -21,7 +21,7 @@ import java.io.InputStream;
  * and JDBC 4.0 (which occurs in JDK 1.6).
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 14, 2007
  */
 interface Factory {

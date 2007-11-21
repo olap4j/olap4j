@@ -17,7 +17,7 @@ import java.io.InputStream;
  * Implementation of {@link Factory} for JDBC 3.0.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 14, 2007
  */
 class FactoryJdbc3Impl implements Factory {

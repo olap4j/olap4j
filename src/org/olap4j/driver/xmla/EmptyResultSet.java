@@ -26,7 +26,7 @@ import java.net.URL;
  * any instances for this particular driver.</p>
  *
  * @author jhyde
- * @version $Id: EmptyResultSet.java 22 2007-06-15 02:23:07Z jhyde $
+ * @version $Id$
  * @since May 24, 2007
  */
 abstract class EmptyResultSet implements ResultSet, OlapWrapper {

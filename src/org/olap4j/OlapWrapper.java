@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -59,7 +59,7 @@ import java.sql.SQLException;
  * to create a JDBC 4.0 connection and convert it to an olap4j connection.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 14, 2007
  */
 public interface OlapWrapper {

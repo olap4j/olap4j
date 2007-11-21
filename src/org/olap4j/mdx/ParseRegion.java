@@ -1,5 +1,5 @@
 /*
-// $Id: ParseTreeNode.java 20 2007-06-10 23:09:28Z jhyde $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -29,7 +29,7 @@ package org.olap4j.mdx;
  *
  * <p>Regions are immutable.
  *
- * @version $Id: $
+ * @version $Id$
  * @author jhyde
  */
 public class ParseRegion {

@@ -21,7 +21,7 @@ import java.util.List;
  * for the Mondrian OLAP engine.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jun 13, 2007
  */
 class XmlaOlap4jCellSetMetaData implements CellSetMetaData {

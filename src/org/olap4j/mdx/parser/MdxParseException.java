@@ -1,5 +1,5 @@
 /*
-// $Id: ParseTreeNode.java 20 2007-06-10 23:09:28Z jhyde $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -16,7 +16,7 @@ import org.olap4j.mdx.ParseRegion;
  * indicate an error in parsing. Has a {@link org.olap4j.mdx.ParseRegion}.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  */
 public class MdxParseException extends RuntimeException {
     private final ParseRegion region;

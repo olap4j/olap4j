@@ -18,7 +18,7 @@ import org.olap4j.metadata.NamedList;
  * the {@link Named} interface.
  *
  * @author jhyde
- * @version $Id: NamedListImpl.java 20 2007-06-10 23:09:28Z jhyde $
+ * @version $Id$
  * @since May 23, 2007
  */
 class NamedListImpl<T extends Named>

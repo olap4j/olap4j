@@ -26,7 +26,7 @@ import mondrian.olap.Util;
  * for XML/A providers.
  *
  * @author jhyde
- * @version $Id: MondrianOlap4jCellSet.java 22 2007-06-15 02:23:07Z jhyde $
+ * @version $Id$
  * @since May 24, 2007
  */
 abstract class XmlaOlap4jCellSet implements CellSet {

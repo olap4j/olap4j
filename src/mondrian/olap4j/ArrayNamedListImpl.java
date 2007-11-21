@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * @see mondrian.olap4j.NamedListImpl
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Nov 12, 2007
  */
 public abstract class ArrayNamedListImpl<T>

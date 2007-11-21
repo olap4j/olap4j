@@ -14,7 +14,7 @@ package org.olap4j.driver.xmla;
  * {@link org.olap4j.metadata.NamedList} which works on such objects.
  *
  * @author jhyde
- * @version $Id: Named.java 20 2007-06-10 23:09:28Z jhyde $
+ * @version $Id$
  * @since May 23, 2007
  */
 interface Named {
