@@ -86,7 +86,7 @@ class FactoryJdbc3Impl implements Factory {
         public MondrianOlap4jCellSetJdbc3(
             MondrianOlap4jStatement olap4jStatement, Query query)
         {
-            super(olap4jStatement);
+            super(olap4jStatement, query);
         }
     }
 

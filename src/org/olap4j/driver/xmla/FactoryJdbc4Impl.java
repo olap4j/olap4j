@@ -13,7 +13,7 @@ import java.util.Properties;
 import java.io.Reader;
 import java.io.InputStream;
 
-import org.olap4j.OlapConnection;
+import org.olap4j.*;
 
 /**
  * Implementation of {@link Factory} for JDBC 4.0.
@@ -311,6 +311,14 @@ class FactoryJdbc4Impl implements Factory {
             super(factory, proxy, url, info);
         }
 
+        public OlapStatement createStatement() {
+            return super.createStatement();
+        }
+
+        public OlapDatabaseMetaData getMetaData() {
+            return super.getMetaData();
+        }
+
         // implement java.sql.Connection methods
         // introduced in JDBC 4.0/JDK 1.6
 
@@ -368,6 +376,10 @@ class FactoryJdbc4Impl implements Factory {
             InputStream is)
         {
             super(olap4jStatement, is);
+        }
+
+        public CellSetMetaData getMetaData() {
+            return super.getMetaData();
         }
 
         // implement java.sql.CellSet methods
@@ -603,12 +615,17 @@ class FactoryJdbc4Impl implements Factory {
     }
 
     private static class XmlaOlap4jPreparedStatementJdbc4
-        extends XmlaOlap4jPreparedStatement {
-        public XmlaOlap4jPreparedStatementJdbc4(
+        extends XmlaOlap4jPreparedStatement
+    {
+        XmlaOlap4jPreparedStatementJdbc4(
             XmlaOlap4jConnection olap4jConnection,
             String mdx)
         {
             super(olap4jConnection, mdx);
+        }
+
+        public CellSetMetaData getMetaData() {
+            return super.getMetaData();
         }
 
         // implement java.sql.PreparedStatement methods
@@ -705,11 +722,16 @@ class FactoryJdbc4Impl implements Factory {
     }
 
     private static class XmlaOlap4jDatabaseMetaDataJdbc4
-        extends XmlaOlap4jDatabaseMetaData {
-        public XmlaOlap4jDatabaseMetaDataJdbc4(
+        extends XmlaOlap4jDatabaseMetaData
+    {
+        XmlaOlap4jDatabaseMetaDataJdbc4(
             XmlaOlap4jConnection olap4jConnection)
         {
             super(olap4jConnection);
+        }
+
+        public OlapConnection getConnection() {
+            return super.getConnection();
         }
 
         // implement java.sql.DatabaseMetaData methods

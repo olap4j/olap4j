@@ -12,7 +12,7 @@ package org.olap4j.query;
 import org.olap4j.metadata.Member;
 
 /**
- * Contains factory methods for creating {@link SelectionImpl}s.
+ * Contains factory methods for creating implementations of {@link Selection}.
  *
  * <p>Created using {@link Query#getSelectionFactory()}.
  *

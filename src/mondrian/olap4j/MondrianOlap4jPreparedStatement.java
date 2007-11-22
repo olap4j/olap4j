@@ -198,7 +198,7 @@ abstract class MondrianOlap4jPreparedStatement
         throw new UnsupportedOperationException();
     }
 
-    public CellSetMetaData getMetaData() throws SQLException {
+    public CellSetMetaData getMetaData() {
         return cellSetMetaData;
     }
 

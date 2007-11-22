@@ -10,13 +10,15 @@
 package mondrian.olap4j;
 
 import org.olap4j.OlapConnection;
+import org.olap4j.OlapStatement;
+import org.olap4j.CellSetMetaData;
+import org.olap4j.OlapDatabaseMetaData;
 
 import java.sql.*;
 import java.util.*;
 import java.io.Reader;
 import java.io.InputStream;
 
-import mondrian.olap.Result;
 import mondrian.olap.Query;
 
 /**
@@ -76,7 +78,7 @@ class FactoryJdbc4Impl implements Factory {
     // Inner classes
 
     private static class EmptyResultSetJdbc4 extends EmptyResultSet {
-        public EmptyResultSetJdbc4(
+        EmptyResultSetJdbc4(
             MondrianOlap4jConnection olap4jConnection,
             List<String> headerList,
             List<List<Object>> rowList)
@@ -320,12 +322,20 @@ class FactoryJdbc4Impl implements Factory {
         extends MondrianOlap4jConnection
         implements OlapConnection
     {
-        public MondrianOlap4jConnectionJdbc4(
+        MondrianOlap4jConnectionJdbc4(
             Factory factory,
             String url,
             Properties info) throws SQLException
         {
             super(factory, url, info);
+        }
+
+        public OlapStatement createStatement() {
+            return super.createStatement();
+        }
+
+        public OlapDatabaseMetaData getMetaData() {
+            return super.getMetaData();
         }
 
         // implement java.sql.Connection methods
@@ -385,6 +395,10 @@ class FactoryJdbc4Impl implements Factory {
             Query query)
         {
             super(olap4jStatement, query);
+        }
+
+        public CellSetMetaData getMetaData() {
+            return super.getMetaData();
         }
 
         // implement java.sql.CellSet methods
@@ -629,6 +643,10 @@ class FactoryJdbc4Impl implements Factory {
             super(olap4jConnection, mdx);
         }
 
+        public CellSetMetaData getMetaData() {
+            return super.getMetaData();
+        }
+
         // implement java.sql.PreparedStatement methods
         // introduced in JDBC 4.0/JDK 1.6
 
@@ -728,6 +746,10 @@ class FactoryJdbc4Impl implements Factory {
             MondrianOlap4jConnection olap4jConnection)
         {
             super(olap4jConnection);
+        }
+
+        public OlapConnection getConnection() {
+            return super.getConnection();
         }
 
         // implement java.sql.DatabaseMetaData methods

@@ -122,7 +122,11 @@ ${jar-jdk14.file}"/>
     <mkdir dir="${testlog.dir}"/>
   </target>
 
-  <target name="compile" depends="prepare,parser,compile.java"/>
+  <target name="compile" depends="prepare,parser,compile.java,compileJdk16"/>
+
+  <target name="compileJdk16">
+    <exec executable="buildJdk16.sh"/>
+  </target>
 
   <target name="compile.java">
     <condition property="jdk16.present">
@@ -201,6 +205,7 @@ doc/**/*.html,
 doc/**/*.pdf,
 build.xml,
 build.properties,
+buildJdk16.sh,
 test.properties.example,
 LICENSE.html,
 README.txt,
@@ -291,7 +296,7 @@ doc/olap4j_api.pdf"
     </tar>
   </target>
 
-  <target name="jar" depends="version,compile">
+  <target name="jar" depends="version,compile,compileJdk16">
     <mkdir dir="${lib.dir}" />
     <zip
         zipfile="${jar.file}"

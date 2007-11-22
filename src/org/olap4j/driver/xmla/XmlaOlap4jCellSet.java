@@ -53,7 +53,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         }
     }
 
-    public CellSetMetaData getMetaData() throws OlapException {
+    public CellSetMetaData getMetaData() {
         return metaData;
     }
 

@@ -483,7 +483,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *
      * @exception OlapException if a database access error occurs
      *
-     * @see #getFunctions(String, String, String)
+     * @see java.sql.DatabaseMetaData#getFunctions(String, String, String)
      * @see #getSearchStringEscape
      */
     ResultSet getOlapFunctions(

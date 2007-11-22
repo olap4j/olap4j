@@ -685,7 +685,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         throw new UnsupportedOperationException();
     }
 
-    public OlapConnection getConnection() throws SQLException {
+    public OlapConnection getConnection() {
         return olap4jConnection;
     }
 
