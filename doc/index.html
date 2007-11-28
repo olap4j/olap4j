@@ -1,136 +1,221 @@
-<html>
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Language" content="en-us">
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-<title>olap4j</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<!--
+  == $Id$
+  == This software is subject to the terms of the Common Public License
+  == Agreement, available at the following URL:
+  == http://www.opensource.org/licenses/cpl.html.
+  == Copyright (C) 2006-2007 Julian Hyde and others.
+  == All Rights Reserved.
+  == You must accept the terms of that agreement to use this software.
+  -->
+<title>olap4j: Open Java API for OLAP</title>
 <style type="text/css">
-  body { color: white; font-family: Arial, sans-serif; }
-  p.green { color: #9DFF5B; }
-  p.orange { color: #FF8000; }
-  h4 { color: #9DFF5B; }
-</style>
-<style fprolloverstyle>A:hover {color: #FF8000; text-decoration: none}
+  body { 
+  color: #000000; 
+  font-family: Arial, sans-serif; 
+  font-size: .85em;
+  }
+  
+  a {
+	font-family: Tahoma, Helvetica, sans-serif;
+	color: #949e3e;
+}
+
+a:link {
+	font-family: Tahoma, Helvetica, sans-serif;
+	color: #004263;
+}
+a:visited {
+	font-family: Tahoma, Helvetica, sans-serif;
+	color: #000000;
+}
+
+a:hover, a:active {
+	font-family: Tahoma, Helvetica, sans-serif;
+	color: #907c6c;
+}
+  
+  ul {
+	margin-left: 0px;
+	margin-top: 0px;
+	padding-left: 2em;
+	text-indent: -1.45em;
+	list-style-type: disc;
+	list-style-image: url(images/bullet_gray.png);
+	list-style-position: inside;
+	}
+  
+  p { margin: 0px; }
+  
+  .logo { 
+  padding: 0px 0px 10px 0px; 
+  }
+  
+  .banner_title {
+  padding: 42px 0px 0px 10px;
+  }
+  
+  .col_spacer { 
+  width: 15px;
+  height: 15px;
+  }
+  
+  h4 {
+  font-size: 1.2em;
+  color:#004263;
+  font-weight:bold;
+  margin: 20px 0px 0px 0px;
+  }
+  
+  h5 {
+  font-size: .85em;
+  color:#000000;
+  font-weight:bold;
+  margin: 20px 0px 0px 0px;
+  }
+    
+  .home_box { 
+  background-color:#004263; 
+  background-image:url(images/curve_bg.png); 
+  }
+  
+  .home_box_center { 
+  background-image:url(images/home_box_bg.png); 
+  background-repeat: no-repeat;
+  background-position: top right;
+  padding: 0px 0px 10px 0px;
+  }
+  
+  .home_box_spacer { 
+  background-color:#004263; 
+  width: 11px;
+  height: 11px;
+  background-image:url(images/curve_bg.png); 
+  }
+  
+  p.box_header { 
+  color: #ffffff; 
+  font-size: 1.45em; 
+  margin-top: 10px;
+  width: 385px;
+  font-weight:bold;
+  }
+  
+  p.box_subheader { 
+  color: #ffffff;
+  font-size: 1.35em; 
+  }
+  
+  .participation_bg {
+  background-color: #c0c0c0;
+  padding: 10px 15px 1px 15px;
+  margin: 15px 0px 10px 0px;
+  width: 170px;
+  }
+  
+  .copyright {
+  border-top: 1px solid #004263; 
+  font: normal .75em Arial, Helvetica, sans-serif; 
+  color:#000000; 
+  text-align:center; 
+  padding: 5px 0px 5px 0px;
+  }
+  
 </style>
 </head>
 
-<body link="#9DFF5B" text="#FFFFFF" vlink="#9DFF5B" alink="#FF8000" topmargin="20" leftmargin="20" rightmargin="20" bottommargin="20">
-
-<table border="1" width="700" bgcolor="#004263" id="table1" style="border-collapse: collapse" bordercolor="#9DFF5B" cellpadding="15">
-	<tr>
-		<td>
-		<table border="0" width="100%" style="border-collapse: collapse" id="table2" cellpadding="0">
-			<tr>
-				<td bgcolor="#FF8000" colspan="2">
-				<table border="0" width="100%" cellpadding="6" id="table3" cellspacing="0">
-					<tr>
-						<td>
-				<font size="7">olap4j</font><font size="4">&nbsp;&nbsp; 
-				open java api for </font> 
-				<span style="font-variant: small-caps; font-weight:700">
-				<font size="4">OLAP</font></span></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2">&nbsp;</td>
-			</tr>
-			<tr>
-				<td bgcolor="#004263" valign="top">
-	<img border="0" src="images/spacer.png" width="222" height="1"></td>
-				<td>
-				<table border="1" width="100%" cellspacing="0" cellpadding="6" id="table4" bordercolor="#FF8000" style="border-collapse: collapse">
-					<tr>
-						<td bordercolor="#000000" bgcolor="#004263">
-						<p class="green">
-						<font size="5">olap4j is an open Java 
+<body>
+<table width="700" border="0" align="center" cellpadding="0" cellspacing="0">
+  <tr>
+    <td valign="top" width="159"><img src="images/olap4j_logo.png" alt="OLAP 4 J" width="159" height="81" class="logo" /></td>
+    <td valign="top" width="541"><img src="images/banner_title.png" width="247" height="25" alt="open java api for OLAP" class="banner_title" /></td>
+  </tr>
+  <tr>
+    <td colspan="2" valign="top"><table width="700" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td><img src="images/curve_top_left.png" width="11" height="11" /></td>
+          <td width="100%" class="home_box"><img src="images/spacer.png" class="home_box_spacer"/></td>
+          <td><img src="images/curve_top_right.png" width="11" height="11" /></td>
+        </tr>
+        <tr>
+          <td class="home_box"><img src="images/spacer.png" class="home_box_spacer"/></td>
+          <td class="home_box"><div class="home_box_center"><p class="box_header">
+						olap4j is an open Java 
 						<span style="font-variant: small-caps">API</span> for
-						<span style="font-variant: small-caps">OLAP</span>.</font></p>
+						<span style="font-variant: small-caps">OLAP</span>.</p>
 						
-						<p class="green">
-						<font size="5">Think of it as like 
+						<p class="box_header">
+						Think of it  like 
 						<span style="font-variant: small-caps">JDBC</span>, 
-						except for accessing multi-dimensional data.</font></p>
-						
-						<p class="green">
-						<font size="4">olap4j is designed to be 
+						except for accessing multi-dimensional data.</p>
+						<br />
+						<p class="box_subheader">
+						olap4j is designed to be 
 						a common API for any OLAP server, so you can write an 
 						application on one OLAP server and easily switch it to 
 						another. And built on that API, there will be a growing 
-						collection of tools and components.</font></p>
-						</td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td valign="top" colspan="2">
-						<table border="0" width="100%" id="table6">
-							<tr>
-								<td>
-								<h4>Status</h4>
-						<p>The draft olap4j 
-						specification, version 0.5, was released on September 2nd, 
-						2006.</p>
-						<h4>Participation</h4>
-						<p>olap4j is an open specification, being developed by a 
-						consortium of companies and open source projects.</p>
-	<blockquote>
-						<table border="0" id="table7">
-							<tr>
-								<td width="150">Projects</td>
-								<td width="150">Companies</td>
-							</tr>
-							<tr>
-								<td width="150" valign="top"><ul>
-									<li><a href="http://jpivot.sourceforge.net">JPivot</a></li>
-									<li><a href="http://rubik.sourceforge.net">JRubik</a></li>
-									<li><a href="http://mondrian.pentaho.org">Mondrian</a></li>
-									<li><a href="http://openi.sourceforge.net">OpenI</a></li>
-                                    <li><a href="http://www.palo.net">PALO</a></li>
-								</ul>
-								</td>
-								<td width="150" valign="top"><ul>
-									<li><a href="http://www.jedox.com">Jedox</a></li>
-                                    <li><a href="http://www.jaspersoft.com">JasperSoft</a></li>
-									<li><a href="http://www.loyaltymatrix.com">Loyalty Matrix</a></li>
-									<li><a href="http://www.lucidera.com">LucidEra</a></li>
-									<li><a href="http://www.pentaho.org">Pentaho</a></li>
-                                    <li><a href="http://www.tensegrity-software.de">Tensegrity</a></li>
-									<li><a href="http://www.tonbeller.com/">Tonbeller AG</a></li>
-								</ul>
-								</td>
-							</tr>
-						</table>
-
-	</blockquote>
-	<p><b>Get involved!</b> Join the 
-	<a href="http://sourceforge.net/forum/forum.php?forum_id=577988">forum</a>, download the specification, and give us 
-	your feedback. If you are developing an OLAP server, component or 
-	application, let's work together to make&nbsp;your project olap4j-compliant.</p>
-						<h4>Resources</h4>
-						<ul>
-							<li><font face="Arial" color="#FFFFFF">
-							<a href="http://sourceforge.net/projects/olap4j">
-							olap4j project at SourceForge</a></font></li>
-							<li>
-							<a href="http://sourceforge.net/project/showfiles.php?group_id=168953">Download specification</a></li>
-							<li>
-							<a href="api/index.html">API javadoc</a></li>
-						</ul>
-								</td>
-								<td>
-								<img border="0" src="images/spacer.png" width="100" height="1"></td>
-							</tr>
-						</table>
-						</td>
-			</tr>
-		</table>
-		</td>
-	</tr>
+						collection of tools and components.</p></div></td>
+          <td class="home_box"><img src="images/spacer.png" class="home_box_spacer"/></td>
+        </tr>
+        <tr>
+          <td><img src="images/curve_btm_left.png" width="11" height="11" /></td>
+          <td class="home_box"><img src="images/spacer.png" class="home_box_spacer"/></td>
+          <td><img src="images/curve_btm_right.png" width="11" height="11" /></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr>
+    <td colspan="2" valign="top"><table width="700" border="0" cellspacing="0" cellpadding="0">
+        
+        
+        <tr>
+          <td width="100%" valign="top" style="padding-bottom: 10px;"><h4>Status</h4>
+		  The olap4j specification will go beta in early December 2007. The first release candidate, olap4j-0.9.1, is available for download now. The olap4j release includes the specification, a reference implementation of the API in the form of a olap4j driver for mondrian, and a Test Compatibility Kit (TCK) consisting of a suite of JUnit tests. In the 0.9 beta release, the API includes full support for managing connections, statements, multidmensional result sets, parsing and validating MDX, and managing metadata.
+<h4>Resources</h4>
+<ul>
+							<li><a href="http://sourceforge.net/projects/olap4j">olap4j project at SourceForge</a></font></li>
+							<li><a href="http://sourceforge.net/project/showfiles.php?group_id=168953">Download 0.9 specification and release</a></li>
+							<li><a href="api/index.html">API javadoc</a></li>
+							<li>For project committers: latest <a href="head/api/index.html">API</a>
+								and <a href="http://olap4j.svn.sourceforge.net/viewvc/*checkout*/olap4j/trunk/doc/olap4j_fs.html">specification (HTML)</a>.</li>
+			</ul>
+			
+			<h4>Get involved!</h4> 
+			Join the <a href="http://sourceforge.net/forum/forum.php?forum_id=577988">forum</a>, download the specification, and give us your feedback. If you are developing an OLAP server, component or 
+	application, let's work together to make&nbsp;your project olap4j-compliant.</td>
+          <td rowspan="5" class="col_spacer" style="padding-bottom: 10px;"><img src="images/spacer.png" class="col_spacer"/></td>
+          <td rowspan="4" valign="top" style="padding-bottom: 10px;"><div class="participation_bg"><h4 style="margin: 0px;">Participation</h4>
+			olap4j is an open specification, being developed by a consortium of companies and open source projects, including:
+		  <h5 style="margin-top: 5px;">Projects</h5>
+		  	<ul style="white-space:nowrap">
+				<li><a href="http://jpivot.sourceforge.net">JPivot</a></li>
+				<li><a href="http://rubik.sourceforge.net">JRubik</a></li>
+				<li><a href="http://mondrian.pentaho.org">Mondrian</a></li>
+				<li><a href="http://openi.sourceforge.net">OpenI</a></li>
+				<li><a href="http://www.palo.net">PALO</a></li>
+			</ul>
+			<h5>Companies</h5>
+			<ul style="white-space:nowrap">
+				<li><a href="http://www.jedox.com">Jedox</a></li>
+				<li><a href="http://www.jaspersoft.com">JasperSoft</a></li>
+				<li><a href="http://www.loyaltymatrix.com">Loyalty Matrix</a></li>
+				<li><a href="http://www.lucidera.com">LucidEra</a></li>
+				<li><a href="http://www.pentaho.org">Pentaho</a></li>
+				<li><a href="http://www.tensegrity-software.de">Tensegrity</a></li>
+				<li><a href="http://www.tonbeller.com/">Tonbeller AG</a></li>
+			</ul></div></td>
+		</tr>
+						</table></td>
+  </tr>
+  <tr>
+    <td colspan="2" class="copyright">&copy; 2007</td></td>
+  </tr>
 </table>
-
+</td>
+  </tr>
+</table>
 </body>
-
 </html>
