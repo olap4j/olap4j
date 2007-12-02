@@ -3,7 +3,7 @@
 # This software is subject to the terms of the Common Public License
 # Agreement, available at the following URL:
 # http://www.opensource.org/licenses/cpl.html.
-# Copyright (C) 2005-2005 Julian Hyde
+# Copyright (C) 2005-2007 Julian Hyde
 # All Rights Reserved.
 # You must accept the terms of that agreement to use this software.
 #
@@ -24,8 +24,8 @@ prefix="$1"
 # Directory at sf.net
 docdir=
 case "$prefix" in
-0.5) export docdir=htdocs;;
-head) export docdir=head;;
+release) export docdir=olap4j;;
+head) export docdir=olap4j.head;;
 *) echo "Bad prefix '$prefix'"; exit 1;;
 esac
 
@@ -68,11 +68,15 @@ set -v
 cd /home/jhyde
 tar xzf doc.tar.gz
 rm -rf olap4j.old
-if [ -d olap4j ]; then mv olap4j olap4j.old; fi
-mv doc olap4j
-rm -rf olap4j.old
+if [ -d $docdir ]; then mv $docdir $docdir.old; fi
+mv doc $docdir
+rm -rf $docdir.old
 rm -f doc.tar.gz
-./makeLinks
+case $docdir in
+olap4j) (cd olap4j; rm -rf head; ln -s . head) ;;
+olap4j.head) (cd olap4j; rm -rf head; mv ../olap4j.head ./head) ;;
+esac
+./makeLinks $docdir
 EOF
 
 fi

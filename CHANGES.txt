@@ -1,0 +1,224 @@
+# $Id$
+# Changes to olap4j since olap4j-0.5.
+
+------------------------------------------------------------------------
+r48 | jhyde | 2007-12-02 02:42:19 -0800 (Sun, 02 Dec 2007) | 1 line
+
+Fix release issues noted by John Sichi.
+------------------------------------------------------------------------
+r47 | jhyde | 2007-11-27 20:03:57 -0800 (Tue, 27 Nov 2007) | 1 line
+
+Website re-design.
+------------------------------------------------------------------------
+r46 | jhyde | 2007-11-21 19:41:45 -0800 (Wed, 21 Nov 2007) | 1 line
+
+Fix build for JDK 1.6; check in mondrian jars built under JDK 1.5 (not
+JDK 1.6); add script to recursively switch to JDK 1.6 and invoke ant
+to build a couple of classes.
+------------------------------------------------------------------------
+r45 | jhyde | 2007-11-21 19:31:13 -0800 (Wed, 21 Nov 2007) | 1 line
+
+Latest spec in PDF format. Obsolete SpringSample.
+------------------------------------------------------------------------
+r44 | jhyde | 2007-11-21 04:09:46 -0800 (Wed, 21 Nov 2007) | 1 line
+
+Check in necessary libraries. Mondrian as of change 10210. Remove
+dependency on spring. Revise README and up version number.
+------------------------------------------------------------------------
+r43 | jhyde | 2007-11-20 17:57:47 -0800 (Tue, 20 Nov 2007) | 1 line
+
+Enable keyword expansion.
+------------------------------------------------------------------------
+r42 | jhyde | 2007-11-20 17:39:37 -0800 (Tue, 20 Nov 2007) | 1 line
+
+Move test parameters out of source code and into a
+file. 'test.properties' should be the only file you need to
+edit. Provided 'test.properties.example'. First cut README.txt.
+------------------------------------------------------------------------
+r41 | jhyde | 2007-11-17 17:33:12 -0800 (Sat, 17 Nov 2007) | 1 line
+
+Trip down which packages/classes appear in public API javadoc.
+------------------------------------------------------------------------
+r40 | jhyde | 2007-11-17 17:13:26 -0800 (Sat, 17 Nov 2007) | 1 line
+
+Specify thread-safety, timeout, statement cancel; Specify compliance
+levels; Specify access control; Specify internationalization; add
+OlapConnection.get/setLocale. Add diagram of object model to spec;
+Ensure that every public class and method has a full javadoc
+description. Implement timeout and cancel in mondrian driver; and
+test. Implement drill-through in mondrian driver; and test. Make
+CellSetAxis implement Iterable<Position>. Remove some unneeded methods
+from org.olap4j.type package. Rename SLICER to FILTER.
+------------------------------------------------------------------------
+r39 | jhyde | 2007-11-13 01:46:46 -0800 (Tue, 13 Nov 2007) | 1 line
+
+Oops, fix for JDK 1.5.
+------------------------------------------------------------------------
+r38 | jhyde | 2007-11-13 01:37:16 -0800 (Tue, 13 Nov 2007) | 4 lines
+
+Lots of tests for metadata classes, and implement corresponding
+functionality in mondrian driver.  Review org.olap4j.type package, and
+remove/hide several methods.  Add API for creating validator and
+validating an MDX parse tree.  Test that non-unique axis names cause a
+validation error.
+------------------------------------------------------------------------
+r37 | jhyde | 2007-11-11 20:14:39 -0800 (Sun, 11 Nov 2007) | 1 line
+
+Javadoc fixes. One javadoc target documents the public API, another to
+check all javadoc including against private methods and test classes.
+------------------------------------------------------------------------
+r36 | perfecthash | 2007-11-05 01:06:12 -0800 (Mon, 05 Nov 2007) | 3
+lines
+
+Add unit test for construction of an MDX statement via language object model.
+
+
+------------------------------------------------------------------------
+r35 | jhyde | 2007-10-23 14:42:48 -0700 (Tue, 23 Oct 2007) | 1 line
+
+Document and revise OlapDatabaseMetaData methods; write unit tests for
+all methods; implement methods in mondrian's olap4j driver.
+------------------------------------------------------------------------
+r34 | perfecthash | 2007-10-06 20:06:58 -0700 (Sat, 06 Oct 2007) | 4
+lines
+
+Delete "ant test" task, add one for removing site-specifics from
+unit test code.
+
+
+------------------------------------------------------------------------
+r33 | perfecthash | 2007-09-26 22:11:22 -0700 (Wed, 26 Sep 2007) | 3 lines
+
+Implement ant "test" target.
+
+
+------------------------------------------------------------------------
+r32 | perfecthash | 2007-09-26 17:54:27 -0700 (Wed, 26 Sep 2007) | 3 lines
+
+Just testing commit privileges.
+
+
+------------------------------------------------------------------------
+r31 | jhyde | 2007-09-21 19:29:21 -0700 (Fri, 21 Sep 2007) | 1 line
+
+Correct typos in spec; eliminate QueryAxis.xxxDimension and
+QueryDimension.xxxSelection methods; property methods now take a
+Property, not the property name
+------------------------------------------------------------------------
+r30 | jhyde | 2007-09-21 02:14:34 -0700 (Fri, 21 Sep 2007) | 1 line
+
+A few more parameters to OlapDatabaseMetaData.getXxx methods
+------------------------------------------------------------------------
+r29 | jhyde | 2007-09-21 00:13:14 -0700 (Fri, 21 Sep 2007) | 1 line
+
+Add parameters to OlapDatabaseMetaData.getXxx methods
+------------------------------------------------------------------------
+r28 | jhyde | 2007-09-20 03:46:43 -0700 (Thu, 20 Sep 2007) | 1 line
+
+Javadoc and spec tasks, mostly adding descriptions of metadata elements.
+------------------------------------------------------------------------
+r27 | jhyde | 2007-09-18 00:34:57 -0700 (Tue, 18 Sep 2007) | 1 line
+
+Add task list, and minor spec/javadoc edits
+------------------------------------------------------------------------
+r26 | jhyde | 2007-08-14 23:55:30 -0700 (Tue, 14 Aug 2007) | 1 line
+
+Fix build under JDK 1.5
+------------------------------------------------------------------------
+r25 | jhyde | 2007-08-09 00:50:03 -0700 (Thu, 09 Aug 2007) | 1 line
+
+Add skeleton olap4j driver for XMLA
+------------------------------------------------------------------------
+r24 | jhyde | 2007-07-24 22:56:33 -0700 (Tue, 24 Jul 2007) | 1 line
+
+Add junit.jar
+------------------------------------------------------------------------
+r23 | jhyde | 2007-06-14 20:53:14 -0700 (Thu, 14 Jun 2007) | 1 line
+
+Add notion of ParseRegion to parser and parse tree nodes.
+------------------------------------------------------------------------
+r22 | jhyde | 2007-06-14 19:23:07 -0700 (Thu, 14 Jun 2007) | 1 line
+
+In mondrian driver, create dual implementations of key JDBC objects to
+allow running against both JDBC 3.0 (JDK 1.5) and JDBC 4.0 (JDK 1.6);
+add OlapWrapper for JDBC 3.0 users, who have no access to
+java.sql.Wrapper methods; implement OlapPreparedStatement in mondrian
+driver.
+------------------------------------------------------------------------
+r21 | jhyde | 2007-06-14 13:37:17 -0700 (Thu, 14 Jun 2007) | 1 line
+
+Get mondrian classes from parallel source directory, not log file (for now); fix 'ant clean' mayhem; add 'javadoc-with-ydoc' ant target.
+------------------------------------------------------------------------
+r20 | jhyde | 2007-06-10 16:09:28 -0700 (Sun, 10 Jun 2007) | 1 line
+
+Enable keyword substitution
+------------------------------------------------------------------------
+r19 | jhyde | 2007-06-10 15:53:45 -0700 (Sun, 10 Jun 2007) | 1 line
+
+Obsolete Database and Olap4j; update spec with parse tree model
+changes; enable keyword substitutions
+------------------------------------------------------------------------
+r18 | jhyde | 2007-06-10 11:31:17 -0700 (Sun, 10 Jun 2007) | 1 line
+
+Add query model (from James Dixon), parser and parser object model.
+------------------------------------------------------------------------
+r17 | jhyde | 2007-05-25 15:34:38 -0700 (Fri, 25 May 2007) | 1 line
+
+Rename OlapResultSet to CellSet, OlapResultSetMetaData to
+CellSetMetaData, OlapResultAxis to CellSetAxis, ResultCell to Cell,
+ResultSetPosition to Position; add implementation of olap4j against
+mondrian, and a unit test
+------------------------------------------------------------------------
+r16 | jhyde | 2006-10-24 15:48:56 -0700 (Tue, 24 Oct 2006) | 1 line
+
+Add NamedSet and Database; clean up schema result set defns in spec;
+switch some uses of SQLException to OlapException
+------------------------------------------------------------------------
+r15 | jhyde | 2006-10-24 01:41:02 -0700 (Tue, 24 Oct 2006) | 1 line
+
+Changes to org.olap4j package regarding result sets, and
+org.olap4j.metadata package regarding Database, Catalog, Schema
+------------------------------------------------------------------------
+r14 | jhyde | 2006-10-20 17:35:30 -0700 (Fri, 20 Oct 2006) | 1 line
+
+Add items from 2006/10/20 progress meeting to spec.
+------------------------------------------------------------------------
+r13 | jhyde | 2006-10-19 13:06:48 -0700 (Thu, 19 Oct 2006) | 1 line
+
+Barry Klawans's changes to Transform component of olap4j specification
+------------------------------------------------------------------------
+r12 | jhyde | 2006-10-17 17:32:56 -0700 (Tue, 17 Oct 2006) | 1 line
+
+Move JDK topic from 'open issues' to body of spec; clean up some links.
+------------------------------------------------------------------------
+r11 | jhyde | 2006-10-17 17:31:42 -0700 (Tue, 17 Oct 2006) | 1 line
+
+Include PNG images in doczip.
+------------------------------------------------------------------------
+r10 | jhyde | 2006-10-15 22:37:08 -0700 (Sun, 15 Oct 2006) | 1 line
+
+Update specification and java code, especially metadata
+(org.olap4j.metadata) and type (org.olap4j.type) sections, and
+description of how to interoperate with connection pools.
+------------------------------------------------------------------------
+r9 | jhyde | 2006-10-12 03:07:40 -0700 (Thu, 12 Oct 2006) | 1 line
+
+Add table of contents functional spec, and some content regarding
+drivers, connections and statements; Add ant target to generate
+javadoc in PDF format; Rename OlapResult to OlapResultSet.
+------------------------------------------------------------------------
+r8 | jhyde | 2006-09-03 18:57:41 -0700 (Sun, 03 Sep 2006) | 1 line
+
+Tweak stylesheet.
+------------------------------------------------------------------------
+r7 | jhyde | 2006-09-03 02:23:08 -0700 (Sun, 03 Sep 2006) | 1 line
+
+Release 0.5 (continued).
+------------------------------------------------------------------------
+r6 | jhyde | 2006-09-03 01:57:45 -0700 (Sun, 03 Sep 2006) | 1 line
+
+Release 0.5.
+------------------------------------------------------------------------
+
+# End CHANGES.txt
+

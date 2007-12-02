@@ -36,7 +36,7 @@ The mondrian driver requires the following additional files at run time:
 
 Note that mondrian.jar is built from a development version of mondrian, not
 an official release. The source code was p4:perforce.eigenbase.org:1666 (a
-point between mondrian-2.4.2 and mondrian-3.0), change 10210.
+point between mondrian-2.4.2 and mondrian-3.0), change 10247.
 
 Building olap4j from source
 ---------------------------
@@ -75,7 +75,8 @@ Running the test suite
 Follow the instructions for 'Building olap4j from source'. Then:
 
 1. Download the latest mondrian release (mondrian-2.4.2) and use the
-   MondrianFoodMartLoader utility to load the sample database.
+   MondrianFoodMartLoader utility to load the sample database into the DBMS of
+   your choice.
 2. In the root of the source tree, create a file called "test.properties"
    describing your environment. The easiest way to this is to copy
    "test.properties.example" and customize it. Note that you will need to
