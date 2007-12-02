@@ -3,8 +3,9 @@
 # built under JDK 1.6.
 
 # Change the following line to point to your JDK 1.6 home.
-export JAVA_HOME=/usr/local/jdk1.6.0_01
-export PATH=$JAVA_HOME/bin:$PATH
+set JAVA_HOME=C:\jdk1.6.0_01
+set PATH=%JAVA_HOME%\bin;%PATH%
 ant compile.java
 
-# End buildJdk16.sh
+# End buildJdk16.bat
+

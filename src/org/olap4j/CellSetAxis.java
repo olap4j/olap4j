@@ -108,7 +108,7 @@ public interface CellSetAxis extends Iterable<Position> {
      *          Cell cell = cellSet.getCell(colPos, rowPos);
      *          ....
      *     }
-     * }</code></blockquote>
+     * }</pre></blockquote>
      *
      * @return iterator over the collection of positions
      */

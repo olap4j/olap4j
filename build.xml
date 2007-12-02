@@ -12,6 +12,7 @@
   <property name="project.location" location="."/>
   <property name="lib.location" location="${project.location}/lib"/>
   <property file="${project.location}/build.properties"/>
+  <property file="${project.location}/test.properties"/>
   <property name="project.build.debug" value="on"/>
   <property name="name" value="olap4j"/>
   <property name="version" value="0.9.0"/>
@@ -78,6 +79,7 @@ ${jar-jdk14.file}"/>
   <path id="project.test.classpath">
     <path refid="project.classpath"/>
     <pathelement location="${testclasses.dir}"/>
+    <pathelement location="${org.olap4j.test.driverClasspath}"/>
   </path>
 
   <!-- Arguments to the java process spawned by the junit task. -->
@@ -122,13 +124,8 @@ ${jar-jdk14.file}"/>
     <mkdir dir="${testlog.dir}"/>
   </target>
 
-  <target name="compile" depends="prepare,parser,compile.java,compileJdk16"/>
+  <target name="compile" depends="prepare,parser,compile.java"/>
 
-  <target name="compileJdk16">
-    <exec executable="buildJdk16.sh"/>
-  </target>
-
-  <target name="compile.java">
     <condition property="jdk16.present">
       <equals arg1="${ant.java.version}" arg2="1.6"/>
     </condition>
@@ -138,6 +135,7 @@ ${jar-jdk14.file}"/>
       </not>
     </condition>
 
+  <target name="compile.java">
     <javac
         srcdir="${src.dir}"
         destdir="${classes.dir}"
@@ -205,7 +203,6 @@ doc/**/*.html,
 doc/**/*.pdf,
 build.xml,
 build.properties,
-buildJdk16.sh,
 test.properties.example,
 LICENSE.html,
 README.txt,
@@ -215,6 +212,13 @@ ${javadoc.dir}/**,
 **/_vti*/*,
 **/*~,
 **/junit-results/**" />
+      <zipfileset
+          dir="."
+          prefix="${dist.name}"
+          filemode="755"
+          includes="
+buildJdk16.bat,
+buildJdk16.sh" />
     </zip>
   </target>
 
@@ -296,7 +300,16 @@ doc/olap4j_api.pdf"
     </tar>
   </target>
 
-  <target name="jar" depends="version,compile,compileJdk16">
+  <target name="checkIsNotJdk16" if="jdk16.present">
+    <fail message="The 'jar' target (and dependent targets 'release', 'binzip')
+must be run under JDK 1.5." />
+  </target>
+
+  <target name="compileJdk16">
+    <exec executable="buildJdk16.sh"/>
+  </target>
+
+  <target name="jar" depends="version,checkIsNotJdk16,compile,compileJdk16">
     <mkdir dir="${lib.dir}" />
     <zip
         zipfile="${jar.file}"
