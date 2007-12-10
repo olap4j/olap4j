@@ -208,8 +208,7 @@ public class OlapTest extends TestCase {
         }
     }
 
-    public static void listMembers(Level level) {
-
+    public static void listMembers(Level level) throws OlapException {
         List<Member> members = level.getMembers();
         for (Member member : members) {
             System.out.println("member name=" + member.getName());

@@ -9,8 +9,9 @@
 package mondrian.olap4j;
 
 import org.olap4j.metadata.Property;
+import org.olap4j.metadata.Datatype;
 
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Implementation of {@link org.olap4j.metadata.Property}
@@ -30,13 +31,25 @@ class MondrianOlap4jProperty implements Property, Named {
     }
 
     public Datatype getDatatype() {
-        return Datatype.valueOf(property.getType().name());
+        switch (property.getType()) {
+        case TYPE_BOOLEAN:
+            return Datatype.BOOLEAN;
+        case TYPE_NUMERIC:
+            return Datatype.UNSIGNED_INTEGER;
+        case TYPE_STRING:
+            return Datatype.STRING;
+        case TYPE_OTHER:
+            return Datatype.VARIANT;
+        default:
+            throw new RuntimeException("unexpected: " + property.getType());
+        }
     }
 
-    public Scope getScope() {
-        return property.isCellProperty()
-            ? Scope.CELL
-            : Scope.MEMBER;
+    public Set<TypeFlag> getType() {
+        return TypeFlag.forMask(
+            property.isCellProperty()
+                ? TypeFlag.CELL.xmlaOrdinal
+                : TypeFlag.MEMBER.xmlaOrdinal);
     }
 
     public String getName() {
@@ -55,6 +68,10 @@ class MondrianOlap4jProperty implements Property, Named {
     public String getDescription(Locale locale) {
         // todo: i18n
         return property.getDescription();
+    }
+
+    public ContentType getContentType() {
+        return ContentType.REGULAR;
     }
 }
 

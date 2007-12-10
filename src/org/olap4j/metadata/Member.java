@@ -38,7 +38,17 @@ public interface Member extends MetadataElement {
      *
      * @return children of this member
      */
-    NamedList<? extends Member> getChildMembers();
+    NamedList<? extends Member> getChildMembers() throws OlapException;
+
+    /**
+     * Returns the number of children this Member has.
+     *
+     * <p>This method has the same effect as
+     * <code>getChildMembers().size()</code>, but is typically less expensive.
+     *
+     * @return number of children
+     */
+    int getChildMemberCount();
 
     /**
      * Returns the parent of this Member, or null if it has no parent.
@@ -169,7 +179,7 @@ public interface Member extends MetadataElement {
     ParseTreeNode getExpression();
 
     /**
-     * Returns array of all members, which are ancestor to <code>this</code>.
+     * Returns array of all members which are ancestor to <code>this</code>.
      *
      * @return ancestor Members
      */

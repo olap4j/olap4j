@@ -9,6 +9,8 @@
 */
 package org.olap4j.metadata;
 
+import java.util.*;
+
 /**
  * Data value of primary interest to the user browsing the cube.
  *
@@ -20,6 +22,26 @@ package org.olap4j.metadata;
  * @since Oct 13, 2006
  */
 public interface Measure extends Member {
+    /**
+     * Returns the Aggregator of this Measure.
+     *
+     * @return Aggregator
+     */
+    Aggregator getAggregator();
+
+    /**
+     * Returns the data type of this Measure.
+     *
+     * @return data type
+     */
+    Datatype getDatatype();
+
+    /**
+     * Returns whether this Measure is visible.
+     *
+     * @return whether this Measure is visible
+     */
+    boolean isVisible();
 
     /**
      * Enumeration of the aggregate functions which can be used to derive a
@@ -78,6 +100,21 @@ public interface Measure extends Member {
 
         private final int xmlaOrdinal;
 
+        private static final Map<Integer, Aggregator> xmlaMap =
+            new HashMap<Integer, Aggregator>();
+
+        static {
+            for (Aggregator aggregator : values()) {
+                xmlaMap.put(aggregator.xmlaOrdinal, aggregator);
+            }
+        }
+
+        /**
+         * Creates an Aggregator.
+         *
+         * @param xmlaOrdinal Ordinal of the aggregator in the XMLA
+         * specification
+         */
         private Aggregator(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
         }
@@ -92,6 +129,19 @@ public interface Measure extends Member {
          */
         public final int xmlaOrdinal() {
             return xmlaOrdinal;
+        }
+
+        /**
+         * Looks up an Aggregator by its XMLA ordinal.
+         *
+         * @param xmlaOrdinal Ordinal of an Aggregator according to the XMLA
+         * specification.
+         *
+         * @return Aggregator with the given ordinal, or null if there is no
+         * such Aggregator
+         */
+        public static Aggregator forXmlaOrdinal(int xmlaOrdinal) {
+            return xmlaMap.get(xmlaOrdinal);
         }
     }
 }

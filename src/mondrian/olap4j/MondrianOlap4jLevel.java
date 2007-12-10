@@ -9,13 +9,7 @@
 */
 package mondrian.olap4j;
 
-import mondrian.olap.*;
 import org.olap4j.metadata.*;
-import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.Level;
-import org.olap4j.metadata.Member;
-import org.olap4j.metadata.Property;
 
 import java.util.*;
 
@@ -31,7 +25,7 @@ class MondrianOlap4jLevel implements Level, Named {
     private final MondrianOlap4jSchema olap4jSchema;
     private final mondrian.olap.Level level;
 
-    public MondrianOlap4jLevel(
+    MondrianOlap4jLevel(
         MondrianOlap4jSchema olap4jSchema,
         mondrian.olap.Level level)
     {
@@ -83,7 +77,7 @@ class MondrianOlap4jLevel implements Level, Named {
     public List<Member> getMembers() {
         final MondrianOlap4jConnection olap4jConnection =
             olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection;
-        final SchemaReader schemaReader =
+        final mondrian.olap.SchemaReader schemaReader =
             olap4jConnection.connection.getSchemaReader();
         final mondrian.olap.Member[] levelMembers =
             schemaReader.getLevelMembers(level, true);
@@ -112,7 +106,12 @@ class MondrianOlap4jLevel implements Level, Named {
     }
 
     public String getDescription(Locale locale) {
-        throw new UnsupportedOperationException();
+        // todo: localize
+        return level.getDescription();
+    }
+
+    public int getCardinality() {
+        return level.getApproxRowCount();
     }
 }
 

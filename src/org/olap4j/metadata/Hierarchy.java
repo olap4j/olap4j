@@ -9,6 +9,8 @@
 */
 package org.olap4j.metadata;
 
+import org.olap4j.OlapException;
+
 /**
  * An organization of the set of {@link Member}s in a {@link Dimension} and
  * their positions relative to one another.
@@ -70,9 +72,15 @@ public interface Hierarchy extends MetadataElement {
      * <p>The caller should assume that the list is immutable;
      * if the caller modifies the list, behavior is undefined.</p>
      *
+     * <p>The result is similar to calling
+     * <code>getLevels().get(0).getMembers()</code>. The contents will be the
+     * same, but this method returns a link {@link NamedList} rather than a
+     * mere {@link java.util.List} because the members of the root level are
+     * known to have unique names.
+     *
      * @return root members of this hierarchy
      */
-    NamedList<Member> getRootMembers();
+    NamedList<Member> getRootMembers() throws OlapException;
 }
 
 // End Hierarchy.java

@@ -78,7 +78,9 @@ public interface CellSet extends ResultSet, OlapWrapper {
      * Retrieves the CellSetAxis representing the filter axis.
      *
      * <p>This axis always has one row, and contains one member for each
-     * dimension included on in the WHERE clause of the MDX statement.
+     * dimension not included in any other axis. Some of these dimensions may
+     * have been explicitly mentioned in the WHERE clause of the MDX statement;
+     * others dimensions are represented by their default member.
      *
      * @return the filter axis
      */
@@ -128,6 +130,9 @@ public interface CellSet extends ResultSet, OlapWrapper {
      * @param positions Array of positions
      *
      * @return Cell
+     *
+     * @throws IllegalArgumentException if positions does not have the same
+     * number of members as the cell set has axes
      *
      * @throws IndexOutOfBoundsException if positions lie outside CellSet
      * bounds

@@ -9,7 +9,9 @@
 */
 package org.olap4j.metadata;
 
-import java.util.List;
+import org.olap4j.OlapException;
+
+import java.util.*;
 
 /**
  * Group of {@link Member} objects in a {@link Hierarchy},
@@ -81,7 +83,14 @@ public interface Level extends MetadataElement {
      *
      * @return List of members in this Level
      */
-    List<Member> getMembers();
+    List<Member> getMembers() throws OlapException;
+
+    /**
+     * Returns the number of members in this Level.
+     *
+     * @return number of members
+     */
+    int getCardinality();
 
     /**
      * Enumeration of the types of a {@link Level}.
@@ -199,6 +208,15 @@ public interface Level extends MetadataElement {
 
         private final int xmlaOrdinal;
 
+        private static final Map<Integer, Type> xmlaMap = 
+            new HashMap<Integer, Type>();
+
+        static {
+            for (Type type : values()) {
+                xmlaMap.put(type.xmlaOrdinal, type);
+            }
+        }
+
         private Type(int code) {
             this.xmlaOrdinal = code;
         }
@@ -214,7 +232,20 @@ public interface Level extends MetadataElement {
         public int xmlaOrdinal() {
             return xmlaOrdinal;
         }
-        
+
+        /**
+         * Looks up a Type by its XMLA ordinal.
+         *
+         * @param xmlaOrdinal Ordinal of a level Type according to XMLA
+         * specification.
+         *
+         * @return Type with the given ordinal, or null if there is no such
+         * Type
+         */
+        public static Type forXmlaOrdinal(int xmlaOrdinal) {
+            return xmlaMap.get(xmlaOrdinal);
+        }
+
         /**
          * Returns whether this is a time-related level
          * ({@link #TimeYears}, {@link #TimeQuarters}, {@link #TimeMonths},

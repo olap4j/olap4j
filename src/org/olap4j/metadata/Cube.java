@@ -9,6 +9,8 @@
 */
 package org.olap4j.metadata;
 
+import org.olap4j.OlapException;
+
 import java.util.*;
 
 /**
@@ -17,6 +19,8 @@ import java.util.*;
  * <p>A Cube belongs to a {@link Schema}, and is described by a list of
  * {@link Dimension}s and a list of {@link Measure}s. It may also have one or
  * more {@link NamedSet}s.
+ *
+ * @see org.olap4j.metadata.Cube#getMeasures()
  *
  * @author jhyde
  * @version $Id$
@@ -41,6 +45,18 @@ public interface Cube extends MetadataElement {
      * @return list of Dimensions
      */
     NamedList<Dimension> getDimensions();
+
+    /**
+     * Returns a list of {@link Hierarchy} objects in this Cube.
+     *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.</p>
+     *
+     * @see org.olap4j.OlapDatabaseMetaData#getHierarchies(String, String, String, String, String)
+     *
+     * @return list of Dimensions
+     */
+    NamedList<Hierarchy> getHierarchies();
 
     /**
      * Returns a list of {@link Measure} objects in this Cube.
@@ -102,9 +118,12 @@ public interface Cube extends MetadataElement {
      * dimension.
      *
      * @param nameParts Components of the fully-qualified member name
+     * 
      * @return member with the given name, or null if not found
+     *
+     * @throws OlapException if error occurs
      */
-    Member lookupMember(String... nameParts);
+    Member lookupMember(String... nameParts) throws OlapException;
 
     /**
      * Finds a collection of members in the current Cube related to a given
@@ -114,23 +133,26 @@ public interface Cube extends MetadataElement {
      * name as for {@link #lookupMember(String[])}, then applies the set of
      * tree-operations to find related members.
      *
-     * <p>The returned collection is sorted in hierarchical order. If no member
-     * is found with the given name, the collection is empty.
+     * <p>The returned collection is sorted by level number then by member
+     * ordinal. If no member is found with the given name, the collection is
+     * empty.
      *
      * <p>For example,
      *
-     * <blockquote>
+     * <blockquote><pre>
      * <code>lookupMembers(
      *     EnumSet.of(TreeOp.ANCESTORS, TreeOp.CHILDREN),
      *     "Time", "1997", "Q2")</code>
-     * </blockquote>
+     * </pre></blockquote>
      *
      * returns
      *
-     * <blockquote>
-     * [Time].[1997], [Time].[1997].[Q2].[4],
-     * [Time].[1997].[Q2].[5], [Time].[1997].[Q2].[6]
-     * </blockquote>
+     * <blockquote><pre><code>
+     * [Time].[1997]
+     * [Time].[1997].[Q2].[4]
+     * [Time].[1997].[Q2].[5]
+     * [Time].[1997].[Q2].[6]
+     * </code></pre></blockquote>
      *
      * <p>The fully-qualified name starts with the name of the dimension,
      * followed by the name of a root member, and continues with the name of
@@ -151,10 +173,12 @@ public interface Cube extends MetadataElement {
      *
      * @return collection of members related to the given member, or empty
      * set if the member is not found
+     *
+     * @throws OlapException if error occurs
      */
     List<Member> lookupMembers(
         Set<Member.TreeOp> treeOps,
-        String... nameParts);
+        String... nameParts) throws OlapException;
 }
 
 // End Cube.java

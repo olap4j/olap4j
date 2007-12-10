@@ -10,18 +10,11 @@
 package mondrian.olap4j;
 
 import org.olap4j.metadata.*;
-import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.Level;
-import org.olap4j.metadata.Member;
-import org.olap4j.metadata.Property;
 import org.olap4j.OlapException;
 import org.olap4j.mdx.ParseTreeNode;
 
 import java.util.List;
 import java.util.Locale;
-
-import mondrian.olap.*;
 
 /**
  * Implementation of {@link Member}
@@ -74,7 +67,11 @@ class MondrianOlap4jMember implements Member, Named {
         };
     }
 
-    public Member getParentMember() {
+    public int getChildMemberCount() {
+        return olap4jSchema.schemaReader.getMemberChildren(member).length;
+    }
+
+    public MondrianOlap4jMember getParentMember() {
         final mondrian.olap.Member parentMember = member.getParentMember();
         if (parentMember == null) {
             return null;

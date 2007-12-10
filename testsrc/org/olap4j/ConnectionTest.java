@@ -553,14 +553,12 @@ public class ConnectionTest extends TestCase {
         assertEquals(2, hierarchies.size());
         assertEquals("Store", hierarchies.get(0).getName());
         assertEquals("Gender", hierarchies.get(1).getName());
-        final NamedList<Property> properties =
+        final List<Property> properties =
             cellSetAxisMetaData.getProperties();
         assertEquals(3, properties.size());
         assertEquals("MEMBER_ORDINAL", properties.get(0).getName());
         assertEquals("MEMBER_UNIQUE_NAME", properties.get(1).getName());
         assertEquals("DISPLAY_INFO", properties.get(2).getName());
-        assertNotNull(properties.get("DISPLAY_INFO"));
-        assertNull(properties.get("FOO_BAR"));
     }
 
     public void testCellSet() throws SQLException {
@@ -1117,8 +1115,8 @@ public class ConnectionTest extends TestCase {
 
         assertEquals("MEMBER_CAPTION", property.getName());
         assertEquals("MEMBER_CAPTION", property.getUniqueName());
-        assertEquals(Property.Scope.MEMBER, property.getScope());
-        assertEquals(Property.Datatype.TYPE_STRING, property.getDatatype());
+        assertEquals(EnumSet.of(Property.TypeFlag.MEMBER), property.getType());
+        assertEquals(Datatype.STRING, property.getDatatype());
     }
 
     /**

@@ -82,7 +82,7 @@ TABLE TD {
 Version: 0.9 (beta)<br>
 Revision: $Id$
 (<a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
-Last modified: December 2<sup>nd</sup>, 2007.</p>
+Last modified: December 10<sup>th</sup>, 2007.</p>
 <hr noshade="noshade">
 
 <h2><a name="Contents">Contents</a></h2>
@@ -148,6 +148,8 @@ Last modified: December 2<sup>nd</sup>, 2007.</p>
 				<li><a href="#Member">The Member interface</a></li>
 				<li><a href="#Measure">The Measure interface</a></li>
 				<li><a href="#Property">The Property interface</a></li>
+				<li><a href="#NamedSet">The NamedSet interface</a></li>
+				<li><a href="#Datatype">The Datatype enum</a></li>
 			</ol></li>
 			<li>
 			<a href="#The_OlapDatabaseMetaData_interface_and_methods_which_return_schema_rowsets">The OlapDatabaseMetaData interface, and schema result sets</a><ol>
@@ -1302,6 +1304,7 @@ formula.</p>
 
 <ul>
 	<li><code>NamedList&lt;Dimension&gt; getDimensions()</code></li>
+	<li><code>NamedList&lt;Hierarchy&gt; getHierarchies()</code></li>
 	<li><code>List&lt;Measure&gt; getMeasures()</code></li>
 	<li><code>NamedList&lt;NamedSet&gt; getSets()</code></li>
 	<li><code>Schema getSchema()</code></li>
@@ -1354,6 +1357,7 @@ attributes and at the same depth in the hierarchy.</p>
 	<li><code>Level.Type getLevelType()</code></li>
 	<li><code>NamedList&lt;Property&gt; getProperties()</code></li>
 	<li><code>List&lt;Member&gt; getMembers()</code></li>
+	<li><code>int getCardinality()</code></li>
 </ul>
 <h5>2.7.2.8. <a name="Member">The Member interface</a></h5>
 <p>A <a class="javadoc" href="api/org/olap4j/metadata/Member.html">Member</a>&nbsp; 
@@ -1378,6 +1382,7 @@ MetadataElement</a>) is a data value in an OLAP dimension.</p>
 	<li><code>int getOrdinal()</code></li>
 	<li><code>boolean isHidden()</code></li>
 	<li><code>Member getDataMember()</code></li>
+	<li><code>int getChildMemberCount()</code></li>
 </ul>
 
 <h5>2.7.2.9. <a name="Measure">The Measure interface</a></h5>
@@ -1388,6 +1393,13 @@ data value of primary interest to the user browsing the cube. It provides the
 value of each cell, and is usually numeric.</p>
 
 <p>Every measure is a member of a special dimension called &quot;Measures&quot;.</p>
+
+<ul>
+	<li><code>boolean isVisible()</code></li>
+	<li><code>Aggregator getAggregator()</code></li>
+	<li><code>Datatype getDataType()</code></li>
+</ul>
+
 <h5>2.7.2.10. <a name="Property">The Property interface</a></h5>
 <p><a class="javadoc" href="api/org/olap4j/metadata/Property.html">Property</a>&nbsp; 
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
@@ -1407,22 +1419,100 @@ properties; for example:</p>
 &nbsp;&nbsp;&nbsp; Property.StandardMemberProperty.CATALOG_NAME);</div>
 <p>Members:</p>
 <ul>
-	<li><code>Datatype getType()</code></li>
-	<li><code>Scope getScope()</code></li>
-	<li><code>enum Scope { MEMBER, CELL }</code></li>
-	<li><code>enum Datatype { STRING, OTHER, NUMERIC, BOOLEAN }</code></li>
+	<li><code>Datatype getDatatype()</code></li>
+	<li><code>Set&lt;TypeFlag&gt; getType()</code></li>
+	<li><code>ContentType getContentType()</code></li>
+	<li><code>enum TypeFlag { MEMBER, CELL, SYSTEM, BLOB }</code></li>
 	<li><code>enum StandardMemberProperty implements Property { CATALOG_NAME, SCHEMA_NAME, CUBE_NAME, ...
 	}</code></li>
 	<li><code>enum StandardCellProperty implements Property { BACK_COLOR, CELL_EVALUATION_LIST, ... }</code></li>
+	<li><code>enum ContentType { REGULAR, ID, RELATION_TO_PARENT, ... }</code></li>
 </ul>
-<h5>2.7.2.11. <a name="The_NamedSet_interface">The NamedSet interface</a></h5>
+<h5>2.7.2.11. <a name="NamedSet">The NamedSet interface</a></h5>
 <p>A <a class="javadoc" href="api/org/olap4j/metadata/NamedSet.html">NamedSet</a> 
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>) describes a set whose value is determined by an MDX 
 expression. It belongs to a cube.</p>
 <ul>
 	<li><code>Cube getCube()</code></li>
+	<li><code>Expression getExpression()</code></li>
 </ul>
+
+<h5>2.7.2.12. <a name="Datatype">The Datatype enum</a></h5>
+
+<p>The <a class="javadoc" href="api/org/olap4j/metadata/Datatype.html">
+Datatype</a> enum describes the type of property and measure values. Because 
+olap4j drivers need to interoperate with OLE DB for OLAP and XMLA systems, 
+Datatype values have the same ordinals as in the OLE DB specification, and we 
+show here the 
+name and description of the corresponding type in the OLE DB specification. The table shows 
+the analogous Java type, if there is one.</p>
+
+<table>
+	<tbody>
+    <tr>
+		<th>Datatype</th>
+		<th>Java&nbsp;type</th>
+		<th>OLE DB type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>INTEGER</td>
+		<td>int</td>
+		<td>DBTYPE_I4</td>
+		<td>A four-byte, signed integer: INTEGER</td>
+	</tr>
+	<tr>
+		<td>DOUBLE</td>
+		<td>double</td>
+		<td>DBTYPE_R8</td>
+		<td>A double-precision floating-point value: Double</td>
+	</tr>
+	<tr>
+		<td>CURRENCY</td>
+		<td>&nbsp;</td>
+		<td>DBTYPE_CY</td>
+		<td>A currency value: LARGE_INTEGER, Currency is a fixed-point number with four digits to the right of the decimal point. It is stored in an eight-byte signed integer, scaled by 10,000.</td>
+	</tr>
+	<tr>
+		<td>BOOLEAN</td>
+		<td>boolean</td>
+		<td>DBTYPE_BOOL</td>
+		<td>A Boolean value stored in the same way as in Automation: VARIANT_BOOL; 0 means false and ~0 (bitwise, the value is not 0; that is, all bits are set to 1) means true.</td>
+	</tr>
+	<tr>
+		<td>VARIANT</td>
+		<td>Object</td>
+		<td>DBTYPE_VARIANT</td>
+		<td>An Automation VARIANT</td>
+	</tr>
+	<tr>
+		<td>UNSIGNED_SHORT</td>
+		<td>-</td>
+		<td>DBTYPE_UI2</td>
+		<td>A two-byte, unsigned integer</td>
+	</tr>
+	<tr>
+		<td>UNSIGNED_INTEGER</td>
+		<td>-</td>
+		<td>DBTYPE_UI4</td>
+		<td>A four-byte, unsigned integer</td>
+	</tr>
+	<tr>
+		<td>LARGE_INTEGER</td>
+		<td>long</td>
+		<td>DBTYPE_I8</td>
+		<td>An eight-byte, signed integer: LARGE_INTEGER</td>
+	</tr>
+	<tr>
+		<td>STRING</td>
+		<td>String</td>
+		<td>DBTYPE_WSTR</td>
+		<td>A null-terminated Unicode character string: wchar_t[length]; If DBTYPE_WSTR is used by itself, the number of bytes allocated for the string, including the null-termination character, is specified by cbMaxLen in the DBBINDING structure. If DBTYPE_WSTR is combined with DBTYPE_BYREF, the number of bytes allocated for the string, including the null-termination character, is at least the length of the string plus two. In either case, the actual length of the string is determined from the bound length value. The maximum length of the string is the number of allocated bytes divided by sizeof(wchar_t) and truncated to the nearest integer.</td>
+	</tr>
+</tbody>
+</table>
+
 <h4>2.7.3. 
 <a name="The_OlapDatabaseMetaData_interface_and_methods_which_return_schema_rowsets">The OlapDatabaseMetaData 
 interface, and methods which return schema rowsets</a></h4>

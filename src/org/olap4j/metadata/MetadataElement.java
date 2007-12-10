@@ -36,8 +36,10 @@ public interface MetadataElement {
     /**
      * Returns the caption of this element in the given locale.
      *
-     * If <code>locale</code> is null or if no caption has been defined for the
-     * element in that locale, returns the caption in base locale.
+     * <p>If <code>locale</code> is null or if no caption has been defined for
+     * the element in that locale, returns the caption in base locale.</p>
+     *
+     * <p>This method may return the empty string, but never returns null.</p>
      *
      * @param locale Locale
      * @return Caption of this element in the given locale, or the base locale;
@@ -48,8 +50,11 @@ public interface MetadataElement {
     /**
      * Returns the description of this element in the given locale.
      *
-     * If <code>locale</code> is null or if no description has been defined for
-     * the element in that locale, returns the description in base locale.
+     * <p>If <code>locale</code> is null or if no description has been defined
+     * for the element in that locale, returns the description in base
+     * locale.</p>
+     *
+     * <p>This method may return the empty string, but never returns null.</p>
      *
      * @param locale Locale
      * @return description of this element in the given locale, or the base

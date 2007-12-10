@@ -9,7 +9,7 @@
 */
 package org.olap4j.metadata;
 
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Definition of a property of a {@link Member} or
@@ -28,29 +28,113 @@ public interface Property extends MetadataElement {
     Datatype getDatatype();
 
     /**
-     * Returns the scope of this property.
+     * Returns a set of flags which describe the type of this Property.
      *
-     * @return scope of this Property
+     * @return type of this Property
      */
-    Scope getScope();
+    Set<TypeFlag> getType();
 
     /**
-     * Enumeration of the scope of a Property: whether it belongs to a member
-     * or a cell.
+     * Returns the content type of this Property.
+     *
+     * @return content type
      */
-    enum Scope {
-        MEMBER,
-        CELL
-    }
+    ContentType getContentType();
 
     /**
-     * Enumeration of the allowable data types of a Property.
+     * Enumeration of aspects of the type of a Property. In particular, whether
+     * it belongs to a member or a cell.
+     *
+     * <p>The values are as specified by XMLA for the PROPERTY_TYPE attribute
+     * of the MDSCHEMA_PROPERTIES data set.
+     * For example, XMLA specifies that the value 9 (0x1 | 0x8) means that a
+     * property belongs to a member and is a binary large object (BLOB).
+     * In this case, {@link Property#getType} will return the {@link Set}
+     * {{@link #MEMBER}, {@link #BLOB}}.
      */
-    enum Datatype {
-        TYPE_STRING,
-        TYPE_OTHER,
-        TYPE_NUMERIC,
-        TYPE_BOOLEAN
+    enum TypeFlag {
+        /**
+         * Identifies a property of a member. This property can be used in the
+         * DIMENSION PROPERTIES clause of the SELECT statement.
+         */
+        MEMBER(1),
+
+        /**
+         * Identifies a property of a cell. This property can be used in the
+         * CELL PROPERTIES clause that occurs at the end of the SELECT
+         * statement.
+         */
+        CELL(2),
+
+        /**
+         * Identifies an internal property.
+         */
+        SYSTEM(4),
+
+        /**
+         * Identifies a property which contains a binary large object (blob).
+         */
+        BLOB(8);
+
+        public final int xmlaOrdinal;
+        private static final Map<Integer, TypeFlag> xmlaMap =
+            new HashMap<Integer, TypeFlag>();
+
+        static {
+            for (TypeFlag typeFlag : values()) {
+                xmlaMap.put(typeFlag.xmlaOrdinal, typeFlag);
+            }
+        }
+
+        private static final Set<TypeFlag> CELL_TYPE_FLAG =
+            Collections.unmodifiableSet(EnumSet.of(TypeFlag.CELL));
+        private static final Set<TypeFlag> MEMBER_TYPE_FLAG =
+            Collections.unmodifiableSet(EnumSet.of(TypeFlag.MEMBER));
+
+        private TypeFlag(int xmlaOrdinal) {
+            this.xmlaOrdinal = xmlaOrdinal;
+        }
+
+        /**
+         * Looks up a TypeFlag by its XMLA ordinal.
+         *
+         * @param xmlaOrdinal Ordinal of a TypeFlag according to the XMLA
+         * specification.
+         *
+         * @return TypeFlag with the given ordinal, or null if there is no
+         * such TypeFlag
+         */
+        public static TypeFlag forXmlaOrdinal(int xmlaOrdinal) {
+            return xmlaMap.get(xmlaOrdinal);
+        }
+
+        /**
+         * Creates a set of TypeFlag values by parsing a mask.
+         *
+         * <p>For example, <code>forMask(9)</code> returns the set
+         * {{@link #MEMBER}, {@link #BLOB}} because 9 = MEMBER (1) | BLOB (8).
+         *
+         * @param xmlaOrdinalMask Bit mask
+         * @return Set of TypeFlag values
+         */
+        public static Set<TypeFlag> forMask(int xmlaOrdinalMask) {
+            switch (xmlaOrdinalMask) {
+            // Optimize common cases {MEMBER} and {CELL}.
+            case 1:
+                return MEMBER_TYPE_FLAG;
+            case 2:
+                return CELL_TYPE_FLAG;
+            default:
+                Set<TypeFlag> type =
+                    EnumSet.noneOf(TypeFlag.class);
+                for (TypeFlag typeFlag : values()) {
+                    if ((xmlaOrdinalMask & typeFlag.xmlaOrdinal) != 0) {
+                        type.add(typeFlag);
+                    }
+                }
+                return type;
+            }
+        }
     }
 
     /**
@@ -83,110 +167,110 @@ public interface Property extends MetadataElement {
          * Definition of the property which
          * holds the name of the current catalog.
          */
-        CATALOG_NAME(Datatype.TYPE_STRING, 10, false, "Optional. The name of the catalog to which this member belongs. NULL if the provider does not support catalogs."),
+        CATALOG_NAME(Datatype.STRING, 10, false, "Optional. The name of the catalog to which this member belongs. NULL if the provider does not support catalogs."),
 
         /**
          * Definition of the property which
          * holds the name of the current schema.
          */
-        SCHEMA_NAME(Datatype.TYPE_STRING, 11, false, "Optional. The name of the schema to which this member belongs. NULL if the provider does not support schemas."),
+        SCHEMA_NAME(Datatype.STRING, 11, false, "Optional. The name of the schema to which this member belongs. NULL if the provider does not support schemas."),
 
         /**
          * Definition of the property which
          * holds the name of the current cube.
          */
-        CUBE_NAME(Datatype.TYPE_STRING, 12, false, "Required. Name of the cube to which this member belongs."),
+        CUBE_NAME(Datatype.STRING, 12, false, "Required. Name of the cube to which this member belongs."),
 
         /**
          * Definition of the property which
          * holds the unique name of the current dimension.
          */
-        DIMENSION_UNIQUE_NAME(Datatype.TYPE_STRING, 13, false, "Required. Unique name of the dimension to which this member belongs. For providers that generate unique names by qualification, each component of this name is delimited."),
+        DIMENSION_UNIQUE_NAME(Datatype.STRING, 13, false, "Required. Unique name of the dimension to which this member belongs. For providers that generate unique names by qualification, each component of this name is delimited."),
 
         /**
          * Definition of the property which
          * holds the unique name of the current hierarchy.
          */
-        HIERARCHY_UNIQUE_NAME(Datatype.TYPE_STRING, 14, false, "Required. Unique name of the hierarchy. If the member belongs to more than one hierarchy, there is one row for each hierarchy to which it belongs. For providers that generate unique names by qualification, each component of this name is delimited."),
+        HIERARCHY_UNIQUE_NAME(Datatype.STRING, 14, false, "Required. Unique name of the hierarchy. If the member belongs to more than one hierarchy, there is one row for each hierarchy to which it belongs. For providers that generate unique names by qualification, each component of this name is delimited."),
 
         /**
          * Definition of the property which
          * holds the unique name of the current level.
          */
-        LEVEL_UNIQUE_NAME(Datatype.TYPE_STRING, 15, false, "Required. Unique name of the level to which the member belongs. For providers that generate unique names by qualification, each component of this name is delimited."),
+        LEVEL_UNIQUE_NAME(Datatype.STRING, 15, false, "Required. Unique name of the level to which the member belongs. For providers that generate unique names by qualification, each component of this name is delimited."),
 
         /**
          * Definition of the property which
          * holds the ordinal of the current level.
          */
-        LEVEL_NUMBER(Datatype.TYPE_STRING, 16, false, "Required. The distance of the member from the root of the hierarchy. The root level is zero."),
+        LEVEL_NUMBER(Datatype.UNSIGNED_INTEGER, 16, false, "Required. The distance of the member from the root of the hierarchy. The root level is zero."),
 
         /**
          * Definition of the property which
          * holds the ordinal of the current member.
          */
-        MEMBER_ORDINAL(Datatype.TYPE_NUMERIC, 17, false, "Required. Ordinal number of the member. Sort rank of the member when members of this dimension are sorted in their natural sort order. If providers do not have the concept of natural ordering, this should be the rank when sorted by MEMBER_NAME."),
+        MEMBER_ORDINAL(Datatype.UNSIGNED_INTEGER, 17, false, "Required. Ordinal number of the member. Sort rank of the member when members of this dimension are sorted in their natural sort order. If providers do not have the concept of natural ordering, this should be the rank when sorted by MEMBER_NAME."),
 
         /**
          * Definition of the property which
          * holds the name of the current member.
          */
-        MEMBER_NAME(Datatype.TYPE_STRING, 18, false, "Required. Name of the member."),
+        MEMBER_NAME(Datatype.STRING, 18, false, "Required. Name of the member."),
 
         /**
          * Definition of the property which
          * holds the unique name of the current member.
          */
-        MEMBER_UNIQUE_NAME(Datatype.TYPE_STRING, 19, false, "Required. Unique name of the member. For providers that generate unique names by qualification, each component of this name is delimited."),
+        MEMBER_UNIQUE_NAME(Datatype.STRING, 19, false, "Required. Unique name of the member. For providers that generate unique names by qualification, each component of this name is delimited."),
 
         /**
          * Definition of the property which
          * holds the type of the member.
          */
-        MEMBER_TYPE(Datatype.TYPE_STRING, 20, false, "Required. Type of the member. Can be one of the following values: MDMEMBER_Datatype.TYPE_REGULAR, MDMEMBER_Datatype.TYPE_ALL, MDMEMBER_Datatype.TYPE_FORMULA, MDMEMBER_Datatype.TYPE_MEASURE, MDMEMBER_Datatype.TYPE_UNKNOWN. MDMEMBER_Datatype.TYPE_FORMULA takes precedence over MDMEMBER_Datatype.TYPE_MEASURE. Therefore, if there is a formula (calculated) member on the Measures dimension, it is listed as MDMEMBER_Datatype.TYPE_FORMULA."),
+        MEMBER_TYPE(Datatype.STRING, 20, false, "Required. Type of the member. Can be one of the following values: MDMEMBER_Datatype.TYPE_REGULAR, MDMEMBER_Datatype.TYPE_ALL, MDMEMBER_Datatype.TYPE_FORMULA, MDMEMBER_Datatype.TYPE_MEASURE, MDMEMBER_Datatype.TYPE_UNKNOWN. MDMEMBER_Datatype.TYPE_FORMULA takes precedence over MDMEMBER_Datatype.TYPE_MEASURE. Therefore, if there is a formula (calculated) member on the Measures dimension, it is listed as MDMEMBER_Datatype.TYPE_FORMULA."),
 
         /**
          * Definition of the property which
          * holds the GUID of the member
          */
-        MEMBER_GUID(Datatype.TYPE_STRING, 21, false, "Optional. Member GUID. NULL if no GUID exists."),
+        MEMBER_GUID(Datatype.STRING, 21, false, "Optional. Member GUID. NULL if no GUID exists."),
 
         /**
          * Definition of the property which
          * holds the label or caption associated with the member, or the
          * member's name if no caption is defined.
          */
-        MEMBER_CAPTION(Datatype.TYPE_STRING, 22, false, "Required. A label or caption associated with the member. Used primarily for display purposes. If a caption does not exist, MEMBER_NAME is returned."),
+        MEMBER_CAPTION(Datatype.STRING, 22, false, "Required. A label or caption associated with the member. Used primarily for display purposes. If a caption does not exist, MEMBER_NAME is returned."),
 
         /**
          * Definition of the property which holds the
          * number of children this member has.
          */
-        CHILDREN_CARDINALITY(Datatype.TYPE_NUMERIC, 23, false, "Required. Number of children that the member has. This can be an estimate, so consumers should not rely on this to be the exact count. Providers should return the best estimate possible."),
+        CHILDREN_CARDINALITY(Datatype.UNSIGNED_INTEGER, 23, false, "Required. Number of children that the member has. This can be an estimate, so consumers should not rely on this to be the exact count. Providers should return the best estimate possible."),
 
         /**
          * Definition of the property which holds the
          * distance from the root of the hierarchy of this member's parent.
          */
-        PARENT_LEVEL(Datatype.TYPE_NUMERIC, 24, false, "Required. The distance of the member's parent from the root level of the hierarchy. The root level is zero."),
+        PARENT_LEVEL(Datatype.UNSIGNED_INTEGER, 24, false, "Required. The distance of the member's parent from the root level of the hierarchy. The root level is zero."),
 
         /**
          * Definition of the property which holds the
          * Name of the current catalog.
          */
-        PARENT_UNIQUE_NAME(Datatype.TYPE_STRING, 25, false, "Required. Unique name of the member's parent. NULL is returned for any members at the root level. For providers that generate unique names by qualification, each component of this name is delimited."),
+        PARENT_UNIQUE_NAME(Datatype.STRING, 25, false, "Required. Unique name of the member's parent. NULL is returned for any members at the root level. For providers that generate unique names by qualification, each component of this name is delimited."),
 
         /**
          * Definition of the property which holds the
          * number of parents that this member has. Generally 1, or 0 for root members.
          */
-        PARENT_COUNT(Datatype.TYPE_NUMERIC, 26, false, "Required. Number of parents that this member has."),
+        PARENT_COUNT(Datatype.UNSIGNED_INTEGER, 26, false, "Required. Number of parents that this member has."),
 
         /**
          * Definition of the property which holds the
          * description of this member.
          */
-        DESCRIPTION(Datatype.TYPE_STRING, 27, false, "Optional. A human-readable description of the member."),
+        DESCRIPTION(Datatype.STRING, 27, false, "Optional. A human-readable description of the member."),
 
         /**
          * Definition of the internal property which holds the
@@ -194,7 +278,7 @@ public interface Property extends MetadataElement {
          * (especially a measure or calculated member) in a user interface such as
          * JPivot.
          */
-        $visible(Datatype.TYPE_BOOLEAN, 28, true, null),
+        $visible(Datatype.BOOLEAN, 28, true, null),
 
         /**
          * Definition of the property which
@@ -203,7 +287,7 @@ public interface Property extends MetadataElement {
          * <p>Caution: Level depth of members in parent-child hierarchy isn't from their levels.
          * It's calculated from the underlying data dynamically.
          */
-        DEPTH(Datatype.TYPE_NUMERIC, 43, true, "The level depth of a member"),
+        DEPTH(Datatype.UNSIGNED_INTEGER, 43, true, "The level depth of a member"),
 
         /**
          * Definition of the property which
@@ -211,14 +295,14 @@ public interface Property extends MetadataElement {
          *
          * <p>Caution: This property's value is calculated based on a specified MDX query, so its value is dynamic at runtime.
          */
-        DISPLAY_INFO(Datatype.TYPE_NUMERIC, 44, false, "Display instruction of a member for XML/A"),
+        DISPLAY_INFO(Datatype.UNSIGNED_INTEGER, 44, false, "Display instruction of a member for XML/A"),
 
         /**
          * Definition of the property which
          * holds the value of a cell. Is usually numeric (since most measures are
          * numeric) but is occasionally another type.
          */
-        VALUE(Datatype.TYPE_NUMERIC, 41, false, "The unformatted value of the cell.");
+        VALUE(Datatype.VARIANT, 41, false, "The unformatted value of the cell.");
 
         private final Datatype type;
         private final String description;
@@ -256,8 +340,12 @@ public interface Property extends MetadataElement {
             return type;
         }
 
-        public Scope getScope() {
-            return Scope.MEMBER;
+        public Set<TypeFlag> getType() {
+            return TypeFlag.forMask(TypeFlag.MEMBER.xmlaOrdinal);
+        }
+
+        public ContentType getContentType() {
+            return ContentType.REGULAR;
         }
 
         public boolean isInternal() {
@@ -285,47 +373,47 @@ public interface Property extends MetadataElement {
      * </ul>
      */
     enum StandardCellProperty implements Property {
-        BACK_COLOR(Datatype.TYPE_STRING, 30, false, "The background color for displaying the VALUE or FORMATTED_VALUE property. For more information, see FORE_COLOR and BACK_COLOR Contents."),
+        BACK_COLOR(Datatype.STRING, 30, false, "The background color for displaying the VALUE or FORMATTED_VALUE property. For more information, see FORE_COLOR and BACK_COLOR Contents."),
 
-        CELL_EVALUATION_LIST(Datatype.TYPE_STRING, 31, false, "The semicolon-delimited list of evaluated formulas applicable to the cell, in order from lowest to highest solve order. For more information about solve order, see Understanding Pass Order and Solve Order"),
+        CELL_EVALUATION_LIST(Datatype.STRING, 31, false, "The semicolon-delimited list of evaluated formulas applicable to the cell, in order from lowest to highest solve order. For more information about solve order, see Understanding Pass Order and Solve Order"),
 
-        CELL_ORDINAL(Datatype.TYPE_NUMERIC, 32, false, "The ordinal number of the cell in the dataset."),
+        CELL_ORDINAL(Datatype.UNSIGNED_INTEGER, 32, false, "The ordinal number of the cell in the dataset."),
 
-        FORE_COLOR(Datatype.TYPE_STRING, 33, false, "The foreground color for displaying the VALUE or FORMATTED_VALUE property. For more information, see FORE_COLOR and BACK_COLOR Contents."),
+        FORE_COLOR(Datatype.STRING, 33, false, "The foreground color for displaying the VALUE or FORMATTED_VALUE property. For more information, see FORE_COLOR and BACK_COLOR Contents."),
 
-        FONT_NAME(Datatype.TYPE_STRING, 34, false, "The font to be used to display the VALUE or FORMATTED_VALUE property."),
+        FONT_NAME(Datatype.STRING, 34, false, "The font to be used to display the VALUE or FORMATTED_VALUE property."),
 
-        FONT_SIZE(Datatype.TYPE_STRING, 35, false, "Font size to be used to display the VALUE or FORMATTED_VALUE property."),
+        FONT_SIZE(Datatype.STRING, 35, false, "Font size to be used to display the VALUE or FORMATTED_VALUE property."),
 
-        FONT_FLAGS(Datatype.TYPE_NUMERIC, 36, false, "The bitmask detailing effects on the font. The value is the result of a bitwise OR operation of one or more of the following constants: MDFF_BOLD  = 1, MDFF_ITALIC = 2, MDFF_UNDERLINE = 4, MDFF_STRIKEOUT = 8. For example, the value 5 represents the combination of bold (MDFF_BOLD) and underline (MDFF_UNDERLINE) font effects."),
+        FONT_FLAGS(Datatype.UNSIGNED_INTEGER, 36, false, "The bitmask detailing effects on the font. The value is the result of a bitwise OR operation of one or more of the following constants: MDFF_BOLD  = 1, MDFF_ITALIC = 2, MDFF_UNDERLINE = 4, MDFF_STRIKEOUT = 8. For example, the value 5 represents the combination of bold (MDFF_BOLD) and underline (MDFF_UNDERLINE) font effects."),
 
         /**
          * Definition of the property which
          * holds the formatted value of a cell.
          */
-        FORMATTED_VALUE(Datatype.TYPE_STRING, 37, false, "The character string that represents a formatted display of the VALUE property."),
+        FORMATTED_VALUE(Datatype.STRING, 37, false, "The character string that represents a formatted display of the VALUE property."),
 
         /**
          * Definition of the property which
          * holds the format string used to format cell values.
          */
-        FORMAT_STRING(Datatype.TYPE_STRING, 38, false, "The format string used to create the FORMATTED_VALUE property value. For more information, see FORMAT_STRING Contents."),
+        FORMAT_STRING(Datatype.STRING, 38, false, "The format string used to create the FORMATTED_VALUE property value. For more information, see FORMAT_STRING Contents."),
 
-        NON_EMPTY_BEHAVIOR(Datatype.TYPE_STRING, 39, false, "The measure used to determine the behavior of calculated members when resolving empty cells."),
+        NON_EMPTY_BEHAVIOR(Datatype.STRING, 39, false, "The measure used to determine the behavior of calculated members when resolving empty cells."),
 
         /**
          * Definition of the property which
          * determines the solve order of a calculated member with respect to other
          * calculated members.
          */
-        SOLVE_ORDER(Datatype.TYPE_NUMERIC, 40, false, "The solve order of the cell."),
+        SOLVE_ORDER(Datatype.INTEGER, 40, false, "The solve order of the cell."),
 
         /**
          * Definition of the property which
          * holds the value of a cell. Is usually numeric (since most measures are
          * numeric) but is occasionally another type.
          */
-        VALUE(Datatype.TYPE_NUMERIC, 41, false, "The unformatted value of the cell."),
+        VALUE(Datatype.VARIANT, 41, false, "The unformatted value of the cell."),
 
         /**
          * Definition of the property which
@@ -335,7 +423,7 @@ public interface Property extends MetadataElement {
          * is not specified, the datatype is "Numeric" by default, except measures
          * whose aggregator is "Count", whose datatype is "Integer".
          */
-        DATATYPE(Datatype.TYPE_STRING, 42, false, "The datatype of the cell.");
+        DATATYPE(Datatype.STRING, 42, false, "The datatype of the cell.");
 
         /**
          * The datatype of the property.
@@ -360,8 +448,8 @@ public interface Property extends MetadataElement {
             return type;
         }
 
-        public Scope getScope() {
-            return Scope.CELL;
+        public Set<TypeFlag> getType() {
+            return TypeFlag.forMask(TypeFlag.CELL.xmlaOrdinal);
         }
 
         public String getName() {
@@ -382,6 +470,10 @@ public interface Property extends MetadataElement {
 
         public boolean isInternal() {
             return internal;
+        }
+
+        public ContentType getContentType() {
+            return ContentType.REGULAR;
         }
     }
 
@@ -462,6 +554,15 @@ public interface Property extends MetadataElement {
 
         private final int xmlaOrdinal;
 
+        private static final Map<Integer, ContentType> xmlaMap =
+            new HashMap<Integer, ContentType>();
+
+        static {
+            for (ContentType contentType : values()) {
+                xmlaMap.put(contentType.xmlaOrdinal, contentType);
+            }
+        }
+
         /**
          * Returns the ordinal code as specified by XMLA.
          *
@@ -476,6 +577,19 @@ public interface Property extends MetadataElement {
 
         private ContentType(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
+        }
+
+        /**
+         * Looks up a ContentType by its XMLA ordinal.
+         *
+         * @param xmlaOrdinal Ordinal of a ContentType according to the XMLA
+         * specification.
+         *
+         * @return ContentType with the given ordinal, or null if there is no
+         * such ContentType
+         */
+        public static ContentType forXmlaOrdinal(int xmlaOrdinal) {
+            return xmlaMap.get(xmlaOrdinal);
         }
     }
 }

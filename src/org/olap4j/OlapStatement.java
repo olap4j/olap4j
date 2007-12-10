@@ -29,8 +29,13 @@ public interface OlapStatement extends Statement, OlapWrapper {
      * Executes an OLAP statement.
      *
      * @param mdx MDX <code>SELECT</code> statement
+     *
      * @return Cell set
-     * @throws OlapException if error occurs
+     *
+     * @throws OlapException if a database access error occurs,
+     * this method is called on a closed <code>OlapStatement</code>,
+     * the query times out (see {@link #setQueryTimeout(int)})
+     * or another thread cancels the statement (see {@link #cancel()})
      */
     CellSet executeOlapQuery(String mdx) throws OlapException;
 
@@ -40,8 +45,13 @@ public interface OlapStatement extends Statement, OlapWrapper {
      * <p>Validates the parse tree before executing it.
      *
      * @param selectNode Parse tree of MDX <code>SELECT</code> statement
+     *
      * @return Cell set
-     * @throws OlapException if error occurs
+     *
+     * @throws OlapException if a database access error occurs,
+     * this method is called on a closed <code>OlapStatement</code>,
+     * the query times out (see {@link #setQueryTimeout(int)})
+     * or another thread cancels the statement (see {@link #cancel()})
      */
     CellSet executeOlapQuery(SelectNode selectNode) throws OlapException;
 }

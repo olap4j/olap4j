@@ -72,9 +72,14 @@ public interface CellSetAxisMetaData {
     /**
      * Returns the member properties which are returned on this axis.
      *
+     * <p>This method does not return a {@link NamedList} because the names of
+     * the properties are not necessarily unique; for example, there might be
+     * two hierarchies on the axis, each of which returns the DISPLAY_INFO
+     * property.</p>
+     * 
      * @return list of member properties on this Axis
      */
-    NamedList<Property> getProperties();
+    List<Property> getProperties();
 }
 
 // End CellSetAxisMetaData.java
