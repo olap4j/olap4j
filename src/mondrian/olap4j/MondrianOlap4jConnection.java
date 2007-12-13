@@ -11,6 +11,7 @@ package mondrian.olap4j;
 
 import mondrian.mdx.*;
 import mondrian.olap.*;
+import mondrian.rolap.RolapStoredMeasure;
 import org.olap4j.Axis;
 import org.olap4j.Cell;
 import org.olap4j.*;
@@ -30,6 +31,9 @@ import java.util.*;
 /**
  * Implementation of {@link org.olap4j.OlapConnection}
  * for the Mondrian OLAP engine.
+ *
+ * <p>This class has sub-classes which implement JDBC 3.0 and JDBC 4.0 APIs;
+ * it is instantiated using {@link Factory#newConnection}.</p>
  *
  * @author jhyde
  * @version $Id$
@@ -409,10 +413,18 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
         if (member == null) {
             return null;
         }
+        if (member instanceof RolapStoredMeasure) {
+            RolapStoredMeasure measure = (RolapStoredMeasure) member;
+            return new MondrianOlap4jMeasure(
+                toOlap4j(member.getDimension().getSchema()),
+                measure);
+        }
         return new MondrianOlap4jMember(
             toOlap4j(member.getDimension().getSchema()),
             member);
     }
+
+
 
     MondrianOlap4jLevel toOlap4j(mondrian.olap.Level level) {
         if (level == null) {
@@ -496,8 +508,8 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
      * and factory methods.
      */
     static class Helper {
-        SQLException createException(String msg) {
-            return new SQLException(msg);
+        OlapException createException(String msg) {
+            return new OlapException(msg);
         }
 
         /**
@@ -528,6 +540,19 @@ abstract class MondrianOlap4jConnection implements OlapConnection {
             OlapException exception = new OlapException(msg, cause);
             exception.setContext(context);
             return exception;
+        }
+
+        /**
+         * Creates an exception with a given cause.
+         *
+         * @param msg Message
+         * @param cause Causing exception
+         * @return New exception
+         */
+        OlapException createException(
+            String msg, Throwable cause)
+        {
+            return new OlapException(msg, cause);
         }
 
         /**

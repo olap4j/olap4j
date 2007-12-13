@@ -12,6 +12,7 @@ package mondrian.olap4j;
 import mondrian.olap.Query;
 import mondrian.olap.QueryAxis;
 import org.olap4j.*;
+import org.olap4j.impl.ArrayNamedListImpl;
 import org.olap4j.metadata.*;
 
 import java.sql.SQLException;

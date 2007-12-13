@@ -6,28 +6,34 @@
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
-package org.olap4j.driver.xmla;
-
-import java.util.ArrayList;
+package org.olap4j.impl;
 
 import org.olap4j.metadata.NamedList;
 
+import java.util.ArrayList;
+
 /**
  * Implementation of {@link org.olap4j.metadata.NamedList} which uses
- * {@link java.util.ArrayList} for storage and assumes that elements implement
- * the {@link Named} interface.
+ * {@link java.util.ArrayList} for storage.
+ *
+ * <p>Derived class must implement {@link #getName(Object)}, to indicate how
+ * elements are named.
+ *
+ * @see NamedListImpl
  *
  * @author jhyde
  * @version $Id$
- * @since May 23, 2007
+ * @since Nov 12, 2007
  */
-class NamedListImpl<T extends Named>
+public abstract class ArrayNamedListImpl<T>
     extends ArrayList<T>
-    implements NamedList<T> {
+    implements NamedList<T>
+{
+    protected abstract String getName(T t);
 
     public T get(String name) {
         for (T t : this) {
-            if (t.getName().equals(name)) {
+            if (getName(t).equals(name)) {
                 return t;
             }
         }
@@ -37,7 +43,7 @@ class NamedListImpl<T extends Named>
     public int indexOfName(String name) {
         for (int i = 0; i < size(); ++i) {
             T t = get(i);
-            if (t.getName().equals(name)) {
+            if (getName(t).equals(name)) {
                 return i;
             }
         }
@@ -45,4 +51,4 @@ class NamedListImpl<T extends Named>
     }
 }
 
-// End NamedListImpl.java
+// End ArrayNamedListImpl.java

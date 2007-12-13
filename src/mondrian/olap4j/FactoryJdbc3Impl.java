@@ -100,14 +100,23 @@ class FactoryJdbc3Impl implements Factory {
         }
     }
 
-    private class MondrianOlap4jConnectionJdbc3 extends MondrianOlap4jConnection {
-        public MondrianOlap4jConnectionJdbc3(String url, Properties info) throws SQLException {
+    private class MondrianOlap4jConnectionJdbc3
+        extends MondrianOlap4jConnection
+    {
+        public MondrianOlap4jConnectionJdbc3(
+            String url,
+            Properties info) throws SQLException
+        {
             super(FactoryJdbc3Impl.this, url, info);
         }
     }
 
-    private static class MondrianOlap4jDatabaseMetaDataJdbc3 extends MondrianOlap4jDatabaseMetaData {
-        public MondrianOlap4jDatabaseMetaDataJdbc3(MondrianOlap4jConnection olap4jConnection) {
+    private static class MondrianOlap4jDatabaseMetaDataJdbc3
+        extends MondrianOlap4jDatabaseMetaData
+    {
+        public MondrianOlap4jDatabaseMetaDataJdbc3(
+            MondrianOlap4jConnection olap4jConnection)
+        {
             super(olap4jConnection);
         }
     }

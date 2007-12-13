@@ -389,7 +389,9 @@ class FactoryJdbc4Impl implements Factory {
         }
     }
 
-    private static class MondrianOlap4jCellSetJdbc4 extends MondrianOlap4jCellSet {
+    private static class MondrianOlap4jCellSetJdbc4
+        extends MondrianOlap4jCellSet
+    {
         public MondrianOlap4jCellSetJdbc4(
             MondrianOlap4jStatement olap4jStatement,
             Query query)
@@ -741,7 +743,8 @@ class FactoryJdbc4Impl implements Factory {
     }
 
     private static class MondrianOlap4jDatabaseMetaDataJdbc4
-        extends MondrianOlap4jDatabaseMetaData {
+        extends MondrianOlap4jDatabaseMetaData
+    {
         public MondrianOlap4jDatabaseMetaDataJdbc4(
             MondrianOlap4jConnection olap4jConnection)
         {
@@ -779,7 +782,8 @@ class FactoryJdbc4Impl implements Factory {
         public ResultSet getFunctions(
             String catalog,
             String schemaPattern,
-            String functionNamePattern) throws SQLException {
+            String functionNamePattern) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -787,7 +791,8 @@ class FactoryJdbc4Impl implements Factory {
             String catalog,
             String schemaPattern,
             String functionNamePattern,
-            String columnNamePattern) throws SQLException {
+            String columnNamePattern) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
     }

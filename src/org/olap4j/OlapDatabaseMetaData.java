@@ -739,7 +739,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
     /**
      * Retrieves a result set describing the Members in this database.
      *
-     * <p>Specification as for XML/A MDSCHEMA_MEMBERS schema rowset.
+     * <p>Specification as for XML/A MDSCHEMA_MEMBERS schema rowset. Rows
+     * are sorted by level number then by ordinal.
      *
      * <p>The <code>treeOps</code> parameter allows you to retrieve members
      * relative to a given member. It is only applicable if a

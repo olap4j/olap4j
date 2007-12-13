@@ -28,7 +28,8 @@ Javadoc
 
 Code
 ----
- 
+
+* add method(s) to Cube to look up a member and its relatives by unique name
 * fix 4 TODOs in ParserTest 
 
 Testing
@@ -51,7 +52,34 @@ Not in scope for olap4j 0.9
  
 * convert parser to javacc 
 * XMLA driver 
- 
+
+XMLA driver tasks
+-----------------
+
+* Member cache as part of cube (weak hash map)
+** Use member cache for XmlaOlap4jHierarchy.getDefaultMember (store member in hierarchy, so Hierarchy.getDefaultMember never throws OlapException)
+** Use member cache for XmlaOlap4jHierarchy.getRootMembers
+** Consider using member cache for XmlaOlap4jLevel.getMembers
+** Use member cache for XmlaOlap4jMember.getParentMember (lookup parent member before creating member, and store pointer rather than name of parent member)
+
+* On creating XmlaOlap4jDimension, lookup and store default hierarchy; obsolete defaultHierarchyUniqueName field
+
+* Create enum Measure.DataType (possibly related to Property.Datatype), and change method 'int Measure.dataType()' to 'Datatype Measure.getDatatype()'
+
+* Reduce memory usage by converting some of XmlaOlap4jMember's fields into properties (e.g. ordinal, cardinality)
+
+* Add test for Member.getAncestorMembers
+
+* Remove dependency on xerces; use JDK XML parser.
+
+Changes since 0.9
+-----------------
+
+* Various methods now throw OlapException
+
+* Rename 'enum Property.Scope' to 'Property.TypeFlag', and method
+  'Scope Property.getScope()' becomes 'Set<TypeFlag> Property.getType()'. 
+
 General guidelines
 ------------------
  

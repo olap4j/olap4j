@@ -7,18 +7,18 @@
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
-package mondrian.olap4j;
+package org.olap4j.impl;
 
 /**
  * Implementation of {@link org.olap4j.metadata.NamedList} which uses
  * {@link java.util.ArrayList} for storage and assumes that elements implement
- * the {@link Named} interface.
+ * the {@link org.olap4j.impl.Named} interface.
  *
  * @author jhyde
  * @version $Id$
  * @since May 23, 2007
  */
-class NamedListImpl<T extends Named>
+public class NamedListImpl<T extends Named>
     extends ArrayNamedListImpl<T>
 {
     protected final String getName(T t) {

@@ -8,15 +8,12 @@
 */
 package org.olap4j.driver.xmla;
 
-import java.sql.*;
-import java.util.Properties;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.io.InputStream;
-import java.io.IOException;
+import java.sql.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Olap4j driver for generic XML for Analysis (XMLA) providers.
@@ -70,6 +67,12 @@ public class XmlaOlap4jDriver implements Driver {
     public static final int MAJOR_VERSION = 0;
     public static final int MINOR_VERSION = 1;
     private final Factory factory;
+
+    /**
+     * Executor shared by all connections making asynchronous XMLA calls.
+     */
+    private static final ExecutorService executor =
+        Executors.newCachedThreadPool();
 
     static {
         try {
@@ -169,21 +172,65 @@ public class XmlaOlap4jDriver implements Driver {
         return new HttpProxy();
     }
 
+    public Future<byte[]> getFuture(
+        final Proxy proxy,
+        final URL url,
+        final String request)
+    {
+        return executor.submit(
+            new Callable<byte[] >() {
+                public byte[] call() throws Exception {
+                    return proxy.get(url, request);
+                }
+            }
+        );
+    }
+
     /**
      * Object which can respond to HTTP requests.
      */
     public interface Proxy {
-        InputStream get(URL url, String request) throws IOException;
+        byte[] get(URL url, String request) throws IOException;
+
+        /**
+         * Submits a request for background execution.
+         *
+         * @param url URL
+         * @param request Request
+         * @return Future object representing the submitted job
+         */
+        Future<byte[]> submit(
+            URL url,
+            String request);
     }
 
     /**
      * Implementation of {@link Proxy} which uses HTTP.
      */
     protected static class HttpProxy implements Proxy {
-
-        public InputStream get(URL url, String request) throws IOException {
+        public byte[] get(URL url, String request) throws IOException {
             URLConnection urlConnection = url.openConnection();
-            return urlConnection.getInputStream();
+            InputStream is = urlConnection.getInputStream();
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
+            int count;
+            while ((count = is.read(buf)) > 0) {
+                baos.write(buf, 0, count);
+            }
+            return baos.toByteArray();
+        }
+
+        public Future<byte[]> submit(
+            final URL url,
+            final String request)
+        {
+            return executor.submit(
+                new Callable<byte[] >() {
+                    public byte[] call() throws Exception {
+                        return get(url, request);
+                    }
+                }
+            );
         }
     }
 
@@ -196,12 +243,13 @@ public class XmlaOlap4jDriver implements Driver {
     /**
      * Properties supported by this driver.
      */
-    enum Property {
+    public enum Property {
         UseThreadProxy(
             "If true, use the proxy object in the THREAD_PROXY field. "
                 + "For testing. Default is false."),
 
-        Server("URL of HTTP server");
+        Server("URL of HTTP server"),
+        Catalog("Catalog name");
 
         Property(String description) {
         }

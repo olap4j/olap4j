@@ -10,6 +10,8 @@
 package mondrian.olap4j;
 
 import org.olap4j.metadata.*;
+import org.olap4j.impl.ArrayNamedListImpl;
+import org.olap4j.impl.Named;
 
 import java.util.*;
 

@@ -27,6 +27,9 @@ import mondrian.olap.Parameter;
  * Implementation of {@link PreparedOlapStatement}
  * for the Mondrian OLAP engine.
  *
+ * <p>This class has sub-classes which implement JDBC 3.0 and JDBC 4.0 APIs;
+ * it is instantiated using {@link Factory#newPreparedStatement}.</p>
+ *
  * @author jhyde
  * @version $Id$
  * @since Jun 12, 2007

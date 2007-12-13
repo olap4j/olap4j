@@ -11,6 +11,7 @@ package mondrian.olap4j;
 
 import org.olap4j.metadata.*;
 import org.olap4j.OlapException;
+import org.olap4j.impl.*;
 
 import java.util.*;
 
@@ -53,18 +54,18 @@ class MondrianOlap4jCube implements Cube, Named {
     }
 
     public NamedList<Dimension> getDimensions() {
-        List<MondrianOlap4jDimension> list =
+        NamedList<MondrianOlap4jDimension> list =
             new NamedListImpl<MondrianOlap4jDimension>();
         for (mondrian.olap.Dimension dimension : cube.getDimensions()) {
             list.add(
                 new MondrianOlap4jDimension(
                     olap4jSchema, dimension));
         }
-        return (NamedList) list;
+        return Olap4jUtil.cast(list);
     }
 
     public NamedList<Hierarchy> getHierarchies() {
-        List<MondrianOlap4jHierarchy> list =
+        NamedList<MondrianOlap4jHierarchy> list =
             new NamedListImpl<MondrianOlap4jHierarchy>();
         for (mondrian.olap.Dimension dimension : cube.getDimensions()) {
             for (mondrian.olap.Hierarchy hierarchy : dimension.getHierarchies()) {
@@ -73,7 +74,7 @@ class MondrianOlap4jCube implements Cube, Named {
                         olap4jSchema, hierarchy));
             }
         }
-        return (NamedList) list;
+        return Olap4jUtil.cast(list);
     }
 
     public List<Measure> getMeasures() {
@@ -81,7 +82,7 @@ class MondrianOlap4jCube implements Cube, Named {
             (MondrianOlap4jLevel)
                 getDimensions().get("Measures").getDefaultHierarchy()
                     .getLevels().get(0);
-        return (List) measuresLevel.getMembers();
+        return Olap4jUtil.cast(measuresLevel.getMembers());
     }
 
     public NamedList<NamedSet> getSets() {
@@ -92,7 +93,7 @@ class MondrianOlap4jCube implements Cube, Named {
         for (mondrian.olap.NamedSet namedSet : cube.getNamedSets()) {
             list.add(olap4jConnection.toOlap4j(cube, namedSet));
         }
-        return (NamedList) list;
+        return Olap4jUtil.cast(list);
     }
 
     public Collection<Locale> getSupportedLocales() {
@@ -175,7 +176,7 @@ class MondrianOlap4jCube implements Cube, Named {
                 siblingMembers = parentMember.getChildMembers();
             } else {
                 siblingMembers =
-                    (NamedList) member.getHierarchy().getRootMembers();
+                    Olap4jUtil.cast(member.getHierarchy().getRootMembers());
             }
             List<MondrianOlap4jMember> targetList = list;
             for (MondrianOlap4jMember siblingMember : siblingMembers) {
@@ -210,7 +211,7 @@ class MondrianOlap4jCube implements Cube, Named {
         if (remainingSiblingsList != null) {
             list.addAll(remainingSiblingsList);
         }
-        return (List) list;
+        return Olap4jUtil.cast(list);
     }
 
     private static void addDescendants(

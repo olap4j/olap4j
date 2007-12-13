@@ -8,18 +8,17 @@
 */
 package org.olap4j;
 
+import mondrian.tui.XmlaSupport;
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.test.TestContext;
 import org.xml.sax.SAXException;
 
+import javax.servlet.ServletException;
+import java.io.IOException;
+import java.net.URL;
 import java.sql.*;
 import java.util.*;
-import java.io.*;
-import java.net.URL;
-
-import mondrian.tui.XmlaSupport;
-
-import javax.servlet.ServletException;
+import java.util.concurrent.*;
 
 /**
  * Implementation of {@link org.olap4j.test.TestContext.Tester} which speaks
@@ -41,7 +40,10 @@ public class XmlaTester implements TestContext.Tester {
         try {
             XmlaOlap4jDriver.THREAD_PROXY.set(proxy);
             Properties info = new Properties();
-            info.setProperty("UseThreadProxy", "true");
+            info.setProperty(
+                XmlaOlap4jDriver.Property.UseThreadProxy.name(), "true");
+            info.setProperty(
+                XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
             return
                 DriverManager.getConnection(
                     getURL(),
@@ -80,8 +82,8 @@ public class XmlaTester implements TestContext.Tester {
         return "jdbc:xmla:Server=http://foo;UseThreadProxy=true";
     }
 
-    public boolean isMondrian() {
-        return false;
+    public Flavor getFlavor() {
+        return Flavor.XMLA;
     }
 
     public static final String DRIVER_CLASS_NAME =
@@ -96,14 +98,30 @@ public class XmlaTester implements TestContext.Tester {
      * in-process. This is more convenient to debug than an inter-process
      * request using HTTP.
      */
-    private static class MondrianInprocProxy implements XmlaOlap4jDriver.Proxy {
-        public InputStream get(URL url, String request) throws IOException {
+    private static class MondrianInprocProxy
+        implements XmlaOlap4jDriver.Proxy
+    {
+        // Use single-threaded executor for ease of debugging.
+        private static final ExecutorService singleThreadExecutor =
+            Executors.newSingleThreadExecutor();
+
+        public byte[] get(URL url, String request) throws IOException {
             try {
-                Map<String, String> map = new HashMap<String, String>();
-                String urlString = url.toString();
-                byte[] bytes = XmlaSupport.processSoapXmla(
-                    request, urlString, map, null);
-                return new ByteArrayInputStream(bytes);
+                final Properties properties = TestContext.testProperties;
+                final String catalogUrl =
+                    properties.getProperty(
+                        "org.olap4j.XmlaTester.CatalogUrl");
+                Map<String, String> catalogNameUrls =
+                    new HashMap<String, String>();
+                catalogNameUrls.put("FoodMart", catalogUrl);
+                String urlString =
+                    properties.getProperty("org.olap4j.test.connectUrl");
+                if (!urlString.startsWith("jdbc:mondrian:")) {
+                    throw new IllegalArgumentException();
+                }
+                urlString = urlString.substring("jdbc:mondrian:".length());
+                return XmlaSupport.processSoapXmla(
+                    request, urlString, catalogNameUrls, null);
             } catch (ServletException e) {
                 throw new RuntimeException(
                     "Error while reading '" + url + "'", e);
@@ -111,6 +129,19 @@ public class XmlaTester implements TestContext.Tester {
                 throw new RuntimeException(
                     "Error while reading '" + url + "'", e);
             }
+        }
+
+        public Future<byte[]> submit(
+            final URL url,
+            final String request)
+        {
+            return singleThreadExecutor.submit(
+                new Callable<byte[] >() {
+                    public byte[] call() throws Exception {
+                        return get(url, request);
+                    }
+                }
+            );
         }
     }
 }

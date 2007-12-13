@@ -8,10 +8,11 @@
 */
 package org.olap4j.driver.xmla;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import org.olap4j.OlapException;
+
+import java.sql.*;
 import java.util.Properties;
-import java.io.InputStream;
+import java.util.List;
 
 /**
  * Instantiates classes to implement the olap4j API against the
@@ -30,14 +31,20 @@ interface Factory {
         String url,
         Properties info) throws SQLException;
 
-    EmptyResultSet newEmptyResultSet(XmlaOlap4jConnection olap4jConnection);
+    EmptyResultSet newEmptyResultSet(
+        XmlaOlap4jConnection olap4jConnection);
+
+    ResultSet newFixedResultSet(
+        XmlaOlap4jConnection olap4jConnection,
+        List<String> headerList,
+        List<List<Object>> rowList);
 
     XmlaOlap4jCellSet newCellSet(
-        XmlaOlap4jStatement olap4jStatement, /*,
-        Result result */InputStream is);
+        XmlaOlap4jStatement olap4jStatement) throws OlapException;
 
     XmlaOlap4jPreparedStatement newPreparedStatement(
-        String mdx, XmlaOlap4jConnection olap4jConnection);
+        String mdx, 
+        XmlaOlap4jConnection olap4jConnection) throws OlapException;
 
     XmlaOlap4jDatabaseMetaData newDatabaseMetaData(
         XmlaOlap4jConnection olap4jConnection);

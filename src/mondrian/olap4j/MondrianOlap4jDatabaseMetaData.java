@@ -15,6 +15,8 @@ import mondrian.xmla.XmlaUtil;
 import org.olap4j.OlapDatabaseMetaData;
 import org.olap4j.OlapException;
 import org.olap4j.OlapConnection;
+import org.olap4j.impl.NamedListImpl;
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
 
 import java.sql.ResultSet;
@@ -24,6 +26,9 @@ import java.util.*;
 /**
  * Implementation of {@link org.olap4j.OlapDatabaseMetaData}
  * for the Mondrian OLAP engine.
+ *
+ * <p>This class has sub-classes which implement JDBC 3.0 and JDBC 4.0 APIs;
+ * it is instantiated using {@link Factory#newDatabaseMetaData}.</p>
  *
  * @author jhyde
  * @version $Id$
@@ -97,7 +102,7 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         NamedList<MondrianOlap4jCatalog> list =
             new NamedListImpl<MondrianOlap4jCatalog>();
         list.add(olap4jCatalog);
-        return (NamedList) list;
+        return Olap4jUtil.cast(list);
     }
 
     // implement DatabaseMetaData
@@ -601,7 +606,11 @@ abstract class MondrianOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public ResultSet getSchemas() throws SQLException {
-        // No XMLA method exists for this.
+        if (false) {
+            // Do not use DBSCHEMA_SCHEMATA: it has different columns than the
+            // JDBC spec requires
+            return getMetadata("DBSCHEMA_SCHEMATA");
+        }
         List<String> headerList =
             Arrays.asList("TABLE_SCHEM", "TABLE_CAT");
         List<List<Object>> rowList = new ArrayList<List<Object>>();

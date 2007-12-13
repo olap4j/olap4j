@@ -9,18 +9,14 @@
 */
 package mondrian.olap4j;
 
-import org.olap4j.OlapStatement;
-import org.olap4j.CellSet;
-import org.olap4j.OlapException;
-import org.olap4j.mdx.SelectNode;
-import org.olap4j.mdx.ParseTreeNode;
-import org.olap4j.mdx.ParseTreeWriter;
+import mondrian.olap.*;
+import org.olap4j.*;
+import org.olap4j.mdx.*;
 
-import java.sql.*;
-import java.io.StringWriter;
 import java.io.PrintWriter;
-
-import mondrian.olap.Query;
+import java.io.StringWriter;
+import java.sql.*;
+import java.sql.Connection;
 
 /**
  * Implementation of {@link org.olap4j.OlapStatement}
@@ -254,7 +250,13 @@ class MondrianOlap4jStatement implements OlapStatement {
     // implement OlapStatement
 
     public CellSet executeOlapQuery(String mdx) throws OlapException {
-        Query query = olap4jConnection.connection.parseQuery(mdx);
+        Query query;
+        try {
+            query = olap4jConnection.connection.parseQuery(mdx);
+        } catch (MondrianException e) {
+            throw olap4jConnection.helper.createException(
+                "mondrian gave exception while parsing query", e);
+        }
         return executeOlapQueryInternal(query);
     }
 
@@ -285,7 +287,13 @@ class MondrianOlap4jStatement implements OlapStatement {
         }
         // Release the monitor before executing, to give another thread the
         // opportunity to call cancel.
-        openCellSet.execute();
+        try {
+            openCellSet.execute();
+        } catch (QueryCanceledException e) {
+            throw olap4jConnection.helper.createException("Query canceled");
+        } catch (QueryTimeoutException e) {
+            throw olap4jConnection.helper.createException(e.getMessage());
+        }
         return openCellSet;
     }
 

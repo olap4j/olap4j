@@ -10,6 +10,7 @@ package mondrian.olap4j;
 
 import org.olap4j.metadata.Property;
 import org.olap4j.metadata.Datatype;
+import org.olap4j.impl.Named;
 
 import java.util.*;
 

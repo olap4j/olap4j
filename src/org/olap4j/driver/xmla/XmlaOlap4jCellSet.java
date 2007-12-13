@@ -9,21 +9,26 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
+import org.olap4j.impl.Olap4jUtil;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
+import org.olap4j.metadata.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Calendar;
-import java.sql.*;
+import java.io.*;
 import java.math.BigDecimal;
-import java.io.InputStream;
-import java.io.Reader;
 import java.net.URL;
-
-import mondrian.olap.Util;
+import java.sql.*;
+import java.sql.Date;
+import java.util.*;
 
 /**
  * Implementation of {@link org.olap4j.CellSet}
  * for XML/A providers.
+ * 
+ * <p>This class has sub-classes which implement JDBC 3.0 and JDBC 4.0 APIs;
+ * it is instantiated using {@link Factory#newCellSet}.</p>
  *
  * @author jhyde
  * @version $Id$
@@ -32,25 +37,343 @@ import mondrian.olap.Util;
 abstract class XmlaOlap4jCellSet implements CellSet {
     final XmlaOlap4jStatement olap4jStatement;
     protected boolean closed;
-    private final XmlaOlap4jCellSetMetaData metaData;
-    private final InputStream is;
+    private XmlaOlap4jCellSetMetaData metaData;
+    private final Map<Integer, Cell> cellMap =
+        new HashMap<Integer, Cell>();
+    private final List<XmlaOlap4jCellSetAxis> axisList =
+        new ArrayList<XmlaOlap4jCellSetAxis>();
+    private final List<CellSetAxis> immutableAxisList =
+        Olap4jUtil.cast(Collections.unmodifiableList(axisList));
+    private XmlaOlap4jCellSetAxis filterAxis;
+    private static final boolean DEBUG = true;
 
-    public XmlaOlap4jCellSet(
-        XmlaOlap4jStatement olap4jStatement,
-        InputStream is)
+    private static final List<String> standardProperties = Arrays.asList(
+        "UName", "Caption", "LName", "LNum", "DisplayInfo");
+
+    XmlaOlap4jCellSet(
+        XmlaOlap4jStatement olap4jStatement)
+        throws OlapException
     {
         assert olap4jStatement != null;
         this.olap4jStatement = olap4jStatement;
-        this.is = is;
         this.closed = false;
+    }
+
+    void populate() throws OlapException {
+        byte[] bytes = olap4jStatement.getBytes();
+
+        Document doc;
+        try {
+            doc = parse(bytes);
+        } catch (IOException e) {
+            throw olap4jStatement.olap4jConnection.helper.createException(
+                "error creating CellSet", e);
+        } catch (SAXException e) {
+            throw olap4jStatement.olap4jConnection.helper.createException(
+                "error creating CellSet", e);
+        }
+        // <SOAP-ENV:Envelope>
+        //   <SOAP-ENV:Header/>
+        //   <SOAP-ENV:Body>
+        //     <xmla:ExecuteResponse>
+        //       <xmla:return>
+        //         <root>
+        //           (see below)
+        //         </root>
+        //       <xmla:return>
+        //     </xmla:ExecuteResponse>
+        //   </SOAP-ENV:Body>
+        // </SOAP-ENV:Envelope>
+        final Element envelope = doc.getDocumentElement();
+        if (DEBUG) System.out.println(XmlaOlap4jUtil.toString(doc,true));
+        assert envelope.getLocalName().equals("Envelope");
+        assert envelope.getNamespaceURI().equals(SOAP_NS);
+        Element body =
+            findChild(envelope, SOAP_NS, "Body");
+        Element fault =
+            findChild(body, SOAP_NS, "Fault");
+        if (fault != null) {
+            /*
+            Example:
+            
+        <SOAP-ENV:Fault>
+            <faultcode>SOAP-ENV:Client.00HSBC01</faultcode>
+            <faultstring>XMLA connection datasource not found</faultstring>
+            <faultactor>Mondrian</faultactor>
+            <detail>
+                <XA:error xmlns:XA="http://mondrian.sourceforge.net">
+                    <code>00HSBC01</code>
+                    <desc>The Mondrian XML: Mondrian Error:Internal
+                        error: no catalog named 'LOCALDB'</desc>
+                </XA:error>
+            </detail>
+        </SOAP-ENV:Fault>
+             */
+            // TODO: log doc to logfile
+            final Element faultstring = findChild(fault, null, "faultstring");
+            String message = faultstring.getTextContent();
+            throw olap4jStatement.olap4jConnection.helper.createException(
+                "XMLA provider gave exception: " + message);
+        }
+        Element executeResponse =
+            findChild(body, XMLA_NS, "ExecuteResponse");
+        Element returnElement =
+            findChild(executeResponse, XMLA_NS, "return");
+        // <root> has children
+        //   <xsd:schema/>
+        //   <OlapInfo>
+        //     <CubeInfo>
+        //       <Cube>
+        //         <CubeName>FOO</CubeName>
+        //       </Cube>
+        //     </CubeInfo>
+        //     <AxesInfo>
+        //       <AxisInfo/> ...
+        //     </AxesInfo>
+        //   </OlapInfo>
+        //   <Axes>
+        //      <Axis>
+        //        <Tuples>
+        //      </Axis>
+        //      ...
+        //   </Axes>
+        //   <CellData>
+        //      <Cell/>
+        //      ...
+        //   </CellData>
+        final Element root =
+            findChild(returnElement, MDDATASET_NS, "root");
+
         if (olap4jStatement instanceof XmlaOlap4jPreparedStatement) {
             this.metaData =
-                ((XmlaOlap4jPreparedStatement) olap4jStatement).cellSetMetaData;
+                ((XmlaOlap4jPreparedStatement) olap4jStatement)
+                    .cellSetMetaData;
         } else {
-            this.metaData =
-                new XmlaOlap4jCellSetMetaData(
-                    olap4jStatement);
+            this.metaData = createMetaData(olap4jStatement, root);
         }
+
+        // todo: use CellInfo element to determine mapping of cell properties
+        // to XML tags
+        /*
+                        <CellInfo>
+                            <Value name="VALUE"/>
+                            <FmtValue name="FORMATTED_VALUE"/>
+                            <FormatString name="FORMAT_STRING"/>
+                        </CellInfo>
+         */
+
+        final Element axesNode = findChild(root, MDDATASET_NS, "Axes");
+        for (Element axisNode : findChildren(axesNode, MDDATASET_NS, "Axis")) {
+            final String axisName = axisNode.getAttribute("name");
+            final Axis axis = xx(axisName);
+            final XmlaOlap4jCellSetAxis cellSetAxis =
+                new XmlaOlap4jCellSetAxis(this, axis);
+            switch (axis) {
+            case FILTER:
+                filterAxis = cellSetAxis;
+                break;
+            default:
+                axisList.add(cellSetAxis);
+                break;
+            }
+            final Element tuplesNode =
+                findChild(axisNode, MDDATASET_NS, "Tuples");
+            int ordinal = 0;
+            final Map<Property, String> propertyValues =
+                new HashMap<Property, String>();
+            for (Element tupleNode
+                : findChildren(tuplesNode, MDDATASET_NS, "Tuple"))
+            {
+                final List<Member> members = new ArrayList<Member>();
+                for (Element memberNode
+                    : findChildren(tupleNode, MDDATASET_NS, "Member"))
+                {
+                    String hierarchyName =
+                        memberNode.getAttribute("Hierarchy");
+                    String uname = stringElement(memberNode, "UName");
+                    Member member =
+                        metaData.cube.lookupMemberByUniqueName(uname);
+                    propertyValues.clear();
+                    for (Element childNode : childElements(memberNode)) {
+                        XmlaOlap4jCellSetMemberProperty property =
+                            ((XmlaOlap4jCellSetAxisMetaData)
+                                cellSetAxis.getAxisMetaData()).lookupProperty(
+                                hierarchyName,
+                                childNode.getLocalName());
+                        if (property != null) {
+                            String value = childNode.getTextContent();
+                            propertyValues.put(property, value);
+                        }
+                    }
+                    if (!propertyValues.isEmpty()) {
+                        member =
+                            new XmlaOlap4jPositionMember(
+                                member, propertyValues);
+                    }
+                    members.add(member);
+                }
+                cellSetAxis.positions.add(
+                    new XmlaOlap4jPosition(members, ordinal++));
+            }
+        }
+
+        final Map<Property, Object> propertyValues =
+            new HashMap<Property, Object>();
+        final Element cellDataNode = findChild(root, MDDATASET_NS, "CellData");
+        for (Element cell : findChildren(cellDataNode, MDDATASET_NS, "Cell")) {
+            propertyValues.clear();
+            final int cellOrdinal =
+                Integer.valueOf(cell.getAttribute("CellOrdinal"));
+            // todo: convert to type based on <Value xsi:type> attribute
+            final String value = stringElement(cell, "Value");
+            final String formattedValue = stringElement(cell, "FmtValue");
+            final String formatString = stringElement(cell, "FormatString");
+            for (Element element : childElements(cell)) {
+                String tag = element.getLocalName();
+                final Property property =
+                    metaData.propertiesByTag.get(tag);
+                if (property != null) {
+                    propertyValues.put(property, element.getTextContent());
+                }
+            }
+            cellMap.put(
+                cellOrdinal,
+                new XmlaOlap4jCell(
+                    this,
+                    cellOrdinal,
+                    value,
+                    formattedValue,
+                    propertyValues));
+        }
+    }
+
+    private XmlaOlap4jCellSetMetaData createMetaData(
+        XmlaOlap4jStatement olap4jStatement,
+        Element root) throws OlapException
+    {
+        final Element olapInfo =
+            findChild(root, MDDATASET_NS, "OlapInfo");
+        final Element cubeInfo =
+            findChild(olapInfo, MDDATASET_NS, "CubeInfo");
+        final Element cubeNode =
+            findChild(cubeInfo, MDDATASET_NS, "Cube");
+        final Element cubeNameNode =
+            findChild(cubeNode, MDDATASET_NS, "CubeName");
+        final String cubeName = gatherText(cubeNameNode);
+        final XmlaOlap4jCube cube =
+            this.olap4jStatement.olap4jConnection.olap4jSchema.cubes.get(
+                cubeName);
+        if (cube == null) {
+            throw olap4jStatement.olap4jConnection.helper.createException(
+                "Internal error: cube '" + cubeName + "' not found");
+        }
+        final Element axesInfo =
+            findChild(olapInfo, MDDATASET_NS, "AxesInfo");
+        final List<Element> axisInfos =
+            findChildren(axesInfo, MDDATASET_NS, "AxisInfo");
+        final List<CellSetAxisMetaData> axisMetaDataList =
+            new ArrayList<CellSetAxisMetaData>();
+        XmlaOlap4jCellSetAxisMetaData filterAxisMetaData = null;
+        for (Element axisInfo : axisInfos) {
+            final String axisName = axisInfo.getAttribute("name");
+            Axis axis = xx(axisName);
+            final List<Element> hierarchyInfos =
+                findChildren(axisInfo, MDDATASET_NS, "HierarchyInfo");
+            final List<Hierarchy> hierarchyList =
+                new ArrayList<Hierarchy>();
+            /*
+            <OlapInfo>
+                <AxesInfo>
+                    <AxisInfo name="Axis0">
+                        <HierarchyInfo name="Customers">
+                            <UName name="[Customers].[MEMBER_UNIQUE_NAME]"/>
+                            <Caption name="[Customers].[MEMBER_CAPTION]"/>
+                            <LName name="[Customers].[LEVEL_UNIQUE_NAME]"/>
+                            <LNum name="[Customers].[LEVEL_NUMBER]"/>
+                            <DisplayInfo name="[Customers].[DISPLAY_INFO]"/>
+                        </HierarchyInfo>
+                    </AxisInfo>
+                    ...
+                </AxesInfo>
+                <CellInfo>
+                    <Value name="VALUE"/>
+                    <FmtValue name="FORMATTED_VALUE"/>
+                    <FormatString name="FORMAT_STRING"/>
+                </CellInfo>
+            </OlapInfo>
+             */
+            final List<XmlaOlap4jCellSetMemberProperty> propertyList =
+                new ArrayList<XmlaOlap4jCellSetMemberProperty>();
+            for (Element hierarchyInfo : hierarchyInfos) {
+                final String hierarchyName =
+                    hierarchyInfo.getAttribute("name");
+                final Hierarchy hierarchy =
+                    cube.getHierarchies().get(hierarchyName);
+                if (hierarchy == null) {
+                    throw olap4jStatement.olap4jConnection.helper.createException(
+                        "Internal error: hierarchy '" + hierarchyName
+                            + "' not found in cube '" + cubeName + "'");
+                }
+                hierarchyList.add(hierarchy);
+                for (Element childNode : childElements(hierarchyInfo)) {
+                    String tag = childNode.getLocalName();
+                    if (standardProperties.contains(tag)) {
+                        continue;
+                    }
+                    final String propertyUniqueName =
+                        childNode.getAttribute("name");
+                    final XmlaOlap4jCellSetMemberProperty property =
+                        new XmlaOlap4jCellSetMemberProperty(
+                            propertyUniqueName,
+                            hierarchy,
+                            tag);
+                    propertyList.add(property);
+                }
+            }
+            final XmlaOlap4jCellSetAxisMetaData axisMetaData =
+                new XmlaOlap4jCellSetAxisMetaData(
+                    olap4jStatement.olap4jConnection,
+                    axis,
+                    hierarchyList,
+                    propertyList);
+            switch (axis) {
+            case FILTER:
+                filterAxisMetaData = axisMetaData;
+                break;
+            default:
+                axisMetaDataList.add(axisMetaData);
+                break;
+            }
+        }
+        final Element cellInfo =
+            findChild(olapInfo, MDDATASET_NS, "CellInfo");
+        List<XmlaOlap4jCellProperty> cellProperties =
+            new ArrayList<XmlaOlap4jCellProperty>();
+        for (Element element : childElements(cellInfo)) {
+            cellProperties.add(
+                new XmlaOlap4jCellProperty(
+                    element.getLocalName(),
+                    element.getAttribute("name")));
+        }
+        return
+            new XmlaOlap4jCellSetMetaData(
+                olap4jStatement,
+                cube,
+                filterAxisMetaData,
+                axisMetaDataList,
+                cellProperties);
+    }
+
+    private Axis xx(String axisName) {
+        Axis axis;
+        if (axisName.startsWith("Axis")) {
+            final Integer ordinal =
+                Integer.valueOf(axisName.substring("Axis".length()));
+            axis = Axis.values()[Axis.COLUMNS.ordinal() + ordinal];
+        } else {
+            axis = Axis.FILTER;
+        }
+        return axis;
     }
 
     public CellSetMetaData getMetaData() {
@@ -58,31 +381,110 @@ abstract class XmlaOlap4jCellSet implements CellSet {
     }
 
     public Cell getCell(List<Integer> coordinates) {
-        throw Util.needToImplement(this);
+        return getCellInternal(coordinatesToOrdinal(coordinates));
     }
 
     public Cell getCell(int ordinal) {
-        throw Util.needToImplement(this);
+        return getCellInternal(ordinal);
     }
 
     public Cell getCell(Position... positions) {
-        throw Util.needToImplement(this);
+        if (positions.length != getAxes().size()) {
+            throw new IllegalArgumentException(
+                "cell coordinates should have dimension " + getAxes().size());
+        }
+        List<Integer> coords = new ArrayList<Integer>(positions.length);
+        for (Position position : positions) {
+            coords.add(position.getOrdinal());
+        }
+        return getCell(coords);
+    }
+
+    private Cell getCellInternal(int pos) {
+        final Cell cell = cellMap.get(pos);
+        if (cell == null) {
+            if (pos < 0 || pos >= maxOrdinal()) {
+                throw new IndexOutOfBoundsException();
+            } else {
+                // Cell is within bounds, but is not held in the cache because
+                // it has no value. Manufacture a cell with an empty value.
+                return new XmlaOlap4jCell(
+                    this, pos, null, null,
+                    Collections.<Property, Object>emptyMap());
+            }
+        }
+        return cell;
+    }
+
+    private String getBoundsAsString() {
+        StringBuilder buf = new StringBuilder();
+        int k = 0;
+        for (CellSetAxis axis : getAxes()) {
+            if (k++ > 0) {
+                buf.append(", ");
+            }
+            buf.append(axis.getPositionCount());
+        }
+        return buf.toString();
     }
 
     public List<CellSetAxis> getAxes() {
-        throw Util.needToImplement(this);
+        return immutableAxisList;
     }
 
     public CellSetAxis getFilterAxis() {
-        throw Util.needToImplement(this);
+        return filterAxis;
+    }
+
+    private int maxOrdinal() {
+        int modulo = 1;
+        for (CellSetAxis axis : axisList) {
+            modulo *= axis.getPositionCount();
+        }
+        return modulo;
     }
 
     public List<Integer> ordinalToCoordinates(int ordinal) {
-        throw new UnsupportedOperationException();
+        List<CellSetAxis> axes = getAxes();
+        final List<Integer> list = new ArrayList<Integer>(axes.size());
+        int modulo = 1;
+        for (CellSetAxis axis : axes) {
+            int prevModulo = modulo;
+            modulo *= axis.getPositionCount();
+            list.add((ordinal % modulo) / prevModulo);
+        }
+        if (ordinal < 0 || ordinal >= modulo) {
+            throw new IndexOutOfBoundsException(
+                "Cell ordinal " + ordinal
+                    + ") lies outside CellSet bounds ("
+                    + getBoundsAsString() + ")");
+        }
+        return list;
     }
 
     public int coordinatesToOrdinal(List<Integer> coordinates) {
-        throw new UnsupportedOperationException();
+        List<CellSetAxis> axes = getAxes();
+        if (coordinates.size() != axes.size()) {
+            throw new IllegalArgumentException(
+                "Coordinates have different dimension " + coordinates.size()
+                    + " than axes " + axes.size());
+        }
+        int modulo = 1;
+        int ordinal = 0;
+        int k = 0;
+        for (CellSetAxis axis : axes) {
+            final Integer coordinate = coordinates.get(k++);
+            if (coordinate < 0 || coordinate >= axis.getPositionCount()) {
+                throw new IndexOutOfBoundsException(
+                    "Coordinate " + coordinate
+                        + " of axis " + k
+                        + " is out of range ("
+                        + getBoundsAsString() + ")");
+            }
+            ordinal += coordinate * modulo;
+            modulo *= axis.getPositionCount();
+        }
+        return ordinal;
     }
 
     public boolean next() throws SQLException {
@@ -665,6 +1067,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         throw new UnsupportedOperationException();
     }
+
 }
 
 // End XmlaOlap4jCellSet.java

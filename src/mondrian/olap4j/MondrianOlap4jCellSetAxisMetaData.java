@@ -10,7 +10,6 @@ package mondrian.olap4j;
 
 import org.olap4j.CellSetAxisMetaData;
 import org.olap4j.Axis;
-import org.olap4j.metadata.*;
 import org.olap4j.metadata.Hierarchy;
 import org.olap4j.metadata.Property;
 import mondrian.olap.*;
@@ -30,12 +29,7 @@ import java.util.ArrayList;
 class MondrianOlap4jCellSetAxisMetaData implements CellSetAxisMetaData {
     private final QueryAxis queryAxis;
     private final MondrianOlap4jConnection olap4jConnection;
-    private final NamedList<Property> propertyList =
-        new ArrayNamedListImpl<Property>() {
-            protected String getName(Property property) {
-                return property.getName();
-            }
-        };
+    private final List<Property> propertyList = new ArrayList<Property>();
 
     MondrianOlap4jCellSetAxisMetaData(
         MondrianOlap4jConnection olap4jConnection,
@@ -93,7 +87,7 @@ class MondrianOlap4jCellSetAxisMetaData implements CellSetAxisMetaData {
         return hierarchyList;
     }
 
-    public NamedList<Property> getProperties() {
+    public List<Property> getProperties() {
         return propertyList;
     }
 }

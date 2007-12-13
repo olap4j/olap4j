@@ -27,6 +27,9 @@ import java.net.URL;
  * methods for querying object types where those object types never have
  * any instances for this particular driver.</p>
  *
+ * <p>This class has sub-classes which implement JDBC 3.0 and JDBC 4.0 APIs;
+ * it is instantiated using {@link Factory#newEmptyResultSet}.</p>
+ *
  * @author jhyde
  * @version $Id$
  * @since May 24, 2007

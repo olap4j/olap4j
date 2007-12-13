@@ -11,6 +11,7 @@ package mondrian.olap4j;
 import org.olap4j.metadata.NamedSet;
 import org.olap4j.metadata.Cube;
 import org.olap4j.mdx.ParseTreeNode;
+import org.olap4j.impl.Named;
 
 import java.util.Locale;
 

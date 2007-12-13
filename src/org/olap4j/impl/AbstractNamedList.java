@@ -7,7 +7,7 @@
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
-package mondrian.olap4j;
+package org.olap4j.impl;
 
 import org.olap4j.metadata.NamedList;
 
@@ -20,13 +20,13 @@ import java.util.AbstractList;
  * per {@link java.util.AbstractList}; and must implement
  * {@link #getName(Object)}, to indicate how elements are named.
  *
- * @see ArrayNamedListImpl
+ * @see org.olap4j.impl.ArrayNamedListImpl
  *
  * @author jhyde
  * @version $Id$
  * @since May 25, 2007
  */
-abstract class AbstractNamedList<T>
+public abstract class AbstractNamedList<T>
     extends AbstractList<T>
     implements NamedList<T>
 {

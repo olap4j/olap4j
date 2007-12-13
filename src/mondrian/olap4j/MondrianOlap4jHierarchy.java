@@ -10,6 +10,7 @@
 package mondrian.olap4j;
 
 import org.olap4j.metadata.*;
+import org.olap4j.impl.*;
 
 import java.util.Locale;
 
@@ -55,7 +56,7 @@ class MondrianOlap4jHierarchy implements Hierarchy, Named {
         for (mondrian.olap.Level level : hierarchy.getLevels()) {
             list.add(olap4jConnection.toOlap4j(level));
         }
-        return (NamedList) list;
+        return Olap4jUtil.cast(list);
     }
 
     public boolean hasAll() {

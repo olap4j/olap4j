@@ -19,7 +19,13 @@
 
 # Name of class which targets the olap4j test suite to a particular driver
 # implementation. Must implement org.olap4j.test.TestContext.Tester interface.
-# Default is "org.olap4j.MondrianTester".
-org.olap4j.test.helperClassName=org.olap4j.MondrianTester
+# Default is "org.olap4j.MondrianTester";
+# to test the XMLA driver, use "org.olap4j.XmlaTester".
+#org.olap4j.test.helperClassName=org.olap4j.XmlaTester
+#org.olap4j.test.helperClassName=org.olap4j.MondrianTester
+
+# Path to the FoodMart.xml catalog file.
+# Must be specified if you are using XmlaTester; there is no default.
+#org.olap4j.XmlaTester.CatalogUrl=/a/path/mondrian/demo/FoodMart.xml
 
 # End test.properties.example

@@ -12,6 +12,7 @@ package mondrian.olap4j;
 import mondrian.olap.DimensionType;
 import mondrian.olap.Util;
 import org.olap4j.OlapException;
+import org.olap4j.impl.*;
 import org.olap4j.metadata.*;
 
 import java.util.Locale;
@@ -53,7 +54,7 @@ class MondrianOlap4jDimension implements Dimension, Named {
         for (mondrian.olap.Hierarchy hierarchy : dimension.getHierarchies()) {
             list.add(olap4jConnection.toOlap4j(hierarchy));
         }
-        return (NamedList) list;
+        return Olap4jUtil.cast(list);
     }
 
     public Hierarchy getDefaultHierarchy() {
@@ -65,6 +66,8 @@ class MondrianOlap4jDimension implements Dimension, Named {
         switch (dimensionType) {
         case StandardDimension:
             return Type.OTHER;
+        case MeasuresDimension:
+            return Type.MEASURE;
         case TimeDimension:
             return Type.TIME;
         default:

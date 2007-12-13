@@ -27,6 +27,9 @@ import java.net.URL;
  * Implementation of {@link CellSet}
  * for the Mondrian OLAP engine.
  *
+ * <p>This class has sub-classes which implement JDBC 3.0 and JDBC 4.0 APIs;
+ * it is instantiated using {@link Factory#newCellSet}.</p>
+ *
  * @author jhyde
  * @version $Id$
  * @since May 24, 2007
@@ -113,6 +116,11 @@ abstract class MondrianOlap4jCellSet implements CellSet {
     }
 
     public Cell getCell(int ordinal) {
+        final int[] pos = ordinalToCoordinateArray(ordinal);
+        return getCellInternal(pos);
+    }
+
+    private int[] ordinalToCoordinateArray(int ordinal) {
         Axis[] axes = result.getAxes();
         final int[] pos = new int[axes.length];
         int modulo = 1;
@@ -127,7 +135,7 @@ abstract class MondrianOlap4jCellSet implements CellSet {
                     + ") lies outside CellSet bounds ("
                     + getBoundsAsString() + ")");
         }
-        return getCellInternal(pos);
+        return pos;
     }
 
     public Cell getCell(Position... positions) {
@@ -148,6 +156,10 @@ abstract class MondrianOlap4jCellSet implements CellSet {
                     "Cell coordinates (" + getCoordsAsString(pos)
                         + ") fall outside CellSet bounds ("
                         + getCoordsAsString(pos) + ")");
+            } else if (e.getMessage().indexOf("coordinates should have dimension") >= 0) {
+                throw new IllegalArgumentException(
+                    "Cell coordinates should have dimension "
+                        + axisList.size() + ")");
             } else {
                 throw e;
             }
@@ -156,7 +168,7 @@ abstract class MondrianOlap4jCellSet implements CellSet {
     }
 
     private String getBoundsAsString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Axis[] axes = result.getAxes();
         for (int i = 0; i < axes.length; i++) {
             if (i > 0) {
@@ -168,7 +180,7 @@ abstract class MondrianOlap4jCellSet implements CellSet {
     }
 
     private static String getCoordsAsString(int[] pos) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < pos.length; i++) {
             int po = pos[i];
             if (i > 0) {
@@ -180,11 +192,37 @@ abstract class MondrianOlap4jCellSet implements CellSet {
     }
 
     public List<Integer> ordinalToCoordinates(int ordinal) {
-        throw new UnsupportedOperationException();
+        final int[] ints = ordinalToCoordinateArray(ordinal);
+        final List<Integer> list = new ArrayList<Integer>(ints.length);
+        for (int i : ints) {
+            list.add(i);
+        }
+        return list;
     }
 
     public int coordinatesToOrdinal(List<Integer> coordinates) {
-        throw new UnsupportedOperationException();
+        List<CellSetAxis> axes = getAxes();
+        if (coordinates.size() != axes.size()) {
+            throw new IllegalArgumentException(
+                "Coordinates have different dimension " + coordinates.size()
+                    + " than axes " + axes.size());
+        }
+        int modulo = 1;
+        int ordinal = 0;
+        int k = 0;
+        for (CellSetAxis axis : axes) {
+            final Integer coordinate = coordinates.get(k++);
+            if (coordinate < 0 || coordinate >= axis.getPositionCount()) {
+                throw new IndexOutOfBoundsException(
+                    "Coordinate " + coordinate
+                        + " of axis " + k
+                        + " is out of range ("
+                        + getBoundsAsString() + ")");
+            }
+            ordinal += coordinate * modulo;
+            modulo *= axis.getPositionCount();
+        }
+        return ordinal;
     }
 
     public boolean next() throws SQLException {

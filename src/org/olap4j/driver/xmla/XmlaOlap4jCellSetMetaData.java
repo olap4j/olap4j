@@ -8,47 +8,114 @@
 */
 package org.olap4j.driver.xmla;
 
-import mondrian.olap.Util;
 import org.olap4j.CellSetAxisMetaData;
 import org.olap4j.CellSetMetaData;
+import org.olap4j.impl.ArrayNamedListImpl;
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
 
 import java.sql.SQLException;
-import java.util.List;
+import java.util.*;
 
 /**
  * Implementation of {@link org.olap4j.CellSetMetaData}
- * for the Mondrian OLAP engine.
+ * for XML/A providers.
  *
  * @author jhyde
  * @version $Id$
  * @since Jun 13, 2007
  */
 class XmlaOlap4jCellSetMetaData implements CellSetMetaData {
-    private final XmlaOlap4jStatement olap4jStatement;
+    final XmlaOlap4jCube cube;
+    private final NamedList<CellSetAxisMetaData> axisMetaDataList =
+        new ArrayNamedListImpl<CellSetAxisMetaData>() {
+            protected String getName(CellSetAxisMetaData axisMetaData) {
+                return axisMetaData.getAxisOrdinal().name();
+            }
+        };
+    private final XmlaOlap4jCellSetAxisMetaData filterAxisMetaData;
+    private final NamedList<Property> cellProperties =
+        new ArrayNamedListImpl<Property>() {
+            protected String getName(Property property) {
+                return property.getName();
+            }
+        };
+    final Map<String, Property> propertiesByTag;
 
     XmlaOlap4jCellSetMetaData(
-        XmlaOlap4jStatement olap4jStatement)
+        XmlaOlap4jStatement olap4jStatement,
+        XmlaOlap4jCube cube,
+        XmlaOlap4jCellSetAxisMetaData filterAxisMetaData,
+        List<CellSetAxisMetaData> axisMetaDataList,
+        List<XmlaOlap4jCellProperty> cellProperties)
     {
-        this.olap4jStatement = olap4jStatement;
+        assert olap4jStatement != null;
+        assert cube != null;
+        assert filterAxisMetaData != null;
+        this.cube = cube;
+        this.filterAxisMetaData = filterAxisMetaData;
+        this.axisMetaDataList.addAll(axisMetaDataList);
+        this.propertiesByTag = new HashMap<String, Property>();
+        for (XmlaOlap4jCellProperty cellProperty : cellProperties) {
+            Property property;
+            try {
+                property = Property.StandardCellProperty.valueOf(
+                    cellProperty.propertyName);
+                this.propertiesByTag.put(cellProperty.tag, property);
+            } catch (IllegalArgumentException e) {
+                property = cellProperty;
+                this.propertiesByTag.put(property.getName(), property);
+            }
+            this.cellProperties.add(property);
+        }
+    }
+
+    private XmlaOlap4jCellSetMetaData(
+        XmlaOlap4jStatement olap4jStatement,
+        XmlaOlap4jCube cube,
+        XmlaOlap4jCellSetAxisMetaData filterAxisMetaData,
+        List<CellSetAxisMetaData> axisMetaDataList,
+        Map<String, Property> propertiesByTag,
+        List<Property> cellProperties)
+    {
+        assert olap4jStatement != null;
+        assert cube != null;
+        assert filterAxisMetaData != null;
+        this.cube = cube;
+        this.filterAxisMetaData = filterAxisMetaData;
+        this.axisMetaDataList.addAll(axisMetaDataList);
+        this.propertiesByTag = propertiesByTag;
+        this.cellProperties.addAll(cellProperties);
+    }
+
+    XmlaOlap4jCellSetMetaData cloneFor(
+        XmlaOlap4jPreparedStatement preparedStatement)
+    {
+        return new XmlaOlap4jCellSetMetaData(
+            preparedStatement,
+            cube,
+            filterAxisMetaData,
+            axisMetaDataList,
+            propertiesByTag,
+            cellProperties);
     }
 
     // implement CellSetMetaData
 
     public NamedList<Property> getCellProperties() {
-        throw Util.needToImplement(this);
+        return Olap4jUtil.cast(cellProperties);
     }
 
     public Cube getCube() {
-        throw Util.needToImplement(this);
+        return cube;
     }
 
     public NamedList<CellSetAxisMetaData> getAxesMetaData() {
-        throw Util.needToImplement(this);
+        return axisMetaDataList;
     }
 
     public CellSetAxisMetaData getFilterAxisMetaData() {
-        throw Util.needToImplement(this);
+        return filterAxisMetaData;
     }
 
 // implement ResultSetMetaData

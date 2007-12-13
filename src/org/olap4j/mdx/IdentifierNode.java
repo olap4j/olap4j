@@ -9,6 +9,7 @@
 */
 package org.olap4j.mdx;
 
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.type.Type;
 
 import java.util.*;
@@ -159,7 +160,11 @@ public class IdentifierNode
      * @see org.olap4j.metadata.Cube#lookupMember(String[])
      *
      * @param identifier MDX identifier string
+     *
      * @return List of name segments
+     *
+     * @throws IllegalArgumentException if the format of the identifier is
+     * invalid
      */
     public static List<Segment> parseIdentifier(String identifier)  {
         if (!identifier.startsWith("[")) {
@@ -172,7 +177,8 @@ public class IdentifierNode
         Quoting type;
         while (i < identifier.length()) {
             if (identifier.charAt(i) != '&' && identifier.charAt(i) != '[') {
-                throw new RuntimeException("invalid member '" + identifier + "'");
+                throw new IllegalArgumentException(
+                    "Invalid member identifier '" + identifier + "'");
             }
 
             if (identifier.charAt(i) ==  '&') {
@@ -183,18 +189,21 @@ public class IdentifierNode
             }
 
             if (identifier.charAt(i) != '[') {
-                throw new RuntimeException("invalid member '" + identifier + "'");
+                throw new IllegalArgumentException(
+                    "Invalid member identifier '" + identifier + "'");
             }
 
             int j = getEndIndex(identifier, i + 1);
             if (j == -1) {
-                throw new RuntimeException("invalid member '" + identifier + "'");
+                throw new IllegalArgumentException(
+                    "Invalid member identifier '" + identifier + "'");
             }
 
             list.add(
                 new Segment(
                     null,
-                    replace(identifier.substring(i + 1, j), "]]", "]"),
+                    Olap4jUtil.replace(
+                        identifier.substring(i + 1, j), "]]", "]"),
                     type));
 
             i = j + 2;
@@ -226,86 +235,61 @@ public class IdentifierNode
     }
 
     /**
-     * Returns a string with every occurrence of a seek string replaced with
-     * another.
+     * Returns string quoted in [...].
      *
-     * @param s String to act on
-     * @param find String to find
-     * @param replace String to replace it with
-     * @return The modified string
+     * <p>For example, "San Francisco" becomes
+     * "[San Francisco]"; "a [bracketed] string" becomes
+     * "[a [bracketed]] string]".
+     *
+     * @param id Unquoted name
+     * @return Quoted name
      */
-    private static String replace(
-        String s,
-        String find,
-        String replace)
-    {
-        // let's be optimistic
-        int found = s.indexOf(find);
-        if (found == -1) {
-            return s;
-        }
-        StringBuilder sb = new StringBuilder(s.length() + 20);
-        int start = 0;
-        char[] chars = s.toCharArray();
-        final int step = find.length();
-        if (step == 0) {
-            // Special case where find is "".
-            sb.append(s);
-            replace(sb, 0, find, replace);
-        } else {
-            for (;;) {
-                sb.append(chars, start, found-start);
-                if (found == s.length()) {
-                    break;
-                }
-                sb.append(replace);
-                start = found + step;
-                found = s.indexOf(find, start);
-                if (found == -1) {
-                    found = s.length();
-                }
-            }
-        }
-        return sb.toString();
+    static String quoteMdxIdentifier(String id) {
+        StringBuilder buf = new StringBuilder(id.length() + 20);
+        quoteMdxIdentifier(id, buf);
+        return buf.toString();
     }
 
     /**
-     * Replaces all occurrences of a string in a buffer with another.
+     * Returns a string quoted in [...], writing the results to a
+     * {@link StringBuilder}.
      *
-     * @param buf String buffer to act on
-     * @param start Ordinal within <code>find</code> to start searching
-     * @param find String to find
-     * @param replace String to replace it with
-     * @return The string buffer
+     * @param id Unquoted name
+     * @param buf Builder to write quoted string to
      */
-    private static StringBuilder replace(
-        StringBuilder buf,
-        int start,
-        String find,
-        String replace)
+    static void quoteMdxIdentifier(String id, StringBuilder buf) {
+        buf.append('[');
+        int start = buf.length();
+        buf.append(id);
+        Olap4jUtil.replace(buf, start, "]", "]]");
+        buf.append(']');
+    }
+
+    /**
+     * Converts a sequence of identifiers to a string.
+     *
+     * <p>For example, {"Store", "USA",
+     * "California"} becomes "[Store].[USA].[California]".
+     * 
+     * @param ids List of segments
+     * @return Segments as quoted string
+     */
+    static String unparseIdentifierList(List<Segment> ids) {
+        StringBuilder sb = new StringBuilder(64);
+        quoteMdxIdentifier(ids, sb);
+        return sb.toString();
+    }
+
+    static void quoteMdxIdentifier(
+        List<Segment> ids,
+        StringBuilder sb)
     {
-        // Search and replace from the end towards the start, to avoid O(n ^ 2)
-        // copying if the string occurs very commonly.
-        int findLength = find.length();
-        if (findLength == 0) {
-            // Special case where the seek string is empty.
-            for (int j = buf.length(); j >= 0; --j) {
-                buf.insert(j, replace);
+        for (int i = 0; i < ids.size(); i++) {
+            if (i > 0) {
+                sb.append('.');
             }
-            return buf;
+            sb.append(ids.get(i).toString());
         }
-        int k = buf.length();
-        while (k > 0) {
-            int i = buf.lastIndexOf(find, k);
-            if (i < start) {
-                break;
-            }
-            buf.replace(i, i + find.length(), replace);
-            // Step back far enough to ensure that the beginning of the section
-            // we just replaced does not cause a match.
-            k = i - findLength;
-        }
-        return buf;
     }
 
     /**
@@ -360,13 +344,38 @@ public class IdentifierNode
          */
         public String toString() {
             switch (quoting) {
-            case UNQUOTED: //return name; Disabled to pass old tests...
-            case QUOTED: return "[" + name + "]";
-            case KEY: return "&[" + name + "]";
-            default: return "UNKNOWN:" + name;
+            case UNQUOTED:
+                return name;
+            case QUOTED:
+                return quoteMdxIdentifier(name);
+            case KEY:
+                return '&' + quoteMdxIdentifier(name);
+            default:
+                throw Olap4jUtil.unexpected(quoting);
             }
         }
 
+        /**
+         * Appends this segment to a StringBuffer
+         *
+         * @param buf StringBuffer
+         */
+        void toString(StringBuilder buf) {
+            switch (quoting) {
+            case UNQUOTED:
+                buf.append(name);
+                return;
+            case QUOTED:
+                quoteMdxIdentifier(name, buf);
+                return;
+            case KEY:
+                buf.append('&');
+                quoteMdxIdentifier(name, buf);
+                return;
+            default:
+                throw Olap4jUtil.unexpected(quoting);
+            }
+        }
         /**
          * Returns the region of the source code which this Segment was created
          * from, if it was created by parsing.

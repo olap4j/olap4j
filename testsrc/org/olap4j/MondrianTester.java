@@ -54,8 +54,8 @@ public class MondrianTester implements TestContext.Tester {
             "org.olap4j.test.connectUrl");
     }
 
-    public boolean isMondrian() {
-        return true;
+    public Flavor getFlavor() {
+        return Flavor.MONDRIAN;
     }
 
     public static final String DRIVER_CLASS_NAME =

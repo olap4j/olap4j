@@ -375,7 +375,9 @@ public class TestContext {
 
         String getURL();
 
-        boolean isMondrian();
+        Flavor getFlavor();
+
+        enum Flavor { MONDRIAN, XMLA }
     }
 }
 

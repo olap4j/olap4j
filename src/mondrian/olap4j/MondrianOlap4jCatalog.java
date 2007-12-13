@@ -14,6 +14,7 @@ import org.olap4j.metadata.NamedList;
 import org.olap4j.metadata.Schema;
 import org.olap4j.OlapException;
 import org.olap4j.OlapDatabaseMetaData;
+import org.olap4j.impl.*;
 
 /**
  * Implementation of {@link Catalog}
@@ -40,7 +41,7 @@ class MondrianOlap4jCatalog implements Catalog, Named {
             olap4jDatabaseMetaData.olap4jConnection.connection.getSchema();
         list.add(
             olap4jDatabaseMetaData.olap4jConnection.toOlap4j(schema));
-        return (NamedList) list;
+        return Olap4jUtil.cast(list);
     }
 
     public String getName() {

@@ -9,7 +9,6 @@
 */
 package mondrian.olap4j;
 
-import mondrian.olap.Result;
 import mondrian.olap.Query;
 
 import java.util.Properties;

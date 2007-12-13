@@ -7,18 +7,18 @@
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
-package mondrian.olap4j;
+package org.olap4j.impl;
 
 /**
  * Interface which describes an object which has a name, for the purposes of
- * creating an implementation, {@link mondrian.olap4j.NamedListImpl} of
+ * creating an implementation, {@link NamedListImpl} of
  * {@link org.olap4j.metadata.NamedList} which works on such objects.
  *
  * @author jhyde
  * @version $Id$
  * @since May 23, 2007
  */
-interface Named {
+public interface Named {
     /**
      * Returns the name of this object.
      *

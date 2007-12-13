@@ -8,21 +8,25 @@
 */
 package org.olap4j.driver.xmla;
 
-import mondrian.olap.Util;
 import org.olap4j.*;
-import org.olap4j.type.*;
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
+import org.olap4j.type.*;
 
-import java.sql.*;
-import java.math.BigDecimal;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Calendar;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.sql.*;
+import java.sql.Date;
+import java.util.*;
 
 /**
  * Implementation of {@link org.olap4j.PreparedOlapStatement}
  * for XML/A providers.
+ *
+ * <p>This class has sub-classes which implement JDBC 3.0 and JDBC 4.0 APIs;
+ * it is instantiated using {@link Factory#newPreparedStatement}.</p>
  *
  * @author jhyde
  * @version $Id$
@@ -30,31 +34,46 @@ import java.net.URL;
  */
 abstract class XmlaOlap4jPreparedStatement
     extends XmlaOlap4jStatement
-    implements PreparedOlapStatement, OlapParameterMetaData {
+    implements PreparedOlapStatement, OlapParameterMetaData
+{
+    final XmlaOlap4jCellSetMetaData cellSetMetaData;
     private final String mdx;
-//    private Query query;
-    XmlaOlap4jCellSetMetaData cellSetMetaData;
 
-    public XmlaOlap4jPreparedStatement(
+    XmlaOlap4jPreparedStatement(
         XmlaOlap4jConnection olap4jConnection,
-        String mdx)
+        String mdx) throws OlapException
     {
         super(olap4jConnection);
+
+        // Execute a statement and steal its metadata.
+        final OlapStatement statement = olap4jConnection.createStatement();
+        try {
+            final CellSet cellSet = statement.executeOlapQuery(mdx);
+            final XmlaOlap4jCellSetMetaData cellSetMetaData1 =
+                (XmlaOlap4jCellSetMetaData) cellSet.getMetaData();
+            this.cellSetMetaData = cellSetMetaData1.cloneFor(this);
+            cellSet.close();
+            statement.close();
+
+        } catch (SQLException e) {
+            throw olap4jConnection.helper.createException(
+                "Error while preparing statement '" + mdx + "'",
+                e);
+        }
+
         this.mdx = mdx;
-//        this.query = olap4jConnection.connection.parseQuery(mdx);
-        this.cellSetMetaData = new XmlaOlap4jCellSetMetaData(this);
     }
 
     // override OlapStatement
 
     public CellSet executeOlapQuery(String mdx) throws OlapException {
-        throw Util.needToImplement(this);
+        return super.executeOlapQuery(mdx);
     }
 
     // implement PreparedOlapStatement
 
     public CellSet executeQuery() throws OlapException {
-        throw Util.needToImplement(this);
+        return executeOlapQuery(mdx);
     }
 
     public OlapParameterMetaData getParameterMetaData() throws OlapException {
@@ -62,7 +81,7 @@ abstract class XmlaOlap4jPreparedStatement
     }
 
     public Cube getCube() {
-        throw new UnsupportedOperationException();
+        return cellSetMetaData.cube;
     }
 
     // implement PreparedStatement
@@ -231,25 +250,26 @@ abstract class XmlaOlap4jPreparedStatement
     }
 
     private Parameter getParameter(int param) throws OlapException {
-        final Parameter[] parameters = getParameters();
-        if (param < 1 || param > parameters.length) {
-            throw this.olap4jConnection.helper.toOlapException(
-                this.olap4jConnection.helper.createException(
+        final List<Parameter> parameters = getParameters();
+        if (param < 1 || param > parameters.size()) {
+            throw olap4jConnection.helper.toOlapException(
+                olap4jConnection.helper.createException(
                     "parameter ordinal " + param + " out of range"));
         }
-        return parameters[param - 1];
+        return parameters.get(param - 1);
     }
 
-    private Parameter[] getParameters() {
-        throw Util.needToImplement(this);
+    private List<Parameter> getParameters() {
+        // XMLA statements do not have parameters yet
+        return Collections.emptyList();
     }
 
     public Type getParameterOlapType(int param) throws OlapException {
-        throw Util.needToImplement(this);
+        throw Olap4jUtil.needToImplement(this);
     }
 
     public int getParameterCount() {
-        return getParameters().length;
+        return getParameters().size();
     }
 
     public int isNullable(int param) throws SQLException {
@@ -355,7 +375,7 @@ abstract class XmlaOlap4jPreparedStatement
     }
 
     public int getParameterMode(int param) throws SQLException {
-        throw Util.needToImplement(this);
+        throw Olap4jUtil.needToImplement(this);
     }
 
     // Helper classes

@@ -23,6 +23,7 @@ import java.util.*;
 public class MetadataTest extends TestCase {
     private static final String NL = System.getProperty("line.separator");
 
+    private final TestContext.Tester tester;
     private final Connection connection;
     private final String catalogName;
     private final OlapConnection olapConnection;
@@ -47,7 +48,8 @@ public class MetadataTest extends TestCase {
     private static final List<String> ACTIONS_COLUMN_NAMES = Arrays.asList("SCHEMA_NAME", "CUBE_NAME", "ACTION_NAME", "COORDINATE", "COORDINATE_TYPE");
 
     public MetadataTest() throws SQLException {
-        connection = TestContext.instance().getTester().createConnection();
+        tester = TestContext.instance().getTester();
+        connection = tester.createConnection();
         catalogName = connection.getCatalog();
         olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
@@ -70,7 +72,7 @@ public class MetadataTest extends TestCase {
 
     private int linecount(String s) {
         int i = 0;
-        int count = 1;
+        int count = 0;
         while (i < s.length()) {
             int nl = s.indexOf('\n', i);
             if (nl < 0) {
@@ -85,33 +87,57 @@ public class MetadataTest extends TestCase {
     // ~ Tests follow -------------
 
     public void testDatabaseMetaData() throws SQLException {
-        assertEquals("LOCALDB", catalogName);
+        assertEquals("" + catalogName + "", catalogName);
 
         DatabaseMetaData databaseMetaData = connection.getMetaData();
-        assertTrue(databaseMetaData.getDatabaseMajorVersion() > 0);
-        assertTrue(databaseMetaData.getDatabaseMinorVersion() >= 0);
-        assertTrue(databaseMetaData.getDatabaseProductName() != null);
-        assertTrue(databaseMetaData.getDatabaseProductVersion() != null);
+        switch (tester.getFlavor()) {
+        case XMLA:
+            // FIXME: implement getDatabaseXxxVersion in XMLA driver
+            break;
+        default:
+            assertTrue(databaseMetaData.getDatabaseMajorVersion() > 0);
+            assertTrue(databaseMetaData.getDatabaseMinorVersion() >= 0);
+//            assertTrue(databaseMetaData.getDatabaseProductName() != null);
+            assertTrue(databaseMetaData.getDatabaseProductVersion() != null);
+            break;
+        }
         assertTrue(databaseMetaData.getDriverName() != null);
         assertTrue(databaseMetaData.getDriverVersion() != null);
 
         // mondrian-specific
-        assertTrue(databaseMetaData.isReadOnly());
-        assertNull(databaseMetaData.getUserName());
-        assertNotNull(databaseMetaData.getURL());
+        switch (tester.getFlavor()) {
+        case MONDRIAN:
+            assertTrue(databaseMetaData.isReadOnly());
+            assertNull(databaseMetaData.getUserName());
+            assertNotNull(databaseMetaData.getURL());
+            break;
+        }
 
         // unwrap connection; may or may not be the same object as connection;
         // check extended methods
 
         // also unwrap metadata from regular connection
-        assertTrue(((OlapWrapper) databaseMetaData).isWrapperFor(OlapDatabaseMetaData.class));
-        assertFalse(((OlapWrapper) databaseMetaData).isWrapperFor(OlapStatement.class));
+        assertTrue(
+            ((OlapWrapper) databaseMetaData).isWrapperFor(
+                OlapDatabaseMetaData.class));
+        assertFalse(
+            ((OlapWrapper) databaseMetaData).isWrapperFor(
+                OlapStatement.class));
         OlapDatabaseMetaData olapDatabaseMetaData1 =
             ((OlapWrapper) databaseMetaData).unwrap(
                 OlapDatabaseMetaData.class);
         assertTrue(
-            olapDatabaseMetaData1.getDatabaseProductVersion().equals(
-                olapDatabaseMetaData.getDatabaseProductVersion()));
+            olapDatabaseMetaData1.getDriverName().equals(
+                olapDatabaseMetaData.getDriverName()));
+        switch (tester.getFlavor()) {
+        case XMLA:
+            // FIXME: implement getDatabaseXxxVersion in XMLA driver
+            break;
+        default:
+            assertTrue(
+                olapDatabaseMetaData1.getDatabaseProductVersion().equals(
+                    olapDatabaseMetaData.getDatabaseProductVersion()));
+        }
     }
 
     public void testSchema() throws OlapException {
@@ -132,21 +158,42 @@ public class MetadataTest extends TestCase {
         String s = checkResultSet(
             olapDatabaseMetaData.getDatasources(),
             DATASOURCES_COLUMN_NAMES);
-        assertEquals("DATA_SOURCE_NAME=xxx, DATA_SOURCE_DESCRIPTION=null, URL=null, DATA_SOURCE_INFO=xxx, PROVIDER_NAME=null, PROVIDER_TYPE=MDP, AUTHENTICATION_MODE=null", s);
+        switch (tester.getFlavor()) {
+        case MONDRIAN:
+            assertEquals(TestContext.fold("DATA_SOURCE_NAME=xxx,"
+                + " DATA_SOURCE_DESCRIPTION=null,"
+                + " URL=null,"
+                + " DATA_SOURCE_INFO=xxx,"
+                + " PROVIDER_NAME=null,"
+                + " PROVIDER_TYPE=MDP,"
+                + " AUTHENTICATION_MODE=null\n"),
+                s);
+            break;
+        case XMLA:
+            assertEquals(TestContext.fold("DATA_SOURCE_NAME=MondrianFoodMart,"
+                + " DATA_SOURCE_DESCRIPTION=Mondrian FoodMart data source,"
+                + " URL=http://localhost:8080/mondrian/xmla,"
+                + " DATA_SOURCE_INFO=MondrianFoodMart,"
+                + " PROVIDER_NAME=Mondrian,"
+                + " PROVIDER_TYPE=MDP,"
+                + " AUTHENTICATION_MODE=Unauthenticated\n"),
+                s);
+            break;
+        }
     }
 
     public void testDatabaseMetaDataGetCatalogs() throws SQLException {
         String s = checkResultSet(
             olapDatabaseMetaData.getCatalogs(),
             CATALOGS_COLUMN_NAMES);
-        assertEquals("TABLE_CAT=LOCALDB", s);
+        assertEquals(TestContext.fold("TABLE_CAT=" + catalogName + "\n"), s);
     }
 
     public void testDatabaseMetaDataGetSchemas() throws SQLException {
         String s = checkResultSet(
             olapDatabaseMetaData.getSchemas(),
             SCHEMAS_COLUMN_NAMES);
-        assertEquals("TABLE_SCHEM=FoodMart, TABLE_CAT=LOCALDB", s);
+        assertEquals(TestContext.fold("TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "\n"), s);
     }
     
     public void testDatabaseMetaDataGetLiterals() throws SQLException {
@@ -169,7 +216,7 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getProperties(
                 catalogName, null, null, null, null, null, null, null),
             PROPERTIES_COLUMN_NAMES);
-        assertContains("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse and Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store], LEVEL_UNIQUE_NAME=[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Frozen Sqft, PROPERTY_CAPTION=Frozen Sqft, PROPERTY_TYPE=1, DATA_TYPE=5, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Warehouse and Sales Cube - Store Hierarchy - Store Name Level - Frozen Sqft Property", s);
+        assertContains("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse and Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store], LEVEL_UNIQUE_NAME=[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Frozen Sqft, PROPERTY_CAPTION=Frozen Sqft, PROPERTY_TYPE=1, DATA_TYPE=5, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Warehouse and Sales Cube - Store Hierarchy - Store Name Level - Frozen Sqft Property", s);
         assertEquals(s, 70, linecount(s));
 
         s = checkResultSet(
@@ -178,8 +225,8 @@ public class MetadataTest extends TestCase {
                 null, null, "[Store].[Store Name]",
                 null, null),
             PROPERTIES_COLUMN_NAMES);
-        assertContains("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store], LEVEL_UNIQUE_NAME=[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Has coffee bar, PROPERTY_CAPTION=Has coffee bar, PROPERTY_TYPE=1, DATA_TYPE=11, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Sales Cube - Store Hierarchy - Store Name Level - Has coffee bar Property", s);
-        assertNotContains("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse and Sales, ", s);
+        assertContains("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store], LEVEL_UNIQUE_NAME=[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Has coffee bar, PROPERTY_CAPTION=Has coffee bar, PROPERTY_TYPE=1, DATA_TYPE=11, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Sales Cube - Store Hierarchy - Store Name Level - Has coffee bar Property", s);
+        assertNotContains("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse and Sales, ", s);
         assertEquals(8, linecount(s));
     }
 
@@ -196,7 +243,7 @@ public class MetadataTest extends TestCase {
                 null,
                 null),
             CUBE_COLUMN_NAMES);
-        assertContains("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, ", s);
+        assertContains("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, ", s);
 
         s = checkResultSet(
             olapDatabaseMetaData.getCubes(
@@ -245,7 +292,7 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getDimensions(
                 catalogName, null, null, null),
             DIMENSIONS_COLUMN_NAMES);
-        assertContains("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_NAME=Education Level, DIMENSION_UNIQUE_NAME=[Education Level], DIMENSION_GUID=null, DIMENSION_CAPTION=Education Level, DIMENSION_ORDINAL=9, DIMENSION_TYPE=3, DIMENSION_CARDINALITY=6, DEFAULT_HIERARCHY=[Education Level], DESCRIPTION=Sales Cube - Education Level Dimension, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_MASTER_UNIQUE_NAME=null, DIMENSION_IS_VISIBLE=true", s);
+        assertContains("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_NAME=Education Level, DIMENSION_UNIQUE_NAME=[Education Level], DIMENSION_GUID=null, DIMENSION_CAPTION=Education Level, DIMENSION_ORDINAL=9, DIMENSION_TYPE=3, DIMENSION_CARDINALITY=6, DEFAULT_HIERARCHY=[Education Level], DESCRIPTION=Sales Cube - Education Level Dimension, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_MASTER_UNIQUE_NAME=null, DIMENSION_IS_VISIBLE=true", s);
         assertEquals(62, linecount(s));
     }
 
@@ -267,13 +314,13 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getHierarchies(
                 catalogName, null, null, null, null),
             HIERARCHIES_COLUMN_NAMES);
-        assertContains("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=HR, DIMENSION_UNIQUE_NAME=[Employees], HIERARCHY_NAME=Employees, HIERARCHY_UNIQUE_NAME=[Employees], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Employees, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=1156, DEFAULT_MEMBER=[Employees].[All Employees], ALL_MEMBER=[Employees].[All Employees], DESCRIPTION=HR Cube - Employees Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_ORDINAL=7, DIMENSION_IS_SHARED=true, PARENT_CHILD=true", s);
+        assertContains("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=HR, DIMENSION_UNIQUE_NAME=[Employees], HIERARCHY_NAME=Employees, HIERARCHY_UNIQUE_NAME=[Employees], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Employees, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=1156, DEFAULT_MEMBER=[Employees].[All Employees], ALL_MEMBER=[Employees].[All Employees], DESCRIPTION=HR Cube - Employees Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_ORDINAL=7, DIMENSION_IS_SHARED=true, PARENT_CHILD=true", s);
 
         s = checkResultSet(
             olapDatabaseMetaData.getHierarchies(
                 catalogName, null, "Sales", null, "Store"),
             HIERARCHIES_COLUMN_NAMES);
-        assertEquals("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_NAME=Store, HIERARCHY_UNIQUE_NAME=[Store], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Store, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=63, DEFAULT_MEMBER=[Store].[All Stores], ALL_MEMBER=[Store].[All Stores], DESCRIPTION=Sales Cube - Store Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_ORDINAL=1, DIMENSION_IS_SHARED=true, PARENT_CHILD=false", s);
+        assertEquals(TestContext.fold("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_NAME=Store, HIERARCHY_UNIQUE_NAME=[Store], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Store, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=63, DEFAULT_MEMBER=[Store].[All Stores], ALL_MEMBER=[Store].[All Stores], DESCRIPTION=Sales Cube - Store Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_ORDINAL=1, DIMENSION_IS_SHARED=true, PARENT_CHILD=false\n"), s);
     }
 
     public void testDatabaseMetaDataGetLevels() throws SQLException {
@@ -281,7 +328,7 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getLevels(
                 catalogName, null, null, null, null, null),
             LEVELS_COLUMN_NAMES);
-        assertContains("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Product], HIERARCHY_UNIQUE_NAME=[Product], LEVEL_NAME=Product Category, LEVEL_UNIQUE_NAME=[Product].[Product Category], LEVEL_GUID=null, LEVEL_CAPTION=Product Category, LEVEL_NUMBER=3, LEVEL_CARDINALITY=55, LEVEL_TYPE=0, CUSTOM_ROLLUP_SETTINGS=0, LEVEL_UNIQUE_SETTINGS=0, LEVEL_IS_VISIBLE=true, DESCRIPTION=Sales Cube - Product HierarchyProduct Category Level", s);
+        assertContains("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Product], HIERARCHY_UNIQUE_NAME=[Product], LEVEL_NAME=Product Category, LEVEL_UNIQUE_NAME=[Product].[Product Category], LEVEL_GUID=null, LEVEL_CAPTION=Product Category, LEVEL_NUMBER=3, LEVEL_CARDINALITY=55, LEVEL_TYPE=0, CUSTOM_ROLLUP_SETTINGS=0, LEVEL_UNIQUE_SETTINGS=0, LEVEL_IS_VISIBLE=true, DESCRIPTION=Sales Cube - Product HierarchyProduct Category Level", s);
 
         s = checkResultSet(
             olapDatabaseMetaData.getLevels(
@@ -303,7 +350,7 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getMeasures(
                 catalogName, null, null, null, null),
             MEASURES_COLUMN_NAMES);
-        assertContains("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, MEASURE_NAME=Profit, MEASURE_UNIQUE_NAME=[Measures].[Profit], MEASURE_CAPTION=Profit, MEASURE_GUID=null, MEASURE_AGGREGATOR=127, DATA_TYPE=130, MEASURE_IS_VISIBLE=true, LEVELS_LIST=null, DESCRIPTION=Sales Cube - Profit Member", s);
+        assertContains("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, MEASURE_NAME=Profit, MEASURE_UNIQUE_NAME=[Measures].[Profit], MEASURE_CAPTION=Profit, MEASURE_GUID=null, MEASURE_AGGREGATOR=127, DATA_TYPE=130, MEASURE_IS_VISIBLE=true, LEVELS_LIST=null, DESCRIPTION=Sales Cube - Profit Member", s);
 
         // wildcard match
         s = checkResultSet(
@@ -327,10 +374,9 @@ public class MetadataTest extends TestCase {
                 null),
             MEMBERS_COLUMN_NAMES);
         assertEquals(
-            TestContext.fold(
-                "CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender], LEVEL_UNIQUE_NAME=[Gender].[(All)], LEVEL_NUMBER=0, MEMBER_ORDINAL=0, MEMBER_NAME=All Gender, MEMBER_UNIQUE_NAME=[Gender].[All Gender], MEMBER_TYPE=2, MEMBER_GUID=null, MEMBER_CAPTION=All Gender, CHILDREN_CARDINALITY=2, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=null, PARENT_COUNT=0, TREE_OP=null, DEPTH=0\n"
-            + "CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender], LEVEL_NUMBER=1, MEMBER_ORDINAL=1, MEMBER_NAME=F, MEMBER_UNIQUE_NAME=[Gender].[All Gender].[F], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=F, CHILDREN_CARDINALITY=0, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Gender].[All Gender], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
-            + "CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender], LEVEL_NUMBER=1, MEMBER_ORDINAL=2, MEMBER_NAME=M, MEMBER_UNIQUE_NAME=[Gender].[All Gender].[M], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=M, CHILDREN_CARDINALITY=0, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Gender].[All Gender], PARENT_COUNT=1, TREE_OP=null, DEPTH=1"),
+            TestContext.fold("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender], LEVEL_UNIQUE_NAME=[Gender].[(All)], LEVEL_NUMBER=0, MEMBER_ORDINAL=0, MEMBER_NAME=All Gender, MEMBER_UNIQUE_NAME=[Gender].[All Gender], MEMBER_TYPE=2, MEMBER_GUID=null, MEMBER_CAPTION=All Gender, CHILDREN_CARDINALITY=2, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=null, PARENT_COUNT=0, TREE_OP=null, DEPTH=0\n"
+                + "CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender], LEVEL_NUMBER=1, MEMBER_ORDINAL=1, MEMBER_NAME=F, MEMBER_UNIQUE_NAME=[Gender].[All Gender].[F], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=F, CHILDREN_CARDINALITY=0, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Gender].[All Gender], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
+                + "CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender], LEVEL_NUMBER=1, MEMBER_ORDINAL=2, MEMBER_NAME=M, MEMBER_UNIQUE_NAME=[Gender].[All Gender].[M], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=M, CHILDREN_CARDINALITY=0, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Gender].[All Gender], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"),
             s);
 
         // by member unique name
@@ -339,7 +385,7 @@ public class MetadataTest extends TestCase {
                 catalogName, "FoodMart", "Sales", null, null, null,
                 "[Time].[1997].[Q2].[4]", null),
             MEMBERS_COLUMN_NAMES);
-        assertEquals("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Time], HIERARCHY_UNIQUE_NAME=[Time], LEVEL_UNIQUE_NAME=[Time].[Month], LEVEL_NUMBER=2, MEMBER_ORDINAL=6, MEMBER_NAME=4, MEMBER_UNIQUE_NAME=[Time].[1997].[Q2].[4], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=4, CHILDREN_CARDINALITY=0, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Time].[1997].[Q2], PARENT_COUNT=1, TREE_OP=null, DEPTH=2",
+        assertEquals(TestContext.fold("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Time], HIERARCHY_UNIQUE_NAME=[Time], LEVEL_UNIQUE_NAME=[Time].[Month], LEVEL_NUMBER=2, MEMBER_ORDINAL=6, MEMBER_NAME=4, MEMBER_UNIQUE_NAME=[Time].[1997].[Q2].[4], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=4, CHILDREN_CARDINALITY=0, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Time].[1997].[Q2], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"),
             s);
 
         // with treeop
@@ -349,12 +395,26 @@ public class MetadataTest extends TestCase {
                 "[Customers].[USA].[CA]",
                 EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.SIBLINGS)),
             MEMBERS_COLUMN_NAMES);
-        assertEquals(
-            TestContext.fold("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=7235, MEMBER_NAME=OR, MEMBER_UNIQUE_NAME=[Customers].[All Customers].[USA].[OR], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=OR, CHILDREN_CARDINALITY=11, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[All Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
-                + "CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=8298, MEMBER_NAME=WA, MEMBER_UNIQUE_NAME=[Customers].[All Customers].[USA].[WA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=WA, CHILDREN_CARDINALITY=22, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[All Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
-                + "CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[Country], LEVEL_NUMBER=1, MEMBER_ORDINAL=2966, MEMBER_NAME=USA, MEMBER_UNIQUE_NAME=[Customers].[All Customers].[USA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=USA, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Customers].[All Customers], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
-                + "CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[(All)], LEVEL_NUMBER=0, MEMBER_ORDINAL=0, MEMBER_NAME=All Customers, MEMBER_UNIQUE_NAME=[Customers].[All Customers], MEMBER_TYPE=2, MEMBER_GUID=null, MEMBER_CAPTION=All Customers, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=null, PARENT_COUNT=0, TREE_OP=null, DEPTH=0"),
-            s);
+        switch (tester.getFlavor()) {
+        case MONDRIAN:
+            // TODO: fix mondrian driver so that members are returned sorted
+            // by level depth
+            assertEquals(
+                TestContext.fold("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=7235, MEMBER_NAME=OR, MEMBER_UNIQUE_NAME=[Customers].[All Customers].[USA].[OR], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=OR, CHILDREN_CARDINALITY=11, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[All Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
+                    + "CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=8298, MEMBER_NAME=WA, MEMBER_UNIQUE_NAME=[Customers].[All Customers].[USA].[WA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=WA, CHILDREN_CARDINALITY=22, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[All Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
+                    + "CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[Country], LEVEL_NUMBER=1, MEMBER_ORDINAL=2966, MEMBER_NAME=USA, MEMBER_UNIQUE_NAME=[Customers].[All Customers].[USA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=USA, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Customers].[All Customers], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
+                    + "CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[(All)], LEVEL_NUMBER=0, MEMBER_ORDINAL=0, MEMBER_NAME=All Customers, MEMBER_UNIQUE_NAME=[Customers].[All Customers], MEMBER_TYPE=2, MEMBER_GUID=null, MEMBER_CAPTION=All Customers, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=null, PARENT_COUNT=0, TREE_OP=null, DEPTH=0\n"),
+                s);
+            break;
+        default:
+            assertEquals(
+                TestContext.fold("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[(All)], LEVEL_NUMBER=0, MEMBER_ORDINAL=0, MEMBER_NAME=All Customers, MEMBER_UNIQUE_NAME=[Customers].[All Customers], MEMBER_TYPE=2, MEMBER_GUID=null, MEMBER_CAPTION=All Customers, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=null, PARENT_COUNT=0, TREE_OP=null, DEPTH=0\n"
+                    + "CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[Country], LEVEL_NUMBER=1, MEMBER_ORDINAL=2966, MEMBER_NAME=USA, MEMBER_UNIQUE_NAME=[Customers].[All Customers].[USA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=USA, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Customers].[All Customers], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
+                    + "CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=7235, MEMBER_NAME=OR, MEMBER_UNIQUE_NAME=[Customers].[All Customers].[USA].[OR], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=OR, CHILDREN_CARDINALITY=11, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[All Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
+                    + "CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers], LEVEL_UNIQUE_NAME=[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=8298, MEMBER_NAME=WA, MEMBER_UNIQUE_NAME=[Customers].[All Customers].[USA].[WA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=WA, CHILDREN_CARDINALITY=22, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[All Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"),
+                s);
+            break;
+        }
     }
 
     public void testDatabaseMetaDataGetSets() throws SQLException {
@@ -362,7 +422,7 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getSets(
                 catalogName, null, null, null),
             SETS_COLUMN_NAMES);
-        assertEquals("CATALOG_NAME=LOCALDB, SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse, SET_NAME=[Top Sellers], SCOPE=1", s);
+        assertEquals(TestContext.fold("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse, SET_NAME=[Top Sellers], SCOPE=1\n"), s);
 
         s = checkResultSet(
             olapDatabaseMetaData.getSets(
@@ -397,9 +457,6 @@ public class MetadataTest extends TestCase {
         int k = 0;
         StringBuilder buf = new StringBuilder();
         while (resultSet.next()) {
-            if (k > 0) {
-                buf.append(NL);
-            }
             ++k;
             for (int i = 0; i < columnCount; i++) {
                 if (i > 0) {
@@ -410,6 +467,7 @@ public class MetadataTest extends TestCase {
                     .append('=')
                     .append(s);
             }
+            buf.append(NL);
         }
         assertTrue(k >= 0);
         assertTrue(resultSet.isAfterLast());

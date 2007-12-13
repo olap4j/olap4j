@@ -9,7 +9,7 @@
 package org.olap4j.driver.xmla;
 
 import java.sql.*;
-import java.util.Properties;
+import java.util.*;
 import java.io.Reader;
 import java.io.InputStream;
 
@@ -27,43 +27,57 @@ class FactoryJdbc4Impl implements Factory {
         XmlaOlap4jDriver.Proxy proxy,
         String url,
         Properties info)
-        throws SQLException {
-        return new FactoryJdbc4Impl.XmlaOlap4jConnectionJdbc4(
+        throws SQLException
+    {
+        return new XmlaOlap4jConnectionJdbc4(
             this, proxy, url, info);
     }
 
     public EmptyResultSet newEmptyResultSet(
         XmlaOlap4jConnection olap4jConnection)
     {
-        return new FactoryJdbc4Impl.EmptyResultSetJdbc4(olap4jConnection);
+        List<String> headerList = Collections.emptyList();
+        List<List<Object>> rowList = Collections.emptyList();
+        return new EmptyResultSetJdbc4(olap4jConnection, headerList, rowList);
+    }
+
+    public ResultSet newFixedResultSet(
+        XmlaOlap4jConnection olap4jConnection,
+        List<String> headerList,
+        List<List<Object>> rowList)
+    {
+        return new EmptyResultSetJdbc4(
+            olap4jConnection, headerList, rowList);
     }
 
     public XmlaOlap4jCellSet newCellSet(
-        XmlaOlap4jStatement olap4jStatement,
-        InputStream is)
+        XmlaOlap4jStatement olap4jStatement) throws OlapException
     {
-        return new FactoryJdbc4Impl.XmlaOlap4jCellSetJdbc4(
-            olap4jStatement, is);
+        return new XmlaOlap4jCellSetJdbc4(olap4jStatement);
     }
 
     public XmlaOlap4jPreparedStatement newPreparedStatement(
         String mdx,
-        XmlaOlap4jConnection olap4jConnection)
+        XmlaOlap4jConnection olap4jConnection) throws OlapException
     {
-        return new FactoryJdbc4Impl.XmlaOlap4jPreparedStatementJdbc4(olap4jConnection, mdx);
+        return new XmlaOlap4jPreparedStatementJdbc4(olap4jConnection, mdx);
     }
 
     public XmlaOlap4jDatabaseMetaData newDatabaseMetaData(
         XmlaOlap4jConnection olap4jConnection)
     {
-        return new FactoryJdbc4Impl.XmlaOlap4jDatabaseMetaDataJdbc4(olap4jConnection);
+        return new XmlaOlap4jDatabaseMetaDataJdbc4(olap4jConnection);
     }
 
     // Inner classes
 
     private static class EmptyResultSetJdbc4 extends EmptyResultSet {
-        public EmptyResultSetJdbc4(XmlaOlap4jConnection olap4jConnection) {
-            super(olap4jConnection);
+        EmptyResultSetJdbc4(
+            XmlaOlap4jConnection olap4jConnection,
+            List<String> headerList,
+            List<List<Object>> rowList)
+        {
+            super(olap4jConnection, headerList, rowList);
         }
 
         // implement java.sql.ResultSet methods
@@ -94,12 +108,14 @@ class FactoryJdbc4Impl implements Factory {
         }
 
         public void updateNString(
-            int columnIndex, String nString) throws SQLException {
+            int columnIndex, String nString) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateNString(
-            String columnLabel, String nString) throws SQLException {
+            String columnLabel, String nString) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -108,7 +124,8 @@ class FactoryJdbc4Impl implements Factory {
         }
 
         public void updateNClob(
-            String columnLabel, NClob nClob) throws SQLException {
+            String columnLabel, NClob nClob) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -129,12 +146,14 @@ class FactoryJdbc4Impl implements Factory {
         }
 
         public void updateSQLXML(
-            int columnIndex, SQLXML xmlObject) throws SQLException {
+            int columnIndex, SQLXML xmlObject) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateSQLXML(
-            String columnLabel, SQLXML xmlObject) throws SQLException {
+            String columnLabel, SQLXML xmlObject) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -155,42 +174,50 @@ class FactoryJdbc4Impl implements Factory {
         }
 
         public void updateNCharacterStream(
-            int columnIndex, Reader x, long length) throws SQLException {
+            int columnIndex, Reader x, long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateNCharacterStream(
-            String columnLabel, Reader reader, long length) throws SQLException {
+            String columnLabel, Reader reader, long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateAsciiStream(
-            int columnIndex, InputStream x, long length) throws SQLException {
+            int columnIndex, InputStream x, long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateBinaryStream(
-            int columnIndex, InputStream x, long length) throws SQLException {
+            int columnIndex, InputStream x, long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateCharacterStream(
-            int columnIndex, Reader x, long length) throws SQLException {
+            int columnIndex, Reader x, long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateAsciiStream(
-            String columnLabel, InputStream x, long length) throws SQLException {
+            String columnLabel, InputStream x, long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateBinaryStream(
-            String columnLabel, InputStream x, long length) throws SQLException {
+            String columnLabel, InputStream x, long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateCharacterStream(
-            String columnLabel, Reader reader, long length) throws SQLException {
+            String columnLabel, Reader reader, long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -371,11 +398,11 @@ class FactoryJdbc4Impl implements Factory {
     }
 
     private static class XmlaOlap4jCellSetJdbc4 extends XmlaOlap4jCellSet {
-        public XmlaOlap4jCellSetJdbc4(
-            XmlaOlap4jStatement olap4jStatement, 
-            InputStream is)
+        XmlaOlap4jCellSetJdbc4(
+            XmlaOlap4jStatement olap4jStatement)
+            throws OlapException
         {
-            super(olap4jStatement, is);
+            super(olap4jStatement);
         }
 
         public CellSetMetaData getMetaData() {
@@ -619,7 +646,7 @@ class FactoryJdbc4Impl implements Factory {
     {
         XmlaOlap4jPreparedStatementJdbc4(
             XmlaOlap4jConnection olap4jConnection,
-            String mdx)
+            String mdx) throws OlapException
         {
             super(olap4jConnection, mdx);
         }

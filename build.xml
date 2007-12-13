@@ -55,9 +55,16 @@ ${jar-jdk14.file}"/>
     <pathelement location="${testlib.dir}/junit.jar"/>
     <pathelement location="${testlib.dir}/servlet.jar"/>
 
+    <!-- To use the checked in mondrian.jar, make sure the <pathelement>
+         element following this comment is uncommented; to develop code against
+         'live' mondrian source code, uncomment <pathelement> elements 2 and 3
+         following this comment. Between releases, we don't keep mondrian.jar
+         up to date, so probably the latter option is the only one which will
+         work. One day the mondrian driver will be part of the mondrian source
+         code and all mondrian dependencies will go away. -->
+<!--
     <pathelement location="${lib.dir}/mondrian.jar"/>
-    <!-- To develop code against 'live' mondrian source code, remove the
-         previous line and uncomment the next two.
+-->
     <pathelement location="${mondrian.dir}/classes"/>
     <pathelement location="${mondrian.dir}/testclasses"/>
       -->
@@ -74,6 +81,7 @@ ${jar-jdk14.file}"/>
     <pathelement location="${lib.dir}/commons-vfs.jar"/>
     <pathelement location="${lib.dir}/commons-logging.jar"/>
     <pathelement location="${lib.dir}/commons-math-1.0.jar"/>
+    <pathelement location="${lib.dir}/xercesImpl.jar"/>
   </path>
 
   <path id="project.test.classpath">
@@ -253,6 +261,7 @@ lib/commons-vfs.jar,
 lib/commons-logging.jar,
 lib/commons-math-1.0.jar,
 lib/javacup.jar,
+lib/xercesImpl.jar,
 lib/log4j-1.2.9.jar,
 lib/asm-2.2.3.jar,
 lib/asm-commons-2.2.3.jar,
@@ -372,7 +381,7 @@ META-INF/**"/>
         classpathref="project.test.classpath"
         destdir="${javadoc.dir}"
         packagenames="org.olap4j.*"
-        excludepackagenames="org.olap4j.driver.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
+        excludepackagenames="org.olap4j.driver.*,org.olap4j.impl.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
         overview="${src.dir}/overview.html"
         footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=35302&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
         author="true"
@@ -441,7 +450,7 @@ META-INF/**"/>
         classpathref="project.test.classpath"
         destdir="${javadoc.dir}"
         packagenames="org.olap4j.*"
-        excludepackagenames="org.olap4j.driver.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
+        excludepackagenames="org.olap4j.driver.*,org.olap4j.impl.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
         overview="${src.dir}/overview.html"
         footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=35302&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
         author="true"
@@ -499,8 +508,8 @@ META-INF/**"/>
     </javadoc>
   </target>
 
-  <target name="test" depends="prepare, compile.tests">
-    <junit printsummary="yes" fork="no" failureproperty="junit.failure"
+  <target name="test" depends="prepare, compile, compile.tests">
+    <junit printsummary="yes" fork="yes" failureproperty="junit.failure"
       tempdir="${testlog.dir}">
       <formatter type="plain"/>
       <formatter type="xml"/>
@@ -510,6 +519,7 @@ META-INF/**"/>
         </fileset>
       </batchtest>
       <classpath refid="project.test.classpath"/>
+      <jvmarg value="-Xmx256m"/>
     </junit>
   </target>
 

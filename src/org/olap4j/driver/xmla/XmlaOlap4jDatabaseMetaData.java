@@ -8,21 +8,24 @@
 */
 package org.olap4j.driver.xmla;
 
-import org.olap4j.OlapDatabaseMetaData;
-import org.olap4j.OlapConnection;
-import org.olap4j.OlapException;
-import org.olap4j.metadata.Catalog;
-import org.olap4j.metadata.NamedList;
-import org.olap4j.metadata.Member;
-import mondrian.olap.Util;
+import org.olap4j.*;
+import org.olap4j.impl.ArrayMap;
+import org.olap4j.impl.Olap4jUtil;
+import org.olap4j.metadata.*;
+import org.w3c.dom.Element;
 
-import java.sql.SQLException;
 import java.sql.ResultSet;
-import java.util.Set;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Implementation of {@link org.olap4j.OlapDatabaseMetaData}
  * for XML/A providers.
+ *
+ * <p>This class has sub-classes which implement JDBC 3.0 and JDBC 4.0 APIs;
+ * it is instantiated using {@link Factory#newDatabaseMetaData}.</p>
  *
  * @author jhyde
  * @version $Id$
@@ -31,15 +34,116 @@ import java.util.Set;
 abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     final XmlaOlap4jConnection olap4jConnection;
 
+    private final NamedList<XmlaOlap4jCatalog> catalogs;
+
     XmlaOlap4jDatabaseMetaData(
         XmlaOlap4jConnection olap4jConnection)
     {
         this.olap4jConnection = olap4jConnection;
+        this.catalogs =
+            new DeferredNamedListImpl<XmlaOlap4jCatalog>(
+                XmlaOlap4jConnection.MetadataRequest.DBSCHEMA_CATALOGS,
+                new XmlaOlap4jConnection.Context(
+                    olap4jConnection, this, null, null, null, null, null,
+                    null),
+                new XmlaOlap4jConnection.CatalogHandler());
     }
 
-    // package-protected
+    // package-protected: not part of olap4j API
     NamedList<Catalog> getCatalogObjects() {
-        throw Util.needToImplement(this);
+        return Olap4jUtil.cast(catalogs);
+    }
+
+    /**
+     * Executes a metadata query and returns the result as a JDBC
+     * {@link ResultSet}.
+     *
+     * @param metadataRequest Name of the metadata request. Corresponds to the XMLA
+     * method name, e.g. "MDSCHEMA_CUBES"
+     *
+     * @param patternValues Array of alternating parameter name and value
+     * pairs. If the parameter value is null, it is ignored.
+     *
+     * @return Result set of metadata
+     *
+     * @throws org.olap4j.OlapException on error
+     */
+    private ResultSet getMetadata(
+        XmlaOlap4jConnection.MetadataRequest metadataRequest,
+        Object... patternValues) throws OlapException
+    {
+        assert patternValues.length % 2 == 0;
+        final XmlaOlap4jConnection.Context context =
+            new XmlaOlap4jConnection.Context(
+                olap4jConnection, null, null, null, null, null, null, null);
+        List<String> patternValueList = new ArrayList<String>();
+        Map<String, Matcher> predicateList = new ArrayMap<String, Matcher>();
+        for (int i = 0; i < patternValues.length; i += 2) {
+            String name = (String) patternValues[i];
+            Object value = patternValues[i + 1];
+            if (value == null) {
+                // ignore
+            } else if (value instanceof Wildcard) {
+                final Wildcard wildcard = (Wildcard) value;
+                if (wildcard.pattern.indexOf('%') < 0
+                    && wildcard.pattern.indexOf('_') < 0) {
+                    patternValueList.add(name);
+                    patternValueList.add(wildcard.pattern);
+                } else {
+                    String regexp =
+                        Olap4jUtil.wildcardToRegexp(
+                            Collections.singletonList(wildcard.pattern));
+                    final Matcher matcher = Pattern.compile(regexp).matcher("");
+                    predicateList.put(name, matcher);
+                }
+            } else {
+                patternValueList.add(name);
+                patternValueList.add((String) value);
+            }
+        }
+        String request =
+            olap4jConnection.generateRequest(
+                context,
+                metadataRequest,
+                patternValueList.toArray(
+                    new String[patternValueList.size()]));
+        final Element root = olap4jConnection.xxx(request);
+        List<List<Object>> rowList = new ArrayList<List<Object>>();
+        rowLoop:
+        for (Element row : XmlaOlap4jUtil.childElements(root)) {
+            final ArrayList<Object> valueList = new ArrayList<Object>();
+            for (Map.Entry<String,Matcher> entry : predicateList.entrySet()) {
+                final String column = entry.getKey();
+                final String value =
+                    XmlaOlap4jUtil.stringElement(row, column);
+                final Matcher matcher = entry.getValue();
+                if (!matcher.reset(value).matches()) {
+                    continue rowLoop;
+                }
+            }
+            for (XmlaOlap4jConnection.MetadataColumn column
+                : metadataRequest.columns)
+            {
+                final String value =
+                    XmlaOlap4jUtil.stringElement(row, column.xmlaName);
+                valueList.add(value);
+            }
+            rowList.add(valueList);
+        }
+        List<String> headerList = new ArrayList<String>();
+        for (XmlaOlap4jConnection.MetadataColumn column
+            : metadataRequest.columns)
+        {
+            headerList.add(column.name);
+        }
+        return olap4jConnection.factory.newFixedResultSet(
+            olap4jConnection, headerList, rowList);
+    }
+
+    private Wildcard wildcard(String pattern) {
+        return pattern == null
+            ? null
+            : new Wildcard(pattern);
     }
 
     // implement DatabaseMetaData
@@ -82,11 +186,11 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public String getDatabaseProductName() throws SQLException {
-        throw Util.needToImplement(this);
+        throw Olap4jUtil.needToImplement(this);
     }
 
     public String getDatabaseProductVersion() throws SQLException {
-        throw Util.needToImplement(this);
+        throw Olap4jUtil.needToImplement(this);
     }
 
     public String getDriverName() throws SQLException {
@@ -542,11 +646,13 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public ResultSet getSchemas() throws SQLException {
-        throw new UnsupportedOperationException();
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.DBSCHEMA_SCHEMATA);
     }
 
     public ResultSet getCatalogs() throws SQLException {
-        throw new UnsupportedOperationException();
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.DBSCHEMA_CATALOGS);
     }
 
     public ResultSet getTableTypes() throws SQLException {
@@ -736,11 +842,11 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public int getDatabaseMajorVersion() throws SQLException {
-        throw Util.needToImplement(this);
+        throw Olap4jUtil.needToImplement(this);
     }
 
     public int getDatabaseMinorVersion() throws SQLException {
-        throw Util.needToImplement(this);
+        throw Olap4jUtil.needToImplement(this);
     }
 
     public int getJDBCMajorVersion() throws SQLException {
@@ -792,62 +898,107 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String cubeNamePattern,
         String actionNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_ACTIONS,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "ACTION_NAME", wildcard(actionNamePattern));
     }
 
-    public ResultSet getDatasources(
-    ) throws OlapException {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+    public ResultSet getDatasources() throws OlapException {
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.DISCOVER_DATASOURCES);
     }
 
     public ResultSet getLiterals() throws OlapException {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.DISCOVER_LITERALS);
     }
 
     public ResultSet getDatabaseProperties(
         String dataSourceName,
         String propertyNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.DISCOVER_PROPERTIES);
     }
 
     public ResultSet getProperties(
         String catalog,
         String schemaPattern,
         String cubeNamePattern,
-        String dimensionNamePattern,
-        String hierarchyNamePattern,
-        String levelNamePattern,
+        String dimensionUniqueName,
+        String hierarchyUniqueName,
+        String levelUniqueName,
         String memberUniqueName,
-        String propertyNamePattern) throws OlapException 
+        String propertyNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_PROPERTIES,
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "DIMENSION_UNIQUE_NAME", dimensionUniqueName,
+            "HIERARCHY_UNIQUE_NAME", hierarchyUniqueName,
+            "LEVEL_UNIQUE_NAME", levelUniqueName,
+            "MEMBER_UNIQUE_NAME", memberUniqueName,
+            "PROPERTY_NAME", wildcard(propertyNamePattern));
     }
 
     public String getMdxKeywords() throws OlapException {
-        throw Util.needToImplement(this);
+        final XmlaOlap4jConnection.MetadataRequest metadataRequest =
+            XmlaOlap4jConnection.MetadataRequest.DISCOVER_KEYWORDS;
+        final XmlaOlap4jConnection.Context context =
+            new XmlaOlap4jConnection.Context(
+                olap4jConnection, null, null, null, null, null, null, null);
+        String request =
+            olap4jConnection.generateRequest(context, metadataRequest);
+        final Element root = olap4jConnection.xxx(request);
+        StringBuilder buf = new StringBuilder();
+        for (Element row : XmlaOlap4jUtil.childElements(root)) {
+            if (buf.length() > 0) {
+                buf.append(',');
+            }
+            final String keyword =
+                XmlaOlap4jUtil.stringElement(row, "Keyword");
+            buf.append(keyword);
+        }
+        return buf.toString();
     }
 
     public ResultSet getCubes(
         String catalog,
         String schemaPattern,
-        String cubeNamePattern) throws OlapException {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        String cubeNamePattern)
+        throws OlapException
+    {
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_CUBES,
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern));
     }
 
     public ResultSet getDimensions(
         String catalog,
         String schemaPattern,
         String cubeNamePattern,
-        String dimensionNamePattern) throws OlapException
+        String dimensionNamePattern)
+        throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_DIMENSIONS,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "DIMSENSION_NAME", wildcard(dimensionNamePattern));
     }
 
     public ResultSet getOlapFunctions(
         String functionNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_FUNCTIONS,
+            "FUNCTION_NAME", wildcard(functionNamePattern));
     }
 
     public ResultSet getHierarchies(
@@ -855,9 +1006,16 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String schemaPattern,
         String cubeNamePattern,
         String dimensionNamePattern,
-        String hierarchyNamePattern) throws OlapException
+        String hierarchyNamePattern)
+        throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_HIERARCHIES,
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "DIMENSION_NAME", wildcard(dimensionNamePattern),
+            "HIERARCHY_NAME", wildcard(hierarchyNamePattern));
     }
 
     public ResultSet getMeasures(
@@ -867,31 +1025,63 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String measureNamePattern,
         String measureUniqueName) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEASURES,
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "MEASURE_NAME", wildcard(measureNamePattern),
+            "MEASURE_UNIQUE_NAME", measureUniqueName);
     }
 
     public ResultSet getMembers(
         String catalog,
         String schemaPattern,
         String cubeNamePattern,
-        String dimensionNamePattern,
-        String hierarchyNamePattern,
-        String levelNamePattern,
+        String dimensionUniqueName,
+        String hierarchyUniqueName,
+        String levelUniqueName,
         String memberUniqueName,
         Set<Member.TreeOp> treeOps) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        String treeOpString;
+        if (treeOps != null) {
+            int op = 0;
+            for (Member.TreeOp treeOp : treeOps) {
+                op |= treeOp.xmlaOrdinal();
+            }
+            treeOpString = String.valueOf(op);
+        } else {
+            treeOpString = null;
+        }
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEMBERS,
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "DIMENSION_UNIQUE_NAME", dimensionUniqueName,
+            "HIERARCHY_UNIQUE_NAME", hierarchyUniqueName,
+            "LEVEL_UNIQUE_NAME", levelUniqueName,
+            "MEMBER_UNIQUE_NAME", memberUniqueName,
+            "TREE_OP", treeOpString);
     }
 
     public ResultSet getLevels(
         String catalog,
         String schemaPattern,
         String cubeNamePattern,
-        String dimensionNamePattern,
-        String hierarchyNamePattern,
+        String dimensionUniqueName,
+        String hierarchyUniqueName,
         String levelNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_LEVELS,
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "DIMENSION_UNIQUE_NAME", dimensionUniqueName,
+            "HIERARCHY_UNIQUE_NAME", hierarchyUniqueName,
+            "LEVEL_NAME", wildcard(levelNamePattern));
     }
 
     public ResultSet getSets(
@@ -900,7 +1090,25 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String cubeNamePattern,
         String setNamePattern) throws OlapException
     {
-        return olap4jConnection.factory.newEmptyResultSet(olap4jConnection);
+        return getMetadata(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_SETS,
+            "CATALOG_NAME", catalog,
+            "SCHEMA_NAME", wildcard(schemaPattern),
+            "CUBE_NAME", wildcard(cubeNamePattern),
+            "SET_NAME", wildcard(setNamePattern));
+    }
+
+
+    /**
+     * Wrapper which indicates that a restriction is to be treated as a
+     * SQL-style wildcard match.
+     */
+    static class Wildcard {
+        final String pattern;
+
+        Wildcard(String pattern) {
+            this.pattern = pattern;
+        }
     }
 }
 

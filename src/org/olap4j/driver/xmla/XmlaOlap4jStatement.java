@@ -15,6 +15,7 @@ import org.olap4j.mdx.ParseTreeWriter;
 
 import java.sql.*;
 import java.io.*;
+import java.util.concurrent.*;
 
 /**
  * Implementation of {@link org.olap4j.OlapStatement}
@@ -27,7 +28,16 @@ import java.io.*;
 class XmlaOlap4jStatement implements OlapStatement {
     final XmlaOlap4jConnection olap4jConnection;
     private boolean closed;
+
+    /**
+     * Current cell set, or null if the statement is not executing anything.
+     * Any method which modifies this member must synchronize
+     * on the {@link XmlaOlap4jStatement}.
+     */
     XmlaOlap4jCellSet openCellSet;
+    private boolean canceled;
+    int timeoutSeconds;
+    Future<byte []> future;
 
     XmlaOlap4jStatement(
         XmlaOlap4jConnection olap4jConnection)
@@ -85,15 +95,24 @@ class XmlaOlap4jStatement implements OlapStatement {
     }
 
     public int getQueryTimeout() throws SQLException {
-        throw new UnsupportedOperationException();
+        return timeoutSeconds;
     }
 
     public void setQueryTimeout(int seconds) throws SQLException {
-        throw new UnsupportedOperationException();
+        if (seconds < 0) {
+            throw olap4jConnection.helper.createException(
+                "illegal timeout value " + seconds);
+        }
+        this.timeoutSeconds = seconds;
     }
 
-    public void cancel() throws SQLException {
-        throw new UnsupportedOperationException();
+    public synchronized void cancel() {
+        if (!canceled) {
+            canceled = true;
+            if (future != null) {
+                future.cancel(true);
+            }
+        }
     }
 
     public SQLWarning getWarnings() throws SQLException {
@@ -235,42 +254,115 @@ class XmlaOlap4jStatement implements OlapStatement {
     // implement OlapStatement
 
     public CellSet executeOlapQuery(String mdx) throws OlapException {
-        try {
-            String request = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-               "<soapenv:Envelope\n" +
-               "    xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-               "    xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" +
-               "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
-               "    <soapenv:Body>\n" +
-               "        <Execute xmlns=\"urn:schemas-microsoft-com:xml-analysis\">\n" +
-               "        <Command>\n" +
-               "        <Statement>\n" +
-               "           <![CDATA[\n" + mdx + "]]>\n" +
-               "         </Statement>\n" +
-               "        </Command>\n" +
-               "        <Properties>\n" +
-               "          <PropertyList>\n" +
-               "            <Catalog>${catalog}</Catalog>\n" +
-               "            <DataSourceInfo>${data.source.info}</DataSourceInfo>\n" +
-               "            <Format>${format}</Format>\n" +
-               "            <AxisFormat>TupleFormat</AxisFormat>\n" +
-               "          </PropertyList>\n" +
-               "        </Properties>\n" +
-               "</Execute>\n" +
-               "</soapenv:Body>\n" +
-               "</soapenv:Envelope>";
-
-            InputStream is = olap4jConnection.proxy.get(
-                olap4jConnection.serverUrl, request);
-            return olap4jConnection.factory.newCellSet(this, is);
-        } catch (IOException e) {
-            throw olap4jConnection.helper.createException(null, null, e);
+        final String catalog = olap4jConnection.getCatalog();
+        final String dataSourceInfo = olap4jConnection.getDataSourceInfo();
+        StringBuilder buf = new StringBuilder(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<soapenv:Envelope\n" +
+                "    xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
+                "    xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" +
+                "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
+                "    <soapenv:Body>\n" +
+                "        <Execute xmlns=\"urn:schemas-microsoft-com:xml-analysis\">\n" +
+                "        <Command>\n" +
+                "        <Statement>\n" +
+                "           <![CDATA[\n" + mdx + "]]>\n" +
+                "         </Statement>\n" +
+                "        </Command>\n" +
+                "        <Properties>\n" +
+                "          <PropertyList>\n");
+        if (catalog != null) {
+            buf.append("            <Catalog>");
+            buf.append(catalog);
+            buf.append("</Catalog>\n");
         }
+        if (dataSourceInfo != null) {
+            buf.append("            <DataSourceInfo>");
+            buf.append(dataSourceInfo);
+            buf.append("</DataSourceInfo>\n");
+        }
+        buf.append(
+            "            <Format>Multidimensional</Format>\n" +
+                "            <AxisFormat>TupleFormat</AxisFormat>\n" +
+                "          </PropertyList>\n" +
+                "        </Properties>\n" +
+                "</Execute>\n" +
+                "</soapenv:Body>\n" +
+                "</soapenv:Envelope>");
+        final String request = buf.toString();
+
+        // Close the previous open CellSet, if there is one.
+        synchronized (this) {
+            if (openCellSet != null) {
+                final XmlaOlap4jCellSet cs = openCellSet;
+                openCellSet = null;
+                try {
+                    cs.close();
+                } catch (SQLException e) {
+                    throw olap4jConnection.helper.createException(
+                        "Error while closing previous CellSet", e);
+                }
+            }
+
+            this.future =
+                olap4jConnection.proxy.submit(
+                    olap4jConnection.serverUrl, request);
+            openCellSet = olap4jConnection.factory.newCellSet(this);
+        }
+        // Release the monitor before calling populate, so that cancel can
+        // grab the monitor if it needs to.
+        openCellSet.populate();
+        return openCellSet;
     }
 
     public CellSet executeOlapQuery(SelectNode selectNode) throws OlapException {
         final String mdx = toString(selectNode);
         return executeOlapQuery(mdx);
+    }
+
+    /**
+     * Waits for an XMLA request to complete.
+     *
+     * <p>You must not hold the monitor on this Statement when calling this
+     * method; otherwise {@link #cancel()} will not be able to operate.
+     *
+     * @return Byte array resulting from successful request
+     *
+     * @throws OlapException if error occurred, or request timed out or
+     * was canceled
+     */
+    byte[] getBytes() throws OlapException {
+        synchronized (this) {
+            if (future == null) {
+                throw new IllegalArgumentException();
+            }
+        }
+        try {
+            // Wait for the request to complete, with timeout if necessary.
+            // Whether or not timeout is used, the request can still be
+            // canceled.
+            if (timeoutSeconds > 0) {
+                return future.get(timeoutSeconds, TimeUnit.SECONDS);
+            } else {
+                return future.get();
+            }
+        } catch (InterruptedException e) {
+            throw olap4jConnection.helper.createException(null, e);
+        } catch (ExecutionException e) {
+            throw olap4jConnection.helper.createException(null, e.getCause());
+        } catch (TimeoutException e) {
+            throw olap4jConnection.helper.createException(
+                "Query timeout of " + timeoutSeconds + " seconds exceeded");
+        } catch (CancellationException e) {
+            throw olap4jConnection.helper.createException("Query canceled");
+        } finally {
+            synchronized (this) {
+                if (future == null) {
+                    throw new IllegalArgumentException();
+                }
+                future = null;
+            }
+        }
     }
 
     /**

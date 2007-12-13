@@ -14,6 +14,7 @@ import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Schema;
 import org.olap4j.OlapException;
+import org.olap4j.impl.*;
 
 import java.util.Locale;
 import java.util.Collection;
@@ -57,7 +58,7 @@ class MondrianOlap4jSchema implements Schema, Named {
         for (mondrian.olap.Cube cube : schema.getCubes()) {
             list.add(olap4jConnection.toOlap4j(cube));
         }
-        return (NamedList) list;
+        return Olap4jUtil.cast(list);
     }
 
     public NamedList<Dimension> getSharedDimensions() throws OlapException {
@@ -68,7 +69,7 @@ class MondrianOlap4jSchema implements Schema, Named {
         for (Hierarchy hierarchy : schema.getSharedHierarchies()) {
             list.add(olap4jConnection.toOlap4j(hierarchy.getDimension()));
         }
-        return (NamedList) list;
+        return Olap4jUtil.cast(list);
     }
 
     public Collection<Locale> getSupportedLocales() throws OlapException {

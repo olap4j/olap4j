@@ -8,10 +8,10 @@
 */
 package org.olap4j.driver.xmla;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.io.InputStream;
+import org.olap4j.OlapException;
+
+import java.sql.*;
+import java.util.*;
 
 /**
  * Implementation of {@link Factory} for JDBC 3.0.
@@ -34,28 +34,40 @@ class FactoryJdbc3Impl implements Factory {
     public EmptyResultSet newEmptyResultSet(
         XmlaOlap4jConnection olap4jConnection)
     {
-        return new FactoryJdbc3Impl.EmptyResultSetJdbc3(olap4jConnection);
+        List<String> headerList = Collections.emptyList();
+        List<List<Object>> rowList = Collections.emptyList();
+        return new FactoryJdbc3Impl.EmptyResultSetJdbc3(
+            olap4jConnection, headerList, rowList);
+    }
+
+    public ResultSet newFixedResultSet(
+        XmlaOlap4jConnection olap4jConnection,
+        List<String> headerList,
+        List<List<Object>> rowList)
+    {
+        return new EmptyResultSetJdbc3(olap4jConnection, headerList, rowList);
     }
 
     public XmlaOlap4jCellSet newCellSet(
-        XmlaOlap4jStatement olap4jStatement,
-        InputStream is)
+        XmlaOlap4jStatement olap4jStatement) throws OlapException
     {
         return new FactoryJdbc3Impl.XmlaOlap4jCellSetJdbc3(
-            olap4jStatement, is);
+            olap4jStatement);
     }
 
     public XmlaOlap4jPreparedStatement newPreparedStatement(
         String mdx,
         XmlaOlap4jConnection olap4jConnection)
     {
-        return new FactoryJdbc3Impl.XmlaOlap4jPreparedStatementJdbc3(olap4jConnection, mdx);
+        return new FactoryJdbc3Impl.XmlaOlap4jPreparedStatementJdbc3(
+            olap4jConnection, mdx);
     }
 
     public XmlaOlap4jDatabaseMetaData newDatabaseMetaData(
         XmlaOlap4jConnection olap4jConnection)
     {
-        return new FactoryJdbc3Impl.XmlaOlap4jDatabaseMetaDataJdbc3(olap4jConnection);
+        return new FactoryJdbc3Impl.XmlaOlap4jDatabaseMetaDataJdbc3(
+            olap4jConnection);
     }
 
     // Inner classes
@@ -72,18 +84,19 @@ class FactoryJdbc3Impl implements Factory {
     private static class XmlaOlap4jCellSetJdbc3
         extends XmlaOlap4jCellSet {
         public XmlaOlap4jCellSetJdbc3(
-            XmlaOlap4jStatement olap4jStatement,
-            InputStream is)
+            XmlaOlap4jStatement olap4jStatement) throws OlapException
         {
-            super(olap4jStatement, is);
+            super(olap4jStatement);
         }
     }
 
     private static class EmptyResultSetJdbc3 extends EmptyResultSet {
         public EmptyResultSetJdbc3(
-            XmlaOlap4jConnection olap4jConnection)
+            XmlaOlap4jConnection olap4jConnection,
+            List<String> headerList,
+            List<List<Object>> rowList)
         {
-            super(olap4jConnection);
+            super(olap4jConnection, headerList, rowList);
         }
     }
 
