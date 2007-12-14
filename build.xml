@@ -58,16 +58,17 @@ ${jar-jdk14.file}"/>
     <!-- To use the checked in mondrian.jar, make sure the <pathelement>
          element following this comment is uncommented; to develop code against
          'live' mondrian source code, uncomment <pathelement> elements 2 and 3
-         following this comment. Between releases, we don't keep mondrian.jar
-         up to date, so probably the latter option is the only one which will
-         work. One day the mondrian driver will be part of the mondrian source
-         code and all mondrian dependencies will go away. -->
+         following this comment. If the latter, you will also need to define
+         mondrian.dir in build.properties. Between releases, we don't keep
+         mondrian.jar up to date, so probably the latter option is the only one
+         which will work. One day the mondrian driver will be part of the
+         mondrian source code and all mondrian dependencies will go away. -->
 <!--
     <pathelement location="${lib.dir}/mondrian.jar"/>
 -->
     <pathelement location="${mondrian.dir}/classes"/>
     <pathelement location="${mondrian.dir}/testclasses"/>
-      -->
+
     <!-- The following libraries are required by mondrian, and therefore olap4j
          needs them too, for now. When olap4j no longer depends on
          mondrian, and the mondrian olap4j driver is tested as part of

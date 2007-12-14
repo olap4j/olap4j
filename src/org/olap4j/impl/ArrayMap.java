@@ -67,7 +67,7 @@ public class ArrayMap<K, V>
 
     private int indexOfKey(Object key) {
         for (int i = 0; i < keyValues.length; i += 2) {
-            if (equal(keyValues[i], key)) {
+            if (Olap4jUtil.equal(keyValues[i], key)) {
                 return i;
             }
         }
@@ -76,7 +76,7 @@ public class ArrayMap<K, V>
 
     public boolean containsValue(Object value) {
         for (int i = 1; i < keyValues.length; i += 2) {
-            if (equal(keyValues[i], value)) {
+            if (Olap4jUtil.equal(keyValues[i], value)) {
                 return true;
             }
         }
@@ -151,10 +151,6 @@ public class ArrayMap<K, V>
         return new EntrySet();
     }
 
-    private static <T> boolean equal(T t1, T t2) {
-        return t1 == null ? t2 == null : t1.equals(t2);
-    }
-
     private class KeySet extends AbstractSet<K> {
         public Iterator<K> iterator() {
             return new Iterator<K>() {
@@ -199,8 +195,10 @@ public class ArrayMap<K, V>
                 }
 
                 public Entry<K, V> next() {
-                    final AbstractMap.SimpleEntry<K, V> entry =
-                        new AbstractMap.SimpleEntry<K, V>(
+                    // We would use AbstractMap.SimpleEntry but it is not public
+                    // until JDK 1.6.
+                    final Entry<K, V> entry =
+                        new Pair<K,V>(
                             (K) keyValues[i], (V) keyValues[i + 1]);
                     i += 2;
                     return entry;

@@ -303,6 +303,9 @@ public class IdentifierNode
      * <li>"New Mexico", {@link IdentifierNode.Quoting#QUOTED}</li>
      * <li>"45", {@link IdentifierNode.Quoting#KEY}</li>
      * </ul>
+     *
+     * To parse an identifier into a list of segments, use the method
+     * {@link IdentifierNode#parseIdentifier(String)}.</p>
      */
     public static class Segment {
         final String name;

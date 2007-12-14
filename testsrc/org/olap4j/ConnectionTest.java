@@ -318,7 +318,7 @@ public class ConnectionTest extends TestCase {
             }
         }
         // Error does not cause statement to become closed.
-        assertFalse(olapStatement.isClosed());
+        assertIsClosed(olapStatement, false);
         olapStatement.close();
         connection.close();
     }

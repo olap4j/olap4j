@@ -26,6 +26,10 @@
 
 # Path to the FoodMart.xml catalog file.
 # Must be specified if you are using XmlaTester; there is no default.
-#org.olap4j.XmlaTester.CatalogUrl=/a/path/mondrian/demo/FoodMart.xml
+#org.olap4j.XmlaTester.CatalogUrl=file:/a/path/mondrian/demo/FoodMart.xml
+
+# Classpath for your JDBC driver. Only required if the driver isn't already on
+# the classpath.
+#org.olap4j.test.driverClasspath=/usr/lib/oracle/xe/app/oracle/product/10.2.0/server/jdbc/lib/ojdbc14.jar
 
 # End test.properties.example

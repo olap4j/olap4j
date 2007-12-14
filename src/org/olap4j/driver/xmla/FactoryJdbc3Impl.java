@@ -57,7 +57,7 @@ class FactoryJdbc3Impl implements Factory {
 
     public XmlaOlap4jPreparedStatement newPreparedStatement(
         String mdx,
-        XmlaOlap4jConnection olap4jConnection)
+        XmlaOlap4jConnection olap4jConnection) throws OlapException
     {
         return new FactoryJdbc3Impl.XmlaOlap4jPreparedStatementJdbc3(
             olap4jConnection, mdx);
@@ -73,16 +73,19 @@ class FactoryJdbc3Impl implements Factory {
     // Inner classes
 
     private static class XmlaOlap4jPreparedStatementJdbc3
-        extends XmlaOlap4jPreparedStatement {
+        extends XmlaOlap4jPreparedStatement
+    {
         public XmlaOlap4jPreparedStatementJdbc3(
             XmlaOlap4jConnection olap4jConnection,
-            String mdx) {
+            String mdx) throws OlapException
+        {
             super(olap4jConnection, mdx);
         }
     }
 
     private static class XmlaOlap4jCellSetJdbc3
-        extends XmlaOlap4jCellSet {
+        extends XmlaOlap4jCellSet
+    {
         public XmlaOlap4jCellSetJdbc3(
             XmlaOlap4jStatement olap4jStatement) throws OlapException
         {
