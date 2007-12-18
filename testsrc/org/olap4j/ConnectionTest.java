@@ -740,6 +740,7 @@ public class ConnectionTest extends TestCase {
             final ResultSet resultSet = cell.drillThrough();
             assertEquals(5, resultSet.getMetaData().getColumnCount());
             resultSet.close();
+            break;
         }
 
         // cell out of range using getCell(int)

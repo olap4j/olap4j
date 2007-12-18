@@ -107,14 +107,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
         this.catalogName = map.get(XmlaOlap4jDriver.Property.Catalog.name());
 
-        this.olap4jDatabaseMetaData =
-            factory.newDatabaseMetaData(this);
-        final XmlaOlap4jCatalog catalog =
-            (XmlaOlap4jCatalog)
-                this.olap4jDatabaseMetaData.getCatalogObjects().get(
-                    catalogName);
-        this.olap4jSchema = new XmlaOlap4jSchema(catalog, catalogName);
-
         // Set URL of HTTP server.
         String serverUrl = map.get(XmlaOlap4jDriver.Property.Server.name());
         if (serverUrl == null) {
@@ -128,6 +120,14 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             throw helper.createException(
                 "Error while creating connection", e);
         }
+
+        this.olap4jDatabaseMetaData =
+            factory.newDatabaseMetaData(this);
+        final XmlaOlap4jCatalog catalog =
+            (XmlaOlap4jCatalog)
+                this.olap4jDatabaseMetaData.getCatalogObjects().get(
+                    catalogName);
+        this.olap4jSchema = new XmlaOlap4jSchema(catalog, catalogName);
     }
 
     static boolean acceptsURL(String url) {

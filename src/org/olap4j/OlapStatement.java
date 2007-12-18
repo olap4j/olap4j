@@ -17,6 +17,9 @@ import org.olap4j.mdx.SelectNode;
  * Object used for statically executing an MDX statement and returning a
  * {@link CellSet}.
  *
+ * <p>An <code>OlapStatement</code> is generally created using
+ * {@link OlapConnection#createStatement()}.</p>
+ *
  * @see PreparedOlapStatement
  *
  * @author jhyde

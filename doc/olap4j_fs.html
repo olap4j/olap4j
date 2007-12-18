@@ -79,10 +79,10 @@ TABLE TD {
 <h1>olap4j Specification</h1>
 
 <p>Authors: Julian Hyde, Barry Klawans<br>
-Version: 0.9 (beta)<br>
+Version: 0.9.4 (beta)<br>
 Revision: $Id$
 (<a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
-Last modified: December 10<sup>th</sup>, 2007.</p>
+Last modified: December 18<sup>th</sup>, 2007.</p>
 <hr noshade="noshade">
 
 <h2><a name="Contents">Contents</a></h2>
@@ -510,7 +510,7 @@ executes a statement:</p>
   <br>
   Class.forName(&quot;mondrian.olap4j.Driver&quot;);<br>
   	OlapConnection connection =<br>
-&nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>
+&nbsp;&nbsp;&nbsp; DriverManager.getConnection(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot;
   +<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot;
@@ -518,7 +518,7 @@ executes a statement:</p>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Role='California manager'&quot;);<br>
 	OlapWrapper wrapper = (OlapWrapper) connection;<br>
   	OlapConnection olapConnection = wrapper.unwrap(OlapConnection.class);<br>
-  	OlapStatement statement = olapConnection.createOlapStatement();<br>
+  	OlapStatement statement = olapConnection.createStatement();<br>
   <br>
   OlapResult result =<br>
 &nbsp;&nbsp;&nbsp; statement.execute(<br>
@@ -537,12 +537,12 @@ string, the code is identical.</p>
     <br>
     Class.forName(&quot;olap4j.impl.xmla.Driver&quot;);<br>
     OlapConnection connection =<br>
-    &nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>
+    &nbsp;&nbsp;&nbsp; DriverManager.getConnection(<br>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:olap4jxmla:Server=http://localhost/xmla/msxisapi.dll;&quot;
   +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=FoodMart&quot;);<br>
 	OlapWrapper wrapper = (OlapWrapper) connection;<br>
   	OlapConnection olapConnection = wrapper.unwrap(OlapConnection.class);<br>
-	OlapStatement statement = connection.createOlapStatement();<br>
+	OlapStatement statement = connection.createStatement();<br>
 	<br>
     CellSet result =<br>
     &nbsp;&nbsp;&nbsp; statement.execute(<br>
@@ -574,20 +574,34 @@ client application must first strip away the wrapper object.</p>
 <a class="javadoc" href="api/org/olap4j/OlapWrapper.html">OlapWrapper</a> 
 interface with the method method <code>unwrap(Class)</code> to access the object underneath 
 the wrapped
-connection. For instance,</p>
+connection. For instance, if you were using DBCP, you could define and use a 
+pooling olap4j data source as follows:</p>
 
-<div class="code">DataSource dataSource; // a data source using a connection
-	pool<br>
-  	Connection connection =<br>
-&nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot;
-  +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot;
-  +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Role='California manager'&quot;);<br>
+<div class="code">import org.apache.commons.dbcp.*;<br>
+	import org.olap4j.*;<br>
+	<br>
+	GenericObjectPool connectionPool =<br>
+&nbsp;&nbsp;&nbsp; new GenericObjectPool(null);<br>
+	ConnectionFactory connectionFactory =<br>
+&nbsp;&nbsp;&nbsp; new DriverManagerConnectionFactory(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	&quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot; +<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	&quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot; +<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Role='California manager'&quot;)<br>
+	PoolableConnectionFactory poolableConnectionFactory =<br>
+&nbsp;&nbsp;&nbsp; new PoolableConnectionFactory(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; connectionFactory, connectionPool, 
+	null, null, false, true);<br>
+	DataSource dataSource =<br>
+&nbsp;&nbsp;&nbsp; new PoolingDataSource(connectionPool);<br>
+	<br>
+	// and some time later...<br>
+	<br>
+  	Connection connection = dataSource.getConnection();<br>
 	OlapWrapper wrapper = (OlapWrapper) connection;<br>
 	OlapConnection olapConnection = wrapper.unwrap(OlapConnection.class);<br>
-  	OlapStatement statement = olapConnection.createOlapStatement();</div>
+  	OlapStatement statement = olapConnection.createStatement();</div>
 
 <p>The <a class="javadoc" href="api/org/olap4j/OlapStatement.html">OlapStatement</a>,
 <a class="javadoc" href="api/org/olap4j/PreparedOlapStatement.html">PreparedOlapStatement</a>, 
@@ -609,17 +623,9 @@ class implements the
 <a class="javadoc" href="http://java.sun.com/javase/6/docs/api/java/sql/Wrapper.html">java.sql.Wrapper</a> interface introduced in JDBC 4.0, 
 so the code can be simplified:</p>
 
-<div class="code">DataSource dataSource; // a data source using a connection
-	pool<br>
-  	Connection connection =<br>
-&nbsp;&nbsp;&nbsp; DriverManager.createConnection(<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot;
-  +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot;
-  +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Role='California manager'&quot;);<br>
+<div class="code">Connection connection = DriverManager.getConnection();<br>
 	OlapConnection olapConnection = connection.unwrap(OlapConnection.class);<br>
-  	OlapStatement statement = olapConnection.createOlapStatement();</div>
+  	OlapStatement statement = olapConnection.createStatement();</div>
 
 <p>Note that the <code>OlapWrapper</code> interface is not needed. This code 
 will work with any JDBC 4.0-compliant connection pool.</p>

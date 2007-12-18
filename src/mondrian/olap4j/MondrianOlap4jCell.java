@@ -18,6 +18,9 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.ArrayList;
 import java.sql.*;
+import java.lang.reflect.Proxy;
+
+import mondrian.util.DelegatingInvocationHandler;
 
 /**
  * Implementation of {@link Cell}
@@ -109,10 +112,6 @@ class MondrianOlap4jCell implements Cell {
     }
 
     public ResultSet drillThrough() throws OlapException {
-        // REVIEW: This method returns a ResultSet without closing the
-        // Statement or the Connection. If we closed them, the ResultSet would
-        // be useless. But as it stands, we have a connection leak. Should we
-        // tell the client that they need to close the result set's connection?
         if (!cell.canDrillThrough()) {
             return null;
         }
@@ -124,9 +123,39 @@ class MondrianOlap4jCell implements Cell {
         try {
             final Connection connection = dataSource.getConnection();
             final Statement statement = connection.createStatement();
-            return statement.executeQuery(sql);
+            final ResultSet resultSet = statement.executeQuery(sql);
+
+            // To prevent a connection leak, wrap the result set in a proxy
+            // which automatically closes the connection (and hence also the
+            // statement and result set) when the result set is closed.
+            // The caller still has to remember to call ResultSet.close(), of
+            // course.
+            return (ResultSet) Proxy.newProxyInstance(
+                null,
+                new Class<?>[] {ResultSet.class},
+                new MyDelegatingInvocationHandler(resultSet));
         } catch (SQLException e) {
             throw olap4jConnection.helper.toOlapException(e);
+        }
+    }
+
+    // must be public for reflection to work
+    public static class MyDelegatingInvocationHandler
+        extends DelegatingInvocationHandler
+    {
+        private final ResultSet resultSet;
+
+        MyDelegatingInvocationHandler(ResultSet resultSet) {
+            this.resultSet = resultSet;
+        }
+
+        protected Object getTarget() {
+            return resultSet;
+        }
+
+        // implement ResultSet.close()
+        public void close() throws SQLException {
+            resultSet.getStatement().getConnection().close();
         }
     }
 }
