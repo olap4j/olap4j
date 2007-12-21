@@ -738,31 +738,36 @@ public class ConnectionTest extends TestCase {
             break;
         default:
             final ResultSet resultSet = cell.drillThrough();
-            assertEquals(5, resultSet.getMetaData().getColumnCount());
+            final ResultSetMetaData metaData = resultSet.getMetaData();
+            // Most databases return 5 columns. Derby returns 9 because of
+            // 4 columns in the ORDER BY clause.
+            assertTrue(metaData.getColumnCount() >= 5);
+            assertEquals("Year", metaData.getColumnLabel(1));
+            assertEquals("Store Sales", metaData.getColumnLabel(5));
             resultSet.close();
             break;
         }
 
         // cell out of range using getCell(int)
         try {
-            cellSet.getCell(-5);
-            fail("expected exception");
+            Cell cell2 = cellSet.getCell(-5);
+            fail("expected exception, got " + cell2);
         } catch (IndexOutOfBoundsException e) {
             // ok
         }
 
         // cell out of range using getCell(int)
         try {
-            cellSet.getCell(105);
-            fail("expected exception");
+            Cell cell2 = cellSet.getCell(105);
+            fail("expected exception, got " + cell2);
         } catch (IndexOutOfBoundsException e) {
             // ok
         }
 
         // cell out of range using getCell(List<Integer>)
         try {
-            cellSet.getCell(Arrays.asList(2, 1));
-            fail("expected exception");
+            Cell cell2 = cellSet.getCell(Arrays.asList(2, 1));
+            fail("expected exception, got " + cell2);
         } catch (IndexOutOfBoundsException e) {
             // ok
         }
@@ -771,18 +776,20 @@ public class ConnectionTest extends TestCase {
         // number of positions might be wrong
         try {
             // too few dimensions
-            cellSet.getCell(cellSet.getAxes().get(0).getPositions().get(0));
-            fail("expected exception");
+            Cell cell2 =
+                cellSet.getCell(cellSet.getAxes().get(0).getPositions().get(0));
+            fail("expected exception, got " + cell2);
         } catch (IllegalArgumentException e) {
             // ok
         }
         try {
             // too many dimensions
-            cellSet.getCell(
-                cellSet.getAxes().get(0).getPositions().get(0),
-                cellSet.getAxes().get(1).getPositions().get(0),
-                cellSet.getAxes().get(0).getPositions().get(0));
-            fail("expected exception");
+            Cell cell2 =
+                cellSet.getCell(
+                    cellSet.getAxes().get(0).getPositions().get(0),
+                    cellSet.getAxes().get(1).getPositions().get(0),
+                    cellSet.getAxes().get(0).getPositions().get(0));
+            fail("expected exception, got " + cell2);
         } catch (IllegalArgumentException e) {
             // ok
         }

@@ -301,12 +301,12 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getOlapFunctions(null),
             FUNCTIONS_COLUMN_NAMES);
         assertContains("FUNCTION_NAME=Name, DESCRIPTION=Returns the name of a member., PARAMETER_LIST=Member, RETURN_TYPE=8, ORIGIN=1, INTERFACE_NAME=, LIBRARY_NAME=null, CAPTION=Name", s);
-        assertEquals(272, linecount(s));
+        assertEquals(274, linecount(s));
 
         s = checkResultSet(
             olapDatabaseMetaData.getOlapFunctions("%scendants"),
             FUNCTIONS_COLUMN_NAMES);
-        assertEquals(s, 6, linecount(s));
+        assertEquals(s, 7, linecount(s));
     }
 
     public void testDatabaseMetaDataGetHierarchies() throws SQLException {
