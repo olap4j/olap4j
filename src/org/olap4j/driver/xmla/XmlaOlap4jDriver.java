@@ -205,11 +205,19 @@ public class XmlaOlap4jDriver implements Driver {
     }
 
     /**
-     * Implementation of {@link Proxy} which uses HTTP.
+     * Implementation of {@link Proxy} which uses HTTP POST.
      */
     protected static class HttpProxy implements Proxy {
         public byte[] get(URL url, String request) throws IOException {
+            // Open connection to manipulate the properties
             URLConnection urlConnection = url.openConnection();
+            urlConnection.setDoOutput(true);
+            urlConnection.setRequestProperty("content-type", "text/xml");
+
+            // Send data (i.e. POST). Assume default encoding.
+            urlConnection.getOutputStream().write(request.getBytes());
+
+            // Get the response, again assuming default encoding.
             InputStream is = urlConnection.getInputStream();
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buf = new byte[1024];
