@@ -1,5 +1,5 @@
 /*
-// $Id: //open/mondrian/src/main/mondrian/util/UtilCompatibleJdk14.java#3 $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -10,16 +10,11 @@
 package org.olap4j.impl;
 
 /**
- * Implementation of {@link mondrian.util.UtilCompatible} which runs in
+ * Implementation of {@link Olap4jUtilCompatible} which runs in
  * JDK 1.4.
  *
- * <p>The code uses JDK 1.5 constructs such as generics and for-each loops,
- * but retroweaver can convert these. It does not use
- * <code>java.util.EnumSet</code>, which is important, because retroweaver has
- * trouble with this.
- *
  * @author jhyde
- * @version $Id: //open/mondrian/src/main/mondrian/util/UtilCompatibleJdk14.java#3 $
+ * @version $Id$
  * @since Feb 5, 2007
  */
 public class Olap4jUtilCompatibleJdk14 implements Olap4jUtilCompatible {

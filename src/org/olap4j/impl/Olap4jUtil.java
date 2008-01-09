@@ -26,7 +26,7 @@ import java.util.Set;
  * to use classes in this package, but not writers of applications.</p>
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Dec 12, 2007
  */
 public class Olap4jUtil {

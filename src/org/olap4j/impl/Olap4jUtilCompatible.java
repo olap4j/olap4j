@@ -1,5 +1,5 @@
 /*
-// $Id: //open/mondrian/src/main/mondrian/util/UtilCompatible.java#3 $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -23,7 +23,7 @@ package org.olap4j.impl;
  * which have different implementations in different environments.</p>
  *
  * @author jhyde
- * @version $Id: //open/mondrian/src/main/mondrian/util/UtilCompatible.java#3 $
+ * @version $Id$
  * @since Feb 5, 2007
  */
 public interface Olap4jUtilCompatible {
