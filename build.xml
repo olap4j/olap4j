@@ -152,8 +152,6 @@ ${jar-jdk14.file}"/>
         classpathref="project.classpath"
         source="1.5">
       <include name="**/*.java"/>
-      <exclude name="mondrian/olap4j/FactoryJdbc3Impl.java" if="jdk16.present"/>
-      <exclude name="mondrian/olap4j/FactoryJdbc4Impl.java" if="jdk16.not.present"/>
       <exclude name="org/olap4j/driver/xmla/FactoryJdbc3Impl.java" if="jdk16.present"/>
       <exclude name="org/olap4j/driver/xmla/FactoryJdbc4Impl.java" if="jdk16.not.present"/>
     </javac>

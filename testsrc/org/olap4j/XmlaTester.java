@@ -8,17 +8,13 @@
 */
 package org.olap4j;
 
-import mondrian.tui.XmlaSupport;
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.test.TestContext;
-import org.xml.sax.SAXException;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.net.URL;
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Implementation of {@link org.olap4j.test.TestContext.Tester} which speaks
@@ -28,8 +24,30 @@ import java.util.concurrent.*;
  * @version $Id$
  */
 public class XmlaTester implements TestContext.Tester {
-    XmlaOlap4jDriver.Proxy proxy =
-        new MondrianInprocProxy();
+    final XmlaOlap4jDriver.Proxy proxy;
+
+    public XmlaTester()
+        throws ClassNotFoundException, IllegalAccessException,
+        InstantiationException, NoSuchMethodException,
+        InvocationTargetException
+    {
+        final Properties properties = TestContext.getTestProperties();
+        final String catalogUrl =
+            properties.getProperty(
+                "org.olap4j.XmlaTester.CatalogUrl");
+        Map<String, String> catalogNameUrls =
+            new HashMap<String, String>();
+        catalogNameUrls.put("FoodMart", catalogUrl);
+        String urlString =
+            properties.getProperty("org.olap4j.test.connectUrl");
+
+        final Class<?> clazz = Class.forName("mondrian.olap4j.MondrianInprocProxy");
+        final Constructor<?> constructor =
+            clazz.getConstructor(Map.class, String.class);
+        this.proxy =
+            (XmlaOlap4jDriver.Proxy) constructor.newInstance(
+                catalogNameUrls, urlString);
+    }
 
     public Connection createConnection() throws SQLException {
         try {
@@ -92,58 +110,6 @@ public class XmlaTester implements TestContext.Tester {
     public static final String DRIVER_URL_PREFIX = "jdbc:xmla:";
     private static final String USER = "user";
     private static final String PASSWORD = "password";
-
-    /**
-     * Proxy which implements XMLA requests by talking to mondrian
-     * in-process. This is more convenient to debug than an inter-process
-     * request using HTTP.
-     */
-    private static class MondrianInprocProxy
-        implements XmlaOlap4jDriver.Proxy
-    {
-        // Use single-threaded executor for ease of debugging.
-        private static final ExecutorService singleThreadExecutor =
-            Executors.newSingleThreadExecutor();
-
-        public byte[] get(URL url, String request) throws IOException {
-            try {
-                final Properties properties = TestContext.testProperties;
-                final String catalogUrl =
-                    properties.getProperty(
-                        "org.olap4j.XmlaTester.CatalogUrl");
-                Map<String, String> catalogNameUrls =
-                    new HashMap<String, String>();
-                catalogNameUrls.put("FoodMart", catalogUrl);
-                String urlString =
-                    properties.getProperty("org.olap4j.test.connectUrl");
-                if (!urlString.startsWith("jdbc:mondrian:")) {
-                    throw new IllegalArgumentException();
-                }
-                urlString = urlString.substring("jdbc:mondrian:".length());
-                return XmlaSupport.processSoapXmla(
-                    request, urlString, catalogNameUrls, null);
-            } catch (ServletException e) {
-                throw new RuntimeException(
-                    "Error while reading '" + url + "'", e);
-            } catch (SAXException e) {
-                throw new RuntimeException(
-                    "Error while reading '" + url + "'", e);
-            }
-        }
-
-        public Future<byte[]> submit(
-            final URL url,
-            final String request)
-        {
-            return singleThreadExecutor.submit(
-                new Callable<byte[] >() {
-                    public byte[] call() throws Exception {
-                        return get(url, request);
-                    }
-                }
-            );
-        }
-    }
 }
 
 // End XmlaTester.java

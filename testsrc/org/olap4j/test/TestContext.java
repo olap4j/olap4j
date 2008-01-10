@@ -18,10 +18,10 @@ import java.sql.*;
 
 import org.olap4j.metadata.Member;
 import org.olap4j.*;
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.mdx.ParseTreeWriter;
 import junit.framework.ComparisonFailure;
-import mondrian.olap.Util;
 
 /**
  * Context for olap4j tests.
@@ -243,8 +243,8 @@ public class TestContext {
         // into ["string with \"quotes\" split\n" +
         // "across lines
         //
-        s = Util.replace(s, "\\", "\\\\");
-        s = Util.replace(s, "\"", "\\\"");
+        s = Olap4jUtil.replace(s, "\\", "\\\\");
+        s = Olap4jUtil.replace(s, "\"", "\\\"");
         s = LineBreakPattern.matcher(s).replaceAll(lineBreak2);
         s = TabPattern.matcher(s).replaceAll("\\\\t");
         s = "\"" + s + "\"";

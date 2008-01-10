@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 import java.util.*;
 
 /**
- * Tests for methods in {@link mondrian.olap.Util}.
+ * Unit test for {@link org.olap4j.impl.ConnectStringParser}.
  *
  * @version $Id: $
  * @author jhyde

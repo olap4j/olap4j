@@ -237,9 +237,20 @@ public class ConnectionTest extends TestCase {
         // Unwrap the mondrian connection.
         switch (tester.getFlavor()) {
         case MONDRIAN:
-            final mondrian.olap.Connection mondrianConnection =
-                ((OlapWrapper) connection).unwrap(mondrian.olap.Connection.class);
+            // mondrian.olap.Connection does not extend java.sql.Connection
+            // but we should be able to unwrap it regardless
+            final Class<?> mondrianConnectionClass;
+            try {
+                mondrianConnectionClass =
+                    Class.forName("mondrian.olap.Connection");
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            final Object mondrianConnection =
+                ((OlapWrapper) connection).unwrap(
+                    mondrianConnectionClass);
             assertNotNull(mondrianConnection);
+            assert mondrianConnectionClass.isInstance(mondrianConnection);
         }
     }
 
