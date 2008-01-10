@@ -80,7 +80,7 @@ import java.util.List;
  * 		</tr>
  * 	</table>
  *
- * <p>each of the 5 positions on the <code>ROWS</code> axis has two members,
+ * <p>each of the six positions on the <code>ROWS</code> axis has two members,
  * consistent with its dimensionality of 2. The <code>COLUMNS</code> axis has
  * two positions, each with one member.</p>
  *
