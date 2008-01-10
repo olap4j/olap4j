@@ -409,7 +409,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 // Cell is within bounds, but is not held in the cache because
                 // it has no value. Manufacture a cell with an empty value.
                 return new XmlaOlap4jCell(
-                    this, pos, null, null,
+                    this, pos, null, "",
                     Collections.<Property, Object>emptyMap());
             }
         }

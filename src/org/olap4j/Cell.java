@@ -148,6 +148,11 @@ public interface Cell {
      * FORMAT_STRING property and using the numeric formatting tokens the
      * current locale.
      *
+     * <p>The formatted value is never null. In particular, when the cell
+     * contains the MDX NULL value, {@link #getValue()} will return the Java
+     * <code>null</code> value but this method will return the empty string
+     * <code>""</code>.
+     *
      * @return Formatted value of this Cell
      */
     String getFormattedValue();
@@ -159,6 +164,8 @@ public interface Cell {
      * <p>If drill-through is not possible, returns null.
      *
      * @return result set of the fact rows underlying this Cell
+     *
+     * @throws OlapException if a database error occurs
      */
     ResultSet drillThrough() throws OlapException;
 }

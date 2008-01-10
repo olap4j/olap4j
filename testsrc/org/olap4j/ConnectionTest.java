@@ -519,9 +519,20 @@ public class ConnectionTest extends TestCase {
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
 
-        final String mdx =
+        checkCellSetMetaData1(
+            olapConnection,
             "select {[Gender]} on columns from [sales]\n" +
-            "where [Time].[1997].[Q4]";
+            "where [Time].[1997].[Q4]");
+
+        // now a query with no explicit slicer
+        checkCellSetMetaData1(
+            olapConnection,
+            "select {[Gender]} on columns from [sales]");
+    }
+
+    private void checkCellSetMetaData1(
+        OlapConnection olapConnection, String mdx) throws SQLException
+    {
         PreparedOlapStatement pstmt =
             olapConnection.prepareOlapStatement(mdx);
         final CellSetMetaData cellSetMetaData = pstmt.getMetaData();
@@ -555,6 +566,7 @@ public class ConnectionTest extends TestCase {
         assertEquals("Sales", cellSetMetaData.getCube().getName());
 
         int k = -1;
+        int hierarchyCount = 0;
         for (CellSetAxisMetaData axisMetaData
             : cellSetMetaData.getAxesMetaData())
         {
@@ -562,6 +574,7 @@ public class ConnectionTest extends TestCase {
             assertEquals(Axis.forOrdinal(k), axisMetaData.getAxisOrdinal());
             assertEquals(k, axisMetaData.getAxisOrdinal().axisOrdinal());
             assertTrue(axisMetaData.getHierarchies().size() > 0);
+            hierarchyCount += axisMetaData.getHierarchies().size();
             assertTrue(axisMetaData.getProperties().size() == 0);
             if (cellSet != null) {
                 final CellSetAxisMetaData cellSetAxisMetaData =
@@ -574,7 +587,11 @@ public class ConnectionTest extends TestCase {
             cellSetMetaData.getFilterAxisMetaData();
         assertNotNull(axisMetaData);
         assertEquals(Axis.FILTER, axisMetaData.getAxisOrdinal());
-        assertTrue(axisMetaData.getHierarchies().size() > 0);
+        assertTrue(axisMetaData.getHierarchies().size() >= 0);
+        assertEquals(
+            axisMetaData.getHierarchies().size(),
+            cellSetMetaData.getCube().getHierarchies().size()
+                - hierarchyCount);
         assertTrue(axisMetaData.getProperties().size() == 0);
         if (cellSet != null) {
             assertEquals(
@@ -1653,6 +1670,63 @@ public class ConnectionTest extends TestCase {
         } catch (OlapException e) {
             assertTrue(e.getMessage().indexOf("Query timeout of ") >= 0);
         }
+    }
+
+    public void testCellSetBug() throws SQLException {
+        Connection connection = tester.createConnection();
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+        final OlapStatement olapStatement = olapConnection.createStatement();
+        CellSet cellSet =
+            olapStatement.executeOlapQuery(
+                    "SELECT " +
+                    "{[Product].[All Products].[Drink].[Alcoholic Beverages].Children, [Product].[All Products].[Food].[Baked Goods].Children} ON COLUMNS, " +
+                    "CrossJoin([Store].[All Stores].[USA].[CA].Children, [Time].[1997].[Q1].Children) ON ROWS " +
+                    "FROM [Sales Ragged]");
+        TestContext.assertEqualsVerbose(
+            TestContext.fold("Axis #0:\n" +
+                "{[Measures].[Unit Sales], [Geography].[All Geographys], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
+                "Axis #1:\n" +
+                "{[Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n" +
+                "{[Product].[All Products].[Food].[Baked Goods].[Bread]}\n" +
+                "Axis #2:\n" +
+                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[1]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[2]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[3]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[1]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[2]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[3]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n" +
+                "Row #0: \n" +
+                "Row #0: \n" +
+                "Row #1: \n" +
+                "Row #1: \n" +
+                "Row #2: \n" +
+                "Row #2: \n" +
+                "Row #3: 22\n" +
+                "Row #3: 63\n" +
+                "Row #4: 28\n" +
+                "Row #4: 59\n" +
+                "Row #5: 28\n" +
+                "Row #5: 39\n" +
+                "Row #6: 70\n" +
+                "Row #6: 51\n" +
+                "Row #7: 89\n" +
+                "Row #7: 51\n" +
+                "Row #8: 27\n" +
+                "Row #8: 54\n" +
+                "Row #9: 6\n" +
+                "Row #9: 2\n" +
+                "Row #10: 3\n" +
+                "Row #10: 7\n" +
+                "Row #11: 2\n" +
+                "Row #11: 10\n"),
+            TestContext.toString(cellSet));
     }
 }
 
