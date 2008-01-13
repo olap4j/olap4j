@@ -10,8 +10,7 @@ package org.olap4j.impl;
 
 import org.olap4j.metadata.NamedList;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Utility methods common to multiple olap4j driver implementations.
@@ -48,6 +47,10 @@ public class Olap4jUtil {
             "com.rc.retroweaver.runtime.Enum_");
 
     private static final Olap4jUtilCompatible compatible;
+
+    private static final NamedList<?> EMPTY_NAMED_LIST =
+        new EmptyNamedList();
+
     static {
         String className;
         if (PreJdk15 || Retrowoven) {
@@ -56,6 +59,7 @@ public class Olap4jUtil {
             className = "org.olap4j.impl.Olap4jUtilCompatibleJdk15";
         }
         try {
+            //noinspection unchecked
             Class<Olap4jUtilCompatible> clazz =
                 (Class<Olap4jUtilCompatible>) Class.forName(className);
             compatible = clazz.newInstance();
@@ -68,22 +72,31 @@ public class Olap4jUtil {
         }
     }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static void discard(boolean b) { }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static void discard(byte b) { }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static void discard(char c) { }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static void discard(double v) { }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static void discard(float v) { }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static void discard(int i) { }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static void discard(long l) { }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static void discard(Object o) { }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static void discard(short i) { }
 
     /**
@@ -92,6 +105,7 @@ public class Olap4jUtil {
      * @param set Set
      * @return Set of desired type
      */
+    @SuppressWarnings({"unchecked"})
     public static <T> Set<T> cast(Set<?> set) {
         return (Set<T>) set;
     }
@@ -102,6 +116,7 @@ public class Olap4jUtil {
      * @param list List
      * @return List of desired type
      */
+    @SuppressWarnings({"unchecked"})
     public static <T> List<T> cast(List<?> list) {
         return (List<T>) list;
     }
@@ -112,6 +127,7 @@ public class Olap4jUtil {
      * @param list Named list
      * @return Named list of desired type
      */
+    @SuppressWarnings({"unchecked"})
     public static <T> NamedList<T> cast(NamedList<?> list) {
         return (NamedList<T>) list;
     }
@@ -322,8 +338,35 @@ public class Olap4jUtil {
         throw new UnsupportedOperationException("need to implement " + o);
     }
 
+    @SuppressWarnings({"unchecked"})
+    public static <T> NamedList<T> emptyNamedList() {
+        return (NamedList<T>) EMPTY_NAMED_LIST;
+    }
 
     private enum DummyEnum {}
+
+    /**
+     * Implementation of {@link NamedList} whih is immutable and empty.
+     */
+    private static class EmptyNamedList<T> extends AbstractNamedList<T> {
+        protected String getName(Object o) {
+            throw new UnsupportedOperationException();
+        }
+
+        public int size() {
+            return 0;
+        }
+
+        public T get(int index) {
+            throw new IndexOutOfBoundsException("Index: "+index);
+        }
+
+        // Preserves singleton property
+        @SuppressWarnings({"UnusedDeclaration"})
+        private Object readResolve() {
+            return EMPTY_NAMED_LIST;
+        }
+    }
 }
 
 // End Olap4jUtil.java

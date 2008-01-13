@@ -413,7 +413,7 @@ public class ConnectionTest extends TestCase {
         String s = TestContext.toString(cellSet);
         TestContext.assertEqualsVerbose(
             TestContext.fold("Axis #0:\n" +
-                "{[Gender].[All Gender].[M]}\n" +
+                "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender].[M], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
                 "Axis #1:\n" +
                 "{[Store].[All Stores].[USA]}\n" +
                 "{[Store].[All Stores].[USA].[CA].[Alameda]}\n" +
@@ -442,7 +442,7 @@ public class ConnectionTest extends TestCase {
         TestContext.assertEqualsVerbose(
             TestContext.fold(
                 "Axis #0:\n" +
-                    "{[Gender].[All Gender].[M]}\n" +
+                    "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender].[M], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
                     "Axis #1:\n" +
                     "{[Store].[All Stores].[USA].[CA]}\n" +
                     "{[Store].[All Stores].[USA].[CA].[San Francisco].[Store 14]}\n" +
@@ -451,11 +451,11 @@ public class ConnectionTest extends TestCase {
             s);
 
         // Re-execute with a new MDX string.
-        CellSet cellSet3 = pstmt.executeOlapQuery("SELECT FROM [Sales] WHERE [Gender]");
+        CellSet cellSet3 = pstmt.executeOlapQuery("SELECT FROM [Sales] WHERE [Time.Weekly].[1997].[3]");
         TestContext.assertEqualsVerbose(
             TestContext.fold("Axis #0:\n" +
-                "{[Gender].[All Gender]}\n" +
-                "266,773"),
+                "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time.Weekly].[All Time.Weeklys].[1997].[3], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
+                "9,518"),
             TestContext.toString(cellSet3));
 
         // Number of parameters has changed.
@@ -475,7 +475,7 @@ public class ConnectionTest extends TestCase {
         assertIsClosed(cellSet4, false);
         assertIsClosed(cellSet3, true);
         assertEquals(0, cellSet4.getAxes().size());
-        assertEquals(266773.0, cellSet4.getCell(0).getValue());
+        assertEquals(9518.0, cellSet4.getCell(0).getValue());
 
         // Re-execute with a parse tree.
         MdxParser mdxParser =
@@ -488,7 +488,7 @@ public class ConnectionTest extends TestCase {
         TestContext.assertEqualsVerbose(
             TestContext.fold(
                 "Axis #0:\n" +
-                    "{[Time].[1997].[Q4]}\n" +
+                    "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q4], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
                     "Axis #1:\n" +
                     "{[Gender].[All Gender]}\n" +
                     "Row #0: 72,024\n"),
@@ -566,7 +566,8 @@ public class ConnectionTest extends TestCase {
         assertEquals("Sales", cellSetMetaData.getCube().getName());
 
         int k = -1;
-        int hierarchyCount = 0;
+        final Set<Dimension> unseenDimensions =
+            new HashSet<Dimension>(cellSetMetaData.getCube().getDimensions());
         for (CellSetAxisMetaData axisMetaData
             : cellSetMetaData.getAxesMetaData())
         {
@@ -574,7 +575,9 @@ public class ConnectionTest extends TestCase {
             assertEquals(Axis.forOrdinal(k), axisMetaData.getAxisOrdinal());
             assertEquals(k, axisMetaData.getAxisOrdinal().axisOrdinal());
             assertTrue(axisMetaData.getHierarchies().size() > 0);
-            hierarchyCount += axisMetaData.getHierarchies().size();
+            for (Hierarchy hierarchy : axisMetaData.getHierarchies()) {
+                unseenDimensions.remove(hierarchy.getDimension());
+            }
             assertTrue(axisMetaData.getProperties().size() == 0);
             if (cellSet != null) {
                 final CellSetAxisMetaData cellSetAxisMetaData =
@@ -588,10 +591,13 @@ public class ConnectionTest extends TestCase {
         assertNotNull(axisMetaData);
         assertEquals(Axis.FILTER, axisMetaData.getAxisOrdinal());
         assertTrue(axisMetaData.getHierarchies().size() >= 0);
+        final Set<Hierarchy> unseenHierarchies = new HashSet<Hierarchy>();
+        for (Dimension unseenDimension : unseenDimensions) {
+            unseenHierarchies.add(unseenDimension.getDefaultHierarchy());
+        }
         assertEquals(
-            axisMetaData.getHierarchies().size(),
-            cellSetMetaData.getCube().getHierarchies().size()
-                - hierarchyCount);
+            new HashSet<Hierarchy>(axisMetaData.getHierarchies()),
+            unseenHierarchies);
         assertTrue(axisMetaData.getProperties().size() == 0);
         if (cellSet != null) {
             assertEquals(
@@ -670,47 +676,31 @@ public class ConnectionTest extends TestCase {
                     "FROM [Sales]\n" +
                     "WHERE [Time].[1997].[Q2]");
         String s = TestContext.toString(cellSet);
-        final String slicer;
-        switch (tester.getFlavor()) {
-        case MONDRIAN:
-            // TODO: fix mondrian driver to return all hierarchies not on
-            // any other axis
-            slicer = "Axis #0:\n"
-                + "{[Time].[1997].[Q2]}\n";
-            break;
-        default:
-            // Note that we return all hierarchies not on another axis, not
-            // just the axes in the WHERE clause. This is mainly to be 
-            // consistent with XMLA.
-            slicer = "Axis #0:\n" +
+        assertEquals(
+            TestContext.fold("Axis #0:\n" +
                 "{[Store].[All Stores],"
                 + " [Store Size in SQFT].[All Store Size in SQFTs],"
                 + " [Store Type].[All Store Types],"
                 + " [Time].[1997].[Q2],"
-                + " [Time.Weekly].[All Time.Weeklys].[1997],"
                 + " [Promotion Media].[All Media],"
                 + " [Promotions].[All Promotions],"
                 + " [Customers].[All Customers],"
                 + " [Education Level].[All Education Levels],"
                 + " [Marital Status].[All Marital Status],"
-                + " [Yearly Income].[All Yearly Incomes]}\n";
-            break;
-        }
-        assertEquals(
-            TestContext.fold(slicer +
-                "Axis #1:\n" +
-                "{[Measures].[Unit Sales]}\n" +
-                "{[Measures].[Store Sales]}\n" +
-                "Axis #2:\n" +
-                "{[Gender].[All Gender].[M], [Product].[All Products].[Drink]}\n" +
-                "{[Gender].[All Gender].[M], [Product].[All Products].[Food]}\n" +
-                "{[Gender].[All Gender].[M], [Product].[All Products].[Non-Consumable]}\n" +
-                "Row #0: 3,023\n" +
-                "Row #0: 6,004.80\n" +
-                "Row #1: 22,558\n" +
-                "Row #1: 47,869.17\n" +
-                "Row #2: 6,037\n" +
-                "Row #2: 12,935.16\n"),
+                + " [Yearly Income].[All Yearly Incomes]}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Unit Sales]}\n"
+                + "{[Measures].[Store Sales]}\n"
+                + "Axis #2:\n"
+                + "{[Gender].[All Gender].[M], [Product].[All Products].[Drink]}\n"
+                + "{[Gender].[All Gender].[M], [Product].[All Products].[Food]}\n"
+                + "{[Gender].[All Gender].[M], [Product].[All Products].[Non-Consumable]}\n"
+                + "Row #0: 3,023\n"
+                + "Row #0: 6,004.80\n"
+                + "Row #1: 22,558\n"
+                + "Row #1: 47,869.17\n"
+                + "Row #2: 6,037\n"
+                + "Row #2: 12,935.16\n"),
             s);
     }
 
@@ -1727,6 +1717,32 @@ public class ConnectionTest extends TestCase {
                 "Row #11: 2\n" +
                 "Row #11: 10\n"),
             TestContext.toString(cellSet));
+    }
+
+    public void testCellSetWithCalcMember() throws SQLException {
+        Connection connection = tester.createConnection();
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+        final OlapStatement olapStatement = olapConnection.createStatement();
+        CellSet cellSet =
+            olapStatement.executeOlapQuery(
+                "WITH MEMBER [Measures].[Average Profit] AS" +
+                    "'[Measures].[Profit] / [Measures].[Sales Count]'" +
+                    "SELECT {[Measures].[Average Profit]} ON 0,\n"
+                    + "{[Product].Children} ON 1\n"
+                    + "FROM [Sales]");
+        TestContext.assertEqualsVerbose(
+            TestContext.fold("Axis #0:\n" +
+                "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
+                "Axis #1:\n" +
+                "{[Measures].[Average Profit]}\n" +
+                "Axis #2:\n" +
+                "{[Product].[All Products].[Drink]}\n" +
+                "{[Product].[All Products].[Food]}\n" +
+                "{[Product].[All Products].[Non-Consumable]}\n" +
+                "Row #0: $3.68\n" +
+                "Row #1: $3.94\n" +
+                "Row #2: $3.93\n"), TestContext.toString(cellSet));
     }
 }
 

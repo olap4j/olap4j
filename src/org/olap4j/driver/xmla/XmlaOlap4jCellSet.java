@@ -9,6 +9,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
+import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.impl.Olap4jUtil;
 import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
 import org.olap4j.metadata.*;
@@ -190,9 +191,19 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 {
                     String hierarchyName =
                         memberNode.getAttribute("Hierarchy");
-                    String uname = stringElement(memberNode, "UName");
+                    final String uname = stringElement(memberNode, "UName");
                     Member member =
                         metaData.cube.lookupMemberByUniqueName(uname);
+                    if (member == null) {
+                        final String caption =
+                            stringElement(memberNode, "Caption");
+                        final int lnum = integerElement(memberNode, "LNum");
+                        final Hierarchy hierarchy =
+                            metaData.cube.getHierarchies().get(hierarchyName);
+                        final Level level = hierarchy.getLevels().get(lnum);
+                        member = new XmlaOlap4jSurpriseMember(
+                            level, hierarchy, lnum, caption, uname);
+                    }
                     propertyValues.clear();
                     for (Element childNode : childElements(memberNode)) {
                         XmlaOlap4jCellSetMemberProperty property =
@@ -1068,6 +1079,138 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Implementation of {@link Member} for a member which is not present
+     * in the cube (probably because the member is a calculated member
+     * defined in the query).
+     */
+    private static class XmlaOlap4jSurpriseMember implements Member {
+        private final Level level;
+        private final Hierarchy hierarchy;
+        private final int lnum;
+        private final String caption;
+        private final String uname;
+
+        XmlaOlap4jSurpriseMember(
+            Level level,
+            Hierarchy hierarchy,
+            int lnum,
+            String caption,
+            String uname)
+        {
+            this.level = level;
+            this.hierarchy = hierarchy;
+            this.lnum = lnum;
+            this.caption = caption;
+            this.uname = uname;
+        }
+
+        public NamedList<? extends Member> getChildMembers()
+        {
+            return Olap4jUtil.emptyNamedList();
+        }
+
+        public int getChildMemberCount() {
+            return 0;
+        }
+
+        public Member getParentMember() {
+            return null;
+        }
+
+        public Level getLevel() {
+            return level;
+        }
+
+        public Hierarchy getHierarchy() {
+            return hierarchy;
+        }
+
+        public Dimension getDimension() {
+            return hierarchy.getDimension();
+        }
+
+        public Type getMemberType() {
+            return Type.UNKNOWN;
+        }
+
+        public boolean isAll() {
+            return false; // FIXME
+        }
+
+        public boolean isChildOrEqualTo(Member member) {
+            return false; // FIXME
+        }
+
+        public boolean isCalculated() {
+            return false; // FIXME
+        }
+
+        public int getSolveOrder() {
+            return 0; // FIXME
+        }
+
+        public ParseTreeNode getExpression() {
+            return null;
+        }
+
+        public List<Member> getAncestorMembers() {
+            return Collections.emptyList(); // FIXME
+        }
+
+        public boolean isCalculatedInQuery() {
+            return true; // probably
+        }
+
+        public Object getPropertyValue(Property property) {
+            return null;
+        }
+
+        public String getPropertyFormattedValue(Property property) {
+            return null;
+        }
+
+        public void setProperty(Property property, Object value)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public NamedList<Property> getProperties() {
+            return Olap4jUtil.emptyNamedList();
+        }
+
+        public int getOrdinal() {
+            return -1; // FIXME
+        }
+
+        public boolean isHidden() {
+            return false;
+        }
+
+        public int getDepth() {
+            return lnum;
+        }
+
+        public Member getDataMember() {
+            return null;
+        }
+
+        public String getName() {
+            return caption;
+        }
+
+        public String getUniqueName() {
+            return uname;
+        }
+
+        public String getCaption(Locale locale) {
+            return caption;
+        }
+
+        public String getDescription(Locale locale) {
+            return null;
+        }
+    }
 }
 
 // End XmlaOlap4jCellSet.java
