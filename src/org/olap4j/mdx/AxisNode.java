@@ -11,6 +11,7 @@ package org.olap4j.mdx;
 
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Collections;
 
 import org.olap4j.Axis;
 import org.olap4j.type.Type;
@@ -28,7 +29,7 @@ public class AxisNode implements ParseTreeNode {
     private ParseTreeNode expression;
     private final Axis axis;
 
-    private final List<IdentifierNode>  dimensionProperties;
+    private final List<IdentifierNode> dimensionProperties;
 
     /**
      * Creates an axis.
@@ -38,7 +39,8 @@ public class AxisNode implements ParseTreeNode {
      *    are all empty
      * @param expression Expression to populate the axis
      * @param axisDef Which axis (ROWS, COLUMNS, etc.)
-     * @param dimensionProperties List of dimension properties
+     * @param dimensionProperties List of dimension properties; if null,
+     *   empty list is assumed
      */
     public AxisNode(
         ParseRegion region,
@@ -48,10 +50,12 @@ public class AxisNode implements ParseTreeNode {
         List<IdentifierNode> dimensionProperties)
     {
         this.region = region;
-        assert dimensionProperties != null;
         this.nonEmpty = nonEmpty;
         this.expression = expression;
         this.axis = axisDef;
+        if (dimensionProperties == null) {
+            dimensionProperties = Collections.emptyList();
+        }
         this.dimensionProperties = dimensionProperties;
     }
 

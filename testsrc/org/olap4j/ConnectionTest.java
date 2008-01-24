@@ -1744,6 +1744,84 @@ public class ConnectionTest extends TestCase {
                 "Row #1: $3.94\n" +
                 "Row #2: $3.93\n"), TestContext.toString(cellSet));
     }
+
+    public void testBuildQuery() throws SQLException {
+        Connection connection = tester.createConnection();
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+        buildQuery(olapConnection, true);
+        buildQuery(olapConnection, false);
+    }
+
+    private void buildQuery(
+        OlapConnection olapConnection,
+        boolean useCubeObject)
+        throws OlapException
+    {
+        final String catalogName;
+        switch (tester.getFlavor()) {
+        case MONDRIAN:
+            catalogName = "LOCALDB";
+            break;
+        case XMLA:
+        default:
+            catalogName = "FoodMart";
+            break;
+        }
+        Catalog catalog = olapConnection.getCatalogs().get(catalogName);
+        Schema schema = catalog.getSchemas().get("FoodMart");
+        Cube cube = schema.getCubes().get("Sales");
+        SelectNode query = new SelectNode();
+        ParseTreeNode cubeNode;
+        if (useCubeObject) {
+            cubeNode = new IdentifierNode(
+                IdentifierNode.parseIdentifier(cube.getUniqueName()));
+        } else {
+            cubeNode = new CubeNode(null, cube);
+        }
+        query.setFrom(cubeNode);
+        AxisNode columnAxis =
+            new AxisNode(
+                null, false,
+                new CallNode(
+                    null, "MEMBERS", Syntax.Property,
+                    new IdentifierNode(
+                        IdentifierNode.parseIdentifier("[Gender]"))),
+                Axis.COLUMNS, null);
+        AxisNode rowAxis =
+            new AxisNode(
+                null, false,
+                new CallNode(
+                    null, "CHILDREN", Syntax.Property,
+                    new IdentifierNode(
+                        IdentifierNode.parseIdentifier("[Customers].[USA]"))),
+                Axis.ROWS, null);
+        query.getAxisList().add(columnAxis);
+        query.getAxisList().add(rowAxis);
+        OlapStatement statement = olapConnection.createStatement();
+        CellSet cellSet = statement.executeOlapQuery(query);
+        TestContext.assertEqualsVerbose(TestContext.fold(
+            "Axis #0:\n" +
+                "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Education Level].[All Education Levels], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
+                "Axis #1:\n" +
+                "{[Gender].[All Gender]}\n" +
+                "{[Gender].[All Gender].[F]}\n" +
+                "{[Gender].[All Gender].[M]}\n" +
+                "Axis #2:\n" +
+                "{[Customers].[All Customers].[USA].[CA]}\n" +
+                "{[Customers].[All Customers].[USA].[OR]}\n" +
+                "{[Customers].[All Customers].[USA].[WA]}\n" +
+                "Row #0: 74,748\n" +
+                "Row #0: 36,759\n" +
+                "Row #0: 37,989\n" +
+                "Row #1: 67,659\n" +
+                "Row #1: 33,036\n" +
+                "Row #1: 34,623\n" +
+                "Row #2: 124,366\n" +
+                "Row #2: 61,763\n" +
+                "Row #2: 62,603\n"),
+            TestContext.toString(cellSet));
+    }
 }
 
 // End ConnectionTest.java

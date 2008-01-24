@@ -42,7 +42,7 @@ public class IdentifierNode
      *
      * @param segments List of segments
      */
-    private IdentifierNode(List<IdentifierNode.Segment> segments) {
+    public IdentifierNode(List<IdentifierNode.Segment> segments) {
         if (segments.size() < 1) {
             throw new IllegalArgumentException();
         }
