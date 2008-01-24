@@ -502,8 +502,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 final String restriction = restrictions[i];
                 final String value = restrictions[i + 1];
                 buf.append("<").append(restriction).append(">");
-                // TODO: escape value
-                buf.append(value);
+                buf.append(xmlEncode(value));
                 buf.append("</").append(restriction).append(">");
             }
         }
@@ -521,6 +520,27 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             + "</SOAP-ENV:Body>\n"
             + "</SOAP-ENV:Envelope>");
         return buf.toString();
+    }
+
+    /**
+     * Encodes a string for use in an XML CDATA section.
+     *
+     * <p>TODO use an XML serialiser or handle these too:
+     * quote (") "
+     * apostrophe (') &apos;
+     * ampersand (&) &amp;
+     * less than (<) &lt;
+     * greater than (>) &gt;
+     *
+     * @param value to be xml encoded
+     * @return an XML encode string or the value is not required.
+     */
+    private static String xmlEncode(String value){
+        if (value.indexOf('&') == -1) {
+            return value;
+        } else {
+            return value.replace("&", "&amp;");
+        }
     }
 
     // ~ inner classes --------------------------------------------------------
