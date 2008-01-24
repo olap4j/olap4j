@@ -8,6 +8,8 @@
 */
 package org.olap4j.driver.xmla;
 
+import org.olap4j.impl.Base64;
+
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -213,6 +215,14 @@ public class XmlaOlap4jDriver implements Driver {
             URLConnection urlConnection = url.openConnection();
             urlConnection.setDoOutput(true);
             urlConnection.setRequestProperty("content-type", "text/xml");
+
+            // Encode credentials for basic authentication
+            if (url.getUserInfo() != null) {
+                String encoding =
+                    Base64.encodeBytes(url.getUserInfo().getBytes(), 0);
+                urlConnection.setRequestProperty(
+                    "Authorization", "Basic " + encoding);
+            }
 
             // Send data (i.e. POST). Assume default encoding.
             urlConnection.getOutputStream().write(request.getBytes());

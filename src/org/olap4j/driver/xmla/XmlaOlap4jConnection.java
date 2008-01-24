@@ -114,6 +114,20 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 + XmlaOlap4jDriver.Property.Server.name()
                 + "' must be specified");
         }
+
+        // Basic authentication. Make sure the credentials passed as standard
+        // JDBC parameters override any credentials already included in the URL
+        // as part of the standard URL scheme.
+        if (map.containsKey("user") && map.containsKey("password")) {
+            serverUrl = serverUrl.replaceFirst(
+                ":\\/\\/(.*\\@){0,1}",
+                "://"
+                    .concat(map.get("user"))
+                    .concat(":")
+                    .concat(map.get("password")
+                    .concat("@")));
+        }
+
         try {
             this.serverUrl = new URL(serverUrl);
         } catch (MalformedURLException e) {
@@ -641,7 +655,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class HierarchyHandler extends HandlerImpl<XmlaOlap4jHierarchy> {
-        public void handle(Element row, Context context, List<XmlaOlap4jHierarchy> list) {
+        public void handle(
+            Element row, Context context, List<XmlaOlap4jHierarchy> list)
+            throws OlapException
+        {
             /*
             Example:
 
@@ -687,9 +704,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 stringElement(row, "DEFAULT_MEMBER");
             list.add(
                 new XmlaOlap4jHierarchy(
-                    context.getDimension(row), hierarchyUniqueName, hierarchyName,
-                    hierarchyCaption, description, allMember != null,
-                    defaultMemberUniqueName));
+                    context.getDimension(row), hierarchyUniqueName,
+                    hierarchyName, hierarchyCaption, description,
+                    allMember != null, defaultMemberUniqueName));
         }
     }
 

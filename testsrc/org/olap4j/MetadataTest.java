@@ -301,8 +301,11 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getOlapFunctions(null),
             FUNCTIONS_COLUMN_NAMES);
         assertContains("FUNCTION_NAME=Name, DESCRIPTION=Returns the name of a member., PARAMETER_LIST=Member, RETURN_TYPE=8, ORIGIN=1, INTERFACE_NAME=, LIBRARY_NAME=null, CAPTION=Name", s);
-        assertEquals(340, linecount(s));
+        // Mondrian has 361 functions (as of 2008/1/23)
+        final int functionCount = linecount(s);
+        assertTrue(functionCount + " functions", functionCount > 360);
 
+        // Mondrian has 7 variants of the Ascendants and Descendants functions
         s = checkResultSet(
             olapDatabaseMetaData.getOlapFunctions("%scendants"),
             FUNCTIONS_COLUMN_NAMES);
