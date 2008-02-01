@@ -182,6 +182,32 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             int ordinal = 0;
             final Map<Property, String> propertyValues =
                 new HashMap<Property, String>();
+
+            // First pass, gather up a list of member unique names to fetch
+            // all at once.
+            //
+            // NOTE: This approach allows the driver to fetch a large number
+            // of members in one round trip, which is much more efficient.
+            // However, if the axis has a very large number of members, the map
+            // may use too much memory. This is an unresolved issue.
+            final MetadataReader metadataReader =
+                metaData.cube.getMetadataReader();
+            final Map<String, XmlaOlap4jMember> memberMap =
+                new HashMap<String, XmlaOlap4jMember>();
+            List<String> uniqueNames = new ArrayList<String>();
+            for (Element tupleNode
+                : findChildren(tuplesNode, MDDATASET_NS, "Tuple"))
+            {
+                for (Element memberNode
+                    : findChildren(tupleNode, MDDATASET_NS, "Member"))
+                {
+                    final String uname = stringElement(memberNode, "UName");
+                    uniqueNames.add(uname);
+                }
+            }
+            metadataReader.lookupMembersByUniqueName(uniqueNames, memberMap);
+
+            // Second pass, populate the axis.
             for (Element tupleNode
                 : findChildren(tuplesNode, MDDATASET_NS, "Tuple"))
             {
@@ -192,8 +218,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                     String hierarchyName =
                         memberNode.getAttribute("Hierarchy");
                     final String uname = stringElement(memberNode, "UName");
-                    Member member =
-                        metaData.cube.lookupMemberByUniqueName(uname);
+                    Member member = memberMap.get(uname);
                     if (member == null) {
                         final String caption =
                             stringElement(memberNode, "Caption");

@@ -1667,15 +1667,20 @@ public class ConnectionTest extends TestCase {
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
         final OlapStatement olapStatement = olapConnection.createStatement();
+        // Note: substitute [Sales Ragged] for [Sales] below and the query
+        // takes a very long time against mondrian's XMLA driver, because
+        // mondrian has a performance bug assigning ordinals to ragged
+        // hierarchies, and XMLA requests ask for member ordinals along with
+        // the other attributes of members.
         CellSet cellSet =
             olapStatement.executeOlapQuery(
                     "SELECT " +
                     "{[Product].[All Products].[Drink].[Alcoholic Beverages].Children, [Product].[All Products].[Food].[Baked Goods].Children} ON COLUMNS, " +
                     "CrossJoin([Store].[All Stores].[USA].[CA].Children, [Time].[1997].[Q1].Children) ON ROWS " +
-                    "FROM [Sales Ragged]");
+                    "FROM [Sales]");
         TestContext.assertEqualsVerbose(
             TestContext.fold("Axis #0:\n" +
-                "{[Measures].[Unit Sales], [Geography].[All Geographys], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
+                "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
                 "Axis #1:\n" +
                 "{[Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n" +
                 "{[Product].[All Products].[Food].[Baked Goods].[Bread]}\n" +
@@ -1689,6 +1694,9 @@ public class ConnectionTest extends TestCase {
                 "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n" +
                 "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n" +
                 "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[1]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[2]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[3]}\n" +
                 "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n" +
                 "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n" +
                 "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n" +
@@ -1710,12 +1718,18 @@ public class ConnectionTest extends TestCase {
                 "Row #7: 51\n" +
                 "Row #8: 27\n" +
                 "Row #8: 54\n" +
-                "Row #9: 6\n" +
-                "Row #9: 2\n" +
-                "Row #10: 3\n" +
-                "Row #10: 7\n" +
-                "Row #11: 2\n" +
-                "Row #11: 10\n"),
+                "Row #9: 54\n" +
+                "Row #9: 51\n" +
+                "Row #10: 38\n" +
+                "Row #10: 48\n" +
+                "Row #11: 64\n" +
+                "Row #11: 55\n" +
+                "Row #12: 6\n" +
+                "Row #12: 2\n" +
+                "Row #13: 3\n" +
+                "Row #13: 7\n" +
+                "Row #14: 2\n" +
+                "Row #14: 10\n"),
             TestContext.toString(cellSet));
     }
 

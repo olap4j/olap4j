@@ -12,6 +12,8 @@ import org.olap4j.OlapException;
 import org.olap4j.impl.*;
 import org.olap4j.metadata.*;
 
+import java.util.List;
+
 /**
  * Implementation of {@link org.olap4j.metadata.Hierarchy}
  * for XML/A providers.
@@ -37,7 +39,7 @@ class XmlaOlap4jHierarchy
         String caption,
         String description,
         boolean all,
-        String defaultMemberUniqueName)
+        String defaultMemberUniqueName) throws OlapException
     {
         super(uniqueName, name, caption, description);
         assert olap4jDimension != null;
@@ -58,26 +60,22 @@ class XmlaOlap4jHierarchy
         return all;
     }
 
-    public Member getDefaultMember() {
-        try {
-            return olap4jDimension.olap4jCube.lookupMemberByUniqueName(
-                defaultMemberUniqueName);
-        } catch (OlapException e) {
-            // TODO: cache member in hierarchy on creation, and obsolete the
-            // defaultMemberUniqueName field; do not make this method throw
-            // OlapException
-            throw new RuntimeException(
-                "Internal error: lookup up default member" +
-                        defaultMemberUniqueName,
-                e);
+    public Member getDefaultMember() throws OlapException {
+        if (defaultMemberUniqueName == null) {
+            return null;
         }
+        return olap4jDimension.olap4jCube.getMetadataReader()
+            .lookupMemberByUniqueName(
+                defaultMemberUniqueName);
     }
 
     public NamedList<Member> getRootMembers() throws OlapException {
+        final List<XmlaOlap4jMember> memberList =
+            olap4jDimension.olap4jCube.getMetadataReader().getLevelMembers(
+                levels.get(0));
         final NamedList<XmlaOlap4jMember> list =
             new NamedListImpl<XmlaOlap4jMember>();
-        olap4jDimension.olap4jCube.lookupLevelMembers(
-            levels.get(0), list);
+        list.addAll(memberList);
         return Olap4jUtil.cast(list);
     }
 }

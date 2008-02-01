@@ -396,7 +396,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         Context context,
         MetadataRequest metadataRequest,
         Handler<T> handler,
-        String... restrictions) throws OlapException
+        Object[] restrictions) throws OlapException
     {
         String request =
             generateRequest(context, metadataRequest, restrictions);
@@ -474,10 +474,24 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return findChild(returnElement, ROWSET_NS, "root");
     }
 
+    /**
+     * Generates a metadata request.
+     *
+     * <p>The list of restrictions must have even length. Even elements must
+     * be a string (the name of the restriction); odd elements must be either
+     * a string (the value of the restriction) or a list of strings (multiple
+     * values of the restriction)
+     *
+     *
+     * @param context Context
+     * @param metadataRequest Metadata request
+     * @param restrictions List of restrictions
+     * @return XMLA request
+     */
     public String generateRequest(
         Context context,
         MetadataRequest metadataRequest,
-        String... restrictions)
+        Object[] restrictions)
     {
         final String dataSourceInfo =
             context.olap4jConnection.getDataSourceInfo();
@@ -499,11 +513,23 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 throw new IllegalArgumentException();
             }
             for (int i = 0; i < restrictions.length; i += 2) {
-                final String restriction = restrictions[i];
-                final String value = restrictions[i + 1];
-                buf.append("<").append(restriction).append(">");
-                buf.append(xmlEncode(value));
-                buf.append("</").append(restriction).append(">");
+                final String restriction = (String) restrictions[i];
+                final Object o = restrictions[i + 1];
+                if (o instanceof String) {
+                    buf.append("<").append(restriction).append(">");
+                    final String value = (String) o;
+                    buf.append(xmlEncode(value));
+                    buf.append("</").append(restriction).append(">");
+
+                } else {
+                    //noinspection unchecked
+                    List<String> valueList = (List<String>) o;
+                    for (String value : valueList) {
+                        buf.append("<").append(restriction).append(">");
+                        buf.append(xmlEncode(value));
+                        buf.append("</").append(restriction).append(">");
+                    }
+                }
             }
         }
         buf.append("      </RestrictionList>\n"

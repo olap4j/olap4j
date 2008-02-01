@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class XmlaTester implements TestContext.Tester {
     final XmlaOlap4jDriver.Proxy proxy;
+    private Connection connection;
 
     public XmlaTester()
         throws ClassNotFoundException, IllegalAccessException,
@@ -50,6 +51,9 @@ public class XmlaTester implements TestContext.Tester {
     }
 
     public Connection createConnection() throws SQLException {
+        if (connection != null) {
+            return connection;
+        }
         try {
             Class.forName(DRIVER_CLASS_NAME);
         } catch (ClassNotFoundException e) {
@@ -62,10 +66,11 @@ public class XmlaTester implements TestContext.Tester {
                 XmlaOlap4jDriver.Property.UseThreadProxy.name(), "true");
             info.setProperty(
                 XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
-            return
+            connection =
                 DriverManager.getConnection(
                     getURL(),
                     info);
+            return connection;
         } finally {
             XmlaOlap4jDriver.THREAD_PROXY.set(null);
         }

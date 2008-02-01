@@ -14,6 +14,7 @@ import org.olap4j.mdx.IdentifierNode;
 import org.olap4j.metadata.*;
 
 import java.util.*;
+import java.lang.ref.SoftReference;
 
 /**
  * Implementation of {@link Cube}
@@ -43,6 +44,7 @@ class XmlaOlap4jCube implements Cube, Named
         new NamedListImpl<XmlaOlap4jMeasure>();
     private final NamedList<XmlaOlap4jNamedSet> namedSets =
         new NamedListImpl<XmlaOlap4jNamedSet>();
+    private final MetadataReader metadataReader;
 
     XmlaOlap4jCube(
         XmlaOlap4jSchema olap4jSchema,
@@ -55,6 +57,11 @@ class XmlaOlap4jCube implements Cube, Named
         this.olap4jSchema = olap4jSchema;
         this.name = name;
         this.description = description;
+        this.metadataReader =
+            new CachingMetadataReader(
+                new RawMetadataReader()
+            )
+        ;
         final XmlaOlap4jConnection olap4jConnection =
             olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection;
 
@@ -168,117 +175,26 @@ class XmlaOlap4jCube implements Cube, Named
     private Member lookupMember(
         List<IdentifierNode.Segment> segmentList) throws OlapException
     {
-        if (true) {
-            StringBuilder buf = new StringBuilder();
-            for (IdentifierNode.Segment segment : segmentList) {
-                if (buf.length() > 0) {
-                    buf.append('.');
-                }
-                buf.append(segment.toString());
+        StringBuilder buf = new StringBuilder();
+        for (IdentifierNode.Segment segment : segmentList) {
+            if (buf.length() > 0) {
+                buf.append('.');
             }
-            final String uniqueName = buf.toString();
-            return lookupMemberByUniqueName(uniqueName);
-        } else {
-            final Hierarchy hierarchy =
-                getHierarchies().get(segmentList.get(0).getName());
-            final NamedList<Member> rootMembers = hierarchy.getRootMembers();
-            Member member = rootMembers.get(segmentList.get(1).getName());
-            int k = 1;
-            if (member == null) {
-                if (rootMembers.size() == 1
-                    && rootMembers.get(0).isAll()) {
-                    member = rootMembers.get(0);
-                    ++k;
-                } else {
-                    return null;
-                }
-            }
-            while (k < segmentList.size()) {
-
-            }
-            return member;
+            buf.append(segment.toString());
         }
+        final String uniqueName = buf.toString();
+        return getMetadataReader().lookupMemberByUniqueName(uniqueName);
     }
 
     /**
-     * Looks up a member by its unique name.
+     * Returns this cube's metadata reader.
      *
      * <p>Not part of public olap4j API.
      *
-     * @param memberUniqueName Unique name of member
-     * @return Member, or null if not found
-     * @throws OlapException if error occurs
+     * @return metadata reader
      */
-    XmlaOlap4jMember lookupMemberByUniqueName(
-        String memberUniqueName)
-        throws OlapException
-    {
-        NamedList<XmlaOlap4jMember> list =
-            new NamedListImpl<XmlaOlap4jMember>();
-        lookupMembersByUniqueName(
-            EnumSet.of(Member.TreeOp.SELF), memberUniqueName, list);
-        switch (list.size()) {
-        case 0:
-            return null;
-        case 1:
-            return list.get(0);
-        default:
-            throw new IllegalArgumentException(
-                "more than one member with unique name '"
-                    + memberUniqueName
-                    + "'");
-        }
-    }
-
-    /**
-     * Looks a member by its unique name and returns members related by
-     * the specified tree-operations.
-     *
-     * <p>Not part of public olap4j API.
-     *
-     * @param memberUniqueName Unique name of member
-     *
-     * @param treeOps Collection of tree operations to travel relative to
-     * given member in order to create list of members
-     *
-     * @param list list to be populated with members related to the given
-     * member, or empty set if the member is not found
-     *
-     * @throws OlapException if error occurs
-     */
-    void lookupMembersByUniqueName(
-        Set<Member.TreeOp> treeOps,
-        String memberUniqueName,
-        List<XmlaOlap4jMember> list) throws OlapException
-    {
-        final XmlaOlap4jConnection.Context context =
-            new XmlaOlap4jConnection.Context(this, null, null, null);
-        int treeOpMask = 0;
-        for (Member.TreeOp treeOp : treeOps) {
-            treeOpMask |= treeOp.xmlaOrdinal();
-        }
-        olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection
-            .populateList(
-                list,
-                context,
-                XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEMBERS,
-                new XmlaOlap4jConnection.MemberHandler(),
-                "CATALOG_NAME", olap4jSchema.olap4jCatalog.getName(),
-                "SCHEMA_NAME", olap4jSchema.getName(),
-                "CUBE_NAME", getName(),
-                "MEMBER_UNIQUE_NAME", memberUniqueName,
-                "TREE_OP", String.valueOf(treeOpMask));
-    }
-
-    /**
-     * Returns true if two objects are equal, or are both null.
-     *
-     * @param s First object
-     * @param t Second object
-     * @return whether objects are equal
-     */
-    static <T> boolean equal(T s, T t) {
-        return (s == null) ? (t == null) : s.equals(t);
+    MetadataReader getMetadataReader() {
+        return metadataReader;
     }
 
     public List<Member> lookupMembers(
@@ -295,80 +211,248 @@ class XmlaOlap4jCube implements Cube, Named
         final String uniqueName = buf.toString();
         final List<XmlaOlap4jMember> list =
             new ArrayList<XmlaOlap4jMember>();
-        lookupMembersByUniqueName(treeOps, uniqueName, list);
-//        Collections.sort(list, new MemberComparator());
+        getMetadataReader().lookupMemberRelatives(
+            treeOps, uniqueName, list);
         return Olap4jUtil.cast(list);
     }
 
     /**
-     * Looks a member by its unique name and returns members related by
-     * the specified tree-operations.
-     *
-     * <p>Not part of public olap4j API.
-     *
-     * @param level Level
-     *
-     * @param list list to be populated with members related to the given level
-     *
-     * @throws OlapException if error occurs
+     * Abstract implementation of MemberReader that delegates all operations
+     * to an underlying MemberReader.
      */
-    void lookupLevelMembers(
-        XmlaOlap4jLevel level,
-        List<XmlaOlap4jMember> list) throws OlapException
+    private static abstract class DelegatingMetadataReader
+        implements MetadataReader
     {
-        assert level.olap4jHierarchy.olap4jDimension.olap4jCube == this;
-        final XmlaOlap4jConnection.Context context =
-            new XmlaOlap4jConnection.Context(level);
-        olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection
-            .populateList(
-                list,
-                context,
-                XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEMBERS,
-                new XmlaOlap4jConnection.MemberHandler(),
-                "CATALOG_NAME", olap4jSchema.olap4jCatalog.getName(),
-                "SCHEMA_NAME", olap4jSchema.getName(),
-                "CUBE_NAME", getName(),
-                "DIMENSION_UNIQUE_NAME",
-                level.olap4jHierarchy.olap4jDimension.getUniqueName(),
-                "HIERARCHY_UNIQUE_NAME",
-                level.olap4jHierarchy.getUniqueName(),
-                "LEVEL_UNIQUE_NAME", level.getUniqueName());
+        private final MetadataReader metadataReader;
+
+        DelegatingMetadataReader(MetadataReader metadataReader) {
+            this.metadataReader = metadataReader;
+        }
+
+        public XmlaOlap4jMember lookupMemberByUniqueName(
+            String memberUniqueName) throws OlapException
+        {
+            return metadataReader.lookupMemberByUniqueName(memberUniqueName);
+        }
+
+        public void lookupMembersByUniqueName(
+            List<String> memberUniqueNames,
+            Map<String, XmlaOlap4jMember> memberMap) throws OlapException
+        {
+            metadataReader.lookupMembersByUniqueName(
+                memberUniqueNames, memberMap);
+        }
+
+        public void lookupMemberRelatives(
+            Set<Member.TreeOp> treeOps,
+            String memberUniqueName,
+            List<XmlaOlap4jMember> list) throws OlapException
+        {
+            metadataReader.lookupMemberRelatives(
+                treeOps, memberUniqueName, list);
+        }
+
+        public List<XmlaOlap4jMember> getLevelMembers(
+            XmlaOlap4jLevel level)
+            throws OlapException
+        {
+            return metadataReader.getLevelMembers(level);
+        }
     }
 
-    // NOT USED
-    private static class MemberComparator
-        implements Comparator<XmlaOlap4jMember>
+    /**
+     * Implementation of MemberReader that reads from an underlying member
+     * reader and caches the results.
+     *
+     * <p>Caches are {@link Map}s containing
+     * {@link java.lang.ref.SoftReference}s to cached objects, so can be
+     * cleared when memory is in short supply.
+     */
+    private static class CachingMetadataReader
+        extends DelegatingMetadataReader
     {
-        public int compare(XmlaOlap4jMember m1, XmlaOlap4jMember m2) {
-            if (equal(m1, m2)) {
-                return 0;
-            }
-            while (true) {
-                int depth1 = m1.getDepth(),
-                        depth2 = m2.getDepth();
-                if (depth1 < depth2) {
-                    m2 = m2.getParentMember();
-                    if (Olap4jUtil.equal(m1, m2)) {
-                        return -1;
-                    }
-                } else if (depth1 > depth2) {
-                    m1 = m1.getParentMember();
-                    if (equal(m1, m2)) {
-                        return 1;
-                    }
-                } else {
-                    m1 = m1.getParentMember();
-                    m2 = m2.getParentMember();
-                    if (equal(m1, m2)) {
-                        // The previous values of m1 and m2 are siblings.
-                        // We do not have access to the ordering key, if
-                        // we assume that (a) the siblings were returned in
-                        // the correct order, and (b) the sort is stable,
-                        // then the first member is the earlier one.
-                        return -1;
-                    }
+        private final Map<String, SoftReference<XmlaOlap4jMember>> memberMap =
+            new HashMap<String, SoftReference<XmlaOlap4jMember>>();
+
+        private final Map<XmlaOlap4jLevel, SoftReference<List<XmlaOlap4jMember>>>
+            levelMemberListMap =
+            new HashMap<XmlaOlap4jLevel, SoftReference<List<XmlaOlap4jMember>>>();
+
+        CachingMetadataReader(MetadataReader metadataReader) {
+            super(metadataReader);
+        }
+
+        public XmlaOlap4jMember lookupMemberByUniqueName(
+            String memberUniqueName) throws OlapException
+        {
+            final SoftReference<XmlaOlap4jMember> memberRef =
+                memberMap.get(memberUniqueName);
+            if (memberRef != null) {
+                final XmlaOlap4jMember member = memberRef.get();
+                if (member != null) {
+                    return member;
                 }
             }
+            final XmlaOlap4jMember member =
+                super.lookupMemberByUniqueName(memberUniqueName);
+            memberMap.put(
+                memberUniqueName,
+                new SoftReference<XmlaOlap4jMember>(member));
+            return member;
+        }
+
+        public void lookupMembersByUniqueName(
+            List<String> memberUniqueNames,
+            Map<String, XmlaOlap4jMember> memberMap) throws OlapException
+        {
+            final ArrayList<String> remainingMemberUniqueNames =
+                new ArrayList<String>();
+            for (String memberUniqueName : memberUniqueNames) {
+                final SoftReference<XmlaOlap4jMember> memberRef =
+                    this.memberMap.get(memberUniqueName);
+                final XmlaOlap4jMember member;
+                if (memberRef != null &&
+                    (member = memberRef.get()) != null) {
+                    memberMap.put(memberUniqueName, member);
+                } else {
+                    remainingMemberUniqueNames.add(memberUniqueName);
+                }
+            }
+            // If any of the member names were not in the cache, look them up
+            // by delegating.
+            if (!remainingMemberUniqueNames.isEmpty()) {
+                super.lookupMembersByUniqueName(
+                    memberUniqueNames,
+                    memberMap);
+            }
+        }
+
+        public List<XmlaOlap4jMember> getLevelMembers(
+            XmlaOlap4jLevel level)
+            throws OlapException
+        {
+            final SoftReference<List<XmlaOlap4jMember>> memberListRef =
+                levelMemberListMap.get(level);
+            if (memberListRef != null) {
+                final List<XmlaOlap4jMember> memberList = memberListRef.get();
+                if (memberList != null) {
+                    return memberList;
+                }
+            }
+            final List<XmlaOlap4jMember> memberList =
+                super.getLevelMembers(level);
+            levelMemberListMap.put(
+                level,
+                new SoftReference<List<XmlaOlap4jMember>>(memberList));
+            return memberList;
+        }
+    }
+
+    /**
+     * Implementation of MetadataReader that reads from the XMLA provider,
+     * without caching.
+     */
+    private class RawMetadataReader implements MetadataReader {
+        public XmlaOlap4jMember lookupMemberByUniqueName(
+            String memberUniqueName)
+            throws OlapException
+        {
+            NamedList<XmlaOlap4jMember> list =
+                new NamedListImpl<XmlaOlap4jMember>();
+            lookupMemberRelatives(
+                EnumSet.of(Member.TreeOp.SELF), memberUniqueName, list);
+            switch (list.size()) {
+            case 0:
+                return null;
+            case 1:
+                return list.get(0);
+            default:
+                throw new IllegalArgumentException(
+                    "more than one member with unique name '"
+                        + memberUniqueName
+                        + "'");
+            }
+        }
+
+        public void lookupMembersByUniqueName(
+            List<String> memberUniqueNames,
+            Map<String, XmlaOlap4jMember> memberMap) throws OlapException
+        {
+            final XmlaOlap4jConnection.Context context =
+                new XmlaOlap4jConnection.Context(
+                    XmlaOlap4jCube.this, null, null, null);
+            List<XmlaOlap4jMember> memberList =
+                new ArrayList<XmlaOlap4jMember>();
+            olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection
+                .populateList(
+                    memberList,
+                    context,
+                    XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEMBERS,
+                    new XmlaOlap4jConnection.MemberHandler(),
+                    new Object[] {
+                        "CATALOG_NAME", olap4jSchema.olap4jCatalog.getName(),
+                        "SCHEMA_NAME", olap4jSchema.getName(),
+                        "CUBE_NAME", getName(),
+                        "MEMBER_UNIQUE_NAME", memberUniqueNames
+                    });
+            for (XmlaOlap4jMember member : memberList) {
+                memberMap.put(member.getUniqueName(), member);
+            }
+        }
+
+        public void lookupMemberRelatives(
+            Set<Member.TreeOp> treeOps,
+            String memberUniqueName,
+            List<XmlaOlap4jMember> list) throws OlapException
+        {
+            final XmlaOlap4jConnection.Context context =
+                new XmlaOlap4jConnection.Context(
+                    XmlaOlap4jCube.this, null, null, null);
+            int treeOpMask = 0;
+            for (Member.TreeOp treeOp : treeOps) {
+                treeOpMask |= treeOp.xmlaOrdinal();
+            }
+            olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection
+                .populateList(
+                    list,
+                    context,
+                    XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEMBERS,
+                    new XmlaOlap4jConnection.MemberHandler(),
+                    new Object[] {
+                        "CATALOG_NAME", olap4jSchema.olap4jCatalog.getName(),
+                        "SCHEMA_NAME", olap4jSchema.getName(),
+                        "CUBE_NAME", getName(),
+                        "MEMBER_UNIQUE_NAME", memberUniqueName,
+                        "TREE_OP", String.valueOf(treeOpMask)
+                    });
+        }
+
+        public List<XmlaOlap4jMember> getLevelMembers(
+            XmlaOlap4jLevel level)
+            throws OlapException
+        {
+            assert level.olap4jHierarchy.olap4jDimension.olap4jCube
+                == XmlaOlap4jCube.this;
+            final XmlaOlap4jConnection.Context context =
+                new XmlaOlap4jConnection.Context(level);
+            List<XmlaOlap4jMember> list = new ArrayList<XmlaOlap4jMember>();
+            olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection
+                .populateList(
+                    list,
+                    context,
+                    XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEMBERS,
+                    new XmlaOlap4jConnection.MemberHandler(),
+                    new Object[] {
+                        "CATALOG_NAME", olap4jSchema.olap4jCatalog.getName(),
+                        "SCHEMA_NAME", olap4jSchema.getName(),
+                        "CUBE_NAME", getName(),
+                        "DIMENSION_UNIQUE_NAME",
+                        level.olap4jHierarchy.olap4jDimension.getUniqueName(),
+                        "HIERARCHY_UNIQUE_NAME",
+                        level.olap4jHierarchy.getUniqueName(),
+                        "LEVEL_UNIQUE_NAME", level.getUniqueName()
+                    });
+            return list;
         }
     }
 }

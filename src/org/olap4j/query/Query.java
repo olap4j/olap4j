@@ -104,7 +104,7 @@ public class Query {
         return unused;
     }
 
-    public boolean validate() {
+    public boolean validate() throws OlapException {
         for (Dimension dimension :  cube.getDimensions()) {
             QueryDimension queryDimension =
                 getDimension(dimension.getName());

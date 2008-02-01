@@ -57,20 +57,22 @@ class XmlaOlap4jLevel
             {
                 context.olap4jConnection.populateList(
                     list, context, metadataRequest, handler,
-                    "CATALOG_NAME",
-                    olap4jHierarchy.olap4jDimension.olap4jCube.olap4jSchema
-                        .olap4jCatalog.getName(),
-                    "SCHEMA_NAME",
-                    olap4jHierarchy.olap4jDimension.olap4jCube.olap4jSchema
-                        .getName(),
-                    "CUBE_NAME",
-                    olap4jHierarchy.olap4jDimension.olap4jCube.getName(),
-                    "DIMENSION_UNIQUE_NAME",
-                    olap4jHierarchy.olap4jDimension.getUniqueName(),
-                    "HIERARCHY_UNIQUE_NAME",
-                    olap4jHierarchy.getUniqueName(),
-                    "LEVEL_UNIQUE_NAME",
-                    getUniqueName());
+                    new Object[] {
+                        "CATALOG_NAME",
+                        olap4jHierarchy.olap4jDimension.olap4jCube.olap4jSchema
+                            .olap4jCatalog.getName(),
+                        "SCHEMA_NAME",
+                        olap4jHierarchy.olap4jDimension.olap4jCube.olap4jSchema
+                            .getName(),
+                        "CUBE_NAME",
+                        olap4jHierarchy.olap4jDimension.olap4jCube.getName(),
+                        "DIMENSION_UNIQUE_NAME",
+                        olap4jHierarchy.olap4jDimension.getUniqueName(),
+                        "HIERARCHY_UNIQUE_NAME",
+                        olap4jHierarchy.getUniqueName(),
+                        "LEVEL_UNIQUE_NAME",
+                        getUniqueName()
+                    });
             }
         };
     }
@@ -106,11 +108,9 @@ class XmlaOlap4jLevel
     }
 
     public List<Member> getMembers() throws OlapException {
-        final List<XmlaOlap4jMember> list =
-            new ArrayList<XmlaOlap4jMember>();
-        olap4jHierarchy.olap4jDimension.olap4jCube.lookupLevelMembers(
-            this, list);
-        return Olap4jUtil.cast(list);
+        return Olap4jUtil.cast(
+            olap4jHierarchy.olap4jDimension.olap4jCube.getMetadataReader()
+                .getLevelMembers(this));
     }
 
     public int getCardinality() {

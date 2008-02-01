@@ -10,6 +10,7 @@ package org.olap4j;
 
 import org.olap4j.metadata.*;
 import org.olap4j.query.*;
+import org.olap4j.test.TestContext;
 
 import org.w3c.dom.*;
 
@@ -35,15 +36,17 @@ import junit.framework.TestCase;
  * @version $Id$
  */
 public class OlapTest extends TestCase {
+    final TestContext.Tester tester = TestContext.instance().getTester();
 
     public OlapTest() {
         super();
     }
 
     public void testModel() {
-
         try {
+            Connection jdbcConnection;
 
+            if (false) {
             // define the connection information
             String schemaUri = "file:/open/mondrian/demo/FoodMart.xml";
             String schemaName = "FoodMart";
@@ -54,11 +57,14 @@ public class OlapTest extends TestCase {
             // Create a connection object to the specific implementation of an olap4j source
             // This is the only provider-specific code
             Class.forName("mondrian.olap4j.MondrianOlap4jDriver");
-            Connection jdbcConnection = DriverManager.getConnection(
+            jdbcConnection = DriverManager.getConnection(
                 "jdbc:mondrian:Jdbc=" + jdbc
                     + ";User=" + userName
                     + ";Password=" + password
                     + ";Catalog=" + schemaUri);
+            } else {
+                jdbcConnection = tester.createConnection();
+            }
             OlapConnection connection =
                 ((OlapWrapper) jdbcConnection).unwrap(OlapConnection.class);
 
@@ -69,7 +75,18 @@ public class OlapTest extends TestCase {
             // The code from here on is generic olap4j stuff
 
             // Get a list of the schemas available from this connection and dump their names
-            NamedList<Schema> schemas = connection.getCatalogs().get("LOCALDB").getSchemas();
+            final String catalogName;
+            switch (tester.getFlavor()) {
+            case MONDRIAN:
+                catalogName = "LOCALDB";
+                break;
+            case XMLA:
+            default:
+                catalogName = "FoodMart";
+                break;
+            }
+            Catalog catalog = connection.getCatalogs().get(catalogName);
+            NamedList<Schema> schemas = catalog.getSchemas();
             for (Schema schema : schemas) {
                 System.out.println("schema name="+schema.getName());
             }
@@ -502,7 +519,9 @@ public class OlapTest extends TestCase {
             }
         }
 
-        public static Element hierarchyToXml(Hierarchy hierarchy, Document doc) {
+        public static Element hierarchyToXml(Hierarchy hierarchy, Document doc)
+            throws OlapException
+        {
             Element hierarchyNode;
             Element levelNode;
             Element nameNode;

@@ -61,7 +61,7 @@ public interface Hierarchy extends MetadataElement {
      *
      * @return the default member of this hierarchy
      */
-    Member getDefaultMember();
+    Member getDefaultMember() throws OlapException;
 
     /**
      * Returns the root member or members of this Dimension.
@@ -72,13 +72,15 @@ public interface Hierarchy extends MetadataElement {
      * <p>The caller should assume that the list is immutable;
      * if the caller modifies the list, behavior is undefined.</p>
      *
-     * <p>The result is similar to calling
-     * <code>getLevels().get(0).getMembers()</code>. The contents will be the
-     * same, but this method returns a link {@link NamedList} rather than a
+     * <p>The result is similar to that returned by
+     * <code>getLevels().get(0).getMembers()</code>; the contents will be the
+     * same, but this method returns a {@link NamedList} rather than a
      * mere {@link java.util.List} because the members of the root level are
      * known to have unique names.
      *
      * @return root members of this hierarchy
+     *
+     * @throws OlapException on database error
      */
     NamedList<Member> getRootMembers() throws OlapException;
 }

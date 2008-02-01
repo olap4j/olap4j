@@ -22,7 +22,7 @@ import java.util.*;
  * <p>TODO:<ol>
  * <li>create members with a pointer to their parent member (not the name)</li>
  * <li>implement a member cache (by unique name, belongs to cube, soft)</li>
- * <li>implement Hierarchy.getRootMembers and Hierarchy.getDefaultMember</li>
+ * <li>implement Hierarchy.getRootMembers</li>
  * </ol>
  *
  * @author jhyde
@@ -82,7 +82,8 @@ class XmlaOlap4jMember
         final NamedList<XmlaOlap4jMember> list =
             new NamedListImpl<XmlaOlap4jMember>();
         getCube()
-            .lookupMembersByUniqueName(
+            .getMetadataReader()
+            .lookupMemberRelatives(
                 EnumSet.of(TreeOp.CHILDREN),
                 uniqueName,
                 list);
@@ -100,7 +101,7 @@ class XmlaOlap4jMember
         if (parentMember == null) {
             try {
                 parentMember =
-                    getCube()
+                    getCube().getMetadataReader()
                         .lookupMemberByUniqueName(parentMemberUniqueName);
             } catch (OlapException e) {
                 throw new RuntimeException("yuck!"); // FIXME
