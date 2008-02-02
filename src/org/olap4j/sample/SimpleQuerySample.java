@@ -244,15 +244,15 @@ public class SimpleQuerySample {
             new AxisNode(
                 null,
                 false,
+                Axis.ROWS,
+                new ArrayList<IdentifierNode>(),
                 new CallNode(
                     null,
                     "{}",
                     Syntax.Braces,
                     new IdentifierNode(
                         new IdentifierNode.Segment("Measures"),
-                        new IdentifierNode.Segment("Unit Sales"))),
-                Axis.ROWS,
-                new ArrayList<IdentifierNode>()));
+                        new IdentifierNode.Segment("Unit Sales")))));
 
         // Create a statement based upon the query model.
         OlapStatement stmt;

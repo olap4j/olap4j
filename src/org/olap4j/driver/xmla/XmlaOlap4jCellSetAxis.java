@@ -63,7 +63,7 @@ class XmlaOlap4jCellSetAxis implements CellSetAxis {
     }
 
     public ListIterator<Position> iterator() {
-        return (ListIterator<Position>) immutablePositions.iterator();
+        return immutablePositions.listIterator();
     }
 }
 

@@ -1005,9 +1005,9 @@ public class ConnectionTest extends TestCase {
             new AxisNode(
                 null,
                 false,
-                null,
                 Axis.FILTER,
-                new ArrayList<IdentifierNode>()),
+                new ArrayList<IdentifierNode>(),
+                null),
             new ArrayList<IdentifierNode>());
         select.getWithList().add(
             new WithMemberNode(
@@ -1029,6 +1029,8 @@ public class ConnectionTest extends TestCase {
             new AxisNode(
                 null,
                 false,
+                Axis.COLUMNS,
+                new ArrayList<IdentifierNode>(),
                 new CallNode(
                     null,
                     "{}",
@@ -1036,13 +1038,14 @@ public class ConnectionTest extends TestCase {
                     Arrays.asList(
                         (ParseTreeNode)
                             new IdentifierNode(
-                                new IdentifierNode.Segment("Gender")))),
-                Axis.COLUMNS,
-                new ArrayList<IdentifierNode>()));
+                                new IdentifierNode.Segment("Gender"))))
+            ));
         select.getAxisList().add(
             new AxisNode(
                 null,
                 false,
+                Axis.ROWS,
+                new ArrayList<IdentifierNode>(),
                 new CallNode(
                     null,
                     "{}",
@@ -1052,10 +1055,7 @@ public class ConnectionTest extends TestCase {
                         "Children",
                         Syntax.Property,
                         new IdentifierNode(
-                            new IdentifierNode.Segment("Store"))
-                        )),
-                Axis.ROWS,
-                new ArrayList<IdentifierNode>()));
+                            new IdentifierNode.Segment("Store"))))));
         select.getFilterAxis().setExpression(
             new IdentifierNode(
                 new IdentifierNode.Segment("Time"),
@@ -1073,7 +1073,7 @@ public class ConnectionTest extends TestCase {
         Connection connection = tester.createConnection();
         OlapConnection olapConnection =
             ((OlapWrapper) connection).unwrap(OlapConnection.class);
-        Cube cube = olapConnection.getSchema().getCubes().get("Sales");
+        Cube cube = olapConnection.getSchema().getCubes().get("Sales Ragged");
 
         Member member =
             cube.lookupMember(
@@ -1796,20 +1796,18 @@ public class ConnectionTest extends TestCase {
         query.setFrom(cubeNode);
         AxisNode columnAxis =
             new AxisNode(
-                null, false,
+                null, false, Axis.COLUMNS, null,
                 new CallNode(
                     null, "MEMBERS", Syntax.Property,
                     new IdentifierNode(
-                        IdentifierNode.parseIdentifier("[Gender]"))),
-                Axis.COLUMNS, null);
+                        IdentifierNode.parseIdentifier("[Gender]"))));
         AxisNode rowAxis =
             new AxisNode(
-                null, false,
+                null, false, Axis.ROWS, null,
                 new CallNode(
                     null, "CHILDREN", Syntax.Property,
                     new IdentifierNode(
-                        IdentifierNode.parseIdentifier("[Customers].[USA]"))),
-                Axis.ROWS, null);
+                        IdentifierNode.parseIdentifier("[Customers].[USA]"))));
         query.getAxisList().add(columnAxis);
         query.getAxisList().add(rowAxis);
         OlapStatement statement = olapConnection.createStatement();
@@ -1835,6 +1833,85 @@ public class ConnectionTest extends TestCase {
                 "Row #2: 61,763\n" +
                 "Row #2: 62,603\n"),
             TestContext.toString(cellSet));
+    }
+
+    public void testBuildQuery2() throws ClassNotFoundException, SQLException {
+        Connection connection = tester.createConnection();
+        OlapConnection olapConnection =
+            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+
+        Schema schema = olapConnection.getSchema();
+        Cube cube = schema.getCubes().get("Sales");
+        Measure measure = cube.getMeasures().get(0);
+        Dimension dimPromotionMedia = cube.getDimensions().get("Promotion Media");
+        //
+        // IdentifierNode cubeNode = new IdentifierNode(new IdentifierNode.Segment(cube.getUniqueName()));
+        CubeNode cubeNode = new CubeNode(null, cube);
+        MemberNode measuresQuantity = new MemberNode(null, measure);
+        HierarchyNode promotionHierarchyNode =
+            new HierarchyNode(null, dimPromotionMedia.getDefaultHierarchy());
+        CallNode promotionChildren =
+            new CallNode(
+                null, "children", Syntax.Property, promotionHierarchyNode);
+        //
+        List<IdentifierNode> columnDimensionProperties =
+            new ArrayList<IdentifierNode>();
+        AxisNode columnAxis =
+            new AxisNode(
+                null, false,
+                Axis.COLUMNS,
+                columnDimensionProperties,
+                new CallNode(null, "{}", Syntax.Braces, measuresQuantity));
+        List<IdentifierNode> rowDimensionProperties =
+            new ArrayList<IdentifierNode>();
+        AxisNode rowAxis =
+            new AxisNode(
+                null, false,
+                Axis.ROWS,
+                rowDimensionProperties,
+                new CallNode(null, "{}", Syntax.Braces, promotionChildren));
+        //
+        SelectNode query = new SelectNode();
+        query.setFrom(cubeNode);
+        query.getAxisList().add(columnAxis);
+        query.getAxisList().add(rowAxis);
+        //
+        OlapStatement statement = olapConnection.createStatement();
+        CellSet cellSet = statement.executeOlapQuery(query);
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        for (Position row : cellSet.getAxes().get(1)) {
+            for (Position column : cellSet.getAxes().get(0)) {
+                pw.print("ROW:");
+                for (Member member : row.getMembers()) {
+                    pw.print("[" + member.getName() + "]");
+                }
+                pw.print(" COL:");
+                for (Member member : column.getMembers()) {
+                    pw.print("[" + member.getName() + "]");
+                }
+                Cell cell = cellSet.getCell(column, row);
+                pw.println(" CELL:" + cell.getFormattedValue());
+            }
+        }
+        pw.flush();
+        TestContext.assertEqualsVerbose(
+            TestContext.fold(
+                "ROW:[Bulk Mail] COL:[Customer Count] CELL:333\n" +
+                    "ROW:[Cash Register Handout] COL:[Customer Count] CELL:482\n" +
+                    "ROW:[Daily Paper] COL:[Customer Count] CELL:528\n" +
+                    "ROW:[Daily Paper, Radio] COL:[Customer Count] CELL:499\n" +
+                    "ROW:[Daily Paper, Radio, TV] COL:[Customer Count] CELL:687\n" +
+                    "ROW:[In-Store Coupon] COL:[Customer Count] CELL:290\n" +
+                    "ROW:[No Media] COL:[Customer Count] CELL:5,043\n" +
+                    "ROW:[Product Attachment] COL:[Customer Count] CELL:532\n" +
+                    "ROW:[Radio] COL:[Customer Count] CELL:186\n" +
+                    "ROW:[Street Handout] COL:[Customer Count] CELL:381\n" +
+                    "ROW:[Sunday Paper] COL:[Customer Count] CELL:307\n" +
+                    "ROW:[Sunday Paper, Radio] COL:[Customer Count] CELL:422\n" +
+                    "ROW:[Sunday Paper, Radio, TV] COL:[Customer Count] CELL:196\n" +
+                    "ROW:[TV] COL:[Customer Count] CELL:274\n"),
+            sw.toString());
     }
 }
 

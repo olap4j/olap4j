@@ -100,7 +100,7 @@ class DeferredNamedListImpl<T extends Named>
 
     protected void populateList(NamedList<T> list) throws OlapException {
         context.olap4jConnection.populateList(
-            list, context, metadataRequest, handler);
+            list, context, metadataRequest, handler, new Object[0]);
     }
 
     private enum State {

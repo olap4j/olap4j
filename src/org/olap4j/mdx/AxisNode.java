@@ -37,17 +37,17 @@ public class AxisNode implements ParseTreeNode {
      * @param region Region of source code
      * @param nonEmpty Whether to filter out members of this axis whose cells
      *    are all empty
-     * @param expression Expression to populate the axis
      * @param axisDef Which axis (ROWS, COLUMNS, etc.)
      * @param dimensionProperties List of dimension properties; if null,
      *   empty list is assumed
+     * @param expression Expression to populate the axis
      */
     public AxisNode(
         ParseRegion region,
         boolean nonEmpty,
-        ParseTreeNode expression,
         Axis axisDef,
-        List<IdentifierNode> dimensionProperties)
+        List<IdentifierNode> dimensionProperties,
+        ParseTreeNode expression)
     {
         this.region = region;
         this.nonEmpty = nonEmpty;

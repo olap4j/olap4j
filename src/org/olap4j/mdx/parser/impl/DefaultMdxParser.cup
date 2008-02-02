@@ -154,8 +154,8 @@ parser code {:
             filter == null ?
                 null :
                 new AxisNode(
-                    filter.getRegion(), false, filter, Axis.FILTER,
-                    Collections.EMPTY_LIST);
+                    filter.getRegion(), false, Axis.FILTER,
+                    Collections.EMPTY_LIST, filter);
         // sort axes by ordinal
         Collections.sort(axisList, new Comparator<AxisNode>() {
             public int compare(AxisNode o1, AxisNode o2) {
@@ -1418,7 +1418,7 @@ axis_specification ::=
             Axis axis = Axis.valueOf(a.toUpperCase());
             ParseRegion region = createRegion(
                 bleft, bright, sleft, sright, dpleft, dpright, aleft, aright);
-            RESULT = new AxisNode(region, b, s, axis, emptyList(dp));
+            RESULT = new AxisNode(region, b, axis, emptyList(dp), s);
         :}
     |   non_empty_opt:b expression:s dim_props_opt:dp ON axis_number:n {:
             double d = n.doubleValue();
@@ -1436,7 +1436,7 @@ axis_specification ::=
             Axis axis = Axis.forOrdinal(index);
             ParseRegion region = createRegion(
                 bleft, bright, sleft, sright, dpleft, dpright, nleft, nright);
-            RESULT = new AxisNode(region, b, s, axis, emptyList(dp));
+            RESULT = new AxisNode(region, b, axis, emptyList(dp), s);
         :}
     ;
 

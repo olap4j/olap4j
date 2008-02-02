@@ -952,7 +952,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
             new XmlaOlap4jConnection.Context(
                 olap4jConnection, null, null, null, null, null, null, null);
         String request =
-            olap4jConnection.generateRequest(context, metadataRequest);
+            olap4jConnection.generateRequest(
+                context, metadataRequest, new Object[0]);
         final Element root = olap4jConnection.xxx(request);
         StringBuilder buf = new StringBuilder();
         for (Element row : XmlaOlap4jUtil.childElements(root)) {

@@ -3,7 +3,7 @@
   == This software is subject to the terms of the Common Public License
   == Agreement, available at the following URL:
   == http://www.opensource.org/licenses/cpl.html.
-  == Copyright (C) 2006-2007 Julian Hyde and others.
+  == Copyright (C) 2006-2008 Julian Hyde and others.
   == All Rights Reserved.
   == You must accept the terms of that agreement to use this software.
   -->
@@ -314,7 +314,8 @@ must be run under JDK 1.5." />
   </target>
 
   <target name="compileJdk16">
-    <exec executable="buildJdk16.sh"/>
+    <exec os="linux" executable="buildJdk16.sh"/>
+    <exec os="windows" executable="buildJdk16.bat"/>
   </target>
 
   <target name="jar" depends="version,checkIsNotJdk16,compile,compileJdk16">
@@ -518,7 +519,7 @@ META-INF/**"/>
         </fileset>
       </batchtest>
       <classpath refid="project.test.classpath"/>
-      <jvmarg value="-Xmx256m"/>
+      <jvmarg value="-Xmx512m"/>
     </junit>
   </target>
 
