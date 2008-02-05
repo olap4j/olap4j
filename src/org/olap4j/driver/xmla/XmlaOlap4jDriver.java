@@ -65,9 +65,9 @@ import java.util.concurrent.*;
  */
 public class XmlaOlap4jDriver implements Driver {
     public static final String NAME = "olap4j driver for XML/A";
-    public static final String VERSION = "0.1";
+    public static final String VERSION = "0.9.4";
     public static final int MAJOR_VERSION = 0;
-    public static final int MINOR_VERSION = 1;
+    public static final int MINOR_VERSION = 904;
     private final Factory factory;
 
     /**
