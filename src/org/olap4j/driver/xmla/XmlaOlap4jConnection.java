@@ -406,6 +406,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 handler.handle(o, context, list);
             }
         }
+        handler.sortList(list);
     }
 
     Element xxx(String request) throws OlapException {
@@ -571,6 +572,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     // ~ inner classes --------------------------------------------------------
 
+    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     static class Helper {
         OlapException createException(String msg) {
             return new OlapException(msg);
@@ -849,6 +851,20 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     measureCaption, description, null, measureAggregator,
                     datatype, measureIsVisible));
         }
+
+        public void sortList(List<XmlaOlap4jMeasure> list) {
+            Collections.sort(
+                list,
+                new Comparator<XmlaOlap4jMeasure>() {
+                    public int compare(
+                        XmlaOlap4jMeasure o1,
+                        XmlaOlap4jMeasure o2)
+                    {
+                        return o1.getOrdinal() - o2.getOrdinal();
+                    }
+                }
+            );
+        }
     }
 
     static class MemberHandler extends HandlerImpl<XmlaOlap4jMember> {
@@ -983,13 +999,43 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         }
     }
 
+    /**
+     * Callback for converting XMLA results into metadata elements.
+     */
     interface Handler<T extends Named> {
+        /**
+         * Converts an XML element from an XMLA result set into a metadata
+         * element and appends it to a list of metadata elements.
+         *
+         * @param row XMLA element
+         *
+         * @param context Context (schema, cube, dimension, etc.) that the
+         * request was executed in and that the element will belong to
+         *
+         * @param list List of metadata elements to append new metadata element
+         *
+         * @throws OlapException on error
+         */
         void handle(
             Element row,
-            Context context, List<T> list) throws OlapException;
+            Context context,
+            List<T> list) throws OlapException;
+
+        /**
+         * Sorts a list of metadata elements.
+         *
+         * <p>For most element types, the order returned by XMLA is correct, and
+         * this method will no-op.
+         *
+         * @param list List of metadata elements
+         */
+        void sortList(List<T> list);
     }
 
     static abstract class HandlerImpl<T extends Named> implements Handler<T> {
+        public void sortList(List<T> list) {
+            // do nothing - assume XMLA returned list in correct order
+        }
     }
 
     static class Context {

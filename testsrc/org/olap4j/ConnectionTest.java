@@ -1309,9 +1309,10 @@ public class ConnectionTest extends TestCase {
         assertEquals(
             2, timeWeeklyHierarchy.getDimension().getHierarchies().size());
 
-        cube = olapConnection.getSchema().getCubes().get("Warehouse");
+        Cube warehouseCube =
+            olapConnection.getSchema().getCubes().get("Warehouse");
         int count = 0;
-        for (NamedSet namedSet : cube.getSets()) {
+        for (NamedSet namedSet : warehouseCube.getSets()) {
             ++count;
             assertNotNull(namedSet.getName());
             assertNotNull(namedSet.getUniqueName());
@@ -1375,7 +1376,14 @@ public class ConnectionTest extends TestCase {
         assertEquals(Datatype.STRING, property.getDatatype());
 
         // Measures
+        int k = -1;
         for (Measure measure : cube.getMeasures()) {
+            ++k;
+            // The first measure is [Unit Sales], because the list must be
+            // sorted by ordinal.
+            if (k == 0) {
+                assertEquals("Unit Sales", measure.getName());
+            }
             assertNotNull(measure.getName());
             assertNotNull(measure.getAggregator());
             assertTrue(measure.getDatatype() != null);
@@ -1843,6 +1851,7 @@ public class ConnectionTest extends TestCase {
         Schema schema = olapConnection.getSchema();
         Cube cube = schema.getCubes().get("Sales");
         Measure measure = cube.getMeasures().get(0);
+        assertEquals("Unit Sales", measure.getName());
         Dimension dimPromotionMedia = cube.getDimensions().get("Promotion Media");
         //
         // IdentifierNode cubeNode = new IdentifierNode(new IdentifierNode.Segment(cube.getUniqueName()));
@@ -1897,20 +1906,20 @@ public class ConnectionTest extends TestCase {
         pw.flush();
         TestContext.assertEqualsVerbose(
             TestContext.fold(
-                "ROW:[Bulk Mail] COL:[Customer Count] CELL:333\n" +
-                    "ROW:[Cash Register Handout] COL:[Customer Count] CELL:482\n" +
-                    "ROW:[Daily Paper] COL:[Customer Count] CELL:528\n" +
-                    "ROW:[Daily Paper, Radio] COL:[Customer Count] CELL:499\n" +
-                    "ROW:[Daily Paper, Radio, TV] COL:[Customer Count] CELL:687\n" +
-                    "ROW:[In-Store Coupon] COL:[Customer Count] CELL:290\n" +
-                    "ROW:[No Media] COL:[Customer Count] CELL:5,043\n" +
-                    "ROW:[Product Attachment] COL:[Customer Count] CELL:532\n" +
-                    "ROW:[Radio] COL:[Customer Count] CELL:186\n" +
-                    "ROW:[Street Handout] COL:[Customer Count] CELL:381\n" +
-                    "ROW:[Sunday Paper] COL:[Customer Count] CELL:307\n" +
-                    "ROW:[Sunday Paper, Radio] COL:[Customer Count] CELL:422\n" +
-                    "ROW:[Sunday Paper, Radio, TV] COL:[Customer Count] CELL:196\n" +
-                    "ROW:[TV] COL:[Customer Count] CELL:274\n"),
+                "ROW:[Bulk Mail] COL:[Unit Sales] CELL:4,320\n" +
+                    "ROW:[Cash Register Handout] COL:[Unit Sales] CELL:6,697\n" +
+                    "ROW:[Daily Paper] COL:[Unit Sales] CELL:7,738\n" +
+                    "ROW:[Daily Paper, Radio] COL:[Unit Sales] CELL:6,891\n" +
+                    "ROW:[Daily Paper, Radio, TV] COL:[Unit Sales] CELL:9,513\n" +
+                    "ROW:[In-Store Coupon] COL:[Unit Sales] CELL:3,798\n" +
+                    "ROW:[No Media] COL:[Unit Sales] CELL:195,448\n" +
+                    "ROW:[Product Attachment] COL:[Unit Sales] CELL:7,544\n" +
+                    "ROW:[Radio] COL:[Unit Sales] CELL:2,454\n" +
+                    "ROW:[Street Handout] COL:[Unit Sales] CELL:5,753\n" +
+                    "ROW:[Sunday Paper] COL:[Unit Sales] CELL:4,339\n" +
+                    "ROW:[Sunday Paper, Radio] COL:[Unit Sales] CELL:5,945\n" +
+                    "ROW:[Sunday Paper, Radio, TV] COL:[Unit Sales] CELL:2,726\n" +
+                    "ROW:[TV] COL:[Unit Sales] CELL:3,607\n"),
             sw.toString());
     }
 }

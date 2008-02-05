@@ -61,6 +61,10 @@ public interface Cube extends MetadataElement {
     /**
      * Returns a list of {@link Measure} objects in this Cube.
      *
+     * <p>The list includes both stored and calculated members, and (unlike
+     * the {@link org.olap4j.OlapDatabaseMetaData#getMeasures} method or the
+     * MDSCHEMA_MEASURES XMLA request) is sorted by ordinal.
+     *
      * @see org.olap4j.OlapDatabaseMetaData#getMeasures(String,String,String,String,String)
      *
      * @return list of Measures
