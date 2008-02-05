@@ -805,7 +805,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class MeasureHandler extends HandlerImpl<XmlaOlap4jMeasure> {
-        public void handle(Element row, Context context, List<XmlaOlap4jMeasure> list) {
+        public void handle(Element row, Context context, List<XmlaOlap4jMeasure> list)
+            throws OlapException {
             /*
             Example:
 
@@ -845,11 +846,30 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 (XmlaOlap4jLevel)
                     context.getCube(row).getHierarchies().get("Measures")
                         .getLevels().get(0);
+
+            // Every measure is a member. MDSCHEMA_MEASURES does not return all
+            // properties of measures, so lookup the corresponding member. In
+            // particular, we need the ordinal.
+            if (list.isEmpty()) {
+                // First call this method, ask for all members of the measures
+                // level. This should ensures that we get all members in one
+                // round trip.
+                final List<Member> measureMembers = measuresLevel.getMembers();
+                Olap4jUtil.discard(measureMembers);
+            }
+            Member member =
+                context.getCube(row).getMetadataReader().lookupMemberByUniqueName(
+                    measureUniqueName);
+            int ordinal = -1;
+            if (member != null) {
+                ordinal = member.getOrdinal();
+            }
+
             list.add(
                 new XmlaOlap4jMeasure(
                     measuresLevel, measureUniqueName, measureName,
                     measureCaption, description, null, measureAggregator,
-                    datatype, measureIsVisible));
+                    datatype, measureIsVisible, ordinal));
         }
 
         public void sortList(List<XmlaOlap4jMeasure> list) {

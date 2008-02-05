@@ -37,11 +37,12 @@ class XmlaOlap4jMeasure
         String parentMemberUniqueName,
         Aggregator aggregator,
         Datatype datatype,
-        boolean visible)
+        boolean visible,
+        int ordinal)
     {
         super(
             olap4jLevel, uniqueName, name, caption, description,
-            parentMemberUniqueName, Type.MEASURE, 0, -1);
+            parentMemberUniqueName, Type.MEASURE, 0, ordinal);
         this.aggregator = aggregator;
         this.datatype = datatype;
         this.visible = visible;
