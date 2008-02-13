@@ -12,6 +12,7 @@ package org.olap4j.mdx;
 import org.olap4j.type.Type;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,6 +85,14 @@ public class SelectNode implements ParseTreeNode {
     public Type getType() {
         // not an expression, so has no type
         return null;
+    }
+
+    public String toString() {
+        StringWriter sw = new StringWriter();
+        ParseTreeWriter pw = new ParseTreeWriter(new PrintWriter(sw));
+        unparse(pw);
+        sw.flush();
+        return sw.toString();
     }
 
     public void unparse(ParseTreeWriter writer) {

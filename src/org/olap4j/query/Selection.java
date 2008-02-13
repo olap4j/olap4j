@@ -10,6 +10,7 @@
 package org.olap4j.query;
 
 import org.olap4j.metadata.Dimension;
+import org.olap4j.metadata.Member;
 
 /**
  * A selection of members from an OLAP dimension hierarchy.
@@ -32,6 +33,8 @@ public interface Selection {
 
     void setName(String name);
 
+    Member getMember();
+
     Dimension getDimension();
 
     String getHierarchyName();
@@ -44,7 +47,7 @@ public interface Selection {
     void setOperator(Operator operator);
 
     public enum Operator {
-        MEMBER, CHILDREN, INCLUDE_CHILDREN, SIBLINGS;
+        MEMBER, CHILDREN, INCLUDE_CHILDREN, SIBLINGS, ANCESTORS, DESCENDANTS;
     }
 }
 

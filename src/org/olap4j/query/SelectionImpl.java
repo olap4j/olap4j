@@ -10,6 +10,7 @@
 package org.olap4j.query;
 
 import org.olap4j.metadata.Dimension;
+import org.olap4j.metadata.Member;
 
 /**
  * Abstract implementation of {@link Selection}.
@@ -20,6 +21,7 @@ import org.olap4j.metadata.Dimension;
  */
 abstract class SelectionImpl implements Selection {
 
+    protected Member member;
     protected String dimensionName;
     protected String hierarchyName;
     protected String levelName;
@@ -33,6 +35,7 @@ abstract class SelectionImpl implements Selection {
      * @pre operator != null
      */
     public SelectionImpl(
+        Member member,
         Dimension dimension,
         String hierarchyName,
         String levelName,
@@ -40,6 +43,7 @@ abstract class SelectionImpl implements Selection {
         Operator operator)
     {
         super();
+        this.member = member;
         this.dimension = dimension;
         this.hierarchyName = hierarchyName;
         this.levelName = levelName;
@@ -63,6 +67,10 @@ abstract class SelectionImpl implements Selection {
         this.dimension = dimension;
     }
 
+    public Member getMember() {
+        return member;
+    }
+    
     public String getDimensionName() {
         return dimensionName;
     }

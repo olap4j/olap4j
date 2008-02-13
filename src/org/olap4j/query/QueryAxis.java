@@ -92,12 +92,19 @@ public class QueryAxis {
         }
 
         public void add(int index, QueryDimension dimension) {
+            if (this.contains(dimension)) {
+                throw new IllegalStateException("dimension already on this axis");
+            }
             if (dimension.getAxis() != null) {
                 // careful! potential for loop
                 dimension.getAxis().getDimensions().remove(dimension);
             }
             dimension.setAxis(QueryAxis.this);
-            list.add(index, dimension);
+            if (index >= list.size()) {
+                list.add(dimension);
+            } else {
+                list.add(index, dimension);
+            }
         }
 
         public QueryDimension remove(int index) {

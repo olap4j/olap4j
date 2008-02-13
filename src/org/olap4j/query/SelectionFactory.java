@@ -33,7 +33,16 @@ public class SelectionFactory {
     }
 
     Selection createMemberSelection(Member member, Selection.Operator operator) {
-        throw new UnsupportedOperationException();
+        SelectionImpl selectionImpl = 
+            new SelectionImpl(
+                    member,
+                    member.getDimension(), 
+                    member.getHierarchy().getUniqueName(),
+                    member.getLevel().getUniqueName(),
+                    member.getUniqueName(),
+                    operator
+                    ) {};
+        return selectionImpl;
     }
 }
 

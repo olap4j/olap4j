@@ -9,11 +9,16 @@
 */
 package org.olap4j.query;
 
+import org.olap4j.OlapException;
+import org.olap4j.mdx.IdentifierNode;
+import org.olap4j.mdx.IdentifierNode.Segment;
 import org.olap4j.metadata.*;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.AbstractList;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Usage of a dimension for an OLAP query.
@@ -69,23 +74,55 @@ public class QueryDimension {
             member, operator);
     }
 
-    public List<Member> resolve(Selection selection)
+    public static String[] getNameParts(String sel) {
+        List<Segment> list = IdentifierNode.parseIdentifier(sel);
+        String nameParts[] = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            nameParts[i] = list.get(i).getName();
+        }
+        return nameParts;
+    }
+    
+    public List<Member> resolve(Selection selection) throws OlapException
     {
         assert selection != null;
-
+        final Member.TreeOp op;
+        Member.TreeOp secondOp = null;
         switch (selection.getOperator()) {
-        case CHILDREN:
-            /*
-            * TODO: implement CHILDREN operator.
-            *
-            * need to implement getChildren method or something similar - maybe
-            * generate MDX
-            return dimension.getChildren(selection.getHierarchyName(), selection.getLevelName(), selection.getName());
-            */
-            throw new UnsupportedOperationException();
-        default:
-            // TODO implement other operators
-            throw new UnsupportedOperationException();
+            case CHILDREN:
+                op = Member.TreeOp.CHILDREN;
+                break;
+                
+            case SIBLINGS:
+                op = Member.TreeOp.SIBLINGS;
+                break;
+                
+            case INCLUDE_CHILDREN:
+                op = Member.TreeOp.SELF;
+                secondOp = Member.TreeOp.CHILDREN;
+                break;
+                
+            case MEMBER:
+                op = Member.TreeOp.SELF;
+                break;
+                
+            default:
+                throw new OlapException("Operation not supported: " + selection.getOperator());
+                
+        }
+        Set<Member.TreeOp> set = new TreeSet<Member.TreeOp>();
+        set.add(op);
+        if (secondOp != null) {
+            set.add(secondOp);
+        }
+        try {
+            return 
+                query.getCube().lookupMembers(
+                    set, 
+                    getNameParts(selection.getName())
+                );
+        } catch (Exception e) {
+            throw new OlapException("Error while resolving selection " + selection.toString(), e);
         }
     }
 
@@ -127,9 +164,8 @@ public class QueryDimension {
         }
 
         public void add(int index, Selection selection) {
-            if (selection.getDimension() != dimension) {
-                // TODO raise an exception
-                return;
+            if (this.contains(selection)) {
+                throw new IllegalStateException("dimension already contains selection");
             }
             list.add(index, selection);
         }
