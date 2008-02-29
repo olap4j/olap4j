@@ -81,6 +81,9 @@ public class XmlaOlap4jDriver implements Driver {
             register();
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -192,6 +195,14 @@ public class XmlaOlap4jDriver implements Driver {
      * Object which can respond to HTTP requests.
      */
     public interface Proxy {
+        /**
+         * Sends a request to a URL and returns the response.
+         *
+         * @param url Target URL
+         * @param request Request string
+         * @return Response
+         * @throws IOException
+         */
         byte[] get(URL url, String request) throws IOException;
 
         /**
@@ -204,6 +215,12 @@ public class XmlaOlap4jDriver implements Driver {
         Future<byte[]> submit(
             URL url,
             String request);
+
+        /**
+         * Returns the name of the character set use for encoding the XML
+         * string.
+         */
+//        String getEncodingCharsetName();
     }
 
     /**
@@ -224,8 +241,10 @@ public class XmlaOlap4jDriver implements Driver {
                     "Authorization", "Basic " + encoding);
             }
 
-            // Send data (i.e. POST). Assume default encoding.
-            urlConnection.getOutputStream().write(request.getBytes());
+            // Send data (i.e. POST). Use same encoding as specified in the
+            // header.
+            final String encoding = getEncodingCharsetName();
+            urlConnection.getOutputStream().write(request.getBytes(encoding));
 
             // Get the response, again assuming default encoding.
             InputStream is = urlConnection.getInputStream();
@@ -249,6 +268,10 @@ public class XmlaOlap4jDriver implements Driver {
                     }
                 }
             );
+        }
+
+        public String getEncodingCharsetName() {
+            return "UTF-8";
         }
     }
 

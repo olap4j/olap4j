@@ -497,8 +497,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         final String dataSourceInfo =
             context.olap4jConnection.getDataSourceInfo();
         final String content = "Data";
+        final String encoding = "UTF-8"; // proxy.getEncodingCharsetName();
         final StringBuilder buf = new StringBuilder(
-            "<SOAP-ENV:Envelope\n"
+            "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n" 
+                + "<SOAP-ENV:Envelope\n"
                 + "    xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
                 + "    SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
                 + "  <SOAP-ENV:Body>\n"
