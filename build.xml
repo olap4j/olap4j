@@ -68,8 +68,8 @@ ${jar-jdk14.file}"/>
 
     <!-- Mondrian jars. If you are running against the mondrian driver,
          define mondrian.lib.dir and uncomment the following lines. -->
-    <!-- -->
-    <pathelement location="${mondrian.dir}/classes"/>
+    <!--
+    <pathelement location="${mondrian.lib.dir}/mondrian.jar"/>
     <pathelement location="${mondrian.dir}/testclasses"/>
     <pathelement location="${mondrian.lib.dir}/eigenbase-xom.jar"/>
     <pathelement location="${mondrian.lib.dir}/eigenbase-properties.jar"/>
@@ -81,7 +81,7 @@ ${jar-jdk14.file}"/>
     <pathelement location="${mondrian.lib.dir}/commons-logging.jar"/>
     <pathelement location="${mondrian.lib.dir}/commons-math-1.0.jar"/>
     <pathelement location="${mondrian.lib.dir}/xercesImpl.jar"/>
-    <!-- -->
+    -->
 
   </path>
 
