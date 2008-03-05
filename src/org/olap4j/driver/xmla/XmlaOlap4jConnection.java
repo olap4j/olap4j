@@ -506,7 +506,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         final String dataSourceInfo =
             context.olap4jConnection.getDataSourceInfo();
         final String content = "Data";
-        final String encoding = "UTF-8"; // proxy.getEncodingCharsetName();
+        final String encoding = proxy.getEncodingCharsetName();
         final StringBuilder buf = new StringBuilder(
             "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n" 
                 + "<SOAP-ENV:Envelope\n"

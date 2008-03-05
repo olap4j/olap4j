@@ -15,7 +15,7 @@
   <property file="${project.location}/test.properties"/>
   <property name="project.build.debug" value="on"/>
   <property name="name" value="olap4j"/>
-  <property name="version" value="0.9.4-svn072"/>
+  <property name="version" value="0.9.5-svn076"/>
   <property name="dist.name" value="${name}-${version}" />
 
   <!-- properties related to paths -->
@@ -68,8 +68,8 @@ ${jar-jdk14.file}"/>
 
     <!-- Mondrian jars. If you are running against the mondrian driver,
          define mondrian.lib.dir and uncomment the following lines. -->
-    <!--
-    <pathelement location="${mondrian.lib.dir}/mondrian.jar"/>
+    <!-- -->
+    <pathelement location="${mondrian.dir}/classes"/>
     <pathelement location="${mondrian.dir}/testclasses"/>
     <pathelement location="${mondrian.lib.dir}/eigenbase-xom.jar"/>
     <pathelement location="${mondrian.lib.dir}/eigenbase-properties.jar"/>
@@ -81,7 +81,7 @@ ${jar-jdk14.file}"/>
     <pathelement location="${mondrian.lib.dir}/commons-logging.jar"/>
     <pathelement location="${mondrian.lib.dir}/commons-math-1.0.jar"/>
     <pathelement location="${mondrian.lib.dir}/xercesImpl.jar"/>
-    -->
+    <!-- -->
 
   </path>
 
@@ -128,14 +128,15 @@ ${jar-jdk14.file}"/>
 
   <target name="compile" depends="prepare,parser,compile.java"/>
 
-    <condition property="jdk16.present">
+  <condition property="jdk16.present">
+    <equals arg1="${ant.java.version}" arg2="1.6"/>
+  </condition>
+
+  <condition property="jdk16.not.present">
+    <not>
       <equals arg1="${ant.java.version}" arg2="1.6"/>
-    </condition>
-    <condition property="jdk16.not.present">
-      <not>
-        <equals arg1="${ant.java.version}" arg2="1.6"/>
-      </not>
-    </condition>
+    </not>
+  </condition>
 
   <target name="compile.java">
     <javac
@@ -296,8 +297,8 @@ must be run under JDK 1.5." />
   </target>
 
   <target name="compileJdk16">
-    <exec os="linux" executable="buildJdk16.sh"/>
-    <exec os="windows" executable="buildJdk16.bat"/>
+    <exec osfamily="unix" executable="buildJdk16.sh"/>
+    <exec osfamily="windows" executable="buildJdk16.bat"/>
   </target>
 
   <target name="jar" depends="version,checkIsNotJdk16,compile,compileJdk16">

@@ -343,12 +343,21 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             for (Element hierarchyInfo : hierarchyInfos) {
                 final String hierarchyName =
                     hierarchyInfo.getAttribute("name");
-                final Hierarchy hierarchy =
+                Hierarchy hierarchy =
                     cube.getHierarchies().get(hierarchyName);
                 if (hierarchy == null) {
-                    throw olap4jStatement.olap4jConnection.helper.createException(
-                        "Internal error: hierarchy '" + hierarchyName
-                            + "' not found in cube '" + cubeName + "'");
+                    for (Hierarchy hierarchy1 : cube.getHierarchies()) {
+                        if (hierarchy1.getUniqueName().equals(hierarchyName)) {
+                            hierarchy = hierarchy1;
+                            break;
+                        }
+                    }
+                    if (hierarchy == null) {
+                        throw olap4jStatement.olap4jConnection.helper
+                            .createException(
+                                "Internal error: hierarchy '" + hierarchyName
+                                    + "' not found in cube '" + cubeName + "'");
+                    }
                 }
                 hierarchyList.add(hierarchy);
                 for (Element childNode : childElements(hierarchyInfo)) {

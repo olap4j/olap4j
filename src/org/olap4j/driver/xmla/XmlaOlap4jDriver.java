@@ -220,7 +220,7 @@ public class XmlaOlap4jDriver implements Driver {
          * Returns the name of the character set use for encoding the XML
          * string.
          */
-//        String getEncodingCharsetName();
+        String getEncodingCharsetName();
     }
 
     /**
