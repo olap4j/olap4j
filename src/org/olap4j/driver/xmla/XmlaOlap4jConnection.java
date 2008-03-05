@@ -67,6 +67,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     private Locale locale;
     private String catalogName;
     private static final boolean DEBUG = true;
+    private String roleName;
 
     /**
      * Creates an Olap4j connection an XML/A provider.
@@ -389,6 +390,14 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             return Locale.getDefault();
         }
         return locale;
+    }
+
+    public void setRoleName(String roleName) throws OlapException {
+        this.roleName = roleName;
+    }
+
+    public String getRoleName() {
+        return roleName;
     }
 
     <T extends Named> void populateList(

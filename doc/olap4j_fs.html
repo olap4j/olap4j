@@ -79,10 +79,10 @@ TABLE TD {
 <h1>olap4j Specification</h1>
 
 <p>Authors: Julian Hyde, Barry Klawans<br>
-Version: 0.9.4 (beta)<br>
+Version: 0.9.5 (beta)<br>
 Revision: $Id$
 (<a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
-Last modified: December 18<sup>th</sup>, 2007.</p>
+Last modified: March 5<sup>th</sup>, 2008.</p>
 <hr noshade="noshade">
 
 <h2><a name="Contents">Contents</a></h2>
@@ -643,6 +643,13 @@ connection to an OLAP data source.</p>
 Methods:</p>
 <ul>
     <li><code>NamedList&lt;Catalog&gt; getCatalogs()</code></li>
+    <li><code>Schema getSchema()</code></li>
+    <li><code>void setLocale(Locale locale)</code></li>
+    <li><code>Locale getLocale()</code></li>
+    <li><code>void setRoleName(String roleName)</code></li>
+    <li><code>String getRoleName()</code></li>
+    <li><code>PreparedOlapStatement prepareOlapStatement(String mdx)</code></li>
+    <li><code>MdxParserFactory getParserFactory()</code></li>
 </ul>
 
 <h4>2.2.3. <a name="The_OlapWrapper_interface">The OlapWrapper interface</a></h4>
@@ -1204,7 +1211,8 @@ org.olap4j.metadata.Cube</a>.</li>
 for access control depend on the provider, and this specification does not say 
 what those rules should be. But this specification requires that the API methods 
 must behave consistently with the server's access control policy.</p>
-<p>For example, in mondrian, users belong to roles, and roles may be granted or 
+
+<p>For example, in mondrian, users belong to roles, and roles may be granted or
 denied access to cubes, hierarchies, or members within hierarchies. Suppose that 
 user Fred belongs to the &quot;Sales Manager&quot; role, which does not have access to the
 <code>[Nation]</code>
@@ -1214,6 +1222,12 @@ been opened in the &quot;Sales Manager&quot; role. Then the <code>Member.getPare
 is invisible to him; also, the <code>Hierarchy.getLevels()</code> and <code>
 OlapDatabaseMetaData.getLevels()</code> methods will omit the Nation level from 
 the list of levels they return.</p>
+
+<p>In olap4j, you can set a connection's role at connect time using the
+<code>Role</code> connect string property, or you can call the
+<code>OlapConnection.setRole(String roleName)</code> method at any point
+during the lifecycle of the connection. Setting the role name to
+<code>null</code> reverts to the default access-control context.</p>
 
 <h4>2.7.2. <a name="Metadata_objects">Metadata objects</a></h4>
 

@@ -96,6 +96,23 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * @return locale of this connection
      */
     Locale getLocale();
+
+    /**
+     * Sets the name of the role in which this connection executes queries. If
+     * the name of the role is null, the connection reverts to the default
+     * access control context.
+     *
+     * @param roleName Name of role
+     * @throws OlapException if role name is invalid
+     */
+    void setRoleName(String roleName) throws OlapException;
+
+    /**
+     * Returns the name of the role in which this connection executes queries.
+     *
+     * @return name of the role in which this connection executes queries
+     */
+    String getRoleName();
 }
 
 // End OlapConnection.java
