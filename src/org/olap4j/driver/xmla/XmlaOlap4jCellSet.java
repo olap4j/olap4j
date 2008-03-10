@@ -46,20 +46,30 @@ abstract class XmlaOlap4jCellSet implements CellSet {
     private final List<CellSetAxis> immutableAxisList =
         Olap4jUtil.cast(Collections.unmodifiableList(axisList));
     private XmlaOlap4jCellSetAxis filterAxis;
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static final List<String> standardProperties = Arrays.asList(
         "UName", "Caption", "LName", "LNum", "DisplayInfo");
 
+    /**
+     * Creates an XmlaOlap4jCellSet.
+     *
+     * @param olap4jStatement Statement
+     */
     XmlaOlap4jCellSet(
         XmlaOlap4jStatement olap4jStatement)
-        throws OlapException
     {
         assert olap4jStatement != null;
         this.olap4jStatement = olap4jStatement;
         this.closed = false;
     }
 
+    /**
+     * Gets response from the XMLA request and populates cell set axes and cells
+     * with it.
+     *
+     * @throws OlapException on error
+     */
     void populate() throws OlapException {
         byte[] bytes = olap4jStatement.getBytes();
 
@@ -150,7 +160,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 ((XmlaOlap4jPreparedStatement) olap4jStatement)
                     .cellSetMetaData;
         } else {
-            this.metaData = createMetaData(olap4jStatement, root);
+            this.metaData = createMetaData(root);
         }
 
         // todo: use CellInfo element to determine mapping of cell properties
@@ -166,7 +176,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         final Element axesNode = findChild(root, MDDATASET_NS, "Axes");
         for (Element axisNode : findChildren(axesNode, MDDATASET_NS, "Axis")) {
             final String axisName = axisNode.getAttribute("name");
-            final Axis axis = xx(axisName);
+            final Axis axis = lookupAxis(axisName);
             final XmlaOlap4jCellSetAxis cellSetAxis =
                 new XmlaOlap4jCellSetAxis(this, axis);
             switch (axis) {
@@ -224,7 +234,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                             stringElement(memberNode, "Caption");
                         final int lnum = integerElement(memberNode, "LNum");
                         final Hierarchy hierarchy =
-                            metaData.cube.getHierarchies().get(hierarchyName);
+                            lookupHierarchy(metaData.cube, hierarchyName);
                         final Level level = hierarchy.getLevels().get(lnum);
                         member = new XmlaOlap4jSurpriseMember(
                             level, hierarchy, lnum, caption, uname);
@@ -264,6 +274,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             final String value = stringElement(cell, "Value");
             final String formattedValue = stringElement(cell, "FmtValue");
             final String formatString = stringElement(cell, "FormatString");
+            Olap4jUtil.discard(formatString);
             for (Element element : childElements(cell)) {
                 String tag = element.getLocalName();
                 final Property property =
@@ -283,9 +294,15 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         }
     }
 
-    private XmlaOlap4jCellSetMetaData createMetaData(
-        XmlaOlap4jStatement olap4jStatement,
-        Element root) throws OlapException
+    /**
+     * Creates metadata for a cell set, given the DOM of the XMLA result.
+     *
+     * @param root Root node of XMLA result
+     * @return Metadata describing this cell set
+     * @throws OlapException on error
+     */
+    private XmlaOlap4jCellSetMetaData createMetaData(Element root)
+        throws OlapException
     {
         final Element olapInfo =
             findChild(root, MDDATASET_NS, "OlapInfo");
@@ -312,7 +329,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         XmlaOlap4jCellSetAxisMetaData filterAxisMetaData = null;
         for (Element axisInfo : axisInfos) {
             final String axisName = axisInfo.getAttribute("name");
-            Axis axis = xx(axisName);
+            Axis axis = lookupAxis(axisName);
             final List<Element> hierarchyInfos =
                 findChildren(axisInfo, MDDATASET_NS, "HierarchyInfo");
             final List<Hierarchy> hierarchyList =
@@ -341,24 +358,8 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             final List<XmlaOlap4jCellSetMemberProperty> propertyList =
                 new ArrayList<XmlaOlap4jCellSetMemberProperty>();
             for (Element hierarchyInfo : hierarchyInfos) {
-                final String hierarchyName =
-                    hierarchyInfo.getAttribute("name");
-                Hierarchy hierarchy =
-                    cube.getHierarchies().get(hierarchyName);
-                if (hierarchy == null) {
-                    for (Hierarchy hierarchy1 : cube.getHierarchies()) {
-                        if (hierarchy1.getUniqueName().equals(hierarchyName)) {
-                            hierarchy = hierarchy1;
-                            break;
-                        }
-                    }
-                    if (hierarchy == null) {
-                        throw olap4jStatement.olap4jConnection.helper
-                            .createException(
-                                "Internal error: hierarchy '" + hierarchyName
-                                    + "' not found in cube '" + cubeName + "'");
-                    }
-                }
+                final String hierarchyName = hierarchyInfo.getAttribute("name");
+                Hierarchy hierarchy = lookupHierarchy(cube, hierarchyName);
                 hierarchyList.add(hierarchy);
                 for (Element childNode : childElements(hierarchyInfo)) {
                     String tag = childNode.getLocalName();
@@ -409,16 +410,51 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 cellProperties);
     }
 
-    private Axis xx(String axisName) {
-        Axis axis;
+    /**
+     * Looks up a hierarchy in a cube with a given name or, failing that, a
+     * given unique name. Throws if not found.
+     *
+     * @param cube Cube
+     * @param hierarchyName Name (or unique name) of hierarchy.
+     * @return Hierarchy
+     * @throws OlapException
+     */
+    private Hierarchy lookupHierarchy(XmlaOlap4jCube cube, String hierarchyName)
+        throws OlapException
+    {
+        Hierarchy hierarchy = cube.getHierarchies().get(hierarchyName);
+        if (hierarchy == null) {
+            for (Hierarchy hierarchy1 : cube.getHierarchies()) {
+                if (hierarchy1.getUniqueName().equals(hierarchyName)) {
+                    hierarchy = hierarchy1;
+                    break;
+                }
+            }
+            if (hierarchy == null) {
+                throw this.olap4jStatement.olap4jConnection.helper
+                    .createException(
+                        "Internal error: hierarchy '" + hierarchyName
+                            + "' not found in cube '" + cube.getName()
+                            + "'");
+            }
+        }
+        return hierarchy;
+    }
+
+    /**
+     * Looks up an Axis with a given name.
+     *
+     * @param axisName Name of axis
+     * @return Axis
+     */
+    private Axis lookupAxis(String axisName) {
         if (axisName.startsWith("Axis")) {
             final Integer ordinal =
                 Integer.valueOf(axisName.substring("Axis".length()));
-            axis = Axis.values()[Axis.COLUMNS.ordinal() + ordinal];
+            return Axis.values()[Axis.COLUMNS.ordinal() + ordinal];
         } else {
-            axis = Axis.FILTER;
+            return Axis.FILTER;
         }
-        return axis;
     }
 
     public CellSetMetaData getMetaData() {
@@ -445,6 +481,13 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         return getCell(coords);
     }
 
+    /**
+     * Returns a cell given its ordinal.
+     *
+     * @param pos Ordinal
+     * @return Cell
+     * @throws IndexOutOfBoundsException if ordinal is not in range
+     */
     private Cell getCellInternal(int pos) {
         final Cell cell = cellMap.get(pos);
         if (cell == null) {
@@ -461,6 +504,12 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         return cell;
     }
 
+    /**
+     * Returns a string describing the maximum coordinates of this cell set;
+     * for example "2, 3" for a cell set with 2 columns and 3 rows.
+     *
+     * @return description of cell set bounds
+     */
     private String getBoundsAsString() {
         StringBuilder buf = new StringBuilder();
         int k = 0;
@@ -481,6 +530,12 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         return filterAxis;
     }
 
+    /**
+     * Returns the ordinal of the last cell in this cell set. This is the
+     * product of the cardinalities of all axes.
+     *
+     * @return ordinal of last cell in cell set
+     */
     private int maxOrdinal() {
         int modulo = 1;
         for (CellSetAxis axis : axisList) {
@@ -1125,6 +1180,15 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         private final String caption;
         private final String uname;
 
+        /**
+         * Creates an XmlaOlap4jSurpriseMember.
+         *
+         * @param level Level
+         * @param hierarchy Hierarchy
+         * @param lnum Level number
+         * @param caption Caption
+         * @param uname Member unique name
+         */
         XmlaOlap4jSurpriseMember(
             Level level,
             Hierarchy hierarchy,
