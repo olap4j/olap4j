@@ -505,6 +505,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     {
         final String dataSourceInfo =
             context.olap4jConnection.getDataSourceInfo();
+        final String catalog =
+            context.olap4jConnection.getCatalog();
         final String content = "Data";
         final String encoding = proxy.getEncodingCharsetName();
         final StringBuilder buf = new StringBuilder(
@@ -551,6 +553,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             + "        <DataSourceInfo>");
         buf.append(dataSourceInfo);
         buf.append("</DataSourceInfo>\n"
+            + "        <Catalog>");
+        buf.append(catalog);
+        buf.append("</Catalog>\n"
             + "        <Content>" + content + "</Content>\n"
             + "      </PropertyList>\n"
             + "    </Properties>\n"
@@ -563,22 +568,26 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     /**
      * Encodes a string for use in an XML CDATA section.
      *
-     * <p>TODO use an XML serialiser or handle these too:
-     * quote (") "
-     * apostrophe (') &apos;
-     * ampersand (&) &amp;
-     * less than (<) &lt;
-     * greater than (>) &gt;
-     *
      * @param value to be xml encoded
      * @return an XML encode string or the value is not required.
      */
     private static String xmlEncode(String value){
-        if (value.indexOf('&') == -1) {
-            return value;
-        } else {
-            return value.replace("&", "&amp;");
+        if (value.indexOf('&') >= 0) {
+            value = value.replace("&", "&amp;");
         }
+        if (value.indexOf('<') >= 0) {
+            value = value.replace("<", "&lt;");
+        }
+        if (value.indexOf('>') >= 0) {
+            value = value.replace(">", "&gt;");
+        }
+        if (value.indexOf('"') >= 0) {
+            value = value.replace("\"", "&quot;");
+        }
+        if (value.indexOf('\'') >= 0) {
+            value = value.replace("'", "&apos;");
+        }
+        return value;
     }
 
     // ~ inner classes --------------------------------------------------------

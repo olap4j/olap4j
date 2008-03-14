@@ -57,6 +57,7 @@ ${jar-jdk14.file}"/>
     <pathelement location="${ant.home}/lib/ant.jar"/>
     <pathelement location="${lib.dir}/log4j-1.2.9.jar"/>
     <pathelement location="${lib.dir}/javacup.jar"/>
+    <pathelement location="${lib.dir}/xercesImpl.jar"/>
     <pathelement location="${testlib.dir}/junit.jar"/>
     <pathelement location="${testlib.dir}/servlet.jar"/>
   </path>
@@ -197,6 +198,7 @@ ${jar-jdk14.file}"/>
           prefix="${dist.name}"
           includes="
 ${src.dir}/**/*.java,
+${src.dir}/**/*.cup,
 ${testsrc.dir}/**/*.java,
 doc/**/*.css,
 doc/**/*.png,
