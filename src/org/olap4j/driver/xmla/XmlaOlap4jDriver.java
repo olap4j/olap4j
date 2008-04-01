@@ -52,6 +52,12 @@ import java.util.concurrent.*;
  * <tr> <th>Property</th>        <th>Description</th> </tr>
  *
  * <tr> <td>Server</td>          <td>URL of HTTP server.</td> </tr>
+ * 
+ * <tr> <td>Catalog</td>          <td>Catalog name to use</td> </tr>
+ * 
+ * <tr> <td>Provider</td>          <td>Name of the XMLA provider. This option is facultative. By default, the first one available will be used.</td> </tr>
+ * 
+ * <tr> <td>DataSource</td>          <td>Name of the XMLA datasource. This option is facultative. By default, the first one available will be used. When using a Mondrian backed XMLA server, be sure to include the full datasource name between quotes.</td> </tr>
  *
  * <tr> <td>UseThreadProxy</td>  <td>If true, use the proxy object in the
  *                                   {@link #THREAD_PROXY} field. For testing.
@@ -290,7 +296,9 @@ public class XmlaOlap4jDriver implements Driver {
                 + "For testing. Default is false."),
 
         Server("URL of HTTP server"),
-        Catalog("Catalog name");
+        Catalog("Catalog name"),
+        Provider("Name of the datasource provider"),
+        DataSource("Name of the datasource");
 
         Property(String description) {
         }

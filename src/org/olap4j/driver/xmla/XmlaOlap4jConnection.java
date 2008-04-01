@@ -8,24 +8,65 @@
 */
 package org.olap4j.driver.xmla;
 
-import org.olap4j.*;
-import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
-import org.olap4j.impl.*;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.ROWSET_NS;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.SOAP_NS;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.XMLA_NS;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.booleanElement;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.childElements;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.findChild;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.integerElement;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.parse;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.stringElement;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Savepoint;
+import java.sql.Statement;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.olap4j.Cell;
+import org.olap4j.OlapConnection;
+import org.olap4j.OlapDatabaseMetaData;
+import org.olap4j.OlapException;
+import org.olap4j.OlapStatement;
+import org.olap4j.PreparedOlapStatement;
+import org.olap4j.impl.ConnectStringParser;
+import org.olap4j.impl.Named;
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.ParseTreeWriter;
 import org.olap4j.mdx.SelectNode;
-import org.olap4j.mdx.parser.*;
+import org.olap4j.mdx.parser.MdxParser;
+import org.olap4j.mdx.parser.MdxParserFactory;
+import org.olap4j.mdx.parser.MdxValidator;
 import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
-import org.olap4j.metadata.*;
+import org.olap4j.metadata.Catalog;
+import org.olap4j.metadata.Datatype;
+import org.olap4j.metadata.Dimension;
+import org.olap4j.metadata.Level;
+import org.olap4j.metadata.Measure;
+import org.olap4j.metadata.Member;
+import org.olap4j.metadata.NamedList;
+import org.olap4j.metadata.Property;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.sql.*;
-import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Implementation of {@link org.olap4j.OlapConnection}
@@ -58,7 +99,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     final XmlaOlap4jDriver.Proxy proxy;
 
     private boolean closed;
-
+    
     /**
      * URL of the HTTP server to which to send XML requests.
      */
@@ -66,8 +107,31 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     private Locale locale;
     private String catalogName;
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private String roleName;
+    
+    /**
+     * Holds on to the provider name
+     */
+    private String providerName = null;
+    
+    /**
+     * Holds on to the datasource name.
+     */
+    private String datasourceName = null;
+    
+    /**
+     * Holds on to the datasource name as specified by the
+     * server. Some servers (mondrian...) return both the provider
+     * name and the datasource name in their response.
+     * 
+     * It's bad but hey, you gotta live with it.
+     * 
+     * It's this value that we use inside queries, and not the jdbc
+     * query value.
+     * 
+     */
+    private String nativeDatasourceName = null;
 
     /**
      * Creates an Olap4j connection an XML/A provider.
@@ -106,6 +170,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             map.put(entry.getKey(), entry.getValue());
         }
 
+        this.providerName = map.get(XmlaOlap4jDriver.Property.Provider.name());
+        this.datasourceName = map.get(XmlaOlap4jDriver.Property.DataSource.name());
         this.catalogName = map.get(XmlaOlap4jDriver.Property.Catalog.name());
 
         // Set URL of HTTP server.
@@ -121,7 +187,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         // as part of the standard URL scheme.
         if (map.containsKey("user") && map.containsKey("password")) {
             serverUrl = serverUrl.replaceFirst(
-                ":\\/\\/(.*\\@){0,1}",
+                ":\\/\\/([^@]*@){0,1}",
                 "://"
                     .concat(map.get("user"))
                     .concat(":")
@@ -149,10 +215,75 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return url.startsWith(CONNECT_STRING_PREFIX);
     }
 
+    
+    
+    
     // not part of public API
-    String getDataSourceInfo() {
-        // todo:
-        return "MondrianFoodMart";
+    String getDataSourceInfo() throws OlapException 
+    {
+    	// If we already know it, return it.
+        if ( this.nativeDatasourceName != null )
+        	return this.nativeDatasourceName;
+    	
+    	try 
+    	{
+    		// We need to query for it
+    		ResultSet rSet = this.olap4jDatabaseMetaData.getDatasources();
+    		
+			
+			
+    		// Check if the user requested a particular one. 
+    		if (this.datasourceName != null || this.providerName != null)
+    		{
+    			// We iterate through the datasources
+    			datasources : while ( rSet.next() )
+    			{
+    				// Get current values
+    	    		String currentDatasource = rSet.getString("DATA_SOURCE_NAME"); //$NON-NLS-1$
+    				String currentProvider = rSet.getString("PROVIDER_NAME"); //$NON-NLS-1$
+    	    		
+    	    		// If datasource and provider match, we got it.
+    				// If datasource matches but no provider is specified, we got it.
+    				// If provider matches but no datasource specified, we consider it good.
+    				if ( 
+    					( currentDatasource.equals(this.datasourceName)
+    					  && currentProvider.equals(this.providerName) )
+    					  ||
+    					( currentDatasource.equals(this.datasourceName)
+    	    			  && this.providerName == null )
+    	    			  ||
+    					( currentProvider.equals(this.providerName)
+    	    			  && this.datasourceName == null )
+    					)
+    				{
+    					// Got it
+    					this.nativeDatasourceName = rSet.getString("DATA_SOURCE_NAME");
+    					break datasources;
+    				}
+    				
+    			} // datasources loop
+    		}
+    		else
+    		{
+    			// Use first
+    			rSet.first();
+    			
+	    		// Keep it
+	    		this.nativeDatasourceName = rSet.getString("DATA_SOURCE_NAME"); //$NON-NLS-1$
+    		}
+    		
+    		// Crash if no valid datasource is found.
+    		if ( this.nativeDatasourceName == null )
+    			throw new OlapException("No datasource could be found.");
+    		
+    		// If there is a provider
+			return this.nativeDatasourceName;
+			
+		} catch (SQLException e) 
+		{
+			// We tried...
+			throw new OlapException("Datasource name not found.", e);
+		}
     }
 
     public OlapStatement createStatement() {
@@ -484,6 +615,35 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return findChild(returnElement, ROWSET_NS, "root");
     }
 
+    
+    /**
+     * Generates a metadata request.
+     *
+     * <p>The list of restrictions must have even length. Even elements must
+     * be a string (the name of the restriction); odd elements must be either
+     * a string (the value of the restriction) or a list of strings (multiple
+     * values of the restriction)
+     *
+     * <p>This signature only relays the execution to 
+     * {@link XmlaOlap4jConnection.generateRequest(Context,MetadataRequest,Object[])}
+     * but passes it a true value to mark any request as datasource name
+     * specific.
+     *
+     * @param context Context
+     * @param metadataRequest Metadata request
+     * @param restrictions List of restrictions
+     * @return XMLA request
+     * @throws OlapException 
+     */
+    public String generateRequest(
+            Context context,
+            MetadataRequest metadataRequest,
+            Object[] restrictions) throws OlapException
+    {
+    	return this.generateRequest(context, metadataRequest, restrictions, true);
+    }
+    
+    
     /**
      * Generates a metadata request.
      *
@@ -496,15 +656,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * @param context Context
      * @param metadataRequest Metadata request
      * @param restrictions List of restrictions
+     * @param datasourceDependentRequest Should we lookup the datasource name ?
      * @return XMLA request
+     * @throws OlapException 
      */
     public String generateRequest(
         Context context,
         MetadataRequest metadataRequest,
-        Object[] restrictions)
+        Object[] restrictions,
+        boolean datasourceDependentRequest) throws OlapException
     {
-        final String dataSourceInfo =
-            context.olap4jConnection.getDataSourceInfo();
         final String catalog =
             context.olap4jConnection.getCatalog();
         final String content = "Data";
@@ -549,14 +710,22 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         buf.append("      </RestrictionList>\n"
             + "    </Restrictions>\n"
             + "    <Properties>\n"
-            + "      <PropertyList>\n"
-            + "        <DataSourceInfo>");
-        buf.append(dataSourceInfo);
-        buf.append("</DataSourceInfo>\n"
-            + "        <Catalog>");
-        buf.append(catalog);
-        buf.append("</Catalog>\n"
-            + "        <Content>" + content + "</Content>\n"
+            + "      <PropertyList>\n");
+        
+        
+        // Add the datasource node only if this request requires it.
+        if ( datasourceDependentRequest )
+        {
+        	buf.append("        <DataSourceInfo>");
+	        buf.append( context.olap4jConnection.getDataSourceInfo() );
+	        buf.append("</DataSourceInfo>\n        <Catalog>");
+	        buf.append(catalog);
+	        buf.append("</Catalog>\n");
+        }
+        
+        
+        
+        buf.append("        <Content>" + content + "</Content>\n"
             + "      </PropertyList>\n"
             + "    </Properties>\n"
             + "    </Discover>\n"
@@ -592,7 +761,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     // ~ inner classes --------------------------------------------------------
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     static class Helper {
         OlapException createException(String msg) {
             return new OlapException(msg);

@@ -101,12 +101,15 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
                 patternValueList.add((String) value);
             }
         }
+    
         String request =
             olap4jConnection.generateRequest(
                 context,
                 metadataRequest,
                 patternValueList.toArray(
-                    new String[patternValueList.size()]));
+                    new String[patternValueList.size()]),
+                    metadataRequest.equals( XmlaOlap4jConnection.MetadataRequest.DISCOVER_DATASOURCES ) ? false : true);
+        
         final Element root = olap4jConnection.xxx(request);
         List<List<Object>> rowList = new ArrayList<List<Object>>();
         rowLoop:
