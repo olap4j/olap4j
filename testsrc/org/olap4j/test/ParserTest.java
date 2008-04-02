@@ -18,6 +18,7 @@ import org.olap4j.OlapConnection;
 import org.olap4j.Axis;
 
 import java.sql.SQLException;
+import java.sql.Connection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,14 +37,31 @@ public class ParserTest extends TestCase {
         Pattern.compile(
             "(?s)From line ([0-9]+), column ([0-9]+) to line ([0-9]+), column ([0-9]+): (.*)");
 
+    final TestContext testContext = TestContext.instance();
+    private Connection connection;
+
     public ParserTest(String name) {
         super(name);
     }
 
+    protected OlapConnection getOlapConnection() throws SQLException {
+        if (connection == null) {
+            connection = testContext.getTester().createConnection();
+        }
+        return testContext.getTester().getWrapper().unwrap(
+            connection, OlapConnection.class);
+    }
+
+    protected void tearDown() throws Exception {
+        if (connection != null && !connection.isClosed()) {
+            connection.close();
+            connection = null;
+        }
+    }
+
     private MdxParser createParser() {
         try {
-            OlapConnection olapConnection =
-                TestContext.instance().getOlapConnection();
+            OlapConnection olapConnection = getOlapConnection();
             return olapConnection.getParserFactory()
                 .createMdxParser(olapConnection);
         } catch (SQLException e) {
@@ -185,9 +203,7 @@ public class ParserTest extends TestCase {
 
     private void checkUnparse(String queryString, final String expected) {
         try {
-            final TestContext testContext = TestContext.instance();
-
-            OlapConnection olapConnection = testContext.getOlapConnection();
+            OlapConnection olapConnection = getOlapConnection();
             MdxParser mdxParser =
                 olapConnection.getParserFactory()
                     .createMdxParser(olapConnection);
@@ -528,7 +544,7 @@ public class ParserTest extends TestCase {
 
     // todo: enable this
     public void _testCloneQuery() throws SQLException {
-        OlapConnection olapConnection = TestContext.instance().getOlapConnection();
+        OlapConnection olapConnection = getOlapConnection();
         MdxParser mdxParser =
             olapConnection.getParserFactory()
                 .createMdxParser(olapConnection);

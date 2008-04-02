@@ -194,17 +194,6 @@ public class TestContext {
     }
 
     /**
-     * Creates a connection to the test's default OLAP server.
-     *
-     * @return connection
-     * @throws SQLException on error
-     */
-    public OlapConnection getOlapConnection() throws SQLException {
-        java.sql.Connection connection = tester.createConnection();
-        return ((OlapWrapper) connection).unwrap(OlapConnection.class);
-    }
-
-    /**
      * Checks that an actual string matches an expected string. If they do not,
      * throws a {@link junit.framework.ComparisonFailure} and prints the
      * difference, including the actual string as an easily pasted Java string

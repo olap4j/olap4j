@@ -24,10 +24,10 @@ public class MetadataTest extends TestCase {
     private static final String NL = System.getProperty("line.separator");
 
     private final TestContext.Tester tester;
-    private final Connection connection;
-    private final String catalogName;
-    private final OlapConnection olapConnection;
-    private final OlapDatabaseMetaData olapDatabaseMetaData;
+    private Connection connection;
+    private String catalogName;
+    private OlapConnection olapConnection;
+    private OlapDatabaseMetaData olapDatabaseMetaData;
     private final String propertyNamePattern = null;
     private final String dataSourceName = "xx";
 
@@ -49,11 +49,21 @@ public class MetadataTest extends TestCase {
 
     public MetadataTest() throws SQLException {
         tester = TestContext.instance().getTester();
+    }
+
+    protected void setUp() throws SQLException {
         connection = tester.createConnection();
         catalogName = connection.getCatalog();
         olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         olapDatabaseMetaData  = olapConnection.getMetaData();
+    }
+
+    protected void tearDown() throws Exception {
+        if (connection != null && !connection.isClosed()) {
+            connection.close();
+            connection = null;
+        }
     }
 
     // ~ Helper methods ----------
