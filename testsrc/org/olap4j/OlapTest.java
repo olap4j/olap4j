@@ -38,16 +38,27 @@ import junit.framework.TestCase;
  */
 public class OlapTest extends TestCase {
     final TestContext.Tester tester = TestContext.instance().getTester();
+    private Connection connection;
 
     public OlapTest() {
         super();
     }
 
+    protected void tearDown() throws Exception {
+        // Simple strategy to prevent connection leaks
+        if (connection != null
+            && !connection.isClosed())
+        {
+            connection.close();
+            connection = null;
+        }
+    }
+
     public Cube getFoodmartCube(String cubeName) {
         try {
-            Connection jdbcConnection = tester.createConnection();
-            OlapConnection connection =
-                ((OlapWrapper) jdbcConnection).unwrap(OlapConnection.class);
+            connection = tester.createConnection();
+            OlapConnection olapConnection =
+                tester.getWrapper().unwrap(connection, OlapConnection.class);
             final String catalogName;
             switch (tester.getFlavor()) {
                 case MONDRIAN:
@@ -58,7 +69,7 @@ public class OlapTest extends TestCase {
                     catalogName = "FoodMart";
                     break;
             }
-            Catalog catalog = connection.getCatalogs().get(catalogName);
+            Catalog catalog = olapConnection.getCatalogs().get(catalogName);
             NamedList<Schema> schemas = catalog.getSchemas();
             if (schemas.size() == 0) {
                 System.out.println("No Schemas found in catalog");
@@ -90,8 +101,6 @@ public class OlapTest extends TestCase {
     
     public void testModel() {
         try {
-            Connection jdbcConnection;
-
             if (false) {
             // define the connection information
             String schemaUri = "file:/open/mondrian/demo/FoodMart.xml";
@@ -103,16 +112,16 @@ public class OlapTest extends TestCase {
             // Create a connection object to the specific implementation of an olap4j source
             // This is the only provider-specific code
             Class.forName("mondrian.olap4j.MondrianOlap4jDriver");
-            jdbcConnection = DriverManager.getConnection(
+            connection = DriverManager.getConnection(
                 "jdbc:mondrian:Jdbc=" + jdbc
                     + ";User=" + userName
                     + ";Password=" + password
                     + ";Catalog=" + schemaUri);
             } else {
-                jdbcConnection = tester.createConnection();
+                connection = tester.createConnection();
             }
-            OlapConnection connection =
-                ((OlapWrapper) jdbcConnection).unwrap(OlapConnection.class);
+            OlapConnection olapConnection =
+                tester.getWrapper().unwrap(connection, OlapConnection.class);
 
             // REVIEW: jhyde: Why do you want to name connections? We could add
             // a connect string property 'description', if that helps
@@ -131,7 +140,7 @@ public class OlapTest extends TestCase {
                 catalogName = "FoodMart";
                 break;
             }
-            Catalog catalog = connection.getCatalogs().get(catalogName);
+            Catalog catalog = olapConnection.getCatalogs().get(catalogName);
             NamedList<Schema> schemas = catalog.getSchemas();
             for (Schema schema : schemas) {
                 System.out.println("schema name="+schema.getName());

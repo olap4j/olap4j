@@ -27,6 +27,15 @@ public class XmlaTester implements TestContext.Tester {
     final XmlaOlap4jDriver.Proxy proxy;
     private Connection connection;
 
+    /**
+     * Creates an XmlaTester
+     *
+     * @throws ClassNotFoundException on error
+     * @throws IllegalAccessException on error
+     * @throws InstantiationException on error
+     * @throws NoSuchMethodException on error
+     * @throws InvocationTargetException on error
+     */
     public XmlaTester()
         throws ClassNotFoundException, IllegalAccessException,
         InstantiationException, NoSuchMethodException,
@@ -35,12 +44,12 @@ public class XmlaTester implements TestContext.Tester {
         final Properties properties = TestContext.getTestProperties();
         final String catalogUrl =
             properties.getProperty(
-                "org.olap4j.XmlaTester.CatalogUrl");
+                TestContext.Property.XMLA_CATALOG_URL.path);
         Map<String, String> catalogNameUrls =
             new HashMap<String, String>();
         catalogNameUrls.put("FoodMart", catalogUrl);
         String urlString =
-            properties.getProperty("org.olap4j.test.connectUrl");
+            properties.getProperty(TestContext.Property.CONNECT_URL.path);
 
         final Class<?> clazz = Class.forName("mondrian.olap4j.MondrianInprocProxy");
         final Constructor<?> constructor =
@@ -107,6 +116,10 @@ public class XmlaTester implements TestContext.Tester {
 
     public Flavor getFlavor() {
         return Flavor.XMLA;
+    }
+
+    public TestContext.Wrapper getWrapper() {
+        return TestContext.Wrapper.NONE;
     }
 
     public static final String DRIVER_CLASS_NAME =

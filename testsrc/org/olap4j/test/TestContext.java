@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -21,12 +21,16 @@ import org.olap4j.*;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.mdx.ParseTreeWriter;
+import org.apache.commons.dbcp.*;
 import junit.framework.ComparisonFailure;
 
 /**
  * Context for olap4j tests.
  *
  * <p>Also provides static utility methods such as {@link #fold(String)}.
+ *
+ * <p>Properties used by the test framework are described in
+ * {@link org.olap4j.test.TestContext.Property}.
  *
  * @author jhyde
  * @version $Id$
@@ -59,7 +63,7 @@ public class TestContext {
      */
     public static String fold(String string) {
         if (!NL.equals("\n")) {
-            string = string.replace("\n", NL);
+            string = Olap4jUtil.replace(string, "\n", NL);
         }
         return string;
     }
@@ -90,6 +94,12 @@ public class TestContext {
         return sw.toString();
     }
 
+    /**
+     * Prints a CellSet.
+     *
+     * @param cellSet Cell set
+     * @param pw Print writer
+     */
     private static void print(CellSet cellSet, PrintWriter pw) {
         pw.println("Axis #0:");
         printAxis(pw, cellSet.getFilterAxis());
@@ -138,6 +148,12 @@ public class TestContext {
         }
     }
 
+    /**
+     * Prints an axis and its members.
+     *
+     * @param pw Print writer
+     * @param axis Axis
+     */
     private static void printAxis(PrintWriter pw, CellSetAxis axis) {
         List<Position> positions = axis.getPositions();
         for (Position position: positions) {
@@ -154,6 +170,13 @@ public class TestContext {
         }
     }
 
+    /**
+     * Prints the formatted value of a Cell at a given position.
+     *
+     * @param cellSet Cell set
+     * @param pw Print writer
+     * @param pos Cell coordinates
+     */
     private static void printCell(
         CellSet cellSet, PrintWriter pw, List<Integer> pos)
     {
@@ -161,10 +184,21 @@ public class TestContext {
         pw.print(cell.getFormattedValue());
     }
 
+    /**
+     * The default instance of TestContext.
+     *
+     * @return default TestContext
+     */
     public static TestContext instance() {
         return INSTANCE;
     }
 
+    /**
+     * Creates a connection to the test's default OLAP server.
+     *
+     * @return connection
+     * @throws SQLException on error
+     */
     public OlapConnection getOlapConnection() throws SQLException {
         java.sql.Connection connection = tester.createConnection();
         return ((OlapWrapper) connection).unwrap(OlapConnection.class);
@@ -286,14 +320,16 @@ public class TestContext {
      * @return a new Tester
      */
     private static Tester createTester() {
+        Properties testProperties = getTestProperties();
         String helperClassName =
-            getTestProperties().getProperty("org.olap4j.test.helperClassName");
+            testProperties.getProperty(Property.HELPER_CLASS_NAME.path);
         if (helperClassName == null) {
             helperClassName = "org.olap4j.MondrianTester";
         }
+        Tester tester;
         try {
             Class<?> clazz = Class.forName(helperClassName);
-            return (Tester) clazz.newInstance();
+            tester = (Tester) clazz.newInstance();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
@@ -301,6 +337,115 @@ public class TestContext {
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         }
+
+        // Apply a wrapper, if the "org.olap4j.test.wrapper" property is
+        // specified.
+        String wrapperName = testProperties.getProperty(Property.WRAPPER.path);
+        Wrapper wrapper;
+        if (wrapperName == null || wrapperName.equals("")) {
+            wrapper = Wrapper.NONE;
+        } else {
+            try {
+                wrapper = Enum.valueOf(Wrapper.class, wrapperName);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException(
+                    "Unknown wrapper value '" + wrapperName + "'");
+            }
+        }
+        switch (wrapper) {
+        case NONE:
+            break;
+        case DBCP:
+            final BasicDataSource dataSource = new BasicDataSource();
+            dataSource.setDriverClassName(tester.getDriverClassName());
+            dataSource.setUrl(tester.getURL());
+            // need access to underlying connection so that we can call
+            // olap4j-specific methods
+            dataSource.setAccessToUnderlyingConnectionAllowed(true);
+            tester = new DelegatingTester(tester) {
+                public Connection createConnection()
+                    throws SQLException
+                {
+                    return dataSource.getConnection();
+                }
+
+                public Wrapper getWrapper() {
+                    return Wrapper.DBCP;
+                }
+            };
+            break;
+        }
+        return tester;
+    }
+
+    /**
+     * Enumeration of valid values for the
+     * {@link org.olap4j.test.TestContext.Property#WRAPPER} property.
+     */
+    public enum Wrapper {
+        /**
+         * No wrapper.
+         */
+        NONE {
+            public <T extends Statement> T unwrap(
+                Statement statement,
+                Class<T> clazz) throws SQLException
+            {
+                return ((OlapWrapper) statement).unwrap(clazz);
+            }
+
+            public <T extends Connection> T unwrap(
+                Connection connection,
+                Class<T> clazz) throws SQLException
+            {
+                return ((OlapWrapper) connection).unwrap(clazz);
+            }
+        },
+        /**
+         * Instructs the olap4j testing framework to wrap connections using
+         * the Apache commons-dbcp connection-pooling framework.
+         */
+        DBCP {
+            public <T extends Statement> T unwrap(
+                Statement statement,
+                Class<T> clazz) throws SQLException
+            {
+                return clazz.cast(
+                    ((DelegatingStatement) statement).getInnermostDelegate());
+            }
+
+            public <T extends Connection> T unwrap(
+                Connection connection,
+                Class<T> clazz) throws SQLException
+            {
+                return clazz.cast(
+                    ((DelegatingConnection) connection).getInnermostDelegate());
+            }
+        };
+
+        /**
+         * Removes wrappers from a statement.
+         *
+         * @param statement Statement
+         * @param clazz Desired result type
+         * @return Unwrapped object
+         * @throws SQLException
+         */
+        public abstract <T extends Statement> T unwrap(
+            Statement statement,
+            Class<T> clazz) throws SQLException;
+
+        /**
+         * Removes wrappers from a connection.
+         *
+         * @param connection Connection
+         * @param clazz Desired result type
+         * @return Unwrapped object
+         * @throws SQLException
+         */
+        public abstract <T extends Connection> T unwrap(
+            Connection connection,
+            Class<T> clazz) throws SQLException;
     }
 
     /**
@@ -355,6 +500,11 @@ public class TestContext {
         return sw.toString();
     }
 
+    /**
+     * Returns this context's tester.
+     *
+     * @return a tester
+     */
     public Tester getTester() {
         return tester;
     }
@@ -365,19 +515,154 @@ public class TestContext {
      * multiple implementations of olap4j.
      */
     public interface Tester {
+        /**
+         * Creates a connection
+         *
+         * @return connection
+         * @throws SQLException on error
+         */
         Connection createConnection() throws SQLException;
 
+        /**
+         * Returns the prefix of URLs recognized by this driver, for example
+         * "jdbc:mondrian:"
+         *
+         * @return URL prefix
+         */
         String getDriverUrlPrefix();
 
+        /**
+         * Returns the class name of the driver, for example
+         * "mondrian.olap4j.MondrianOlap4jDriver".
+         *
+         * @return driver class name
+         */
         String getDriverClassName();
 
+        /**
+         * Creates a connection using the
+         * {@link java.sql.DriverManager#getConnection(String, String, String)}
+         * method.
+         *
+         * @return connection
+         * @throws SQLException on error
+         */
         Connection createConnectionWithUserPassword() throws SQLException;
 
+        /**
+         * Returns the URL of the FoodMart database.
+         *
+         * @return URL of the FoodMart database
+         */
         String getURL();
 
+        /**
+         * Returns an enumeration indicating the driver (or strictly, the family
+         * of drivers) supported by this Tester. Allows the test suite to
+         * disable tests or expect slightly different results if the
+         * capabilities of OLAP servers are different.
+         *
+         * @return Flavor of driver/OLAP engine we are connecting to
+         */
         Flavor getFlavor();
 
+        /**
+         * Returns a description of the wrapper, if any, around this connection.
+         */
+        Wrapper getWrapper();
+
         enum Flavor { MONDRIAN, XMLA }
+    }
+
+    /**
+     * Implementation of {@link Tester} that delegates to an underlying tester.
+     */
+    public static abstract class DelegatingTester implements Tester {
+        protected final Tester tester;
+
+        /**
+         * Creates a DelegatingTester.
+         *
+         * @param tester Underlying tester to which calls are delegated
+         */
+        protected DelegatingTester(Tester tester) {
+            this.tester = tester;
+        }
+
+        public Connection createConnection() throws SQLException {
+            return tester.createConnection();
+        }
+
+        public String getDriverUrlPrefix() {
+            return tester.getDriverUrlPrefix();
+        }
+
+        public String getDriverClassName() {
+            return tester.getDriverClassName();
+        }
+
+        public Connection createConnectionWithUserPassword() throws SQLException {
+            return tester.createConnectionWithUserPassword();
+        }
+
+        public String getURL() {
+            return tester.getURL();
+        }
+
+        public Flavor getFlavor() {
+            return tester.getFlavor();
+        }
+
+        public Wrapper getWrapper() {
+            return tester.getWrapper();
+        }
+    }
+
+    /**
+     * Enumeration of system properties that mean something to the olap4j
+     * testing framework.
+     */
+    public enum Property {
+
+        /**
+         * Name of the class used by the test infrastructure to make connections
+         * to the olap4j data source and perform other housekeeping operations.
+         * Valid values include "org.olap4j.MondrianTester" (the default)
+         * and "org.olap4j.XmlaTester".
+         */
+        HELPER_CLASS_NAME("org.olap4j.test.helperClassName"),
+
+        /**
+         * Test property that provides the value of returned by the
+         * {@link Tester#getURL} method.
+         */
+        CONNECT_URL("org.olap4j.test.connectUrl"),
+
+        /**
+         * Test property that provides the URL name of the catalog for the XMLA
+         * driver.
+         */
+        XMLA_CATALOG_URL("org.olap4j.XmlaTester.CatalogUrl"),
+
+        /**
+         * Test property that indicates the wrapper to place around the
+         * connection. Valid values are defined by the {@link Wrapper}
+         * enumeration, such as "Dbcp". If not specified, the connection is used
+         * without a connection pool.
+         */
+        WRAPPER("org.olap4j.test.wrapper"),
+        ;
+
+        public final String path;
+
+        /**
+         * Creates a Property enum value.
+         *
+         * @param path Full name of property, e.g. "org.olap4.foo.Bar".
+         */
+        private Property(String path) {
+            this.path = path;
+        }
     }
 }
 

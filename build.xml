@@ -60,6 +60,8 @@ ${jar-jdk14.file}"/>
     <pathelement location="${lib.dir}/xercesImpl.jar"/>
     <pathelement location="${testlib.dir}/junit.jar"/>
     <pathelement location="${testlib.dir}/servlet.jar"/>
+    <pathelement location="${testlib.dir}/commons-dbcp.jar"/>
+    <pathelement location="${testlib.dir}/commons-pool.jar"/>
   </path>
 
   <path id="project.test.classpath">
@@ -75,8 +77,6 @@ ${jar-jdk14.file}"/>
     <pathelement location="${mondrian.lib.dir}/eigenbase-xom.jar"/>
     <pathelement location="${mondrian.lib.dir}/eigenbase-properties.jar"/>
     <pathelement location="${mondrian.lib.dir}/eigenbase-resgen.jar"/>
-    <pathelement location="${mondrian.lib.dir}/commons-dbcp.jar"/>
-    <pathelement location="${mondrian.lib.dir}/commons-pool.jar"/>
     <pathelement location="${mondrian.lib.dir}/commons-collections.jar"/>
     <pathelement location="${mondrian.lib.dir}/commons-vfs.jar"/>
     <pathelement location="${mondrian.lib.dir}/commons-logging.jar"/>
@@ -491,6 +491,10 @@ META-INF/**"/>
   </target>
 
   <target name="test" depends="prepare, compile, compile.tests">
+    <antcall target="test-nobuild"/>
+  </target>
+
+  <target name="test-nobuild">
     <junit printsummary="yes" fork="yes" failureproperty="junit.failure"
       tempdir="${testlog.dir}">
       <formatter type="plain"/>

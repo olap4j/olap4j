@@ -740,22 +740,12 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * @param value to be xml encoded
      * @return an XML encode string or the value is not required.
      */
-    private static String xmlEncode(String value){
-        if (value.indexOf('&') >= 0) {
-            value = value.replace("&", "&amp;");
-        }
-        if (value.indexOf('<') >= 0) {
-            value = value.replace("<", "&lt;");
-        }
-        if (value.indexOf('>') >= 0) {
-            value = value.replace(">", "&gt;");
-        }
-        if (value.indexOf('"') >= 0) {
-            value = value.replace("\"", "&quot;");
-        }
-        if (value.indexOf('\'') >= 0) {
-            value = value.replace("'", "&apos;");
-        }
+    private static String xmlEncode(String value) {
+        value = Olap4jUtil.replace(value, "&", "&amp;");
+        value = Olap4jUtil.replace(value, "<", "&lt;");
+        value = Olap4jUtil.replace(value, ">", "&gt;");
+        value = Olap4jUtil.replace(value, "\"", "&quot;");
+        value = Olap4jUtil.replace(value, "'", "&apos;");
         return value;
     }
 

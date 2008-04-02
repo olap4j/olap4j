@@ -51,11 +51,15 @@ public class MondrianTester implements TestContext.Tester {
         // This property is usually defined in build.properties. See
         // examples in that file.
         return TestContext.getTestProperties().getProperty(
-            "org.olap4j.test.connectUrl");
+            TestContext.Property.CONNECT_URL.path);
     }
 
     public Flavor getFlavor() {
         return Flavor.MONDRIAN;
+    }
+
+    public TestContext.Wrapper getWrapper() {
+        return TestContext.Wrapper.NONE;
     }
 
     public static final String DRIVER_CLASS_NAME =

@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -11,6 +11,7 @@ package org.olap4j;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.*;
 import org.olap4j.mdx.parser.*;
 import org.olap4j.metadata.*;
@@ -37,6 +38,23 @@ public class ConnectionTest extends TestCase {
 
     private static final boolean IS_JDK_16 =
         System.getProperty("java.version").startsWith("1.6.");
+
+    /**
+     * Simple strategy to prevent connection leaks: each test that needs a
+     * connection assigns it to this field, and {@link #tearDown()} closes it
+     * if it is not already closed.
+     */
+    private Connection connection;
+
+    protected void tearDown() throws Exception {
+        // Simple strategy to prevent connection leaks
+        if (connection != null
+            && !connection.isClosed())
+        {
+            connection.close();
+            connection = null;
+        }
+    }
 
     /**
      * Driver basics.
@@ -89,7 +107,10 @@ public class ConnectionTest extends TestCase {
         if (!IS_JDK_16) {
             return;
         }
-        //  assertTrue(connection.isValid(0));
+        // We would like to evaluate
+        //    assertTrue(connection.isValid(0));
+        // but this code would not compile on JDK 1.5 or lower. So, we invoke
+        // the same code by reflection.
         try {
             java.lang.reflect.Method method =
                 Connection.class.getMethod("isValid", int.class);
@@ -100,7 +121,14 @@ public class ConnectionTest extends TestCase {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
+            if (e.getTargetException() instanceof AbstractMethodError) {
+                // This happens in commons-dbcp. Somehow the method exists in
+                // the connection class, but it fails later. Not the fault of
+                // olap4j or the olapj driver, so ignore the error.
+                Olap4jUtil.discard(e);
+            } else {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -115,6 +143,10 @@ public class ConnectionTest extends TestCase {
      */
     void assertIsClosed(Object o, boolean b) {
         if (!IS_JDK_16) {
+            return;
+        }
+        if (tester.getWrapper() == TestContext.Wrapper.DBCP) {
+            // commons-dbcp 1.1 doesn't support isClosed
             return;
         }
         //  assertTrue(statment.isClosed());
@@ -151,7 +183,7 @@ public class ConnectionTest extends TestCase {
         Class.forName(tester.getDriverClassName());
 
         // connect using properties and no username/password
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         assertNotNull(connection);
 
         // check isClosed, isValid
@@ -168,7 +200,15 @@ public class ConnectionTest extends TestCase {
         assertTrue(connection.isClosed());
 
         // it's ok to close twice
-        connection.close();
+        switch (tester.getWrapper()) {
+        case DBCP:
+            // DBCP complains if you close a connection twice. Even though the
+            // JDBC spec is clear that it is OK.
+        break;
+        default:
+            connection.close();
+            break;
+        }
 
         switch (tester.getFlavor()) {
         case MONDRIAN:
@@ -194,7 +234,12 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testConnectionUnwrap() throws SQLException {
-        java.sql.Connection connection = tester.createConnection();
+        // commons-dbcp 1.1 doesn't do wrapping very well
+        switch (tester.getWrapper()) {
+        case DBCP:
+            return;
+        }
+        connection = tester.createConnection();
 
         // Trivial unwrap
         assertTrue(((OlapWrapper) connection).isWrapperFor(Connection.class));
@@ -217,7 +262,7 @@ public class ConnectionTest extends TestCase {
 
         // Unwrap and get locale
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         final Locale locale = olapConnection.getLocale();
         assertEquals(locale, Locale.getDefault());
 
@@ -255,7 +300,7 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testStatement() throws SQLException {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         Statement statement = connection.createStatement();
 
         // Closing a statement is idempotent.
@@ -269,7 +314,7 @@ public class ConnectionTest extends TestCase {
         // driver, this may or may not be the same object.
         statement = connection.createStatement();
         OlapStatement olapStatement =
-            ((OlapWrapper) statement).unwrap(OlapStatement.class);
+            tester.getWrapper().unwrap(statement, OlapStatement.class);
         assertNotNull(olapStatement);
 
         // Execute a simple query.
@@ -304,10 +349,10 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testInvalidStatement() throws SQLException {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         Statement statement = connection.createStatement();
         OlapStatement olapStatement =
-            ((OlapWrapper) statement).unwrap(OlapStatement.class);
+            tester.getWrapper().unwrap(statement, OlapStatement.class);
 
         // Execute a query with a syntax error.
         try {
@@ -337,9 +382,9 @@ public class ConnectionTest extends TestCase {
     private enum Method { ClassName, Mode, Type, TypeName, OlapType }
 
     public void testPreparedStatement() throws SQLException {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         PreparedOlapStatement pstmt =
             olapConnection.prepareOlapStatement(
                 "SELECT {\n" +
@@ -515,9 +560,9 @@ public class ConnectionTest extends TestCase {
 
     public void testCellSetMetaData() throws SQLException {
         // Metadata of prepared statement
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
 
         checkCellSetMetaData1(
             olapConnection,
@@ -612,9 +657,9 @@ public class ConnectionTest extends TestCase {
      * @throws Exception on error
      */
     public void testCellSetAxisMetaData() throws Exception {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         final String mdx = "SELECT\n"
             + "   {[Measures].Members} ON COLUMNS,\n"
             + "   CrossJoin([Store].Members, [Gender].Children)\n"
@@ -663,10 +708,10 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testCellSet() throws SQLException {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         Statement statement = connection.createStatement();
         final OlapStatement olapStatement =
-            ((OlapWrapper) statement).unwrap(OlapStatement.class);
+            tester.getWrapper().unwrap(statement, OlapStatement.class);
         final CellSet cellSet =
             olapStatement.executeOlapQuery(
                 "SELECT\n" +
@@ -705,10 +750,10 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testCell() throws Exception {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         Statement statement = connection.createStatement();
         final OlapStatement olapStatement =
-            ((OlapWrapper) statement).unwrap(OlapStatement.class);
+            tester.getWrapper().unwrap(statement, OlapStatement.class);
         CellSet cellSet =
             olapStatement.executeOlapQuery(
                 "SELECT\n" +
@@ -933,9 +978,9 @@ public class ConnectionTest extends TestCase {
 
         // parse
 
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         MdxParser mdxParser =
             olapConnection.getParserFactory().createMdxParser(olapConnection);
         SelectNode select =
@@ -1070,9 +1115,9 @@ public class ConnectionTest extends TestCase {
      */
     public void testCubeLookupMember() throws Exception {
         Class.forName(tester.getDriverClassName());
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         Cube cube = olapConnection.getSchema().getCubes().get("Sales Ragged");
 
         Member member =
@@ -1117,9 +1162,9 @@ public class ConnectionTest extends TestCase {
      */
     public void testCubeLookupMembers() throws Exception {
         Class.forName(tester.getDriverClassName());
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         Cube cube = olapConnection.getSchema().getCubes().get("Sales");
 
         List<Member> memberList =
@@ -1222,9 +1267,9 @@ public class ConnectionTest extends TestCase {
      */
     public void testMetadata() throws Exception {
         Class.forName(tester.getDriverClassName());
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
 
         // Schema
         boolean found = false;
@@ -1403,9 +1448,9 @@ public class ConnectionTest extends TestCase {
             return;
         }
         Class.forName(tester.getDriverClassName());
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
 
         final MdxParserFactory parserFactory =
             olapConnection.getParserFactory();
@@ -1426,7 +1471,7 @@ public class ConnectionTest extends TestCase {
             final ParseTreeNode from = select.getFrom();
             assertTrue(from instanceof IdentifierNode);
             Type type = from.getType();
-            fail("expected error");
+            fail("expected error, got " + type);
         } catch (UnsupportedOperationException e) {
             // ignore
         }
@@ -1472,9 +1517,9 @@ public class ConnectionTest extends TestCase {
         Class.forName(tester.getDriverClassName());
 
         // connect using properties and no username/password
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
 
         final MdxParserFactory parserFactory =
             olapConnection.getParserFactory();
@@ -1560,9 +1605,9 @@ public class ConnectionTest extends TestCase {
             return;
         }
         Class.forName(tester.getDriverClassName());
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
 
         final MdxParserFactory parserFactory =
             olapConnection.getParserFactory();
@@ -1611,9 +1656,9 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testStatementCancel() throws Throwable {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         final OlapStatement olapStatement = olapConnection.createStatement();
         final Throwable[] exceptions = {null};
         new Thread(
@@ -1644,9 +1689,9 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testStatementTimeout() throws Throwable {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         final OlapStatement olapStatement = olapConnection.createStatement();
 
         try {
@@ -1671,9 +1716,9 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testCellSetBug() throws SQLException {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         final OlapStatement olapStatement = olapConnection.createStatement();
         // Note: substitute [Sales Ragged] for [Sales] below and the query
         // takes a very long time against mondrian's XMLA driver, because
@@ -1742,9 +1787,9 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testCellSetWithCalcMember() throws SQLException {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         final OlapStatement olapStatement = olapConnection.createStatement();
         CellSet cellSet =
             olapStatement.executeOlapQuery(
@@ -1768,9 +1813,9 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testBuildQuery() throws SQLException {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
         buildQuery(olapConnection, true);
         buildQuery(olapConnection, false);
     }
@@ -1844,9 +1889,9 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testBuildQuery2() throws ClassNotFoundException, SQLException {
-        Connection connection = tester.createConnection();
+        connection = tester.createConnection();
         OlapConnection olapConnection =
-            ((OlapWrapper) connection).unwrap(OlapConnection.class);
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
 
         Schema schema = olapConnection.getSchema();
         Cube cube = schema.getCubes().get("Sales");
