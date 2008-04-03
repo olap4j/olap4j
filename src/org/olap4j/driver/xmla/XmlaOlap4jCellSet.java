@@ -35,7 +35,9 @@ import java.util.*;
  * @version $Id$
  * @since May 24, 2007
  */
-abstract class XmlaOlap4jCellSet implements CellSet {
+abstract class XmlaOlap4jCellSet implements CellSet 
+{
+	
     final XmlaOlap4jStatement olap4jStatement;
     protected boolean closed;
     private XmlaOlap4jCellSetMetaData metaData;
@@ -270,10 +272,13 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             propertyValues.clear();
             final int cellOrdinal =
                 Integer.valueOf(cell.getAttribute("CellOrdinal"));
-            // todo: convert to type based on <Value xsi:type> attribute
-            final String value = stringElement(cell, "Value");
+            
+            // Get the value casted correctly. 
+            final Object value = this.getTypedValue(cell);
+            
             final String formattedValue = stringElement(cell, "FmtValue");
             final String formatString = stringElement(cell, "FormatString");
+            
             Olap4jUtil.discard(formatString);
             for (Element element : childElements(cell)) {
                 String tag = element.getLocalName();
@@ -294,7 +299,67 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         }
     }
 
+    
+    
+    
     /**
+     * 
+     * <p>The value type has to conform to XSD definitions of
+     * the XML element. See http://books.xmlschemata.org/relaxng/relax-CHP-19.html
+     * for a full list of possible data types.
+     * 
+     * <p>Not all types are supported for now. Those not supported fall back
+     * to Strings. Most numeric types are. No dates yet are supported.
+     * 
+     * <p>If any exception is encountered, it returns null.
+     * 
+     * @param cell The cell of which we want the casted object.
+     * @return The object with a correct value.
+     */
+    private Object getTypedValue(Element cell)
+    {
+    	try 
+    	{
+    		Element elm = findChild(cell, MDDATASET_NS, "Value");
+    		
+	    	// The object type is contained in xsi:type attribute.
+	    	String type = elm.getAttribute("xsi:type");
+	    	
+	    	if ( type.equals( "xsd:int" ) )
+	        	return XmlaOlap4jUtil.intElement(cell, "Value");
+	    	
+	    	else if ( type.equals( "xsd:integer" ) )
+	    		return XmlaOlap4jUtil.integerElement(cell, "Value");
+	    	
+	    	else if ( type.equals( "xsd:double" ) )
+	    		return XmlaOlap4jUtil.doubleElement(cell, "Value");
+	    		   	    	
+	        else if ( type.equals( "xsd:float" ) )
+	        	return XmlaOlap4jUtil.floatElement(cell, "Value");
+	    	
+	        else if ( type.equals( "xsd:long" ) )
+	        	return XmlaOlap4jUtil.longElement(cell, "Value");
+	    	
+	        else if ( type.equals( "xsd:boolean" ) )
+	        	return XmlaOlap4jUtil.booleanElement(cell, "Value");
+	    	
+	        else 
+	        	return XmlaOlap4jUtil.stringElement(cell, "Value");
+    	}
+    	
+    	catch (Exception e)
+    	{
+    		System.out.println(e.getMessage());
+    		e.printStackTrace();
+    		return null;
+    	}
+	}
+
+    
+    
+    
+    
+	/**
      * Creates metadata for a cell set, given the DOM of the XMLA result.
      *
      * @param root Root node of XMLA result
