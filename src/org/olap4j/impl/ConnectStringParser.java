@@ -77,6 +77,9 @@ public class ConnectStringParser {
      */
     private void parsePair(PropertyMap map) {
         String name = parseName();
+        if (name == null) {
+            return;
+        }
         String value;
         if (i >= n) {
             value = "";
@@ -93,7 +96,8 @@ public class ConnectStringParser {
      * Reads "name=". Name can contain equals sign if equals sign is
      * doubled.
      *
-     * @return Next name in the connect string being parsed
+     * @return Next name in the connect string being parsed, or null if there
+     * is no further name
      */
     private String parseName() {
         nameBuf.setLength(0);
@@ -115,6 +119,11 @@ public class ConnectStringParser {
                 if (nameBuf.length() == 0) {
                     // ignore preceding spaces
                     i++;
+                    if (i >= n) {
+                        // there is no name, e.g. trailing spaces after
+                        // semicolon, 'x=1; y=2; '
+                        return null;
+                    }
                     break;
                 } else {
                     // fall through

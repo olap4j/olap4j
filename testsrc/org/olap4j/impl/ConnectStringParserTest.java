@@ -83,6 +83,35 @@ public class ConnectStringParserTest extends TestCase {
     }
 
     /**
+     * Testcase for bug 1938151, "StringIndexOutOfBoundsException instead of a
+     * meaningful error"
+     */
+    public void testBug1938151 () {
+        Map<String, String> properties;
+
+        // ends in semi
+        properties = ConnectStringParser.parseConnectString("foo=true; bar=xxx;");
+        assertEquals(2, properties.size());
+
+        // ends in semi+space
+        properties = ConnectStringParser.parseConnectString("foo=true; bar=xxx; ");
+        assertEquals(2, properties.size());
+
+        // ends in space
+        properties = ConnectStringParser.parseConnectString("   ");
+        assertEquals(0, properties.size());
+
+        // actual testcase for bug
+        properties = ConnectStringParser.parseConnectString(
+            "provider=mondrian; JdbcDrivers=org.hsqldb.jdbcDriver;"
+                + "Jdbc=jdbc:hsqldb:./sql/sampledata;"
+                + "Catalog=C:\\cygwin\\home\\src\\jfreereport\\engines\\classic\\extensions-mondrian\\demo\\steelwheels.mondrian.xml;"
+                + "JdbcUser=sa; JdbcPassword=; ");
+        assertEquals(6, properties.size());
+        assertEquals("", properties.get("JdbcPassword"));
+    }
+
+    /**
      * Checks that <code>connectString</code> contains a property called
      * <code>name</code>, whose value is <code>value</code>.
      *
