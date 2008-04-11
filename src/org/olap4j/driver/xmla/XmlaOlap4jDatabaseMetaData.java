@@ -108,7 +108,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
                 metadataRequest,
                 patternValueList.toArray(
                     new String[patternValueList.size()]),
-                    metadataRequest.equals( XmlaOlap4jConnection.MetadataRequest.DISCOVER_DATASOURCES ) ? false : true);
+                    !metadataRequest.equals( XmlaOlap4jConnection.MetadataRequest.DISCOVER_DATASOURCES ));
         
         final Element root = olap4jConnection.xxx(request);
         List<List<Object>> rowList = new ArrayList<List<Object>>();
