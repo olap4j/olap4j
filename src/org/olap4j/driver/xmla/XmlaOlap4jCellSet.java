@@ -309,8 +309,9 @@ abstract class XmlaOlap4jCellSet implements CellSet {
      * 
      * @param cell The cell of which we want the casted object.
      * @return The object with a correct value.
+     * @throws OlapException gets thrown if any error is encountered while casting the cell value.
      */
-    private Object getTypedValue(Element cell) {
+    private Object getTypedValue(Element cell) throws OlapException {
     	try {
     		Element elm = findChild(cell, MDDATASET_NS, "Value");
 
@@ -332,11 +333,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
 	        	return XmlaOlap4jUtil.stringElement(cell, "Value");
             }
         } catch (Exception e) {
-            // REVIEW: Use standard error-handling. Wrap the error in some
-            // contextual information and re-throw.
-            System.out.println(e.getMessage());
-    		e.printStackTrace();
-    		return null;
+            throw new OlapException("En exception was encountered while casting a cell value to it's correct data type.", e); //$NON-NLS-1$
     	}
 	}
 
