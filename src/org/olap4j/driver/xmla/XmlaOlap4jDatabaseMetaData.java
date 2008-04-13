@@ -36,6 +36,11 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
 
     private final NamedList<XmlaOlap4jCatalog> catalogs;
 
+    /**
+     * Creates an XmlaOlap4jDatabaseMetaData.
+     *
+     * @param olap4jConnection Connection
+     */
     XmlaOlap4jDatabaseMetaData(
         XmlaOlap4jConnection olap4jConnection)
     {
@@ -49,7 +54,13 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
                 new XmlaOlap4jConnection.CatalogHandler());
     }
 
-    // package-protected: not part of olap4j API
+    /**
+     * Returns a list of catalogs in this database.
+     *
+     * <p>Package-local because not part of olap4j API.
+     *
+     * @return List of catalog objects
+     */
     NamedList<Catalog> getCatalogObjects() {
         return Olap4jUtil.cast(catalogs);
     }
@@ -101,15 +112,14 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
                 patternValueList.add((String) value);
             }
         }
-    
+
         String request =
             olap4jConnection.generateRequest(
                 context,
                 metadataRequest,
                 patternValueList.toArray(
-                    new String[patternValueList.size()]),
-                    !metadataRequest.equals( XmlaOlap4jConnection.MetadataRequest.DISCOVER_DATASOURCES ));
-        
+                    new String[patternValueList.size()]));
+
         final Element root = olap4jConnection.xxx(request);
         List<List<Object>> rowList = new ArrayList<List<Object>>();
         rowLoop:
@@ -143,6 +153,12 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
             olap4jConnection, headerList, rowList);
     }
 
+    /**
+     * Converts a string to a wildcard object.
+     *
+     * @param pattern String pattern
+     * @return wildcard object, or null if pattern was null
+     */
     private Wildcard wildcard(String pattern) {
         return pattern == null
             ? null
@@ -1110,7 +1126,13 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     static class Wildcard {
         final String pattern;
 
+        /**
+         * Creates a Wildcard.
+         *
+         * @param pattern Pattern
+         */
         Wildcard(String pattern) {
+            assert pattern != null;
             this.pattern = pattern;
         }
     }

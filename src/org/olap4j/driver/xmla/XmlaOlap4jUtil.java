@@ -169,10 +169,6 @@ abstract class XmlaOlap4jUtil {
         return null;
     }
 
-    
-    
-    
-    
     static String stringElement(Element row, String name) {
         final NodeList childNodes = row.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
@@ -184,38 +180,30 @@ abstract class XmlaOlap4jUtil {
         return null;
     }
 
-    static Integer integerElement(Element row, String name) 
-    {
+    static Integer integerElement(Element row, String name) {
         return Integer.valueOf( stringElement(row, name) );
     }
-    
-    static int intElement(Element row, String name) 
-    {
+
+    static int intElement(Element row, String name) {
         return integerElement(row, name).intValue();
     }
-    
-    static Double doubleElement(Element row, String name) 
-    {
-        return Double.valueOf( stringElement(row, name) );
+
+    static Double doubleElement(Element row, String name) {
+        return Double.valueOf(stringElement(row, name));
     }
 
-    static boolean booleanElement(Element row, String name) 
-    {
-        return "true".equals( stringElement(row, name) );
+    static boolean booleanElement(Element row, String name) {
+        return "true".equals(stringElement(row, name));
     }
 
-    static Float floatElement(Element row, String name) 
-    {
-        return Float.valueOf( stringElement(row, name) );
+    static Float floatElement(Element row, String name) {
+        return Float.valueOf(stringElement(row, name));
     }
-    
-    static long longElement(Element row, String name) 
-    {
-        return Long.valueOf( stringElement(row, name) ).longValue();
+
+    static long longElement(Element row, String name) {
+        return Long.valueOf(stringElement(row, name)).longValue();
     }
-    
-    
-    
+
     static List<Element> childElements(Element memberNode) {
         final List<Element> list = new ArrayList<Element>();
         final NodeList childNodes = memberNode.getChildNodes();

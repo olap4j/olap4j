@@ -80,22 +80,31 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     private String datasourceName;
     
     /**
-     * <p>Holds on to the datasource name as specified by the
-     * server. Some servers (mondrian...) return both the provider
+     * Holds the datasource name as specified by the server. Necessary because
+     * some servers (such as mondrian) return both the provider
      * name and the datasource name in their response.
-     * 
-     * <p>It's bad but hey, you gotta live with it.
-     * 
-     *<p> It's this value that we use inside queries, and not the jdbc
+     *
+     * <p>It's this value that we use inside queries, and not the jdbc
      * query value.
-     * 
      */
     private String nativeDatasourceName;
     private boolean autoCommit;
     private boolean readOnly;
 
     /**
-     * <p>Creates an Olap4j connection an XML/A provider.
+     * Name of the "DATA_SOURCE_NAME" column returned from
+     * {@link org.olap4j.OlapDatabaseMetaData#getDatasources()}.
+     */
+    private static final String DATA_SOURCE_NAME = "DATA_SOURCE_NAME";
+
+    /**
+     * Name of the "PROVIDER_NAME" column returned from
+     * {@link org.olap4j.OlapDatabaseMetaData#getDatasources()}.
+     */
+    private static final String PROVIDER_NAME = "PROVIDER_NAME";
+
+    /**
+     * Creates an Olap4j connection an XML/A provider.
      *
      * <p>This method is intentionally package-protected. The public API
      * uses the traditional JDBC {@link java.sql.DriverManager}.
@@ -181,93 +190,75 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return url.startsWith(CONNECT_STRING_PREFIX);
     }
 
-    // not part of public API
-    String getDataSourceInfo() throws OlapException 
-    {
+    /**
+     * Returns the native datasource name, using the cached value if already
+     * computed.
+     *
+     * <p>Not part of public API.
+     *
+     * @return native datasource name
+     * @throws OlapException if cannot find a datasource that matches
+     */
+    String getDataSourceInfo() throws OlapException {
     	// If we already know it, return it.
-        if ( this.nativeDatasourceName != null )
-        {
+        if (this.nativeDatasourceName != null) {
         	return this.nativeDatasourceName;
         }
-    	
+
         ResultSet rSet = null;
-        
-    	try 
-    	{
+    	try {
     		// We need to query for it
     		rSet = this.olap4jDatabaseMetaData.getDatasources();
-    		
-			
-			
+
     		// Check if the user requested a particular one. 
-    		if (this.datasourceName != null || this.providerName != null)
-    		{
+    		if (this.datasourceName != null || this.providerName != null) {
     			// We iterate through the datasources
-    			datasources : while ( rSet.next() )
-    			{
+    			while (rSet.next()) {
     				// Get current values
-    	    		String currentDatasource = rSet.getString("DATA_SOURCE_NAME"); //$NON-NLS-1$
-    				String currentProvider = rSet.getString("PROVIDER_NAME"); //$NON-NLS-1$
-    	    		
+    	    		String currentDatasource = rSet.getString(DATA_SOURCE_NAME);
+    				String currentProvider = rSet.getString(PROVIDER_NAME);
+
     	    		// If datasource and provider match, we got it.
-    				// If datasource matches but no provider is specified, we got it.
-    				// If provider matches but no datasource specified, we consider it good.
-    				if ( 
-    					( currentDatasource.equals(this.datasourceName)
-    					  && currentProvider.equals(this.providerName) )
-    					  ||
-    					( currentDatasource.equals(this.datasourceName)
-    	    			  && this.providerName == null )
-    	    			  ||
-    					( currentProvider.equals(this.providerName)
-    	    			  && this.datasourceName == null )
-    					)
+    				// If datasource matches but no provider is specified, we
+                    // got it.
+    				// If provider matches but no datasource specified, we
+                    // consider it good.
+                    if (currentDatasource.equals(this.datasourceName)
+                        && currentProvider.equals(this.providerName)
+                        || currentDatasource.equals(this.datasourceName)
+                        && this.providerName == null
+                        || currentProvider.equals(this.providerName)
+                        && this.datasourceName == null)
     				{
     					// Got it
-    					this.nativeDatasourceName = rSet.getString("DATA_SOURCE_NAME"); //$NON-NLS-1$
-    					break datasources;
+    					this.nativeDatasourceName = currentDatasource;
+    					break;
     				}
-    				
-    			} // datasources loop
-    		}
-    		else
-    		{
+    			}
+    		} else {
     			// Use first
-    			rSet.first();
-    			
-	    		// Keep it
-	    		this.nativeDatasourceName = rSet.getString("DATA_SOURCE_NAME"); //$NON-NLS-1$
-    		}
-    		
+    			if (rSet.first()) {
+                    this.nativeDatasourceName = rSet.getString(DATA_SOURCE_NAME);
+                }
+            }
+
     		// Throws exception to the client. 
     		//Tells that there are no datasource corresponding to the search criterias. 
-    		if ( this.nativeDatasourceName == null )
-    		{
-    			throw new OlapException("No datasource could be found.");//$NON-NLS-1$
+    		if (this.nativeDatasourceName == null) {
+    			throw new OlapException("No datasource could be found.");
     		}
     		
     		// If there is a provider
 			return this.nativeDatasourceName;
-    	} 
-    	catch (OlapException e)
-    	{
-    		//Throws back, no use here and doesn't wrap exception
+    	} catch (OlapException e) {
     		throw e;
-		} 
-    	catch (SQLException e) 
-		{
-			// We tried...
-			throw new OlapException("Datasource name not found.", e);//$NON-NLS-1$
-		}
-    	finally 
-    	{
-    		try 
-    		{
+		} catch (SQLException e) {
+			throw new OlapException("Datasource name not found.", e);
+		} finally  {
+    		try {
 				rSet.close();
-			} 
-    		catch (Throwable t) 
-    		{ 
-    			// Nothing to do 
+			} catch (SQLException e) {
+                // ignore
     		}
     	}
     }
@@ -601,7 +592,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return findChild(returnElement, ROWSET_NS, "root");
     }
 
-    
     /**
      * Generates a metadata request.
      *
@@ -610,50 +600,22 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * a string (the value of the restriction) or a list of strings (multiple
      * values of the restriction)
      *
-     * <p>This signature only relays the execution to 
-     * {@link #generateRequest(Context,MetadataRequest,Object[])}
-     * but passes it a true value to mark any request as datasource name
-     * specific.
-     *
      * @param context Context
      * @param metadataRequest Metadata request
      * @param restrictions List of restrictions
-     * @return XMLA request
-     * @throws OlapException 
-     */
-    public String generateRequest(
-            Context context,
-            MetadataRequest metadataRequest,
-            Object[] restrictions) throws OlapException
-    {
-    	return this.generateRequest(context, metadataRequest, restrictions, true);
-    }
-    
-    
-    /**
-     * <p>Generates a metadata request.
-     *
-     * <p>The list of restrictions must have even length. Even elements must
-     * be a string (the name of the restriction); odd elements must be either
-     * a string (the value of the restriction) or a list of strings (multiple
-     * values of the restriction)
-     *
-     *
-     * @param context Context
-     * @param metadataRequest Metadata request
-     * @param restrictions List of restrictions
-     * @param datasourceDependentRequest Should we lookup the datasource name ?
      * @return XMLA SOAP request as a string.
-     * @throws OlapException Gets thrown when a query was dependant on a datasource name
-     * but either the one specified doesn't exist at the url, or there are no default
-     * datasource (should use the first one.).
+     *
+     * @throws OlapException when the query depends on a datasource name but
+     * the one specified doesn't exist at the url, or there are no default
+     * datasource (should use the first one)
      */
     public String generateRequest(
         Context context,
         MetadataRequest metadataRequest,
-        Object[] restrictions,
-        boolean datasourceDependentRequest) throws OlapException
+        Object[] restrictions) throws OlapException
     {
+        final boolean datasourceDependentRequest =
+            metadataRequest.requiresDatasourceName();
         final String catalog =
             context.olap4jConnection.getCatalog();
         final String content = "Data";
@@ -699,21 +661,20 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             + "    </Restrictions>\n"
             + "    <Properties>\n"
             + "      <PropertyList>\n");
-        
-        
+
         // Add the datasource node only if this request requires it.
-        if ( datasourceDependentRequest )
-        {
+        if (datasourceDependentRequest) {
         	buf.append("        <DataSourceInfo>");
-	        buf.append( context.olap4jConnection.getDataSourceInfo() );
-	        buf.append("</DataSourceInfo>\n        <Catalog>");
-	        buf.append(catalog);
+	        buf.append(xmlEncode(context.olap4jConnection.getDataSourceInfo()));
+	        buf.append("</DataSourceInfo>\n"
+                + "        <Catalog>");
+	        buf.append(xmlEncode(catalog));
 	        buf.append("</Catalog>\n");
         }
-        
-        
-        
-        buf.append("        <Content>" + content + "</Content>\n"
+
+        buf.append("        <Content>");
+        buf.append(xmlEncode(content));
+        buf.append("</Content>\n"
             + "      </PropertyList>\n"
             + "    </Properties>\n"
             + "    </Discover>\n"
@@ -1617,6 +1578,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             this.columns =
                 Collections.unmodifiableList(
                     Arrays.asList(columns));
+        }
+
+        /**
+         * Returns whether this request requires a
+         * {@code &lt;DatasourceName&gt;} element.
+         *
+         * @return whether this request requires a DatasourceName element
+         */
+        public boolean requiresDatasourceName() {
+            return this != DISCOVER_DATASOURCES;
         }
     }
 
