@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class XmlaTester implements TestContext.Tester {
     final XmlaOlap4jDriver.Proxy proxy;
+    final String cookie;
     private Connection connection;
 
     /**
@@ -57,6 +58,8 @@ public class XmlaTester implements TestContext.Tester {
         this.proxy =
             (XmlaOlap4jDriver.Proxy) constructor.newInstance(
                 catalogNameUrls, urlString);
+        this.cookie = XmlaOlap4jDriver.nextCookie();
+        XmlaOlap4jDriver.PROXY_MAP.put(cookie, proxy);
     }
 
     public Connection createConnection() throws SQLException {
@@ -68,21 +71,14 @@ public class XmlaTester implements TestContext.Tester {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("oops", e);
         }
-        try {
-            XmlaOlap4jDriver.THREAD_PROXY.set(proxy);
-            Properties info = new Properties();
-            info.setProperty(
-                XmlaOlap4jDriver.Property.UseThreadProxy.name(), "true");
-            info.setProperty(
-                XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
-            connection =
-                DriverManager.getConnection(
-                    getURL(),
-                    info);
-            return connection;
-        } finally {
-            XmlaOlap4jDriver.THREAD_PROXY.set(null);
-        }
+        Properties info = new Properties();
+        info.setProperty(
+            XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
+        connection =
+            DriverManager.getConnection(
+                getURL(),
+                info);
+        return connection;
     }
 
     public Connection createConnectionWithUserPassword() throws SQLException {
@@ -91,15 +87,11 @@ public class XmlaTester implements TestContext.Tester {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("oops", e);
         }
-        try {
-            XmlaOlap4jDriver.THREAD_PROXY.set(proxy);
-            Properties info = new Properties();
-            info.setProperty("UseThreadProxy", "true");
-            return DriverManager.getConnection(
-                getURL(), USER, PASSWORD);
-        } finally {
-            XmlaOlap4jDriver.THREAD_PROXY.set(null);
-        }
+        Properties info = new Properties();
+        info.setProperty(
+            XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
+        return DriverManager.getConnection(
+            getURL(), USER, PASSWORD);
     }
 
     public String getDriverUrlPrefix() {
@@ -111,7 +103,7 @@ public class XmlaTester implements TestContext.Tester {
     }
 
     public String getURL() {
-        return "jdbc:xmla:Server=http://foo;UseThreadProxy=true";
+        return "jdbc:xmla:Server=http://foo;Catalog=FoodMart;TestProxyCookie=" + cookie;
     }
 
     public Flavor getFlavor() {

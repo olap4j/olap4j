@@ -9,6 +9,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.impl.Base64;
+import org.olap4j.impl.Olap4jUtil;
 
 import java.io.*;
 import java.net.URL;
@@ -48,20 +49,27 @@ import java.util.concurrent.*;
  *
  * <h3>Connection properties</h3>
  *
+ * <p>Unless otherwise stated, properties are optional. If a property occurs
+ * multiple times in the connect string, the first occurrence is used.
+ *
  * <table border="1">
  * <tr> <th>Property</th>        <th>Description</th> </tr>
  *
- * <tr> <td>Server</td>          <td>URL of HTTP server.</td> </tr>
+ * <tr> <td>Server</td>          <td>URL of HTTP server. Required.</td> </tr>
  * 
- * <tr> <td>Catalog</td>          <td>Catalog name to use</td> </tr>
+ * <tr> <td>Catalog</td>         <td>Catalog name to use. Required.</td> </tr>
  * 
- * <tr> <td>Provider</td>          <td>Name of the XMLA provider. This option is facultative. By default, the first one available will be used.</td> </tr>
+ * <tr> <td>Provider</td>        <td>Name of the XMLA provider.</td> </tr>
  * 
- * <tr> <td>DataSource</td>          <td>Name of the XMLA datasource. This option is facultative. By default, the first one available will be used. When using a Mondrian backed XMLA server, be sure to include the full datasource name between quotes.</td> </tr>
+ * <tr> <td>DataSource</td>      <td>Name of the XMLA datasource. When using a
+ *                                   Mondrian backed XMLA server, be sure to
+ *                                   include the full datasource name between
+ *                                   quotes.</td> </tr>
  *
- * <tr> <td>UseThreadProxy</td>  <td>If true, use the proxy object in the
- *                                   {@link #THREAD_PROXY} field. For testing.
- *                                   Default is false.</td> </tr>
+ * <tr> <td>TestProxyCookie</td>  <td>String that uniquely identifies a proxy
+ *                                    object in {@link #PROXY_MAP} via which to
+ *                                    send XMLA requests for testing
+ *                                    purposes.</td> </tr>
  *
  * </table>
  *
@@ -71,9 +79,9 @@ import java.util.concurrent.*;
  */
 public class XmlaOlap4jDriver implements Driver {
     public static final String NAME = "olap4j driver for XML/A";
-    public static final String VERSION = "0.9.4";
+    public static final String VERSION = "0.9.5";
     public static final int MAJOR_VERSION = 0;
-    public static final int MINOR_VERSION = 904;
+    public static final int MINOR_VERSION = 905;
     private final Factory factory;
 
     /**
@@ -81,6 +89,8 @@ public class XmlaOlap4jDriver implements Driver {
      */
     private static final ExecutorService executor =
         Executors.newCachedThreadPool();
+
+    private static int nextCookie;
 
     static {
         try {
@@ -93,6 +103,9 @@ public class XmlaOlap4jDriver implements Driver {
         }
     }
 
+    /**
+     * Creates an XmlaOlap4jDriver.
+     */
     protected XmlaOlap4jDriver() {
         String factoryClassName;
         try {
@@ -115,6 +128,11 @@ public class XmlaOlap4jDriver implements Driver {
         }
     }
 
+    /**
+     * Registers this driver.
+     *
+     * @throws SQLException on error
+     */
     private static void register() throws SQLException {
         DriverManager.registerDriver(new XmlaOlap4jDriver());
     }
@@ -123,7 +141,9 @@ public class XmlaOlap4jDriver implements Driver {
         if (!XmlaOlap4jConnection.acceptsURL(url)) {
             return null;
         }
-        Proxy proxy = createProxy(info);
+        Map<String, String> map =
+            XmlaOlap4jConnection.parseConnectString(url, info);
+        Proxy proxy = createProxy(map);
         return factory.newConnection(proxy, url, info);
     }
 
@@ -166,16 +186,13 @@ public class XmlaOlap4jDriver implements Driver {
      * implementation, for testing, which talks to mondrian's XMLA service
      * in-process.
      *
-     * @param info Connection properties
+     * @param map Connection properties
      * @return A Proxy with which to submit XML requests
      */
-    protected Proxy createProxy(Properties info) {
-        String useThreadProxy =
-            info.getProperty(
-                Property.UseThreadProxy.name());
-        if (useThreadProxy != null &&
-            Boolean.valueOf(useThreadProxy)) {
-            Proxy proxy = THREAD_PROXY.get();
+    protected Proxy createProxy(Map<String, String> map) {
+        String cookie = map.get(Property.TestProxyCookie.name());
+        if (cookie != null) {
+            Proxy proxy = PROXY_MAP.get(cookie);
             if (proxy != null) {
                 return proxy;
             }
@@ -183,6 +200,16 @@ public class XmlaOlap4jDriver implements Driver {
         return new HttpProxy();
     }
 
+    /**
+     * Returns a future object representing an asynchronous submission of an
+     * XMLA request to a URL.
+     *
+     * @param proxy Proxy via which to send the request
+     * @param url URL of XMLA server
+     * @param request Request
+     * @return Future object from which the byte array containing the result
+     * of the XMLA call can be obtained
+     */
     public Future<byte[]> getFuture(
         final Proxy proxy,
         final URL url,
@@ -282,25 +309,42 @@ public class XmlaOlap4jDriver implements Driver {
     }
 
     /**
-     * For testing.
+     * For testing. Map from a cookie value (which is uniquely generated for
+     * each test) to a proxy object. Uses a weak hash map so that, if the code
+     * that created the proxy 'forgets' the cookie value, then the proxy can
+     * be garbage-collected. 
      */
-    public static final ThreadLocal<Proxy> THREAD_PROXY =
-        new ThreadLocal<Proxy>();
+    public static final Map<String, Proxy> PROXY_MAP =
+        Collections.synchronizedMap(new WeakHashMap<String, Proxy>());
+
+    /**
+     * Generates and returns a unique string.
+     *
+     * @return unique string
+     */
+    public static synchronized String nextCookie() {
+        return "cookie" + nextCookie++;
+    }
 
     /**
      * Properties supported by this driver.
      */
     public enum Property {
-        UseThreadProxy(
-            "If true, use the proxy object in the THREAD_PROXY field. "
-                + "For testing. Default is false."),
-
+        TestProxyCookie(
+            "String that uniquely identifies a proxy object via which to send "
+                + "XMLA requests for testing purposes."),
         Server("URL of HTTP server"),
         Catalog("Catalog name"),
         Provider("Name of the datasource provider"),
         DataSource("Name of the datasource");
 
+        /**
+         * Creates a property.
+         *
+         * @param description Description of property
+         */
         Property(String description) {
+            Olap4jUtil.discard(description);
         }
     }
 }

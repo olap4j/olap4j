@@ -72,12 +72,12 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     /**
      * <p>Holds on to the provider name
      */
-    private String providerName = null;
+    private String providerName;
     
     /**
      * <p>Holds on to the datasource name.
      */
-    private String datasourceName = null;
+    private String datasourceName;
     
     /**
      * <p>Holds on to the datasource name as specified by the
@@ -90,7 +90,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * query value.
      * 
      */
-    private String nativeDatasourceName = null;
+    private String nativeDatasourceName;
+    private boolean autoCommit;
+    private boolean readOnly;
 
     /**
      * <p>Creates an Olap4j connection an XML/A provider.
@@ -122,12 +124,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             throw new AssertionError(
                 "does not start with '" + CONNECT_STRING_PREFIX + "'");
         }
-        String x = url.substring(CONNECT_STRING_PREFIX.length());
-        Map<String, String> map =
-            ConnectStringParser.parseConnectString(x);
-        for (Map.Entry<String,String> entry : toMap(info).entrySet()) {
-            map.put(entry.getKey(), entry.getValue());
-        }
+        Map<String, String> map = parseConnectString(url, info);
 
         this.providerName = map.get(XmlaOlap4jDriver.Property.Provider.name());
         this.datasourceName = map.get(XmlaOlap4jDriver.Property.DataSource.name());
@@ -170,13 +167,20 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         this.olap4jSchema = new XmlaOlap4jSchema(catalog, catalogName);
     }
 
+    static Map<String, String> parseConnectString(String url, Properties info) {
+        String x = url.substring(CONNECT_STRING_PREFIX.length());
+        Map<String, String> map =
+            ConnectStringParser.parseConnectString(x);
+        for (Map.Entry<String,String> entry : toMap(info).entrySet()) {
+            map.put(entry.getKey(), entry.getValue());
+        }
+        return map;
+    }
+
     static boolean acceptsURL(String url) {
         return url.startsWith(CONNECT_STRING_PREFIX);
     }
 
-    
-    
-    
     // not part of public API
     String getDataSourceInfo() throws OlapException 
     {
@@ -285,11 +289,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-        throw new UnsupportedOperationException();
+        this.autoCommit = autoCommit;
     }
 
     public boolean getAutoCommit() throws SQLException {
-        throw new UnsupportedOperationException();
+        return autoCommit;
     }
 
     public void commit() throws SQLException {
@@ -317,11 +321,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     public void setReadOnly(boolean readOnly) throws SQLException {
-        throw new UnsupportedOperationException();
+        this.readOnly = readOnly;
     }
 
     public boolean isReadOnly() throws SQLException {
-        throw new UnsupportedOperationException();
+        return readOnly;
     }
 
     public void setCatalog(String catalog) throws SQLException {
@@ -607,7 +611,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * values of the restriction)
      *
      * <p>This signature only relays the execution to 
-     * {@link XmlaOlap4jConnection.generateRequest(Context,MetadataRequest,Object[])}
+     * {@link #generateRequest(Context,MetadataRequest,Object[])}
      * but passes it a true value to mark any request as datasource name
      * specific.
      *
