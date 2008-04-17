@@ -59,9 +59,7 @@ class XmlaOlap4jCube implements Cube, Named
         this.description = description;
         this.metadataReader =
             new CachingMetadataReader(
-                new RawMetadataReader()
-            )
-        ;
+                new RawMetadataReader());
         final XmlaOlap4jConnection olap4jConnection =
             olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection;
 
@@ -115,6 +113,13 @@ class XmlaOlap4jCube implements Cube, Named
             XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEASURES,
             new XmlaOlap4jConnection.MeasureHandler(),
             restrictions);
+        // replace temporary member versions of measures in cache with final
+        // measures
+        for (XmlaOlap4jMeasure measure : measures) {
+            ((CachingMetadataReader) metadataReader).memberMap.put(
+                measure.getUniqueName(),
+                new SoftReference<XmlaOlap4jMember>(measure));
+        }
         // populate named sets
         olap4jConnection.populateList(
             namedSets, context,
@@ -436,6 +441,21 @@ class XmlaOlap4jCube implements Cube, Named
             final XmlaOlap4jConnection.Context context =
                 new XmlaOlap4jConnection.Context(level);
             List<XmlaOlap4jMember> list = new ArrayList<XmlaOlap4jMember>();
+            // If this is a level in the [Measures] dimension, we want to
+            // return objects that implement the Measure interface. During
+            // bootstrap, the list will be empty, and we need to return the
+            // regular Member objects which have the extra properties that are
+            // returned by MSCHEMA_MEMBERS but not MDSCHEMA_MEASURES.
+            switch (level.getDimension().getDimensionType()) {
+            case MEASURE:
+                if (!level.olap4jHierarchy.olap4jDimension.olap4jCube.measures
+                    .isEmpty()) {
+                    return Olap4jUtil.cast(
+                        level.olap4jHierarchy.olap4jDimension.olap4jCube
+                            .measures);
+                }
+                break;
+            }
             olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection
                 .populateList(
                     list,

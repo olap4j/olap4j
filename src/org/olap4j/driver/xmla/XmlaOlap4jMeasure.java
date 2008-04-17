@@ -9,8 +9,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.impl.Named;
-import org.olap4j.metadata.Datatype;
-import org.olap4j.metadata.Measure;
+import org.olap4j.metadata.*;
 
 /**
  * Implementation of {@link org.olap4j.metadata.Measure}
@@ -42,7 +41,11 @@ class XmlaOlap4jMeasure
     {
         super(
             olap4jLevel, uniqueName, name, caption, description,
-            parentMemberUniqueName, Type.MEASURE, 0, ordinal);
+            parentMemberUniqueName,
+            aggregator == Aggregator.CALCULATED ? Type.FORMULA : Type.MEASURE,
+            0, ordinal);
+        assert olap4jLevel.olap4jHierarchy.olap4jDimension.type
+            == Dimension.Type.MEASURE;
         this.aggregator = aggregator;
         this.datatype = datatype;
         this.visible = visible;

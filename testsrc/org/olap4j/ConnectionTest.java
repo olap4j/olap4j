@@ -129,6 +129,11 @@ public class ConnectionTest extends TestCase {
             } else {
                 throw new RuntimeException(e);
             }
+        } catch (AbstractMethodError e) {
+            // This happens in commons-dbcp. Somehow the method exists in
+            // the connection class, but it fails later. Not the fault of
+            // olap4j or the olapj driver, so ignore the error.
+            Olap4jUtil.discard(e);
         }
     }
 
@@ -204,7 +209,7 @@ public class ConnectionTest extends TestCase {
         case DBCP:
             // DBCP complains if you close a connection twice. Even though the
             // JDBC spec is clear that it is OK.
-        break;
+            break;
         default:
             connection.close();
             break;
@@ -346,6 +351,32 @@ public class ConnectionTest extends TestCase {
 
         // Close the connection.
         connection.close();
+    }
+
+    public void testAxes() throws SQLException {
+        connection = tester.createConnection();
+        Statement statement = connection.createStatement();
+
+        OlapStatement olapStatement =
+            tester.getWrapper().unwrap(statement, OlapStatement.class);
+
+        CellSet cellSet =
+            olapStatement.executeOlapQuery(
+                "SELECT {[Measures].[Unit Sales]} on 0,\n"
+                    + "{[Store].Children} on 1\n"
+                    + "FROM [Sales]");
+        List<CellSetAxis> axesList = cellSet.getAxes();
+        assertEquals(2, axesList.size());
+        final Member rowsMember =
+            axesList.get(0).getPositions().get(0).getMembers().get(0);
+        assertTrue(
+            rowsMember.getUniqueName(),
+            rowsMember instanceof Measure);
+        final Member columnsMember =
+            axesList.get(1).getPositions().get(0).getMembers().get(0);
+        assertTrue(
+            columnsMember.getUniqueName(),
+            !(columnsMember instanceof Measure));
     }
 
     public void testInvalidStatement() throws SQLException {
@@ -1313,6 +1344,9 @@ public class ConnectionTest extends TestCase {
                 for (Member rootMember : rootMemberList) {
                     assertNull(rootMember.getParentMember());
                 }
+                assertEquals(
+                    rootMemberList,
+                    hierarchy.getLevels().get(0).getMembers());
                 assertNotNull(hierarchy.getDefaultMember());
                 assertNotNull(hierarchy.getName());
                 assertNotNull(hierarchy.getUniqueName());
@@ -1328,6 +1362,10 @@ public class ConnectionTest extends TestCase {
                     for (Member member : level.getMembers()) {
                         assertNotNull(member.getName());
                         assertEquals(level, member.getLevel());
+                        if (dimension.getDimensionType()
+                            == Dimension.Type.MEASURE) {
+                            assertTrue(member instanceof Measure);
+                        }
                         if (++k > 3) {
                             break;
                         }
@@ -1422,6 +1460,7 @@ public class ConnectionTest extends TestCase {
 
         // Measures
         int k = -1;
+        Set<String> measureNameSet = new HashSet<String>();
         for (Measure measure : cube.getMeasures()) {
             ++k;
             // The first measure is [Unit Sales], because the list must be
@@ -1429,10 +1468,33 @@ public class ConnectionTest extends TestCase {
             if (k == 0) {
                 assertEquals("Unit Sales", measure.getName());
             }
+            if (measure.getName().equals("Profit Growth")
+                || measure.getName().equals("Profit last Period")
+                || measure.getName().equals("Profit")) {
+                assertEquals(Member.Type.FORMULA, measure.getMemberType());
+                assertTrue(measure.isCalculated());
+            } else {
+                assertEquals(Member.Type.MEASURE, measure.getMemberType());                
+                assertFalse(measure.isCalculated());
+            }
             assertNotNull(measure.getName());
             assertNotNull(measure.getAggregator());
             assertTrue(measure.getDatatype() != null);
+            measureNameSet.add(measure.getName());
         }
+        assertEquals(
+            new HashSet<String>(
+                Arrays.asList(
+                    "Unit Sales",
+                    "Customer Count",
+                    "Profit last Period",
+                    "Profit",
+                    "Profit Growth",
+                    "Promotion Sales",
+                    "Sales Count",
+                    "Store Sales",
+                    "Store Cost")),
+            measureNameSet);
     }
 
     /**

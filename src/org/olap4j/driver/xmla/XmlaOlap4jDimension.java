@@ -25,7 +25,7 @@ class XmlaOlap4jDimension
     implements Dimension, Named
 {
     final XmlaOlap4jCube olap4jCube;
-    private final Type type;
+    final Type type;
     final NamedList<XmlaOlap4jHierarchy> hierarchies =
         new NamedListImpl<XmlaOlap4jHierarchy>();
     private final String defaultHierarchyUniqueName;

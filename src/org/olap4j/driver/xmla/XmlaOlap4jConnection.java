@@ -256,7 +256,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 			throw new OlapException("Datasource name not found.", e);
 		} finally  {
     		try {
-				rSet.close();
+				if (rSet != null) {
+                    rSet.close();
+                }
 			} catch (SQLException e) {
                 // ignore
     		}
@@ -985,11 +987,14 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 Olap4jUtil.discard(measureMembers);
             }
             Member member =
-                context.getCube(row).getMetadataReader().lookupMemberByUniqueName(
-                    measureUniqueName);
-            int ordinal = -1;
+                context.getCube(row).getMetadataReader()
+                    .lookupMemberByUniqueName(
+                        measureUniqueName);
+            final int ordinal;
             if (member != null) {
                 ordinal = member.getOrdinal();
+            } else {
+                ordinal = -1;
             }
 
             list.add(
@@ -1055,6 +1060,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 stringElement(row, "MEMBER_CAPTION");
             int childrenCardinality =
                 integerElement(row, "CHILDREN_CARDINALITY");
+            // If this member is a measure, we want to return an object that
+            // implements the Measure interface to all API calls. But we also
+            // need to retrieve the properties that occur in MDSCHEMA_MEMBERS
+            // that are not available in MDSCHEMA_MEASURES, so we create a
+            // member for internal use.
             list.add(
                 new XmlaOlap4jMember(
                     context.getLevel(row), memberUniqueName, memberName,

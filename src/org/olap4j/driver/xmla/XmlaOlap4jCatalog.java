@@ -31,6 +31,8 @@ class XmlaOlap4jCatalog implements Catalog, Named {
         XmlaOlap4jDatabaseMetaData olap4jDatabaseMetaData,
         String name)
     {
+        assert olap4jDatabaseMetaData != null;
+        assert name != null;
         this.olap4jDatabaseMetaData = olap4jDatabaseMetaData;
         this.name = name;
         this.schemas =

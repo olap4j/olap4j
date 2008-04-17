@@ -305,37 +305,43 @@ abstract class XmlaOlap4jCellSet implements CellSet {
      * are supported, but no dates are yet supported. Those not supported
      * fall back to Strings.
      *
-     * <p>If any exception is encountered, it returns null.
-     * 
      * @param cell The cell of which we want the casted object.
      * @return The object with a correct value.
-     * @throws OlapException gets thrown if any error is encountered while casting the cell value.
+     * @throws OlapException if any error is encountered while casting the cell
+     * value
      */
     private Object getTypedValue(Element cell) throws OlapException {
-    	try {
-    		Element elm = findChild(cell, MDDATASET_NS, "Value");
+        Element elm = findChild(cell, MDDATASET_NS, "Value");
+        if (elm == null) {
+            // Cell is null.
+            return null;
+        }
 
-	    	// The object type is contained in xsi:type attribute.
-	    	String type = elm.getAttribute("xsi:type");
-	    	if (type.equals( "xsd:int")) {
-	        	return XmlaOlap4jUtil.intElement(cell, "Value");
+        // The object type is contained in xsi:type attribute.
+        String type = elm.getAttribute("xsi:type");
+        try {
+            if (type.equals( "xsd:int")) {
+                return XmlaOlap4jUtil.intElement(cell, "Value");
             } else if (type.equals( "xsd:integer")) {
-	    		return XmlaOlap4jUtil.integerElement(cell, "Value");
+                return XmlaOlap4jUtil.integerElement(cell, "Value");
             } else if (type.equals( "xsd:double")) {
-	    		return XmlaOlap4jUtil.doubleElement(cell, "Value");
+                return XmlaOlap4jUtil.doubleElement(cell, "Value");
             } else if (type.equals( "xsd:float")) {
-	        	return XmlaOlap4jUtil.floatElement(cell, "Value");
+                return XmlaOlap4jUtil.floatElement(cell, "Value");
             } else if (type.equals( "xsd:long")) {
-	        	return XmlaOlap4jUtil.longElement(cell, "Value");
+                return XmlaOlap4jUtil.longElement(cell, "Value");
             } else if (type.equals( "xsd:boolean")) {
-	        	return XmlaOlap4jUtil.booleanElement(cell, "Value");
+                return XmlaOlap4jUtil.booleanElement(cell, "Value");
             } else {
-	        	return XmlaOlap4jUtil.stringElement(cell, "Value");
+                return XmlaOlap4jUtil.stringElement(cell, "Value");
             }
         } catch (Exception e) {
-            throw new OlapException("En exception was encountered while casting a cell value to it's correct data type.", e); //$NON-NLS-1$
-    	}
-	}
+            throw new OlapException(
+                "Error while casting a cell value to the correct java type for"
+                    + " its XSD type " + type,
+                e);
+        }
+    }
 
 	/**
      * Creates metadata for a cell set, given the DOM of the XMLA result.
