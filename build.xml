@@ -305,6 +305,12 @@ must be run under JDK 1.5." />
 
   <target name="jar" depends="version,checkIsNotJdk16,compile,compileJdk16">
     <mkdir dir="${lib.dir}" />
+    <!-- Declare driver so that it can we loaded implicitly, without using
+         'Class.forName'. Requires JDBC 4.0 (JDK 1.6) and later. -->
+    <mkdir dir="${classes.dir}/META-INF/services" />
+    <echo
+        file="${classes.dir}/META-INF/services/java.sql.Driver"
+        message="org.olap4j.driver.xmla.XmlaOlap4jDriver" />
     <zip
         zipfile="${jar.file}"
         update="true">
