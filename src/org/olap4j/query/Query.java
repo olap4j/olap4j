@@ -162,7 +162,14 @@ public class Query {
             List<QueryAxis> axisList = new ArrayList<QueryAxis>();
             axisList.add(query.getAxes().get(Axis.COLUMNS));
             axisList.add(query.getAxes().get(Axis.ROWS));
-            
+
+            AxisNode filterAxis = null;
+            if (query.getAxes().containsKey(Axis.FILTER)) {
+                final QueryAxis axis = query.getAxes().get(Axis.FILTER);
+                if (!axis.dimensions.isEmpty()) {
+                    filterAxis = toOlap4j(axis);
+                }
+            }
             return new SelectNode(
                 null,
                 withList,
@@ -170,9 +177,7 @@ public class Query {
                 new CubeNode(
                     null,
                     query.getCube()),
-                    query.getAxes().containsKey(Axis.FILTER)
-                    ? null
-                    : toOlap4j(query.getAxes().get(Axis.FILTER)),
+                filterAxis,
                 list);
         }
 

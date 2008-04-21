@@ -61,13 +61,13 @@ public class OlapTest extends TestCase {
                 tester.getWrapper().unwrap(connection, OlapConnection.class);
             final String catalogName;
             switch (tester.getFlavor()) {
-                case MONDRIAN:
-                    catalogName = "LOCALDB";
-                    break;
-                case XMLA:
-                default:
-                    catalogName = "FoodMart";
-                    break;
+            case MONDRIAN:
+                catalogName = "LOCALDB";
+                break;
+            case XMLA:
+            default:
+                catalogName = "FoodMart";
+                break;
             }
             Catalog catalog = olapConnection.getCatalogs().get(catalogName);
             NamedList<Schema> schemas = catalog.getSchemas();
@@ -91,14 +91,14 @@ public class OlapTest extends TestCase {
 
             // take the first cube
             return cubes.get(cubeName);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
-        
+
     }
-    
+
     public void testModel() {
         try {
             if (false) {
@@ -227,7 +227,7 @@ public class OlapTest extends TestCase {
 
             // place our dimensions on the axes
             query.getAxes().get(Axis.COLUMNS).getDimensions().add(productQuery);
-            assert productQuery.getAxis() == query.getAxes().get(Axis.COLUMNS); 
+            assert productQuery.getAxis() == query.getAxes().get(Axis.COLUMNS);
             query.getAxes().get(Axis.ROWS).getDimensions().add(storeQuery);
             query.getAxes().get(Axis.ROWS).getDimensions().add(timeQuery);
 
@@ -273,114 +273,118 @@ public class OlapTest extends TestCase {
                 fail("Could not find Sales cube");
             }
             Query query = new Query("my query", cube);
-            
+
             // TEST CHILDREN SELECTION
-            
+
             QueryDimension productDimension = query.getDimension("Product");
             Member drinkMember = cube.lookupMember("Product", "Drink");
-            Selection drinkSelection = 
-                productDimension.createSelection(drinkMember, 
+            Selection drinkSelection =
+                productDimension.createSelection(drinkMember,
                         Selection.Operator.CHILDREN);
             productDimension.getSelections().add(drinkSelection);
-            
+
             QueryDimension measuresDimension = query.getDimension("Measures");
             Member storeSalesMember = cube.lookupMember("Measures", "Store Sales");
-            Selection storeSalesSelection = 
-                measuresDimension.createSelection(storeSalesMember, 
+            Selection storeSalesSelection =
+                measuresDimension.createSelection(storeSalesMember,
                         Selection.Operator.MEMBER);
             measuresDimension.getSelections().add(storeSalesSelection);
-            
+
             query.getAxes().get(Axis.ROWS).getDimensions().add(productDimension);
             query.getAxes().get(Axis.COLUMNS).getDimensions().add(measuresDimension);
-            
+
             query.validate();
-            
+
             SelectNode mdx = query.getSelect();
             String mdxString = mdx.toString();
-            assertEquals(mdxString, 
-                    "SELECT\n" + 
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" + 
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
                     "{[Product].[All Products].[Drink].Children} ON ROWS\n" +
-                    "FROM [Sales]");
-            
+                    "FROM [Sales]"));
+
             // TEST ANCESTORS SELECTION
-            
+
             productDimension.getSelections().clear();
-            drinkSelection = 
-                productDimension.createSelection(drinkMember, 
+            drinkSelection =
+                productDimension.createSelection(drinkMember,
                         Selection.Operator.ANCESTORS);
             productDimension.getSelections().add(drinkSelection);
-            
+
             query.validate();
-            
+
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(mdxString, 
-                    "SELECT\n" + 
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" + 
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
                     "{Ascendants([Product].[All Products].[Drink])} ON ROWS\n" +
-                    "FROM [Sales]");
+                    "FROM [Sales]"));
 
             // TEST DESCENDANTS SELECTION
-            
+
             productDimension.getSelections().clear();
-            drinkSelection = 
-                productDimension.createSelection(drinkMember, 
+            drinkSelection =
+                productDimension.createSelection(drinkMember,
                         Selection.Operator.DESCENDANTS);
             productDimension.getSelections().add(drinkSelection);
-            
+
             query.validate();
-            
+
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(mdxString, 
-                    "SELECT\n" + 
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" + 
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
                     "{Descendants([Product].[All Products].[Drink])} ON ROWS\n" +
-                    "FROM [Sales]");
-       
+                    "FROM [Sales]"));
+
             // TEST INCLUDE_CHILDREN SELECTION
-            
+
             productDimension.getSelections().clear();
-            drinkSelection = 
-                productDimension.createSelection(drinkMember, 
+            drinkSelection =
+                productDimension.createSelection(drinkMember,
                         Selection.Operator.INCLUDE_CHILDREN);
             productDimension.getSelections().add(drinkSelection);
-            
+
             query.validate();
-            
+
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(mdxString, 
-                    "SELECT\n" + 
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" + 
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
                     "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n" +
-                    "FROM [Sales]");
-            
+                    "FROM [Sales]"));
+
             // TEST SIBLINGS SELECTION
-            
+
             productDimension.getSelections().clear();
-            drinkSelection = 
-                productDimension.createSelection(drinkMember, 
+            drinkSelection =
+                productDimension.createSelection(drinkMember,
                         Selection.Operator.SIBLINGS);
             productDimension.getSelections().add(drinkSelection);
-            
+
             query.validate();
-            
+
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(mdxString, 
-                    "SELECT\n" + 
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" + 
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
                     "{[Product].[All Products].[Drink].Siblings} ON ROWS\n" +
-                    "FROM [Sales]");
-            
+                    "FROM [Sales]"));
         } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
     }
-    
+
     public void testMultipleDimensionSelections() {
         try {
             Cube cube = getFoodmartCube("Sales");
@@ -390,59 +394,60 @@ public class OlapTest extends TestCase {
             Query query = new Query("my query", cube);
 
             // create selections
-            
+
             QueryDimension productDimension = query.getDimension("Product");
             Member drinkMember = cube.lookupMember("Product", "Drink");
-            Selection drinkSelection = 
-                productDimension.createSelection(drinkMember, 
+            Selection drinkSelection =
+                productDimension.createSelection(drinkMember,
                         Selection.Operator.CHILDREN);
             productDimension.getSelections().add(drinkSelection);
-            
+
             QueryDimension storeDimension = query.getDimension("Store");
             Member usaMember = cube.lookupMember("Store", "USA");
-            Selection usaSelection = 
-                storeDimension.createSelection(usaMember, 
+            Selection usaSelection =
+                storeDimension.createSelection(usaMember,
                         Selection.Operator.INCLUDE_CHILDREN);
             storeDimension.getSelections().add(usaSelection);
-            
+
             QueryDimension timeDimension = query.getDimension("Time");
             Member year1997Member = cube.lookupMember("Time", "1997");
-            Selection year1997Selection = 
-                timeDimension.createSelection(year1997Member, 
+            Selection year1997Selection =
+                timeDimension.createSelection(year1997Member,
                         Selection.Operator.CHILDREN);
             timeDimension.getSelections().add(year1997Selection);
-            
+
             QueryDimension measuresDimension = query.getDimension("Measures");
             Member storeSalesMember = cube.lookupMember("Measures", "Store Sales");
-            Selection storeSalesSelection = 
-                measuresDimension.createSelection(storeSalesMember, 
+            Selection storeSalesSelection =
+                measuresDimension.createSelection(storeSalesMember,
                         Selection.Operator.MEMBER);
             measuresDimension.getSelections().add(storeSalesSelection);
-            
+
             query.getAxes().get(Axis.ROWS).getDimensions().add(productDimension);
             query.getAxes().get(Axis.ROWS).getDimensions().add(storeDimension);
             query.getAxes().get(Axis.ROWS).getDimensions().add(timeDimension);
             query.getAxes().get(Axis.COLUMNS).getDimensions().add(measuresDimension);
-            
+
             query.validate();
-            
+
             SelectNode mdx = query.getSelect();
             String mdxString = mdx.toString();
-            assertEquals(mdxString, 
-                    "SELECT\n" + 
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" + 
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
                     "CrossJoin({[Product].[All Products].[Drink].Children}, " +
                     "CrossJoin({{[Store].[All Stores].[USA], " +
                     "[Store].[All Stores].[USA].Children}}, " +
                     "{[Time].[1997].Children})) ON ROWS\n" +
-                    "FROM [Sales]");
+                    "FROM [Sales]"));
 
         } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
     }
-    
+
     public void testSwapAxes() {
         try {
             Cube cube = getFoodmartCube("Sales");
@@ -452,52 +457,54 @@ public class OlapTest extends TestCase {
             Query query = new Query("my query", cube);
 
             // create selections
-            
+
             QueryDimension productDimension = query.getDimension("Product");
             Member drinkMember = cube.lookupMember("Product", "Drink");
-            Selection drinkSelection = 
-                productDimension.createSelection(drinkMember, 
+            Selection drinkSelection =
+                productDimension.createSelection(drinkMember,
                         Selection.Operator.CHILDREN);
             productDimension.getSelections().add(drinkSelection);
 
             QueryDimension measuresDimension = query.getDimension("Measures");
             Member storeSalesMember = cube.lookupMember("Measures", "Store Sales");
-            Selection storeSalesSelection = 
-                measuresDimension.createSelection(storeSalesMember, 
+            Selection storeSalesSelection =
+                measuresDimension.createSelection(storeSalesMember,
                         Selection.Operator.MEMBER);
             measuresDimension.getSelections().add(storeSalesSelection);
-            
+
             query.getAxes().get(Axis.ROWS).getDimensions().add(productDimension);
             query.getAxes().get(Axis.COLUMNS).getDimensions().add(measuresDimension);
-            
+
             query.validate();
-            
+
             assertEquals(productDimension.getAxis().getLocation(), Axis.ROWS);
             assertEquals(measuresDimension.getAxis().getLocation(), Axis.COLUMNS);
-            
+
             SelectNode mdx = query.getSelect();
             String mdxString = mdx.toString();
-            assertEquals(mdxString, 
-                    "SELECT\n" + 
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" + 
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
                     "{[Product].[All Products].[Drink].Children} ON ROWS\n" +
-                    "FROM [Sales]");
-            
+                    "FROM [Sales]"));
+
             query.swapAxes();
-            
+
             assertEquals(productDimension.getAxis().getLocation(), Axis.COLUMNS);
             assertEquals(measuresDimension.getAxis().getLocation(), Axis.ROWS);
-            
+
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(mdxString, 
-                    "SELECT\n" + 
-                    "{[Product].[All Products].[Drink].Children} ON COLUMNS,\n" + 
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Product].[All Products].[Drink].Children} ON COLUMNS,\n" +
                     "{[Measures].[Store Sales]} ON ROWS\n" +
-                    "FROM [Sales]");
-            
+                    "FROM [Sales]"));
+
             query.swapAxes();
-            
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -505,8 +512,8 @@ public class OlapTest extends TestCase {
         }
     }
 
-    
-    
+
+
     public static void listHierarchies(Dimension dimension) {
         // Get a list of hierarchy objects and dump their names
         for (Hierarchy hierarchy : dimension.getHierarchies()) {
