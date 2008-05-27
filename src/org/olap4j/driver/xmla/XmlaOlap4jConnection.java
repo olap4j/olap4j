@@ -342,7 +342,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     public void clearWarnings() throws SQLException {
-        throw new UnsupportedOperationException();
+        // this driver does not support warnings, so nothing to do 
     }
 
     public Statement createStatement(

@@ -46,6 +46,13 @@ class XmlaOlap4jCube implements Cube, Named
         new NamedListImpl<XmlaOlap4jNamedSet>();
     private final MetadataReader metadataReader;
 
+    /**
+     * Creates an XmlaOlap4jCube.
+     *
+     * @param olap4jSchema Schema
+     * @param name Name
+     * @param description Description
+     */
     XmlaOlap4jCube(
         XmlaOlap4jSchema olap4jSchema,
         String name,
@@ -120,6 +127,27 @@ class XmlaOlap4jCube implements Cube, Named
                 measure.getUniqueName(),
                 new SoftReference<XmlaOlap4jMember>(measure));
         }
+        if (!measures.isEmpty()) {
+            final XmlaOlap4jHierarchy measuresHierarchy =
+                measures.get(0).getHierarchy();
+            for (XmlaOlap4jLevel level : measuresHierarchy.levels) {
+                final List<Member> memberList = level.getMembers();
+                final List<Measure> measureList =
+                    new ArrayList<Measure>(memberList.size());
+                for (Member member : memberList) {
+                    final SoftReference<XmlaOlap4jMember> measureRef =
+                        ((CachingMetadataReader) metadataReader).memberMap.get(
+                            member.getUniqueName());
+                    // gc not possible - we hold all members in 'measures' field.
+                    assert measureRef.get() != null;
+                    measureList.add((Measure) measureRef.get());
+                }
+                ((CachingMetadataReader) metadataReader).levelMemberListMap.put(
+                    level,
+                    new SoftReference<List<XmlaOlap4jMember>>(
+                        Olap4jUtil.<XmlaOlap4jMember>cast(measureList)));
+            }
+        }
         // populate named sets
         olap4jConnection.populateList(
             namedSets, context,
@@ -177,6 +205,13 @@ class XmlaOlap4jCube implements Cube, Named
         return lookupMember(segmentList);
     }
 
+    /**
+     * Finds a member, given its fully qualfieid name.
+     *
+     * @param segmentList List of the segments of the name
+     * @return Member, or null if not found
+     * @throws OlapException on error
+     */
     private Member lookupMember(
         List<IdentifierNode.Segment> segmentList) throws OlapException
     {
@@ -230,6 +265,11 @@ class XmlaOlap4jCube implements Cube, Named
     {
         private final MetadataReader metadataReader;
 
+        /**
+         * Creates a DelegatingMetadataReader.
+         *
+         * @param metadataReader Underlying metadata reader
+         */
         DelegatingMetadataReader(MetadataReader metadataReader) {
             this.metadataReader = metadataReader;
         }
@@ -283,6 +323,11 @@ class XmlaOlap4jCube implements Cube, Named
             levelMemberListMap =
             new HashMap<XmlaOlap4jLevel, SoftReference<List<XmlaOlap4jMember>>>();
 
+        /**
+         * Creates a CachingMetadataReader.
+         *
+         * @param metadataReader Underlying metadata reader
+         */
         CachingMetadataReader(MetadataReader metadataReader) {
             super(metadataReader);
         }
