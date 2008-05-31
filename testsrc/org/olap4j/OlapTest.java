@@ -166,8 +166,8 @@ public class OlapTest extends TestCase {
                 return;
             }
 
-            // take the first cube
-            Cube cube = cubes.get(0);
+            // take the "Sales" cube
+            Cube cube = cubes.get("Sales");
             System.out.println("using cube name="+cube.getName());
 
             // create an XML doc to represent the Cube and print it out

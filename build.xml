@@ -80,8 +80,8 @@ ${jar-jdk14.file}"/>
     <pathelement location="${mondrian.lib.dir}/commons-collections.jar"/>
     <pathelement location="${mondrian.lib.dir}/commons-vfs.jar"/>
     <pathelement location="${mondrian.lib.dir}/commons-logging.jar"/>
-    <pathelement location="${mondrian.lib.dir}/commons-math-1.0.jar"/>
-    <pathelement location="${mondrian.lib.dir}/xercesImpl.jar"/>
+    <pathelement location="${mondrian.lib.dir}/commons-math.jar"/>
+    <pathelement location="${mondrian.lib.dir}/xml-apis.jar"/>
     -->
 
   </path>
