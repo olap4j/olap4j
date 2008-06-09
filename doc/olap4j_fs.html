@@ -463,7 +463,7 @@ connection pooling, driver registration.</p>
 <p>Same functionality as JDBC.</p>
 <p>Here is an example of registering an olap4j driver:</p>
 
-<div class="code">Class.forName("mondrian.olap4j.Driver");</div>
+<div class="code">Class.forName("mondrian.olap4j.MondrianOlap4jDriver");</div>
 
 <h4>2.1.2. <a name="The_DriverManager_class">The DriverManager class</a></h4>
 
@@ -512,7 +512,7 @@ executes a statement:</p>
 <div class="code">
 	import org.olap4j.*;<br>
   <br>
-  Class.forName(&quot;mondrian.olap4j.Driver&quot;);<br>
+  Class.forName(&quot;mondrian.olap4j.MondrianOlap4jDriver&quot;);<br>
   	OlapConnection connection =<br>
 &nbsp;&nbsp;&nbsp; DriverManager.getConnection(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot;
@@ -539,10 +539,10 @@ string, the code is identical.</p>
 <div class="code">
 	import org.olap4j.*;<br>
     <br>
-    Class.forName(&quot;olap4j.impl.xmla.Driver&quot;);<br>
+    Class.forName(&quot;org.olap4j.driver.xmla.XmlaOlap4jDriver&quot;);<br>
     OlapConnection connection =<br>
     &nbsp;&nbsp;&nbsp; DriverManager.getConnection(<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:olap4jxmla:Server=http://localhost/xmla/msxisapi.dll;&quot;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:xmla:Server=http://localhost/xmla/msxisapi.dll;&quot;
   +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=FoodMart&quot;);<br>
 	OlapWrapper wrapper = (OlapWrapper) connection;<br>
   	OlapConnection olapConnection = wrapper.unwrap(OlapConnection.class);<br>
