@@ -9,6 +9,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.OlapException;
+import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxy;
 
 import java.sql.*;
 import java.util.Properties;
@@ -27,7 +28,7 @@ import java.util.List;
  */
 interface Factory {
     Connection newConnection(
-        XmlaOlap4jDriver.Proxy proxy,
+        XmlaOlap4jProxy proxy,
         String url,
         Properties info) throws SQLException;
 

@@ -31,8 +31,13 @@ class XmlaOlap4jSchema implements Schema, Named {
         XmlaOlap4jCatalog olap4jCatalog,
         String name)
     {
-        assert olap4jCatalog != null;
-        assert name != null;
+        if (olap4jCatalog == null) {
+            throw new NullPointerException("Catalog cannot be null.");
+        }
+        if (name == null) {
+            throw new NullPointerException("Name cannot be null.");
+        }
+        
         this.olap4jCatalog = olap4jCatalog;
         this.name = name;
         this.cubes = new DeferredNamedListImpl<XmlaOlap4jCube>(

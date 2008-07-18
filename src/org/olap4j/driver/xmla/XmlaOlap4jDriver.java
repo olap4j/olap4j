@@ -8,12 +8,10 @@
 */
 package org.olap4j.driver.xmla;
 
-import org.olap4j.impl.Base64;
+import org.olap4j.driver.xmla.proxy.*;
 import org.olap4j.impl.Olap4jUtil;
 
-import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -65,6 +63,18 @@ import java.util.concurrent.*;
  *                                   Mondrian backed XMLA server, be sure to
  *                                   include the full datasource name between
  *                                   quotes.</td> </tr>
+ *                                   
+ * <tr> <td>Cache</td>           <td><p>Class name of the SOAP cache to use. A built in
+ *                                   memory cache is available with 
+ *                                   org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache.
+ *                                   Has to be an implementation of IXmlaOlap4jCache.
+ *                                   <p>By default, no SOAP query cache will be used.
+ *                                   </td> </tr>
+ *                                   
+ * <tr> <td>Cache.*</td>         <td>Properties to transfer to the selected cache 
+ *                                   implementation. See IXmlaOlap4jCache or your
+ *                                   selected implementation for properties details.
+ *                                   </td> </tr>
  *
  * <tr> <td>TestProxyCookie</td>  <td>String that uniquely identifies a proxy
  *                                    object in {@link #PROXY_MAP} via which to
@@ -73,7 +83,7 @@ import java.util.concurrent.*;
  *
  * </table>
  *
- * @author jhyde
+ * @author jhyde, Luc Boudreau
  * @version $Id$
  * @since May 22, 2007
  */
@@ -137,13 +147,24 @@ public class XmlaOlap4jDriver implements Driver {
         DriverManager.registerDriver(new XmlaOlap4jDriver());
     }
 
+    /* (non-Javadoc)
+     * @see java.sql.Driver#connect(java.lang.String, java.util.Properties)
+     */
     public Connection connect(String url, Properties info) throws SQLException {
+        
+        // Checks if this driver handles this connection, exit otherwise.
         if (!XmlaOlap4jConnection.acceptsURL(url)) {
             return null;
         }
+        
+        // Parses the connection string
         Map<String, String> map =
             XmlaOlap4jConnection.parseConnectString(url, info);
-        Proxy proxy = createProxy(map);
+        
+        // Creates a connection proxy
+        XmlaOlap4jProxy proxy = createProxy(map);
+        
+        // returns a connection object to the java API        
         return factory.newConnection(proxy, url, info);
     }
 
@@ -189,15 +210,15 @@ public class XmlaOlap4jDriver implements Driver {
      * @param map Connection properties
      * @return A Proxy with which to submit XML requests
      */
-    protected Proxy createProxy(Map<String, String> map) {
+    protected XmlaOlap4jProxy createProxy(Map<String, String> map) {
         String cookie = map.get(Property.TestProxyCookie.name());
         if (cookie != null) {
-            Proxy proxy = PROXY_MAP.get(cookie);
+            XmlaOlap4jProxy proxy = PROXY_MAP.get(cookie);
             if (proxy != null) {
                 return proxy;
             }
         }
-        return new HttpProxy();
+        return new XmlaOlap4jHttpProxy();
     }
 
     /**
@@ -210,8 +231,8 @@ public class XmlaOlap4jDriver implements Driver {
      * @return Future object from which the byte array containing the result
      * of the XMLA call can be obtained
      */
-    public Future<byte[]> getFuture(
-        final Proxy proxy,
+    public static Future<byte[]> getFuture(
+        final XmlaOlap4jProxy proxy,
         final URL url,
         final String request)
     {
@@ -225,97 +246,13 @@ public class XmlaOlap4jDriver implements Driver {
     }
 
     /**
-     * Object which can respond to HTTP requests.
-     */
-    public interface Proxy {
-        /**
-         * Sends a request to a URL and returns the response.
-         *
-         * @param url Target URL
-         * @param request Request string
-         * @return Response
-         * @throws IOException
-         */
-        byte[] get(URL url, String request) throws IOException;
-
-        /**
-         * Submits a request for background execution.
-         *
-         * @param url URL
-         * @param request Request
-         * @return Future object representing the submitted job
-         */
-        Future<byte[]> submit(
-            URL url,
-            String request);
-
-        /**
-         * Returns the name of the character set use for encoding the XML
-         * string.
-         */
-        String getEncodingCharsetName();
-    }
-
-    /**
-     * Implementation of {@link Proxy} which uses HTTP POST.
-     */
-    protected static class HttpProxy implements Proxy {
-        public byte[] get(URL url, String request) throws IOException {
-            // Open connection to manipulate the properties
-            URLConnection urlConnection = url.openConnection();
-            urlConnection.setDoOutput(true);
-            urlConnection.setRequestProperty("content-type", "text/xml");
-
-            // Encode credentials for basic authentication
-            if (url.getUserInfo() != null) {
-                String encoding =
-                    Base64.encodeBytes(url.getUserInfo().getBytes(), 0);
-                urlConnection.setRequestProperty(
-                    "Authorization", "Basic " + encoding);
-            }
-
-            // Send data (i.e. POST). Use same encoding as specified in the
-            // header.
-            final String encoding = getEncodingCharsetName();
-            urlConnection.getOutputStream().write(request.getBytes(encoding));
-
-            // Get the response, again assuming default encoding.
-            InputStream is = urlConnection.getInputStream();
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buf = new byte[1024];
-            int count;
-            while ((count = is.read(buf)) > 0) {
-                baos.write(buf, 0, count);
-            }
-            return baos.toByteArray();
-        }
-
-        public Future<byte[]> submit(
-            final URL url,
-            final String request)
-        {
-            return executor.submit(
-                new Callable<byte[] >() {
-                    public byte[] call() throws Exception {
-                        return get(url, request);
-                    }
-                }
-            );
-        }
-
-        public String getEncodingCharsetName() {
-            return "UTF-8";
-        }
-    }
-
-    /**
      * For testing. Map from a cookie value (which is uniquely generated for
      * each test) to a proxy object. Uses a weak hash map so that, if the code
      * that created the proxy 'forgets' the cookie value, then the proxy can
      * be garbage-collected. 
      */
-    public static final Map<String, Proxy> PROXY_MAP =
-        Collections.synchronizedMap(new WeakHashMap<String, Proxy>());
+    public static final Map<String, XmlaOlap4jProxy> PROXY_MAP =
+        Collections.synchronizedMap(new WeakHashMap<String, XmlaOlap4jProxy>());
 
     /**
      * Generates and returns a unique string.
@@ -336,7 +273,8 @@ public class XmlaOlap4jDriver implements Driver {
         Server("URL of HTTP server"),
         Catalog("Catalog name"),
         Provider("Name of the datasource provider"),
-        DataSource("Name of the datasource");
+        DataSource("Name of the datasource"),
+        Cache("Class name of the SOAP cache implementation");
 
         /**
          * Creates a property.

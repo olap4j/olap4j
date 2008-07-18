@@ -9,6 +9,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.OlapException;
+import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxy;
 
 import java.sql.*;
 import java.util.*;
@@ -22,7 +23,7 @@ import java.util.*;
  */
 class FactoryJdbc3Impl implements Factory {
     public Connection newConnection(
-        XmlaOlap4jDriver.Proxy proxy,
+        XmlaOlap4jProxy proxy,
         String url,
         Properties info)
         throws SQLException
@@ -105,7 +106,7 @@ class FactoryJdbc3Impl implements Factory {
 
     private class XmlaOlap4jConnectionJdbc3 extends XmlaOlap4jConnection {
         public XmlaOlap4jConnectionJdbc3(
-            XmlaOlap4jDriver.Proxy proxy,
+            XmlaOlap4jProxy proxy,
             String url,
             Properties info)
             throws SQLException

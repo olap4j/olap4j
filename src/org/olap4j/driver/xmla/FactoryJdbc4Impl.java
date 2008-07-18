@@ -14,6 +14,7 @@ import java.io.Reader;
 import java.io.InputStream;
 
 import org.olap4j.*;
+import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxy;
 
 /**
  * Implementation of {@link Factory} for JDBC 4.0.
@@ -24,7 +25,7 @@ import org.olap4j.*;
  */
 class FactoryJdbc4Impl implements Factory {
     public Connection newConnection(
-        XmlaOlap4jDriver.Proxy proxy,
+        XmlaOlap4jProxy proxy,
         String url,
         Properties info)
         throws SQLException
@@ -331,7 +332,7 @@ class FactoryJdbc4Impl implements Factory {
     {
         public XmlaOlap4jConnectionJdbc4(
             Factory factory,
-            XmlaOlap4jDriver.Proxy proxy,
+            XmlaOlap4jProxy proxy,
             String url,
             Properties info) throws SQLException
         {

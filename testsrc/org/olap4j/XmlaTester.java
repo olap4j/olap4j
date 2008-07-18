@@ -9,6 +9,7 @@
 package org.olap4j;
 
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
+import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxy;
 import org.olap4j.test.TestContext;
 
 import java.sql.*;
@@ -24,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
  * @version $Id$
  */
 public class XmlaTester implements TestContext.Tester {
-    final XmlaOlap4jDriver.Proxy proxy;
+    final XmlaOlap4jProxy proxy;
     final String cookie;
     private Connection connection;
 
@@ -56,7 +57,7 @@ public class XmlaTester implements TestContext.Tester {
         final Constructor<?> constructor =
             clazz.getConstructor(Map.class, String.class);
         this.proxy =
-            (XmlaOlap4jDriver.Proxy) constructor.newInstance(
+            (XmlaOlap4jProxy) constructor.newInstance(
                 catalogNameUrls, urlString);
         this.cookie = XmlaOlap4jDriver.nextCookie();
         XmlaOlap4jDriver.PROXY_MAP.put(cookie, proxy);
