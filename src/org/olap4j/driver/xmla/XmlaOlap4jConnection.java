@@ -1230,11 +1230,15 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             Datatype dataType =
                 Datatype.forXmlaOrdinal(
                     integerElement(row, "DATA_TYPE"));
+            final Integer contentTypeOrdinal =
+                integerElement(row, "PROPERTY_CONTENT_TYPE");
             Property.ContentType contentType =
-                Property.ContentType.forXmlaOrdinal(
-                    integerElement(row, "PROPERTY_CONTENT_TYPE"));
+                contentTypeOrdinal == null
+                    ? null
+                    : Property.ContentType.forXmlaOrdinal(contentTypeOrdinal);
             int propertyType = integerElement(row, "PROPERTY_TYPE");
-            Set<Property.TypeFlag> type = Property.TypeFlag.forMask(propertyType);
+            Set<Property.TypeFlag> type =
+                Property.TypeFlag.forMask(propertyType);
             list.add(
                 new XmlaOlap4jProperty(
                     uniqueName, name, caption, description, dataType, type,
