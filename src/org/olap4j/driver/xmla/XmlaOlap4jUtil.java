@@ -181,7 +181,12 @@ abstract class XmlaOlap4jUtil {
     }
 
     static Integer integerElement(Element row, String name) {
-        return Integer.valueOf( stringElement(row, name) );
+        final String s = stringElement(row, name);
+        if (s == null || s.equals("")) {
+            return null;
+        } else {
+            return Integer.valueOf(s);
+        }
     }
 
     static int intElement(Element row, String name) {
