@@ -39,6 +39,10 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     /**
      * Creates an XmlaOlap4jDatabaseMetaData.
      *
+     * <p>Note that this constructor should make zero non-trivial calls, which
+     * could cause deadlocks due to java.sql.DriverManager synchronization 
+     * issues.
+     *
      * @param olap4jConnection Connection
      */
     XmlaOlap4jDatabaseMetaData(

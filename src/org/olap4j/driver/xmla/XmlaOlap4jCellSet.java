@@ -362,8 +362,9 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         final Element cubeNameNode =
             findChild(cubeNode, MDDATASET_NS, "CubeName");
         final String cubeName = gatherText(cubeNameNode);
-        final XmlaOlap4jCube cube =
-            this.olap4jStatement.olap4jConnection.olap4jSchema.cubes.get(
+        final XmlaOlap4jCube cube = 
+            (XmlaOlap4jCube)
+            this.olap4jStatement.olap4jConnection.getSchema().getCubes().get(
                 cubeName);
         if (cube == null) {
             throw olap4jStatement.olap4jConnection.helper.createException(

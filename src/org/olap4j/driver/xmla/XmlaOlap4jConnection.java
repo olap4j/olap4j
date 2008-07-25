@@ -50,7 +50,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     /**
      * <p>Current schema.
      */
-    final XmlaOlap4jSchema olap4jSchema;
+    private XmlaOlap4jSchema olap4jSchema;
 
     private final XmlaOlap4jDatabaseMetaData olap4jDatabaseMetaData;
 
@@ -112,6 +112,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * <p>This method is intentionally package-protected. The public API
      * uses the traditional JDBC {@link java.sql.DriverManager}.
      * See {@link org.olap4j.driver.xmla.XmlaOlap4jDriver} for more details.
+     *
+     * <p>Note that this constructor should make zero non-trivial calls, which
+     * could cause deadlocks due to java.sql.DriverManager synchronization 
+     * issues.
      *
      * @pre acceptsURL(url)
      *
@@ -175,12 +179,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
         this.olap4jDatabaseMetaData =
             factory.newDatabaseMetaData(this);
-        final XmlaOlap4jCatalog catalog =
-            (XmlaOlap4jCatalog)
-                this.olap4jDatabaseMetaData.getCatalogObjects().get(
-                    catalogName);
-        this.olap4jSchema = (XmlaOlap4jSchema) catalog.getSchemas()
-            .get(0);
     }
     
     
@@ -513,7 +511,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         };
     }
 
-    public org.olap4j.metadata.Schema getSchema() throws OlapException {
+    public synchronized org.olap4j.metadata.Schema getSchema() throws OlapException {
+    		// initializes the olap4jSchema if necessary
+    		if (this.olap4jSchema == null) {
+            final XmlaOlap4jCatalog catalog =
+                (XmlaOlap4jCatalog)
+                this.olap4jDatabaseMetaData.getCatalogObjects().get(
+                catalogName);
+            this.olap4jSchema = (XmlaOlap4jSchema) catalog.getSchemas()
+                .get(0);
+    		}
         return olap4jSchema;
     }
 
@@ -1142,7 +1149,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class SchemaHandler extends HandlerImpl<XmlaOlap4jSchema> {
-        public void handle(Element row, Context context, List<XmlaOlap4jSchema> list) {
+        public void handle(Element row, Context context, List<XmlaOlap4jSchema> list) throws OlapException {
             /*
             <row>
                 <CATALOG_NAME>LOCALDB</CATLAOG_NAME>
@@ -1169,7 +1176,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             this.catalogName = catalogName;
         }
         
-        public void handle(Element row, Context context, List<XmlaOlap4jSchema> list) 
+        public void handle(Element row, Context context, List<XmlaOlap4jSchema> list) throws OlapException
         {
             /*
             <row>
@@ -1407,7 +1414,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             return getCube(row).levelsByUname.get(levelUniqueName);
         }
 
-        public XmlaOlap4jCatalog getCatalog(Element row) {
+        public XmlaOlap4jCatalog getCatalog(Element row) throws OlapException {
             if (olap4jCatalog != null) {
                 return olap4jCatalog;
             }
