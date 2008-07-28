@@ -424,29 +424,30 @@ class XmlaOlap4jCube implements Cube, Named
             }
         }
 
+        /* (non-Javadoc)
+         * @see org.olap4j.driver.xmla.MetadataReader
+         *     #lookupMembersByUniqueName(java.util.List, java.util.Map)
+         * TODO Optimize this process so we don't always send N requests for N members.
+         */
         public void lookupMembersByUniqueName(
             List<String> memberUniqueNames,
             Map<String, XmlaOlap4jMember> memberMap) throws OlapException
         {
-            final XmlaOlap4jConnection.Context context =
-                new XmlaOlap4jConnection.Context(
-                    XmlaOlap4jCube.this, null, null, null);
             List<XmlaOlap4jMember> memberList =
                 new ArrayList<XmlaOlap4jMember>();
-            olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection
-                .populateList(
-                    memberList,
-                    context,
-                    XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEMBERS,
-                    new XmlaOlap4jConnection.MemberHandler(),
-                    new Object[] {
-                        "CATALOG_NAME", olap4jSchema.olap4jCatalog.getName(),
-                        "SCHEMA_NAME", olap4jSchema.getName(),
-                        "CUBE_NAME", getName(),
-                        "MEMBER_UNIQUE_NAME", memberUniqueNames
-                    });
-            for (XmlaOlap4jMember member : memberList) {
-                memberMap.put(member.getUniqueName(), member);
+            for (String currentMemberName : memberUniqueNames) {
+                memberList.add(
+                        this.lookupMemberByUniqueName(currentMemberName));
+            }
+            // All members have been found without errors,
+            // we can populate the map.
+            for (XmlaOlap4jMember currentMember : memberList) {
+                if (currentMember != null &&
+                    !memberMap.containsKey(currentMember.getUniqueName())) 
+                {
+                    memberMap.put(currentMember.getUniqueName(), 
+                            currentMember);
+                }
             }
         }
 
