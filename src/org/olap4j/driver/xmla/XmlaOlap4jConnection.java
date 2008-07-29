@@ -9,6 +9,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
+
 import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
 
 import org.olap4j.driver.xmla.proxy.*;
@@ -575,7 +576,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         Element root = xxx(request);
         for (Element o : childElements(root)) {
             if (o.getLocalName().equals("row")) {
-                handler.handle(o, context, list);
+                handler.handle(o, context, list, this);
             }
         }
         handler.sortList(list);
@@ -809,7 +810,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class CubeHandler extends HandlerImpl<XmlaOlap4jCube> {
-        public void handle(Element row, Context context, List<XmlaOlap4jCube> list)
+        
+        public void handle(Element row, Context context, 
+            List<XmlaOlap4jCube> list, XmlaOlap4jConnection connection) 
             throws OlapException
         {
             /*
@@ -834,7 +837,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             String description = stringElement(row, "DESCRIPTION");
             list.add(
                 new XmlaOlap4jCube(
-                    context.olap4jSchema, cubeName, description));
+                    context.olap4jSchema, cubeName, description, connection));
+        }
+
+        public void handle(Element row, Context context,
+                List<XmlaOlap4jCube> list) throws OlapException {
+            throw new RuntimeException(
+                "A cube object needs a reference to the connection who created it.");
         }
     }
 
@@ -1274,6 +1283,28 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             Element row,
             Context context,
             List<T> list) throws OlapException;
+        
+        /**
+         * Converts an XML element from an XMLA result set into a metadata
+         * element and appends it to a list of metadata elements.
+         *
+         * @param row XMLA element
+         *
+         * @param context Context (schema, cube, dimension, etc.) that the
+         * request was executed in and that the element will belong to
+         *
+         * @param list List of metadata elements to append new metadata element
+         * 
+         * @param connection A reference to the connection object which populated
+         * the object.
+         *
+         * @throws OlapException on error
+         */
+        void handle(
+            Element row,
+            Context context,
+            List<T> list,
+            XmlaOlap4jConnection connection) throws OlapException;
 
         /**
          * Sorts a list of metadata elements.
@@ -1289,6 +1320,20 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     static abstract class HandlerImpl<T extends Named> implements Handler<T> {
         public void sortList(List<T> list) {
             // do nothing - assume XMLA returned list in correct order
+        }
+        
+        /**
+         * <p>Default implementation of the handle method with a reference to the
+         * connection object. 
+         * 
+         * @see org.olap4j.driver.xmla.XmlaOlap4jConnection.Handler
+         * #handle(org.w3c.dom.Element, 
+         * org.olap4j.driver.xmla.XmlaOlap4jConnection.Context, 
+         * java.util.List, org.olap4j.driver.xmla.XmlaOlap4jConnection)
+         */
+        public void handle(Element row, Context context, List<T> list,
+                XmlaOlap4jConnection connection) throws OlapException {
+            this.handle(row, context, list);
         }
     }
 

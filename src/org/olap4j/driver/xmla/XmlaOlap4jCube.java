@@ -45,6 +45,7 @@ class XmlaOlap4jCube implements Cube, Named
     private final NamedList<XmlaOlap4jNamedSet> namedSets =
         new NamedListImpl<XmlaOlap4jNamedSet>();
     private final MetadataReader metadataReader;
+    private XmlaOlap4jConnection connection;
 
     /**
      * Creates an XmlaOlap4jCube.
@@ -52,11 +53,13 @@ class XmlaOlap4jCube implements Cube, Named
      * @param olap4jSchema Schema
      * @param name Name
      * @param description Description
+     * @param connection 
      */
     XmlaOlap4jCube(
         XmlaOlap4jSchema olap4jSchema,
         String name,
-        String description) throws OlapException
+        String description, 
+        XmlaOlap4jConnection connection) throws OlapException
     {
         assert olap4jSchema != null;
         assert description != null;
@@ -64,6 +67,7 @@ class XmlaOlap4jCube implements Cube, Named
         this.olap4jSchema = olap4jSchema;
         this.name = name;
         this.description = description;
+        this.connection = connection;
         this.metadataReader =
             new CachingMetadataReader(
                 new RawMetadataReader());
@@ -427,28 +431,80 @@ class XmlaOlap4jCube implements Cube, Named
         /* (non-Javadoc)
          * @see org.olap4j.driver.xmla.MetadataReader
          *     #lookupMembersByUniqueName(java.util.List, java.util.Map)
-         * TODO Optimize this process so we don't always send N requests for N members.
          */
         public void lookupMembersByUniqueName(
             List<String> memberUniqueNames,
             Map<String, XmlaOlap4jMember> memberMap) throws OlapException
         {
-            List<XmlaOlap4jMember> memberList =
-                new ArrayList<XmlaOlap4jMember>();
-            for (String currentMemberName : memberUniqueNames) {
-                memberList.add(
-                        this.lookupMemberByUniqueName(currentMemberName));
+            if (connection.getDataSourceInfo()
+                    .indexOf("Provider=Mondrian") != -1) 
+            {
+                memberMap.putAll(this.mondrianMembersLookup(memberUniqueNames));
+            } else {
+                memberMap.putAll(this.genericMembersLookup(memberUniqueNames));
             }
-            // All members have been found without errors,
-            // we can populate the map.
-            for (XmlaOlap4jMember currentMember : memberList) {
-                if (currentMember != null &&
-                    !memberMap.containsKey(currentMember.getUniqueName())) 
-                {
-                    memberMap.put(currentMember.getUniqueName(), 
-                            currentMember);
+        }
+        
+        /**
+         * This is an optimized method for Mondrian servers members lookup.
+         * @param memberUniqueNames A list of the members to lookup
+         * @return A map of members with their unique name as a key
+         * @throws OlapException Gets thrown for communication errors
+         */
+        private Map<String,XmlaOlap4jMember> mondrianMembersLookup(
+            List<String> memberUniqueNames) throws OlapException
+        {
+            final XmlaOlap4jConnection.Context context =
+                new XmlaOlap4jConnection.Context(
+                    XmlaOlap4jCube.this, null, null, null);
+            final List<XmlaOlap4jMember> memberList = 
+                new ArrayList<XmlaOlap4jMember>();
+            olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection
+                .populateList(
+                    memberList,
+                    context,
+                    XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEMBERS,
+                    new XmlaOlap4jConnection.MemberHandler(),
+                    new Object[] {
+                        "CATALOG_NAME", olap4jSchema.olap4jCatalog.getName(),
+                        "SCHEMA_NAME", olap4jSchema.getName(),
+                        "CUBE_NAME", getName(),
+                        "MEMBER_UNIQUE_NAME", memberUniqueNames
+                    });
+            final Map<String,XmlaOlap4jMember> memberMap =
+                new HashMap<String,XmlaOlap4jMember>(memberUniqueNames.size());
+            for (XmlaOlap4jMember member : memberList) {
+                if (member != null) {
+                    memberMap.put(member.getUniqueName(), member);
                 }
             }
+            return memberMap;
+        }
+        
+        /**
+         * This is an generic method for members lookup.
+         * @param memberUniqueNames A list of the members to lookup
+         * @return A map of members with their unique name as a key
+         * @throws OlapException Gets thrown for communication errors
+         */
+        private Map<String,XmlaOlap4jMember> genericMembersLookup(
+                List<String> memberUniqueNames) throws OlapException
+        {
+            final Map<String,XmlaOlap4jMember> memberMap =
+                new HashMap<String,XmlaOlap4jMember>(memberUniqueNames.size());
+            // Iterates through member names
+            for (String currentMemberName : memberUniqueNames) {
+                // Only lookup if it is not in the map yet
+                if (!memberMap.containsKey(currentMemberName)) {
+                    XmlaOlap4jMember member = 
+                        this.lookupMemberByUniqueName(currentMemberName);
+                    // Null members might mean calculated members
+                    if (member != null) {
+                        memberMap.put(member.getUniqueName(), member);
+                    }
+                }
+            }
+            return memberMap;
         }
 
         public void lookupMemberRelatives(
