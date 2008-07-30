@@ -45,7 +45,6 @@ class XmlaOlap4jCube implements Cube, Named
     private final NamedList<XmlaOlap4jNamedSet> namedSets =
         new NamedListImpl<XmlaOlap4jNamedSet>();
     private final MetadataReader metadataReader;
-    private XmlaOlap4jConnection connection;
 
     /**
      * Creates an XmlaOlap4jCube.
@@ -58,8 +57,7 @@ class XmlaOlap4jCube implements Cube, Named
     XmlaOlap4jCube(
         XmlaOlap4jSchema olap4jSchema,
         String name,
-        String description, 
-        XmlaOlap4jConnection connection) throws OlapException
+        String description) throws OlapException
     {
         assert olap4jSchema != null;
         assert description != null;
@@ -67,7 +65,6 @@ class XmlaOlap4jCube implements Cube, Named
         this.olap4jSchema = olap4jSchema;
         this.name = name;
         this.description = description;
-        this.connection = connection;
         this.metadataReader =
             new CachingMetadataReader(
                 new RawMetadataReader());
@@ -436,8 +433,9 @@ class XmlaOlap4jCube implements Cube, Named
             List<String> memberUniqueNames,
             Map<String, XmlaOlap4jMember> memberMap) throws OlapException
         {
-            if (connection.getDataSourceInfo()
-                    .indexOf("Provider=Mondrian") != -1) 
+            if (olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
+                .olap4jConnection.getDataSourceInfo()
+                    .indexOf("Provider=Mondrian") != -1) //$NON-NLS-1$
             {
                 memberMap.putAll(this.mondrianMembersLookup(memberUniqueNames));
             } else {
