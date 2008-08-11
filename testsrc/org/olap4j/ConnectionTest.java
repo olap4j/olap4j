@@ -1702,6 +1702,42 @@ public class ConnectionTest extends TestCase {
         }
     }
 
+    public void testValidateError() throws Exception {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+            // This test requires validator support.
+            return;
+        }
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+
+        final MdxParserFactory parserFactory =
+            olapConnection.getParserFactory();
+        MdxParser mdxParser =
+            parserFactory.createMdxParser(olapConnection);
+        MdxValidator mdxValidator =
+            parserFactory.createMdxValidator(olapConnection);
+
+        SelectNode select =
+            mdxParser.parseSelect(
+                "select ([Gender], [Store]) on columns\n,"
+                    + "crossjoin([Customers].[City].Members, [Gender].members) on rows\n"
+                    + "from [sales]");
+        AxisNode filterAxis = select.getFilterAxis();
+        assertNull(filterAxis);
+
+        try {
+            select = mdxValidator.validateSelect(select);
+            fail("expected parse error, got " + select);
+        } catch (OlapException e) {
+            assertEquals("Validation error", e.getMessage());
+            assertTrue(
+                TestContext.getStackTrace(e).contains(
+                    "Dimension '[Gender]' appears in more than one independent axis."));
+        }
+    }
+
     // TODO: test for HierarchyType
     // TODO: test for DimensionType
     // TODO: test for LevelType
