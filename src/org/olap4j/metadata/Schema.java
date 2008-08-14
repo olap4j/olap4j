@@ -63,7 +63,7 @@ public interface Schema {
      * @see org.olap4j.OlapDatabaseMetaData#getDimensions(String,String,String,String)
      *
      * @return list of shared dimensions
-     * 
+     *
      * @throws OlapException if database error occurs
      */
     NamedList<Dimension> getSharedDimensions() throws OlapException;

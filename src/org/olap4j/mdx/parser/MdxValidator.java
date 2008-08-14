@@ -46,7 +46,7 @@ public interface MdxValidator {
      * {@link org.olap4j.mdx.ParseTreeNode#getType()} method.
      *
      * @param selectNode Parse tree node representing a SELECT statement
-     * 
+     *
      * @return Validated parse tree
      *
      * @throws OlapException if node is invalid

@@ -153,7 +153,7 @@ public class Query {
     public SelectionFactory getSelectionFactory() {
         return selectionFactory;
     }
-    
+
     private static class Olap4jNodeConverter {
 
         public SelectNode toOlap4j(Query query) {
@@ -182,48 +182,44 @@ public class Query {
         }
 
         private CallNode generateSetCall(ParseTreeNode... args) {
-            final CallNode callNode = new CallNode(
+            return
+                new CallNode(
                     null,
                     "{}",
                     Syntax.Braces,
-                    args
-                );
-            
-            return callNode;
+                    args);
         }
 
         private CallNode generateListSetCall(List<ParseTreeNode> cnodes) {
-            final CallNode callNode = new CallNode(
+            return
+                new CallNode(
                     null,
                     "{}",
                     Syntax.Braces,
-                    cnodes
-                );
-            return callNode;
+                    cnodes);
         }
 
         private CallNode generateListTupleCall(List<ParseTreeNode> cnodes) {
-            final CallNode callNode = new CallNode(
+            return
+                new CallNode(
                     null,
                     "()",
                     Syntax.Parentheses,
-                    cnodes
-                );
-            return callNode;
+                    cnodes);
         }
 
         protected CallNode getMemberSet(QueryDimension dimension) {
-            final CallNode cnode = new CallNode(
+            return
+                new CallNode(
                   null,
                   "{}",
                   Syntax.Braces,
-                  toOlap4j(dimension)
-                );
-            return cnode;
+                  toOlap4j(dimension));
         }
 
         protected CallNode crossJoin(QueryDimension dim1, QueryDimension dim2) {
-            return new CallNode(
+            return
+                new CallNode(
                     null,
                     "CrossJoin",
                     Syntax.Function,
@@ -233,45 +229,47 @@ public class Query {
 
         //
         // This method merges the selections into a single
-        // MDX axis selection.  Right now we do a simple 
+        // MDX axis selection.  Right now we do a simple
         // crossjoin
         //
         private AxisNode toOlap4j(QueryAxis axis) {
             CallNode callNode = null;
             int numDimensions = axis.getDimensions().size();
-            if( axis.getLocation() == Axis.FILTER ) {
+            if (axis.getLocation() == Axis.FILTER) {
                 // need a tuple
                 // need a crossjoin
                 List<ParseTreeNode> members = new ArrayList<ParseTreeNode>();
-                for( int dimNo = 0; dimNo < numDimensions; dimNo++ ) {
-                    QueryDimension dimension = 
-                        axis.getDimensions().get( dimNo );
-                    if( dimension.getSelections().size() == 1 ) {
+                for (int dimNo = 0; dimNo < numDimensions; dimNo++) {
+                    QueryDimension dimension =
+                        axis.getDimensions().get(dimNo);
+                    if (dimension.getSelections().size() == 1) {
                         members.addAll(toOlap4j(dimension));
                     }
                 }
                 callNode = generateListTupleCall(members);
-            } else if( numDimensions == 1 ) {
-                QueryDimension dimension = axis.getDimensions().get( 0 );
+            } else if (numDimensions == 1) {
+                QueryDimension dimension = axis.getDimensions().get(0);
                 List<ParseTreeNode> members = toOlap4j(dimension);
                 callNode = generateListSetCall(members);
-            } else if( numDimensions == 2 ) {
-                callNode = 
-                    crossJoin( axis.getDimensions().get(0), 
+            } else if (numDimensions == 2) {
+                callNode =
+                    crossJoin(
+                        axis.getDimensions().get(0),
                         axis.getDimensions().get(1));
             } else {
                 // need a longer crossjoin
                 // start from the back of the list;
                 List<QueryDimension> dims = axis.getDimensions();
                 callNode = getMemberSet(dims.get(dims.size() - 1));
-                for( int i = dims.size() - 2; i >= 0; i-- ) {
+                for (int i = dims.size() - 2; i >= 0; i--) {
                     CallNode memberSet = getMemberSet(dims.get(i));
-                    callNode = new CallNode(
-                                null,
-                                "CrossJoin",
-                                Syntax.Function,
-                                memberSet,
-                                callNode);
+                    callNode =
+                        new CallNode(
+                            null,
+                            "CrossJoin",
+                            Syntax.Function,
+                            memberSet,
+                            callNode);
                 }
             }
             return new AxisNode(
@@ -280,7 +278,7 @@ public class Query {
                     axis.getLocation(),
                     new ArrayList<IdentifierNode>(),
                     callNode);
-                
+
         }
 
         private List<ParseTreeNode> toOlap4j(QueryDimension dimension) {
@@ -303,50 +301,50 @@ public class Query {
         private ParseTreeNode toOlap4j(Member member, Selection.Operator oper) {
             ParseTreeNode node = null;
             try {
-                switch(oper) {
-                    case MEMBER:
-                        node = new MemberNode(null, member);
-                        break;
-                    case SIBLINGS:
-                        node = new CallNode(
-                                null,
-                                "Siblings",
-                                Syntax.Property,
-                                new MemberNode(null, member)
-                            );
-                        break;
-                    case CHILDREN:
-                        node = new CallNode(
-                                null,
-                                "Children",
-                                Syntax.Property,
-                                new MemberNode(null, member)
-                            );
-                        break;
-                    case INCLUDE_CHILDREN:
-                        node = generateSetCall(
-                                new MemberNode(null, member),
-                                toOlap4j(member, Selection.Operator.CHILDREN)
-                               );
-                        break;
-                    case DESCENDANTS:
-                        node = new CallNode(
-                                null,
-                                "Descendants",
-                                Syntax.Function,
-                                new MemberNode(null, member)
-                            );
-                        break;
-                    case ANCESTORS:
-                        node = new CallNode(
-                                null,
-                                "Ascendants",
-                                Syntax.Function,
-                                new MemberNode(null, member)
-                            );
-                        break;
-                    default:
-                        System.out.println("NOT IMPLEMENTED: " + oper);
+                switch (oper) {
+                case MEMBER:
+                    node = new MemberNode(null, member);
+                    break;
+                case SIBLINGS:
+                    node =
+                        new CallNode(
+                            null,
+                            "Siblings",
+                            Syntax.Property,
+                            new MemberNode(null, member));
+                    break;
+                case CHILDREN:
+                    node =
+                        new CallNode(
+                            null,
+                            "Children",
+                            Syntax.Property,
+                            new MemberNode(null, member));
+                    break;
+                case INCLUDE_CHILDREN:
+                    node =
+                        generateSetCall(
+                            new MemberNode(null, member),
+                            toOlap4j(member, Selection.Operator.CHILDREN));
+                    break;
+                case DESCENDANTS:
+                    node =
+                        new CallNode(
+                            null,
+                            "Descendants",
+                            Syntax.Function,
+                            new MemberNode(null, member));
+                    break;
+                case ANCESTORS:
+                    node =
+                        new CallNode(
+                            null,
+                            "Ascendants",
+                            Syntax.Function,
+                            new MemberNode(null, member));
+                    break;
+                default:
+                    System.out.println("NOT IMPLEMENTED: " + oper);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

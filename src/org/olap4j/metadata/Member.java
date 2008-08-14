@@ -242,7 +242,7 @@ public interface Member extends MetadataElement {
      * {@link org.olap4j.metadata.Property.StandardMemberProperty}
      * enumeration), as well as extra properties defined for its Level
      * (see {@link Level#getProperties()}).</p>
-     * 
+     *
      * @param property property
      *
      * @param value Property value

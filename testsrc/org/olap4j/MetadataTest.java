@@ -205,7 +205,7 @@ public class MetadataTest extends TestCase {
             SCHEMAS_COLUMN_NAMES);
         assertEquals(TestContext.fold("TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "\n"), s);
     }
-    
+
     public void testDatabaseMetaDataGetLiterals() throws SQLException {
         String s = checkResultSet(
             olapDatabaseMetaData.getLiterals(),

@@ -18,32 +18,32 @@ import java.util.concurrent.atomic.AtomicLong;
  * @version $Id: XmlaOlap4jCacheElement.java 92 2008-07-17 07:41:10Z lucboudreau $
  */
 class XmlaOlap4jCacheElement {
-    
+
     /**
      * The time in miliseconds when the entry was created.
      */
     private AtomicLong timestamp = new AtomicLong(Calendar.getInstance().getTimeInMillis());
-    
-    
+
+
     /**
      * This holds the number of times the entry was used.
      */
     private AtomicLong hitMeter = new AtomicLong(new Long("1"));
-    
-    
+
+
     /**
      * The cached SOAP response.
      */
     private byte[] response = null;
-    
-    
+
+
     /**
      * Updates it's internal time stamp.
      */
     public void refreshTimestamp() {
         this.timestamp.compareAndSet(this.timestamp.longValue(), Calendar.getInstance().getTimeInMillis());
     }
-    
+
     /**
      * Updates it's internal time stamp.
      */
@@ -67,3 +67,5 @@ class XmlaOlap4jCacheElement {
         return hitMeter;
     }
 }
+
+// End XmlaOlap4jCacheElement.java

@@ -22,63 +22,63 @@ import java.util.List;
  * query</p>
  *
  * <blockquote>
- * 	<code>SELECT {[Measures].[Unit Sales], [Measures].[Store Sales]} ON
- * 	COLUMNS,<br>
+ *  <code>SELECT {[Measures].[Unit Sales], [Measures].[Store Sales]} ON
+ *  COLUMNS,<br>
  * &nbsp;&nbsp;&nbsp; CrossJoin(<br>
  * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {[Gender].Members},<br>
  * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {[Product].[Food],
- * 	[Product].[Drink]}) ON ROWS<br>
- * 	FROM [Sales]</code>
+ *  [Product].[Drink]}) ON ROWS<br>
+ *  FROM [Sales]</code>
  * </blockquote>
  *
  * <p>the <code>COLUMNS</code> axis has dimensionality
  * {<code>[Measures]</code>} and the <code>ROWS</code> axis has dimensionality
  * {<code>[Gender]</code>, <code>[Product]</code>}. In the result,</p>
  *
- * 	<table border="1" id="table1" cellpadding="3">
- * 		<tr>
- * 			<td bgcolor="#E0E0E0"><b><i>Gender</i></b></td>
- * 			<td bgcolor="#E0E0E0"><b><i>Product</i></b></td>
- * 			<td bgcolor="#E0E0E0"><b>Unit Sales</b></td>
- * 			<td bgcolor="#E0E0E0"><b>Store Sales</b></td>
- * 		</tr>
- * 		<tr>
- * 			<td bgcolor="#E0E0E0"><b>All Gender</b></td>
- * 			<td bgcolor="#E0E0E0"><b>Food</b></td>
- * 			<td align="right">191,940</td>
- * 			<td align="right">409,035.59</td>
- * 		</tr>
- * 		<tr>
- * 			<td bgcolor="#E0E0E0"><b>All Gender</b></td>
- * 			<td bgcolor="#E0E0E0"><b>Drink</b></td>
- * 			<td align="right">24,597</td>
- * 			<td align="right">48,836.21</td>
- * 		</tr>
- * 		<tr>
- * 			<td bgcolor="#E0E0E0"><b>F</b></td>
- * 			<td bgcolor="#E0E0E0"><b>Food</b></td>
- * 			<td align="right">94,814</td>
- * 			<td align="right">203,094.17</td>
- * 		</tr>
- * 		<tr>
- * 			<td bgcolor="#E0E0E0"><b>F</b></td>
- * 			<td bgcolor="#E0E0E0"><b>Drink</b></td>
- * 			<td align="right">12,202</td>
- * 			<td align="right">24,457.37</td>
- * 		</tr>
- * 		<tr>
- * 			<td bgcolor="#E0E0E0"><b>M</b></td>
- * 			<td bgcolor="#E0E0E0"><b>Food</b></td>
- * 			<td align="right">97,126</td>
- * 			<td align="right">205,941.42</td>
- * 		</tr>
- * 		<tr>
- * 			<td bgcolor="#E0E0E0"><b>M</b></td>
- * 			<td bgcolor="#E0E0E0"><b>Drink</b></td>
- * 			<td align="right">12,395</td>
- * 			<td align="right">24,378.84</td>
- * 		</tr>
- * 	</table>
+ *  <table border="1" id="table1" cellpadding="3">
+ *      <tr>
+ *          <td bgcolor="#E0E0E0"><b><i>Gender</i></b></td>
+ *          <td bgcolor="#E0E0E0"><b><i>Product</i></b></td>
+ *          <td bgcolor="#E0E0E0"><b>Unit Sales</b></td>
+ *          <td bgcolor="#E0E0E0"><b>Store Sales</b></td>
+ *      </tr>
+ *      <tr>
+ *          <td bgcolor="#E0E0E0"><b>All Gender</b></td>
+ *          <td bgcolor="#E0E0E0"><b>Food</b></td>
+ *          <td align="right">191,940</td>
+ *          <td align="right">409,035.59</td>
+ *      </tr>
+ *      <tr>
+ *          <td bgcolor="#E0E0E0"><b>All Gender</b></td>
+ *          <td bgcolor="#E0E0E0"><b>Drink</b></td>
+ *          <td align="right">24,597</td>
+ *          <td align="right">48,836.21</td>
+ *      </tr>
+ *      <tr>
+ *          <td bgcolor="#E0E0E0"><b>F</b></td>
+ *          <td bgcolor="#E0E0E0"><b>Food</b></td>
+ *          <td align="right">94,814</td>
+ *          <td align="right">203,094.17</td>
+ *      </tr>
+ *      <tr>
+ *          <td bgcolor="#E0E0E0"><b>F</b></td>
+ *          <td bgcolor="#E0E0E0"><b>Drink</b></td>
+ *          <td align="right">12,202</td>
+ *          <td align="right">24,457.37</td>
+ *      </tr>
+ *      <tr>
+ *          <td bgcolor="#E0E0E0"><b>M</b></td>
+ *          <td bgcolor="#E0E0E0"><b>Food</b></td>
+ *          <td align="right">97,126</td>
+ *          <td align="right">205,941.42</td>
+ *      </tr>
+ *      <tr>
+ *          <td bgcolor="#E0E0E0"><b>M</b></td>
+ *          <td bgcolor="#E0E0E0"><b>Drink</b></td>
+ *          <td align="right">12,395</td>
+ *          <td align="right">24,378.84</td>
+ *      </tr>
+ *  </table>
  *
  * <p>each of the six positions on the <code>ROWS</code> axis has two members,
  * consistent with its dimensionality of 2. The <code>COLUMNS</code> axis has

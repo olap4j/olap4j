@@ -24,19 +24,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>CookieManager is a simple utility for handling cookies when working
  * with <code>java.net.URL</code> and <code>java.net.URLConnection</code>
  * objects.
- * 
+ *
  * <p>This code was taken from http://www.hccp.org/java-net-cookie-how-to.html
  * and modified by Luc Boudreau to support concurrent access and be more
  * thread safe.
- * 
+ *
  * <p>Here's a few use cases examples...
- * 
+ *
  * <hr>
  * <code>
  *     <p>Cookiemanager cm = new CookieManager();
  *     <p>URL url = new URL("http://www.hccp.org/test/cookieTest.jsp");
- *     
- *     <p> . . . 
+ *
+ *     <p> . . .
  *
  *     <p>// getting cookies:
  *     <p>URLConnection conn = url.openConnection();
@@ -47,7 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *     <p>cm.setCookies(url.openConnection());
  * </code>
  * <hr>
- * 
+ *
  * @author <a href="mailto:spam@hccp.org">Ian Brown</a>
  * @version $Id: CookieManager.java 92 2008-07-17 07:41:10Z lucboudreau $
  **/
@@ -84,7 +84,7 @@ public class XmlaOlap4jCookieManager {
      * The connection MUST have been opened using the <i>connect()</i>
      * method or a IOException will be thrown.
      *
-     * @param conn a java.net.URLConnection - must be open, 
+     * @param conn a java.net.URLConnection - must be open,
      * or IOException will be thrown
      * @throws java.io.IOException Thrown if <i>conn</i> is not open.
      */
@@ -116,22 +116,22 @@ public class XmlaOlap4jCookieManager {
 
                 // the specification dictates that the first name/value pair
                 // in the string is the cookie name and value, so let's handle
-                // them as a special case: 
+                // them as a special case:
 
                 if (st.hasMoreTokens()) {
                     String token = st.nextToken();
                     String name = token.substring(0, token
                             .indexOf(NAME_VALUE_SEPARATOR));
                     String value = token.substring(
-                            token .indexOf(NAME_VALUE_SEPARATOR) + 1, 
+                            token .indexOf(NAME_VALUE_SEPARATOR) + 1,
                             token.length());
                     domainStore.put(name, cookie);
                     cookie.put(name, value);
-                    
+
                     if (this.debug  == true) {
                         System.out.println("Saving cookie : " + name + "=" + value);
                     }
-                    
+
                 }
 
                 while (st.hasMoreTokens()) {
@@ -141,7 +141,7 @@ public class XmlaOlap4jCookieManager {
                             token.substring(
                                     token.indexOf(NAME_VALUE_SEPARATOR) + 1,
                                     token.length()));
-                    
+
                     if (this.debug  == true) {
                         System.out.println("Saving cookie : " + token.substring(0,
                                 token.indexOf(NAME_VALUE_SEPARATOR)).toLowerCase() + "="
@@ -158,7 +158,7 @@ public class XmlaOlap4jCookieManager {
      * Prior to opening a URLConnection, calling this method will set all
      * unexpired cookies that match the path or subpaths for thi underlying URL
      *
-     * The connection MUST NOT have been opened 
+     * The connection MUST NOT have been opened
      * method or an IOException will be thrown.
      *
      * @param conn a java.net.URLConnection - must NOT be open, or IOException will be thrown
@@ -181,7 +181,7 @@ public class XmlaOlap4jCookieManager {
             String cookieName = (String) cookieNames.next();
             Map cookie = (Map) domainStore.get(cookieName);
             // check cookie to ensure path matches  and cookie is not expired
-            // if all is cool, add cookie to header string 
+            // if all is cool, add cookie to header string
             if (comparePaths((String) cookie.get(PATH), path)
                     && isNotExpired((String) cookie.get(EXPIRES))) {
                 cookieStringBuffer.append(cookieName);
@@ -192,8 +192,8 @@ public class XmlaOlap4jCookieManager {
             }
         }
         try {
-            if (this.debug  == true 
-                && !(cookieStringBuffer.toString().equals("")) ) 
+            if (this.debug  == true
+                && !(cookieStringBuffer.toString().equals("")))
             {
                 System.out.println(
                   "Using cookie : " + cookieStringBuffer.toString());
@@ -248,3 +248,5 @@ public class XmlaOlap4jCookieManager {
         return store.toString();
     }
 }
+
+// End XmlaOlap4jCookieManager.java

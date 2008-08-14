@@ -16,7 +16,7 @@ import java.io.PrintWriter;
  *
  * <p>Typical use is with the {@link ParseTreeNode#unparse(ParseTreeWriter)}
  * method as follows:
- * 
+ *
  * <blockquote>
  * <pre>
  * ParseTreeNode node;

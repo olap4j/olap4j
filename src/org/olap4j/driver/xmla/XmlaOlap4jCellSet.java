@@ -27,7 +27,7 @@ import java.util.*;
 /**
  * Implementation of {@link org.olap4j.CellSet}
  * for XML/A providers.
- * 
+ *
  * <p>This class has sub-classes which implement JDBC 3.0 and JDBC 4.0 APIs;
  * it is instantiated using {@link Factory#newCellSet}.</p>
  *
@@ -96,7 +96,9 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         //   </SOAP-ENV:Body>
         // </SOAP-ENV:Envelope>
         final Element envelope = doc.getDocumentElement();
-        if (DEBUG) System.out.println(XmlaOlap4jUtil.toString(doc,true));
+        if (DEBUG) {
+            System.out.println(XmlaOlap4jUtil.toString(doc, true));
+        }
         assert envelope.getLocalName().equals("Envelope");
         assert envelope.getNamespaceURI().equals(SOAP_NS);
         Element body =
@@ -106,7 +108,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         if (fault != null) {
             /*
             Example:
-            
+
         <SOAP-ENV:Fault>
             <faultcode>SOAP-ENV:Client.00HSBC01</faultcode>
             <faultstring>XMLA connection datasource not found</faultstring>
@@ -296,7 +298,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
     /**
      * Returns the value of a cell, cast to the appropriate Java object type
      * corresponding to the XML schema (XSD) type of the value.
-     * 
+     *
      * <p>The value type must conform to XSD definitions of the XML element. See
      * <a href="http://books.xmlschemata.org/relaxng/relax-CHP-19.html">RELAX
      * NG, Chapter 19</a> for a full list of possible data types.
@@ -320,17 +322,17 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         // The object type is contained in xsi:type attribute.
         String type = elm.getAttribute("xsi:type");
         try {
-            if (type.equals( "xsd:int")) {
+            if (type.equals("xsd:int")) {
                 return XmlaOlap4jUtil.intElement(cell, "Value");
-            } else if (type.equals( "xsd:integer")) {
+            } else if (type.equals("xsd:integer")) {
                 return XmlaOlap4jUtil.integerElement(cell, "Value");
-            } else if (type.equals( "xsd:double")) {
+            } else if (type.equals("xsd:double")) {
                 return XmlaOlap4jUtil.doubleElement(cell, "Value");
-            } else if (type.equals( "xsd:float")) {
+            } else if (type.equals("xsd:float")) {
                 return XmlaOlap4jUtil.floatElement(cell, "Value");
-            } else if (type.equals( "xsd:long")) {
+            } else if (type.equals("xsd:long")) {
                 return XmlaOlap4jUtil.longElement(cell, "Value");
-            } else if (type.equals( "xsd:boolean")) {
+            } else if (type.equals("xsd:boolean")) {
                 return XmlaOlap4jUtil.booleanElement(cell, "Value");
             } else {
                 return XmlaOlap4jUtil.stringElement(cell, "Value");
@@ -343,7 +345,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         }
     }
 
-	/**
+    /**
      * Creates metadata for a cell set, given the DOM of the XMLA result.
      *
      * @param root Root node of XMLA result
@@ -362,7 +364,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         final Element cubeNameNode =
             findChild(cubeNode, MDDATASET_NS, "CubeName");
         final String cubeName = gatherText(cubeNameNode);
-        final XmlaOlap4jCube cube = 
+        final XmlaOlap4jCube cube =
             (XmlaOlap4jCube)
             this.olap4jStatement.olap4jConnection.getSchema().getCubes().get(
                 cubeName);

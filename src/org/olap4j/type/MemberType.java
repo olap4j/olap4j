@@ -37,7 +37,7 @@ public class MemberType implements Type {
      * Creates a type representing a member.
      *
      * @param dimension Dimension the member belongs to, or null if not known.
-     * 
+     *
      * @param hierarchy Hierarchy the member belongs to, or null if not known.
      *
      * @param level Level the member belongs to, or null if not known

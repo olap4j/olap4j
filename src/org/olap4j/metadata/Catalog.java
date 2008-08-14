@@ -23,7 +23,7 @@ import org.olap4j.OlapDatabaseMetaData;
  * <p>To obtain the collection of catalogs in the current server, call the
  * {@link org.olap4j.OlapConnection#getCatalogs()} method.
  *
- * <p>The hierarchy of metadata objects, rooted at the connection from which 
+ * <p>The hierarchy of metadata objects, rooted at the connection from which
  * they are accessed, is as follows:
  * <blockquote>
  * <ul>

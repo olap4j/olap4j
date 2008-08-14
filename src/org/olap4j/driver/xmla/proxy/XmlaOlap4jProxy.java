@@ -45,3 +45,5 @@ public interface XmlaOlap4jProxy {
      */
     String getEncodingCharsetName();
 }
+
+// End XmlaOlap4jProxy.java

@@ -79,7 +79,7 @@ public interface Level extends MetadataElement {
      * <p>The members of a level do not have unique names, so unlike
      * {@link Hierarchy#getRootMembers()} and
      * {@link Member#getChildMembers()} the result type
-     * is a {@link List} not a {@link NamedList}. 
+     * is a {@link List} not a {@link NamedList}.
      *
      * @return List of members in this Level
      */
@@ -208,7 +208,7 @@ public interface Level extends MetadataElement {
 
         private final int xmlaOrdinal;
 
-        private static final Map<Integer, Type> xmlaMap = 
+        private static final Map<Integer, Type> xmlaMap =
             new HashMap<Integer, Type>();
 
         static {
@@ -226,7 +226,7 @@ public interface Level extends MetadataElement {
          *
          * <p>For example, the XMLA specification says that the ordinal of
          * {@link #CUSTOMER_HOUSEHOLD} is 0x1023.
-         * 
+         *
          * @return ordinal code as specified by XMLA.
          */
         public int xmlaOrdinal() {

@@ -82,7 +82,7 @@ public class QueryDimension {
         }
         return nameParts;
     }
-    
+
     public List<Member> resolve(Selection selection) throws OlapException
     {
         assert selection != null;
@@ -92,23 +92,23 @@ public class QueryDimension {
             case CHILDREN:
                 op = Member.TreeOp.CHILDREN;
                 break;
-                
+
             case SIBLINGS:
                 op = Member.TreeOp.SIBLINGS;
                 break;
-                
+
             case INCLUDE_CHILDREN:
                 op = Member.TreeOp.SELF;
                 secondOp = Member.TreeOp.CHILDREN;
                 break;
-                
+
             case MEMBER:
                 op = Member.TreeOp.SELF;
                 break;
-                
+
             default:
                 throw new OlapException("Operation not supported: " + selection.getOperator());
-                
+
         }
         Set<Member.TreeOp> set = new TreeSet<Member.TreeOp>();
         set.add(op);
@@ -116,11 +116,10 @@ public class QueryDimension {
             set.add(secondOp);
         }
         try {
-            return 
+            return
                 query.getCube().lookupMembers(
-                    set, 
-                    getNameParts(selection.getName())
-                );
+                    set,
+                    getNameParts(selection.getName()));
         } catch (Exception e) {
             throw new OlapException("Error while resolving selection " + selection.toString(), e);
         }

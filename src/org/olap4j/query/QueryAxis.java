@@ -41,7 +41,7 @@ public class QueryAxis {
     /**
      * Returns the location of this <code>QueryAxis</code> in the query;
      * <code>null</code> if unused.
-     * 
+     *
      * @return location of this axis in the query
      */
     public Axis getLocation() {

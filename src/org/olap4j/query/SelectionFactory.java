@@ -25,7 +25,7 @@ public class SelectionFactory {
 
     /**
      * Creates a SelectionFactory. Called from {@link Query}.
-     * 
+     *
      * @param query Owning query
      */
     SelectionFactory(Query query) {
@@ -33,16 +33,15 @@ public class SelectionFactory {
     }
 
     Selection createMemberSelection(Member member, Selection.Operator operator) {
-        SelectionImpl selectionImpl = 
+        return
             new SelectionImpl(
-                    member,
-                    member.getDimension(), 
-                    member.getHierarchy().getUniqueName(),
-                    member.getLevel().getUniqueName(),
-                    member.getUniqueName(),
-                    operator
-                    ) {};
-        return selectionImpl;
+                member,
+                member.getDimension(),
+                member.getHierarchy().getUniqueName(),
+                member.getLevel().getUniqueName(),
+                member.getUniqueName(),
+                operator) {
+        };
     }
 }
 

@@ -80,7 +80,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
 
     /**
      * Sets the current locale of this connection. The value must not be null.
-     * 
+     *
      * <p>If the locale is not set, the JDK's current locale is used (see
      * {@link java.util.Locale#getDefault()}).
      *

@@ -477,7 +477,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *        function name as it is stored in the database; <code>null</code>
      *        means that the function name should not be used to narrow the
      *        search
-     * 
+     *
      * @return a <code>ResultSet</code> object in which each row is a
      *         function description
      *
@@ -840,7 +840,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *        to the member whose unique name was specified; or null to return
      *        just the member itself.
      *        Ignored if <code>memberUniqueName</code> is not specified.
-     *  
+     *
      * @return a <code>ResultSet</code> object in which each row is a
      *         member description
      *

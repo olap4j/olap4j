@@ -57,4 +57,4 @@ public class Olap4jUtilTest extends TestCase {
     }
 }
 
-// End Olap4jOlap4jUtilTest.java
+// End Olap4jUtilTest.java

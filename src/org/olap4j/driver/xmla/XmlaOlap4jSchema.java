@@ -37,7 +37,7 @@ class XmlaOlap4jSchema implements Schema, Named {
         if (name == null) {
             throw new NullPointerException("Name cannot be null.");
         }
-        
+
         this.olap4jCatalog = olap4jCatalog;
         this.name = name;
         this.cubes = new DeferredNamedListImpl<XmlaOlap4jCube>(

@@ -41,7 +41,7 @@ public class LevelType implements Type {
      */
     public LevelType(
         Dimension dimension,
-        Hierarchy hierarchy, 
+        Hierarchy hierarchy,
         Level level)
     {
         this.dimension = dimension;

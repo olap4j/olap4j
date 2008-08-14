@@ -143,7 +143,7 @@ public class OlapTest extends TestCase {
             Catalog catalog = olapConnection.getCatalogs().get(catalogName);
             NamedList<Schema> schemas = catalog.getSchemas();
             for (Schema schema : schemas) {
-                System.out.println("schema name="+schema.getName());
+                System.out.println("schema name=" + schema.getName());
             }
 
             if (schemas.size() == 0) {
@@ -168,7 +168,7 @@ public class OlapTest extends TestCase {
 
             // take the "Sales" cube
             Cube cube = cubes.get("Sales");
-            System.out.println("using cube name="+cube.getName());
+            System.out.println("using cube name=" + cube.getName());
 
             // create an XML doc to represent the Cube and print it out
             // This XML would be used by remote clients to enable cube navigation
@@ -178,9 +178,9 @@ public class OlapTest extends TestCase {
             NamedList<Dimension> dimensions = cube.getDimensions();
             for (Dimension dimension : dimensions) {
                 if (dimension.getDimensionType() == Dimension.Type.MEASURE) {
-                    System.out.println("measures dimension name="+dimension.getName());
+                    System.out.println("measures dimension name=" + dimension.getName());
                 } else {
-                    System.out.println("dimension name="+dimension.getName());
+                    System.out.println("dimension name=" + dimension.getName());
                 }
                 listHierarchies(dimension);
             }
@@ -673,10 +673,16 @@ public class OlapTest extends TestCase {
                 Element dimensionsNode = doc.createElement("dimensions");
                 root.appendChild(dimensionsNode);
 
-                switch(axis.getLocation()) {
-                case COLUMNS: addAttribute("location", "across", root); break;
-                case ROWS: addAttribute("location", "down", root); break;
-                case FILTER: addAttribute("location", "filter", root); break;
+                switch (axis.getLocation()) {
+                case COLUMNS:
+                    addAttribute("location", "across", root);
+                    break;
+                case ROWS:
+                    addAttribute("location", "down", root);
+                    break;
+                case FILTER:
+                    addAttribute("location", "filter", root);
+                    break;
                 }
 
                 List<QueryDimension> dimensions = axis.getDimensions();
@@ -721,9 +727,15 @@ public class OlapTest extends TestCase {
                 addCDataNode("name", selection.getName(), root);
                 addCDataNode("dimension-name", selection.getDimension().getName(), root);
                 switch (selection.getOperator()) {
-                case CHILDREN: addCDataNode("operation", "children", root); break;
-                case SIBLINGS: addCDataNode("operation", "siblings", root); break;
-                case MEMBER: addCDataNode("operation", "member", root); break;
+                case CHILDREN:
+                    addCDataNode("operation", "children", root);
+                    break;
+                case SIBLINGS:
+                    addCDataNode("operation", "siblings", root);
+                    break;
+                case MEMBER:
+                    addCDataNode("operation", "member", root);
+                    break;
                 }
 
             } catch (Throwable t) {

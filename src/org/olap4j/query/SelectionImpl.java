@@ -70,7 +70,7 @@ abstract class SelectionImpl implements Selection {
     public Member getMember() {
         return member;
     }
-    
+
     public String getDimensionName() {
         return dimensionName;
     }

@@ -21,94 +21,93 @@ import org.olap4j.driver.xmla.cache.XmlaOlap4jCache;
 /**
  * <p>Abstract implementation of Proxy which adds a SOAP
  * cache layer between the driver and it's proxy implementations.
- * It can be configured via the setCache() method, as instructed in 
+ * It can be configured via the setCache() method, as instructed in
  * CachedProxy interface.
- * 
- * <p>It also offers helper methods to keep track of 
+ *
+ * <p>It also offers helper methods to keep track of
  * the HTTP cookies and sends them back
  * to the server along with queries. The useful methods are
  * saveCookies(URL) and useCookies(URL).
- * 
+ *
  * @author Luc Boudreau
  * @version $Id: AbstractHttpProxy.java 92 2008-07-17 07:41:10Z lucboudreau $
  */
-public abstract class XmlaOlap4jAbstractHttpProxy implements XmlaOlap4jCachedProxy
+public abstract class XmlaOlap4jAbstractHttpProxy
+    implements XmlaOlap4jCachedProxy
 {
     /**
      * Holds on to the cache implementation.
      */
     private XmlaOlap4jCache cache = null;
-    
-    
+
+
     /**
      * Holds on to the connection name which is associated to this proxy.
      */
     private String cacheId;
-    
-    
+
+
     /**
      * Keeps a link to the cookie manager instance.
      */
     private XmlaOlap4jCookieManager cookieManager = null;
-    
-    
+
+
     /**
      * Sends a request to a URL and returns the response.
      *
-     * @param name The connection name which requested this execution
      * @param url Target URL
      * @param request Request string
      * @return Response
      * @throws IOException
      */
-    abstract public byte[] getResponse(URL url, String request) 
+    abstract public byte[] getResponse(URL url, String request)
         throws IOException;
-    
-    
+
+
     /**
      * Submits a request for background execution.
      *
-     * @param name The connection name which requested this execution
      * @param url URL
      * @param request Request
      * @return Future object representing the submitted job
      */
-    abstract public Future<byte[]> getResponseViaSubmit(final URL url, 
-        final String request);
-    
-    
+    abstract public Future<byte[]> getResponseViaSubmit(
+        URL url,
+        String request);
+
     /**
-     * Helper method to save cookies for later use. 
-     * @param urlConn The url connection for which we want the cookies 
+     * Helper method to save cookies for later use.
+     * @param urlConn The url connection for which we want the cookies
      * saved for later use.
-     * @throws IOException An io exception gets thrown if the given url 
+     * @throws IOException An io exception gets thrown if the given url
      * connection has not been opened yet.
      */
     protected void useCookies(URLConnection urlConn) throws IOException {
         // Initializes the cookie manager
         this.initCookieManager();
-        
+
         // Saves the current cookies
         this.cookieManager.setCookies(urlConn);
     }
-    
-    
+
+
     /**
      * Helper method to add cookies to a given connection.
-     * @param urlConn The url connection to which we want the cookies 
+     * @param urlConn The url connection to which we want the cookies
      * applied to.
-     * @throws IOException An io exception gets thrown if the given url 
+     * @throws IOException An io exception gets thrown if the given url
      * connection has already been opened.
      */
     protected void saveCookies(URLConnection urlConn) throws IOException {
         // Initializes the cookie manager
         this.initCookieManager();
-        
+
         // Saves the current cookies
         this.cookieManager.storeCookies(urlConn);
     }
-    
-    
+
+
     /* (non-Javadoc)
      * @see org.olap4j.driver.xmla.XmlaOlap4jDriver.Proxy#setCache(
      *      java.lang.String, java.util.Properties)
@@ -121,86 +120,79 @@ public abstract class XmlaOlap4jAbstractHttpProxy implements XmlaOlap4jCachedPro
             // Loads the cache class
             Class clazz = Class.forName(config.get(
                     XmlaOlap4jDriver.Property.Cache.name()));
-            
+
             // Instantiates it
             this.cache = (XmlaOlap4jCache) clazz.newInstance();
 
             // Configures it
             this.cacheId = this.cache.setParameters(config, properties);
-        } 
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             throw new OlapException(
                 "The specified cache class name could not be found : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
-        } 
-        catch (InstantiationException e) {
+        } catch (InstantiationException e) {
             throw new OlapException(
-                "The specified cache class name could not be instanciated : " 
+                "The specified cache class name could not be instanciated : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
-        } 
-        catch (IllegalAccessException e) {
-            throw new OlapException(
-                "An error was encountered while instanciating the cache : " 
-                + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
-        } 
-        catch (IllegalArgumentException e) {
+        } catch (IllegalAccessException e) {
             throw new OlapException(
                 "An error was encountered while instanciating the cache : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
-        } 
-        catch (SecurityException e) {
+        } catch (IllegalArgumentException e) {
             throw new OlapException(
                 "An error was encountered while instanciating the cache : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
-        } 
+        } catch (SecurityException e) {
+            throw new OlapException(
+                "An error was encountered while instanciating the cache : "
+                + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
+        }
     }
-    
-    
-    
-    /* (non-Javadoc)
-     * @see org.olap4j.driver.xmla.XmlaOlap4jDriver.Proxy#get(
-     *      java.net.URL, java.lang.String)
-     */
+
+    // implement XmlaOlap4jProxy
     public byte[] get(URL url, String request) throws IOException {
-        
-        byte[] response;
-        
         // Tries to fetch from cache
-        response = getFromCache(url, 
+        byte[] response =
+            getFromCache(
+                url,
                 request.getBytes(getEncodingCharsetName()));
-        
+
         // Returns the cached value if found
-        if ( response != null )
-        {
+        if (response != null) {
             return response;
         }
-            
+
         // Executes the query
         response = getResponse(url, request);
-        
+
         // Adds to cache
-        addToCache(url, 
-                request.getBytes(getEncodingCharsetName()), response);
-        
+        addToCache(
+            url,
+            request.getBytes(getEncodingCharsetName()),
+            response);
+
         // Returns result
         return response;
     }
-    
-    
+
+
     /**
      * Tries to fetch a cached response from the cache implementation.
-     * @param url The url used to send the 
-     * @param request
-     * @return returns either a response in a byte array or null
-     * if the response 
+     *
+     * @param url The url used to send the request
+     *
+     * @param request The SOAP request to cache
+     *
+     * @return either a response in a byte array or null
+     * if the response is not in cache
      */
     private byte[] getFromCache(final URL url, final byte[] request) {
-        return (this.cache != null) 
-            ? this.cache.get(this.cacheId, url, request) 
+        return (this.cache != null)
+            ? this.cache.get(this.cacheId, url, request)
             : null;
     }
-    
-    
+
+
     /**
      * Caches an entry using the current cache implementation.
      * @param url The URL from which originated the request
@@ -212,26 +204,18 @@ public abstract class XmlaOlap4jAbstractHttpProxy implements XmlaOlap4jCachedPro
             this.cache.put(this.cacheId, url, request, response);
         }
     }
-    
-    
-    
-    /* (non-Javadoc)
-     * @see org.olap4j.driver.xmla.XmlaOlap4jDriver.Proxy
-     *      #submit(java.net.URL, java.lang.String)
-     */
-    public Future<byte[]> submit( final URL url, final String request) {
-        
-        /*
-         * The submit operation doesn't need to be cached yet, since it will call the
-         * get operation to fetch the data later on. It will get cached then.
-         * 
-         * I still overridden the submit method in case we need some caching done
-         * in the end.
-         */
+
+    // implement XmlaOlap4jProxy
+    public Future<byte[]> submit(final URL url, final String request) {
+        // The submit operation doesn't need to be cached yet, since it will
+        // call the get operation to fetch the data later on. It will get cached
+        // then.
+        //
+        // I still overridden the submit method in case we need some caching done
+        // in the end. - Luc
         return getResponseViaSubmit(url, request);
     }
-    
-    
+
     /**
      * Initializes the cookie manager. It is not initialized
      * by default because some proxy implementation might not need this
@@ -243,3 +227,5 @@ public abstract class XmlaOlap4jAbstractHttpProxy implements XmlaOlap4jCachedPro
         }
     }
 }
+
+// End XmlaOlap4jAbstractHttpProxy.java

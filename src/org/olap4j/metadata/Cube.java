@@ -93,7 +93,7 @@ public interface Cube extends MetadataElement {
      * languages is confusing; the portal would figure out the best common
      * language, in this case French. This method allows the client to choose
      * the most appropriate locale.</p>
-     * 
+     *
      * <p>The list is advisory: a client is free to choose another locale,
      * in which case, the server will probably revert to the base locale for
      * locale-specific behavior such as captions and formatting.</p>
@@ -122,7 +122,7 @@ public interface Cube extends MetadataElement {
      * dimension.
      *
      * @param nameParts Components of the fully-qualified member name
-     * 
+     *
      * @return member with the given name, or null if not found
      *
      * @throws OlapException if error occurs

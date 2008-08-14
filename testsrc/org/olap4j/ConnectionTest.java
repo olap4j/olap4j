@@ -157,7 +157,7 @@ public class ConnectionTest extends TestCase {
         //  assertTrue(statment.isClosed());
         try {
             Class clazz;
-            if (o instanceof Statement){
+            if (o instanceof Statement) {
                 clazz = Statement.class;
             } else if (o instanceof ResultSet) {
                 clazz = ResultSet.class;
@@ -410,7 +410,13 @@ public class ConnectionTest extends TestCase {
         connection.close();
     }
 
-    private enum Method { ClassName, Mode, Type, TypeName, OlapType }
+    private enum Method {
+        ClassName,
+        Mode,
+        Type,
+        TypeName,
+        OlapType
+    }
 
     public void testPreparedStatement() throws SQLException {
         connection = tester.createConnection();
@@ -586,7 +592,9 @@ public class ConnectionTest extends TestCase {
         assertIsClosed(cellSet6, true);
 
         // todo: test all of the PreparedOlapStatement.setXxx methods
-        if (false) pstmt.getCube();
+        if (false) {
+            pstmt.getCube();
+        }
     }
 
     public void testCellSetMetaData() throws SQLException {
@@ -1033,7 +1041,7 @@ public class ConnectionTest extends TestCase {
         if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
             // This test requires validator support.
             return;
-        }        
+        }
         MdxValidator validator =
             olapConnection.getParserFactory().createMdxValidator(
                 olapConnection);
@@ -1113,9 +1121,8 @@ public class ConnectionTest extends TestCase {
                     Syntax.Braces,
                     Arrays.asList(
                         (ParseTreeNode)
-                            new IdentifierNode(
-                                new IdentifierNode.Segment("Gender"))))
-            ));
+                        new IdentifierNode(
+                            new IdentifierNode.Segment("Gender"))))));
         select.getAxisList().add(
             new AxisNode(
                 null,
@@ -1137,7 +1144,7 @@ public class ConnectionTest extends TestCase {
                 new IdentifierNode.Segment("Time"),
                 new IdentifierNode.Segment("1997"),
                 new IdentifierNode.Segment("Q4")));
-        
+
         checkUnparsedMdx(select);
     }
 
@@ -1290,7 +1297,7 @@ public class ConnectionTest extends TestCase {
             TestContext.fold("[Customers].[All Customers].[USA].[CA]\n"
                 + "[Customers].[All Customers].[USA].[OR]\n"
                 + "[Customers].[All Customers].[USA].[WA]\n"),
-            memberListToString(memberList));        
+            memberListToString(memberList));
     }
 
     /**
@@ -1324,7 +1331,7 @@ public class ConnectionTest extends TestCase {
             assertNotNull(dimension.getDefaultHierarchy());
             assertEquals(
                 dimension.getName().equals("Time")
-                    ? Dimension.Type.TIME 
+                    ? Dimension.Type.TIME
                     : dimension.getName().equals("Measures")
                     ? Dimension.Type.MEASURE
                     : Dimension.Type.OTHER,
@@ -1419,7 +1426,7 @@ public class ConnectionTest extends TestCase {
         assertNotNull(member);
         Member member2 = cube.lookupMember("Product", "All Products", "Food");
         assertEquals(member, member2);
-        assertEquals("[Product].[All Products].[Food]", 
+        assertEquals("[Product].[All Products].[Food]",
             member.getUniqueName());
         assertEquals("Food", member.getName());
         assertEquals("[Product].[Product Family]",
@@ -1474,7 +1481,7 @@ public class ConnectionTest extends TestCase {
                 assertEquals(Member.Type.FORMULA, measure.getMemberType());
                 assertTrue(measure.isCalculated());
             } else {
-                assertEquals(Member.Type.MEASURE, measure.getMemberType());                
+                assertEquals(Member.Type.MEASURE, measure.getMemberType());
                 assertFalse(measure.isCalculated());
             }
             assertNotNull(measure.getName());
@@ -1562,7 +1569,7 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
-     * Tests the type-derivation for query axes 
+     * Tests the type-derivation for query axes
      * ({@link org.olap4j.mdx.SelectNode#getAxisList()} and
      * {@link org.olap4j.mdx.SelectNode#getFilterAxis()}), and the
      * {@link org.olap4j.type.SetType},
@@ -1649,7 +1656,7 @@ public class ConnectionTest extends TestCase {
         assertFalse(memberType.usesDimension(storeDimension, false));
         assertTrue(memberType.usesDimension(customersDimension, false));
         assertTrue(memberType.usesDimension(customersDimension, true));
-        
+
         // Filter
 
         final AxisNode filterAxis = select.getFilterAxis();

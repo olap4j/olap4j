@@ -76,7 +76,7 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
     }
 
     // implement ResultSet
-    
+
     public boolean next() throws SQLException {
         // note that if rowOrdinal == rowList.size - 1, we move but then return
         // false

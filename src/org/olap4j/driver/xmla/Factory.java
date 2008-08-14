@@ -44,7 +44,7 @@ interface Factory {
         XmlaOlap4jStatement olap4jStatement) throws OlapException;
 
     XmlaOlap4jPreparedStatement newPreparedStatement(
-        String mdx, 
+        String mdx,
         XmlaOlap4jConnection olap4jConnection) throws OlapException;
 
     XmlaOlap4jDatabaseMetaData newDatabaseMetaData(

@@ -73,31 +73,40 @@ public class Olap4jUtil {
     }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public static void discard(boolean b) { }
+    public static void discard(boolean b) {
+    }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public static void discard(byte b) { }
+    public static void discard(byte b) {
+    }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public static void discard(char c) { }
+    public static void discard(char c) {
+    }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public static void discard(double v) { }
+    public static void discard(double v) {
+    }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public static void discard(float v) { }
+    public static void discard(float v) {
+    }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public static void discard(int i) { }
+    public static void discard(int i) {
+    }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public static void discard(long l) { }
+    public static void discard(long l) {
+    }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public static void discard(Object o) { }
+    public static void discard(Object o) {
+    }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public static void discard(short i) { }
+    public static void discard(short i) {
+    }
 
     /**
      * Casts a Set to a Set with a different element type.
@@ -186,7 +195,7 @@ public class Olap4jUtil {
             replace(sb, 0, find, replace);
         } else {
             for (;;) {
-                sb.append(chars, start, found-start);
+                sb.append(chars, start, found - start);
                 if (found == s.length()) {
                     break;
                 }
@@ -343,7 +352,8 @@ public class Olap4jUtil {
         return (NamedList<T>) EMPTY_NAMED_LIST;
     }
 
-    private enum DummyEnum {}
+    private enum DummyEnum {
+    }
 
     /**
      * Implementation of {@link NamedList} whih is immutable and empty.
@@ -358,7 +368,7 @@ public class Olap4jUtil {
         }
 
         public T get(int index) {
-            throw new IndexOutOfBoundsException("Index: "+index);
+            throw new IndexOutOfBoundsException("Index: " + index);
         }
 
         // Preserves singleton property

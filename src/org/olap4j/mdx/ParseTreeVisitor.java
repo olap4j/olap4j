@@ -17,7 +17,7 @@ package org.olap4j.mdx;
  * class implementing this interface implements a visitor pattern, to allow
  * an algorithm to efficiently traverse a parse tree and perform an action at
  * each node dependent upon the type of each node.
- *  
+ *
  * @author jhyde
  * @version $Id$
  * @since Jul 21, 2006

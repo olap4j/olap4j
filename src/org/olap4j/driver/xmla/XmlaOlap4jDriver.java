@@ -54,24 +54,24 @@ import java.util.concurrent.*;
  * <tr> <th>Property</th>        <th>Description</th> </tr>
  *
  * <tr> <td>Server</td>          <td>URL of HTTP server. Required.</td> </tr>
- * 
+ *
  * <tr> <td>Catalog</td>         <td>Catalog name to use. Required.</td> </tr>
- * 
+ *
  * <tr> <td>Provider</td>        <td>Name of the XMLA provider.</td> </tr>
- * 
+ *
  * <tr> <td>DataSource</td>      <td>Name of the XMLA datasource. When using a
  *                                   Mondrian backed XMLA server, be sure to
  *                                   include the full datasource name between
  *                                   quotes.</td> </tr>
- *                                   
+ *
  * <tr> <td>Cache</td>           <td><p>Class name of the SOAP cache to use. A built in
- *                                   memory cache is available with 
+ *                                   memory cache is available with
  *                                   org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache.
  *                                   Has to be an implementation of IXmlaOlap4jCache.
  *                                   <p>By default, no SOAP query cache will be used.
  *                                   </td> </tr>
- *                                   
- * <tr> <td>Cache.*</td>         <td>Properties to transfer to the selected cache 
+ *
+ * <tr> <td>Cache.*</td>         <td>Properties to transfer to the selected cache
  *                                   implementation. See IXmlaOlap4jCache or your
  *                                   selected implementation for properties details.
  *                                   </td> </tr>
@@ -84,7 +84,7 @@ import java.util.concurrent.*;
  * </table>
  *
  * @author jhyde, Luc Boudreau
- * @version $Id:$
+ * @version $Id$
  * @since May 22, 2007
  */
 public class XmlaOlap4jDriver implements Driver {
@@ -151,20 +151,20 @@ public class XmlaOlap4jDriver implements Driver {
      * @see java.sql.Driver#connect(java.lang.String, java.util.Properties)
      */
     public Connection connect(String url, Properties info) throws SQLException {
-        
+
         // Checks if this driver handles this connection, exit otherwise.
         if (!XmlaOlap4jConnection.acceptsURL(url)) {
             return null;
         }
-        
+
         // Parses the connection string
         Map<String, String> map =
             XmlaOlap4jConnection.parseConnectString(url, info);
-        
+
         // Creates a connection proxy
         XmlaOlap4jProxy proxy = createProxy(map);
-        
-        // returns a connection object to the java API        
+
+        // returns a connection object to the java API
         return factory.newConnection(proxy, url, info);
     }
 
@@ -249,7 +249,7 @@ public class XmlaOlap4jDriver implements Driver {
      * For testing. Map from a cookie value (which is uniquely generated for
      * each test) to a proxy object. Uses a weak hash map so that, if the code
      * that created the proxy 'forgets' the cookie value, then the proxy can
-     * be garbage-collected. 
+     * be garbage-collected.
      */
     public static final Map<String, XmlaOlap4jProxy> PROXY_MAP =
         Collections.synchronizedMap(new WeakHashMap<String, XmlaOlap4jProxy>());
@@ -285,7 +285,7 @@ public class XmlaOlap4jDriver implements Driver {
             Olap4jUtil.discard(description);
         }
     }
-    
+
     /**
      * This is a mock subclass to prevent retro-compatibility issues.
      * If you're using this class, please change your code to
@@ -294,7 +294,8 @@ public class XmlaOlap4jDriver implements Driver {
      *
      */
     @Deprecated
-    public static interface Proxy extends XmlaOlap4jProxy {}
+    public static interface Proxy extends XmlaOlap4jProxy {
+    }
 }
 
 // End XmlaOlap4jDriver.java

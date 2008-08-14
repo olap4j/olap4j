@@ -156,7 +156,7 @@ public class TestContext {
      */
     private static void printAxis(PrintWriter pw, CellSetAxis axis) {
         List<Position> positions = axis.getPositions();
-        for (Position position: positions) {
+        for (Position position : positions) {
             boolean firstTime = true;
             pw.print("{");
             for (Member member : position.getMembers()) {
@@ -471,7 +471,7 @@ public class TestContext {
                         // ignore
                     }
                 }
-                
+
                 dir = dir.getParentFile();
             }
         }
@@ -560,7 +560,10 @@ public class TestContext {
          */
         Wrapper getWrapper();
 
-        enum Flavor { MONDRIAN, XMLA }
+        enum Flavor {
+            MONDRIAN,
+            XMLA
+        }
     }
 
     /**

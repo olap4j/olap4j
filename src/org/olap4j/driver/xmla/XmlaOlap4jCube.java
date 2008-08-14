@@ -52,7 +52,7 @@ class XmlaOlap4jCube implements Cube, Named
      * @param olap4jSchema Schema
      * @param name Name
      * @param description Description
-     * @param connection 
+     * @param connection
      */
     XmlaOlap4jCube(
         XmlaOlap4jSchema olap4jSchema,
@@ -442,7 +442,7 @@ class XmlaOlap4jCube implements Cube, Named
                 memberMap.putAll(this.genericMembersLookup(memberUniqueNames));
             }
         }
-        
+
         /**
          * This is an optimized method for Mondrian servers members lookup.
          * @param memberUniqueNames A list of the members to lookup
@@ -455,7 +455,7 @@ class XmlaOlap4jCube implements Cube, Named
             final XmlaOlap4jConnection.Context context =
                 new XmlaOlap4jConnection.Context(
                     XmlaOlap4jCube.this, null, null, null);
-            final List<XmlaOlap4jMember> memberList = 
+            final List<XmlaOlap4jMember> memberList =
                 new ArrayList<XmlaOlap4jMember>();
             olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection
                 .populateList(
@@ -478,7 +478,7 @@ class XmlaOlap4jCube implements Cube, Named
             }
             return memberMap;
         }
-        
+
         /**
          * This is an generic method for members lookup.
          * @param memberUniqueNames A list of the members to lookup
@@ -494,7 +494,7 @@ class XmlaOlap4jCube implements Cube, Named
             for (String currentMemberName : memberUniqueNames) {
                 // Only lookup if it is not in the map yet
                 if (!memberMap.containsKey(currentMemberName)) {
-                    XmlaOlap4jMember member = 
+                    XmlaOlap4jMember member =
                         this.lookupMemberByUniqueName(currentMemberName);
                     // Null members might mean calculated members
                     if (member != null) {

@@ -40,7 +40,7 @@ abstract class XmlaOlap4jUtil {
         "urn:schemas-microsoft-com:xml-analysis:mddataset";
     static final String ROWSET_NS =
         "urn:schemas-microsoft-com:xml-analysis:rowset";
-    
+
     static final String XSD_PREFIX = "xsd";
     static final String XMLNS = "xmlns";
 
@@ -126,7 +126,7 @@ abstract class XmlaOlap4jUtil {
                 throw new RuntimeException(errorStr, t);
             }
         } else {
-            System.out.println("errorHandler=" +errorHandler);
+            System.out.println("errorHandler=" + errorHandler);
         }
     }
 
@@ -283,7 +283,7 @@ abstract class XmlaOlap4jUtil {
                     writer.write(LINE_SEP);
                 }
             } else {
-                writer.write("node class = " +node.getClass().getName());
+                writer.write("node class = " + node.getClass().getName());
                 if (prettyPrint) {
                     writer.write(LINE_SEP);
                 } else {

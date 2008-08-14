@@ -16,7 +16,7 @@ import java.util.Set;
 
 /**
  * Implementation of {@link org.olap4j.metadata.Property}
- * for properties defined as part of the definition of a level or measure 
+ * for properties defined as part of the definition of a level or measure
  * from XML/A providers.
  *
  * @see org.olap4j.driver.xmla.XmlaOlap4jCellProperty
@@ -27,7 +27,7 @@ import java.util.Set;
  * @since Dec 9, 2007
  */
 class XmlaOlap4jProperty
-    extends XmlaOlap4jElement 
+    extends XmlaOlap4jElement
     implements Property, Named
 {
     private final Datatype datatype;

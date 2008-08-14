@@ -32,7 +32,7 @@ public interface MetadataElement {
      * @return unique name of this element
      */
     String getUniqueName();
-    
+
     /**
      * Returns the caption of this element in the given locale.
      *

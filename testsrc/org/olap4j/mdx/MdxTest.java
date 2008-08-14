@@ -52,7 +52,7 @@ public class MdxTest extends TestCase {
             new IdentifierNode.Segment(
                 null, "bar", IdentifierNode.Quoting.QUOTED));
         assertEquals(
-            "foo.[bar]", 
+            "foo.[bar]",
             IdentifierNode.unparseIdentifierList(fooBar));
 
         List<IdentifierNode.Segment> empty = Collections.emptyList();
