@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -135,6 +135,11 @@ public class IdentifierNode
             }
         }
         return buf.toString();
+    }
+
+    public IdentifierNode deepCopy() {
+        // IdentifierNode is immutable
+        return this;
     }
 
     /**
@@ -270,7 +275,7 @@ public class IdentifierNode
      *
      * <p>For example, {"Store", "USA",
      * "California"} becomes "[Store].[USA].[California]".
-     * 
+     *
      * @param ids List of segments
      * @return Segments as quoted string
      */

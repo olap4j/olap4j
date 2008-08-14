@@ -3,13 +3,14 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.mdx;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
@@ -157,6 +158,15 @@ public class AxisNode implements ParseTreeNode {
         // An axis is not an expression, so does not have a type.
         // Try AxisNode.getExpression().getType() instead.
         return null;
+    }
+
+    public AxisNode deepCopy() {
+        return new AxisNode(
+            this.region,
+            this.nonEmpty,
+            this.axis,
+            MdxUtil.deepCopyList(dimensionProperties),
+            this.expression.deepCopy());
     }
 }
 

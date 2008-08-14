@@ -16,6 +16,8 @@ import org.olap4j.metadata.Level;
 /**
  * Type of an MDX expression.
  *
+ * <p>All type objects are immutable.
+ *
  * @author jhyde
  * @since Feb 17, 2005
  * @version $Id$

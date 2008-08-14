@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -49,7 +49,7 @@ public class CallNode implements ParseTreeNode {
      * <p>The <code>syntax</code> argument determines whether this is a prefix,
      * infix or postfix operator, a function call, and so forth.
      *
-     * <p>The list of arguuments <code>args</code> must be specified, even if
+     * <p>The list of arguments <code>args</code> must be specified, even if
      * there are zero arguments, and each argument must be not null.
      *
      * <p>The type is initially null, but can be set using {@link #setType}
@@ -99,7 +99,7 @@ public class CallNode implements ParseTreeNode {
      * <p>The <code>syntax</code> argument determines whether this is a prefix,
      * infix or postfix operator, a function call, and so forth.
      *
-     * <p>The list of arguuments <code>args</code> must be specified, even if
+     * <p>The list of arguments <code>args</code> must be specified, even if
      * there are zero arguments, and each argument must be not null.
      *
      * @param region Region of source code
@@ -176,6 +176,14 @@ public class CallNode implements ParseTreeNode {
      */
     public List<ParseTreeNode> getArgList() {
         return argList;
+    }
+
+    public CallNode deepCopy() {
+        return new CallNode(
+            this.region,
+            this.name,
+            this.syntax,
+            MdxUtil.deepCopyList(argList));
     }
 }
 

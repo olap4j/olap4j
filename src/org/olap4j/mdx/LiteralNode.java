@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -19,6 +19,8 @@ import java.io.PrintWriter;
  * <p>Symbols, such as the <code>ASC</code> keyword in
  * <code>Order([Store].Members, [Measures].[Unit Sales], ASC)</code>, are
  * also represented as Literals.
+ *
+ * <p>A LiteralNode is immutable.
  *
  * @version $Id$
  * @author jhyde
@@ -174,6 +176,12 @@ public class LiteralNode implements ParseTreeNode {
             throw new AssertionError("unexpected literal type " + type);
         }
     }
+
+    public LiteralNode deepCopy() {
+        // No need to copy: literal nodes are immutable.
+        return this;
+    }
+
 }
 
 // End LiteralNode.java

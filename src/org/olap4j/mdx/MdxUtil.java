@@ -3,13 +3,14 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.mdx;
 
 import java.util.regex.Pattern;
+import java.util.*;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 
@@ -28,6 +29,9 @@ class MdxUtil {
 
     /**
      * Converts a string into a double-quoted string.
+     *
+     * @param val String
+     * @return String enclosed in double-quotes
      */
     static String quoteForMdx(String val) {
         StringBuilder buf = new StringBuilder(val.length() + 20);
@@ -48,20 +52,42 @@ class MdxUtil {
 
     /**
      * Encodes string for MDX (escapes ] as ]] inside a name).
+     *
+     * @param st String
+     * @return String escaped for inclusion in an MDX identifier
      */
     static String mdxEncodeString(String st) {
         StringBuilder retString = new StringBuilder(st.length() + 20);
         for (int i = 0; i < st.length(); i++) {
             char c = st.charAt(i);
             if ((c == ']') &&
-                ((i+1) < st.length()) &&
-                (st.charAt(i+1) != '.')) {
+                ((i + 1) < st.length()) &&
+                (st.charAt(i + 1) != '.')) {
 
                 retString.append(']'); //escaping character
             }
             retString.append(c);
         }
         return retString.toString();
+    }
+
+    /**
+     * Creates a deep copy of a list.
+     *
+     * @param list List to be copied
+     * @return Copy of list, with each element deep copied
+     */
+    @SuppressWarnings({"unchecked"})
+    static <E extends ParseTreeNode> List<E> deepCopyList(List<E> list) {
+        // Don't make a copy of the system empty list. '==' is intentional.
+        if (list == Collections.EMPTY_LIST) {
+            return list;
+        }
+        final ArrayList<E> listCopy = new ArrayList<E>(list.size());
+        for (E e : list) {
+            listCopy.add((E) e.deepCopy());
+        }
+        return listCopy;
     }
 }
 

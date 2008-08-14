@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -201,6 +201,27 @@ public class SelectNode implements ParseTreeNode {
      */
     public void setFrom(ParseTreeNode fromNode) {
         this.from = fromNode;
+    }
+
+    /**
+     * Returns a list of cell properties in this SelectNode.
+     *
+     * <p>The returned list is mutable.
+     *
+     * @return list of cell properties
+     */
+    public List<IdentifierNode> getCellPropertyList() {
+        return cellPropertyList;
+    }
+
+    public SelectNode deepCopy() {
+        return new SelectNode(
+            this.region,
+            MdxUtil.deepCopyList(withList),
+            MdxUtil.deepCopyList(axisList),
+            this.from != null ? this.from.deepCopy() : null,
+            this.filterAxis != null ? this.filterAxis.deepCopy() : null,
+            MdxUtil.deepCopyList(cellPropertyList));
     }
 }
 

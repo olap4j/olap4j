@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -66,6 +66,17 @@ public interface ParseTreeNode {
      * created by parsing
      */
     ParseRegion getRegion();
+
+    /**
+     * Creates a deep copy of this ParseTreeNode object.
+     *
+     * <p>Note: implementing classes can return the concrete type instead
+     * of ParseTreeNode (using Java 1.5 covariant return types)
+     *
+     * @return The deep copy of this ParseTreeNode
+     */
+    ParseTreeNode deepCopy();
+
 }
 
 // End ParseTreeNode.java

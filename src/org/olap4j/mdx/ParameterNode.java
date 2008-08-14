@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -41,6 +41,7 @@ public class ParameterNode implements ParseTreeNode {
      * <code>defaultValueExpression</code> must be consistent with the
      * <code>type</code>.
      *
+     * @param region Region of source code
      * @param name Name of parameter
      * @param type Type of parameter
      * @param defaultValueExpression Expression which yields the default value
@@ -133,6 +134,13 @@ public class ParameterNode implements ParseTreeNode {
         this.defaultValueExpression = defaultValueExpression;
     }
 
+    public ParameterNode deepCopy() {
+        return new ParameterNode(
+            this.region,
+            this.name,
+            this.type, // types are immutable
+            this.defaultValueExpression.deepCopy());
+    }
 }
 
 // End ParameterNode.java
