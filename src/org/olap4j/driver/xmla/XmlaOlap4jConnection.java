@@ -44,11 +44,6 @@ import java.util.regex.*;
  */
 abstract class XmlaOlap4jConnection implements OlapConnection {
     /**
-     * <p>Handler for errors.
-     */
-    final Helper helper = new Helper();
-
-    /**
      * <p>Current schema.
      */
     private XmlaOlap4jSchema olap4jSchema;
@@ -150,7 +145,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         // Set URL of HTTP server.
         String serverUrl = map.get(XmlaOlap4jDriver.Property.Server.name());
         if (serverUrl == null) {
-            throw helper.createException("Connection property '"
+            throw OlapExceptionHelper.createException("Connection property '"
                 + XmlaOlap4jDriver.Property.Server.name()
                 + "' must be specified");
         }
@@ -174,7 +169,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         try {
             this.serverUrl = new URL(serverUrl);
         } catch (MalformedURLException e) {
-            throw helper.createException(
+            throw OlapExceptionHelper.createException(
                 "Error while creating connection", e);
         }
 
@@ -290,7 +285,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             // Throws exception to the client.
             //Tells that there are no datasource corresponding to the search criterias.
             if (this.nativeDatasourceName == null) {
-                throw new OlapException("No datasource could be found.");
+                throw OlapExceptionHelper.createException("No datasource could be found.");
             }
 
             // If there is a provider
@@ -298,7 +293,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         } catch (OlapException e) {
             throw e;
         } catch (SQLException e) {
-            throw new OlapException("Datasource name not found.", e);
+            throw OlapExceptionHelper.createException("Datasource name not found.", e);
         } finally {
             try {
                 if (rSet != null) {
@@ -485,7 +480,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         if (iface.isInstance(this)) {
             return iface.cast(this);
         }
-        throw helper.createException("does not implement '" + iface + "'");
+        throw OlapExceptionHelper.createException("does not implement '" + iface + "'");
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
@@ -587,16 +582,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         try {
             bytes = proxy.get(serverUrl, request);
         } catch (IOException e) {
-            throw helper.createException(null, e);
+            throw OlapExceptionHelper.createException(null, e);
         }
         Document doc;
         try {
             doc = parse(bytes);
         } catch (IOException e) {
-            throw helper.createException(
+            throw OlapExceptionHelper.createException(
                 "error discovering metadata", e);
         } catch (SAXException e) {
-            throw helper.createException(
+            throw OlapExceptionHelper.createException(
                 "error discovering metadata", e);
         }
         // <SOAP-ENV:Envelope>
@@ -639,7 +634,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             // TODO: log doc to logfile
             final Element faultstring = findChild(fault, null, "faultstring");
             String message = faultstring.getTextContent();
-            throw helper.createException(
+            throw OlapExceptionHelper.createException(
                 "XMLA provider gave exception: " + message
                     + "; request: " + request);
         }
@@ -757,39 +752,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     // ~ inner classes --------------------------------------------------------
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
-    static class Helper {
-        OlapException createException(String msg) {
-            return new OlapException(msg);
-        }
-
-        OlapException createException(String msg, Throwable cause) {
-            return new OlapException(msg, cause);
-        }
-
-        OlapException createException(Cell context, String msg) {
-            OlapException exception = new OlapException(msg);
-            exception.setContext(context);
-            return exception;
-        }
-
-        OlapException createException(
-            Cell context, String msg, Throwable cause)
-        {
-            OlapException exception = new OlapException(msg, cause);
-            exception.setContext(context);
-            return exception;
-        }
-
-        public OlapException toOlapException(SQLException e) {
-            if (e instanceof OlapException) {
-                return (OlapException) e;
-            } else {
-                return new OlapException(null, e);
-            }
-        }
-    }
-
     static class CatalogHandler
         extends HandlerImpl<XmlaOlap4jCatalog>
     {

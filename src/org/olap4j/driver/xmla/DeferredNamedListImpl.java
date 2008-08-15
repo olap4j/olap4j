@@ -71,7 +71,7 @@ class DeferredNamedListImpl<T extends Named>
                 populateList(list);
                 state = State.POPULATED;
             } catch (OlapException e) {
-                // todo: fetch metadata on getCollection() method, so we
+                // TODO: fetch metadata on getCollection() method, so we
                 // can't get an exception while traversing the list
                 throw new RuntimeException(e);
             }

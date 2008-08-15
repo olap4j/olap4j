@@ -77,10 +77,10 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         try {
             doc = parse(bytes);
         } catch (IOException e) {
-            throw olap4jStatement.olap4jConnection.helper.createException(
+            throw OlapExceptionHelper.createException(
                 "error creating CellSet", e);
         } catch (SAXException e) {
-            throw olap4jStatement.olap4jConnection.helper.createException(
+            throw OlapExceptionHelper.createException(
                 "error creating CellSet", e);
         }
         // <SOAP-ENV:Envelope>
@@ -125,7 +125,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             // TODO: log doc to logfile
             final Element faultstring = findChild(fault, null, "faultstring");
             String message = faultstring.getTextContent();
-            throw olap4jStatement.olap4jConnection.helper.createException(
+            throw OlapExceptionHelper.createException(
                 "XMLA provider gave exception: " + message);
         }
         Element executeResponse =
@@ -338,7 +338,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 return XmlaOlap4jUtil.stringElement(cell, "Value");
             }
         } catch (Exception e) {
-            throw new OlapException(
+            throw OlapExceptionHelper.createException(
                 "Error while casting a cell value to the correct java type for"
                     + " its XSD type " + type,
                 e);
@@ -369,7 +369,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             this.olap4jStatement.olap4jConnection.getSchema().getCubes().get(
                 cubeName);
         if (cube == null) {
-            throw olap4jStatement.olap4jConnection.helper.createException(
+            throw OlapExceptionHelper.createException(
                 "Internal error: cube '" + cubeName + "' not found");
         }
         final Element axesInfo =
@@ -483,7 +483,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 }
             }
             if (hierarchy == null) {
-                throw this.olap4jStatement.olap4jConnection.helper
+                throw OlapExceptionHelper
                     .createException(
                         "Internal error: hierarchy '" + hierarchyName
                             + "' not found in cube '" + cube.getName()

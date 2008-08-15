@@ -55,7 +55,7 @@ class XmlaOlap4jStatement implements OlapStatement {
 
     private void checkOpen() throws SQLException {
         if (closed) {
-            throw olap4jConnection.helper.createException("closed");
+            throw OlapExceptionHelper.createException("closed");
         }
     }
 
@@ -100,7 +100,7 @@ class XmlaOlap4jStatement implements OlapStatement {
 
     public void setQueryTimeout(int seconds) throws SQLException {
         if (seconds < 0) {
-            throw olap4jConnection.helper.createException(
+            throw OlapExceptionHelper.createException(
                 "illegal timeout value " + seconds);
         }
         this.timeoutSeconds = seconds;
@@ -243,7 +243,7 @@ class XmlaOlap4jStatement implements OlapStatement {
         if (iface.isInstance(this)) {
             return iface.cast(this);
         }
-        throw olap4jConnection.helper.createException(
+        throw OlapExceptionHelper.createException(
             "does not implement '" + iface + "'");
     }
 
@@ -299,7 +299,7 @@ class XmlaOlap4jStatement implements OlapStatement {
                 try {
                     cs.close();
                 } catch (SQLException e) {
-                    throw olap4jConnection.helper.createException(
+                    throw OlapExceptionHelper.createException(
                         "Error while closing previous CellSet", e);
                 }
             }
@@ -347,14 +347,14 @@ class XmlaOlap4jStatement implements OlapStatement {
                 return future.get();
             }
         } catch (InterruptedException e) {
-            throw olap4jConnection.helper.createException(null, e);
+            throw OlapExceptionHelper.createException(null, e);
         } catch (ExecutionException e) {
-            throw olap4jConnection.helper.createException(null, e.getCause());
+            throw OlapExceptionHelper.createException(null, e.getCause());
         } catch (TimeoutException e) {
-            throw olap4jConnection.helper.createException(
+            throw OlapExceptionHelper.createException(
                 "Query timeout of " + timeoutSeconds + " seconds exceeded");
         } catch (CancellationException e) {
-            throw olap4jConnection.helper.createException("Query canceled");
+            throw OlapExceptionHelper.createException("Query canceled");
         } finally {
             synchronized (this) {
                 if (future == null) {

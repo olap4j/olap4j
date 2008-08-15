@@ -56,7 +56,7 @@ abstract class XmlaOlap4jPreparedStatement
             statement.close();
 
         } catch (SQLException e) {
-            throw olap4jConnection.helper.createException(
+            throw OlapExceptionHelper.createException(
                 "Error while preparing statement '" + mdx + "'",
                 e);
         }
@@ -252,9 +252,8 @@ abstract class XmlaOlap4jPreparedStatement
     private Parameter getParameter(int param) throws OlapException {
         final List<Parameter> parameters = getParameters();
         if (param < 1 || param > parameters.size()) {
-            throw olap4jConnection.helper.toOlapException(
-                olap4jConnection.helper.createException(
-                    "parameter ordinal " + param + " out of range"));
+            throw OlapExceptionHelper.createException(
+                    "parameter ordinal " + param + " out of range");
         }
         return parameters.get(param - 1);
     }

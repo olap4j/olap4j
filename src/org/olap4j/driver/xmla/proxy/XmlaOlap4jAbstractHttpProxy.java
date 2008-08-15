@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.olap4j.OlapException;
+import org.olap4j.OlapExceptionHelper;
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.driver.xmla.cache.XmlaOlap4jCache;
 
@@ -127,23 +128,23 @@ public abstract class XmlaOlap4jAbstractHttpProxy
             // Configures it
             this.cacheId = this.cache.setParameters(config, properties);
         } catch (ClassNotFoundException e) {
-            throw new OlapException(
+            throw OlapExceptionHelper.createException(
                 "The specified cache class name could not be found : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
         } catch (InstantiationException e) {
-            throw new OlapException(
+            throw OlapExceptionHelper.createException(
                 "The specified cache class name could not be instanciated : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
         } catch (IllegalAccessException e) {
-            throw new OlapException(
+            throw OlapExceptionHelper.createException(
                 "An error was encountered while instanciating the cache : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
         } catch (IllegalArgumentException e) {
-            throw new OlapException(
+            throw OlapExceptionHelper.createException(
                 "An error was encountered while instanciating the cache : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
         } catch (SecurityException e) {
-            throw new OlapException(
+            throw OlapExceptionHelper.createException(
                 "An error was encountered while instanciating the cache : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
         }

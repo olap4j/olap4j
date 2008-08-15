@@ -905,7 +905,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         if (iface.isInstance(this)) {
             return iface.cast(this);
         }
-        throw olap4jConnection.helper.createException(
+        throw OlapExceptionHelper.createException(
             "does not implement '" + iface + "'");
     }
 
