@@ -16,6 +16,7 @@ import java.util.concurrent.*;
 
 import org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache.MODE;
 import org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache.Property;
+import org.olap4j.driver.xmla.messages.XmlaOlap4jMessenger;
 
 /**
  * <p>Thread-safe cache object which supports concurrent access.
@@ -109,7 +110,8 @@ class XmlaOlap4jConcurrentMemoryCache {
             this.cacheSize  = size;
         } else {
           throw new IllegalArgumentException(
-            "The XMLAOLap4jMemoryCache size cannot be less or equal to 0.");
+            XmlaOlap4jMessenger.getInstance().getMessage(
+              "XmlaOlap4jConcurrentMemoryCache.invalid_size"));
         }
     }
 
@@ -124,7 +126,8 @@ class XmlaOlap4jConcurrentMemoryCache {
             this.evictionMode = MODE.valueOf(mode);
         } else {
             throw new IllegalArgumentException(
-                "The XMLAOLap4jMemoryCache mode has to be one of XmlaOlap4jMemoryCache.MODE");
+                XmlaOlap4jMessenger.getInstance().getMessage(
+                    "XmlaOlap4jConcurrentMemoryCache.invalid_mode"));
         }
     }
 
@@ -139,7 +142,8 @@ class XmlaOlap4jConcurrentMemoryCache {
             this.cacheTimeout = seconds;
         } else {
           throw new IllegalArgumentException(
-            "The XMLAOLap4jMemoryCache timeout cannot be less or equal to 0.");
+              XmlaOlap4jMessenger.getInstance().getMessage(
+                  "XmlaOlap4jConcurrentMemoryCache.invalid_timeout"));
         }
     }
 

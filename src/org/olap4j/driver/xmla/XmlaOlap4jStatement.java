@@ -9,6 +9,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
+import org.olap4j.driver.xmla.messages.XmlaOlap4jMessenger;
 import org.olap4j.mdx.SelectNode;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.mdx.ParseTreeWriter;
@@ -53,9 +54,11 @@ class XmlaOlap4jStatement implements OlapStatement {
         throw new UnsupportedOperationException();
     }
 
+    // This method is not used anywhere thus marked as deprecated.
+    @Deprecated
     private void checkOpen() throws SQLException {
         if (closed) {
-            throw OlapExceptionHelper.createException("closed");
+            throw XmlaOlap4jMessenger.getInstance().createException("closed");
         }
     }
 
@@ -100,8 +103,9 @@ class XmlaOlap4jStatement implements OlapStatement {
 
     public void setQueryTimeout(int seconds) throws SQLException {
         if (seconds < 0) {
-            throw OlapExceptionHelper.createException(
-                "illegal timeout value " + seconds);
+            throw XmlaOlap4jMessenger.getInstance().createException(
+                "XmlaOlap4jStatement.invalid_timeout_value",
+                seconds);
         }
         this.timeoutSeconds = seconds;
     }
@@ -243,7 +247,7 @@ class XmlaOlap4jStatement implements OlapStatement {
         if (iface.isInstance(this)) {
             return iface.cast(this);
         }
-        throw OlapExceptionHelper.createException(
+        throw XmlaOlap4jMessenger.getInstance().createException(
             "does not implement '" + iface + "'");
     }
 
@@ -299,7 +303,7 @@ class XmlaOlap4jStatement implements OlapStatement {
                 try {
                     cs.close();
                 } catch (SQLException e) {
-                    throw OlapExceptionHelper.createException(
+                    throw XmlaOlap4jMessenger.getInstance().createException(
                         "Error while closing previous CellSet", e);
                 }
             }
@@ -347,14 +351,20 @@ class XmlaOlap4jStatement implements OlapStatement {
                 return future.get();
             }
         } catch (InterruptedException e) {
-            throw OlapExceptionHelper.createException(null, e);
+            throw XmlaOlap4jMessenger.getInstance().createException(
+                "XmlaOlap4jStatement.interrupted",
+                e);
         } catch (ExecutionException e) {
-            throw OlapExceptionHelper.createException(null, e.getCause());
+            throw XmlaOlap4jMessenger.getInstance().createException(
+                "XmlaOlap4jStatement.execution_exception",
+                e);
         } catch (TimeoutException e) {
-            throw OlapExceptionHelper.createException(
-                "Query timeout of " + timeoutSeconds + " seconds exceeded");
+            throw XmlaOlap4jMessenger.getInstance().createException(
+                "XmlaOlap4jStatement.statement_timed_out",
+                timeoutSeconds);
         } catch (CancellationException e) {
-            throw OlapExceptionHelper.createException("Query canceled");
+            throw XmlaOlap4jMessenger.getInstance().createException(
+                "XmlaOlap4jStatement.statement_canceled");
         } finally {
             synchronized (this) {
                 if (future == null) {

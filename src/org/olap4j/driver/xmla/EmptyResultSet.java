@@ -8,11 +8,12 @@
 */
 package org.olap4j.driver.xmla;
 
-import org.olap4j.OlapExceptionHelper;
-import org.olap4j.OlapWrapper;
+import org.olap4j.*;
+import org.olap4j.driver.xmla.messages.*;
 
-import javax.sql.rowset.RowSetMetaDataImpl;
+
 import java.sql.*;
+import javax.sql.rowset.*;
 import java.sql.Date;
 import java.math.BigDecimal;
 import java.io.InputStream;
@@ -725,7 +726,8 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
         if (iface.isInstance(this)) {
             return iface.cast(this);
         }
-        throw OlapExceptionHelper.createException("cannot cast");
+        throw XmlaOlap4jMessenger.getInstance().createException(
+            "EmptyResultSet.unwrap_error"); //$NON-NLS-1$
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {

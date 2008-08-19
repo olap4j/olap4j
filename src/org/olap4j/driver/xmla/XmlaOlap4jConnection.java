@@ -12,6 +12,7 @@ import org.olap4j.*;
 
 import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
 
+import org.olap4j.driver.xmla.messages.XmlaOlap4jMessenger;
 import org.olap4j.driver.xmla.proxy.*;
 import org.olap4j.impl.*;
 import org.olap4j.mdx.ParseTreeWriter;
@@ -50,7 +51,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     private final XmlaOlap4jDatabaseMetaData olap4jDatabaseMetaData;
 
-    private static final String CONNECT_STRING_PREFIX = "jdbc:xmla:";
+    private static final String CONNECT_STRING_PREFIX = "jdbc:xmla:"; //$NON-NLS-1$
 
     final Factory factory;
 
@@ -145,9 +146,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         // Set URL of HTTP server.
         String serverUrl = map.get(XmlaOlap4jDriver.Property.Server.name());
         if (serverUrl == null) {
-            throw OlapExceptionHelper.createException("Connection property '"
-                + XmlaOlap4jDriver.Property.Server.name()
-                + "' must be specified");
+            throw XmlaOlap4jMessenger.getInstance().createException(
+                    "XmlaOlap4jConnection.missing_connection_property",
+                    XmlaOlap4jDriver.Property.Server.name());
         }
 
         // Basic authentication. Make sure the credentials passed as standard
@@ -169,8 +170,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         try {
             this.serverUrl = new URL(serverUrl);
         } catch (MalformedURLException e) {
-            throw OlapExceptionHelper.createException(
-                "Error while creating connection", e);
+            throw XmlaOlap4jMessenger.getInstance().createException(
+                "XmlaOlap4jConnection.url_parsing_error",
+                e);
         }
 
         this.olap4jDatabaseMetaData =
@@ -283,17 +285,21 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             }
 
             // Throws exception to the client.
-            //Tells that there are no datasource corresponding to the search criterias.
+            //Tells that there are no datasource corresponding to the search criteria.
             if (this.nativeDatasourceName == null) {
-                throw OlapExceptionHelper.createException("No datasource could be found.");
+                throw XmlaOlap4jMessenger.getInstance().createException(
+                        "XmlaOlap4jConnection.no_such_datasource", 
+                        this.providerName,
+                        this.datasourceName);
             }
 
-            // If there is a provider
             return this.nativeDatasourceName;
         } catch (OlapException e) {
             throw e;
         } catch (SQLException e) {
-            throw OlapExceptionHelper.createException("Datasource name not found.", e);
+            throw XmlaOlap4jMessenger.getInstance().createException(
+                    "XmlaOlap4jConnection.datasource_lookup_error",
+                    e);
         } finally {
             try {
                 if (rSet != null) {
@@ -480,7 +486,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         if (iface.isInstance(this)) {
             return iface.cast(this);
         }
-        throw OlapExceptionHelper.createException("does not implement '" + iface + "'");
+        throw XmlaOlap4jMessenger.getInstance().createException("does not implement '" + iface + "'");
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
@@ -539,7 +545,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     public void setLocale(Locale locale) {
         if (locale == null) {
-            throw new IllegalArgumentException("locale must not be null");
+            throw new IllegalArgumentException(
+                XmlaOlap4jMessenger.getInstance().getMessage(
+                    "XmlaOlap4jConnection.null_locale"));
         }
         this.locale = locale;
     }
@@ -582,17 +590,21 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         try {
             bytes = proxy.get(serverUrl, request);
         } catch (IOException e) {
-            throw OlapExceptionHelper.createException(null, e);
+            throw XmlaOlap4jMessenger.getInstance().createException(
+                "XmlaOlap4jConnection.communication_error", //$NON-NLS-1$
+                e);
         }
         Document doc;
         try {
             doc = parse(bytes);
         } catch (IOException e) {
-            throw OlapExceptionHelper.createException(
-                "error discovering metadata", e);
+            throw XmlaOlap4jMessenger.getInstance().createException(
+                "XmlaOlap4jConnection.parse_error", //$NON-NLS-1$
+                e);
         } catch (SAXException e) {
-            throw OlapExceptionHelper.createException(
-                "error discovering metadata", e);
+            throw XmlaOlap4jMessenger.getInstance().createException(
+                "XmlaOlap4jConnection.parse_error", //$NON-NLS-1$
+                e);
         }
         // <SOAP-ENV:Envelope>
         //   <SOAP-ENV:Header/>
@@ -617,26 +629,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         Element fault =
             findChild(body, SOAP_NS, "Fault");
         if (fault != null) {
-            /*
-        <SOAP-ENV:Fault>
-            <faultcode>SOAP-ENV:Client.00HSBC01</faultcode>
-            <faultstring>XMLA connection datasource not found</faultstring>
-            <faultactor>Mondrian</faultactor>
-            <detail>
-                <XA:error xmlns:XA="http://mondrian.sourceforge.net">
-                    <code>00HSBC01</code>
-                    <desc>The Mondrian XML: Mondrian Error:Internal
-                        error: no catalog named 'LOCALDB'</desc>
-                </XA:error>
-            </detail>
-        </SOAP-ENV:Fault>
-             */
             // TODO: log doc to logfile
-            final Element faultstring = findChild(fault, null, "faultstring");
-            String message = faultstring.getTextContent();
-            throw OlapExceptionHelper.createException(
-                "XMLA provider gave exception: " + message
-                    + "; request: " + request);
+            throw XmlaOlap4jMessenger.getInstance().createException(fault);
         }
         Element discoverResponse =
             findChild(body, XMLA_NS, "DiscoverResponse");
@@ -743,6 +737,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * @return an XML encode string or the value is not required.
      */
     private static String xmlEncode(String value) {
+        // TODO Make this better and faster.
         value = Olap4jUtil.replace(value, "&", "&amp;");
         value = Olap4jUtil.replace(value, "<", "&lt;");
         value = Olap4jUtil.replace(value, ">", "&gt;");

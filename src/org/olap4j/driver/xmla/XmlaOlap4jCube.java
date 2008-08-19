@@ -433,6 +433,7 @@ class XmlaOlap4jCube implements Cube, Named
             List<String> memberUniqueNames,
             Map<String, XmlaOlap4jMember> memberMap) throws OlapException
         {
+            // TODO This needs to be converted in a MetaData request.
             if (olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
                 .olap4jConnection.getDataSourceInfo()
                     .indexOf("Provider=Mondrian") != -1) //$NON-NLS-1$
