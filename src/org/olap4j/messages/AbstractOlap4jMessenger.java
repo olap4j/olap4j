@@ -34,7 +34,7 @@ import org.olap4j.OlapException;
  * replacing exception messages by performing a lookup in messages bundles and
  * replacing if a corresponding bundeled value is found. 
  * 
- * <p>Example : You call this class with «createException("test.message")».
+ * <p>Example : You call this class with createException("test.message").
  * If your messages bundles include a 'test.message' property, the message will
  * be substituted. If it doesn't include such a key, the key will be used as
  * the exception message, thus allowing easy fallback.
