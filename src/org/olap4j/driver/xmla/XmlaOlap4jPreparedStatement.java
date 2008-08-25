@@ -9,7 +9,6 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
-import org.olap4j.driver.xmla.messages.XmlaOlap4jMessenger;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
 import org.olap4j.type.*;
@@ -57,10 +56,9 @@ abstract class XmlaOlap4jPreparedStatement
             statement.close();
 
         } catch (SQLException e) {
-            throw XmlaOlap4jMessenger.getInstance().createException(
-                "XmlaOlap4jPreparedStatement.parsing_error",
-                e,
-                mdx);
+            throw OlapExceptionHelper.createException(
+                "Error while preparing statement '" + mdx + "'",
+                e);
         }
 
         this.mdx = mdx;
@@ -254,9 +252,8 @@ abstract class XmlaOlap4jPreparedStatement
     private Parameter getParameter(int param) throws OlapException {
         final List<Parameter> parameters = getParameters();
         if (param < 1 || param > parameters.size()) {
-            throw XmlaOlap4jMessenger.getInstance().createException(
-                "XmlaOlap4jPreparedStatement.parameter_out_of_range",
-                param);
+            throw OlapExceptionHelper.createException(
+                    "parameter ordinal " + param + " out of range");
         }
         return parameters.get(param - 1);
     }

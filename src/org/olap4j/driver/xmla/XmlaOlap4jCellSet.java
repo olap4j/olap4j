@@ -10,7 +10,6 @@ package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
 import org.olap4j.mdx.ParseTreeNode;
-import org.olap4j.driver.xmla.messages.XmlaOlap4jMessenger;
 import org.olap4j.impl.Olap4jUtil;
 import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
 import org.olap4j.metadata.*;
@@ -78,11 +77,11 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         try {
             doc = parse(bytes);
         } catch (IOException e) {
-            throw XmlaOlap4jMessenger.getInstance().createException(
-                "XmlaOlap4jCellSet.parse_error", e);
+            throw OlapExceptionHelper.createException(
+                "error creating CellSet", e);
         } catch (SAXException e) {
-            throw XmlaOlap4jMessenger.getInstance().createException(
-                    "XmlaOlap4jCellSet.parse_error", e);
+            throw OlapExceptionHelper.createException(
+                "error creating CellSet", e);
         }
         // <SOAP-ENV:Envelope>
         //   <SOAP-ENV:Header/>
@@ -107,8 +106,27 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         Element fault =
             findChild(body, SOAP_NS, "Fault");
         if (fault != null) {
+            /*
+            Example:
+
+        <SOAP-ENV:Fault>
+            <faultcode>SOAP-ENV:Client.00HSBC01</faultcode>
+            <faultstring>XMLA connection datasource not found</faultstring>
+            <faultactor>Mondrian</faultactor>
+            <detail>
+                <XA:error xmlns:XA="http://mondrian.sourceforge.net">
+                    <code>00HSBC01</code>
+                    <desc>The Mondrian XML: Mondrian Error:Internal
+                        error: no catalog named 'LOCALDB'</desc>
+                </XA:error>
+            </detail>
+        </SOAP-ENV:Fault>
+             */
             // TODO: log doc to logfile
-            throw XmlaOlap4jMessenger.getInstance().createException(fault);
+            final Element faultstring = findChild(fault, null, "faultstring");
+            String message = faultstring.getTextContent();
+            throw OlapExceptionHelper.createException(
+                "XMLA provider gave exception: " + message);
         }
         Element executeResponse =
             findChild(body, XMLA_NS, "ExecuteResponse");
@@ -276,8 +294,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                     propertyValues));
         }
     }
-    
-    
+
     /**
      * Returns the value of a cell, cast to the appropriate Java object type
      * corresponding to the XML schema (XSD) type of the value.
@@ -306,33 +323,25 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         String type = elm.getAttribute("xsi:type");
         try {
             if (type.equals("xsd:int")) {
-                return XmlaOlap4jUtil
-                    .intElement(cell, "Value"); //$NON-NLS-1$
-            } else if (type.equals("xsd:integer")) { //$NON-NLS-1$
-                return XmlaOlap4jUtil
-                    .integerElement(cell, "Value"); //$NON-NLS-1$
-            } else if (type.equals("xsd:double")) { //$NON-NLS-1$
-                return XmlaOlap4jUtil
-                    .doubleElement(cell, "Value"); //$NON-NLS-1$
-            } else if (type.equals("xsd:float")) { //$NON-NLS-1$
-                return XmlaOlap4jUtil
-                    .floatElement(cell, "Value"); //$NON-NLS-1$
-            } else if (type.equals("xsd:long")) { //$NON-NLS-1$
-                return XmlaOlap4jUtil
-                    .longElement(cell, "Value"); //$NON-NLS-1$
-            } else if (type.equals("xsd:boolean")) { //$NON-NLS-1$
-                return XmlaOlap4jUtil
-                    .booleanElement(cell, "Value"); //$NON-NLS-1$
+                return XmlaOlap4jUtil.intElement(cell, "Value");
+            } else if (type.equals("xsd:integer")) {
+                return XmlaOlap4jUtil.integerElement(cell, "Value");
+            } else if (type.equals("xsd:double")) {
+                return XmlaOlap4jUtil.doubleElement(cell, "Value");
+            } else if (type.equals("xsd:float")) {
+                return XmlaOlap4jUtil.floatElement(cell, "Value");
+            } else if (type.equals("xsd:long")) {
+                return XmlaOlap4jUtil.longElement(cell, "Value");
+            } else if (type.equals("xsd:boolean")) {
+                return XmlaOlap4jUtil.booleanElement(cell, "Value");
             } else {
-                return XmlaOlap4jUtil
-                    .stringElement(cell, "Value"); //$NON-NLS-1$
+                return XmlaOlap4jUtil.stringElement(cell, "Value");
             }
         } catch (Exception e) {
-            throw XmlaOlap4jMessenger.getInstance().createException(
-                    "XmlaOlap4jCellSet.xsd_cast_error",
-                    e,
-                    type,
-                    elm);
+            throw OlapExceptionHelper.createException(
+                "Error while casting a cell value to the correct java type for"
+                    + " its XSD type " + type,
+                e);
         }
     }
 
@@ -360,7 +369,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             this.olap4jStatement.olap4jConnection.getSchema().getCubes().get(
                 cubeName);
         if (cube == null) {
-            throw new RuntimeException(
+            throw OlapExceptionHelper.createException(
                 "Internal error: cube '" + cubeName + "' not found");
         }
         final Element axesInfo =
@@ -474,7 +483,8 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 }
             }
             if (hierarchy == null) {
-                throw new RuntimeException(
+                throw OlapExceptionHelper
+                    .createException(
                         "Internal error: hierarchy '" + hierarchyName
                             + "' not found in cube '" + cube.getName()
                             + "'");
@@ -514,12 +524,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
     public Cell getCell(Position... positions) {
         if (positions.length != getAxes().size()) {
             throw new IllegalArgumentException(
-                XmlaOlap4jMessenger.getInstance()
-                    .getMessage(
-                        "XmlaOlap4jCellSet.wrong_nb_coordinates",
-                        (Locale)null,
-                        getAxes().size())
-                );
+                "cell coordinates should have dimension " + getAxes().size());
         }
         List<Integer> coords = new ArrayList<Integer>(positions.length);
         for (Position position : positions) {
@@ -602,11 +607,9 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         }
         if (ordinal < 0 || ordinal >= modulo) {
             throw new IndexOutOfBoundsException(
-                XmlaOlap4jMessenger.getInstance().getMessage(
-                    "XmlaOlap4jCellSet.ordinal_not_within_range",
-                    (Locale)null,
-                    ordinal,
-                    getBoundsAsString()));
+                "Cell ordinal " + ordinal
+                    + ") lies outside CellSet bounds ("
+                    + getBoundsAsString() + ")");
         }
         return list;
     }
@@ -615,11 +618,8 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         List<CellSetAxis> axes = getAxes();
         if (coordinates.size() != axes.size()) {
             throw new IllegalArgumentException(
-                XmlaOlap4jMessenger.getInstance().getMessage(
-                    "XmlaOlap4jCellSet.wrong_nb_coordinates",
-                    (Locale)null,
-                    coordinates.size(),
-                    axes.size()));
+                "Coordinates have different dimension " + coordinates.size()
+                    + " than axes " + axes.size());
         }
         int modulo = 1;
         int ordinal = 0;
@@ -628,12 +628,10 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             final Integer coordinate = coordinates.get(k++);
             if (coordinate < 0 || coordinate >= axis.getPositionCount()) {
                 throw new IndexOutOfBoundsException(
-                    XmlaOlap4jMessenger.getInstance().getMessage(
-                        "XmlaOlap4jCellSet.coordinates_not_within_range",
-                        null,
-                        coordinate,
-                        k,
-                        getBoundsAsString()));
+                    "Coordinate " + coordinate
+                        + " of axis " + k
+                        + " is out of range ("
+                        + getBoundsAsString() + ")");
             }
             ordinal += coordinate * modulo;
             modulo *= axis.getPositionCount();

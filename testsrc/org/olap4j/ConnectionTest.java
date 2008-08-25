@@ -395,7 +395,7 @@ public class ConnectionTest extends TestCase {
             switch (tester.getFlavor()) {
             case XMLA:
                 assertTrue(e.getMessage().indexOf(
-                    "XMLA MDX parse failed") >= 0);
+                    "XMLA provider gave exception: XMLA MDX parse failed") >= 0);
                 break;
             default:
                 assertTrue(
@@ -1786,7 +1786,7 @@ public class ConnectionTest extends TestCase {
             fail("expected exception indicating stmt had been canceled,"
                 + " got cellSet " + cellSet);
         } catch (OlapException e) {
-            assertTrue(e.getMessage().indexOf("canceled") >= 0);
+            assertTrue(e.getMessage().indexOf("Query canceled") >= 0);
         }
         if (exceptions[0] != null) {
             throw exceptions[0];
@@ -1803,7 +1803,7 @@ public class ConnectionTest extends TestCase {
             olapStatement.setQueryTimeout(-1);
             fail("expected exception");
         } catch (SQLException e) {
-            assertTrue(e.getMessage().indexOf("timeout") >= 0);
+            assertTrue(e.getMessage().indexOf("illegal timeout value ") >= 0);
         }
         olapStatement.setQueryTimeout(1);
         try {

@@ -9,7 +9,6 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
-import org.olap4j.driver.xmla.messages.XmlaOlap4jMessenger;
 import org.olap4j.impl.ArrayMap;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
@@ -906,7 +905,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         if (iface.isInstance(this)) {
             return iface.cast(this);
         }
-        throw XmlaOlap4jMessenger.getInstance().createException(
+        throw OlapExceptionHelper.createException(
             "does not implement '" + iface + "'");
     }
 
