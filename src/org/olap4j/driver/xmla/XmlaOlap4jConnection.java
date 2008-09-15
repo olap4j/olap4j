@@ -365,9 +365,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         this.catalogName = catalog;
     }
 
-    /* (non-Javadoc)
-     * @see java.sql.Connection#getCatalog()
-     */
     public String getCatalog() throws OlapException {
         if (this.catalogName == null) {
             // This means that no particular catalog name 
@@ -1687,7 +1684,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
          * Returns whether this request requires a
          * {@code &lt;CatalogName&gt;} element.
          *
-         * @return whether this request requires a DatasourceName element
+         * @return whether this request requires a CatalogName element
          */
         public boolean requiresCatalogName() {
             return this != DBSCHEMA_CATALOGS;
