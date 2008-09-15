@@ -1687,7 +1687,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
          * @return whether this request requires a CatalogName element
          */
         public boolean requiresCatalogName() {
-            return this != DBSCHEMA_CATALOGS;
+            return (this != DBSCHEMA_CATALOGS && this != DISCOVER_DATASOURCES);
         }
     }
 

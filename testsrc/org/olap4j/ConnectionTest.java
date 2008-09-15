@@ -316,6 +316,16 @@ public class ConnectionTest extends TestCase {
                     tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
                     info);
             assertEquals("FoodMart", connection.getCatalog());
+            ((OlapConnection)connection).getCatalogs();
+            Statement statement = connection.createStatement();
+            OlapStatement olapStatement =
+                tester.getWrapper().unwrap(statement, OlapStatement.class);
+            CellSet cellSet =
+                olapStatement.executeOlapQuery(
+                    "SELECT FROM [Sales]");
+            List<CellSetAxis> axesList = cellSet.getAxes();
+            assertNotNull(axesList);
+            assertEquals(0, axesList.size());
 
             info.setProperty(
                     XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
@@ -333,7 +343,11 @@ public class ConnectionTest extends TestCase {
                         info);
                 connection.getCatalog();
             } catch (OlapException e) {
-                return;
+                if (e.getMessage().equals(
+                  "There is no catalog named FoodMartError available to query against."))
+                {
+                    return;
+                }
             }
             fail("XmlaOlap4jConnection did not detect an inexistant catalog name.");
         }
