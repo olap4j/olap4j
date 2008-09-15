@@ -55,7 +55,9 @@ import java.util.concurrent.*;
  *
  * <tr> <td>Server</td>          <td>URL of HTTP server. Required.</td> </tr>
  *
- * <tr> <td>Catalog</td>         <td>Catalog name to use. Required.</td> </tr>
+ * <tr> <td>Catalog</td>         <td>Catalog name to use.
+ *                                   By default, the first one returned by the
+ *                                   XMLA server will be used.</td> </tr>
  *
  * <tr> <td>Provider</td>        <td>Name of the XMLA provider.</td> </tr>
  *

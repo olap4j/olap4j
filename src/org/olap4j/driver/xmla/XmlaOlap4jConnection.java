@@ -365,7 +365,25 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         this.catalogName = catalog;
     }
 
-    public String getCatalog() {
+    /* (non-Javadoc)
+     * @see java.sql.Connection#getCatalog()
+     */
+    public String getCatalog() throws OlapException {
+        if (this.catalogName == null) {
+            // This means that no particular catalog name 
+            // was specified by the user.
+            this.catalogName = this.getCatalogs().get(0).getName();
+        } else {
+            // We must verify that the requested catalog name
+            // exists in the metadata.
+            Catalog buf = this.getCatalogs().get(this.catalogName);
+            if (buf != null) {
+                this.catalogName = buf.getName();
+            } else {
+                throw new OlapException("There is no catalog named " + 
+                    this.catalogName + " available to query against.");
+            }
+        }
         return catalogName;
     }
 
@@ -513,7 +531,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             final XmlaOlap4jCatalog catalog =
                 (XmlaOlap4jCatalog)
                 this.olap4jDatabaseMetaData.getCatalogObjects().get(
-                catalogName);
+                this.getCatalog());
             this.olap4jSchema = (XmlaOlap4jSchema) catalog.getSchemas()
                 .get(0);
             }
@@ -667,10 +685,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         MetadataRequest metadataRequest,
         Object[] restrictions) throws OlapException
     {
-        final boolean datasourceDependentRequest =
-            metadataRequest.requiresDatasourceName();
-        final String catalog =
-            context.olap4jConnection.getCatalog();
         final String content = "Data";
         final String encoding = proxy.getEncodingCharsetName();
         final StringBuilder buf = new StringBuilder(
@@ -716,12 +730,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             + "      <PropertyList>\n");
 
         // Add the datasource node only if this request requires it.
-        if (datasourceDependentRequest) {
+        if (metadataRequest.requiresDatasourceName()) {
             buf.append("        <DataSourceInfo>");
             buf.append(xmlEncode(context.olap4jConnection.getDataSourceInfo()));
-            buf.append("</DataSourceInfo>\n"
-                + "        <Catalog>");
-            buf.append(xmlEncode(catalog));
+            buf.append("</DataSourceInfo>\n");
+        }
+
+     // Add the catalog node only if this request requires it.
+        if (metadataRequest.requiresCatalogName()) {
+            buf.append("        <Catalog>");
+            buf.append(xmlEncode(context.olap4jConnection.getCatalog()));
             buf.append("</Catalog>\n");
         }
 
@@ -1663,6 +1681,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
          */
         public boolean requiresDatasourceName() {
             return this != DISCOVER_DATASOURCES;
+        }
+
+        /**
+         * Returns whether this request requires a
+         * {@code &lt;CatalogName&gt;} element.
+         *
+         * @return whether this request requires a DatasourceName element
+         */
+        public boolean requiresCatalogName() {
+            return this != DBSCHEMA_CATALOGS;
         }
     }
 

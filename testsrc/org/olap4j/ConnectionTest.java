@@ -12,6 +12,7 @@ package org.olap4j;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import org.olap4j.impl.Olap4jUtil;
+import org.olap4j.driver.xmla.*;
 import org.olap4j.mdx.*;
 import org.olap4j.mdx.parser.*;
 import org.olap4j.metadata.*;
@@ -301,6 +302,40 @@ public class ConnectionTest extends TestCase {
                     mondrianConnectionClass);
             assertNotNull(mondrianConnection);
             assert mondrianConnectionClass.isInstance(mondrianConnection);
+        }
+    }
+
+    public void testXmlaCatalogParameter() throws Exception {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA)
+        {
+            // We won't use the tester itself since we want to test
+            // creating a connection with and without a Catalog parameter.
+            Properties info = new Properties();
+            connection =
+                DriverManager.getConnection(
+                    tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
+                    info);
+            assertEquals("FoodMart", connection.getCatalog());
+
+            info.setProperty(
+                    XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
+            connection =
+                DriverManager.getConnection(
+                    tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
+                    info);
+            assertEquals("FoodMart", connection.getCatalog());
+
+            info.setProperty(
+                    XmlaOlap4jDriver.Property.Catalog.name(), "FoodMartError");
+            try {
+                connection = DriverManager.getConnection(
+                        tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
+                        info);
+                connection.getCatalog();
+            } catch (OlapException e) {
+                return;
+            }
+            fail("XmlaOlap4jConnection did not detect an inexistant catalog name.");
         }
     }
 
