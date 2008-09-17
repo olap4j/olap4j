@@ -1143,7 +1143,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             list.add(
                 new XmlaOlap4jSchema(
                     context.getCatalog(row),
-                    schemaName));
+                    (schemaName == null) ? "" : schemaName));
         }
     }
 
