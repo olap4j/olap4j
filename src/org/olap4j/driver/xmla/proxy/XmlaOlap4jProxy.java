@@ -23,10 +23,20 @@ public interface XmlaOlap4jProxy {
      *
      * @param url Target URL
      * @param request Request string
-     * @return Response
-     * @throws IOException
+     * @return Response The byte array that contains the whole response
+     * from the server.
+     * @throws IOException This exception declaration will be removed soon.
+     * Don't catch this. Catch XmlaOlap4jProxyException instead.
+     * @throws XmlaOlap4jProxyException If anything occurs during the
+     * request execution.
      */
-    byte[] get(URL url, String request) throws IOException;
+     /*
+      * FIXME We will need to remove the IOException declaration because
+      * this type of error is linked to the proxy type. A wrapper
+      * class was created, but some proxies out there (MondrianInprocProxy...)
+      * still uses this.
+      */
+    byte[] get(URL url, String request) throws XmlaOlap4jProxyException,IOException;
 
     /**
      * Submits a request for background execution.

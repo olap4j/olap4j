@@ -9,16 +9,10 @@
 */
 package org.olap4j.driver.xmla.proxy;
 
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentHashMap;
+import java.net.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * <p>CookieManager is a simple utility for handling cookies when working
@@ -88,7 +82,7 @@ public class XmlaOlap4jCookieManager {
      * or IOException will be thrown
      * @throws java.io.IOException Thrown if <i>conn</i> is not open.
      */
-    public void storeCookies(URLConnection conn) throws IOException {
+    public void storeCookies(URLConnection conn){
 
         // Determines the domain from where these cookies are being sent
         String domain = getDomainFromHost(conn.getURL().getHost());
@@ -164,7 +158,7 @@ public class XmlaOlap4jCookieManager {
      * @param conn a java.net.URLConnection - must NOT be open, or IOException will be thrown
      * @throws java.io.IOException Thrown if <i>conn</i> has already been opened.
      */
-    public void setCookies(URLConnection conn) throws IOException {
+    public void setCookies(URLConnection conn){
 
         // Determines the domain and path to retrieve the appropriate cookies
         URL url = conn.getURL();
@@ -200,9 +194,8 @@ public class XmlaOlap4jCookieManager {
             }
             conn.setRequestProperty(COOKIE, cookieStringBuffer.toString());
         } catch (java.lang.IllegalStateException ise) {
-            IOException ioe = new IOException(
+            throw new RuntimeException(
                     "Illegal State! Cookies cannot be set on a URLConnection that is already connected. Only call setCookies(java.net.URLConnection) AFTER calling java.net.URLConnection.connect().");
-            throw ioe;
         }
     }
 

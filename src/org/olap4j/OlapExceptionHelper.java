@@ -21,6 +21,10 @@ public class OlapExceptionHelper {
         return new OlapException(msg);
     }
 
+    public static OlapException createException(Throwable cause) {
+        return new OlapException(cause.getMessage(), cause);
+    }
+
     public static OlapException createException(String msg, Throwable cause) {
         return new OlapException(msg, cause);
     }

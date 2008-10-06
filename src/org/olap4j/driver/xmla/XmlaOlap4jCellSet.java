@@ -13,8 +13,8 @@ import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.impl.Olap4jUtil;
 import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
 import org.olap4j.metadata.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
+import org.w3c.dom.ls.*;
 import org.xml.sax.SAXException;
 
 import java.io.*;
@@ -107,8 +107,6 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             findChild(body, SOAP_NS, "Fault");
         if (fault != null) {
             /*
-            Example:
-
         <SOAP-ENV:Fault>
             <faultcode>SOAP-ENV:Client.00HSBC01</faultcode>
             <faultstring>XMLA connection datasource not found</faultstring>
@@ -123,10 +121,15 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         </SOAP-ENV:Fault>
              */
             // TODO: log doc to logfile
-            final Element faultstring = findChild(fault, null, "faultstring");
-            String message = faultstring.getTextContent();
+            // A message must include the fault XML content. This is the right
+            // and efficient way to do it, according to
+            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6181019
+            // They changed the node.getString() in java... ....
+            DOMImplementation impl = fault.getOwnerDocument().getImplementation();
+            DOMImplementationLS factory = (DOMImplementationLS) impl.getFeature("LS", "3.0");
+            LSSerializer serializer = factory.createLSSerializer();
             throw OlapExceptionHelper.createException(
-                "XMLA provider gave exception: " + message);
+                "XMLA provider gave exception: " + serializer.writeToString(fault));
         }
         Element executeResponse =
             findChild(body, XMLA_NS, "ExecuteResponse");

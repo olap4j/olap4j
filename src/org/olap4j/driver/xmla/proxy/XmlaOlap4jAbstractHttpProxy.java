@@ -63,7 +63,7 @@ public abstract class XmlaOlap4jAbstractHttpProxy
      * @throws IOException
      */
     abstract public byte[] getResponse(URL url, String request)
-        throws IOException;
+        throws XmlaOlap4jProxyException;
 
 
     /**
@@ -84,7 +84,7 @@ public abstract class XmlaOlap4jAbstractHttpProxy
      * @throws IOException An io exception gets thrown if the given url
      * connection has not been opened yet.
      */
-    protected void useCookies(URLConnection urlConn) throws IOException {
+    protected void useCookies(URLConnection urlConn){
         // Initializes the cookie manager
         this.initCookieManager();
 
@@ -100,7 +100,7 @@ public abstract class XmlaOlap4jAbstractHttpProxy
      * @throws IOException An io exception gets thrown if the given url
      * connection has already been opened.
      */
-    protected void saveCookies(URLConnection urlConn) throws IOException {
+    protected void saveCookies(URLConnection urlConn){
         // Initializes the cookie manager
         this.initCookieManager();
 
@@ -151,29 +151,40 @@ public abstract class XmlaOlap4jAbstractHttpProxy
     }
 
     // implement XmlaOlap4jProxy
-    public byte[] get(URL url, String request) throws IOException {
+    public byte[] get(URL url, String request) throws XmlaOlap4jProxyException {
+        byte[] response = null;
         // Tries to fetch from cache
-        byte[] response =
-            getFromCache(
-                url,
-                request.getBytes(getEncodingCharsetName()));
-
-        // Returns the cached value if found
-        if (response != null) {
-            return response;
+        try {
+            response =
+                getFromCache(
+                    url,
+                    request.getBytes(getEncodingCharsetName()));
+            // Returns the cached value if found
+            if (response != null) {
+                return response;
+            }
+        } catch (IOException e) {
+            throw new XmlaOlap4jProxyException(
+                "An exception was encountered while browsing the proxy cache.",
+                e);
         }
 
         // Executes the query
         response = getResponse(url, request);
 
-        // Adds to cache
-        addToCache(
-            url,
-            request.getBytes(getEncodingCharsetName()),
-            response);
-
-        // Returns result
-        return response;
+        try {
+            // Adds to cache
+            addToCache(
+                url,
+                request.getBytes(getEncodingCharsetName()),
+                response);
+            // Returns result
+            return response;
+        } catch (IOException e) {
+            throw new XmlaOlap4jProxyException(
+                "An exception was encountered while saving a response in the proxy cache.",
+                e);
+        }
     }
 
 

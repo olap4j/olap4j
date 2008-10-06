@@ -597,7 +597,18 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         try {
             bytes = proxy.get(serverUrl, request);
         } catch (IOException e) {
-            throw OlapExceptionHelper.createException(null, e);
+            /*
+             * FIXME This type of exception should not reach this point.
+             * It was maintained because some other proxy implementations
+             * exists out there that still throw an IOException arround.
+             * This was a bad design which we will fix at some point but not
+             * before the 1.0 release.
+             */
+            throw OlapExceptionHelper.createException(e);
+        } catch (XmlaOlap4jProxyException e) {
+            throw OlapExceptionHelper.createException(
+                "This connection encountered an exception while executing a query.",
+                e);
         }
         Document doc;
         try {

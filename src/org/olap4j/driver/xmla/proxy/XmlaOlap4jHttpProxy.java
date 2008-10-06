@@ -34,59 +34,66 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
 {
     @Override
     public byte[] getResponse(URL url, String request)
-        throws IOException
+        throws XmlaOlap4jProxyException
     {
-        // Open connection to manipulate the properties
-        URLConnection urlConnection = url.openConnection();
-        urlConnection.setDoOutput(true);
+        try {
+            // Open connection to manipulate the properties
+            URLConnection urlConnection = url.openConnection();
+            urlConnection.setDoOutput(true);
 
-        // Set headers
-        urlConnection.setRequestProperty(
-            "content-type",
-            "text/xml");
-        urlConnection.setRequestProperty(
-            "User-Agent",
-            "Olap4j("
-                .concat(XmlaOlap4jDriver.VERSION)
-                .concat(")"));
-        urlConnection.setRequestProperty(
-            "Accept",
-            "text/xml;q=1");
-        urlConnection.setRequestProperty(
-            "Accept-Charset",
-            getEncodingCharsetName()
-                .concat(";q=1"));
-
-        // Encode credentials for basic authentication
-        if (url.getUserInfo() != null) {
-            String encoding =
-                Base64.encodeBytes(url.getUserInfo().getBytes(), 0);
+            // Set headers
             urlConnection.setRequestProperty(
-                "Authorization", "Basic " + encoding);
+                "content-type",
+                "text/xml");
+            urlConnection.setRequestProperty(
+                "User-Agent",
+                "Olap4j("
+                    .concat(XmlaOlap4jDriver.VERSION)
+                    .concat(")"));
+            urlConnection.setRequestProperty(
+                "Accept",
+                "text/xml;q=1");
+            urlConnection.setRequestProperty(
+                "Accept-Charset",
+                getEncodingCharsetName()
+                    .concat(";q=1"));
+
+            // Encode credentials for basic authentication
+            if (url.getUserInfo() != null) {
+                String encoding =
+                    Base64.encodeBytes(url.getUserInfo().getBytes(), 0);
+                urlConnection.setRequestProperty(
+                    "Authorization", "Basic " + encoding);
+            }
+
+            // Set correct cookies
+            this.useCookies(urlConnection);
+
+            // Send data (i.e. POST). Use same encoding as specified in the
+            // header.
+            final String encoding = getEncodingCharsetName();
+            urlConnection.getOutputStream().write(request.getBytes(encoding));
+
+            // Get the response, again assuming default encoding.
+            InputStream is = urlConnection.getInputStream();
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
+            int count;
+
+            while ((count = is.read(buf)) > 0) {
+                baos.write(buf, 0, count);
+            }
+
+            // Save the returned cookies for later use
+            this.saveCookies(urlConnection);
+
+            return baos.toByteArray();
+        // All exceptions should be trapped here. 
+        // The response will only be available here anyways.
+        } catch (Exception e) {
+            throw new XmlaOlap4jProxyException(
+                "This proxy encountered an exception while processing the query.",e);
         }
-
-        // Set correct cookies
-        this.useCookies(urlConnection);
-
-        // Send data (i.e. POST). Use same encoding as specified in the
-        // header.
-        final String encoding = getEncodingCharsetName();
-        urlConnection.getOutputStream().write(request.getBytes(encoding));
-
-        // Get the response, again assuming default encoding.
-        InputStream is = urlConnection.getInputStream();
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buf = new byte[1024];
-        int count;
-
-        while ((count = is.read(buf)) > 0) {
-            baos.write(buf, 0, count);
-        }
-
-        // Save the returned cookies for later use
-        this.saveCookies(urlConnection);
-
-        return baos.toByteArray();
     }
 
     @Override
