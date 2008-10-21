@@ -444,7 +444,7 @@ public class ConnectionTest extends TestCase {
             switch (tester.getFlavor()) {
             case XMLA:
                 assertTrue(e.getMessage().indexOf(
-                    "XMLA provider gave exception: XMLA MDX parse failed") >= 0);
+                    "XMLA MDX parse failed") >= 0);
                 break;
             default:
                 assertTrue(

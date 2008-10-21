@@ -31,6 +31,10 @@ import java.util.*;
 import java.util.Map.*;
 import java.util.regex.*;
 
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
+
 /**
  * Implementation of {@link org.olap4j.OlapConnection}
  * for XML/A providers.
@@ -658,11 +662,17 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         </SOAP-ENV:Fault>
              */
             // TODO: log doc to logfile
-            final Element faultstring = findChild(fault, null, "faultstring");
-            String message = faultstring.getTextContent();
+            StringWriter writer = new StringWriter(); 
+            writer.append("The SOAP service end-point returned an error message.");
+            try {
+                Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                transformer.transform(new DOMSource(findChild(fault, null, "faultstring")), new StreamResult(writer));
+            } catch (TransformerException e) {
+                //The error message cannot be parsed... weird.
+            }
             throw OlapExceptionHelper.createException(
-                "XMLA provider gave exception: " + message
-                    + "; request: " + request);
+                "XMLA provider gave exception: \n" + writer.getBuffer()
+                    + "\n Request was: \n" + request);
         }
         Element discoverResponse =
             findChild(body, XMLA_NS, "DiscoverResponse");
