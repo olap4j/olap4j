@@ -19,8 +19,11 @@ import org.olap4j.mdx.SelectNode;
 import org.olap4j.mdx.parser.*;
 import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
 import org.olap4j.metadata.*;
+import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import java.io.*;
@@ -662,17 +665,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         </SOAP-ENV:Fault>
              */
             // TODO: log doc to logfile
-            StringWriter writer = new StringWriter(); 
-            writer.append("The SOAP service end-point returned an error message.");
-            try {
-                Transformer transformer = TransformerFactory.newInstance().newTransformer();
-                transformer.transform(new DOMSource(findChild(fault, null, "faultstring")), new StreamResult(writer));
-            } catch (TransformerException e) {
-                //The error message cannot be parsed... weird.
-            }
+            // A message must include the fault XML content. This is the right
+            // and efficient way to do it, according to
+            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6181019
+            // They changed the node.getString() in java... ....
+            DOMImplementation impl = fault.getOwnerDocument().getImplementation();
+            DOMImplementationLS factory = (DOMImplementationLS) impl.getFeature("LS", "3.0");
+            LSSerializer serializer = factory.createLSSerializer();
             throw OlapExceptionHelper.createException(
-                "XMLA provider gave exception: \n" + writer.getBuffer()
-                    + "\n Request was: \n" + request);
+                "XMLA provider gave exception: " + serializer.writeToString(fault)
+                + "\n Request was: \n" + request);
         }
         Element discoverResponse =
             findChild(body, XMLA_NS, "DiscoverResponse");
