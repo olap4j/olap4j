@@ -1,4 +1,4 @@
-package org.olap4j;
+package org.olap4j.driver.xmla.cache;
 
 import junit.framework.TestCase;
 

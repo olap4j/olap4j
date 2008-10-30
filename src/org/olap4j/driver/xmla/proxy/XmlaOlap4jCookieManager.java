@@ -47,7 +47,7 @@ import java.util.concurrent.*;
  **/
 
 @SuppressWarnings("unchecked")
-public class XmlaOlap4jCookieManager {
+class XmlaOlap4jCookieManager {
 
     private Map store;
 

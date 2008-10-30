@@ -33,7 +33,7 @@ import org.olap4j.driver.xmla.cache.XmlaOlap4jCache;
  * @author Luc Boudreau
  * @version $Id: AbstractHttpProxy.java 92 2008-07-17 07:41:10Z lucboudreau $
  */
-public abstract class XmlaOlap4jAbstractHttpProxy
+abstract class XmlaOlap4jAbstractHttpProxy
     implements XmlaOlap4jCachedProxy
 {
     /**
@@ -78,36 +78,28 @@ public abstract class XmlaOlap4jAbstractHttpProxy
         String request);
 
     /**
-     * Helper method to save cookies for later use.
-     * @param urlConn The url connection for which we want the cookies
-     * saved for later use.
-     * @throws IOException An io exception gets thrown if the given url
-     * connection has not been opened yet.
+     * Helper method to add cookies to a given connection.
+     * @param urlConn The url connection to which we want the cookies
+     * applied to.
      */
     protected void useCookies(URLConnection urlConn){
         // Initializes the cookie manager
         this.initCookieManager();
-
         // Saves the current cookies
         this.cookieManager.setCookies(urlConn);
     }
 
-
     /**
-     * Helper method to add cookies to a given connection.
-     * @param urlConn The url connection to which we want the cookies
-     * applied to.
-     * @throws IOException An io exception gets thrown if the given url
-     * connection has already been opened.
+     * Helper method to save cookies for later use.
+     * @param urlConn The url connection for which we want the cookies
+     * saved for later use.
      */
     protected void saveCookies(URLConnection urlConn){
         // Initializes the cookie manager
         this.initCookieManager();
-
         // Saves the current cookies
         this.cookieManager.storeCookies(urlConn);
     }
-
 
     /* (non-Javadoc)
      * @see org.olap4j.driver.xmla.XmlaOlap4jDriver.Proxy#setCache(

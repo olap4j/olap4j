@@ -19,7 +19,7 @@ import java.security.NoSuchAlgorithmException;
  * @version $Id: XmlaOlap4jSHAEncoder.java 92 2008-07-17 07:41:10Z lucboudreau $
  *
  */
-public class XmlaOlap4jSHAEncoder {
+class XmlaOlap4jSHAEncoder {
 
     private static String convertToHex(byte[] data) {
         StringBuilder buf = new StringBuilder();

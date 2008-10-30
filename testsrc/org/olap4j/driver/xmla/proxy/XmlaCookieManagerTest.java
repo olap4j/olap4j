@@ -1,4 +1,4 @@
-package org.olap4j;
+package org.olap4j.driver.xmla.proxy;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

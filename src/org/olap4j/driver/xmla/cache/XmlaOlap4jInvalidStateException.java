@@ -20,7 +20,7 @@ package org.olap4j.driver.xmla.cache;
  * @author Luc Boudreau
  * @version $Id: InvalidStateException.java 92 2008-07-17 07:41:10Z lucboudreau $
  */
-public class XmlaOlap4jInvalidStateException extends RuntimeException {
+class XmlaOlap4jInvalidStateException extends RuntimeException {
     private static final long serialVersionUID = 7265273715459263740L;
 }
 

@@ -1,10 +1,11 @@
-package org.olap4j;
+package org.olap4j.driver.xmla.proxy;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.olap4j.OlapException;
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache;
 import org.olap4j.driver.xmla.proxy.XmlaOlap4jCachedProxy;
