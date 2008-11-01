@@ -665,8 +665,11 @@ public class OlapTest extends TestCase {
             }
         }
 
-        public static void axisToXml(QueryAxis axis, Document doc, Element parent) {
-
+        public static void axisToXml(
+            QueryAxis axis,
+            Document doc,
+            Element parent)
+        {
             try {
                 Element root = doc.createElement("axis");
                 parent.appendChild(root);
@@ -684,6 +687,9 @@ public class OlapTest extends TestCase {
                     addAttribute("location", "filter", root);
                     break;
                 }
+
+                addAttribute(
+                    "nonEmpty", Boolean.toString(axis.isNonEmpty()), parent);
 
                 List<QueryDimension> dimensions = axis.getDimensions();
                 for (QueryDimension dimension : dimensions) {

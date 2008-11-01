@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -31,7 +31,14 @@ public class QueryAxis {
 
     private final Query query;
     protected Axis location = null;
+    private boolean nonEmpty;
 
+    /**
+     * Creates a QueryAxis.
+     *
+     * @param query Query that the axis belongs to
+     * @param location Location of axis (e.g. ROWS, COLUMNS)
+     */
     public QueryAxis(Query query, Axis location) {
         super();
         this.query = query;
@@ -63,8 +70,37 @@ public class QueryAxis {
         return dimensions;
     }
 
+    /**
+     * Returns the name of this QueryAxis.
+     *
+     * @return the name of this axis, for example "ROWS", "COLUMNS".
+     */
     public String getName() {
         return location.getCaption(query.getLocale());
+    }
+
+    /**
+     * Returns whether this QueryAxis filters out empty rows.
+     * If true, axis filters out empty rows, and the MDX to evaluate the axis
+     * will be generated with the "NON EMPTY" expression.
+     *
+     * @return Whether this axis should filter out empty rows
+     *
+     * @see #setNonEmpty(boolean)
+     */
+    public boolean isNonEmpty() {
+        return nonEmpty;
+    }
+
+    /**
+     * Sets whether this QueryAxis filters out empty rows.
+     *
+     * @param nonEmpty Whether this axis should filter out empty rows
+     *
+     * @see #isNonEmpty()
+     */
+    public void setNonEmpty(boolean nonEmpty) {
+        this.nonEmpty = nonEmpty;
     }
 
     /**
