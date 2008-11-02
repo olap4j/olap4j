@@ -233,7 +233,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                     String hierarchyName =
                         memberNode.getAttribute("Hierarchy");
                     final String uname = stringElement(memberNode, "UName");
-                    Member member = memberMap.get(uname);
+                    XmlaOlap4jMemberBase member = memberMap.get(uname);
                     if (member == null) {
                         final String caption =
                             stringElement(memberNode, "Caption");
@@ -242,7 +242,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                             lookupHierarchy(metaData.cube, hierarchyName);
                         final Level level = hierarchy.getLevels().get(lnum);
                         member = new XmlaOlap4jSurpriseMember(
-                            level, hierarchy, lnum, caption, uname);
+                            this, level, hierarchy, lnum, caption, uname);
                     }
                     propertyValues.clear();
                     for (Element childNode : childElements(memberNode)) {
@@ -1228,7 +1228,10 @@ abstract class XmlaOlap4jCellSet implements CellSet {
      * in the cube (probably because the member is a calculated member
      * defined in the query).
      */
-    private static class XmlaOlap4jSurpriseMember implements Member {
+    private static class XmlaOlap4jSurpriseMember
+        implements XmlaOlap4jMemberBase
+    {
+        private final XmlaOlap4jCellSet cellSet;
         private final Level level;
         private final Hierarchy hierarchy;
         private final int lnum;
@@ -1238,6 +1241,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         /**
          * Creates an XmlaOlap4jSurpriseMember.
          *
+         * @param cellSet Cell set
          * @param level Level
          * @param hierarchy Hierarchy
          * @param lnum Level number
@@ -1245,17 +1249,35 @@ abstract class XmlaOlap4jCellSet implements CellSet {
          * @param uname Member unique name
          */
         XmlaOlap4jSurpriseMember(
+            XmlaOlap4jCellSet cellSet,
             Level level,
             Hierarchy hierarchy,
             int lnum,
             String caption,
             String uname)
         {
+            this.cellSet = cellSet;
             this.level = level;
             this.hierarchy = hierarchy;
             this.lnum = lnum;
             this.caption = caption;
             this.uname = uname;
+        }
+
+        public final XmlaOlap4jCube getCube() {
+            return cellSet.metaData.cube;
+        }
+
+        public final XmlaOlap4jConnection getConnection() {
+            return getCatalog().olap4jDatabaseMetaData.olap4jConnection;
+        }
+
+        public final XmlaOlap4jCatalog getCatalog() {
+            return getCube().olap4jSchema.olap4jCatalog;
+        }
+
+        public Map<Property, Object> getPropertyValueMap() {
+            return Collections.emptyMap();
         }
 
         public NamedList<? extends Member> getChildMembers()

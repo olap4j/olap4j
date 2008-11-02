@@ -1491,7 +1491,7 @@ public class ConnectionTest extends TestCase {
             break;
         }
         final NamedList<Property> propertyList = member.getProperties();
-        assertEquals(22, propertyList.size());
+        assertEquals(25, propertyList.size());
         final Property property = propertyList.get("MEMBER_CAPTION");
         assertEquals("Food", member.getPropertyFormattedValue(property));
         assertEquals("Food", member.getPropertyValue(property));
@@ -1551,6 +1551,45 @@ public class ConnectionTest extends TestCase {
                     "Store Sales",
                     "Store Cost")),
             measureNameSet);
+    }
+
+    /**
+     * Tests members from a parent-child hierarchy.
+     *
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
+    public void testParentChild() throws ClassNotFoundException, SQLException {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+
+        final CellSet cellSet =
+            olapConnection.createStatement().executeOlapQuery(
+                "select {[Measures].[Org Salary]} on 0,\n"
+                    + " Head([Employees].Members, 10) DIMENSION PROPERTIES DEPTH ON 1\n"
+                    + "from [HR]");
+        final CellSetAxis rowsAxis = cellSet.getAxes().get(1);
+        assertEquals(10, rowsAxis.getPositionCount());
+        Member member0 = rowsAxis.getPositions().get(0).getMembers().get(0);
+        assertEquals("All Employees", member0.getName());
+        assertEquals(0, member0.getDepth());
+        Member member1 = rowsAxis.getPositions().get(1).getMembers().get(0);
+        assertEquals("[Employees].[All Employees].[Sheri Nowmer]", member1.getUniqueName());
+        assertEquals(1, member1.getDepth());
+        assertEquals(1, member1.getLevel().getDepth());
+        assertEquals(member0.getUniqueName(), member1.getParentMember().getUniqueName());
+        assertEquals(member0, member1.getParentMember());
+        Member member2 = rowsAxis.getPositions().get(2).getMembers().get(0);
+        assertEquals("[Employees].[All Employees].[Derrick Whelply]", member2.getUniqueName());
+        // TODO: should return depth=2 here but mondrian erroneously returns 1
+        assertEquals(1, member2.getDepth());
+        assertEquals(1, member2.getLevel().getDepth());
+        // TODO: member2.parentMember should equal member1, but currently
+        // mondrian cannot look up a member of a parent-child hierarchy based
+        // on its unique name
+        assertNull(member2.getParentMember());
     }
 
     /**

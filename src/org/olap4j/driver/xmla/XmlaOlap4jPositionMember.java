@@ -27,19 +27,64 @@ import java.util.*;
  * properties. All other methods are delegated to the underlying member.</p>
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Dec 7, 2007
  */
-class XmlaOlap4jPositionMember implements Member {
-    private final Member member;
+class XmlaOlap4jPositionMember
+    implements XmlaOlap4jMemberBase
+{
+    private final XmlaOlap4jMemberBase member;
     private final Map<Property, String> propertyValues;
 
+    /**
+     * Creates a XmlaOlap4jPositionMember.
+     *
+     * @param member Underlying member
+     * @param propertyValues Property values
+     */
     XmlaOlap4jPositionMember(
-        Member member,
+        XmlaOlap4jMemberBase member,
         Map<Property, String> propertyValues)
     {
+        assert member != null;
+        assert propertyValues != null;
         this.member = member;
         this.propertyValues = propertyValues;
+    }
+
+    public boolean equals(Object obj) {
+        if (obj instanceof XmlaOlap4jPositionMember) {
+            XmlaOlap4jPositionMember that =
+                (XmlaOlap4jPositionMember) obj;
+            return this.member.equals(that.member);
+        } else if (obj instanceof XmlaOlap4jMember) {
+            XmlaOlap4jMember that = (XmlaOlap4jMember) obj;
+            return this.member.equals(that);
+        } else {
+            return super.equals(obj);
+        }
+    }
+
+    public int hashCode() {
+        return member.hashCode();
+    }
+
+    public XmlaOlap4jCube getCube() {
+        return member.getCube();
+    }
+
+    public XmlaOlap4jConnection getConnection() {
+        return member.getConnection();
+    }
+
+    public XmlaOlap4jCatalog getCatalog() {
+        return member.getCatalog();
+    }
+
+    public Map<Property, Object> getPropertyValueMap() {
+        return new ChainedMap<Property, Object>(
+            propertyValues,
+            member.getPropertyValueMap());
     }
 
     public NamedList<? extends Member> getChildMembers() throws OlapException {
@@ -75,7 +120,7 @@ class XmlaOlap4jPositionMember implements Member {
     }
 
     public boolean isChildOrEqualTo(Member member) {
-        return member.isChildOrEqualTo(member);
+        return this.member.isChildOrEqualTo(member);
     }
 
     public boolean isCalculated() {
@@ -132,7 +177,11 @@ class XmlaOlap4jPositionMember implements Member {
     }
 
     public int getDepth() {
-        return member.getDepth();
+        return XmlaOlap4jMember.toInteger(
+            XmlaOlap4jMember.getPropertyValue(
+                Property.StandardMemberProperty.DEPTH,
+                member,
+                getPropertyValueMap()));
     }
 
     public Member getDataMember() {
@@ -153,6 +202,91 @@ class XmlaOlap4jPositionMember implements Member {
 
     public String getDescription(Locale locale) {
         return member.getDescription(locale);
+    }
+
+    /**
+     * Read-only map that contains the union of two maps.
+     */
+    private static class ChainedMap<K, V> implements Map<K, V> {
+        private final Map<? extends K, ? extends V> map;
+        private final Map<? extends K, ? extends V> next;
+
+        /**
+         * Creates a ChainedMap.
+         *
+         * @param map First map in the chain
+         * @param next Next map in the chain
+         */
+        ChainedMap(
+            Map<? extends K, ? extends V> map,
+            Map<? extends K, ? extends V> next)
+        {
+            this.map = map;
+            this.next = next;
+        }
+
+        public int size() {
+            int n = next.size();
+            for (K k : map.keySet()) {
+                //noinspection SuspiciousMethodCalls
+                if (!next.containsKey(k)) {
+                    ++n;
+                }
+            }
+            return n;
+        }
+
+        public boolean isEmpty() {
+            return map.isEmpty()
+                && next.isEmpty();
+        }
+
+        public boolean containsKey(Object key) {
+            return map.containsKey(key)
+                || next.containsKey(key);
+        }
+
+        public boolean containsValue(Object value) {
+            return map.containsValue(value)
+                || next.containsValue(value);
+        }
+
+        public V get(Object key) {
+            //noinspection SuspiciousMethodCalls
+            if (map.containsKey(key)) {
+                return map.get(key);
+            } else {
+                return next.get(key);
+            }
+        }
+
+        public V put(K key, V value) {
+            throw new UnsupportedOperationException("read only");
+        }
+
+        public V remove(Object key) {
+            throw new UnsupportedOperationException("read only");
+        }
+
+        public void putAll(Map<? extends K, ? extends V> t) {
+            throw new UnsupportedOperationException("read only");
+        }
+
+        public void clear() {
+            throw new UnsupportedOperationException("read only");
+        }
+
+        public Set<K> keySet() {
+            throw new UnsupportedOperationException("need to implement");
+        }
+
+        public Collection<V> values() {
+            throw new UnsupportedOperationException("need to implement");
+        }
+
+        public Set<Entry<K, V>> entrySet() {
+            throw new UnsupportedOperationException("need to implement");
+        }
     }
 }
 

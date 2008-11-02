@@ -315,11 +315,11 @@ public class MetadataTest extends TestCase {
         final int functionCount = linecount(s);
         assertTrue(functionCount + " functions", functionCount > 360);
 
-        // Mondrian has 7 variants of the Ascendants and Descendants functions
+        // Mondrian has 13 variants of the Ascendants and Descendants functions
         s = checkResultSet(
             olapDatabaseMetaData.getOlapFunctions("%scendants"),
             FUNCTIONS_COLUMN_NAMES);
-        assertEquals(s, 7, linecount(s));
+        assertEquals(s, 13, linecount(s));
     }
 
     public void testDatabaseMetaDataGetHierarchies() throws SQLException {

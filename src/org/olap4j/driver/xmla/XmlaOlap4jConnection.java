@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -19,9 +19,7 @@ import org.olap4j.mdx.SelectNode;
 import org.olap4j.mdx.parser.*;
 import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
 import org.olap4j.metadata.*;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
@@ -33,10 +31,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.regex.*;
-
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
 
 /**
  * Implementation of {@link org.olap4j.OlapConnection}
@@ -1078,6 +1072,34 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class MemberHandler extends HandlerImpl<XmlaOlap4jMember> {
+
+        /**
+         * Collection of nodes to ignore because they represent standard
+         * built-in properties of Members.
+         */
+        private static final Set<String> EXCLUDED_PROPERTY_NAMES =
+            new HashSet<String>(
+                Arrays.asList(
+                    Property.StandardMemberProperty.CATALOG_NAME.name(),
+                    Property.StandardMemberProperty.CUBE_NAME.name(),
+                    Property.StandardMemberProperty.DIMENSION_UNIQUE_NAME.name(),
+                    Property.StandardMemberProperty.HIERARCHY_UNIQUE_NAME.name(),
+                    Property.StandardMemberProperty.LEVEL_UNIQUE_NAME.name(),
+                    Property.StandardMemberProperty.PARENT_LEVEL.name(),
+                    Property.StandardMemberProperty.PARENT_COUNT.name(),
+                    Property.StandardMemberProperty.MEMBER_KEY.name(),
+                    Property.StandardMemberProperty.IS_PLACEHOLDERMEMBER.name(),
+                    Property.StandardMemberProperty.IS_DATAMEMBER.name(),
+                    Property.StandardMemberProperty.LEVEL_NUMBER.name(),
+                    Property.StandardMemberProperty.MEMBER_ORDINAL.name(),
+                    Property.StandardMemberProperty.MEMBER_UNIQUE_NAME.name(),
+                    Property.StandardMemberProperty.MEMBER_NAME.name(),
+                    Property.StandardMemberProperty.PARENT_UNIQUE_NAME.name(),
+                    Property.StandardMemberProperty.MEMBER_TYPE.name(),
+                    Property.StandardMemberProperty.MEMBER_CAPTION.name(),
+                    Property.StandardMemberProperty.CHILDREN_CARDINALITY.name(),
+                    Property.StandardMemberProperty.DEPTH.name()));
+
         public void handle(Element row, Context context, List<XmlaOlap4jMember> list) {
             /*
             Example:
@@ -1103,31 +1125,87 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     </row>
 
              */
-            int levelNumber = integerElement(row, "LEVEL_NUMBER");
-            int memberOrdinal = integerElement(row, "MEMBER_ORDINAL");
+            if (false) {
+            int levelNumber =
+                integerElement(
+                    row,
+                    Property.StandardMemberProperty.LEVEL_NUMBER.name());
+            }
+            int memberOrdinal =
+                integerElement(
+                    row,
+                    Property.StandardMemberProperty.MEMBER_ORDINAL.name());
             String memberUniqueName =
-                stringElement(row, "MEMBER_UNIQUE_NAME");
+                stringElement(
+                    row,
+                    Property.StandardMemberProperty.MEMBER_UNIQUE_NAME.name());
             String memberName =
-                stringElement(row, "MEMBER_NAME");
+                stringElement(
+                    row,
+                    Property.StandardMemberProperty.MEMBER_NAME.name());
             String parentUniqueName =
-                stringElement(row, "PARENT_UNIQUE_NAME");
+                stringElement(
+                    row,
+                    Property.StandardMemberProperty.PARENT_UNIQUE_NAME.name());
             Member.Type memberType =
                 Member.Type.values()[
-                    integerElement(row, "MEMBER_TYPE")];
+                    integerElement(
+                        row,
+                        Property.StandardMemberProperty.MEMBER_TYPE.name())];
             String memberCaption =
-                stringElement(row, "MEMBER_CAPTION");
+                stringElement(
+                    row,
+                    Property.StandardMemberProperty.MEMBER_CAPTION.name());
             int childrenCardinality =
-                integerElement(row, "CHILDREN_CARDINALITY");
+                integerElement(
+                    row,
+                    Property.StandardMemberProperty.CHILDREN_CARDINALITY.name());
             // If this member is a measure, we want to return an object that
             // implements the Measure interface to all API calls. But we also
             // need to retrieve the properties that occur in MDSCHEMA_MEMBERS
             // that are not available in MDSCHEMA_MEASURES, so we create a
             // member for internal use.
-            list.add(
+            XmlaOlap4jMember member =
                 new XmlaOlap4jMember(
                     context.getLevel(row), memberUniqueName, memberName,
                     memberCaption, "", parentUniqueName, memberType,
-                    childrenCardinality, memberOrdinal));
+                    childrenCardinality, memberOrdinal);
+            addUserDefinedDimensionProperties(row, member);
+
+            // Usually members have the same depth as their level. (Ragged and
+            // parent-child hierarchies are an exception.) Only store depth for
+            // the unusual ones.
+            final Integer depth =
+                integerElement(
+                    row,
+                    Property.StandardMemberProperty.DEPTH.name());
+            if (depth != null
+                && depth.intValue() != member.getLevel().getDepth())
+            {
+                member.setProperty(Property.StandardMemberProperty.DEPTH, depth);
+            }
+            list.add(member);
+        }
+
+        private void addUserDefinedDimensionProperties(
+            Element row,
+            XmlaOlap4jMember member)
+        {
+            NodeList nodes = row.getChildNodes();
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Node node = nodes.item(i);
+                if (EXCLUDED_PROPERTY_NAMES.contains(node.getLocalName())) {
+                    continue;
+                }
+                for (Property property : member.getLevel().getProperties()) {
+                    if (property instanceof XmlaOlap4jProperty
+                        && property.getName().equalsIgnoreCase(
+                        node.getLocalName()))
+                    {
+                        member.setProperty(property, node.getTextContent());
+                    }
+                }
+            }
         }
     }
 

@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2006-2006 Julian Hyde
+// Copyright (C) 2006-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -279,6 +279,28 @@ public interface Property extends MetadataElement {
          * JPivot.
          */
         $visible(Datatype.BOOLEAN, 28, true, null),
+
+        /**
+         * Definition of the internal property which holds the
+         * value of the member key in the original data type. MEMBER_KEY is for
+         * backward-compatibility.  MEMBER_KEY has the same value as KEY0 for
+         * non-composite keys, and MEMBER_KEY property is null for composite
+         * keys.
+         */
+        MEMBER_KEY(Datatype.VARIANT, 29, true, "Optional. The value of the member key. Null for composite keys."),
+
+        /**
+         * Definition of the boolean property that indicates whether
+         * a member is a placeholder member for an empty position in a
+         * dimension hierarchy.
+         */
+        IS_PLACEHOLDERMEMBER(Datatype.BOOLEAN, 30, false, "Required. Whether the member is a placeholder member for an empty position in a dimension hierarchy."),
+
+        /**
+         * Definition of the property that indicates whether the member is a
+         * data member.
+         */
+        IS_DATAMEMBER(Datatype.BOOLEAN, 31, false, "Required. whether the member is a data member"),
 
         /**
          * Definition of the property which

@@ -26,12 +26,12 @@ import java.util.*;
  * </ol>
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Dec 5, 2007
  */
 class XmlaOlap4jMember
     extends XmlaOlap4jElement
-    implements Member, Named
+    implements XmlaOlap4jMemberBase, Member, Named
 {
     private final XmlaOlap4jLevel olap4jLevel;
 
@@ -161,6 +161,25 @@ class XmlaOlap4jMember
     }
 
     public Object getPropertyValue(Property property) {
+        return getPropertyValue(
+            property,
+            this,
+            propertyValueMap);
+    }
+
+    /**
+     * Helper method to retrieve the value of a property from a member.
+     *
+     * @param property Property
+     * @param member Member
+     * @param propertyValueMap Map of property-value pairs
+     * @return Property value
+     */
+    static Object getPropertyValue(
+        Property property,
+        XmlaOlap4jMemberBase member,
+        Map<Property, Object> propertyValueMap)
+    {
         // If property map contains a value for this property (even if that
         // value is null), that overrides.
         final Object value = propertyValueMap.get(property);
@@ -172,47 +191,48 @@ class XmlaOlap4jMember
                 (Property.StandardMemberProperty) property;
             switch (o) {
             case MEMBER_CAPTION:
-                return getCaption(getConnection().getLocale());
+                return member.getCaption(member.getConnection().getLocale());
             case MEMBER_NAME:
-                return getName();
+                return member.getName();
             case MEMBER_UNIQUE_NAME:
-                return getUniqueName();
+                return member.getUniqueName();
             case CATALOG_NAME:
-                return getCatalog().getName();
+                return member.getCatalog().getName();
             case CHILDREN_CARDINALITY:
-                return getChildMemberCount();
+                return member.getChildMemberCount();
             case CUBE_NAME:
-                return getCube().getName();
+                return member.getCube().getName();
             case DEPTH:
-                return getDepth();
+                return member.getDepth();
             case DESCRIPTION:
-                return getDescription(getConnection().getLocale());
+                return member.getDescription(
+                    member.getConnection().getLocale());
             case DIMENSION_UNIQUE_NAME:
-                return getDimension().getUniqueName();
+                return member.getDimension().getUniqueName();
             case DISPLAY_INFO:
                 // TODO:
                 return null;
             case HIERARCHY_UNIQUE_NAME:
-                return getHierarchy().getUniqueName();
+                return member.getHierarchy().getUniqueName();
             case LEVEL_NUMBER:
-                return getLevel().getDepth();
+                return member.getLevel().getDepth();
             case LEVEL_UNIQUE_NAME:
-                return getLevel().getUniqueName();
+                return member.getLevel().getUniqueName();
             case MEMBER_GUID:
                 // TODO:
                 return null;
             case MEMBER_ORDINAL:
-                return getOrdinal();
+                return member.getOrdinal();
             case MEMBER_TYPE:
-                return getMemberType();
+                return member.getMemberType();
             case PARENT_COUNT:
                 return 1;
             case PARENT_LEVEL:
-                return getParentMember().getLevel().getDepth();
+                return member.getParentMember().getLevel().getDepth();
             case PARENT_UNIQUE_NAME:
-                return getParentMember().getUniqueName();
+                return member.getParentMember().getUniqueName();
             case SCHEMA_NAME:
-                return getCube().olap4jSchema.getName();
+                return member.getCube().olap4jSchema.getName();
             case VALUE:
                 // TODO:
                 return null;
@@ -222,21 +242,26 @@ class XmlaOlap4jMember
     }
 
     // convenience method - not part of olap4j API
-    private XmlaOlap4jCube getCube() {
+    public XmlaOlap4jCube getCube() {
         return olap4jLevel.olap4jHierarchy.olap4jDimension.olap4jCube;
     }
 
     // convenience method - not part of olap4j API
-    private XmlaOlap4jCatalog getCatalog() {
+    public XmlaOlap4jCatalog getCatalog() {
         return olap4jLevel.olap4jHierarchy.olap4jDimension.olap4jCube
             .olap4jSchema.olap4jCatalog;
     }
 
     // convenience method - not part of olap4j API
-    private XmlaOlap4jConnection getConnection() {
+    public XmlaOlap4jConnection getConnection() {
         return olap4jLevel.olap4jHierarchy.olap4jDimension.olap4jCube
             .olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
             .olap4jConnection;
+    }
+
+    // convenience method - not part of olap4j API
+    public Map<Property, Object> getPropertyValueMap() {
+        return propertyValueMap;
     }
 
     public String getPropertyFormattedValue(Property property) {
@@ -245,7 +270,7 @@ class XmlaOlap4jMember
         return String.valueOf(getPropertyValue(property));
     }
 
-    public void setProperty(Property property, Object value) throws OlapException {
+    public void setProperty(Property property, Object value) {
         propertyValueMap.put(property, value);
     }
 
@@ -262,7 +287,29 @@ class XmlaOlap4jMember
     }
 
     public int getDepth() {
-        return olap4jLevel.getDepth();
+        // Since in regular hierarchies members have the same depth as their
+        // level, we store depth as a property only where it is different.
+        final Object depth =
+            propertyValueMap.get(Property.StandardMemberProperty.DEPTH);
+        if (depth == null) {
+            return olap4jLevel.getDepth();
+        } else {
+            return toInteger(depth);
+        }
+    }
+
+    /**
+     * Converts an object to an integer value. Must not be null.
+     *
+     * @param o Object
+     * @return Integer value
+     */
+    static int toInteger(Object o) {
+        if (o instanceof Number) {
+            Number number = (Number) o;
+            return number.intValue();
+        }
+        return Integer.valueOf(o.toString());
     }
 
     public Member getDataMember() {
