@@ -368,7 +368,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     public String getCatalog() throws OlapException {
         if (this.catalogName == null) {
-            // This means that no particular catalog name 
+            // This means that no particular catalog name
             // was specified by the user.
             this.catalogName = this.getCatalogs().get(0).getName();
         } else {
@@ -378,7 +378,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             if (buf != null) {
                 this.catalogName = buf.getName();
             } else {
-                throw new OlapException("There is no catalog named " + 
+                throw new OlapException("There is no catalog named " +
                     this.catalogName + " available to query against.");
             }
         }
@@ -1254,8 +1254,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
         public CatalogSchemaHandler(String catalogName) {
             super();
-            if (catalogName == null)
+            if (catalogName == null) {
                 throw new RuntimeException("The CatalogSchemaHandler handler requires a catalog name.");
+            }
             this.catalogName = catalogName;
         }
 

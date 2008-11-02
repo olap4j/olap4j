@@ -16,7 +16,7 @@ import java.sql.SQLException;
  * @version $Id$
  */
 public class OlapExceptionHelper {
-    
+
     public static OlapException createException(String msg) {
         return new OlapException(msg);
     }
@@ -52,4 +52,4 @@ public class OlapExceptionHelper {
     }
 }
 
-//End ExceptionHelper.java
+// End OlapExceptionHelper.java

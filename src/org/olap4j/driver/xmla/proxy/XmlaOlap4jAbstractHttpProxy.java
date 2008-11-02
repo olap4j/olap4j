@@ -82,7 +82,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
      * @param urlConn The url connection to which we want the cookies
      * applied to.
      */
-    protected void useCookies(URLConnection urlConn){
+    protected void useCookies(URLConnection urlConn) {
         // Initializes the cookie manager
         this.initCookieManager();
         // Saves the current cookies
@@ -94,7 +94,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
      * @param urlConn The url connection for which we want the cookies
      * saved for later use.
      */
-    protected void saveCookies(URLConnection urlConn){
+    protected void saveCookies(URLConnection urlConn) {
         // Initializes the cookie manager
         this.initCookieManager();
         // Saves the current cookies

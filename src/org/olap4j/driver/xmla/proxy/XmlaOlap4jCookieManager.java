@@ -82,7 +82,7 @@ class XmlaOlap4jCookieManager {
      * or IOException will be thrown
      * @throws java.io.IOException Thrown if <i>conn</i> is not open.
      */
-    public void storeCookies(URLConnection conn){
+    public void storeCookies(URLConnection conn) {
 
         // Determines the domain from where these cookies are being sent
         String domain = getDomainFromHost(conn.getURL().getHost());
@@ -158,7 +158,7 @@ class XmlaOlap4jCookieManager {
      * @param conn a java.net.URLConnection - must NOT be open, or IOException will be thrown
      * @throws java.io.IOException Thrown if <i>conn</i> has already been opened.
      */
-    public void setCookies(URLConnection conn){
+    public void setCookies(URLConnection conn) {
 
         // Determines the domain and path to retrieve the appropriate cookies
         URL url = conn.getURL();
@@ -166,8 +166,9 @@ class XmlaOlap4jCookieManager {
         String path = url.getPath();
 
         Map domainStore = (Map) store.get(domain);
-        if (domainStore == null)
+        if (domainStore == null) {
             return;
+        }
         StringBuffer cookieStringBuffer = new StringBuffer();
 
         Iterator cookieNames = domainStore.keySet().iterator();
@@ -181,8 +182,9 @@ class XmlaOlap4jCookieManager {
                 cookieStringBuffer.append(cookieName);
                 cookieStringBuffer.append("=");
                 cookieStringBuffer.append((String) cookie.get(cookieName));
-                if (cookieNames.hasNext())
+                if (cookieNames.hasNext()) {
                     cookieStringBuffer.append(SET_COOKIE_SEPARATOR);
+                }
             }
         }
         try {
@@ -208,8 +210,9 @@ class XmlaOlap4jCookieManager {
     }
 
     private boolean isNotExpired(String cookieExpires) {
-        if (cookieExpires == null)
+        if (cookieExpires == null) {
             return true;
+        }
         Date now = new Date();
         try {
             return (now.compareTo(dateFormat.parse(cookieExpires))) <= 0;

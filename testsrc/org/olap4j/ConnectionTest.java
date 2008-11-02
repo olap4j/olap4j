@@ -306,8 +306,7 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testXmlaCatalogParameter() throws Exception {
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA)
-        {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
             // We won't use the tester itself since we want to test
             // creating a connection with and without a Catalog parameter.
             Properties info = new Properties();
@@ -859,8 +858,9 @@ public class ConnectionTest extends TestCase {
         // access method 1
         Cell cell = cellSet.getCell(5);
         assertEquals(5, cell.getOrdinal());
-        if (tester.getFlavor() != TestContext.Tester.Flavor.XMLA) // FIXME
+        if (tester.getFlavor() != TestContext.Tester.Flavor.XMLA) { // FIXME
         assertEquals(12935.16, cell.getValue());
+        }
         assertEquals(12935.16, cell.getDoubleValue());
         assertEquals("12,935.16", cell.getFormattedValue());
         assertEquals(cellSet, cell.getCellSet());

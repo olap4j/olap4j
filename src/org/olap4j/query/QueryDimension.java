@@ -89,26 +89,22 @@ public class QueryDimension {
         final Member.TreeOp op;
         Member.TreeOp secondOp = null;
         switch (selection.getOperator()) {
-            case CHILDREN:
-                op = Member.TreeOp.CHILDREN;
-                break;
-
-            case SIBLINGS:
-                op = Member.TreeOp.SIBLINGS;
-                break;
-
-            case INCLUDE_CHILDREN:
-                op = Member.TreeOp.SELF;
-                secondOp = Member.TreeOp.CHILDREN;
-                break;
-
-            case MEMBER:
-                op = Member.TreeOp.SELF;
-                break;
-
-            default:
-                throw new OlapException("Operation not supported: " + selection.getOperator());
-
+        case CHILDREN:
+            op = Member.TreeOp.CHILDREN;
+            break;
+        case SIBLINGS:
+            op = Member.TreeOp.SIBLINGS;
+            break;
+        case INCLUDE_CHILDREN:
+            op = Member.TreeOp.SELF;
+            secondOp = Member.TreeOp.CHILDREN;
+            break;
+        case MEMBER:
+            op = Member.TreeOp.SELF;
+            break;
+        default:
+            throw new OlapException(
+                "Operation not supported: " + selection.getOperator());
         }
         Set<Member.TreeOp> set = new TreeSet<Member.TreeOp>();
         set.add(op);
