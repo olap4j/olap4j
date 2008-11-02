@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -26,7 +26,7 @@ import java.util.*;
  * package and in particular {@link org.olap4j.impl.Olap4jUtil}.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Dec 2, 2007
  */
 abstract class XmlaOlap4jUtil {

@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -25,7 +25,7 @@ import org.olap4j.metadata.Member;
  * this package.
  *
  * @author etdub
- * @version $Id: $
+ * @version $Id$
  * @since Aug 7, 2008
  */
 class MdxHelper {

@@ -1,5 +1,5 @@
 /*
-// $Id: //open/mondrian/testsrc/main/mondrian/util/Base64Test.java#2 $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 /**
  * Test case for {@link Base64}.
  *
- * @version $Id: //open/mondrian/testsrc/main/mondrian/util/Base64Test.java#2 $
+ * @version $Id$
  * @author Brian Burton, Julian Hyde
  */
 public class Base64Test extends TestCase

@@ -17,7 +17,7 @@ import java.util.*;
  * Can read metadata, in particular members.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Jan 14, 2008
  */
 interface MetadataReader {

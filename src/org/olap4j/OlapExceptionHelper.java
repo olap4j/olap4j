@@ -13,7 +13,7 @@ import java.sql.SQLException;
 /**
  * Sugar class to help create OlapExceptions.
  * @author Luc Boudreau
- * @version $Id: $
+ * @version $Id$
  */
 public class OlapExceptionHelper {
     

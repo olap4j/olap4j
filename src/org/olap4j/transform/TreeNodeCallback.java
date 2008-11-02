@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -17,7 +17,7 @@ package org.olap4j.transform;
  * <p>REVIEW: Should this class be in the public olap4j API? (jhyde, 2008/8/14)
  *
  * @author etdub
- * @version $Id: $
+ * @version $Id$
  * @since Aug 7, 2008
  */
 interface TreeNodeCallback<T> {

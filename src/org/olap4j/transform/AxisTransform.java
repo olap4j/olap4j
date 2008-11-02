@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -19,7 +19,7 @@ import org.olap4j.mdx.SelectNode;
  * a single query axis (e.g. drill-down on member, roll-up, ...)
  *
  * @author etdub
- * @version $Id: $
+ * @version $Id$
  * @since Aug 7, 2008
  *
  */

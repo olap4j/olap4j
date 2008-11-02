@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
@@ -27,7 +27,7 @@ import org.olap4j.metadata.Member;
  * <p>NOTE: not exactly sure how to implement this, to be completed...
  *
  * @author etdub
- * @version $Id: $
+ * @version $Id$
  * @since Aug 7, 2008
  */
 public class Quax {

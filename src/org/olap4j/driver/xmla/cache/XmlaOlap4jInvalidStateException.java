@@ -1,9 +1,9 @@
 /*
-// $Id: InvalidStateException.java 92 2008-07-17 07:41:10Z lucboudreau $
+// $Id$
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2007 Julian Hyde
+// Copyright (C) 2007-2008 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -18,7 +18,7 @@ package org.olap4j.driver.xmla.cache;
  * to the system level since it's a programming error.
  *
  * @author Luc Boudreau
- * @version $Id: InvalidStateException.java 92 2008-07-17 07:41:10Z lucboudreau $
+ * @version $Id$
  */
 class XmlaOlap4jInvalidStateException extends RuntimeException {
     private static final long serialVersionUID = 7265273715459263740L;

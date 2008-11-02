@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * {@link java.sql.Connection}s.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Mar 25, 2008
  */
 public interface OlapDataSource extends DataSource {

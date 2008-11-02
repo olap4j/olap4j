@@ -14,7 +14,7 @@ import java.util.*;
  * Parser for olap4j connect strings.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Dec 12, 2007
  */
 // Copied from mondrian.olap.Util.ConnectStringParser
