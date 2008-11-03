@@ -15,7 +15,7 @@
   <property file="${project.location}/test.properties"/>
   <property name="project.build.debug" value="on"/>
   <property name="name" value="olap4j"/>
-  <property name="version" value="0.9.5-svn076"/>
+  <property name="version" value="0.9.7"/>
   <property name="dist.name" value="${name}-${version}" />
 
   <!-- properties related to paths -->
@@ -29,12 +29,16 @@
   <property name="build.dir" value="build"/>
   <property name="doc.dir" value="doc"/>
   <property name="javadoc.dir" value="doc/api"/>
+  <property name="javadoc-xmla.dir" value="doc/xmla"/>
   <property name="dist.dir" value="dist"/>
 
   <!-- define location of mondrian; required only if testing the mondrian
        olap4j driver -->
   <property name="mondrian.dir" value="${project.location}/../mondrian" />
+  <property name="mondrian.classes.dir" value="${mondrian.dir}/classes" />
+  <property name="mondrian.testclasses.dir" value="${mondrian.dir}/testclasses" />
   <property name="mondrian.lib.dir" value="${mondrian.dir}/lib" />
+  <property name="mondrian.testlib.dir" value="${mondrian.dir}/testlib" />
 
   <!-- generated files -->
   <property name="jar.file" value="${lib.dir}/${name}.jar" />
@@ -69,21 +73,14 @@ ${jar-jdk14.file}"/>
     <pathelement location="${testclasses.dir}"/>
     <pathelement location="${org.olap4j.test.driverClasspath}"/>
 
-    <!-- Mondrian jars. If you are running against the mondrian driver,
-         define mondrian.lib.dir and uncomment the following lines. -->
-    <!--
-    <pathelement location="${mondrian.lib.dir}/mondrian.jar"/>
-    <pathelement location="${mondrian.dir}/testclasses"/>
-    <pathelement location="${mondrian.lib.dir}/eigenbase-xom.jar"/>
-    <pathelement location="${mondrian.lib.dir}/eigenbase-properties.jar"/>
-    <pathelement location="${mondrian.lib.dir}/eigenbase-resgen.jar"/>
-    <pathelement location="${mondrian.lib.dir}/commons-collections.jar"/>
-    <pathelement location="${mondrian.lib.dir}/commons-vfs.jar"/>
-    <pathelement location="${mondrian.lib.dir}/commons-logging.jar"/>
-    <pathelement location="${mondrian.lib.dir}/commons-math.jar"/>
-    <pathelement location="${mondrian.lib.dir}/xml-apis.jar"/>
-    -->
-
+    <fileset dir="${mondrian.lib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+    <fileset dir="${mondrian.testlib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+    <pathelement location="${mondrian.classes.dir}"/>
+    <pathelement location="${mondrian.testclasses.dir}"/>
   </path>
 
   <!-- Arguments to the java process spawned by the junit task. -->
@@ -155,7 +152,7 @@ ${jar-jdk14.file}"/>
         srcdir="${testsrc.dir}"
         destdir="${testclasses.dir}"
         debug="${project.build.debug}"
-        classpathref="project.classpath"
+        classpathref="project.test.classpath"
         source="1.5">
       <include name="**/*.java"/>
     </javac>
@@ -390,6 +387,37 @@ META-INF/**"/>
       <link href="http://java.sun.com/javase/6/docs/api/"/>
     </javadoc>
   </target>
+	
+	
+	<target name="javadoc-xmla" description="generates the javadoc for the xmla driver package">
+	    <mkdir dir="${javadoc-xmla.dir}" />
+	    <!-- remove stray package.html files under classes to avoid 'multiple
+	         sources of package comments' errors -->
+	    <delete includeEmptyDirs="false" quiet="true">
+	      <fileset dir="${classes.dir}" includes="**/package.html"/>
+	    </delete>
+	    <delete quiet="true" file="${javadoc-xmla.dir}/index.html"/>
+	    <javadoc sourcepath="${src.dir}"
+	        classpathref="project.test.classpath"
+	        destdir="${javadoc-xmla.dir}"
+	        packagenames="org.olap4j.driver.xmla.*"
+	        overview="${src.dir}/overview.html"
+	        footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=168953&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
+	        author="true"
+	        source="1.5"
+	        access="public"
+	        Windowtitle="olap4j, version ${version}"
+	        additionalparam="-linksource"
+	      >
+	      <tag name="pre" description="Pre-condition:"
+	           scope="constructors,methods"/>
+	      <tag name="post" description="Post-condition:"
+	           scope="constructors,methods"/>
+	      <tag name="testcase" description="Test-case:"
+	           scope="constructors,methods,types"/>
+	      <link href="http://java.sun.com/javase/6/docs/api/"/>
+	    </javadoc>
+	  </target>
 
     <!-- Strict javadoc for testing purposes. Includes all packages and
          non-public classes and methods. -->
