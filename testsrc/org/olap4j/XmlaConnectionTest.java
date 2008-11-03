@@ -65,19 +65,17 @@ public class XmlaConnectionTest extends TestCase {
     public void testNoNonTrivalCallsOnConnect() throws Exception {
         String cookie = XmlaOlap4jDriver.nextCookie();
         try {
-
             XmlaOlap4jDriver.PROXY_MAP.put(cookie, new XmlaOlap4jProxyMock());
-
             try {
-        Class.forName(DRIVER_CLASS_NAME);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("oops", e);
-        }
-        Properties info = new Properties();
-        info.setProperty(
-            XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
-        DriverManager.getConnection(
-                    "jdbc:xmla:Server=http://foo;Catalog=FoodMart;TestProxyCookie=" + cookie,
+                Class.forName(DRIVER_CLASS_NAME);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("oops", e);
+            }
+            Properties info = new Properties();
+            info.setProperty(
+                XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
+            DriverManager.getConnection(
+                "jdbc:xmla:Server=http://foo;Catalog=FoodMart;TestProxyCookie=" + cookie,
                 info);
         } catch (Throwable t) {
             t.printStackTrace();
@@ -85,6 +83,16 @@ public class XmlaConnectionTest extends TestCase {
         }
     }
 
+    /**
+     * If the same request
+     * is sent twice, an exception gets triggered. The only
+     * exception to this is the MDSCHEMA_CUBES query that is used to
+     * populate both the catalogs and the schemas associated to a
+     * given catalog. This was due to a flaw in SSAS; it doesn't
+     * return a SCHEMA_NAME column when asked to. We fixed it this
+     * way in some other revision.
+     * @throws Exception If the test fails.
+     */
     public void testNoDoubleQuerySubmission() throws Exception {
         String oldValue = XmlaTester.getProxyClassName();
         XmlaTester.setProxyClassName(

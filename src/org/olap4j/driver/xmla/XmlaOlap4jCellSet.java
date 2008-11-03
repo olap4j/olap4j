@@ -122,7 +122,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
              */
             // TODO: log doc to logfile
             throw OlapExceptionHelper.createException(
-                "XMLA provider gave exception: " + 
+                "XMLA provider gave exception: " +
                 XmlaOlap4jUtil.prettyPrint(fault));
         }
         Element executeResponse =

@@ -660,7 +660,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
              */
             // TODO: log doc to logfile
             throw OlapExceptionHelper.createException(
-                "XMLA provider gave exception: " + 
+                "XMLA provider gave exception: " +
                 XmlaOlap4jUtil.prettyPrint(fault)
                 + "\n Request was: \n" + request);
         }

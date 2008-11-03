@@ -172,7 +172,7 @@ abstract class XmlaOlap4jUtil {
         }
 
     private static void prettyPrintLoop(
-        Node node, 
+        Node node,
         StringBuilder string,
         String indentation)
     {
@@ -183,74 +183,69 @@ abstract class XmlaOlap4jUtil {
         int type = node.getNodeType();
 
         switch (type) {
-            case Node.DOCUMENT_NODE: {
-                string.append("\n");
-                prettyPrintLoop(node.getChildNodes(), string, indentation+"\t");
-                break;
+
+        case Node.DOCUMENT_NODE:
+            string.append("\n");
+            prettyPrintLoop(node.getChildNodes(), string, indentation + "\t");
+            break;
+
+         case Node.ELEMENT_NODE:
+             string.append(indentation);
+             string.append("<");
+             string.append(node.getNodeName());
+
+             int length = (node.getAttributes() != null) ?
+                 node.getAttributes().getLength() : 0;
+             Attr attributes[] = new Attr[length];
+             for (int loopIndex = 0; loopIndex < length; loopIndex++) {
+                 attributes[loopIndex] =
+                     (Attr)node.getAttributes().item(loopIndex);
              }
 
-             case Node.ELEMENT_NODE: {
-                 string.append(indentation);
-                 string.append("<");
-                 string.append(node.getNodeName());
-
-                 int length = (node.getAttributes() != null) ?
-                     node.getAttributes().getLength() : 0;
-                 Attr attributes[] = new Attr[length];
-                 for (int loopIndex = 0; loopIndex < length; loopIndex++) {
-                     attributes[loopIndex] =
-                         (Attr)node.getAttributes().item(loopIndex);
-                 }
-
-                 for (int loopIndex = 0; loopIndex < attributes.length;
-                     loopIndex++) 
-                 {
-                     Attr attribute = attributes[loopIndex];
-                     string.append(" ");
-                     string.append(attribute.getNodeName());
-                     string.append("=\"");
-                     string.append(attribute.getNodeValue());
-                     string.append("\"");
-                 }
-
-                 string.append(">\n");
-
-                 prettyPrintLoop(node.getChildNodes(), string, indentation+"\t");
-
-                 string.append(indentation);
-                 string.append("</");
-                 string.append(node.getNodeName());
-                 string.append(">\n");
-
-                 break;
+             for (int loopIndex = 0; loopIndex < attributes.length;
+                 loopIndex++)
+             {
+                 Attr attribute = attributes[loopIndex];
+                 string.append(" ");
+                 string.append(attribute.getNodeName());
+                 string.append("=\"");
+                 string.append(attribute.getNodeValue());
+                 string.append("\"");
              }
 
-             case Node.TEXT_NODE: {
-                 string.append(indentation);
-                 string.append(node.getNodeValue().trim()+"\n");
-                 //prettyPrintLoop(node, string, indentation+"\t");
-                 break;
-             }
+             string.append(">\n");
 
-             case Node.PROCESSING_INSTRUCTION_NODE: {
-                 string.append(indentation);
-                 string.append("<?");
-                 string.append(node.getNodeName());
-                 String text = node.getNodeValue();
-                 if (text != null && text.length() > 0) {
-                     string.append(text);
-                 }
-                 string.append("?>\n");
-                 break;
-             }
+             prettyPrintLoop(node.getChildNodes(), string, indentation + "\t");
 
-             case Node.CDATA_SECTION_NODE: {
-                 string.append(indentation);
-                 string.append("<![CDATA[");
-                 string.append(node.getNodeValue());
-                 string.append("]]>");
-                 break;
-            }
+             string.append(indentation);
+             string.append("</");
+             string.append(node.getNodeName());
+             string.append(">\n");
+
+             break;
+
+         case Node.TEXT_NODE:
+             string.append(indentation);
+             string.append(node.getNodeValue().trim() + "\n");
+             break;
+
+         case Node.PROCESSING_INSTRUCTION_NODE:
+             string.append(indentation);
+             string.append("<?");
+             string.append(node.getNodeName());
+             String text = node.getNodeValue();
+             if (text != null && text.length() > 0) {
+                 string.append(text);
+             }
+             string.append("?>\n");
+             break;
+
+         case Node.CDATA_SECTION_NODE:
+             string.append(indentation);
+             string.append("<![CDATA[");
+             string.append(node.getNodeValue());
+             string.append("]]>");
+             break;
         }
     }
 
