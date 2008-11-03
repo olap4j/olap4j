@@ -53,7 +53,7 @@ public class XmlaTester implements TestContext.Tester {
         String urlString =
             properties.getProperty(TestContext.Property.CONNECT_URL.path);
 
-        final Class<?> clazz = Class.forName("mondrian.olap4j.MondrianInprocProxy");
+        final Class<?> clazz = Class.forName(getProxyClassName());
         final Constructor<?> constructor =
             clazz.getConstructor(Map.class, String.class);
         this.proxy =
@@ -115,12 +115,21 @@ public class XmlaTester implements TestContext.Tester {
         return TestContext.Wrapper.NONE;
     }
 
+    public static void setProxyClassName(String clazz) {
+        PROXY_CLASS_NAME = clazz;
+    }
+
+    public static String getProxyClassName() {
+        return PROXY_CLASS_NAME;
+    }
+
     public static final String DRIVER_CLASS_NAME =
          "org.olap4j.driver.xmla.XmlaOlap4jDriver";
 
     public static final String DRIVER_URL_PREFIX = "jdbc:xmla:";
     private static final String USER = "user";
     private static final String PASSWORD = "password";
+    private static String PROXY_CLASS_NAME = "mondrian.olap4j.MondrianInprocProxy";
 }
 
 // End XmlaTester.java

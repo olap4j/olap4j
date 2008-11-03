@@ -373,8 +373,17 @@ class XmlaOlap4jCube implements Cube, Named
             // by delegating.
             if (!remainingMemberUniqueNames.isEmpty()) {
                 super.lookupMembersByUniqueName(
-                    memberUniqueNames,
+                    remainingMemberUniqueNames,
                     memberMap);
+                // Add the previously missing members into the cache.
+                for (String memberName : remainingMemberUniqueNames) {
+                    XmlaOlap4jMember member = memberMap.get(memberName);
+                    if (member != null) {
+                        this.memberMap.put(
+                            memberName,
+                            new SoftReference<XmlaOlap4jMember>(member));
+                    }
+                }
             }
         }
 
