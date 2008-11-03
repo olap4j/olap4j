@@ -659,15 +659,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         </SOAP-ENV:Fault>
              */
             // TODO: log doc to logfile
-            // A message must include the fault XML content. This is the right
-            // and efficient way to do it, according to
-            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6181019
-            // They changed the node.getString() in java... ....
-            DOMImplementation impl = fault.getOwnerDocument().getImplementation();
-            DOMImplementationLS factory = (DOMImplementationLS) impl.getFeature("LS", "3.0");
-            LSSerializer serializer = factory.createLSSerializer();
             throw OlapExceptionHelper.createException(
-                "XMLA provider gave exception: " + serializer.writeToString(fault)
+                "XMLA provider gave exception: " + 
+                XmlaOlap4jUtil.prettyPrint(fault)
                 + "\n Request was: \n" + request);
         }
         Element discoverResponse =

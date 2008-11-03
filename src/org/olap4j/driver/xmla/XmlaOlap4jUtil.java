@@ -155,6 +155,106 @@ abstract class XmlaOlap4jUtil {
         return buf.toString();
     }
 
+    static String prettyPrint(Element element) {
+        StringBuilder string = new StringBuilder();
+        prettyPrintLoop(element, string, "");
+        return string.toString();
+    }
+
+    private static void prettyPrintLoop(
+            NodeList nodes, 
+            StringBuilder string,
+            String indentation)
+        {
+            for (int index = 0; index < nodes.getLength(); index++){
+                prettyPrintLoop(nodes.item(index), string, indentation);
+            }
+        }
+
+    private static void prettyPrintLoop(
+        Node node, 
+        StringBuilder string,
+        String indentation)
+    {
+        if (node == null) {
+            return;
+        }
+
+        int type = node.getNodeType();
+
+        switch (type) {
+            case Node.DOCUMENT_NODE: {
+                string.append("\n");
+                prettyPrintLoop(node.getChildNodes(), string, indentation+"\t");
+                break;
+             }
+
+             case Node.ELEMENT_NODE: {
+                 string.append(indentation);
+                 string.append("<");
+                 string.append(node.getNodeName());
+
+                 int length = (node.getAttributes() != null) ?
+                     node.getAttributes().getLength() : 0;
+                 Attr attributes[] = new Attr[length];
+                 for (int loopIndex = 0; loopIndex < length; loopIndex++) {
+                     attributes[loopIndex] =
+                         (Attr)node.getAttributes().item(loopIndex);
+                 }
+
+                 for (int loopIndex = 0; loopIndex < attributes.length;
+                     loopIndex++) 
+                 {
+                     Attr attribute = attributes[loopIndex];
+                     string.append(" ");
+                     string.append(attribute.getNodeName());
+                     string.append("=\"");
+                     string.append(attribute.getNodeValue());
+                     string.append("\"");
+                 }
+
+                 string.append(">\n");
+
+                 prettyPrintLoop(node.getChildNodes(), string, indentation+"\t");
+
+                 string.append(indentation);
+                 string.append("</");
+                 string.append(node.getNodeName());
+                 string.append(">\n");
+
+                 break;
+             }
+
+             case Node.TEXT_NODE: {
+                 string.append(indentation);
+                 string.append(node.getNodeValue().trim()+"\n");
+                 //prettyPrintLoop(node, string, indentation+"\t");
+                 break;
+             }
+
+             case Node.PROCESSING_INSTRUCTION_NODE: {
+                 string.append(indentation);
+                 string.append("<?");
+                 string.append(node.getNodeName());
+                 String text = node.getNodeValue();
+                 if (text != null && text.length() > 0) {
+                     string.append(text);
+                 }
+                 string.append("?>\n");
+                 break;
+             }
+
+             case Node.CDATA_SECTION_NODE: {
+                 string.append(indentation);
+                 string.append("<![CDATA[");
+                 string.append(node.getNodeValue());
+                 string.append("]]>");
+                 break;
+            }
+        }
+    }
+
+
     static Element findChild(Element element, String ns, String tag) {
         final NodeList childNodes = element.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {

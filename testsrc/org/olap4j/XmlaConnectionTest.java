@@ -42,16 +42,10 @@ public class XmlaConnectionTest extends TestCase {
         {
             super(catalogNameUrls,urlString);
         }
-        @Override
         public byte[] get(URL url, String request) throws IOException {
             this.checkup(request);
             return super.get(url, request);
         }
-//        @Override
-//        public Future<byte[]> submit(URL url, String request) {
-//            this.checkup(request);
-//            return super.submit(url, request);
-//        }
         private void checkup(String request) {
             String hash = Encoder.convertToHex(request.getBytes());
             if ( request.indexOf("<RequestType>MDSCHEMA_CUBES</RequestType>") == -1 &&
