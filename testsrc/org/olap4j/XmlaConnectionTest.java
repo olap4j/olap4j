@@ -38,7 +38,7 @@ public class XmlaConnectionTest extends TestCase {
         Map<String,String> requests = new HashMap<String,String>();
         public DoubleSubmissionTestProxy(
                 Map<String, String> catalogNameUrls,
-                String urlString) 
+                String urlString)
         {
             super(catalogNameUrls,urlString);
         }
@@ -48,7 +48,7 @@ public class XmlaConnectionTest extends TestCase {
         }
         private void checkup(String request) {
             String hash = Encoder.convertToHex(request.getBytes());
-            if ( request.indexOf("<RequestType>MDSCHEMA_CUBES</RequestType>") == -1 &&
+            if (request.indexOf("<RequestType>MDSCHEMA_CUBES</RequestType>") == -1 &&
                     this.requests.containsKey(hash)) {
                 throw new RuntimeException("DOUBLE-REQUEST");
             } else {
@@ -97,7 +97,7 @@ public class XmlaConnectionTest extends TestCase {
         String oldValue = XmlaTester.getProxyClassName();
         XmlaTester.setProxyClassName(
         DoubleSubmissionTestProxy.class.getName());
-        if ( TestContext.getTestProperties()
+        if (TestContext.getTestProperties()
           .get(TestContext.Property.HELPER_CLASS_NAME.path)
           .equals("org.olap4j.XmlaTester"))
         {
@@ -124,7 +124,7 @@ public class XmlaConnectionTest extends TestCase {
                             " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n" +
                             "FROM [Sales]\n" +
                             "WHERE [Time].[1997].[Q3]");
-            } catch(RuntimeException e) {
+            } catch (RuntimeException e) {
                 fail(e.getMessage());
             }
        }
