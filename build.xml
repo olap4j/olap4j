@@ -187,6 +187,8 @@ ${jar-jdk14.file}"/>
   <target name="srczip" depends="version">
     <mkdir dir="${dist.dir}" />
     <delete file="${dist.src.file}"/>
+    <exec command="unix2dos CHANGES.txt"/>
+    <exec command="unix2dos README.txt"/>
     <zip
         zipfile="${dist.src.file}"
         update="true">
@@ -205,6 +207,7 @@ build.xml,
 build.properties,
 test.properties.example,
 LICENSE.html,
+CHANGES.txt,
 README.txt,
 VERSION.txt"
           excludes="

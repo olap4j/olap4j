@@ -1554,6 +1554,69 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
+     * Testcase for bug 1868075, "Query on ragged hierarchy gives only empty
+     * cells".
+     */
+    public void testRagged() throws SQLException {
+        connection = tester.createConnection();
+        Statement statement = connection.createStatement();
+        final OlapStatement olapStatement =
+            tester.getWrapper().unwrap(statement, OlapStatement.class);
+        final CellSet cellSet =
+            olapStatement.executeOlapQuery("SELECT\n"
+                + "{[Product].[All Products].[Drink].[Alcoholic Beverages].Children,\n"
+                + "[Product].[All Products].[Food].[Baked Goods].Children} ON COLUMNS,\n"
+                + "CrossJoin([Store].[All Stores].[USA].[CA].Children,\n"
+                + "[Time].[1997].[Q1].Children) ON ROWS\n"
+                + "FROM [Sales Ragged]");
+        String s = TestContext.toString(cellSet);
+        TestContext.assertEqualsVerbose(
+            TestContext.fold("Axis #0:\n" +
+                "{[Measures].[Unit Sales], [Geography].[All Geographys], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
+                "Axis #1:\n" +
+                "{[Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n" +
+                "{[Product].[All Products].[Food].[Baked Goods].[Bread]}\n" +
+                "Axis #2:\n" +
+                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[1]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[2]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[3]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[1]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[2]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[3]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n" +
+                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n" +
+                "Row #0: \n" +
+                "Row #0: \n" +
+                "Row #1: \n" +
+                "Row #1: \n" +
+                "Row #2: \n" +
+                "Row #2: \n" +
+                "Row #3: 22\n" +
+                "Row #3: 63\n" +
+                "Row #4: 28\n" +
+                "Row #4: 59\n" +
+                "Row #5: 28\n" +
+                "Row #5: 39\n" +
+                "Row #6: 70\n" +
+                "Row #6: 51\n" +
+                "Row #7: 89\n" +
+                "Row #7: 51\n" +
+                "Row #8: 27\n" +
+                "Row #8: 54\n" +
+                "Row #9: 6\n" +
+                "Row #9: 2\n" +
+                "Row #10: 3\n" +
+                "Row #10: 7\n" +
+                "Row #11: 2\n" +
+                "Row #11: 10\n"),
+            s);
+
+    }
+    /**
      * Tests members from a parent-child hierarchy.
      *
      * @throws ClassNotFoundException
