@@ -188,7 +188,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * while creating the cache.
      */
     private void initSoapCache(Map<String, String> map) throws OlapException {
-
         //  Test if a SOAP cache class was defined
         if (map.containsKey(XmlaOlap4jDriver.Property.Cache.name()
             .toUpperCase()))
@@ -1368,7 +1367,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         public void sortList(List<T> list) {
             // do nothing - assume XMLA returned list in correct order
         }
-
     }
 
     static class Context {

@@ -54,7 +54,6 @@ abstract class XmlaOlap4jPreparedStatement
             this.cellSetMetaData = cellSetMetaData1.cloneFor(this);
             cellSet.close();
             statement.close();
-
         } catch (SQLException e) {
             throw OlapExceptionHelper.createException(
                 "Error while preparing statement '" + mdx + "'",

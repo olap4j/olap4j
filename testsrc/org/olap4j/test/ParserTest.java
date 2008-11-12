@@ -603,7 +603,6 @@ public class ParserTest extends TestCase {
      * used to gather the mantissa.
      */
     public void testLargePrecision() {
-
         // Now, a query with several numeric literals. This is the original
         // testcase for the bug.
         assertParseQuery(

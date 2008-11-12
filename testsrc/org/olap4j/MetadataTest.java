@@ -442,7 +442,6 @@ public class MetadataTest extends TestCase {
                 catalogName, null, null, "non existent set"),
             SETS_COLUMN_NAMES);
         assertEquals("", s);
-
     }
 
     // todo: More tests required for other methods on DatabaseMetaData

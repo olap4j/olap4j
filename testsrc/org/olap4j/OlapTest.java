@@ -91,12 +91,10 @@ public class OlapTest extends TestCase {
 
             // take the first cube
             return cubes.get(cubeName);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
-
     }
 
     public void testModel() {
@@ -258,12 +256,10 @@ public class OlapTest extends TestCase {
             result = query.execute();
             System.out.println(result.toString());
             System.out.println(Olap4jXml.xmlToString(Olap4jXml.resultToDoc(result)));
-
         } catch (Throwable t) {
             t.printStackTrace();
             fail();
         }
-
     }
 
     public void testSelectionModes() {
@@ -441,7 +437,6 @@ public class OlapTest extends TestCase {
                     "[Store].[All Stores].[USA].Children}}, " +
                     "{[Time].[1997].Children})) ON ROWS\n" +
                     "FROM [Sales]"));
-
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -504,8 +499,6 @@ public class OlapTest extends TestCase {
                     "FROM [Sales]"));
 
             query.swapAxes();
-
-
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -537,11 +530,9 @@ public class OlapTest extends TestCase {
     }
 
     public static void main(String args[]) {
-
         OlapTest olapTest = new OlapTest();
 
         olapTest.testModel();
-
     }
 
     static class Olap4jXml {
@@ -595,8 +586,12 @@ public class OlapTest extends TestCase {
             return doc;
         }
 
-        public static void selectionToXml(Selection selection, List<Member> members, Document doc, Element parent) {
-
+        public static void selectionToXml(
+            Selection selection,
+            List<Member> members,
+            Document doc,
+            Element parent)
+        {
             try {
                 Element root = doc.createElement("olap4j-members");
                 parent.appendChild(root);
@@ -611,16 +606,17 @@ public class OlapTest extends TestCase {
                         memberToXml(member, doc, membersNode);
                     }
                 }
-
             } catch (Throwable t) {
                 t.printStackTrace();
             }
         }
 
-        public static void queryToXml(Query query, Document doc, Element parent) {
-
+        public static void queryToXml(
+            Query query,
+            Document doc,
+            Element parent)
+        {
             try {
-
                 Element root = doc.createElement("query");
                 parent.appendChild(root);
 
@@ -632,16 +628,17 @@ public class OlapTest extends TestCase {
                 axisToXml(query.getAxes().get(Axis.COLUMNS), doc, axes);
                 axisToXml(query.getAxes().get(Axis.ROWS), doc, axes);
                 axisToXml(query.getAxes().get(Axis.FILTER), doc, axes);
-
             } catch (Throwable t) {
                 t.printStackTrace();
             }
         }
 
-        public static void resultsToXml(CellSet result, Document doc, Element parent) {
-
+        public static void resultsToXml(
+            CellSet result,
+            Document doc,
+            Element parent)
+        {
             try {
-
                 Element root = doc.createElement("result");
                 parent.appendChild(root);
 
@@ -659,7 +656,6 @@ public class OlapTest extends TestCase {
                 }
 
                 // TODO
-
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -695,7 +691,6 @@ public class OlapTest extends TestCase {
                 for (QueryDimension dimension : dimensions) {
                     dimensionSelectionsToXml(dimension, doc, dimensionsNode);
                 }
-
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -707,14 +702,12 @@ public class OlapTest extends TestCase {
             Element parent)
         {
             try {
-
                 Element root = doc.createElement("member");
                 parent.appendChild(root);
 
                 addCDataNode("name", member.getName(), root);
                 addCDataNode("unique-name", member.getUniqueName(), root);
                 // addCDataNode("description", member.getDescription(null), root);
-
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -726,7 +719,6 @@ public class OlapTest extends TestCase {
             Element parent)
         {
             try {
-
                 Element root = doc.createElement("selection");
                 parent.appendChild(root);
 
@@ -743,7 +735,6 @@ public class OlapTest extends TestCase {
                     addCDataNode("operation", "member", root);
                     break;
                 }
-
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -761,7 +752,6 @@ public class OlapTest extends TestCase {
             }
 
             try {
-
                 Element root = doc.createElement("cube");
                 parent.appendChild(root);
 
@@ -775,7 +765,6 @@ public class OlapTest extends TestCase {
                         dimensionToXml(dimension, doc, dimensionsNode);
                     }
                 }
-
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -867,7 +856,6 @@ public class OlapTest extends TestCase {
         }
 
         public static Element memberToXml(Member member, Element parent) {
-
             Document doc = parent.getOwnerDocument();
             Element memberNode = doc.createElement("member");
 
@@ -905,7 +893,6 @@ public class OlapTest extends TestCase {
         }
 
         public static Element levelToXml(Level level, Document doc) {
-
             Element levelNode = doc.createElement("level");
 
             addCDataNode("name", level.getName(), levelNode);

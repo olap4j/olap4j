@@ -52,11 +52,11 @@ public class RollUpLevelTransform extends AxisTransform {
      * @param cellSet
      */
     public RollUpLevelTransform(
-            Axis axis,
-            int positionOrdinalInAxis,
-            int memberOrdinalInPosition,
-            CellSet cellSet) {
-
+        Axis axis,
+        int positionOrdinalInAxis,
+        int memberOrdinalInPosition,
+        CellSet cellSet)
+    {
         super(axis);
 
         // this.positionOrdinalInAxis = positionOrdinalInAxis;

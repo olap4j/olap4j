@@ -101,12 +101,10 @@ abstract class XmlaOlap4jAbstractHttpProxy
         this.cookieManager.storeCookies(urlConn);
     }
 
-    /* (non-Javadoc)
-     * @see org.olap4j.driver.xmla.XmlaOlap4jDriver.Proxy#setCache(
-     *      java.lang.String, java.util.Properties)
-     */
     @SuppressWarnings("unchecked")
-    public void setCache(Map<String,String> config, Map<String,String> properties)
+    public void setCache(
+        Map<String,String> config,
+        Map<String,String> properties)
         throws OlapException
     {
         try {

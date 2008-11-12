@@ -83,7 +83,6 @@ class XmlaOlap4jCookieManager {
      * @throws java.io.IOException Thrown if <i>conn</i> is not open.
      */
     public void storeCookies(URLConnection conn) {
-
         // Determines the domain from where these cookies are being sent
         String domain = getDomainFromHost(conn.getURL().getHost());
 
@@ -125,7 +124,6 @@ class XmlaOlap4jCookieManager {
                     if (this.debug  == true) {
                         System.out.println("Saving cookie : " + name + "=" + value);
                     }
-
                 }
 
                 while (st.hasMoreTokens()) {
@@ -159,7 +157,6 @@ class XmlaOlap4jCookieManager {
      * @throws java.io.IOException Thrown if <i>conn</i> has already been opened.
      */
     public void setCookies(URLConnection conn) {
-
         // Determines the domain and path to retrieve the appropriate cookies
         URL url = conn.getURL();
         String domain = getDomainFromHost(url.getHost());
@@ -233,7 +230,6 @@ class XmlaOlap4jCookieManager {
         } else {
             return false;
         }
-
     }
 
     /**

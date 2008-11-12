@@ -98,10 +98,7 @@ public class XmlaCookieManagerTest extends TestCase {
         public String getInternalCookieValue() {
             return internalCookieValue;
         }
-
-
     }
-
 }
 
 // End XmlaCookieManagerTest.java

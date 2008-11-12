@@ -434,10 +434,6 @@ class XmlaOlap4jCube implements Cube, Named
             }
         }
 
-        /* (non-Javadoc)
-         * @see org.olap4j.driver.xmla.MetadataReader
-         *     #lookupMembersByUniqueName(java.util.List, java.util.Map)
-         */
         public void lookupMembersByUniqueName(
             List<String> memberUniqueNames,
             Map<String, XmlaOlap4jMember> memberMap) throws OlapException

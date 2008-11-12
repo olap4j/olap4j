@@ -62,9 +62,9 @@ class MdxUtil {
             char c = st.charAt(i);
             if ((c == ']') &&
                 ((i + 1) < st.length()) &&
-                (st.charAt(i + 1) != '.')) {
-
-                retString.append(']'); //escaping character
+                (st.charAt(i + 1) != '.'))
+            {
+                retString.append(']'); // escaping character
             }
             retString.append(c);
         }

@@ -32,7 +32,6 @@ public abstract class AxisTransform implements MdxQueryTransform {
     }
 
     public SelectNode apply(SelectNode sn) {
-
         // do a deep copy of the existing query SelectNode before
         // modifying it:
         SelectNode newSelectNode = sn.deepCopy();

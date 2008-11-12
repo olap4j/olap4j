@@ -175,7 +175,6 @@ public class TransformTest extends TestCase {
      * @throws java.sql.SQLException on error
      */
     public void _testDrillDownOnPositionTransform() throws SQLException {
-
         // TODO: rewrite the initial and expected MDX once this transform
         // is written.
         // Will fail for now.

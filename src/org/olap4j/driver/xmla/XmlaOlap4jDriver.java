@@ -149,11 +149,7 @@ public class XmlaOlap4jDriver implements Driver {
         DriverManager.registerDriver(new XmlaOlap4jDriver());
     }
 
-    /* (non-Javadoc)
-     * @see java.sql.Driver#connect(java.lang.String, java.util.Properties)
-     */
     public Connection connect(String url, Properties info) throws SQLException {
-
         // Checks if this driver handles this connection, exit otherwise.
         if (!XmlaOlap4jConnection.acceptsURL(url)) {
             return null;

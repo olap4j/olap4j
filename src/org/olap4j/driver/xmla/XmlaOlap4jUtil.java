@@ -64,7 +64,6 @@ abstract class XmlaOlap4jUtil {
     static Document parse(byte[] in)
         throws SAXException, IOException
     {
-
         InputSource source = new InputSource(new ByteArrayInputStream(in));
 
         DOMParser parser = getParser(null, null, false);
@@ -110,16 +109,15 @@ abstract class XmlaOlap4jUtil {
     }
 
     /**
-     * See if the DOMParser after parsing a Document has any errors and,
-     * if so, throw a RuntimeException exception containing the errors.
-     *
+     * Checks whether the DOMParser after parsing a Document has any errors and,
+     * if so, throws a RuntimeException exception containing the errors.
      */
     static void checkForParseError(DOMParser parser, Throwable t) {
         final ErrorHandler errorHandler = parser.getErrorHandler();
 
         if (errorHandler instanceof SAXErrorHandler) {
             final SAXErrorHandler saxEH = (SAXErrorHandler) errorHandler;
-            final List<SAXErrorHandler.ErrorInfo> errors = saxEH.getErrors();
+            final List<ErrorInfo> errors = saxEH.getErrors();
 
             if (errors != null && errors.size() > 0) {
                 String errorStr = SAXErrorHandler.formatErrorInfos(saxEH);
@@ -162,14 +160,14 @@ abstract class XmlaOlap4jUtil {
     }
 
     private static void prettyPrintLoop(
-            NodeList nodes,
-            StringBuilder string,
-            String indentation)
-        {
-            for (int index = 0; index < nodes.getLength(); index++) {
-                prettyPrintLoop(nodes.item(index), string, indentation);
-            }
+        NodeList nodes,
+        StringBuilder string,
+        String indentation)
+    {
+        for (int index = 0; index < nodes.getLength(); index++) {
+            prettyPrintLoop(nodes.item(index), string, indentation);
         }
+    }
 
     private static void prettyPrintLoop(
         Node node,
@@ -181,9 +179,7 @@ abstract class XmlaOlap4jUtil {
         }
 
         int type = node.getNodeType();
-
         switch (type) {
-
         case Node.DOCUMENT_NODE:
             string.append("\n");
             prettyPrintLoop(node.getChildNodes(), string, indentation + "\t");
@@ -194,18 +190,19 @@ abstract class XmlaOlap4jUtil {
             string.append("<");
             string.append(node.getNodeName());
 
-            int length = (node.getAttributes() != null) ?
-                node.getAttributes().getLength() : 0;
-            Attr attributes[] = new Attr[length];
-            for (int loopIndex = 0; loopIndex < length; loopIndex++) {
-                attributes[loopIndex] =
-                    (Attr)node.getAttributes().item(loopIndex);
+            Attr[] attributes;
+            if (node.getAttributes() != null) {
+                int length = node.getAttributes().getLength();
+                attributes = new Attr[length];
+                for (int loopIndex = 0; loopIndex < length; loopIndex++) {
+                    attributes[loopIndex] =
+                        (Attr)node.getAttributes().item(loopIndex);
+                }
+            } else {
+                attributes = new Attr[0];
             }
 
-            for (int loopIndex = 0; loopIndex < attributes.length;
-                loopIndex++)
-            {
-                Attr attribute = attributes[loopIndex];
+            for (Attr attribute : attributes) {
                 string.append(" ");
                 string.append(attribute.getNodeName());
                 string.append("=\"");
@@ -226,7 +223,8 @@ abstract class XmlaOlap4jUtil {
 
         case Node.TEXT_NODE:
             string.append(indentation);
-            string.append(node.getNodeValue().trim() + "\n");
+            string.append(node.getNodeValue().trim());
+            string.append("\n");
             break;
 
         case Node.PROCESSING_INSTRUCTION_NODE:
@@ -248,7 +246,6 @@ abstract class XmlaOlap4jUtil {
             break;
         }
     }
-
 
     static Element findChild(Element element, String ns, String tag) {
         final NodeList childNodes = element.getChildNodes();
@@ -329,7 +326,7 @@ abstract class XmlaOlap4jUtil {
     }
 
     /**
-     * Convert a Node to a String.
+     * Converts a Node to a String.
      *
      * @param node XML node
      * @param prettyPrint Whether to print with nice indentation
@@ -461,14 +458,7 @@ abstract class XmlaOlap4jUtil {
             buf.append(ei.exception.getMessage());
             return buf.toString();
         }
-        public static class ErrorInfo {
-            public SAXParseException exception;
-            public short severity;
-            ErrorInfo(short severity, SAXParseException exception) {
-                this.severity = severity;
-                this.exception = exception;
-            }
-        }
+
         private List<ErrorInfo> errors;
         public SAXErrorHandler() {
         }
@@ -485,7 +475,8 @@ abstract class XmlaOlap4jUtil {
             addError(new ErrorInfo(SEVERITY_ERROR, exception));
         }
         public void fatalError(SAXParseException exception)
-                                                        throws SAXException {
+            throws SAXException
+        {
             addError(new ErrorInfo(SEVERITY_FATAL_ERROR, exception));
         }
         protected void addError(ErrorInfo ei) {
@@ -499,6 +490,16 @@ abstract class XmlaOlap4jUtil {
             return (hasErrors())
                 ? formatErrorInfo(errors.get(0))
                 : "";
+        }
+    }
+
+    static class ErrorInfo {
+        final SAXParseException exception;
+        final short severity;
+
+        ErrorInfo(short severity, SAXParseException exception) {
+            this.severity = severity;
+            this.exception = exception;
         }
     }
 }

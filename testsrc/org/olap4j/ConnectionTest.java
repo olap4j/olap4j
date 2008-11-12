@@ -315,10 +315,12 @@ public class ConnectionTest extends TestCase {
                     tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
                     info);
             assertEquals("FoodMart", connection.getCatalog());
-            ((OlapConnection)connection).getCatalogs();
+            final NamedList<Catalog> catalogs =
+                ((OlapConnection) connection).getCatalogs();
+            assertNotNull(catalogs);
             Statement statement = connection.createStatement();
             OlapStatement olapStatement =
-                tester.getWrapper().unwrap(statement, OlapStatement.class);
+                TestContext.Wrapper.NONE.unwrap(statement, OlapStatement.class);
             CellSet cellSet =
                 olapStatement.executeOlapQuery(
                     "SELECT FROM [Sales]");
@@ -995,18 +997,18 @@ public class ConnectionTest extends TestCase {
 
         // todo: test CellSetAxis methods
         /*
-    public int getAxisOrdinal() {
-    public CellSet getCellSet() {
-    public CellSetAxisMetaData getAxisMetaData() {
-    public List<Position> getPositions() {
-    public int getPositionCount() {
-    public ListIterator<Position> iterate() {
+    public int getAxisOrdinal()
+    public CellSet getCellSet()
+    public CellSetAxisMetaData getAxisMetaData()
+    public List<Position> getPositions()
+    public int getPositionCount()
+    public ListIterator<Position> iterate()
 
     todo: test OlapResultAxisMetaData methods
 
-    public org.olap4j.Axis getAxisOrdinal() {
-    public List<Hierarchy> getHierarchies() {
-    public List<Property> getProperties() {
+    public org.olap4j.Axis getAxisOrdinal()
+    public List<Hierarchy> getHierarchies()
+    public List<Property> getProperties()
          */
     }
 
@@ -1048,7 +1050,6 @@ public class ConnectionTest extends TestCase {
         int y = ResultSet.TYPE_FORWARD_ONLY;
         // are how to ask for these characteristics. also need to document this
         // behavior in the API and the spec. in one mode,
-
     }
 
     /**
@@ -1063,7 +1064,6 @@ public class ConnectionTest extends TestCase {
      * exist.
      */
     public void testParsing() throws SQLException {
-
         // parse
 
         connection = tester.createConnection();
@@ -1120,7 +1120,6 @@ public class ConnectionTest extends TestCase {
                 "FROM [sales]\n" +
                 "WHERE [Time].[1997].[Q4]"),
             mdx);
-
     }
 
     /**
@@ -1614,7 +1613,6 @@ public class ConnectionTest extends TestCase {
                 "Row #11: 2\n" +
                 "Row #11: 10\n"),
             s);
-
     }
     /**
      * Tests members from a parent-child hierarchy.

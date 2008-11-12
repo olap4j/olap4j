@@ -200,7 +200,6 @@ class XmlaOlap4jConcurrentMemoryCache {
      * evicting an entry based on the selected eviction mode.
      */
     private void cleanExpired(boolean makeRoom) {
-
         String toBeEvicted = null;
 
         if (evictionMode == MODE.FIFO || evictionMode == MODE.LIFO) {

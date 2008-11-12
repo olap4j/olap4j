@@ -127,7 +127,6 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
         if (caches == null) {
             caches = new ConcurrentHashMap<String, XmlaOlap4jConcurrentMemoryCache>();
         }
-
     }
 
     // implement XmlaOlap4jCache

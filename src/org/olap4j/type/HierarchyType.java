@@ -48,7 +48,6 @@ public class HierarchyType implements Type {
         }
         buf.append(">");
         this.digest = buf.toString();
-
     }
 
     // not part of public olap4j API

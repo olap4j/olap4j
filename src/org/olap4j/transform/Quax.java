@@ -31,7 +31,6 @@ import org.olap4j.metadata.Member;
  * @since Aug 7, 2008
  */
 public class Quax {
-
     private final CellSetAxis cellSetAxis;
 
     private TreeNode<Member> memberTree;
@@ -42,9 +41,7 @@ public class Quax {
         for (Position p : cellSetAxis.getPositions()) {
             p.getMembers();
         }
-
     }
-
 }
 
 // End Quax.java

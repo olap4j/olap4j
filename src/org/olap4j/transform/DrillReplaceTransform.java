@@ -54,11 +54,11 @@ public class DrillReplaceTransform extends AxisTransform {
      *                transformed
      */
     public DrillReplaceTransform(
-            Axis axis,
-            int positionOrdinalInAxis,
-            int memberOrdinalInPosition,
-            CellSet cellSet) {
-
+        Axis axis,
+        int positionOrdinalInAxis,
+        int memberOrdinalInPosition,
+        CellSet cellSet)
+    {
         super(axis);
 
         // this.positionOrdinalInAxis = positionOrdinalInAxis;

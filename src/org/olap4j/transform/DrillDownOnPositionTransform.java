@@ -75,24 +75,24 @@ public class DrillDownOnPositionTransform extends AxisTransform {
      * @param cellSet
      */
     public DrillDownOnPositionTransform(
-            // ParseTreeNode query,
-            Axis axis,
-            int positionOrdinalInAxis,
-            int memberOrdinalInPosition,
-            CellSet cellSet) {
-
+        Axis axis,
+        int positionOrdinalInAxis,
+        int memberOrdinalInPosition,
+        CellSet cellSet)
+    {
         super(axis);
         // this.positionOrdinalInAxis = positionOrdinalInAxis;
         // this.memberOrdinalInPosition = memberOrdinalInPosition;
         // this.cellSet = cellSet;
 
         positionToDrill =
-            TransformUtil.getPositionFromCellSet(axis, positionOrdinalInAxis,
-                    cellSet);
-        memberToDrill = TransformUtil.getMemberFromCellSet(axis,
-                positionOrdinalInAxis, memberOrdinalInPosition, cellSet);
-        pathToMember = TransformUtil.getPathToMember(positionToDrill,
-                memberOrdinalInPosition);
+            TransformUtil.getPositionFromCellSet(
+                axis, positionOrdinalInAxis, cellSet);
+        memberToDrill = TransformUtil.getMemberFromCellSet(
+            axis, positionOrdinalInAxis, memberOrdinalInPosition, cellSet);
+        pathToMember = TransformUtil.getPathToMember(
+            positionToDrill,
+            memberOrdinalInPosition);
     }
 
     public String getName() {

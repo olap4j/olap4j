@@ -260,7 +260,6 @@ public class TestContext {
      * </code>
      */
     static String toJavaString(String s) {
-
         // Convert [string with "quotes" split
         // across lines]
         // into ["string with \"quotes\" split\n" +
