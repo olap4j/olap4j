@@ -17,6 +17,7 @@ import org.olap4j.mdx.*;
 import org.olap4j.mdx.parser.*;
 import org.olap4j.metadata.*;
 import org.olap4j.test.TestContext;
+import org.olap4j.test.TestContext.Tester;
 import org.olap4j.type.*;
 
 import java.io.*;
@@ -1480,6 +1481,20 @@ public class ConnectionTest extends TestCase {
         assertEquals("[Product].[Product Family]",
             member.getLevel().getUniqueName());
         assertEquals(Member.Type.REGULAR, member.getMemberType());
+
+        assertEquals("Food", member.getCaption(null));
+
+        if (tester.getFlavor() != Tester.Flavor.XMLA) {
+        	  assertNull(member.getDescription(null));
+        	  assertEquals(1, member.getDepth());
+        	  assertEquals(-1, member.getSolveOrder());
+        	  assertFalse(member.isHidden());
+        	  assertNull(member.getDataMember());
+        	  assertFalse(member.isCalculatedInQuery());
+        } else {
+        	  assertEquals("", member.getDescription(null));
+        }
+
         switch (tester.getFlavor()) {
         case MONDRIAN:
             // mondrian does not set ordinals correctly
