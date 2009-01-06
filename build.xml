@@ -15,7 +15,7 @@
   <property file="${project.location}/test.properties"/>
   <property name="project.build.debug" value="on"/>
   <property name="name" value="olap4j"/>
-  <property name="version" value="0.9.7"/>
+  <property name="version" value="0.9.7.135"/>
   <property name="dist.name" value="${name}-${version}" />
 
   <!-- properties related to paths -->
@@ -43,6 +43,8 @@
   <!-- generated files -->
   <property name="jar.file" value="${lib.dir}/${name}.jar" />
   <property name="jar-jdk14.file" value="${lib.dir}/${name}-jdk14.jar" />
+  <property name="sources.jar.file" value="${lib.dir}/${name}-sources.jar" />
+  <property name="javadoc.jar.file" value="${lib.dir}/${name}-javadoc.jar" />
   <property name="dist.bin.file" value="${dist.dir}/${dist.name}.zip" />
   <property name="dist.src.file" value="${dist.dir}/${dist.name}-src.zip" />
   <property name="dist.doc.file" value="${dist.dir}/doc.tar.gz" />
@@ -53,6 +55,8 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java"/>
 
   <property name="generated.lib.files" value="
 ${jar.file},
+${sources.jar.file},
+${javadoc.jar.file},
 ${jar-jdk14.file}"/>
 
   <path id="project.classpath">
@@ -225,7 +229,7 @@ buildJdk16.sh" />
     </zip>
   </target>
 
-  <target name="release" depends="clean-deep, binzip"/>
+  <target name="release" depends="clean-deep, binzip, sourcesjar, javadocjar"/>
 
   <target name="binzip"
       depends="clean,version,jar,srczip,retroweave,jar-jdk14,javadoc,javadoc-pdf">
@@ -390,68 +394,67 @@ META-INF/**"/>
       <link href="http://java.sun.com/javase/6/docs/api/"/>
     </javadoc>
   </target>
-	
-	
-	<target name="javadoc-xmla" description="generates the javadoc for the xmla driver package">
-	    <mkdir dir="${javadoc-xmla.dir}" />
-	    <!-- remove stray package.html files under classes to avoid 'multiple
-	         sources of package comments' errors -->
-	    <delete includeEmptyDirs="false" quiet="true">
-	      <fileset dir="${classes.dir}" includes="**/package.html"/>
-	    </delete>
-	    <delete quiet="true" file="${javadoc-xmla.dir}/index.html"/>
-	    <javadoc sourcepath="${src.dir}"
-	        classpathref="project.test.classpath"
-	        destdir="${javadoc-xmla.dir}"
-	        packagenames="org.olap4j.driver.xmla.*"
-	        overview="${src.dir}/overview.html"
-	        footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=168953&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
-	        author="true"
-	        source="1.5"
-	        access="public"
-	        Windowtitle="olap4j, version ${version}"
-	        additionalparam="-linksource"
-	      >
-	      <tag name="pre" description="Pre-condition:"
-	           scope="constructors,methods"/>
-	      <tag name="post" description="Post-condition:"
-	           scope="constructors,methods"/>
-	      <tag name="testcase" description="Test-case:"
-	           scope="constructors,methods,types"/>
-	      <link href="http://java.sun.com/javase/6/docs/api/"/>
-	    </javadoc>
-	  </target>
 
-    <!-- Strict javadoc for testing purposes. Includes all packages and
-         non-public classes and methods. -->
-    <target name="javadoc-strict">
-      <mkdir dir="${javadoc.dir}" />
-      <!-- remove stray package.html files under classes to avoid 'multiple
-           sources of package comments' errors -->
-      <delete includeEmptyDirs="false" quiet="true">
-        <fileset dir="${classes.dir}" includes="**/package.html"/>
-      </delete>
-      <delete quiet="true" file="${javadoc.dir}/index.html"/>
-      <javadoc sourcepath="${src.dir}:${testsrc.dir}"
-          classpathref="project.test.classpath"
-          destdir="${javadoc.dir}"
-          packagenames="org.olap4j.*"
-          overview="${src.dir}/overview.html"
-          footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=168953&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
-          author="true"
-          source="1.5"
-          access="private"
-          Windowtitle="olap4j, version ${version}"
-        >
-        <tag name="pre" description="Pre-condition:"
-             scope="constructors,methods"/>
-        <tag name="post" description="Post-condition:"
-             scope="constructors,methods"/>
-        <tag name="testcase" description="Test-case:"
-             scope="constructors,methods,types"/>
-        <link href="http://java.sun.com/javase/6/docs/api/"/>
-      </javadoc>
-    </target>
+  <target name="javadoc-xmla" description="generates the javadoc for the xmla driver package">
+    <mkdir dir="${javadoc-xmla.dir}" />
+    <!-- remove stray package.html files under classes to avoid 'multiple
+         sources of package comments' errors -->
+    <delete includeEmptyDirs="false" quiet="true">
+      <fileset dir="${classes.dir}" includes="**/package.html"/>
+    </delete>
+    <delete quiet="true" file="${javadoc-xmla.dir}/index.html"/>
+    <javadoc sourcepath="${src.dir}"
+        classpathref="project.test.classpath"
+        destdir="${javadoc-xmla.dir}"
+        packagenames="org.olap4j.driver.xmla.*"
+        overview="${src.dir}/overview.html"
+        footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=168953&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
+        author="true"
+        source="1.5"
+        access="public"
+        Windowtitle="olap4j, version ${version}"
+        additionalparam="-linksource"
+      >
+      <tag name="pre" description="Pre-condition:"
+           scope="constructors,methods"/>
+      <tag name="post" description="Post-condition:"
+           scope="constructors,methods"/>
+      <tag name="testcase" description="Test-case:"
+           scope="constructors,methods,types"/>
+      <link href="http://java.sun.com/javase/6/docs/api/"/>
+    </javadoc>
+  </target>
+
+  <!-- Strict javadoc for testing purposes. Includes all packages and
+       non-public classes and methods. -->
+  <target name="javadoc-strict">
+    <mkdir dir="${javadoc.dir}" />
+    <!-- remove stray package.html files under classes to avoid 'multiple
+         sources of package comments' errors -->
+    <delete includeEmptyDirs="false" quiet="true">
+      <fileset dir="${classes.dir}" includes="**/package.html"/>
+    </delete>
+    <delete quiet="true" file="${javadoc.dir}/index.html"/>
+    <javadoc sourcepath="${src.dir}:${testsrc.dir}"
+        classpathref="project.test.classpath"
+        destdir="${javadoc.dir}"
+        packagenames="org.olap4j.*"
+        overview="${src.dir}/overview.html"
+        footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=168953&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
+        author="true"
+        source="1.5"
+        access="private"
+        Windowtitle="olap4j, version ${version}"
+      >
+      <tag name="pre" description="Pre-condition:"
+           scope="constructors,methods"/>
+      <tag name="post" description="Post-condition:"
+           scope="constructors,methods"/>
+      <tag name="testcase" description="Test-case:"
+           scope="constructors,methods,types"/>
+      <link href="http://java.sun.com/javase/6/docs/api/"/>
+    </javadoc>
+  </target>
 
   <!-- Generate javadoc with embedded UML diagrams using the yDoc doclet from
        yWorks.com. Set ydoc.home in build.properties, then replace
@@ -546,20 +549,66 @@ META-INF/**"/>
     </junit>
   </target>
 
-  <taskdef name="retroweaver"
-      classname="com.rc.retroweaver.ant.RetroWeaverTask">
-    <classpath>
-      <pathelement location="${lib.dir}/asm-2.2.3.jar" />
-      <pathelement location="${lib.dir}/asm-commons-2.2.3.jar" />
-      <pathelement location="${lib.dir}/retroweaver-1.2.4.jar" />
-      <pathelement location="${lib.dir}/retroweaver-rt-1.2.4.jar" />
-    </classpath>
-  </taskdef>
-
   <target name="retroweave">
+    <taskdef name="retroweaver"
+        classname="com.rc.retroweaver.ant.RetroWeaverTask">
+      <classpath>
+        <pathelement location="${lib.dir}/asm-2.2.3.jar" />
+        <pathelement location="${lib.dir}/asm-commons-2.2.3.jar" />
+        <pathelement location="${lib.dir}/retroweaver-1.2.4.jar" />
+        <pathelement location="${lib.dir}/retroweaver-rt-1.2.4.jar" />
+      </classpath>
+    </taskdef>
     <retroweaver srcdir="${classes.dir}" />
   </target>
 
+  <!-- Generates jar file containing java source files (for maven repository).
+       Does not include housekeeping files (e.g. build.xml) or even java
+       source files from the test suite, so this is no substitute for the
+       source distribution generated by srczip. -->
+  <target name="sourcesjar"
+      depends="version"
+      description="">
+    <mkdir dir="${dist.dir}" />
+    <delete file="${sources.jar.file}"/>
+    <zip
+        zipfile="${sources.jar.file}"
+        update="true">
+      <zipfileset
+          dir="."
+          includes="
+LICENSE.html,
+VERSION.txt" />
+      <zipfileset
+          dir="${src.dir}"
+          includes="
+**/*.java,
+**/*.cup" />
+    </zip>
+  </target>
+
+  <!-- Generates jar file containing java source files (for maven repository).
+       Does not include HTMLized source or ydoc diagrams. -->
+  <target name="javadocjar"
+      depends="version, javadoc">
+    <mkdir dir="${dist.dir}" />
+    <delete file="${javadoc.jar.file}"/>
+    <zip
+        zipfile="${javadoc.jar.file}"
+        update="true">
+      <zipfileset
+          dir="."
+          includes="
+LICENSE.html,
+VERSION.txt" />
+      <zipfileset
+          dir="${javadoc.dir}"
+          includes="
+**"
+          excludes="
+src-html/**" />
+    </zip>
+  </target>
 </project>
 
 <!-- End build.xml -->
