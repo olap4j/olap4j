@@ -33,7 +33,7 @@ public interface XmlaOlap4jCache {
      * if there are no cached response corresponding to the SOAP
      * message and the URL.
      *
-     * @param name The connection unique name which called this cache.
+     * @param id The connection unique name which called this cache.
      * @param url The URL where the SOAP message was sent.
      * @param request The SOAP complete message.
      * @throws XmlaOlap4jInvalidStateException This internal exception gets thrown
@@ -53,7 +53,7 @@ public interface XmlaOlap4jCache {
      * Adds a SOAP response to the cache. It has to be relative to the
      * URL of the SOAP service.
      *
-     * @param name The connection unique name which called this cache.
+     * @param id The connection unique name which called this cache.
      * @param url The URL of the SOAP endpoint.
      * @param request The full SOAP message from which we want to cache its
      * response.
