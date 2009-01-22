@@ -95,6 +95,9 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         Map<String, Matcher> predicateList = new ArrayMap<String, Matcher>();
         for (int i = 0; i < patternValues.length; i += 2) {
             String name = (String) patternValues[i];
+            assert metadataRequest.getColumn(name) != null
+                : "Request '" + metadataRequest
+                + "' does not support column '" + name + "'";
             Object value = patternValues[i + 1];
             if (value == null) {
                 // ignore
@@ -1014,7 +1017,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
             XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_DIMENSIONS,
             "SCHEMA_NAME", wildcard(schemaPattern),
             "CUBE_NAME", wildcard(cubeNamePattern),
-            "DIMSENSION_NAME", wildcard(dimensionNamePattern));
+            "DIMENSION_NAME", wildcard(dimensionNamePattern));
     }
 
     public ResultSet getOlapFunctions(
@@ -1029,7 +1032,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String catalog,
         String schemaPattern,
         String cubeNamePattern,
-        String dimensionNamePattern,
+        String dimensionUniqueName,
         String hierarchyNamePattern)
         throws OlapException
     {
@@ -1038,7 +1041,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
             "CATALOG_NAME", catalog,
             "SCHEMA_NAME", wildcard(schemaPattern),
             "CUBE_NAME", wildcard(cubeNamePattern),
-            "DIMENSION_NAME", wildcard(dimensionNamePattern),
+            "DIMENSION_UNIQUE_NAME", dimensionUniqueName,
             "HIERARCHY_NAME", wildcard(hierarchyNamePattern));
     }
 

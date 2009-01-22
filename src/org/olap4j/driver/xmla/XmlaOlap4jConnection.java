@@ -20,8 +20,6 @@ import org.olap4j.mdx.parser.*;
 import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
 import org.olap4j.metadata.*;
 import org.w3c.dom.*;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import java.io.*;
@@ -1743,6 +1741,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             new MetadataColumn("SCOPE"));
 
         final List<MetadataColumn> columns;
+        final Map<String, MetadataColumn> columnsByName;
 
         MetadataRequest(MetadataColumn... columns) {
             if (name().equals("DBSCHEMA_CATALOGS")) {
@@ -1762,6 +1761,12 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             this.columns =
                 Collections.unmodifiableList(
                     Arrays.asList(columns));
+            final Map<String, MetadataColumn> map =
+                new HashMap<String, MetadataColumn>();
+            for (MetadataColumn column : columns) {
+                map.put(column.name, column);
+            }
+            this.columnsByName = Collections.unmodifiableMap(map);
         }
 
         /**
@@ -1782,6 +1787,17 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
          */
         public boolean requiresCatalogName() {
             return (this != DBSCHEMA_CATALOGS && this != DISCOVER_DATASOURCES);
+        }
+
+        /**
+         * Returns the column with a given name, or null if there is no such
+         * column.
+         *
+         * @param name Column name
+         * @return Column, or null if not found
+         */
+        public MetadataColumn getColumn(String name) {
+            return columnsByName.get(name);
         }
     }
 

@@ -334,6 +334,13 @@ public class MetadataTest extends TestCase {
                 catalogName, null, "Sales", null, "Store"),
             HIERARCHIES_COLUMN_NAMES);
         assertEquals(TestContext.fold("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_NAME=Store, HIERARCHY_UNIQUE_NAME=[Store], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Store, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=63, DEFAULT_MEMBER=[Store].[All Stores], ALL_MEMBER=[Store].[All Stores], DESCRIPTION=Sales Cube - Store Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_ORDINAL=1, DIMENSION_IS_SHARED=true, PARENT_CHILD=false\n"), s);
+
+        // With dimension unique name (bug 2527862).
+        s = checkResultSet(
+            olapDatabaseMetaData.getHierarchies(
+                catalogName, null, "Sales", "[Store]", null),
+            HIERARCHIES_COLUMN_NAMES);
+        assertEquals(TestContext.fold("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_NAME=Store, HIERARCHY_UNIQUE_NAME=[Store], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Store, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=63, DEFAULT_MEMBER=[Store].[All Stores], ALL_MEMBER=[Store].[All Stores], DESCRIPTION=Sales Cube - Store Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_ORDINAL=1, DIMENSION_IS_SHARED=true, PARENT_CHILD=false\n"), s);
     }
 
     public void testDatabaseMetaDataGetLevels() throws SQLException {

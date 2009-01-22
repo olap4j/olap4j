@@ -550,7 +550,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *        without a cube; <code>null</code> means that the cube name should
      *        not be used to narrow the search
      *
-     * @param dimensionNamePattern a dimension name pattern; must match the
+     * @param dimensionUniqueName unique name of a dimension (not a pattern);
+     *        must match the
      *        dimension name as it is stored in the database; <code>null</code>
      *        means that the dimension name should not be used to narrow the
      *        search
@@ -572,7 +573,7 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
         String catalog,
         String schemaPattern,
         String cubeNamePattern,
-        String dimensionNamePattern,
+        String dimensionUniqueName,
         String hierarchyNamePattern) throws OlapException;
 
     /**
