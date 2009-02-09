@@ -64,7 +64,7 @@ public class Query {
         across = new QueryAxis(this, Axis.COLUMNS);
         down = new QueryAxis(this, Axis.ROWS);
         filter = new QueryAxis(this, Axis.FILTER);
-        axes.put(null, unused);
+        axes.put(Axis.UNUSED, unused);
         axes.put(Axis.COLUMNS, across);
         axes.put(Axis.ROWS, down);
         axes.put(Axis.FILTER, filter);
