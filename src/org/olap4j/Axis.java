@@ -24,60 +24,155 @@ import java.util.Locale;
  * @version $Id$
  * @since Oct 23, 2006
  */
-public enum Axis {
-    UNUSED,
-    FILTER,
-    COLUMNS,
-    ROWS,
-    PAGES,
-    CHAPTERS,
-    SECTIONS;
+public interface Axis {
+
+    /**
+     * Returns the name of this axis, e.g. "COLUMNS", "SLICER", "AXIS(17)".
+     *
+     * @return Name of the axis
+     */
+    String name();
+
+    /**
+     * Returns whether this is the filter (slicer) axis.
+     *
+     * @return whether this is the filter axis
+     */
+    boolean isFilter();
+
+    /**
+     * @deprecated Will be removed before olap4j 1.0.
+     */
+    public static final Standard UNUSED = null;
+
+    /**
+     * @deprecated Will be removed before olap4j 1.0.
+     */
+    public static final Standard NONE = null;
+
+    /**
+     * Abbreviation for {@link org.olap4j.Axis.Standard#FILTER}.
+     */
+    public static final Standard FILTER = Standard.FILTER;
+    public static final Standard COLUMNS = Standard.COLUMNS;
+    public static final Standard ROWS = Standard.ROWS;
+    public static final Standard PAGES = Standard.PAGES;
+    public static final Standard SECTIONS = Standard.SECTIONS;
+    public static final Standard CHAPTERS = Standard.CHAPTERS;
+
+    /**
+     * Enumeration of standard, named axes descriptors.
+     */
+    public enum Standard implements Axis {
+        /** Filter axis. */
+        FILTER,
+
+        /** COLUMNS axis, also known as X axis and AXIS(0). */
+        COLUMNS,
+
+        /** ROWS axis, also known as Y axis and AXIS(1). */
+        ROWS,
+
+        /** PAGES axis, also known as AXIS(2). */
+        PAGES,
+
+        /** CHAPTERS axis, also known as AXIS(3). */
+        CHAPTERS,
+
+        /** SECTIONS axis, also known as AXIS(4). */
+        SECTIONS;
+
+        public int axisOrdinal() {
+            return ordinal() - 1;
+        }
+
+        public boolean isFilter() {
+            return this == FILTER;
+        }
+
+        public String getCaption(Locale locale) {
+            // TODO: localize
+            return name();
+        }
+    }
+
+    class Factory {
+        private static final Standard[] STANDARD_VALUES = Standard.values();
+
+        /**
+         * Returns the axis with a given {@code axisOrdinal}.
+         *
+         * <p>For example, {@code forOrdinal(0)} returns the COLUMNS axis;
+         * {@code forOrdinal(-1)} returns the SLICER axis;
+         * {@code forOrdinal(100)} returns AXIS(100).
+         *
+         * @param ordinal Axis ordinal
+         * @return Axis whose ordinal is as given
+         */
+        public static Axis forOrdinal(final int ordinal) {
+            if (ordinal < -1) {
+                throw new IllegalArgumentException(
+                    "Axis ordinal must be -1 or higher");
+            }
+            if (ordinal + 1 < STANDARD_VALUES.length) {
+                return STANDARD_VALUES[ordinal + 1];
+            }
+            return new Axis() {
+                public String toString() {
+                    return name();
+                }
+
+                public String name() {
+                    return "AXIS(" + ordinal + ")";
+                }
+
+                public boolean isFilter() {
+                    return false;
+                }
+
+                public int axisOrdinal() {
+                    return ordinal;
+                }
+
+                public String getCaption(Locale locale) {
+                    // TODO: localize
+                    return name();
+                }
+            };
+        }
+    }
 
     /**
      * Returns the ordinal which is to be used for retrieving this axis from
      * the {@link org.olap4j.CellSet#getAxes()}, or retrieving its
      * coordinate from {@link Cell#getCoordinateList()}.
      *
-     * <p>The axis ordinal is two less than the {@link #ordinal} value which
-     * every <code>enum</code> value possesses. Hence, {@link #UNUSED} is -2
-     * and {@link #FILTER} is -1 (because they are not treated the same as the
-     * other axes), {@link #COLUMNS} is 0, {@link #ROWS} is 1, and so forth.
+     * <p>For example:
+     * <ul>
+     * <li>-1 {@link org.olap4j.Axis.Standard#FILTER FILTER}</li>
+     * <li>0 {@link org.olap4j.Axis.Standard#COLUMNS COLUMNS}</li>
+     * <li>1 {@link org.olap4j.Axis.Standard#ROWS ROWS}</li>
+     * <li>2 {@link org.olap4j.Axis.Standard#PAGES PAGES}</li>
+     * <li>3 {@link org.olap4j.Axis.Standard#CHAPTERS CHAPTERS}</li>
+     * <li>4 {@link org.olap4j.Axis.Standard#SECTIONS SECTIONS}</li>
+     * <li>5 {@link org.olap4j.Axis.Standard#SECTIONS SECTIONS}</li>
+     * <li>6 AXES(6)</li>
+     * <li>123 AXES(123)</li>
+     * </ul>
      *
-     * @return Axis ordinal
+     * @return ordinal of this axis
      */
-    public int axisOrdinal() {
-        return axisOrdinal;
-    }
+    int axisOrdinal();
 
     /**
      * Returns localized name for this Axis.
      *
+     * <p>Examples: "FILTER", "ROWS", "COLUMNS", "AXIS(10)".
+     *
      * @param locale Locale for which to give the name
      * @return localized name for this Axis
      */
-    public String getCaption(Locale locale) {
-        // todo: localize
-        return name();
-    }
-
-    /**
-     * Returns the axis with a given {@link #axisOrdinal()}.
-     *
-     * @param axisOrdinal Axis ordinal
-     * @return Axis whose {@link #axisOrdinal()} is as given
-     */
-    public static Axis forOrdinal(int axisOrdinal) {
-        Axis axis = values()[axisOrdinal + 2];
-        assert axis.axisOrdinal() == axisOrdinal;
-        return axis;
-    }
-
-    private final int axisOrdinal = ordinal() - 2;
-
-    /**
-     * The largest legal value for {@link #forOrdinal(int)}.
-     */
-    public static final int MAX_ORDINAL = SECTIONS.axisOrdinal();
+    String getCaption(Locale locale);
 }
 
 // End Axis.java

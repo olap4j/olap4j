@@ -672,7 +672,7 @@ public class OlapTest extends TestCase {
                 Element dimensionsNode = doc.createElement("dimensions");
                 root.appendChild(dimensionsNode);
 
-                switch (axis.getLocation()) {
+                switch ((Axis.Standard) axis.getLocation()) {
                 case COLUMNS:
                     addAttribute("location", "across", root);
                     break;

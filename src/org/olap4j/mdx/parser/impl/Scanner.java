@@ -238,9 +238,9 @@ class Scanner {
         initResword(DefaultMdxParserSym.CASE                ,"CASE");
         initResword(DefaultMdxParserSym.CELL                ,"CELL");
 //      initResword(DefaultMdxParserSym.CELL_ORDINAL        ,"CELL_ORDINAL");
-//      initResword(DefaultMdxParserSym.CHAPTERS            ,"CHAPTERS");
+        initResword(DefaultMdxParserSym.CHAPTERS            ,"CHAPTERS");
 //      initResword(DefaultMdxParserSym.CHILDREN            ,"CHILDREN");
-//      initResword(DefaultMdxParserSym.COLUMNS             ,"COLUMNS");
+        initResword(DefaultMdxParserSym.COLUMNS             ,"COLUMNS");
 //      initResword(DefaultMdxParserSym.DESC                ,"DESC");
         initResword(DefaultMdxParserSym.DIMENSION           ,"DIMENSION");
         initResword(DefaultMdxParserSym.ELSE                ,"ELSE");
@@ -270,13 +270,13 @@ class Scanner {
         initResword(DefaultMdxParserSym.NULL                ,"NULL");
         initResword(DefaultMdxParserSym.ON                  ,"ON");
         initResword(DefaultMdxParserSym.OR                  ,"OR");
-//      initResword(DefaultMdxParserSym.PAGES               ,"PAGES");
+        initResword(DefaultMdxParserSym.PAGES               ,"PAGES");
 //      initResword(DefaultMdxParserSym.PARENT              ,"PARENT");
 //      initResword(DefaultMdxParserSym.PREVMEMBER          ,"PREVMEMBER");
         initResword(DefaultMdxParserSym.PROPERTIES          ,"PROPERTIES");
 //      initResword(DefaultMdxParserSym.RECURSIVE           ,"RECURSIVE");
-//      initResword(DefaultMdxParserSym.ROWS                ,"ROWS");
-//      initResword(DefaultMdxParserSym.SECTIONS            ,"SECTIONS");
+        initResword(DefaultMdxParserSym.ROWS                ,"ROWS");
+        initResword(DefaultMdxParserSym.SECTIONS            ,"SECTIONS");
         initResword(DefaultMdxParserSym.SELECT              ,"SELECT");
         initResword(DefaultMdxParserSym.SET                 ,"SET");
 //      initResword(DefaultMdxParserSym.SOLVE_ORDER         ,"SOLVE_ORDER");

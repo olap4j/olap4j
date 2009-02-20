@@ -707,7 +707,7 @@ public class ConnectionTest extends TestCase {
             : cellSetMetaData.getAxesMetaData())
         {
             ++k;
-            assertEquals(Axis.forOrdinal(k), axisMetaData.getAxisOrdinal());
+            assertEquals(Axis.Factory.forOrdinal(k), axisMetaData.getAxisOrdinal());
             assertEquals(k, axisMetaData.getAxisOrdinal().axisOrdinal());
             assertTrue(axisMetaData.getHierarchies().size() > 0);
             for (Hierarchy hierarchy : axisMetaData.getHierarchies()) {

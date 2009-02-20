@@ -27,6 +27,12 @@ class XmlaOlap4jCellSetAxis implements CellSetAxis {
     private final List<Position> immutablePositions =
         Collections.unmodifiableList(positions);
 
+    /**
+     * Creates an XmlaOlap4jCellSetAxis.
+     *
+     * @param olap4jCellSet Cell set
+     * @param axis Axis identifier
+     */
     public XmlaOlap4jCellSetAxis(
         XmlaOlap4jCellSet olap4jCellSet,
         Axis axis)
@@ -45,10 +51,9 @@ class XmlaOlap4jCellSetAxis implements CellSetAxis {
 
     public CellSetAxisMetaData getAxisMetaData() {
         final CellSetMetaData cellSetMetaData = olap4jCellSet.getMetaData();
-        switch (axis) {
-        case FILTER:
+        if (axis.isFilter()) {
             return cellSetMetaData.getFilterAxisMetaData();
-        default:
+        } else {
             return cellSetMetaData.getAxesMetaData().get(
                 axis.axisOrdinal());
         }

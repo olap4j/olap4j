@@ -13,8 +13,8 @@ import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.impl.Olap4jUtil;
 import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
 import org.olap4j.metadata.*;
+
 import org.w3c.dom.*;
-import org.w3c.dom.ls.*;
 import org.xml.sax.SAXException;
 
 import java.io.*;
@@ -178,13 +178,10 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             final Axis axis = lookupAxis(axisName);
             final XmlaOlap4jCellSetAxis cellSetAxis =
                 new XmlaOlap4jCellSetAxis(this, axis);
-            switch (axis) {
-            case FILTER:
+            if (axis.isFilter()) {
                 filterAxis = cellSetAxis;
-                break;
-            default:
+            } else {
                 axisList.add(cellSetAxis);
-                break;
             }
             final Element tuplesNode =
                 findChild(axisNode, MDDATASET_NS, "Tuples");
@@ -431,13 +428,10 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                     axis,
                     hierarchyList,
                     propertyList);
-            switch (axis) {
-            case FILTER:
+            if (axis.isFilter()) {
                 filterAxisMetaData = axisMetaData;
-                break;
-            default:
+            } else {
                 axisMetaDataList.add(axisMetaData);
-                break;
             }
         }
         final Element cellInfo =
@@ -500,7 +494,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         if (axisName.startsWith("Axis")) {
             final Integer ordinal =
                 Integer.valueOf(axisName.substring("Axis".length()));
-            return Axis.values()[Axis.COLUMNS.ordinal() + ordinal];
+            return Axis.Factory.forOrdinal(ordinal);
         } else {
             return Axis.FILTER;
         }

@@ -138,7 +138,11 @@ public class ParserTest extends TestCase {
 
         assertParseQueryFails(
             "select [member] on ^axis(1.7)^ from sales",
-            "(?s).*The axis number must be an integer.*");
+            "(?s).*The axis number must be a non-negative integer, but it was 1.7.");
+
+        assertParseQueryFails(
+            "select [member] on ^foobar^ from sales",
+            "Syntax error at \\[1:20, 1:25\\], token 'foobar'");
 
         assertParseQueryFails(
             "select [member] on axis(-^ ^1) from sales",
@@ -148,21 +152,28 @@ public class ParserTest extends TestCase {
             "select [member] on axis(-^1^) from sales",
             "Syntax error at \\[1:26\\], token '-'");
 
-        assertParseQueryFails(
-            "select [member] on ^axis(5)^ from sales",
-            "Invalid axis specification\\. The axis number must be an integer between 0 and 4, but it was 5\\.0\\.");
+        // used to be an error, but no longer
+        assertParseQuery(
+            "select [member] on axis(5) from sales",
+            TestContext.fold(
+                "SELECT\n" +
+                    "[member] ON AXIS(5)\n" +
+                    "FROM sales"));
 
         assertParseQueryFails(
-            "select [member] on axes(^0^) from sales",
-            "Syntax error at \\[1:25\\], token '\\('");
+            "select [member] on ^axes^(0) from sales",
+            "Syntax error at \\[1:20, 1:23\\], token 'axes'");
 
         assertParseQueryFails(
             "select [member] on ^0.5^ from sales",
-            "Invalid axis specification\\. The axis number must be an integer between 0 and 4, but it was 0\\.5\\.");
+            "Invalid axis specification\\. The axis number must be a non-negative integer, but it was 0\\.5\\.");
 
-        assertParseQueryFails(
-            "select [member] on ^555^ from sales",
-            "Invalid axis specification\\. The axis number must be an integer between 0 and 4, but it was 555\\.0\\.");
+        assertParseQuery(
+            "select [member] on 555 from sales",
+            TestContext.fold(
+                "SELECT\n" +
+                    "[member] ON AXIS(555)\n" +
+                    "FROM sales"));
     }
 
     public void testScannerPunc() {
@@ -227,7 +238,7 @@ public class ParserTest extends TestCase {
         final ParseRegion.RegionAndSource ras = ParseRegion.findPos(query);
         try {
             SelectNode selectNode = p.parseSelect(ras.source);
-            fail("Must return an error");
+            fail("Must return an error, got " + selectNode);
         } catch (Exception e) {
             checkEx(e, expected, ras);
         }
@@ -403,10 +414,14 @@ public class ParserTest extends TestCase {
         List<AxisNode> axes = select.getAxisList();
 
         assertEquals("Number of axes", 2, axes.size());
-        assertEquals("Axis index name must be correct",
-            Axis.forOrdinal(0), axes.get(0).getAxis());
-        assertEquals("Axis index name must be correct",
-            Axis.forOrdinal(1), axes.get(1).getAxis());
+        assertEquals(
+            "Axis index name must be correct",
+            Axis.Factory.forOrdinal(0),
+            axes.get(0).getAxis());
+        assertEquals(
+            "Axis index name must be correct",
+            Axis.Factory.forOrdinal(1),
+            axes.get(1).getAxis());
 
         // now a similar query with axes reversed
 
@@ -417,10 +432,14 @@ public class ParserTest extends TestCase {
         axes = select.getAxisList();
 
         assertEquals("Number of axes", 2, axes.size());
-        assertEquals("Axis index name must be correct",
-            Axis.forOrdinal(0), axes.get(0).getAxis());
-        assertEquals("Axis index name must be correct",
-            Axis.forOrdinal(1), axes.get(1).getAxis());
+        assertEquals(
+            "Axis index name must be correct",
+            Axis.Factory.forOrdinal(0),
+            axes.get(0).getAxis());
+        assertEquals(
+            "Axis index name must be correct",
+            Axis.Factory.forOrdinal(1),
+            axes.get(1).getAxis());
 
         ParseTreeNode colsSetExpr = axes.get(0).getExpression();
         assertNotNull("Column tuples", colsSetExpr);

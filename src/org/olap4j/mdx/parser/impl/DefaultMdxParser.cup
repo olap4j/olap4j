@@ -155,11 +155,11 @@ parser code {:
                 null :
                 new AxisNode(
                     filter.getRegion(), false, Axis.FILTER,
-                    Collections.EMPTY_LIST, filter);
+                    Collections.<IdentifierNode>emptyList(), filter);
         // sort axes by ordinal
         Collections.sort(axisList, new Comparator<AxisNode>() {
             public int compare(AxisNode o1, AxisNode o2) {
-                return o1.getAxis().ordinal() - o2.getAxis().ordinal();
+                return o1.getAxis().axisOrdinal() - o2.getAxis().axisOrdinal();
             }
         });
         return new SelectNode(
@@ -277,6 +277,8 @@ terminal
     CASE,
     CAST,
     CELL,
+    CHAPTERS,
+    COLUMNS,
     DIMENSION,
     ELSE,
     EMPTY,
@@ -291,7 +293,10 @@ terminal
     NULL,
     ON,
     OR,
+    PAGES,
     PROPERTIES,
+    ROWS,
+    SECTIONS,
     SELECT,
     SET,
     THEN,
@@ -360,8 +365,9 @@ non terminal IdentifierNode
     cube_specification,
     member_name,
     set_name;
+non terminal Axis.Standard
+    axis_name;
 non terminal String
-    axis_name,
     comp_op,
     keyword;
 non terminal IdentifierNode.Segment
@@ -1431,25 +1437,25 @@ set_name ::= compound_id ;
 // <axis_specification> ::= [NON EMPTY] <set> [<dim_props>] ON <axis_name>
 axis_specification ::=
         non_empty_opt:b expression:s dim_props_opt:dp ON axis_name:a {:
-            Axis axis = Axis.valueOf(a.toUpperCase());
             ParseRegion region = createRegion(
                 bleft, bright, sleft, sright, dpleft, dpright, aleft, aright);
-            RESULT = new AxisNode(region, b, axis, emptyList(dp), s);
+            RESULT = new AxisNode(region, b, a, emptyList(dp), s);
         :}
     |   non_empty_opt:b expression:s dim_props_opt:dp ON axis_number:n {:
             double d = n.doubleValue();
             int index = (int)d;
 
-            // Legal axis ordinals run from 0 (COLUMS) to 4 (SECTIONS),
-            // inclusive.
-            if (index < 0 || index != d || index > Axis.MAX_ORDINAL) {
+            // AxisOrdinal values go from -2 to 4 for standard axis, but higher
+            // ordinals are allowed. The negative values represent
+            // special cases, so are ignored.
+            if (index < 0 || index != d) {
                 throw new MdxParseException(
                     createRegion(nleft, nright),
-                    "Invalid axis specification. The axis number must be an integer between 0 and " +
-                    Axis.MAX_ORDINAL + ", but it was " + d + ".");
+                    "Invalid axis specification. The axis number must be a " +
+                    "non-negative integer, but it was " + d + ".");
             }
 
-            Axis axis = Axis.forOrdinal(index);
+            Axis axis = Axis.Factory.forOrdinal(index);
             ParseRegion region = createRegion(
                 bleft, bright, sleft, sright, dpleft, dpright, nleft, nright);
             RESULT = new AxisNode(region, b, axis, emptyList(dp), s);
@@ -1476,8 +1482,20 @@ dim_props_opt ::=
 //               | SECTIONS
 //               | AXIS(<index>)
 axis_name ::=
-        identifier:i {:
-            RESULT = i.getName();
+        COLUMNS {:
+            RESULT = Axis.COLUMNS;
+        :}
+    |   ROWS {:
+            RESULT = Axis.ROWS;
+        :}
+    |   PAGES {:
+            RESULT = Axis.PAGES;
+        :}
+    |   SECTIONS {:
+            RESULT = Axis.SECTIONS;
+        :}
+    |   CHAPTERS {:
+            RESULT = Axis.CHAPTERS;
         :}
     ;
 
