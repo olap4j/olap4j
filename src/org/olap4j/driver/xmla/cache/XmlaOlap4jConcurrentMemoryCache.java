@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2008-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -14,75 +14,75 @@ import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.*;
 
-import org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache.MODE;
+import org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache.Mode;
 import org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache.Property;
+import org.olap4j.impl.Olap4jUtil;
 
 /**
- * <p>Thread-safe cache object which supports concurrent access.
- * <p>It keeps it's cache element objects in memory in an internal hash
+ * Thread-safe cache object which supports concurrent access.
+ *
+ * <p>It keeps its cache element objects in memory in an internal hash
  * table. Instantiate it and use. As simple as that.
+ *
  * @author Luc Boudreau
  * @version $Id$
  */
 class XmlaOlap4jConcurrentMemoryCache {
 
     /**
-     * This defines the default cache timeout of 1 minute. The value
-     * has to be in seconds.
+     * Default cache timeout (1 minute). The value is in seconds.
      */
     private final static int DEFAULT_CACHE_TIMEOUT = 60;
 
-
-
-
     /**
-     * This defines the default cache size of 10.
+     * Default cache size (10).
      */
     private final static int DEFAULT_CACHE_SIZE = 10;
 
-
-
-
-
     /**
-     * This defines the current eviction mode. Defaults to LFU.
+     * Default eviction mode (LFU).
      */
-    private final static MODE DEFAULT_EVICTION_MODE = MODE.LFU;
+    private final static Mode DEFAULT_EVICTION_MODE = Mode.LFU;
 
 
     /**
-     * <p>Thread safe hashmap which will be used as a cache.
+     * Thread-safe hashmap which will be used as a cache.
      *
-     * <p>The cache is a map structured as follows :
+     * <p>The cache is a map structured as follows:
      *
      * <ul>
-     *  <li>key -> String : SHA-1 encoding of the full URL
+     * <li>key -> String : SHA-1 encoding of the full URL</li>
+     * </ul>
      */
     private Map<String, XmlaOlap4jCacheElement> cacheEntries =
         new ConcurrentHashMap<String, XmlaOlap4jCacheElement>();
 
 
     /**
-     * Holds on to the current cache size
+     * Cache size.
      */
     private int cacheSize = DEFAULT_CACHE_SIZE;
 
-
     /**
-     * Holds on to the current eviction mode
+     * Eviction mode.
      */
-    private MODE evictionMode = DEFAULT_EVICTION_MODE;
-
+    private Mode evictionMode = DEFAULT_EVICTION_MODE;
 
     /**
-     * Holds on to the current cache timeout
+     * Cache timeout, in seconds.
      */
     private int cacheTimeout = DEFAULT_CACHE_TIMEOUT;
 
-
-
-
-    public XmlaOlap4jConcurrentMemoryCache(Map<String,String> props) throws IllegalArgumentException {
+    /**
+     * Creates a XmlaOlap4jConcurrentMemoryCache.
+     *
+     * @param props Properties
+     * @throws IllegalArgumentException
+     */
+    public XmlaOlap4jConcurrentMemoryCache(
+        Map<String,String> props)
+        throws IllegalArgumentException
+    {
         for (Entry<String,String> entry : props.entrySet()) {
             if (Property.Size.name()
                     .equalsIgnoreCase(entry.getKey().toString())) {
@@ -105,46 +105,51 @@ class XmlaOlap4jConcurrentMemoryCache {
      * @param size The number of cached entries.
      */
     private void setCacheSize(int size) {
-        if (size > 0) {
-            this.cacheSize  = size;
-        } else {
-          throw new IllegalArgumentException(
-            "The XMLAOLap4jMemoryCache size cannot be less or equal to 0.");
+        if (size <= 0) {
+            throw new IllegalArgumentException(
+                "Cache size must be positive, but was " + size);
         }
+        this.cacheSize  = size;
     }
-
-
 
     /**
-     * Sets the number of cached entries.
-     * @param size The number of cached entries.
+     * Sets the eviction mode.
+     *
+     * @param mode Eviction mode
      */
     private void setCacheMode(String mode) {
-        if (MODE.valueOf(mode) != null) {
-            this.evictionMode = MODE.valueOf(mode);
-        } else {
+        if (Mode.valueOf(mode) == null) {
             throw new IllegalArgumentException(
-                "The XMLAOLap4jMemoryCache mode has to be one of XmlaOlap4jMemoryCache.MODE");
+                "The XmlaOlap4jMemoryCache mode has to be one of " +
+                    Mode.class.getName());
         }
+        this.evictionMode = Mode.valueOf(mode);
     }
-
-
 
     /**
      * Sets the cache expiration timeout.
+     *
      * @param seconds The number of seconds to hold the entries in cache.
      */
     private void setCacheTimeout(int seconds) {
-        if (seconds > 0) {
-            this.cacheTimeout = seconds;
-        } else {
-          throw new IllegalArgumentException(
-            "The XMLAOLap4jMemoryCache timeout cannot be less or equal to 0.");
+        if (seconds <= 0) {
+            throw new IllegalArgumentException(
+                "Cache timeout must be positive, but was " + seconds);
         }
+        this.cacheTimeout = seconds;
     }
 
-
-    public byte[] get(final URL url, final byte[] request) {
+    /**
+     * TODO: javadoc required
+     *
+     * @param url TODO
+     * @param request TODO
+     * @return TODO
+     */
+    public byte[] get(
+        final URL url,
+        final byte[] request)
+    {
         // Take the cache for ourself
         synchronized (this.cacheEntries) {
             // Clean expired values
@@ -168,9 +173,17 @@ class XmlaOlap4jConcurrentMemoryCache {
         }
     }
 
-
-    public void put(final URL url, final byte[] request,
-            final byte[] response)
+    /**
+     * TODO: javadoc required
+     *
+     * @param url TODO
+     * @param request TODO
+     * @param response TODO
+     */
+    public void put(
+        final URL url,
+        final byte[] request,
+        final byte[] response)
     {
         // Take the cache for ourself
         synchronized (this.cacheEntries) {
@@ -196,22 +209,28 @@ class XmlaOlap4jConcurrentMemoryCache {
 
     /**
      * Cleans expired cache entries.
+     *
      * @param makeRoom Whether to make room for later appending by
      * evicting an entry based on the selected eviction mode.
      */
     private void cleanExpired(boolean makeRoom) {
-        String toBeEvicted = null;
-
-        if (evictionMode == MODE.FIFO || evictionMode == MODE.LIFO) {
+        final String toBeEvicted;
+        switch (evictionMode) {
+        case FIFO:
+        case LIFO:
             toBeEvicted = timeBasedEviction(makeRoom);
-        }
-        if (evictionMode == MODE.LFU || evictionMode == MODE.MFU) {
+            break;
+        case LFU:
+        case MFU:
             toBeEvicted = hitBasedEviction(makeRoom);
+            break;
+        default:
+            throw Olap4jUtil.unexpected(evictionMode);
         }
 
         // Make some space if required
         if (makeRoom && this.cacheEntries.size() >= cacheSize
-                && toBeEvicted != null)
+            && toBeEvicted != null)
         {
             this.cacheEntries.remove(toBeEvicted);
         }
@@ -220,6 +239,7 @@ class XmlaOlap4jConcurrentMemoryCache {
     /**
      * Scans for the key of the cache entry to be evicted based
      * on the selected time based eviction mode.
+     *
      * @param makeRoom Whether to make room for later appending by
      * evicting an entry. if false is specified, there might not
      * be an evicted entry if the cache is not full.
@@ -228,7 +248,7 @@ class XmlaOlap4jConcurrentMemoryCache {
     private String timeBasedEviction(boolean makeRoom)
     {
         // This is a flag to find the oldest entry.
-        long currentEvictedTimestamp = evictionMode == MODE.LIFO
+        long currentEvictedTimestamp = evictionMode == Mode.LIFO
             ? Long.MAX_VALUE
             : Long.MIN_VALUE;
 
@@ -240,19 +260,25 @@ class XmlaOlap4jConcurrentMemoryCache {
         {
             // Check if not expired
             if (Calendar.getInstance().getTimeInMillis() >
-                (entry.getValue().getTimestamp().longValue() + (cacheTimeout * 1000)))
+                (entry.getValue().getTimestamp().longValue()
+                    + (cacheTimeout * 1000)))
             {
                 // Evicts it.
                 this.cacheEntries.remove(entry.getKey());
                 continue;
             }
 
-            // Checks if this is the oldest entry
+            // Checks if this is the oldest entry.
+            //
+            // REVIEW (jhyde, 2009/2/20): are parens correct? makeRoom
+            // associates with LIFO but not FIFO
             if (makeRoom &&
-                (evictionMode == MODE.LIFO
-                  && entry.getValue().getTimestamp().longValue() < currentEvictedTimestamp)
-                || (evictionMode == MODE.FIFO
-                  && entry.getValue().getTimestamp().longValue() > currentEvictedTimestamp))
+                (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.LIFO
+                    && entry.getValue().getTimestamp().longValue()
+                    < currentEvictedTimestamp)
+                || (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.FIFO
+                && entry.getValue().getTimestamp().longValue()
+                > currentEvictedTimestamp))
             {
                 currentEvictedTimestamp = entry.getValue().getTimestamp().longValue();
                 toBeEvicted = entry.getKey();
@@ -265,15 +291,17 @@ class XmlaOlap4jConcurrentMemoryCache {
     /**
      * Scans for the key of the cache entry to be evicted based
      * on the selected hit based eviction mode.
-     * @param makeRoom Whether to make room for later appending by evicting an entry.
-     * if false is specified, there might not be an evicted entry if the cache
-     * is not full.
+     *
+     * @param makeRoom Whether to make room for later appending by evicting an
+     * entry. If false, there might not be an evicted entry if the cache is not
+     * full
+     *
      * @return The key of the entry to remove, null otherwise.
      */
     private String hitBasedEviction(boolean makeRoom)
     {
         // Flag to find the oldest entry.
-        long currentEvictedHits = (evictionMode == MODE.LFU)
+        long currentEvictedHits = (evictionMode == Mode.LFU)
             ? Long.MAX_VALUE
             : Long.MIN_VALUE;
 
@@ -285,19 +313,23 @@ class XmlaOlap4jConcurrentMemoryCache {
         {
             // Checks if not expired
             if (Calendar.getInstance().getTimeInMillis() >
-                (entry.getValue().getTimestamp().longValue() + (cacheTimeout * 1000)))
+                (entry.getValue().getTimestamp().longValue()
+                    + (cacheTimeout * 1000)))
             {
                 // Evicts it
                 this.cacheEntries.remove(entry.getKey());
                 continue;
             }
 
-            // Checks if this is the oldest entry
+            // Checks if this is the oldest entry.
+            // REVIEW: Same comments as above.
             if (makeRoom &&
-              (evictionMode == MODE.LFU
-                && entry.getValue().getHitCount().longValue() < currentEvictedHits)
-              || (evictionMode == MODE.MFU
-                && entry.getValue().getHitCount().longValue() > currentEvictedHits))
+                (evictionMode == Mode.LFU
+                    && entry.getValue().getHitCount().longValue()
+                    < currentEvictedHits)
+                || (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.MFU
+                && entry.getValue().getHitCount().longValue()
+                > currentEvictedHits))
             {
                 currentEvictedHits = entry.getValue().getHitCount().longValue();
                 toBeEvicted = entry.getKey();

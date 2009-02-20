@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2008-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -16,7 +16,7 @@ import java.util.concurrent.*;
 import org.olap4j.impl.Olap4jUtil;
 
 /**
- * <p>Implementation of the XMLA SOAP cache places it's cache entries
+ * <p>Implementation of the XMLA SOAP cache that places its cache entries
  * in memory for later use. It is thread safe and at static class level.
  *
  * <p>It supports cache sharing through the Name property.
@@ -98,10 +98,14 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
     /**
      * Defines the supported eviction modes.
      */
-    public static enum MODE {
+    public static enum Mode {
+        /** Last-in, first-out. */
         LIFO,
+        /** First-in, first-out. */
         FIFO,
+        /** Least-frequently used. */
         LFU,
+        /** Most-frequently used. */
         MFU
     }
 

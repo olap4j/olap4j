@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2008-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -36,9 +36,10 @@ public interface XmlaOlap4jCache {
      * @param id The connection unique name which called this cache.
      * @param url The URL where the SOAP message was sent.
      * @param request The SOAP complete message.
-     * @throws XmlaOlap4jInvalidStateException This internal exception gets thrown
-     * when operations to the cache are performed but it hasn't been
-     * initialized. Make sure you call the setParameters method.
+     *
+     * @throws XmlaOlap4jInvalidStateException when
+     * operations to the cache are performed but it hasn't been initialized.
+     * Make sure you call the setParameters method.
      *
      * @return The SOAP response, null if there are no corresponding
      * response in the cache.
@@ -59,7 +60,7 @@ public interface XmlaOlap4jCache {
      * response.
      * @param response The response to cache.
      *
-     * @throws XmlaOlap4jInvalidStateException This internal exception gets thrown when
+     * @throws XmlaOlap4jInvalidStateException when
      * operations to the cache are performed but it hasn't been initialized.
      * Make sure you call the setParameters method.
      */
@@ -67,10 +68,11 @@ public interface XmlaOlap4jCache {
         String id,
         URL url,
         byte[] request,
-        byte[] response) throws XmlaOlap4jInvalidStateException;
+        byte[] response)
+        throws XmlaOlap4jInvalidStateException;
 
     /**
-     * This tells the cache to flush all cached entries.
+     * Tells the cache to flush all cached entries.
      */
     public void flushCache();
 
