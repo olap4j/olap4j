@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -27,7 +27,47 @@ import java.util.Locale;
 public interface Axis {
 
     /**
-     * Returns the name of this axis, e.g. "COLUMNS", "SLICER", "AXIS(17)".
+     * @deprecated Will be removed before olap4j 1.0.
+     */
+    Standard UNUSED = null;
+
+    /**
+     * @deprecated Will be removed before olap4j 1.0.
+     */
+    Standard NONE = null;
+
+    /**
+     * Abbreviation for {@link org.olap4j.Axis.Standard#FILTER}.
+     */
+    Standard FILTER = Standard.FILTER;
+
+    /**
+     * Abbreviation for {@link org.olap4j.Axis.Standard#COLUMNS}.
+     */
+    Standard COLUMNS = Standard.COLUMNS;
+
+    /**
+     * Abbreviation for {@link org.olap4j.Axis.Standard#ROWS}.
+     */
+    Standard ROWS = Standard.ROWS;
+
+    /**
+     * Abbreviation for {@link org.olap4j.Axis.Standard#PAGES}.
+     */
+    Standard PAGES = Standard.PAGES;
+
+    /**
+     * Abbreviation for {@link org.olap4j.Axis.Standard#CHAPTERS}.
+     */
+    Standard SECTIONS = Standard.SECTIONS;
+
+    /**
+     * Abbreviation for {@link org.olap4j.Axis.Standard#FILTER}.
+     */
+    Standard CHAPTERS = Standard.CHAPTERS;
+
+    /**
+     * Returns the name of this axis, e.g. "COLUMNS", "FILTER", "AXIS(17)".
      *
      * @return Name of the axis
      */
@@ -40,31 +80,44 @@ public interface Axis {
      */
     boolean isFilter();
 
-    /**
-     * @deprecated Will be removed before olap4j 1.0.
-     */
-    public static final Standard UNUSED = null;
 
     /**
-     * @deprecated Will be removed before olap4j 1.0.
+     * Returns the ordinal which is to be used for retrieving this axis from
+     * the {@link org.olap4j.CellSet#getAxes()}, or retrieving its
+     * coordinate from {@link Cell#getCoordinateList()}.
+     *
+     * <p>For example:
+     * <ul>
+     * <li>-1 {@link org.olap4j.Axis.Standard#FILTER FILTER}</li>
+     * <li>0 {@link org.olap4j.Axis.Standard#COLUMNS COLUMNS}</li>
+     * <li>1 {@link org.olap4j.Axis.Standard#ROWS ROWS}</li>
+     * <li>2 {@link org.olap4j.Axis.Standard#PAGES PAGES}</li>
+     * <li>3 {@link org.olap4j.Axis.Standard#CHAPTERS CHAPTERS}</li>
+     * <li>4 {@link org.olap4j.Axis.Standard#SECTIONS SECTIONS}</li>
+     * <li>5 {@link org.olap4j.Axis.Standard#SECTIONS SECTIONS}</li>
+     * <li>6 AXES(6)</li>
+     * <li>123 AXES(123)</li>
+     * </ul>
+     *
+     * @return ordinal of this axis
      */
-    public static final Standard NONE = null;
+    int axisOrdinal();
 
     /**
-     * Abbreviation for {@link org.olap4j.Axis.Standard#FILTER}.
+     * Returns localized name for this Axis.
+     *
+     * <p>Examples: "FILTER", "ROWS", "COLUMNS", "AXIS(10)".
+     *
+     * @param locale Locale for which to give the name
+     * @return localized name for this Axis
      */
-    public static final Standard FILTER = Standard.FILTER;
-    public static final Standard COLUMNS = Standard.COLUMNS;
-    public static final Standard ROWS = Standard.ROWS;
-    public static final Standard PAGES = Standard.PAGES;
-    public static final Standard SECTIONS = Standard.SECTIONS;
-    public static final Standard CHAPTERS = Standard.CHAPTERS;
+    String getCaption(Locale locale);
 
     /**
      * Enumeration of standard, named axes descriptors.
      */
     public enum Standard implements Axis {
-        /** Filter axis. */
+        /** Filter axis, also known as the slicer axis. */
         FILTER,
 
         /** COLUMNS axis, also known as X axis and AXIS(0). */
@@ -96,11 +149,14 @@ public interface Axis {
         }
     }
 
+    /**
+     * Container class for various Axis factory methods.
+     */
     class Factory {
         private static final Standard[] STANDARD_VALUES = Standard.values();
 
         /**
-         * Returns the axis with a given {@code axisOrdinal}.
+         * Returns the axis with a given ordinal.
          *
          * <p>For example, {@code forOrdinal(0)} returns the COLUMNS axis;
          * {@code forOrdinal(-1)} returns the SLICER axis;
@@ -141,38 +197,6 @@ public interface Axis {
             };
         }
     }
-
-    /**
-     * Returns the ordinal which is to be used for retrieving this axis from
-     * the {@link org.olap4j.CellSet#getAxes()}, or retrieving its
-     * coordinate from {@link Cell#getCoordinateList()}.
-     *
-     * <p>For example:
-     * <ul>
-     * <li>-1 {@link org.olap4j.Axis.Standard#FILTER FILTER}</li>
-     * <li>0 {@link org.olap4j.Axis.Standard#COLUMNS COLUMNS}</li>
-     * <li>1 {@link org.olap4j.Axis.Standard#ROWS ROWS}</li>
-     * <li>2 {@link org.olap4j.Axis.Standard#PAGES PAGES}</li>
-     * <li>3 {@link org.olap4j.Axis.Standard#CHAPTERS CHAPTERS}</li>
-     * <li>4 {@link org.olap4j.Axis.Standard#SECTIONS SECTIONS}</li>
-     * <li>5 {@link org.olap4j.Axis.Standard#SECTIONS SECTIONS}</li>
-     * <li>6 AXES(6)</li>
-     * <li>123 AXES(123)</li>
-     * </ul>
-     *
-     * @return ordinal of this axis
-     */
-    int axisOrdinal();
-
-    /**
-     * Returns localized name for this Axis.
-     *
-     * <p>Examples: "FILTER", "ROWS", "COLUMNS", "AXIS(10)".
-     *
-     * @param locale Locale for which to give the name
-     * @return localized name for this Axis
-     */
-    String getCaption(Locale locale);
 }
 
 // End Axis.java
