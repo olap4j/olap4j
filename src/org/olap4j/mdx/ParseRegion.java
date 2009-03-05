@@ -9,6 +9,8 @@
 */
 package org.olap4j.mdx;
 
+import java.io.Serializable;
+
 /**
  * Region of parser source code.
  *
@@ -32,7 +34,7 @@ package org.olap4j.mdx;
  * @version $Id$
  * @author jhyde
  */
-public class ParseRegion {
+public class ParseRegion implements Serializable{
     private final int startLine;
     private final int startColumn;
     private final int endLine;

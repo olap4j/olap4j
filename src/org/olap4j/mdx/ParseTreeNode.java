@@ -9,6 +9,7 @@
 */
 package org.olap4j.mdx;
 
+import java.io.Serializable;
 import org.olap4j.type.Type;
 
 /**
@@ -21,7 +22,7 @@ import org.olap4j.type.Type;
  * @version $Id$
  * @since Jun 4, 2007
  */
-public interface ParseTreeNode {
+public interface ParseTreeNode extends Serializable {
     /**
      * Accepts a visitor to this MDX parse tree node.
      *

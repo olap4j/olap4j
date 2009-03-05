@@ -9,6 +9,7 @@
 */
 package org.olap4j;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Locale;
  * @version $Id$
  * @since Oct 23, 2006
  */
-public interface Axis {
+public interface Axis extends Serializable {
 
     /**
      * @deprecated Will be removed before olap4j 1.0.

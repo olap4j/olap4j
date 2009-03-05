@@ -12,6 +12,7 @@ package org.olap4j.mdx;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.type.Type;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -312,7 +313,7 @@ public class IdentifierNode
      * To parse an identifier into a list of segments, use the method
      * {@link IdentifierNode#parseIdentifier(String)}.</p>
      */
-    public static class Segment {
+    public static class Segment implements Serializable{
         final String name;
         final IdentifierNode.Quoting quoting;
         private final ParseRegion region;
