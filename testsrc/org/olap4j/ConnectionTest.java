@@ -1485,14 +1485,14 @@ public class ConnectionTest extends TestCase {
         assertEquals("Food", member.getCaption(null));
 
         if (tester.getFlavor() != Tester.Flavor.XMLA) {
-        	  assertNull(member.getDescription(null));
-        	  assertEquals(1, member.getDepth());
-        	  assertEquals(-1, member.getSolveOrder());
-        	  assertFalse(member.isHidden());
-        	  assertNull(member.getDataMember());
-        	  assertFalse(member.isCalculatedInQuery());
+          assertNull(member.getDescription(null));
+          assertEquals(1, member.getDepth());
+          assertEquals(-1, member.getSolveOrder());
+          assertFalse(member.isHidden());
+          assertNull(member.getDataMember());
+          assertFalse(member.isCalculatedInQuery());
         } else {
-        	  assertEquals("", member.getDescription(null));
+          assertEquals("", member.getDescription(null));
         }
 
         switch (tester.getFlavor()) {

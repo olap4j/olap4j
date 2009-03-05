@@ -34,7 +34,7 @@ import java.io.Serializable;
  * @version $Id$
  * @author jhyde
  */
-public class ParseRegion implements Serializable{
+public class ParseRegion implements Serializable {
     private final int startLine;
     private final int startColumn;
     private final int endLine;
