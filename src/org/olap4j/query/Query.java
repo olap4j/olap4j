@@ -13,14 +13,7 @@ import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Member;
 import org.olap4j.*;
-import org.olap4j.mdx.AxisNode;
-import org.olap4j.mdx.CallNode;
-import org.olap4j.mdx.CubeNode;
-import org.olap4j.mdx.IdentifierNode;
-import org.olap4j.mdx.MemberNode;
-import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.mdx.SelectNode;
-import org.olap4j.mdx.Syntax;
 
 import java.util.*;
 import java.sql.SQLException;
@@ -64,23 +57,38 @@ public class Query {
         across = new QueryAxis(this, Axis.COLUMNS);
         down = new QueryAxis(this, Axis.ROWS);
         filter = new QueryAxis(this, Axis.FILTER);
-        axes.put(Axis.UNUSED, unused);
+        axes.put(null, unused);
         axes.put(Axis.COLUMNS, across);
         axes.put(Axis.ROWS, down);
         axes.put(Axis.FILTER, filter);
     }
 
     /**
-     * Returns the MDX parse tree behind this Query.
+     * Returns the MDX parse tree behind this Query. The returned object is
+     * generated for each call to this function. Altering the returned
+     * SelectNode object won't affect the query itself.
+     * @return A SelectNode object representing the current query structure.
      */
     public SelectNode getSelect() {
-        return new Olap4jNodeConverter().toOlap4j(this);
+        return Olap4jNodeConverter.toOlap4j(this);
     }
 
+    /**
+     * Returns the underlying cube object that is used to query against.
+     * @return The Olap4j's Cube object.
+     */
     public Cube getCube() {
         return cube;
     }
 
+    /**
+     * Returns the Olap4j's Dimension object according to the name
+     * given as a parameter. If no dimension of the given name is found,
+     * a null value will be returned.
+     * @param name The name of the dimension you want the object for.
+     * @return The dimension object, null if no dimension of that
+     * name can be found.
+     */
     public QueryDimension getDimension(String name) {
         return dimensionMap.get(name);
     }
@@ -106,258 +114,97 @@ public class Query {
         down.getDimensions().addAll(tmpAcross);
     }
 
+    /**
+     * Returns a map of the current query's axis.
+     * @return A standard Map object that represents the current query's axis.
+     */
     public Map<Axis, QueryAxis> getAxes() {
         return axes;
     }
 
-    public QueryAxis getunusedAxis() {
+    /**
+     * Returns the fictional axis into which all unused dimensions are stored.
+     * All dimensions included in this axis will not be part of the query.
+     * @return The QueryAxis representing dimensions that are currently not
+     * used inside the query.
+     */
+    public QueryAxis getUnusedAxis() {
         return unused;
     }
 
     public boolean validate() throws OlapException {
+        /*
+         * FIXME What's the exact purpose of this validation process?
+         * To start with, it doesn't even really validate... it iterates
+         * over the cube dimensions, but it should iterate over the selected
+         * query dimensions instead, thus saving computation time.
+         * Second, it doesn't actually validate. It just selects default
+         * dimension members in the default hierarchy. Do we really want
+         * to add such arbitrary behavior in a query layer?
+         * This needs work. I'll put something in the tracker.
+         */
         for (Dimension dimension :  cube.getDimensions()) {
             QueryDimension queryDimension =
                 getDimension(dimension.getName());
             if (queryDimension == null) {
-                // TODO log this better
                 return false;
             }
             Member member = dimension.getDefaultHierarchy().getDefaultMember();
             if (queryDimension.getAxis() == null ||
                 queryDimension.getAxis().getLocation() == null) {
                 queryDimension.getSelections().clear();
-                queryDimension.getSelections().add(queryDimension.createSelection(member));
+                queryDimension.getSelections()
+                    .add(queryDimension.createSelection(member));
             } else {
                 if (queryDimension.getSelections().size() == 0) {
-                    queryDimension.getSelections().add(queryDimension.createSelection(member));
+                    queryDimension.getSelections()
+                        .add(queryDimension.createSelection(member));
                 }
             }
         }
         return true;
     }
 
+    /**
+     * Executes the query against the current OlapConnection and returns
+     * a CellSet object representation of the data.
+     * @return A proper CellSet object that represents the query execution
+     * results.
+     * @throws OlapException If something goes sour, an OlapException will
+     * be thrown to the caller. It could be caused by many things, like
+     * a stale connection. Look at the root cause for more details.
+     */
     public CellSet execute() throws OlapException {
         SelectNode mdx = getSelect();
         OlapStatement olapStatement = connection.createStatement();
         return olapStatement.executeOlapQuery(mdx);
     }
 
+    /**
+     * Returns this query's name. There is no guarantee that it is unique
+     * and is set at object instanciation.
+     * @return This query's name.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the current locale with which this query is expressed.
+     * @return A standard Locale object.
+     */
     public Locale getLocale() {
-        return Locale.getDefault(); // todo:
+        // TODO Do queries really support locales?
+        return Locale.getDefault();
     }
 
-    public SelectionFactory getSelectionFactory() {
+    /**
+     * Package restricted method to access this query's selection factory.
+     * Usually used by query dimensions who wants to perform selections.
+     * @return The underlying SelectionFactory implementation.
+     */
+    SelectionFactory getSelectionFactory() {
         return selectionFactory;
-    }
-
-    private static class Olap4jNodeConverter {
-
-        public SelectNode toOlap4j(Query query) {
-            List<IdentifierNode> list = Collections.emptyList();
-            List<ParseTreeNode> withList = Collections.emptyList();
-            List<QueryAxis> axisList = new ArrayList<QueryAxis>();
-            axisList.add(query.getAxes().get(Axis.COLUMNS));
-            axisList.add(query.getAxes().get(Axis.ROWS));
-
-            AxisNode filterAxis = null;
-            if (query.getAxes().containsKey(Axis.FILTER)) {
-                final QueryAxis axis = query.getAxes().get(Axis.FILTER);
-                if (!axis.dimensions.isEmpty()) {
-                    filterAxis = toOlap4j(axis);
-                }
-            }
-            return new SelectNode(
-                null,
-                withList,
-                toOlap4j(axisList),
-                new CubeNode(
-                    null,
-                    query.getCube()),
-                filterAxis,
-                list);
-        }
-
-        private CallNode generateSetCall(ParseTreeNode... args) {
-            return
-                new CallNode(
-                    null,
-                    "{}",
-                    Syntax.Braces,
-                    args);
-        }
-
-        private CallNode generateListSetCall(List<ParseTreeNode> cnodes) {
-            return
-                new CallNode(
-                    null,
-                    "{}",
-                    Syntax.Braces,
-                    cnodes);
-        }
-
-        private CallNode generateListTupleCall(List<ParseTreeNode> cnodes) {
-            return
-                new CallNode(
-                    null,
-                    "()",
-                    Syntax.Parentheses,
-                    cnodes);
-        }
-
-        protected CallNode getMemberSet(QueryDimension dimension) {
-            return
-                new CallNode(
-                  null,
-                  "{}",
-                  Syntax.Braces,
-                  toOlap4j(dimension));
-        }
-
-        protected CallNode crossJoin(QueryDimension dim1, QueryDimension dim2) {
-            return
-                new CallNode(
-                    null,
-                    "CrossJoin",
-                    Syntax.Function,
-                    getMemberSet(dim1),
-                    getMemberSet(dim2));
-        }
-
-        //
-        // This method merges the selections into a single
-        // MDX axis selection.  Right now we do a simple
-        // crossjoin
-        //
-        private AxisNode toOlap4j(QueryAxis axis) {
-            CallNode callNode = null;
-            int numDimensions = axis.getDimensions().size();
-            if (axis.getLocation() == Axis.FILTER) {
-                // need a tuple
-                // need a crossjoin
-                List<ParseTreeNode> members = new ArrayList<ParseTreeNode>();
-                for (int dimNo = 0; dimNo < numDimensions; dimNo++) {
-                    QueryDimension dimension =
-                        axis.getDimensions().get(dimNo);
-                    if (dimension.getSelections().size() == 1) {
-                        members.addAll(toOlap4j(dimension));
-                    }
-                }
-                callNode = generateListTupleCall(members);
-            } else if (numDimensions == 1) {
-                QueryDimension dimension = axis.getDimensions().get(0);
-                List<ParseTreeNode> members = toOlap4j(dimension);
-                callNode = generateListSetCall(members);
-            } else if (numDimensions == 2) {
-                callNode =
-                    crossJoin(
-                        axis.getDimensions().get(0),
-                        axis.getDimensions().get(1));
-            } else {
-                // need a longer crossjoin
-                // start from the back of the list;
-                List<QueryDimension> dims = axis.getDimensions();
-                callNode = getMemberSet(dims.get(dims.size() - 1));
-                for (int i = dims.size() - 2; i >= 0; i--) {
-                    CallNode memberSet = getMemberSet(dims.get(i));
-                    callNode =
-                        new CallNode(
-                            null,
-                            "CrossJoin",
-                            Syntax.Function,
-                            memberSet,
-                            callNode);
-                }
-            }
-            return new AxisNode(
-                null,
-                axis.isNonEmpty(),
-                axis.getLocation(),
-                new ArrayList<IdentifierNode>(),
-                callNode);
-        }
-
-        private List<ParseTreeNode> toOlap4j(QueryDimension dimension) {
-            List<ParseTreeNode> members = new ArrayList<ParseTreeNode>();
-            for (Selection selection : dimension.getSelections()) {
-                members.add(toOlap4j(selection));
-            }
-            return members;
-        }
-
-        private ParseTreeNode toOlap4j(Selection selection) {
-            try {
-                return toOlap4j(selection.getMember(), selection.getOperator());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        private ParseTreeNode toOlap4j(Member member, Selection.Operator oper) {
-            ParseTreeNode node = null;
-            try {
-                switch (oper) {
-                case MEMBER:
-                    node = new MemberNode(null, member);
-                    break;
-                case SIBLINGS:
-                    node =
-                        new CallNode(
-                            null,
-                            "Siblings",
-                            Syntax.Property,
-                            new MemberNode(null, member));
-                    break;
-                case CHILDREN:
-                    node =
-                        new CallNode(
-                            null,
-                            "Children",
-                            Syntax.Property,
-                            new MemberNode(null, member));
-                    break;
-                case INCLUDE_CHILDREN:
-                    node =
-                        generateSetCall(
-                            new MemberNode(null, member),
-                            toOlap4j(member, Selection.Operator.CHILDREN));
-                    break;
-                case DESCENDANTS:
-                    node =
-                        new CallNode(
-                            null,
-                            "Descendants",
-                            Syntax.Function,
-                            new MemberNode(null, member));
-                    break;
-                case ANCESTORS:
-                    node =
-                        new CallNode(
-                            null,
-                            "Ascendants",
-                            Syntax.Function,
-                            new MemberNode(null, member));
-                    break;
-                default:
-                    System.out.println("NOT IMPLEMENTED: " + oper);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return node;
-        }
-
-        private List<AxisNode> toOlap4j(List<QueryAxis> axes) {
-            final ArrayList<AxisNode> axisList = new ArrayList<AxisNode>();
-            for (QueryAxis axis : axes) {
-                axisList.add(toOlap4j(axis));
-            }
-            return axisList;
-        }
     }
 }
 
