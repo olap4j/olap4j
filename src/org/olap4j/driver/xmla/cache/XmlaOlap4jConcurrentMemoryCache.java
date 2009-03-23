@@ -139,10 +139,7 @@ class XmlaOlap4jConcurrentMemoryCache {
         this.cacheTimeout = seconds;
     }
 
-    /* (non-Javadoc)
-     * @see org.olap4j.driver.xmla.cache.XmlaOlap4jCache#get(java.lang.String, java.net.URL, byte[])
-     */
-    public byte[] get(
+    byte[] get(
         final URL url,
         final byte[] request)
     {
@@ -169,10 +166,7 @@ class XmlaOlap4jConcurrentMemoryCache {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.olap4j.driver.xmla.cache.XmlaOlap4jCache#put(java.lang.String, java.net.URL, byte[], byte[])
-     */
-    public void put(
+    void put(
         final URL url,
         final byte[] request,
         final byte[] response)
