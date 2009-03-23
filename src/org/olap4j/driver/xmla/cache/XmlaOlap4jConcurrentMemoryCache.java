@@ -139,12 +139,8 @@ class XmlaOlap4jConcurrentMemoryCache {
         this.cacheTimeout = seconds;
     }
 
-    /**
-     * TODO: javadoc required
-     *
-     * @param url TODO
-     * @param request TODO
-     * @return TODO
+    /* (non-Javadoc)
+     * @see org.olap4j.driver.xmla.cache.XmlaOlap4jCache#get(java.lang.String, java.net.URL, byte[])
      */
     public byte[] get(
         final URL url,
@@ -173,12 +169,8 @@ class XmlaOlap4jConcurrentMemoryCache {
         }
     }
 
-    /**
-     * TODO: javadoc required
-     *
-     * @param url TODO
-     * @param request TODO
-     * @param response TODO
+    /* (non-Javadoc)
+     * @see org.olap4j.driver.xmla.cache.XmlaOlap4jCache#put(java.lang.String, java.net.URL, byte[], byte[])
      */
     public void put(
         final URL url,
