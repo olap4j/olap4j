@@ -269,18 +269,17 @@ class XmlaOlap4jConcurrentMemoryCache {
             }
 
             // Checks if this is the oldest entry.
-            //
-            // REVIEW (jhyde, 2009/2/20): are parens correct? makeRoom
-            // associates with LIFO but not FIFO
-            if (makeRoom &&
-                (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.LIFO
+            if ((makeRoom &&
+                    (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.LIFO
                     && entry.getValue().getTimestamp().longValue()
-                    < currentEvictedTimestamp)
-                || (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.FIFO
-                && entry.getValue().getTimestamp().longValue()
-                > currentEvictedTimestamp))
+                    < currentEvictedTimestamp))
+                || (makeRoom &&
+                    (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.FIFO
+                    && entry.getValue().getTimestamp().longValue()
+                    > currentEvictedTimestamp)))
             {
-                currentEvictedTimestamp = entry.getValue().getTimestamp().longValue();
+                currentEvictedTimestamp =
+                    entry.getValue().getTimestamp().longValue();
                 toBeEvicted = entry.getKey();
             }
         }
@@ -322,14 +321,14 @@ class XmlaOlap4jConcurrentMemoryCache {
             }
 
             // Checks if this is the oldest entry.
-            // REVIEW: Same comments as above.
-            if (makeRoom &&
-                (evictionMode == Mode.LFU
+            if ((makeRoom &&
+                    (evictionMode == Mode.LFU
                     && entry.getValue().getHitCount().longValue()
-                    < currentEvictedHits)
-                || (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.MFU
-                && entry.getValue().getHitCount().longValue()
-                > currentEvictedHits))
+                    < currentEvictedHits))
+                || (makeRoom &&
+                    (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.MFU
+                    && entry.getValue().getHitCount().longValue()
+                    > currentEvictedHits)))
             {
                 currentEvictedHits = entry.getValue().getHitCount().longValue();
                 toBeEvicted = entry.getKey();
