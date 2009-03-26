@@ -17,7 +17,9 @@ import org.olap4j.Axis;
 import org.olap4j.mdx.AxisNode;
 import org.olap4j.mdx.CallNode;
 import org.olap4j.mdx.CubeNode;
+import org.olap4j.mdx.DimensionNode;
 import org.olap4j.mdx.IdentifierNode;
+import org.olap4j.mdx.LiteralNode;
 import org.olap4j.mdx.MemberNode;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.mdx.SelectNode;
@@ -158,7 +160,30 @@ abstract class Olap4jNodeConverter {
         for (Selection selection : dimension.getSelections()) {
             members.add(toOlap4j(selection));
         }
-        return members;
+        if (dimension.getSortOrder() != null) {
+            CallNode currentMemberNode = new CallNode(
+                null,
+                "CurrentMember",
+                Syntax.Property,
+                new DimensionNode(null,dimension.getDimension()));
+            CallNode currentMemberNameNode = new CallNode(
+                null,
+                "Name",
+                Syntax.Property,
+                currentMemberNode);
+            List<ParseTreeNode> orderedList = new ArrayList<ParseTreeNode>();
+            orderedList.add(
+                new CallNode(
+                    null,
+                    "Order",
+                    Syntax.Function,
+                    generateListSetCall(members),
+                    currentMemberNameNode,
+                    LiteralNode.createSymbol(null,dimension.getSortOrder().name())));
+            return orderedList;
+        } else {
+            return members;
+        }
     }
 
     private static ParseTreeNode toOlap4j(Selection selection) {

@@ -38,6 +38,7 @@ public class QueryDimension {
     protected final List<Selection> selections = new SelectionList();
     private final Query query;
     protected Dimension dimension;
+    private SortOrder sortOrder = null;
 
     public QueryDimension(Query query, Dimension dimension) {
         super();
@@ -143,6 +144,14 @@ public class QueryDimension {
         this.dimension = dimension;
     }
 
+    public void setSortOrder(SortOrder order) {
+        this.sortOrder = order;
+    }
+
+    public SortOrder getSortOrder() {
+        return this.sortOrder;
+    }
+
     private class SelectionList extends AbstractList<Selection> {
         private final List<Selection> list = new ArrayList<Selection>();
 
@@ -168,6 +177,17 @@ public class QueryDimension {
         public Selection remove(int index) {
             return list.remove(index);
         }
+    }
+
+    public static enum SortOrder {
+        /**
+         * Ascending sort order.
+         */
+        ASC,
+        /**
+         * Descending sort order.
+         */
+        DESC
     }
 }
 

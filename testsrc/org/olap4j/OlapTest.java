@@ -11,6 +11,7 @@ package org.olap4j;
 import org.olap4j.mdx.SelectNode;
 import org.olap4j.metadata.*;
 import org.olap4j.query.*;
+import org.olap4j.query.QueryDimension.SortOrder;
 import org.olap4j.test.TestContext;
 
 import org.w3c.dom.*;
@@ -504,6 +505,83 @@ public class OlapTest extends TestCase {
             fail();
         }
     }
+
+    public void testSortDimension() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+            Query query = new Query("my query", cube);
+
+            // create selections
+
+            QueryDimension productDimension = query.getDimension("Product");
+            Member drinkMember = cube.lookupMember("Product", "Drink");
+            Selection drinkSelection =
+                productDimension.createSelection(drinkMember,
+                        Selection.Operator.INCLUDE_CHILDREN);
+            productDimension.getSelections().add(drinkSelection);
+
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            Member storeSalesMember = cube.lookupMember("Measures", "Store Sales");
+            Selection storeSalesSelection =
+                measuresDimension.createSelection(storeSalesMember,
+                        Selection.Operator.MEMBER);
+            measuresDimension.getSelections().add(storeSalesSelection);
+
+            query.getAxes().get(Axis.ROWS).getDimensions().add(productDimension);
+            query.getAxes().get(Axis.COLUMNS).getDimensions().add(measuresDimension);
+
+            query.validate();
+
+            assertEquals(productDimension.getAxis().getLocation(), Axis.ROWS);
+            assertEquals(measuresDimension.getAxis().getLocation(), Axis.COLUMNS);
+
+            SelectNode mdx = query.getSelect();
+            String mdxString = mdx.toString();
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
+                    "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n" +
+                    "FROM [Sales]"));
+
+            // Sort the products in ascending order.
+            query.getDimension("Product").setSortOrder(SortOrder.DESC);
+
+            SelectNode sortedMdx = query.getSelect();
+            String sortedMdxString = sortedMdx.toString();
+            assertEquals(
+                sortedMdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
+                    "{Order({{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}}, [Product].CurrentMember.Name, DESC)} ON ROWS\n" +
+                    "FROM [Sales]"));
+
+            CellSet results = query.execute();
+            String s = TestContext.toString(results);
+            TestContext.assertEqualsVerbose(
+                    TestContext.fold("Axis #0:\n" +
+                            "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
+                            "Axis #1:\n" +
+                            "{[Measures].[Store Sales]}\n" +
+                            "Axis #2:\n" +
+                            "{[Product].[All Products].[Drink]}\n" +
+                            "{[Product].[All Products].[Drink].[Dairy]}\n" +
+                            "{[Product].[All Products].[Drink].[Beverages]}\n" +
+                            "{[Product].[All Products].[Drink].[Alcoholic Beverages]}\n" +
+                            "Row #0: 48,836.21\n" +
+                            "Row #1: 7,058.60\n" +
+                            "Row #2: 27,748.53\n" +
+                            "Row #3: 14,029.08\n"),
+                    s);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
 
 
 
