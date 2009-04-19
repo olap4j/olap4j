@@ -226,7 +226,7 @@ public class RectangularCellSetFormatter implements CellSetFormatter {
             for (int y = 0; y < matrix.height; y++) {
                 for (int x = 0; x < matrix.width; x++) {
                     if (x > 0) {
-                        pw.print(' ');                        
+                        pw.print(' ');
                     }
                     final MatrixCell cell = matrix.get(x, y);
                     final int len;

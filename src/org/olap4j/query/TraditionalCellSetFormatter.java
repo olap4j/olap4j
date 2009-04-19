@@ -35,25 +35,40 @@ public class TraditionalCellSetFormatter implements CellSetFormatter {
         print(cellSet, pw);
     }
 
+    /**
+     * Prints a cell set.
+     *
+     * @param cellSet Cell set
+     * @param pw Writer
+     */
     private static void print(CellSet cellSet, PrintWriter pw) {
         pw.println("Axis #0:");
         printAxis(pw, cellSet.getFilterAxis());
         final List<CellSetAxis> axes = cellSet.getAxes();
-        int i = 0;
-        for (CellSetAxis axis : axes) {
-            pw.println("Axis #" + (++i) + ":");
+        final int axisCount = axes.size();
+        for (int i = 0; i < axisCount; i++) {
+            CellSetAxis axis = axes.get(i);
+            pw.println("Axis #" + (i + 1) + ":");
             printAxis(pw, axis);
         }
         // Usually there are 3 axes: {filter, columns, rows}. Position is a
         // {column, row} pair. We call printRows with axis=2. When it
         // recurses to axis=-1, it prints.
-        List<Integer> pos = new ArrayList<Integer>(axes.size());
-        for (CellSetAxis axis : axes) {
+        List<Integer> pos = new ArrayList<Integer>(axisCount);
+        for (int i = 0; i < axisCount; i++) {
             pos.add(-1);
         }
-        printRows(cellSet, pw, axes.size() - 1, pos);
+        printRows(cellSet, pw, axisCount - 1, pos);
     }
 
+    /**
+     * Prints the rows of cell set.
+     *
+     * @param cellSet Cell set
+     * @param pw Writer
+     * @param axis Axis ordinal
+     * @param pos Partial coordinate
+     */
     private static void printRows(
         CellSet cellSet, PrintWriter pw, int axis, List<Integer> pos)
     {
@@ -61,8 +76,8 @@ public class TraditionalCellSetFormatter implements CellSetFormatter {
             cellSet.getFilterAxis() :
             cellSet.getAxes().get(axis);
         List<Position> positions = _axis.getPositions();
-        int i = 0;
-        for (Position position : positions) {
+        final int positionCount = positions.size();
+        for (int i = 0; i < positionCount; i++) {
             if (axis < 0) {
                 if (i > 0) {
                     pw.print(", ");
@@ -71,7 +86,10 @@ public class TraditionalCellSetFormatter implements CellSetFormatter {
             } else {
                 pos.set(axis, i);
                 if (axis == 0) {
-                    int row = axis + 1 < pos.size() ? pos.get(axis + 1) : 0;
+                    int row =
+                        axis + 1 < pos.size()
+                            ? pos.get(axis + 1)
+                            : 0;
                     pw.print("Row #" + row + ": ");
                 }
                 printRows(cellSet, pw, axis - 1, pos);
@@ -79,7 +97,6 @@ public class TraditionalCellSetFormatter implements CellSetFormatter {
                     pw.println();
                 }
             }
-            i++;
         }
     }
 
@@ -119,3 +136,5 @@ public class TraditionalCellSetFormatter implements CellSetFormatter {
         pw.print(cell.getFormattedValue());
     }
 }
+
+// End TraditionalCellSetFormatter.java
