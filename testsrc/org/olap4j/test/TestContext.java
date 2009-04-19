@@ -3,24 +3,23 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.test;
 
 import java.io.*;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.sql.*;
 
-import org.olap4j.metadata.Member;
 import org.olap4j.*;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.mdx.ParseTreeWriter;
+import org.olap4j.query.TraditionalCellSetFormatter;
+
 import org.apache.commons.dbcp.*;
 import junit.framework.ComparisonFailure;
 
@@ -38,9 +37,10 @@ import junit.framework.ComparisonFailure;
 */
 public class TestContext {
     public static final String NL = System.getProperty("line.separator");
+    private static final String indent = "                ";
     private static final TestContext INSTANCE = new TestContext();
-    private static final String lineBreak2 = "\\\\n\" +" + NL + "\"";
-    private static final String lineBreak3 = "\\n\" +" + NL + "\"";
+    private static final String lineBreak2 = "\\\\n\"" + NL + indent + "+ \"";
+    private static final String lineBreak3 = "\\n\"" + NL + indent + "+ \"";
     private static final Pattern LineBreakPattern =
         Pattern.compile("\r\n|\r|\n");
     private static final Pattern TabPattern = Pattern.compile("\t");
@@ -89,99 +89,9 @@ public class TestContext {
     public static String toString(CellSet cellSet) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        print(cellSet, pw);
+            new TraditionalCellSetFormatter().format(cellSet, pw);
         pw.flush();
         return sw.toString();
-    }
-
-    /**
-     * Prints a CellSet.
-     *
-     * @param cellSet Cell set
-     * @param pw Print writer
-     */
-    private static void print(CellSet cellSet, PrintWriter pw) {
-        pw.println("Axis #0:");
-        printAxis(pw, cellSet.getFilterAxis());
-        final List<CellSetAxis> axes = cellSet.getAxes();
-        int i = 0;
-        for (CellSetAxis axis : axes) {
-            pw.println("Axis #" + (++i) + ":");
-            printAxis(pw, axis);
-        }
-        // Usually there are 3 axes: {filter, columns, rows}. Position is a
-        // {column, row} pair. We call printRows with axis=2. When it
-        // recurses to axis=-1, it prints.
-        List<Integer> pos = new ArrayList<Integer>(axes.size());
-        for (CellSetAxis axis : axes) {
-            pos.add(-1);
-        }
-        printRows(cellSet, pw, axes.size() - 1, pos);
-    }
-
-    private static void printRows(
-        CellSet cellSet, PrintWriter pw, int axis, List<Integer> pos)
-    {
-        CellSetAxis _axis = axis < 0 ?
-            cellSet.getFilterAxis() :
-            cellSet.getAxes().get(axis);
-        List<Position> positions = _axis.getPositions();
-        int i = 0;
-        for (Position position : positions) {
-            if (axis < 0) {
-                if (i > 0) {
-                    pw.print(", ");
-                }
-                printCell(cellSet, pw, pos);
-            } else {
-                pos.set(axis, i);
-                if (axis == 0) {
-                    int row = axis + 1 < pos.size() ? pos.get(axis + 1) : 0;
-                    pw.print("Row #" + row + ": ");
-                }
-                printRows(cellSet, pw, axis - 1, pos);
-                if (axis == 0) {
-                    pw.println();
-                }
-            }
-            i++;
-        }
-    }
-
-    /**
-     * Prints an axis and its members.
-     *
-     * @param pw Print writer
-     * @param axis Axis
-     */
-    private static void printAxis(PrintWriter pw, CellSetAxis axis) {
-        List<Position> positions = axis.getPositions();
-        for (Position position : positions) {
-            boolean firstTime = true;
-            pw.print("{");
-            for (Member member : position.getMembers()) {
-                if (! firstTime) {
-                    pw.print(", ");
-                }
-                pw.print(member.getUniqueName());
-                firstTime = false;
-            }
-            pw.println("}");
-        }
-    }
-
-    /**
-     * Prints the formatted value of a Cell at a given position.
-     *
-     * @param cellSet Cell set
-     * @param pw Print writer
-     * @param pos Cell coordinates
-     */
-    private static void printCell(
-        CellSet cellSet, PrintWriter pw, List<Integer> pos)
-    {
-        Cell cell = cellSet.getCell(pos);
-        pw.print(cell.getFormattedValue());
     }
 
     /**
@@ -262,20 +172,20 @@ public class TestContext {
     static String toJavaString(String s) {
         // Convert [string with "quotes" split
         // across lines]
-        // into ["string with \"quotes\" split\n" +
-        // "across lines
+        // into ["string with \"quotes\" split\n"
+        //                 + "across lines
         //
         s = Olap4jUtil.replace(s, "\\", "\\\\");
         s = Olap4jUtil.replace(s, "\"", "\\\"");
         s = LineBreakPattern.matcher(s).replaceAll(lineBreak2);
         s = TabPattern.matcher(s).replaceAll("\\\\t");
         s = "\"" + s + "\"";
-        String spurious = " +" + NL + "\"\"";
+        String spurious = NL + indent + "+ \"\"";
         if (s.endsWith(spurious)) {
             s = s.substring(0, s.length() - spurious.length());
         }
         if (s.indexOf(lineBreak3) >= 0) {
-            s = "fold(" + NL + s + ")";
+            s = "fold(" + NL + indent + s + ")";
         }
         return s;
     }
