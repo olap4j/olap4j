@@ -74,6 +74,32 @@ public class MetadataTest extends TestCase {
         }
     }
 
+    private void assertContainsLine(String partial, String seek, String s) {
+        if (partial == null) {
+            partial = seek;
+        }
+        int i = s.indexOf(partial);
+        if (i < 0) {
+            fail("expected to find '" + seek + "' in '" + s + "'");
+        }
+        int start = i;
+        while (start > 0
+               && s.charAt(start - 1) != 0x0D
+               && s.charAt(start - 1) != 0x0A)
+        {
+            --start;
+        }
+        int end = i;
+        while (end < s.length()
+               && s.charAt(end) != 0x0D
+               && s.charAt(end) != 0x0A)
+        {
+            ++end;
+        }
+        String line = s.substring(start, end);
+        assertEquals(seek, line);
+    }
+
     private void assertNotContains(String seek, String s) {
         if (s.indexOf(seek) >= 0) {
             fail("expected not to find '" + seek + "' in '" + s + "'");
@@ -348,7 +374,10 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getLevels(
                 catalogName, null, null, null, null, null),
             LEVELS_COLUMN_NAMES);
-        assertContains("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Product], HIERARCHY_UNIQUE_NAME=[Product], LEVEL_NAME=Product Category, LEVEL_UNIQUE_NAME=[Product].[Product Category], LEVEL_GUID=null, LEVEL_CAPTION=Product Category, LEVEL_NUMBER=3, LEVEL_CARDINALITY=55, LEVEL_TYPE=0, CUSTOM_ROLLUP_SETTINGS=0, LEVEL_UNIQUE_SETTINGS=0, LEVEL_IS_VISIBLE=true, DESCRIPTION=Sales Cube - Product HierarchyProduct Category Level", s);
+        assertContainsLine(
+            "LEVEL_NAME=Product Category,",
+            "CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Product], HIERARCHY_UNIQUE_NAME=[Product], LEVEL_NAME=Product Category, LEVEL_UNIQUE_NAME=[Product].[Product Category], LEVEL_GUID=null, LEVEL_CAPTION=Product Category, LEVEL_NUMBER=3, LEVEL_CARDINALITY=55, LEVEL_TYPE=0, CUSTOM_ROLLUP_SETTINGS=0, LEVEL_UNIQUE_SETTINGS=0, LEVEL_IS_VISIBLE=true, DESCRIPTION=Sales Cube - Product Hierarchy - Product Category Level",
+            s);
 
         s = checkResultSet(
             olapDatabaseMetaData.getLevels(
@@ -460,7 +489,6 @@ public class MetadataTest extends TestCase {
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
         final int columnCount = resultSetMetaData.getColumnCount();
         if (columnNames != null) {
-            System.out.println(columnNames);
             assertEquals(
                 columnNames.size(),
                 columnCount);

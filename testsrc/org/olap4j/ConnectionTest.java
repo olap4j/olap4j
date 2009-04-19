@@ -1658,14 +1658,21 @@ public class ConnectionTest extends TestCase {
         assertEquals(member0.getUniqueName(), member1.getParentMember().getUniqueName());
         assertEquals(member0, member1.getParentMember());
         Member member2 = rowsAxis.getPositions().get(2).getMembers().get(0);
-        assertEquals("[Employees].[All Employees].[Derrick Whelply]", member2.getUniqueName());
-        // TODO: should return depth=2 here but mondrian erroneously returns 1
-        assertEquals(1, member2.getDepth());
+        assertTrue(
+            member2.getUniqueName().equals(
+                "[Employees].[All Employees].[Derrick Whelply]")
+            || member2.getUniqueName().equals(
+                "[Employees].[All Employees].[Sheri Nowmer].[Derrick Whelply]"));
+        assertEquals(2, member2.getDepth());
         assertEquals(1, member2.getLevel().getDepth());
-        // TODO: member2.parentMember should equal member1, but currently
-        // mondrian cannot look up a member of a parent-child hierarchy based
-        // on its unique name
-        assertNull(member2.getParentMember());
+        final Member parent = member2.getParentMember();
+        assertNotNull(parent);
+        assertEquals(
+            "[Employees].[All Employees].[Sheri Nowmer]",
+            parent.getUniqueName());
+        assertEquals(1, parent.getDepth());
+        assertEquals(member2.getLevel(), parent.getLevel());
+        assertEquals(member1, parent);
     }
 
     /**
