@@ -863,7 +863,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             final int dimensionType =
                 integerElement(row, "DIMENSION_TYPE");
             final Dimension.Type type =
-                Dimension.Type.values()[dimensionType];
+                Dimension.Type.forXmlaOrdinal(dimensionType);
             final String defaultHierarchyUniqueName =
                 stringElement(row, "DEFAULT_HIERARCHY");
             list.add(

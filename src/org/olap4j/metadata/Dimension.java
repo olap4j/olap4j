@@ -11,6 +11,9 @@ package org.olap4j.metadata;
 
 import org.olap4j.OlapException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * An organized hierarchy of categories, known as levels, that describes data
  * in a cube.
@@ -103,6 +106,21 @@ public interface Dimension extends MetadataElement {
 
         private final int xmlaOrdinal;
 
+        private static final Map<Integer, Type> xmlaOrdinalTypeMap;
+
+        static {
+            Map<Integer, Type> map = new HashMap<Integer, Type>();
+            for (Type type : values()) {
+                map.put(type.xmlaOrdinal, type);
+            }
+            xmlaOrdinalTypeMap = map;
+        }
+
+        /**
+         * Creates a Dimension Type.
+         *
+         * @param xmlaOrdinal Ordinal code as specified by XMLA
+         */
         private Type(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
         }
@@ -117,6 +135,16 @@ public interface Dimension extends MetadataElement {
          */
         public final int xmlaOrdinal() {
             return xmlaOrdinal;
+        }
+
+        /**
+         * Returns the type whose XMLA ordinal code is as given.
+         *
+         * @param xmlaOrdinal Ordinal code as specified by XMLA
+         * @return Dimension type, or null
+         */
+        public static Type forXmlaOrdinal(int xmlaOrdinal) {
+            return xmlaOrdinalTypeMap.get(xmlaOrdinal);
         }
     }
 }
