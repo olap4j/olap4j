@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -15,8 +15,10 @@ import org.olap4j.mdx.parser.MdxParserFactory;
 import org.olap4j.mdx.*;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Member;
+import org.olap4j.query.RectangularCellSetFormatter;
 import org.olap4j.type.MemberType;
 
+import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,11 @@ import java.util.List;
  * @since Aug 22, 2006
  */
 public class SimpleQuerySample {
+    /**
+     * Main command-line entry.
+     *
+     * @param args Command line arguments
+     */
     public static void main(String[] args) {
         try {
             new SimpleQuerySample().simpleStatement();
@@ -43,13 +50,13 @@ public class SimpleQuerySample {
 
     /**
      * Simple example which connects to an OLAP server, executes an OLAP
-     * statement and prints the result.
+     * statement and prints the resulting cell set.
      */
     void simpleStatement()
         throws SQLException, ClassNotFoundException
     {
         // Register driver.
-        Class.forName("mondrian.olap4j.Driver");
+        Class.forName("mondrian.olap4j.MondrianOlap4jDriver");
 
         // Create connection.
         Connection connection =
@@ -59,17 +66,17 @@ public class SimpleQuerySample {
 
         // Execute a statement.
         OlapStatement statement = olapConnection.createStatement();
-        CellSet result =
+        CellSet cellSet =
             statement.executeOlapQuery(
-            "select {[Measures].[Unit Sales]} on columns,\n" +
-                " CrossJoin([Store].Children, [Gender].Members) on rows\n" +
-                "from [Sales]");
+                "select {[Measures].[Unit Sales]} on columns,\n"
+                + " CrossJoin([Store].Children, [Gender].Members) on rows\n"
+                + "from [Sales]");
 
-        List<CellSetAxis> cellSetAxes = result.getAxes();
+        List<CellSetAxis> cellSetAxes = cellSet.getAxes();
 
         // Print headings.
         System.out.print("\t");
-        CellSetAxis columnsAxis = cellSetAxes.get(Axis.COLUMNS.ordinal());
+        CellSetAxis columnsAxis = cellSetAxes.get(Axis.COLUMNS.axisOrdinal());
         for (Position position : columnsAxis.getPositions()) {
             Member measure = position.getMembers().get(0);
             System.out.print(measure.getName());
@@ -94,12 +101,12 @@ public class SimpleQuerySample {
                 // Access the cell via its ordinal. The ordinal is kept in step
                 // because we increment the ordinal once for each row and
                 // column.
-                Cell cell = result.getCell(cellOrdinal);
+                Cell cell = cellSet.getCell(cellOrdinal);
 
                 // Just for kicks, convert the ordinal to a list of coordinates.
                 // The list matches the row and column positions.
                 List<Integer> coordList =
-                    result.ordinalToCoordinates(cellOrdinal);
+                    cellSet.ordinalToCoordinates(cellOrdinal);
                 assert coordList.get(0) == rowPosition.getOrdinal();
                 assert coordList.get(1) == columnPosition.getOrdinal();
 
@@ -110,6 +117,12 @@ public class SimpleQuerySample {
             }
             System.out.println();
         }
+
+        // Now, nicely formatted.
+        System.out.println();
+        final PrintWriter pw = new PrintWriter(System.out);
+        new RectangularCellSetFormatter(false).format(cellSet, pw);
+        pw.flush();
 
         // Close the statement and connection.
         statement.close();
@@ -152,9 +165,9 @@ public class SimpleQuerySample {
         statement.setObject(1, memberSeattle);
         statement.setInt(2, 10);
 
-        // Execute, and print result.
-        CellSet result = statement.executeQuery();
-        printResult(result);
+        // Execute, and print cell set.
+        CellSet cellSet = statement.executeQuery();
+        printCellSet(cellSet);
 
         // Close the statement and connection.
         statement.close();
@@ -185,11 +198,19 @@ public class SimpleQuerySample {
         // Create statement.
         OlapStatement statement = olapConnection.createStatement();
         CellSet cellSet = statement.executeOlapQuery(query);
-        printResult(cellSet);
+        printCellSet(cellSet);
     }
 
-    private void printResult(CellSet result) {
-        List<CellSetAxis> cellSetAxes = result.getAxes();
+    /**
+     * Prints a cell set.
+     *
+     * <p>For more sophisticated printing of cell sets, see
+     * {@link org.olap4j.query.CellSetFormatter}.
+     *
+     * @param cellSet Cell set
+     */
+    private void printCellSet(CellSet cellSet) {
+        List<CellSetAxis> cellSetAxes = cellSet.getAxes();
 
         // Print headings.
         System.out.print("\t");
@@ -221,7 +242,7 @@ public class SimpleQuerySample {
             for (Position columnPosition : columnsAxis.getPositions()) {
                 assert columnPosition.getOrdinal() == column;
                 coordList.set(1, column++);
-                Cell cell = result.getCell(coordList);
+                Cell cell = cellSet.getCell(coordList);
                 System.out.print('\t');
                 System.out.print(cell.getFormattedValue());
             }
@@ -267,6 +288,7 @@ public class SimpleQuerySample {
         CellSet cset;
         try {
             cset = stmt.executeOlapQuery(query);
+            printCellSet(cset);
         } catch (OlapException e) {
             System.out.println("Execution failed: " + e);
         }
