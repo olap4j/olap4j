@@ -25,6 +25,8 @@
 # ok in most environments. Note that this connection 
 # requires ANT to run with more memory. You can
 # do that by setting the ANT_OPTS environment variable to "-Xmx1024m"
+# If you want to run the tests against your own database, modify the 
+# [root]/simple-jndi/jdbc.properties file. Don't touch this property.
 ##########################################################################################
 org.olap4j.test.connectUrl=jdbc:mondrian:Datasource=jdbc/SampleData;Catalog=./foodmart/FoodMart.xml;
 
