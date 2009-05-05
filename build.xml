@@ -38,7 +38,7 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
         description="Setups the project for eclipse." />
 
     <target name="hudson" depends="clean-all,clean-tests,version-properties,test,cobertura,jar,jar-jdk14,source.jar"
-        description="Setups the project for eclipse." />
+        description="Sugar goal to build Olap4j from hudson." />
 
     <!-- Override to create a proper release. -->
     <target name="dist"
