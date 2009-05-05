@@ -42,7 +42,7 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
 
     <!-- Override to create a proper release. -->
     <target name="dist"
-        depends="clean-all,clean-tests,version-properties,jar,jar-jdk14,javadoc,javadoc-pdf,javadoc-with-ydoc,source.zip"
+        depends="version-properties,jar,jar-jdk14,javadoc,javadoc-pdf,javadoc-with-ydoc,source.zip"
         description="Creates a distribution">
         <zip zipfile="${dist.dir}/${zip.filename}">
             <zipfileset dir="${basedir}/doc" prefix="${ivy.artifact.id}-${project.revision}/doc"
