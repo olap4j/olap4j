@@ -37,6 +37,9 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
     <target name="setup" depends="compile,create-dot-classpath"
         description="Setups the project for eclipse." />
 
+    <target name="hudson" depends="clean-all,clean-tests,version-properties,test,cobertura,jar,jar-jdk14,source.jar"
+        description="Setups the project for eclipse." />
+
     <!-- Override to create a proper release. -->
     <target name="dist"
         depends="clean-all,clean-tests,version-properties,jar,jar-jdk14,javadoc,javadoc-pdf,javadoc-with-ydoc,source.zip"
