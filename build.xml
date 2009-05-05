@@ -37,7 +37,7 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
     <target name="setup" depends="compile,create-dot-classpath"
         description="Setups the project for eclipse." />
 
-    <target name="hudson" depends="clean-all,clean-tests,version-properties,test,cobertura,jar,jar-jdk14,source.jar"
+    <target name="hudson" depends="clean-all,clean-tests,version-properties,jar,jar-jdk14,source.jar,test,cobertura"
         description="Sugar goal to build Olap4j from hudson." />
 
     <!-- Override to create a proper release. -->
@@ -154,7 +154,6 @@ test.properties.example" />
     <target name="init-tests" depends="clean-tests">
         <mkdir dir="${testclasses.dir}" />
         <mkdir dir="${testsrc.dir}" />
-        <mkdir dir="${basedir}/simple-jndi" />
         <unzip src="${basedir}/foodmart/foodmart.zip" dest="${basedir}/foodmart/"
             overwrite="false" />
     </target>
@@ -187,20 +186,8 @@ test.properties.example" />
         </copy>
     </target>
 
-    <!-- Override for proper license and readme copy -->
-    <!-- <target name="compile.lic_copy" depends="init">
-        <copy todir="${classes.dir}">
-            <fileset dir="."
-                includes="
-LICENSE.html,
-README.txt,
-VERSION.txt">
-            </fileset>
-        </copy>
-    </target> -->
-
     <!-- create a retrowoven jar file which will work under jdk1.4 -->
-    <target name="jar-jdk14" depends="compile,set-build.id,generate.manifest,retroweave">
+    <target name="jar-jdk14" depends="retroweave">
         <mkdir dir="${lib.dir}" />
         <zip zipfile="${jar-jdk14.file}" update="true">
             <zipfileset dir="${classes.dir}"
