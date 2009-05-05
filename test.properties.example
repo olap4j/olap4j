@@ -6,30 +6,46 @@
 # All Rights Reserved.
 # You must accept the terms of that agreement to use this software.
 #
+##########################################################################################
 # Sample "test.properties" file. Rename to "test.properties" and modify
 # for your environment.
+#
+# SPECIAL NOTE.
+# If the TCK is launched within Ant, the default amount of memory that
+# is allowed for Ant won't do the job. There are lots of OLAP operations
+# to perform and it is strongly suggested to give at lease 1 gig of ram
+# to Ant in order to run properly. You can easily achieve this by setting
+# ANT_OPTS environment variable to "-Xmx1024m".
+##########################################################################################
 
-# Connect string olap4j test suite should use to connect to the foodmart
-# database. Examples are shown for mondrian connecting to Apache Derby on
-# Linux, Oracle on Linux, and Microsoft Access on Windows. Must be specified;
-# there is no default.
-#org.olap4j.test.connectUrl=jdbc:mondrian:Jdbc='jdbc:derby:/home/jvs/open/mondrian/demo/derby/foodmart';JdbcUser=sa;JdbcPassword=sa;Catalog='file:///home/jvs/open/mondrian/demo/FoodMart.xml';JdbcDrivers=org.apache.derby.jdbc.EmbeddedDriver;
-#org.olap4j.test.connectUrl=jdbc:mondrian:Jdbc=jdbc:oracle:thin:foodmart/foodmart@//marmalade.hydromatic.net:1521/XE;JdbcUser=foodmart;JdbcPassword=foodmart;Catalog=../mondrian/demo/FoodMart.xml;JdbcDrivers=oracle.jdbc.OracleDriver;
-#org.olap4j.test.connectUrl=jdbc:mondrian:Jdbc='jdbc:odbc:MondrianFoodMart';Catalog='file://c:/open/mondrian/demo/FoodMart.xml';JdbcDrivers=sun.jdbc.odbc.JdbcOdbcDriver;
 
+##########################################################################################
+# Olap4j comes with a hsqldb ready testing database.
+# The current value doesn't need any adjustments and should work
+# ok in most environments. Note that this connection 
+# requires ANT to run with more memory. You can
+# do that by setting the ANT_OPTS environment variable to "-Xmx1024m"
+##########################################################################################
+org.olap4j.test.connectUrl=jdbc:mondrian:Datasource=jdbc/SampleData;Catalog=./foodmart/FoodMart.xml;
+
+##########################################################################################
+# Path to the FoodMart.xml catalog file. The Xmla tester needs this.
+# Must be specified if you are using XmlaTester; there is no default.
+# Olap4j comes with a schema file located under the "foodmart directory,
+# so the current value doesn't need to be updated nd should be ok with most
+# environments.
+##########################################################################################
+org.olap4j.XmlaTester.CatalogUrl=file:foodmart/FoodMart.xml
+
+##########################################################################################
 # Name of class which targets the olap4j test suite to a particular driver
 # implementation. Must implement org.olap4j.test.TestContext.Tester interface.
 # Default is "org.olap4j.MondrianTester";
 # to test the XMLA driver, use "org.olap4j.XmlaTester".
-#org.olap4j.test.helperClassName=org.olap4j.XmlaTester
+# This is the only property you might need to adjust depending on what
+# component you want to test.
+##########################################################################################
 #org.olap4j.test.helperClassName=org.olap4j.MondrianTester
-
-# Path to the FoodMart.xml catalog file.
-# Must be specified if you are using XmlaTester; there is no default.
-#org.olap4j.XmlaTester.CatalogUrl=file:/a/path/mondrian/demo/FoodMart.xml
-
-# Classpath for your JDBC driver. Only required if the driver isn't already on
-# the classpath.
-#org.olap4j.test.driverClasspath=/usr/lib/oracle/xe/app/oracle/product/10.2.0/server/jdbc/lib/ojdbc14.jar
+org.olap4j.test.helperClassName=org.olap4j.XmlaTester
 
 # End test.properties.example

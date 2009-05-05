@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+  <info organisation="${ivy.artifact.group}" module="${ivy.artifact.id}"
+    revision="${project.revision}" />
+
+  <configurations>
+    <conf name="default" />
+    <conf name="test" visibility="private" />
+  </configurations>
+
+  <publications>
+    <artifact name="${ivy.artifact.id}" type="jar" conf="default" />
+  </publications>
+
+  <dependencies defaultconf="default->default">
+
+    <!--  Compile deps here  -->
+
+    <dependency org="asm" name="asm" rev="2.2.3" 
+      transitive="false" />
+
+    <dependency org="asm" name="asm-commons" rev="2.2.3" 
+      transitive="false" />
+
+    <dependency org="javacup" name="javacup" rev="10k" 
+      transitive="false" />
+
+    <dependency org="log4j" name="log4j" rev="1.2.9" 
+      transitive="false" />
+
+    <!-- get retroweaver from Pentaho repo since ibilio one is corrupted -->
+    <dependency org="retroweaver" name="retroweaver" rev="1.2.4"
+      transitive="false" />
+
+    <dependency org="retroweaver" name="retroweaver-rt" rev="1.2.4"
+      transitive="false" />
+
+    <dependency org="xerces" name="xercesImpl" rev="2.6.0" 
+      transitive="false" />
+
+    <!--  test deps here  -->
+
+    <dependency org="commons-dbcp" name="commons-dbcp" rev="1.1" 
+      transitive="false" conf="test->default" />
+
+    <dependency org="net.sf" name="pdfdoclet" rev="1.0.2"
+      transitive="false" conf="test->default" />
+
+    <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7" 
+      transitive="false" conf="test->default" />
+
+    <dependency org="simple-jndi" name="simple-jndi" rev="0.11.4.1" 
+      transitive="false" conf="test->default" />
+
+    <dependency org="commons-pool" name="commons-pool" rev="1.1" 
+      transitive="false" conf="test->default" />
+
+    <dependency org="commons-collections" name="commons-collections" rev="2.1" 
+      transitive="false" conf="test->default" />
+
+    <dependency org="commons-vfs" name="commons-vfs" rev="1.0" 
+      transitive="false" conf="test->default" />
+
+    <dependency org="commons-logging" name="commons-logging" rev="1.1" 
+      transitive="false" conf="test->default" />
+
+    <dependency org="commons-math" name="commons-math" rev="1.1" 
+      transitive="false" conf="test->default" />
+
+    <dependency org="javax.servlet" name="servlet-api" rev="2.4" 
+      transitive="false" conf="test->default" />
+
+    <dependency org="junit" name="junit" rev="3.8.1" 
+      transitive="false" conf="test->default" />
+
+    <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7" 
+      transitive="false" conf="test->default" />
+
+    <dependency org="pentaho" name="mondrian" rev="3.1-SNAPSHOT" 
+      transitive="false" changing="true" conf="test->default" />
+
+    <dependency org="eigenbase" name="eigenbase-xom" rev="1.3.0.11999" 
+      conf="test->default"/>
+
+    <dependency org="eigenbase" name="eigenbase-properties" rev="1.1.0.10924" 
+      conf="test->default"/>
+
+    <dependency org="eigenbase" name="eigenbase-resgen" rev="1.3.0.11873" 
+      conf="test->default"/>
+
+  </dependencies>
+</ivy-module>
+
+  <!-- End build.xml -->

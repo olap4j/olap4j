@@ -5,11 +5,13 @@ rem built under JDK 1.6.
 
 rem Change the following line to point to your JDK 1.6 home.
 set JAVA_HOME=C:\jdk1.6.0_11
+rem set JAVA_HOME=C:\java\jdk1.6.0_13
 
 rem Change the following line to point to your ant home.
 set ANT_HOME=C:\open\thirdparty\ant
+rem set ANT_HOME=C:\ant\ant-1.7.0
 
 set PATH=%JAVA_HOME%\bin;%PATH%
-%ANT_HOME%\bin\ant compile.java
+%ANT_HOME%\bin\ant compile.compile
 
 # End buildJdk16.bat
