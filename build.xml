@@ -94,10 +94,10 @@ VERSION.txt" />
     </target>
 
     <target name="compileJdk16">
-        <exec osfamily="unix" executable="buildJdk16.sh">
+        <exec osfamily="unix" executable="${basedir}/buildJdk16.sh">
             <arg line="compile"/>
         </exec>
-        <exec osfamily="windows" executable="buildJdk16.bat">
+        <exec osfamily="windows" executable="${basedir}/buildJdk16.bat">
             <arg line="compile"/>
         </exec>
     </target>
