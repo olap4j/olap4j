@@ -37,7 +37,7 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
     <target name="setup" depends="compile,create-dot-classpath"
         description="Setups the project for eclipse." />
 
-    <target name="hudson" depends="clean-all,clean-tests,version-properties,jar,source.jar,test,cobertura,jar-jdk14"
+    <target name="hudson" depends="clean-all,clean-tests,version-properties,jar,source.jar,test,clean-hsqldb,cobertura,jar-jdk14"
         description="Sugar goal to build Olap4j from hudson." />
 
     <!-- Override to create a proper release. -->
@@ -140,6 +140,10 @@ test.properties.example" />
     </target>
 
     <target name="clean-tests" depends="subfloor.clean-tests">
+        <antcall target="clean-hsqldb"/>
+    </target>
+
+    <target name="clean-hsqldb">
         <!--
             We need to cleanup any remaining HSQL files, because lock files
             could still be there if previous tests crashed.
@@ -159,14 +163,6 @@ test.properties.example" />
         <mkdir dir="${testsrc.dir}" />
         <unzip src="${basedir}/foodmart/foodmart.zip" dest="${basedir}/foodmart/"
             overwrite="false" />
-<!--        <sql driver="org.hsqldb.jdbcDriver"-->
-<!--           url="jdbc:hsqldb:mem:olap4j-test"-->
-<!--           userid="sa" password="" >-->
-<!--            <classpath>-->
-<!--              <path refid="test.classpath" />-->
-<!--            </classpath>-->
-<!--            <transaction  src="${basedir}/foodmart/foodmart.script"/>-->
-<!--        </sql>-->
     </target>
 
     <!-- override compile task to account for special jdk handling -->
