@@ -140,14 +140,10 @@ test.properties.example" />
     </target>
 
     <target name="clean-tests" depends="subfloor.clean-tests">
-        <antcall target="clean-hsqldb"/>
+        <antcall target="init-hsql"/>
     </target>
 
     <target name="clean-hsqldb">
-        <!--
-            We need to cleanup any remaining HSQL files, because lock files
-            could still be there if previous tests crashed.
-        -->
         <delete includeemptydirs="false">
             <fileset 
                 dir="${basedir}/foodmart"
@@ -158,11 +154,15 @@ test.properties.example" />
         </delete>
     </target>
 
+    <target name="init-hsql" depends="clean-hsql">
+        <unzip src="${basedir}/foodmart/foodmart.zip" dest="${basedir}/foodmart/"
+            overwrite="false" />
+    </target>
+
     <target name="init-tests" depends="clean-tests">
         <mkdir dir="${testclasses.dir}" />
         <mkdir dir="${testsrc.dir}" />
-        <unzip src="${basedir}/foodmart/foodmart.zip" dest="${basedir}/foodmart/"
-            overwrite="false" />
+        <antcall target="init-hsql"/>
     </target>
 
     <!-- override compile task to account for special jdk handling -->
