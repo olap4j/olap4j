@@ -143,7 +143,7 @@ test.properties.example" />
         <antcall target="init-hsql"/>
     </target>
 
-    <target name="clean-hsqldb">
+    <target name="clean-hsql">
         <delete includeemptydirs="false">
             <fileset 
                 dir="${basedir}/foodmart"
