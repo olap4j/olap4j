@@ -236,7 +236,7 @@ META-INF/**" />
     <target name="javadoc">
         <mkdir dir="${javadoc.dir}" />
         <delete quiet="true" file="${javadoc.dir}/index.html" />
-        <javadoc sourcepath="${src.dir}" classpathref="test.classpath"
+        <javadoc sourcepath="${src.dir}" classpathref="classpath"
             destdir="${javadoc.dir}" packagenames="org.olap4j.*"
             excludepackagenames="org.olap4j.impl.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
             overview="${src.dir}/overview.html"
@@ -257,7 +257,7 @@ META-INF/**" />
     <target name="javadoc-strict">
         <mkdir dir="${javadoc.dir}" />
         <delete quiet="true" file="${javadoc.dir}/index.html" />
-        <javadoc sourcepath="${src.dir}:${testsrc.dir}" classpathref="test.classpath"
+        <javadoc sourcepath="${src.dir}:${testsrc.dir}" classpathref="classpath"
             destdir="${javadoc.dir}" packagenames="org.olap4j.*" overview="${src.dir}/overview.html"
             footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=168953&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
             author="true" source="1.5" access="private"
@@ -279,7 +279,7 @@ META-INF/**" />
         <mkdir dir="${javadoc.dir}" />
         <delete quiet="true" file="${javadoc.dir}/index.html" />
         <property name="ps" value="${path.separator}" />
-        <javadoc sourcepath="${src.dir}" classpathref="test.classpath"
+        <javadoc sourcepath="${src.dir}" classpathref="classpath"
             destdir="${javadoc.dir}" packagenames="org.olap4j.*"
             excludepackagenames="org.olap4j.impl.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
             overview="${src.dir}/overview.html"
@@ -315,7 +315,7 @@ META-INF/**" />
         <delete includeEmptyDirs="false" quiet="true">
             <fileset dir="${classes.dir}" includes="**/package.html" />
         </delete>
-        <javadoc sourcepath="${src.dir}" classpathref="test.classpath"
+        <javadoc sourcepath="${src.dir}" classpathref="classpath"
             packagenames="org.olap4j.*"
             excludepackagenames="org.olap4j.impl.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
             overview="${src.dir}/overview.html" author="true" source="1.5"
