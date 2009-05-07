@@ -12,6 +12,10 @@
 
     <property name="jar-jdk14.file"
         value="${dist.dir}/${ivy.artifact.id}-${project.revision}-jdk14.jar" />
+
+    <property name="classes-jdk14.dir"
+                value="${bin.dir}/classes-jdk14" />
+
     <property name="dist.doc.file" value="${dist.dir}/doc.tar.gz" />
 
     <property name="generated.java.files"
@@ -194,16 +198,22 @@ test.properties.example" />
     </target>
 
     <!-- create a retrowoven jar file which will work under jdk1.4 -->
-    <target name="jar-jdk14" depends="retroweave">
-        <mkdir dir="${lib.dir}" />
+    <target name="jar-jdk14">
+        <copy todir="${classes-jdk14.dir}">
+            <fileset dir="${classes.dir}" includes="**/*"/>
+        </copy>
+        <antcall target="retroweave"/>
         <zip zipfile="${jar-jdk14.file}" update="true">
-            <zipfileset dir="${classes.dir}"
+            <zipfileset dir="${classes-jdk14.dir}"
                 includes="
 **/*.class,
 **/*.properties,
 **/*.xml,
 META-INF/**" />
         </zip>
+        <delete includeemptydirs="true">
+            <fileset dir="${classes-jdk14.dir}" includes="**/*"/>
+        </delete>
     </target>
 
     <target name="retroweave">
@@ -215,7 +225,7 @@ META-INF/**" />
                 <pathelement location="${lib.dir}/retroweaver-rt.jar" />
             </classpath>
         </taskdef>
-        <retroweaver srcdir="${classes.dir}" />
+        <retroweaver srcdir="${classes-jdk14.dir}" />
     </target>
 
     <!--
