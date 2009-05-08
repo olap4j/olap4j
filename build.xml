@@ -42,7 +42,7 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
         description="Setups the project for eclipse." />
 
     <target name="hudson" depends="clean-all,clean-tests,version-properties,jar,source.jar,test,jar-jdk14"
-        description="Sugar goal to build Olap4j from hudson." />
+        description="Sugar goal to build olap4j from hudson." />
 
     <!-- Override to create a proper release. -->
     <target name="dist"
@@ -65,11 +65,11 @@ VERSION.txt" />
     </target>
 
     <target name="doczip" depends="clean-all,clean-tests,compile,compile-tests,version-properties,javadoc,javadoc-pdf,javadoc-with-ydoc"
-        description="Creates an archive of all docs to deploy on sf.net
+        description="Creates an archive of all docs to deploy on www.olap4j.org.
                      See also doc/deployDoc.sh.">
         <mkdir dir="${dist.dir}" />
         <tar destfile="${dist.doc.file}" compression="gzip">
-            <tarfileset dir="${basedir}/doc" prefix="" includes="
+            <tarfileset dir="${basedir}/doc" prefix="doc" includes="
 **/*.html,
 **/*.pdf,
 **/*.png,
@@ -80,7 +80,7 @@ olap4j_api.pdf"
 **/*~,
 **/_vti*/*,
 **/*.sh"/>
-            <tarfileset dir="${javadoc.dir}" prefix="api"
+            <tarfileset dir="${javadoc.dir}" prefix="doc/api"
                 includes="**/*" />
         </tar>
     </target>
@@ -243,10 +243,10 @@ META-INF/**" />
         </if>
     </target>
 
-    <target name="javadoc">
+    <target name="javadoc" depends="clean-stray-package-html">
         <mkdir dir="${javadoc.dir}" />
         <delete quiet="true" file="${javadoc.dir}/index.html" />
-        <javadoc sourcepath="${src.dir}" classpathref="classpath"
+        <javadoc sourcepath="${src.dir}" classpathref="javadoc.classpath"
             destdir="${javadoc.dir}" packagenames="org.olap4j.*"
             excludepackagenames="org.olap4j.impl.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
             overview="${src.dir}/overview.html"
@@ -264,10 +264,10 @@ META-INF/**" />
         Strict javadoc for testing purposes. Includes all packages and
         non-public classes and methods.
     -->
-    <target name="javadoc-strict">
+    <target name="javadoc-strict" depends="clean-stray-package-html">
         <mkdir dir="${javadoc.dir}" />
         <delete quiet="true" file="${javadoc.dir}/index.html" />
-        <javadoc sourcepath="${src.dir}:${testsrc.dir}" classpathref="classpath"
+        <javadoc sourcepath="${src.dir}:${testsrc.dir}" classpathref="test.classpath"
             destdir="${javadoc.dir}" packagenames="org.olap4j.*" overview="${src.dir}/overview.html"
             footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=168953&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
             author="true" source="1.5" access="private"
@@ -285,11 +285,11 @@ META-INF/**" />
         ${ydoc.home}/resources/ydoc.license with a full license (free for open
         source use).
     -->
-    <target name="javadoc-with-ydoc">
+    <target name="javadoc-with-ydoc" depends="clean-stray-package-html">
         <mkdir dir="${javadoc.dir}" />
         <delete quiet="true" file="${javadoc.dir}/index.html" />
         <property name="ps" value="${path.separator}" />
-        <javadoc sourcepath="${src.dir}" classpathref="classpath"
+        <javadoc sourcepath="${src.dir}" classpathref="javadoc.classpath"
             destdir="${javadoc.dir}" packagenames="org.olap4j.*"
             excludepackagenames="org.olap4j.impl.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
             overview="${src.dir}/overview.html"
@@ -317,15 +317,8 @@ META-INF/**" />
         </javadoc>
     </target>
 
-    <target name="javadoc-pdf">
-        <!--
-            remove stray package.html files under classes to avoid 'multiple
-            sources of package comments' errors
-        -->
-        <delete includeEmptyDirs="false" quiet="true">
-            <fileset dir="${classes.dir}" includes="**/package.html" />
-        </delete>
-        <javadoc sourcepath="${src.dir}" classpathref="classpath"
+    <target name="javadoc-pdf" depends="clean-stray-package-html">
+        <javadoc sourcepath="${src.dir}" classpathref="javadoc.classpath"
             packagenames="org.olap4j.*"
             excludepackagenames="org.olap4j.impl.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
             overview="${src.dir}/overview.html" author="true" source="1.5"
@@ -336,5 +329,15 @@ META-INF/**" />
             </doclet>
         </javadoc>
     </target>
+
+    <target name="clean-stray-package-html"
+            description="remove stray package.html files under classes to avoid
+                    'multiple sources of package comments' errors">
+        <delete includeEmptyDirs="false" quiet="true">
+            <fileset dir="${classes.dir}" includes="**/package.html" />
+            <fileset dir="${testclasses.dir}" includes="**/package.html" />
+        </delete>
+    </target>
 </project>
+
 <!-- End build.xml -->

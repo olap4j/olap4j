@@ -337,17 +337,18 @@ TYPICAL TARGET SEQUENCE
 
   <!-- Setup the classpath used for testing -->
   <path id="test.classpath">
-    <fileset dir="${devlib.dir}">
-      <include name="*" />
-    </fileset>
-    <fileset dir="${lib.dir}">
-      <include name="*.jar" />
-    </fileset>
+    <path refid="classpath"/>
     <fileset dir="${testlib.dir}">
       <include name="*.jar" />
     </fileset>
-    <dirset dir="${classes.dir}" />
-    <dirset dir="${testclasses.dir}" />
+    <pathelement location="${classes.dir}" />
+    <pathelement location="${testclasses.dir}" />
+  </path>
+
+  <!-- Setup the classpath used for javadoc -->
+  <path id="javadoc.classpath">
+    <path refid="classpath"/>
+    <pathelement location="${classes.dir}" />
   </path>
 
   <!--=======================================================================
