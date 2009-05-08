@@ -1743,6 +1743,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         final List<MetadataColumn> columns;
         final Map<String, MetadataColumn> columnsByName;
 
+        /**
+         * Creates a MetadataRequest.
+         *
+         * @param columns Columns
+         */
         MetadataRequest(MetadataColumn... columns) {
             if (name().equals("DBSCHEMA_CATALOGS")) {
                 // DatabaseMetaData.getCatalogs() is defined by JDBC not XMLA,
@@ -1758,9 +1763,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     new MetadataColumn("CATALOG_NAME", "TABLE_CAT")
                 };
             }
-            this.columns =
-                Collections.unmodifiableList(
-                    Arrays.asList(columns));
+            this.columns = UnmodifiableArrayList.asCopyOf(columns);
             final Map<String, MetadataColumn> map =
                 new HashMap<String, MetadataColumn>();
             for (MetadataColumn column : columns) {

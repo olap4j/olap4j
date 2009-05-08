@@ -10,6 +10,7 @@
 package org.olap4j.mdx;
 
 import org.olap4j.impl.Olap4jUtil;
+import org.olap4j.impl.UnmodifiableArrayList;
 import org.olap4j.type.Type;
 
 import java.util.*;
@@ -21,10 +22,10 @@ import java.util.*;
  *
  * <p>An identifer consists of one or more {@link Segment}s. A segment is
  * either:<ul>
- * <li>An unquoted value such as 'CA',
- * <li>A value quoted in brackets, such as '[San Francisco]', or
+ * <li>An unquoted value such as '{@code CA}',
+ * <li>A value quoted in brackets, such as '{@code [San Francisco]}', or
  * <li>A key of one or more parts, each of which is prefixed with '&amp;',
- *     such as '&[Key 1]&Key2&[5]'.
+ *     such as '{@code &amp;[Key 1]&amp;Key2&amp;[5]}'.
  * </ul>
  *
  * <p>Segment types are indicated by the {@link Quoting} enumeration.
@@ -45,8 +46,8 @@ import java.util.*;
  * </ul>
  *
  * <p>A more complex example illustrates a compound key. The identifier
- * {@code [Customers].[City].&[San Francisco]&CA&USA.&[cust1234]} contains four
- * segments as follows:
+ * {@code [Customers].[City].&amp;[San Francisco]&amp;CA&amp;USA.&amp;[cust1234]}
+ * contains four segments as follows:
  * <ul>
  * <li>Segment #0 is QUOTED, name "Customers"</li>
  * <li>Segment #1 is QUOTED, name "City"</li>
@@ -80,7 +81,10 @@ public class IdentifierNode
      * style
      */
     public IdentifierNode(IdentifierNode.Segment... segments) {
-        this(Arrays.asList(segments));
+        if (segments.length < 1) {
+            throw new IllegalArgumentException();
+        }
+        this.segments = UnmodifiableArrayList.asCopyOf(segments);
     }
 
     /**
@@ -93,8 +97,9 @@ public class IdentifierNode
             throw new IllegalArgumentException();
         }
         this.segments =
-            Collections.unmodifiableList(
-                new ArrayList<Segment>(segments));
+            new UnmodifiableArrayList<Segment>(
+                segments.toArray(
+                    new NameSegment[segments.size()]));
     }
 
     public Type getType() {
@@ -161,15 +166,7 @@ public class IdentifierNode
     }
 
     public String toString() {
-        final StringBuilder buf = new StringBuilder();
-        int k = 0;
-        for (IdentifierNode.Segment s : segments) {
-            if (k++ > 0) {
-                buf.append('.');
-            }
-            s.toString(buf);
-        }
-        return buf.toString();
+        return unparseIdentifierList(segments);
     }
 
     public IdentifierNode deepCopy() {
@@ -184,7 +181,7 @@ public class IdentifierNode
      * was {@link Quoting quoted}. For example,
      *
      * <blockquote><code>
-     * parseIdentifier("[Customers].USA.[South Dakota].[Sioux Falls].&[1245]")
+     * parseIdentifier("[Customers].USA.[South Dakota].[Sioux Falls].&amp;[1245]")
      * </code></blockquote>
      *
      * returns
@@ -311,24 +308,54 @@ public class IdentifierNode
      * <p>For example, {"Store", "USA",
      * "California"} becomes "[Store].[USA].[California]".
      *
-     * @param ids List of segments
+     * @param segments List of segments
      * @return Segments as quoted string
      */
-    static String unparseIdentifierList(List<? extends Segment> ids) {
-        StringBuilder sb = new StringBuilder(64);
-        for (int i = 0; i < ids.size(); i++) {
+    static String unparseIdentifierList(List<? extends Segment> segments) {
+        final StringBuilder buf = new StringBuilder(64);
+        for (int i = 0; i < segments.size(); i++) {
+            Segment segment = segments.get(i);
             if (i > 0) {
-                sb.append('.');
+                buf.append('.');
             }
-            sb.append(ids.get(i).toString());
+            segment.toString(buf);
         }
-        return sb.toString();
+        return buf.toString();
     }
 
+    /**
+     * Component in a compound identifier. It is described by its name and how
+     * the name is quoted.
+     *
+     * <p>For example, the identifier
+     * <code>[Store].USA.[New Mexico].&amp;[45]</code> has four segments:<ul>
+     * <li>"Store", {@link IdentifierNode.Quoting#QUOTED}</li>
+     * <li>"USA", {@link IdentifierNode.Quoting#UNQUOTED}</li>
+     * <li>"New Mexico", {@link IdentifierNode.Quoting#QUOTED}</li>
+     * <li>"45", {@link IdentifierNode.Quoting#KEY}</li>
+     * </ul>
+     *
+     * <p>QUOTED and UNQUOTED segments are represented using a
+     * {@link org.olap4j.mdx.IdentifierNode.NameSegment NameSegment};
+     * KEY segments are represented using a
+     * {@link org.olap4j.mdx.IdentifierNode.KeySegment KeySegment}.
+     *
+     * <p>To parse an identifier into a list of segments, use the method
+     * {@link IdentifierNode#parseIdentifier(String)}.</p>
+     */
     public interface Segment {
 
         /**
-         * Appends this segment to a StringBuffer
+         * Returns a string representation of this Segment.
+         *
+         * <p>For example, "[Foo]", "&amp;[123]", "Abc".
+         *
+         * @return String representation of this Segment
+         */
+        String toString();
+
+        /**
+         * Appends a string representation of this Segment to a StringBuffer.
          *
          * @param buf StringBuffer
          */
@@ -370,19 +397,10 @@ public class IdentifierNode
     }
 
     /**
-     * Component in a compound identifier. It is described by its name and how
-     * the name is quoted.
+     * Component in a compound identifier that describes the name of an object.
+     * Optionally, the name is quoted in brackets.
      *
-     * <p>For example, the identifier
-     * <code>[Store].USA.[New Mexico].&[45]</code> has four segments:<ul>
-     * <li>"Store", {@link IdentifierNode.Quoting#QUOTED}</li>
-     * <li>"USA", {@link IdentifierNode.Quoting#UNQUOTED}</li>
-     * <li>"New Mexico", {@link IdentifierNode.Quoting#QUOTED}</li>
-     * <li>"45", {@link IdentifierNode.Quoting#KEY}</li>
-     * </ul>
-     *
-     * To parse an identifier into a list of segments, use the method
-     * {@link IdentifierNode#parseIdentifier(String)}.</p>
+     * @see org.olap4j.mdx.IdentifierNode.KeySegment
      */
     public static class NameSegment implements Segment {
         final String name;
@@ -415,21 +433,12 @@ public class IdentifierNode
             this(null, name, Quoting.QUOTED);
         }
 
-        /**
-         * Returns a string representation of this Segment.
-         *
-         * <p>For example, "[Foo]", "&[123]", "Abc".
-         *
-         * @return String representation of this Segment
-         */
         public String toString() {
             switch (quoting) {
             case UNQUOTED:
                 return name;
             case QUOTED:
                 return quoteMdxIdentifier(name);
-            case KEY:
-                return '&' + quoteMdxIdentifier(name);
             default:
                 throw Olap4jUtil.unexpected(quoting);
             }
@@ -441,10 +450,6 @@ public class IdentifierNode
                 buf.append(name);
                 return;
             case QUOTED:
-                quoteMdxIdentifier(name, buf);
-                return;
-            case KEY:
-                buf.append('&');
                 quoteMdxIdentifier(name, buf);
                 return;
             default:
@@ -473,20 +478,45 @@ public class IdentifierNode
      *
      * <p>Such a segment appears in an identifier with each component prefixed
      * with '&amp;'. For example, in the identifier
-     * '[Customer].[State].&[WA]&[USA]', the third segment is a compound key
-     * whose parts are "WA" and "USA".
+     * '{@code [Customer].[State].&amp;[WA]&amp;[USA]}', the third segment is a
+     * compound key whose parts are "@{code WA}" and "{@code USA}".
+     *
+     * @see org.olap4j.mdx.IdentifierNode.NameSegment
      */
     public static class KeySegment implements Segment {
         private final List<NameSegment> subSegmentList;
 
         /**
-         * Creates a KeySegment.
+         * Creates a KeySegment with one or more sub-segments.
          *
-         * @param subSegmentList List if sub-segments
+         * @param subSegments Array of sub-segments
+         */
+        public KeySegment(NameSegment... subSegments) {
+            if (subSegments.length < 1) {
+                throw new IllegalArgumentException();
+            }
+            this.subSegmentList = UnmodifiableArrayList.asCopyOf(subSegments);
+        }
+
+        /**
+         * Creates a KeySegment a list of sub-segments.
+         *
+         * @param subSegmentList List of sub-segments
          */
         public KeySegment(List<NameSegment> subSegmentList) {
-            this.subSegmentList = new ArrayList<NameSegment>(subSegmentList);
-            assert subSegmentList.size() >= 1;
+            if (subSegmentList.size() < 1) {
+                throw new IllegalArgumentException();
+            }
+            this.subSegmentList =
+                new UnmodifiableArrayList<NameSegment>(
+                    subSegmentList.toArray(
+                        new NameSegment[subSegmentList.size()]));
+        }
+
+        public String toString() {
+            final StringBuilder buf = new StringBuilder();
+            toString(buf);
+            return buf.toString();
         }
 
         public void toString(StringBuilder buf) {

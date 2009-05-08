@@ -47,6 +47,9 @@ public class Olap4jUtilTest extends TestCase {
 
     //~ Tests follow ===========================================================
 
+    /**
+     * Tests {@link Olap4jUtil#camelToUpper}.
+     */
     public void testCamel() {
         assertEquals(
             "FOO_BAR",
@@ -65,6 +68,9 @@ public class Olap4jUtilTest extends TestCase {
             Olap4jUtil.camelToUpper(""));
     }
 
+    /**
+     * Tests {@link Olap4jUtil#equal}.
+     */
     public void testEqual() {
         assertTrue(Olap4jUtil.equal("x", "x"));
         assertFalse(Olap4jUtil.equal("x", "y"));
@@ -76,6 +82,9 @@ public class Olap4jUtilTest extends TestCase {
         assertTrue(Olap4jUtil.equal(2, TWO));
     }
 
+    /**
+     * Tests {@link Olap4jUtil#wildcardToRegexp(java.util.List)}.
+     */
     public void testWildcard() {
         assertEquals(
             ".\\QFoo\\E.|\\QBar\\E.*\\QBAZ\\E",
@@ -163,6 +172,68 @@ public class Olap4jUtilTest extends TestCase {
         assertTrue(iter.hasNext());
         assertEqualsArray(iter.next(), new int[] {1, 2});
         assertFalse(iter.hasNext());
+    }
+
+    /**
+     * Tests {@link org.olap4j.impl.UnmodifiableArrayList}.
+     */
+    public void testUnmodifiableArrayList() {
+        String[] a = {"x", "y"};
+        final UnmodifiableArrayList<String> list =
+            new UnmodifiableArrayList<String>(a);
+        final UnmodifiableArrayList<String> copyList =
+            UnmodifiableArrayList.asCopyOf(a);
+
+        assertEquals(2, list.size());
+        assertEquals("x", list.get(0));
+        assertEquals("y", list.get(1));
+        try {
+            final String s = list.get(2);
+            fail("expected error, got " + s);
+        } catch (IndexOutOfBoundsException e) {
+            // ok
+        }
+
+        // check various equality relations
+        assertTrue(list.equals(copyList));
+        assertTrue(copyList.equals(list));
+        assertTrue(list.equals(list));
+        assertEquals(list.hashCode(), copyList.hashCode());
+        assertEquals(Arrays.asList(a), list);
+        assertEquals(list, Arrays.asList(a));
+
+        String sum = "";
+        for (String s : list) {
+            sum = sum + s;
+        }
+        assertEquals("xy", sum);
+        final Iterator<String> iterator = list.iterator();
+        assertTrue(iterator.hasNext());
+        assertEquals("x", iterator.next());
+        try {
+            iterator.remove();
+            fail("expected error");
+        } catch (UnsupportedOperationException e) {
+            // ok
+        }
+        a[1] = "z";
+        assertTrue(iterator.hasNext());
+        assertEquals("z", iterator.next());
+        assertFalse(iterator.hasNext());
+
+        // modifying the array modifies the list, but not the clone list
+        assertEquals("z", list.get(1));
+        assertEquals("y", copyList.get(1));
+
+        // test the of(Collection) method
+        final ArrayList<String> arrayList = new ArrayList<String>();
+        arrayList.add("foo");
+        arrayList.add("bar");
+        final UnmodifiableArrayList<String> list3 =
+            UnmodifiableArrayList.of(arrayList);
+        assertEquals(2, list3.size());
+        assertEquals(arrayList, list3);
+        assertEquals(arrayList.hashCode(), list3.hashCode());
     }
 }
 
