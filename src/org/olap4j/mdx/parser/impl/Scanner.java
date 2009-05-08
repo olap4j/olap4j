@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -318,11 +318,21 @@ class Scanner {
     }
 
     private Symbol makeId(String s, boolean quoted, boolean ampersand) {
-        return makeSymbol(
-            quoted && ampersand ? DefaultMdxParserSym.AMP_QUOTED_ID :
-            quoted ? DefaultMdxParserSym.QUOTED_ID :
-            DefaultMdxParserSym.ID,
-            s);
+        final int id;
+        if (quoted) {
+            if (ampersand) {
+                id = DefaultMdxParserSym.AMP_QUOTED_ID;
+            } else {
+                id = DefaultMdxParserSym.QUOTED_ID;
+            }
+        } else {
+            if (ampersand) {
+                id = DefaultMdxParserSym.AMP_UNQUOTED_ID;
+            } else {
+                id = DefaultMdxParserSym.ID;
+            }
+        }
+        return makeSymbol(id, s);
     }
 
     /**
@@ -457,6 +467,7 @@ class Scanner {
         boolean ampersandId = false;
         for (;;) {
             searchForComments();
+            mainSwitch:
             switch (nextChar) {
             case '.':
                 switch (lookahead()) {
@@ -485,14 +496,14 @@ class Scanner {
                 int digitCount = 0, exponent = 0;
                 boolean positive = true;
                 BigDecimal mantissa = BigDecimalZero;
-                Scanner.State state = Scanner.State.leftOfPoint;
+                State state = State.leftOfPoint;
 
                 for (;;) {
                     switch (nextChar) {
                     case '.':
                         switch (state) {
                         case leftOfPoint:
-                            state = Scanner.State.rightOfPoint;
+                            state = State.rightOfPoint;
                             mantissa = n;
                             n = BigDecimalZero;
                             digitCount = 0;
@@ -543,7 +554,7 @@ class Scanner {
                         n = BigDecimalZero;
                         positive = true;
                         advance();
-                        state = Scanner.State.inExponent;
+                        state = State.inExponent;
                         break;
 
                     case'0': case'1': case'2': case'3': case'4':
@@ -556,8 +567,7 @@ class Scanner {
 
                     case '+':
                     case '-':
-                        if (state == Scanner.State.inExponent &&
-                            digitCount == 0) {
+                        if (state == State.inExponent && digitCount == 0) {
                             // We're looking at the sign after the 'e'.
                             positive = !positive;
                             advance();
@@ -600,7 +610,7 @@ class Scanner {
                 /* parse an identifier */
                 id = new StringBuilder();
                 for (;;) {
-                    id.append((char)nextChar);
+                    id.append((char) nextChar);
                     advance();
                     switch (nextChar) {
                     case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
@@ -623,7 +633,7 @@ class Scanner {
                             strId.toUpperCase());
                         if (i == null) {
                             // identifier
-                            return makeId(strId, false, false);
+                            return makeId(strId, false, ampersandId);
                         } else {
                             // reserved word
                             return makeRes(i);
@@ -633,10 +643,26 @@ class Scanner {
 
             case '&':
                 advance();
-                if (nextChar == '[') {
+                switch (nextChar) {
+                case '[':
+                    // fall through to parse a delimited identifier
                     ampersandId = true;
-                    // fall through
-                } else {
+                    break;
+                case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+                case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
+                case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
+                case 's': case 't': case 'u': case 'v': case 'w': case 'x':
+                case 'y': case 'z':
+                case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+                case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
+                case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
+                case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
+                case 'Y': case 'Z':
+                    // fall into logic to create identifer
+                    ampersandId = true;
+                    break mainSwitch;
+                default:
+                    // error
                     return makeToken(DefaultMdxParserSym.UNKNOWN, "&");
                 }
 
@@ -669,39 +695,72 @@ class Scanner {
                             return makeId(id.toString(), true, false);
                         }
                     default:
-                        id.append((char)nextChar);
+                        id.append((char) nextChar);
                     }
                 }
 
-            case ':': advance(); return makeToken(DefaultMdxParserSym.COLON, ":");
-            case ',': advance(); return makeToken(DefaultMdxParserSym.COMMA, ",");
-            case '=': advance(); return makeToken(DefaultMdxParserSym.EQ, "=");
+            case ':':
+                advance();
+                return makeToken(DefaultMdxParserSym.COLON, ":");
+            case ',':
+                advance();
+                return makeToken(DefaultMdxParserSym.COMMA, ",");
+            case '=':
+                advance();
+                return makeToken(DefaultMdxParserSym.EQ, "=");
             case '<':
                 advance();
                 switch (nextChar) {
-                case '>': advance(); return makeToken(DefaultMdxParserSym.NE, "<>");
-                case '=': advance(); return makeToken(DefaultMdxParserSym.LE, "<=");
-                default: return makeToken(DefaultMdxParserSym.LT, "<");
+                case '>':
+                    advance();
+                    return makeToken(DefaultMdxParserSym.NE, "<>");
+                case '=':
+                    advance();
+                    return makeToken(DefaultMdxParserSym.LE, "<=");
+                default:
+                    return makeToken(DefaultMdxParserSym.LT, "<");
                 }
             case '>':
                 advance();
                 switch (nextChar) {
-                case '=': advance(); return makeToken(DefaultMdxParserSym.GE, ">=");
-                default: return makeToken(DefaultMdxParserSym.GT, ">");
+                case '=':
+                    advance();
+                    return makeToken(DefaultMdxParserSym.GE, ">=");
+                default:
+                    return makeToken(DefaultMdxParserSym.GT, ">");
                 }
-            case '{': advance(); return makeToken(DefaultMdxParserSym.LBRACE, "{");
-            case '(': advance(); return makeToken(DefaultMdxParserSym.LPAREN, "(");
-            case '}': advance(); return makeToken(DefaultMdxParserSym.RBRACE, "}");
-            case ')': advance(); return makeToken(DefaultMdxParserSym.RPAREN, ")");
-            case '+': advance(); return makeToken(DefaultMdxParserSym.PLUS, "+");
-            case '-': advance(); return makeToken(DefaultMdxParserSym.MINUS, "-");
-            case '*': advance(); return makeToken(DefaultMdxParserSym.ASTERISK, "*");
-            case '/': advance(); return makeToken(DefaultMdxParserSym.SOLIDUS, "/");
+            case '{':
+                advance();
+                return makeToken(DefaultMdxParserSym.LBRACE, "{");
+            case '(':
+                advance();
+                return makeToken(DefaultMdxParserSym.LPAREN, "(");
+            case '}':
+                advance();
+                return makeToken(DefaultMdxParserSym.RBRACE, "}");
+            case ')':
+                advance();
+                return makeToken(DefaultMdxParserSym.RPAREN, ")");
+            case '+':
+                advance();
+                return makeToken(DefaultMdxParserSym.PLUS, "+");
+            case '-':
+                advance();
+                return makeToken(DefaultMdxParserSym.MINUS, "-");
+            case '*':
+                advance();
+                return makeToken(DefaultMdxParserSym.ASTERISK, "*");
+            case '/':
+                advance();
+                return makeToken(DefaultMdxParserSym.SOLIDUS, "/");
             case '|':
                 advance();
                 switch (nextChar) {
-                case '|': advance(); return makeToken(DefaultMdxParserSym.CONCAT, "||");
-                default: return makeToken(DefaultMdxParserSym.UNKNOWN, "|");
+                case '|':
+                    advance();
+                    return makeToken(DefaultMdxParserSym.CONCAT, "||");
+                default:
+                    return makeToken(DefaultMdxParserSym.UNKNOWN, "|");
                 }
 
             case '"':
@@ -723,7 +782,7 @@ class Scanner {
                     case -1:
                         return makeString(id.toString());
                     default:
-                        id.append((char)nextChar);
+                        id.append((char) nextChar);
                     }
                 }
 
@@ -750,7 +809,7 @@ class Scanner {
                     case -1:
                         return makeString(id.toString());
                     default:
-                        id.append((char)nextChar);
+                        id.append((char) nextChar);
                     }
                 }
 
@@ -760,8 +819,8 @@ class Scanner {
 
             default:
                 // If it's whitespace, skip over it.
-                if (nextChar <= Character.MAX_VALUE &&
-                    Character.isWhitespace(nextChar))
+                if (nextChar <= Character.MAX_VALUE
+                    && Character.isWhitespace(nextChar))
                 {
                     // fall through
                 } else {

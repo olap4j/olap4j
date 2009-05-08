@@ -260,7 +260,7 @@ public class SimpleQuerySample {
         SelectNode query = new SelectNode();
         query.setFrom(
             new IdentifierNode(
-                new IdentifierNode.Segment("Sales")));
+                new IdentifierNode.NameSegment("Sales")));
         query.getAxisList().add(
             new AxisNode(
                 null,
@@ -272,8 +272,8 @@ public class SimpleQuerySample {
                     "{}",
                     Syntax.Braces,
                     new IdentifierNode(
-                        new IdentifierNode.Segment("Measures"),
-                        new IdentifierNode.Segment("Unit Sales")))));
+                        new IdentifierNode.NameSegment("Measures"),
+                        new IdentifierNode.NameSegment("Unit Sales")))));
 
         // Create a statement based upon the query model.
         OlapStatement stmt;

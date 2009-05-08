@@ -1134,7 +1134,7 @@ public class ConnectionTest extends TestCase {
             null,
             new ArrayList<ParseTreeNode>(),
             new ArrayList<AxisNode>(),
-            new IdentifierNode(new IdentifierNode.Segment("sales")),
+            new IdentifierNode(new IdentifierNode.NameSegment("sales")),
             new AxisNode(
                 null,
                 false,
@@ -1146,11 +1146,11 @@ public class ConnectionTest extends TestCase {
             new WithMemberNode(
                 null,
                 new IdentifierNode(
-                    new IdentifierNode.Segment("Measures"),
-                    new IdentifierNode.Segment("Foo")),
+                    new IdentifierNode.NameSegment("Measures"),
+                    new IdentifierNode.NameSegment("Foo")),
                 new IdentifierNode(
-                    new IdentifierNode.Segment("Measures"),
-                    new IdentifierNode.Segment("Bar")),
+                    new IdentifierNode.NameSegment("Measures"),
+                    new IdentifierNode.NameSegment("Bar")),
                 Arrays.asList(
                     new PropertyValueNode(
                         null,
@@ -1171,7 +1171,7 @@ public class ConnectionTest extends TestCase {
                     Arrays.asList(
                         (ParseTreeNode)
                         new IdentifierNode(
-                            new IdentifierNode.Segment("Gender"))))));
+                            new IdentifierNode.NameSegment("Gender"))))));
         select.getAxisList().add(
             new AxisNode(
                 null,
@@ -1187,12 +1187,12 @@ public class ConnectionTest extends TestCase {
                         "Children",
                         Syntax.Property,
                         new IdentifierNode(
-                            new IdentifierNode.Segment("Store"))))));
+                            new IdentifierNode.NameSegment("Store"))))));
         select.getFilterAxis().setExpression(
             new IdentifierNode(
-                new IdentifierNode.Segment("Time"),
-                new IdentifierNode.Segment("1997"),
-                new IdentifierNode.Segment("Q4")));
+                new IdentifierNode.NameSegment("Time"),
+                new IdentifierNode.NameSegment("1997"),
+                new IdentifierNode.NameSegment("Q4")));
 
         checkUnparsedMdx(select);
     }
@@ -2175,7 +2175,9 @@ public class ConnectionTest extends TestCase {
         assertEquals("Unit Sales", measure.getName());
         Dimension dimPromotionMedia = cube.getDimensions().get("Promotion Media");
         //
-        // IdentifierNode cubeNode = new IdentifierNode(new IdentifierNode.Segment(cube.getUniqueName()));
+        // IdentifierNode cubeNode =
+        //    new IdentifierNode(
+        //       new IdentifierNode.NameSegment(cube.getUniqueName()));
         CubeNode cubeNode = new CubeNode(null, cube);
         MemberNode measuresQuantity = new MemberNode(null, measure);
         HierarchyNode promotionHierarchyNode =

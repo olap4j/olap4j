@@ -4,7 +4,7 @@
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
 // Copyright (C) 1999-2002 Kana Software, Inc.
-// Copyright (C) 2002-2008 Julian Hyde and others.
+// Copyright (C) 2002-2009 Julian Hyde and others.
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -332,6 +332,7 @@ terminal Double NUMBER;
 terminal String ID;
 terminal String QUOTED_ID;
 terminal String AMP_QUOTED_ID;
+terminal String AMP_UNQUOTED_ID;
 terminal String STRING;
 terminal String FORMULA_STRING;
 terminal String UNKNOWN; // a token the lexer doesn't like!
@@ -372,9 +373,14 @@ non terminal String
     keyword;
 non terminal IdentifierNode.Segment
     identifier,
+    key_identifier,
     quoted_identifier,
     unquoted_identifier,
-    amp_quoted_identifier;
+    amp_identifier,
+    amp_quoted_identifier,
+    amp_unquoted_identifier;
+non terminal List
+    amp_identifier_list;
 non terminal WithMemberNode
     member_specification;
 non terminal WithSetNode
@@ -425,31 +431,69 @@ start with statement;
 quoted_identifier ::=
         QUOTED_ID:i  {:
             ParseRegion region = createRegion(ileft, iright);
-            RESULT = new IdentifierNode.Segment(region, i, IdentifierNode.Quoting.QUOTED);
-        :}
-    ;
-
-amp_quoted_identifier ::=
-        AMP_QUOTED_ID:i {:
-            ParseRegion region = createRegion(ileft, iright);
-            RESULT = new IdentifierNode.Segment(region, i, IdentifierNode.Quoting.KEY);
+            RESULT = new IdentifierNode.NameSegment(
+                region, i, IdentifierNode.Quoting.QUOTED);
         :}
     ;
 
 unquoted_identifier ::=
         ID:i {:
             ParseRegion region = createRegion(ileft, iright);
-            RESULT = new IdentifierNode.Segment(region, i, IdentifierNode.Quoting.UNQUOTED);
+            RESULT = new IdentifierNode.NameSegment(
+                region, i, IdentifierNode.Quoting.UNQUOTED);
         :}
     |   keyword:i {:
             ParseRegion region = createRegion(ileft, iright);
-            RESULT = new IdentifierNode.Segment(region, i, IdentifierNode.Quoting.UNQUOTED);
+            RESULT = new IdentifierNode.NameSegment(
+                region, i, IdentifierNode.Quoting.UNQUOTED);
+        :}
+    ;
+
+// for example '&foo&[1]&bar' in '[x].&foo&[1]&bar.[y]'
+key_identifier ::=
+       amp_identifier_list:list {:
+            RESULT = new IdentifierNode.KeySegment(list);
+        :}
+    ;
+
+amp_identifier_list ::=
+        amp_identifier:i {:
+            RESULT = new ArrayList<IdentifierNode.NameSegment>();
+            RESULT.add(i);
+        :}
+    |
+        amp_identifier_list:list amp_identifier:i {:
+            list.add(i);
+            RESULT = list;
+        :}
+    ;
+
+amp_identifier ::=
+        amp_quoted_identifier
+    |
+        amp_unquoted_identifier
+    ;
+
+amp_quoted_identifier ::=
+        AMP_QUOTED_ID:i {:
+            ParseRegion region = createRegion(ileft, iright);
+            RESULT = new IdentifierNode.NameSegment(
+                region, i, IdentifierNode.Quoting.QUOTED);
+        :}
+    ;
+
+amp_unquoted_identifier ::=
+        AMP_UNQUOTED_ID:i {:
+            ParseRegion region = createRegion(ileft, iright);
+            RESULT = new IdentifierNode.NameSegment(
+                region, i, IdentifierNode.Quoting.UNQUOTED);
         :}
     ;
 
 identifier ::=
         unquoted_identifier
     |   quoted_identifier
+    |   key_identifier
     ;
 
 // a keyword (unlike a reserved word) can be converted back into an
@@ -470,7 +514,6 @@ compound_id ::=
     |   compound_id:hd DOT identifier:tl {:
             RESULT = hd.append(tl);
         :}
-
     ;
 
 //
@@ -839,17 +882,17 @@ value_expression_primary ::=
                 RESULT = ((IdentifierNode) i).append(j);
             } else {
                 ParseRegion region = createRegion(ileft, jright);
-                RESULT = new CallNode(region,
-                    j.getName(), Syntax.QuotedProperty, i);
+                RESULT = new CallNode(
+                    region, j.getName(), Syntax.QuotedProperty, i);
             }
         :}
-    |   value_expression_primary:i DOT amp_quoted_identifier:j {:
+    |   value_expression_primary:i DOT key_identifier:j {:
             if (i instanceof IdentifierNode) {
                 RESULT = ((IdentifierNode) i).append(j);
             } else {
                 ParseRegion region = createRegion(ileft, jright);
-                RESULT = new CallNode(region,
-                    j.getName(), Syntax.AmpersandQuotedProperty, i);
+                RESULT = new CallNode(
+                    region, j.getName(), Syntax.AmpersandQuotedProperty, i);
             }
         :}
     |   value_expression_primary:i DOT identifier:j LPAREN exp_list_opt:lis RPAREN:rparen {:

@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -52,7 +52,6 @@ class XmlaOlap4jCube implements Cube, Named
      * @param olap4jSchema Schema
      * @param name Name
      * @param description Description
-     * @param connection
      */
     XmlaOlap4jCube(
         XmlaOlap4jSchema olap4jSchema,
@@ -201,7 +200,7 @@ class XmlaOlap4jCube implements Cube, Named
         List<IdentifierNode.Segment> segmentList =
             new ArrayList<IdentifierNode.Segment>();
         for (String namePart : nameParts) {
-            segmentList.add(new IdentifierNode.Segment(namePart));
+            segmentList.add(new IdentifierNode.NameSegment(namePart));
         }
         return lookupMember(segmentList);
     }
@@ -247,7 +246,7 @@ class XmlaOlap4jCube implements Cube, Named
             if (buf.length() > 0) {
                 buf.append('.');
             }
-            buf.append(new IdentifierNode.Segment(namePart));
+            buf.append(new IdentifierNode.NameSegment(namePart));
         }
         final String uniqueName = buf.toString();
         final List<XmlaOlap4jMember> list =

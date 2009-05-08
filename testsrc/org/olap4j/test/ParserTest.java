@@ -16,6 +16,7 @@ import org.olap4j.mdx.parser.MdxParseException;
 import org.olap4j.mdx.*;
 import org.olap4j.OlapConnection;
 import org.olap4j.Axis;
+import org.olap4j.impl.Olap4jUtil;
 
 import java.sql.SQLException;
 import java.sql.Connection;
@@ -447,7 +448,9 @@ public class ParserTest extends TestCase {
         CallNode fun = (CallNode)colsSetExpr;
         IdentifierNode identifier = (IdentifierNode) (fun.getArgList().get(0));
         assertEquals(1, identifier.getSegmentList().size());
-        assertEquals("Correct member on axis", "axis0mbr",
+        assertEquals(
+            "Correct member on axis",
+            "axis0mbr",
             identifier.getSegmentList().get(0).getName());
 
         ParseTreeNode rowsSetExpr = axes.get(1).getExpression();
@@ -456,7 +459,9 @@ public class ParserTest extends TestCase {
         fun = (CallNode) rowsSetExpr;
         identifier = (IdentifierNode) (fun.getArgList().get(0));
         assertEquals(1, identifier.getSegmentList().size());
-        assertEquals("Correct member on axis", "axis1mbr",
+        assertEquals(
+            "Correct member on axis",
+            "axis1mbr",
             identifier.getSegmentList().get(0).getName());
     }
 
@@ -488,11 +493,11 @@ public class ParserTest extends TestCase {
 
     public void testDimensionProperties() {
         assertParseQuery(
-                "select {[foo]} properties p1,   p2 on columns from [cube]",
-                TestContext.fold(
-                    "SELECT\n" +
-                        "{[foo]} DIMENSION PROPERTIES p1, p2 ON COLUMNS\n" +
-                        "FROM [cube]"));
+            "select {[foo]} properties p1,   p2 on columns from [cube]",
+            TestContext.fold(
+                "SELECT\n"
+                + "{[foo]} DIMENSION PROPERTIES p1, p2 ON COLUMNS\n"
+                + "FROM [cube]"));
     }
 
     public void testCellProperties() {
@@ -559,6 +564,90 @@ public class ParserTest extends TestCase {
         assertParseExpr("fOo", "fOo");
         assertParseExpr("[Foo].[Bar Baz]", "[Foo].[Bar Baz]");
         assertParseExpr("[Foo].&[Bar]", "[Foo].&[Bar]");
+    }
+
+    public void testIdWithKey() {
+        // two segments each with a compound key
+        final String mdx = "[Foo].&Key1&Key2.&[Key3]&Key4&[5]";
+        assertParseExpr(mdx, mdx);
+
+        MdxParser p = createParser();
+        final String mdxQuery = wrapExpr(mdx);
+        final SelectNode selectNode = p.parseSelect(mdxQuery);
+        assertEquals(1, selectNode.getWithList().size());
+        WithMemberNode withMember =
+            (WithMemberNode) selectNode.getWithList().get(0);
+        final ParseTreeNode expr = withMember.getExpression();
+        IdentifierNode id = (IdentifierNode) expr;
+        assertNotNull(id.getRegion());
+        assertEquals(3, id.getSegmentList().size());
+
+        final IdentifierNode.Segment seg0 = id.getSegmentList().get(0);
+        assertNotNull(seg0.getRegion());
+        assertEquals("Foo", seg0.getName());
+        assertEquals(IdentifierNode.Quoting.QUOTED, seg0.getQuoting());
+
+        final IdentifierNode.Segment seg1 = id.getSegmentList().get(1);
+        assertEquals(IdentifierNode.Quoting.KEY, seg1.getQuoting());
+        assertNull(seg1.getName());
+        List<IdentifierNode.NameSegment> keyParts = seg1.getKeyParts();
+        assertNotNull(keyParts);
+        assertEquals(2, keyParts.size());
+        assertEquals("Key1", keyParts.get(0).getName());
+        assertEquals(
+            IdentifierNode.Quoting.UNQUOTED, keyParts.get(0).getQuoting());
+        assertEquals("Key2", keyParts.get(1).getName());
+        assertEquals(
+            IdentifierNode.Quoting.UNQUOTED, keyParts.get(1).getQuoting());
+
+        final IdentifierNode.Segment seg2 = id.getSegmentList().get(2);
+        assertNotNull(seg2.getRegion());
+        assertEquals(IdentifierNode.Quoting.KEY, seg2.getQuoting());
+        List<IdentifierNode.NameSegment> keyParts2 = seg2.getKeyParts();
+        assertNotNull(keyParts2);
+        assertEquals(3, keyParts2.size());
+        assertEquals(
+            IdentifierNode.Quoting.QUOTED, keyParts2.get(0).getQuoting());
+        assertEquals(
+            IdentifierNode.Quoting.UNQUOTED, keyParts2.get(1).getQuoting());
+        assertEquals(
+            IdentifierNode.Quoting.QUOTED, keyParts2.get(2).getQuoting());
+        assertEquals("5", keyParts2.get(2).getName());
+        assertNotNull(keyParts2.get(2).getRegion());
+
+        final String actual = TestContext.toString(expr);
+        TestContext.assertEqualsVerbose(mdx, actual);
+    }
+
+    public void testIdComplex() {
+        // simple key
+        assertParseExpr(
+            "[Foo].&[Key1]&[Key2].[Bar]",
+            "[Foo].&[Key1]&[Key2].[Bar]");
+        // compound key
+        assertParseExpr(
+            "[Foo].&[1]&[Key 2]&[3].[Bar]",
+            "[Foo].&[1]&[Key 2]&[3].[Bar]");
+        // compound key sans brackets
+        assertParseExpr(
+            "[Foo].&Key1&Key2 + 4",
+            "([Foo].&Key1&Key2 + 4.0)");
+        // brackets are requred for numbers
+        assertParseExprFails(
+            "[Foo].&[1]&[Key2]&^3.[Bar]",
+            "Syntax error at \\[1:51\\], token '&'");
+        // space between ampersand and key is unacceptable
+        assertParseExprFails(
+            "[Foo].&^ [Key2].[Bar]",
+            "Syntax error at \\[1:40\\], token '&'");
+        // underscore after ampersand is unacceptable
+        assertParseExprFails(
+            "[Foo].&^_Key2.[Bar]",
+            "Syntax error at \\[1:40\\], token '&'");
+        // but underscore is OK within brackets
+        assertParseExpr(
+            "[Foo].&[_Key2].[Bar]",
+            "[Foo].&[_Key2].[Bar]");
     }
 
     // todo: enable this
@@ -653,12 +742,12 @@ public class ParserTest extends TestCase {
         }
 
         id = new IdentifierNode(
-            new IdentifierNode.Segment("foo"));
+            new IdentifierNode.NameSegment("foo"));
         assertEquals("[foo]", id.toString());
 
         // append does not mutate
         IdentifierNode id2 = id.append(
-            new IdentifierNode.Segment(
+            new IdentifierNode.NameSegment(
                 null, "bar", IdentifierNode.Quoting.KEY));
         assertTrue(id != id2);
         assertEquals("[foo]", id.toString());
@@ -680,7 +769,7 @@ public class ParserTest extends TestCase {
         }
         try {
             segments.add(
-                new IdentifierNode.Segment("baz"));
+                new IdentifierNode.NameSegment("baz"));
             fail("expected exception");
         } catch (UnsupportedOperationException e) {
             // ok

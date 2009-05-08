@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Common Public License
 // Agreement, available at the following URL:
 // http://www.opensource.org/licenses/cpl.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -33,6 +33,11 @@ class DefaultMdxValidatorImpl
     private Stack<Boolean> scalarStack = new Stack<Boolean>();
     private final SelectNode selectNode;
 
+    /**
+     * Creates a DefaultMdxValidatorImpl.
+     *
+     * @param selectNode Root of parse tree
+     */
     protected DefaultMdxValidatorImpl(SelectNode selectNode) {
         this.selectNode = selectNode;
     }
@@ -177,10 +182,12 @@ class DefaultMdxValidatorImpl
     public ParseTreeNode accept(IdentifierNode identifier) {
         if (identifier.getSegmentList().size() == 1) {
             final IdentifierNode.Segment s = identifier.getSegmentList().get(0);
-            if (s.quoting == IdentifierNode.Quoting.UNQUOTED &&
-                isReserved(s.name)) {
+            if (s.getQuoting() == IdentifierNode.Quoting.UNQUOTED
+                && isReserved(s.getName()))
+            {
                 return LiteralNode.createSymbol(
-                    s.getRegion(), s.name.toUpperCase());
+                    s.getRegion(),
+                    s.getName().toUpperCase());
             }
         }
         final ParseTreeNode element =

@@ -37,20 +37,21 @@ public class MdxTest extends TestCase {
             "[Store].[USA].[California]",
             IdentifierNode.unparseIdentifierList(
                 Arrays.asList(
-                    new IdentifierNode.Segment(
+                    new IdentifierNode.NameSegment(
                         null, "Store", IdentifierNode.Quoting.QUOTED),
-                    new IdentifierNode.Segment(
+                    new IdentifierNode.NameSegment(
                         null, "USA", IdentifierNode.Quoting.QUOTED),
-                    new IdentifierNode.Segment(
+                    new IdentifierNode.NameSegment(
                         null, "California", IdentifierNode.Quoting.QUOTED))));
     }
 
     public void testImplode() {
-        List<IdentifierNode.Segment> fooBar = Arrays.asList(
-            new IdentifierNode.Segment(
-                null, "foo", IdentifierNode.Quoting.UNQUOTED),
-            new IdentifierNode.Segment(
-                null, "bar", IdentifierNode.Quoting.QUOTED));
+        List<IdentifierNode.Segment> fooBar =
+            Arrays.<IdentifierNode.Segment>asList(
+                new IdentifierNode.NameSegment(
+                    null, "foo", IdentifierNode.Quoting.UNQUOTED),
+                new IdentifierNode.NameSegment(
+                    null, "bar", IdentifierNode.Quoting.QUOTED));
         assertEquals(
             "foo.[bar]",
             IdentifierNode.unparseIdentifierList(fooBar));
@@ -58,33 +59,38 @@ public class MdxTest extends TestCase {
         List<IdentifierNode.Segment> empty = Collections.emptyList();
         assertEquals("", IdentifierNode.unparseIdentifierList(empty));
 
-        List<IdentifierNode.Segment> nasty = Arrays.asList(
-            new IdentifierNode.Segment(
-                null, "string", IdentifierNode.Quoting.QUOTED),
-            new IdentifierNode.Segment(
-                null, "with", IdentifierNode.Quoting.QUOTED),
-            new IdentifierNode.Segment(
-                null, "a [bracket] in it", IdentifierNode.Quoting.QUOTED));
+        List<IdentifierNode.Segment> nasty =
+            Arrays.<IdentifierNode.Segment>asList(
+                new IdentifierNode.NameSegment(
+                    null, "string", IdentifierNode.Quoting.QUOTED),
+                new IdentifierNode.NameSegment(
+                    null, "with", IdentifierNode.Quoting.QUOTED),
+                new IdentifierNode.NameSegment(
+                    null, "a [bracket] in it", IdentifierNode.Quoting.QUOTED));
         assertEquals(
             "[string].[with].[a [bracket]] in it]",
             IdentifierNode.unparseIdentifierList(nasty));
     }
 
     public void testParseIdentifier() {
-        List<IdentifierNode.Segment> strings =
-                IdentifierNode.parseIdentifier(
-                    "[string].[with].[a [bracket]] in it]");
-        assertEquals(3, strings.size());
-        assertEquals("a [bracket] in it", strings.get(2).name);
+        List<IdentifierNode.Segment> segments =
+            IdentifierNode.parseIdentifier(
+                "[string].[with].[a [bracket]] in it]");
+        assertEquals(3, segments.size());
+        assertEquals(
+            "a [bracket] in it",
+            segments.get(2).getName());
 
-        strings = IdentifierNode.parseIdentifier(
+        segments = IdentifierNode.parseIdentifier(
             "[Worklog].[All].[calendar-[LANGUAGE]].js]");
-        assertEquals(3, strings.size());
-        assertEquals("calendar-[LANGUAGE].js", strings.get(2).name);
+        assertEquals(3, segments.size());
+        assertEquals(
+            "calendar-[LANGUAGE].js",
+            segments.get(2).getName());
 
         try {
-            strings = IdentifierNode.parseIdentifier("[foo].bar");
-            fail("expected exception, got " + strings);
+            segments = IdentifierNode.parseIdentifier("[foo].bar");
+            fail("expected exception, got " + segments);
         } catch (IllegalArgumentException e) {
             assertEquals(
                 "Invalid member identifier '[foo].bar'",
@@ -92,8 +98,8 @@ public class MdxTest extends TestCase {
         }
 
         try {
-            strings = IdentifierNode.parseIdentifier("[foo].[bar");
-            fail("expected exception, got " + strings);
+            segments = IdentifierNode.parseIdentifier("[foo].[bar");
+            fail("expected exception, got " + segments);
         } catch (IllegalArgumentException e) {
             assertEquals(
                 "Invalid member identifier '[foo].[bar'",
