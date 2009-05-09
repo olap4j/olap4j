@@ -16,7 +16,6 @@ import org.olap4j.mdx.parser.MdxParseException;
 import org.olap4j.mdx.*;
 import org.olap4j.OlapConnection;
 import org.olap4j.Axis;
-import org.olap4j.impl.Olap4jUtil;
 
 import java.sql.SQLException;
 import java.sql.Connection;
@@ -747,8 +746,9 @@ public class ParserTest extends TestCase {
 
         // append does not mutate
         IdentifierNode id2 = id.append(
-            new IdentifierNode.NameSegment(
-                null, "bar", IdentifierNode.Quoting.KEY));
+            new IdentifierNode.KeySegment(
+                new IdentifierNode.NameSegment(
+                    null, "bar", IdentifierNode.Quoting.QUOTED)));
         assertTrue(id != id2);
         assertEquals("[foo]", id.toString());
         assertEquals("[foo].&[bar]", id2.toString());

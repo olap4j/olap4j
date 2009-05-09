@@ -99,7 +99,7 @@ public class IdentifierNode
         this.segments =
             new UnmodifiableArrayList<Segment>(
                 segments.toArray(
-                    new NameSegment[segments.size()]));
+                    new Segment[segments.size()]));
     }
 
     public Type getType() {
@@ -422,6 +422,9 @@ public class IdentifierNode
             this.region = region;
             this.name = name;
             this.quoting = quoting;
+            if (!(quoting == Quoting.QUOTED || quoting == Quoting.UNQUOTED)) {
+                throw new IllegalArgumentException();
+            }
         }
 
         /**
