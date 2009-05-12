@@ -1943,7 +1943,8 @@ public class ConnectionTest extends TestCase {
                     + "from [sales]");
         select = mdxValidator.validateSelect(select);
         AxisNode filterAxis = select.getFilterAxis();
-        assertNull(filterAxis);
+        assertNotNull(filterAxis);
+        assertNull(filterAxis.getExpression());
 
         try {
             select =
@@ -1983,7 +1984,8 @@ public class ConnectionTest extends TestCase {
                     + "crossjoin([Customers].[City].Members, [Gender].members) on rows\n"
                     + "from [sales]");
         AxisNode filterAxis = select.getFilterAxis();
-        assertNull(filterAxis);
+        assertNotNull(filterAxis);
+        assertNull(filterAxis.getExpression());
 
         try {
             select = mdxValidator.validateSelect(select);
