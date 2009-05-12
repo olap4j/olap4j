@@ -65,6 +65,15 @@ abstract class XmlaOlap4jCellSet implements CellSet {
     }
 
     /**
+     * Returns the error-handler.
+     *
+     * @return Error handler
+     */
+    private final XmlaHelper getHelper() {
+        return olap4jStatement.olap4jConnection.helper;
+    }
+
+    /**
      * Gets response from the XMLA request and populates cell set axes and cells
      * with it.
      *
@@ -77,10 +86,10 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         try {
             doc = parse(bytes);
         } catch (IOException e) {
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "error creating CellSet", e);
         } catch (SAXException e) {
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "error creating CellSet", e);
         }
         // <SOAP-ENV:Envelope>
@@ -121,7 +130,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         </SOAP-ENV:Fault>
              */
             // TODO: log doc to logfile
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "XMLA provider gave exception: " +
                 XmlaOlap4jUtil.prettyPrint(fault));
         }
@@ -332,9 +341,9 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 return XmlaOlap4jUtil.stringElement(cell, "Value");
             }
         } catch (Exception e) {
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "Error while casting a cell value to the correct java type for"
-                    + " its XSD type " + type,
+                + " its XSD type " + type,
                 e);
         }
     }
@@ -363,7 +372,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             this.olap4jStatement.olap4jConnection.getSchema().getCubes().get(
                 cubeName);
         if (cube == null) {
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "Internal error: cube '" + cubeName + "' not found");
         }
         final Element axesInfo =
@@ -474,11 +483,9 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 }
             }
             if (hierarchy == null) {
-                throw OlapExceptionHelper
-                    .createException(
-                        "Internal error: hierarchy '" + hierarchyName
-                            + "' not found in cube '" + cube.getName()
-                            + "'");
+                throw getHelper().createException(
+                    "Internal error: hierarchy '" + hierarchyName
+                    + "' not found in cube '" + cube.getName() + "'");
             }
         }
         return hierarchy;

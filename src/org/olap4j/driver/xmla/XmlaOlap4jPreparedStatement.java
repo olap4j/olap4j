@@ -39,6 +39,13 @@ abstract class XmlaOlap4jPreparedStatement
     final XmlaOlap4jCellSetMetaData cellSetMetaData;
     private final String mdx;
 
+    /**
+     * Creates an XmlaOlap4jPreparedStatement.
+     *
+     * @param olap4jConnection Connection
+     * @param mdx MDX query string
+     * @throws OlapException on error
+     */
     XmlaOlap4jPreparedStatement(
         XmlaOlap4jConnection olap4jConnection,
         String mdx) throws OlapException
@@ -55,12 +62,21 @@ abstract class XmlaOlap4jPreparedStatement
             cellSet.close();
             statement.close();
         } catch (SQLException e) {
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "Error while preparing statement '" + mdx + "'",
                 e);
         }
 
         this.mdx = mdx;
+    }
+
+    /**
+     * Returns the error-handler.
+     *
+     * @return Error handler
+     */
+    private final XmlaHelper getHelper() {
+        return olap4jConnection.helper;
     }
 
     // override OlapStatement
@@ -251,8 +267,8 @@ abstract class XmlaOlap4jPreparedStatement
     private Parameter getParameter(int param) throws OlapException {
         final List<Parameter> parameters = getParameters();
         if (param < 1 || param > parameters.size()) {
-            throw OlapExceptionHelper.createException(
-                    "parameter ordinal " + param + " out of range");
+            throw getHelper().createException(
+                "parameter ordinal " + param + " out of range");
         }
         return parameters.get(param - 1);
     }

@@ -1,3 +1,11 @@
+/*
+// This software is subject to the terms of the Eclipse Public License v1.0
+// Agreement, available at the following URL:
+// http://www.eclipse.org/legal/epl-v10.html.
+// Copyright (C) 2008-2009 Julian Hyde
+// All Rights Reserved.
+// You must accept the terms of that agreement to use this software.
+*/
 package org.olap4j.driver.xmla.proxy;
 
 import java.util.HashMap;
@@ -8,15 +16,13 @@ import junit.framework.TestCase;
 import org.olap4j.OlapException;
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache;
-import org.olap4j.driver.xmla.proxy.XmlaOlap4jCachedProxy;
-import org.olap4j.driver.xmla.proxy.XmlaOlap4jHttpProxy;
 
 /**
  * <p>Tests both the CachedProxy implementation (HttpProxy) and the
  * IXmlaOlap4jCache implementation (XmlaOlap4jNamedMemoryCache).
  *
  * @author Luc Boudreau
- *
+ * @version $Id$
  */
 public class XmlaCachedProxyTest extends TestCase {
 

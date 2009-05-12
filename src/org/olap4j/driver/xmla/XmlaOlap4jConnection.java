@@ -43,6 +43,11 @@ import java.util.regex.*;
  */
 abstract class XmlaOlap4jConnection implements OlapConnection {
     /**
+     * Handler for errors.
+     */
+    final XmlaHelper helper = new XmlaHelper();
+
+    /**
      * <p>Current schema.
      */
     private XmlaOlap4jSchema olap4jSchema;
@@ -58,7 +63,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     private boolean closed;
 
     /**
-     * <p>URL of the HTTP server to which to send XML requests.
+     * URL of the HTTP server to which to send XML requests.
      */
     final URL serverUrl;
 
@@ -68,12 +73,12 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     private String roleName;
 
     /**
-     * <p>Holds on to the provider name
+     * Provider name.
      */
     private String providerName;
 
     /**
-     * <p>Holds on to the datasource name.
+     * Datasource name.
      */
     private String datasourceName;
 
@@ -144,7 +149,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         // Set URL of HTTP server.
         String serverUrl = map.get(XmlaOlap4jDriver.Property.Server.name());
         if (serverUrl == null) {
-            throw OlapExceptionHelper.createException("Connection property '"
+            throw getHelper().createException(
+                "Connection property '"
                 + XmlaOlap4jDriver.Property.Server.name()
                 + "' must be specified");
         }
@@ -168,7 +174,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         try {
             this.serverUrl = new URL(serverUrl);
         } catch (MalformedURLException e) {
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "Error while creating connection", e);
         }
 
@@ -176,6 +182,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             factory.newDatabaseMetaData(this);
     }
 
+    /**
+     * Returns the error-handler
+     * @return Error-handler
+     */
+    private final XmlaHelper getHelper() {
+        return helper;
+    }
 
     /**
      * Initializes a cache object and configures it if cache
@@ -283,7 +296,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             // Throws exception to the client.
             //Tells that there are no datasource corresponding to the search criterias.
             if (this.nativeDatasourceName == null) {
-                throw OlapExceptionHelper.createException("No datasource could be found.");
+                throw getHelper().createException(
+                    "No datasource could be found.");
             }
 
             // If there is a provider
@@ -291,7 +305,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         } catch (OlapException e) {
             throw e;
         } catch (SQLException e) {
-            throw OlapExceptionHelper.createException("Datasource name not found.", e);
+            throw getHelper().createException("Datasource name not found.", e);
         } finally {
             try {
                 if (rSet != null) {
@@ -493,7 +507,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         if (iface.isInstance(this)) {
             return iface.cast(this);
         }
-        throw OlapExceptionHelper.createException("does not implement '" + iface + "'");
+        throw getHelper().createException("does not implement '" + iface + "'");
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
@@ -602,9 +616,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
              * This was a bad design which we will fix at some point but not
              * before the 1.0 release.
              */
-            throw OlapExceptionHelper.createException(e);
+            throw getHelper().createException(e);
         } catch (XmlaOlap4jProxyException e) {
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "This connection encountered an exception while executing a query.",
                 e);
         }
@@ -612,10 +626,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         try {
             doc = parse(bytes);
         } catch (IOException e) {
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "error discovering metadata", e);
         } catch (SAXException e) {
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "error discovering metadata", e);
         }
         // <SOAP-ENV:Envelope>
@@ -656,10 +670,12 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         </SOAP-ENV:Fault>
              */
             // TODO: log doc to logfile
-            throw OlapExceptionHelper.createException(
-                "XMLA provider gave exception: " +
-                XmlaOlap4jUtil.prettyPrint(fault)
-                + "\n Request was: \n" + request);
+            throw getHelper().createException(
+                "XMLA provider gave exception: "
+                + XmlaOlap4jUtil.prettyPrint(fault)
+                + "\n"
+                + "Request was:\n"
+                + request);
         }
         Element discoverResponse =
             findChild(body, XMLA_NS, "DiscoverResponse");

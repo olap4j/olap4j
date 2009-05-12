@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -15,15 +15,15 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.olap4j.OlapException;
-import org.olap4j.OlapExceptionHelper;
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
+import org.olap4j.driver.xmla.XmlaHelper;
 import org.olap4j.driver.xmla.cache.XmlaOlap4jCache;
 
 /**
  * <p>Abstract implementation of Proxy which adds a SOAP
- * cache layer between the driver and it's proxy implementations.
+ * cache layer between the driver and its proxy implementations.
  * It can be configured via the setCache() method, as instructed in
- * CachedProxy interface.
+ * {@link XmlaOlap4jCachedProxy} interface.
  *
  * <p>It also offers helper methods to keep track of
  * the HTTP cookies and sends them back
@@ -36,6 +36,8 @@ import org.olap4j.driver.xmla.cache.XmlaOlap4jCache;
 abstract class XmlaOlap4jAbstractHttpProxy
     implements XmlaOlap4jCachedProxy
 {
+    private final XmlaHelper helper = new XmlaHelper();
+
     /**
      * Holds on to the cache implementation.
      */
@@ -53,6 +55,11 @@ abstract class XmlaOlap4jAbstractHttpProxy
      */
     private XmlaOlap4jCookieManager cookieManager = null;
 
+    /**
+     * Creates an XmlaOlap4jAbstractHttpProxy.
+     */
+    protected XmlaOlap4jAbstractHttpProxy() {
+    }
 
     /**
      * Sends a request to a URL and returns the response.
@@ -60,7 +67,6 @@ abstract class XmlaOlap4jAbstractHttpProxy
      * @param url Target URL
      * @param request Request string
      * @return Response
-     * @throws IOException
      */
     abstract public byte[] getResponse(URL url, String request)
         throws XmlaOlap4jProxyException;
@@ -118,23 +124,23 @@ abstract class XmlaOlap4jAbstractHttpProxy
             // Configures it
             this.cacheId = this.cache.setParameters(config, properties);
         } catch (ClassNotFoundException e) {
-            throw OlapExceptionHelper.createException(
+            throw helper.createException(
                 "The specified cache class name could not be found : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
         } catch (InstantiationException e) {
-            throw OlapExceptionHelper.createException(
+            throw helper.createException(
                 "The specified cache class name could not be instanciated : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
         } catch (IllegalAccessException e) {
-            throw OlapExceptionHelper.createException(
+            throw helper.createException(
                 "An error was encountered while instanciating the cache : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
         } catch (IllegalArgumentException e) {
-            throw OlapExceptionHelper.createException(
+            throw helper.createException(
                 "An error was encountered while instanciating the cache : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
         } catch (SecurityException e) {
-            throw OlapExceptionHelper.createException(
+            throw helper.createException(
                 "An error was encountered while instanciating the cache : "
                 + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
         }

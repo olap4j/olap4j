@@ -2,13 +2,12 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.driver.xmla;
 
-import org.olap4j.OlapExceptionHelper;
 import org.olap4j.OlapWrapper;
 
 import javax.sql.rowset.RowSetMetaDataImpl;
@@ -41,6 +40,13 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
     private int rowOrdinal = -1;
     private final RowSetMetaDataImpl metaData = new RowSetMetaDataImpl();
 
+    /**
+     * Creates an EmptyResultSet.
+     *
+     * @param olap4jConnection Connection
+     * @param headerList Column names
+     * @param rowList List of row values
+     */
     EmptyResultSet(
         XmlaOlap4jConnection olap4jConnection,
         List<String> headerList,
@@ -725,7 +731,7 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
         if (iface.isInstance(this)) {
             return iface.cast(this);
         }
-        throw OlapExceptionHelper.createException("cannot cast");
+        throw olap4jConnection.helper.createException("cannot cast");
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {

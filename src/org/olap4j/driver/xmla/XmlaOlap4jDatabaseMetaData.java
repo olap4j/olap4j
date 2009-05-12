@@ -9,8 +9,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
-import org.olap4j.impl.ArrayMap;
-import org.olap4j.impl.Olap4jUtil;
+import org.olap4j.impl.*;
 import org.olap4j.metadata.*;
 import org.w3c.dom.Element;
 
@@ -908,8 +907,17 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         if (iface.isInstance(this)) {
             return iface.cast(this);
         }
-        throw OlapExceptionHelper.createException(
+        throw getHelper().createException(
             "does not implement '" + iface + "'");
+    }
+
+    /**
+     * Returns the error-handler.
+     *
+     * @return Error handler
+     */
+    private final XmlaHelper getHelper() {
+        return olap4jConnection.helper;
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {

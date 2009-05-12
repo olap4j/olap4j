@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -39,12 +39,26 @@ class XmlaOlap4jStatement implements OlapStatement {
     int timeoutSeconds;
     Future<byte []> future;
 
+    /**
+     * Creates an XmlaOlap4jStatement.
+     *
+     * @param olap4jConnection Connection
+     */
     XmlaOlap4jStatement(
         XmlaOlap4jConnection olap4jConnection)
     {
         assert olap4jConnection != null;
         this.olap4jConnection = olap4jConnection;
         this.closed = false;
+    }
+
+    /**
+     * Returns the error-handler.
+     *
+     * @return Error handler
+     */
+    private final XmlaHelper getHelper() {
+        return olap4jConnection.helper;
     }
 
     // implement Statement
@@ -55,7 +69,7 @@ class XmlaOlap4jStatement implements OlapStatement {
 
     private void checkOpen() throws SQLException {
         if (closed) {
-            throw OlapExceptionHelper.createException("closed");
+            throw getHelper().createException("closed");
         }
     }
 
@@ -100,7 +114,7 @@ class XmlaOlap4jStatement implements OlapStatement {
 
     public void setQueryTimeout(int seconds) throws SQLException {
         if (seconds < 0) {
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "illegal timeout value " + seconds);
         }
         this.timeoutSeconds = seconds;
@@ -243,7 +257,7 @@ class XmlaOlap4jStatement implements OlapStatement {
         if (iface.isInstance(this)) {
             return iface.cast(this);
         }
-        throw OlapExceptionHelper.createException(
+        throw getHelper().createException(
             "does not implement '" + iface + "'");
     }
 
@@ -299,7 +313,7 @@ class XmlaOlap4jStatement implements OlapStatement {
                 try {
                     cs.close();
                 } catch (SQLException e) {
-                    throw OlapExceptionHelper.createException(
+                    throw getHelper().createException(
                         "Error while closing previous CellSet", e);
                 }
             }
@@ -347,14 +361,14 @@ class XmlaOlap4jStatement implements OlapStatement {
                 return future.get();
             }
         } catch (InterruptedException e) {
-            throw OlapExceptionHelper.createException(null, e);
+            throw getHelper().createException(null, e);
         } catch (ExecutionException e) {
-            throw OlapExceptionHelper.createException(null, e.getCause());
+            throw getHelper().createException(null, e.getCause());
         } catch (TimeoutException e) {
-            throw OlapExceptionHelper.createException(
+            throw getHelper().createException(
                 "Query timeout of " + timeoutSeconds + " seconds exceeded");
         } catch (CancellationException e) {
-            throw OlapExceptionHelper.createException("Query canceled");
+            throw getHelper().createException("Query canceled");
         } finally {
             synchronized (this) {
                 if (future == null) {

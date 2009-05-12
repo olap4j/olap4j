@@ -6,36 +6,42 @@
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
-package org.olap4j;
+package org.olap4j.driver.xmla;
+
+import org.olap4j.OlapException;
+import org.olap4j.Cell;
 
 import java.sql.SQLException;
 
 /**
- * Sugar class to help create OlapExceptions.
+ * Helper class which encapsulates policies which are
+ * common throughout a driver. These policies include exception handling
+ * and factory methods.
+ *
  * @author Luc Boudreau
  * @version $Id$
  */
-public class OlapExceptionHelper {
+public class XmlaHelper {
 
-    public static OlapException createException(String msg) {
+    public OlapException createException(String msg) {
         return new OlapException(msg);
     }
 
-    public static OlapException createException(Throwable cause) {
+    public OlapException createException(Throwable cause) {
         return new OlapException(cause.getMessage(), cause);
     }
 
-    public static OlapException createException(String msg, Throwable cause) {
+    public OlapException createException(String msg, Throwable cause) {
         return new OlapException(msg, cause);
     }
 
-    public static OlapException createException(Cell context, String msg) {
+    public OlapException createException(Cell context, String msg) {
         OlapException exception = new OlapException(msg);
         exception.setContext(context);
         return exception;
     }
 
-    public static OlapException createException(
+    public OlapException createException(
         Cell context, String msg, Throwable cause)
     {
         OlapException exception = new OlapException(msg, cause);
@@ -43,7 +49,7 @@ public class OlapExceptionHelper {
         return exception;
     }
 
-    public static OlapException toOlapException(SQLException e) {
+    public OlapException toOlapException(SQLException e) {
         if (e instanceof OlapException) {
             return (OlapException) e;
         } else {
@@ -52,4 +58,4 @@ public class OlapExceptionHelper {
     }
 }
 
-// End OlapExceptionHelper.java
+// End XmlaHelper.java

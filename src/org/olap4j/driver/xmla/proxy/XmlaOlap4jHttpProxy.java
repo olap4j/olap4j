@@ -32,6 +32,12 @@ import org.olap4j.impl.Base64;
  */
 public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
 {
+    /**
+     * Creates a XmlaOlap4jHttpProxy.
+     */
+    public XmlaOlap4jHttpProxy() {
+    }
+
     @Override
     public byte[] getResponse(URL url, String request)
         throws XmlaOlap4jProxyException
