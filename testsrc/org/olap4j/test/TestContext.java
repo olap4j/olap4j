@@ -22,6 +22,7 @@ import org.olap4j.query.TraditionalCellSetFormatter;
 
 import org.apache.commons.dbcp.*;
 import junit.framework.ComparisonFailure;
+import junit.framework.Assert;
 
 /**
  * Context for olap4j tests.
@@ -396,6 +397,25 @@ public class TestContext {
         e.printStackTrace(pw);
         pw.flush();
         return sw.toString();
+    }
+
+    /**
+     * Checks that an exception is not null and the stack trace contains a
+     * given string. Fails otherwise.
+     *
+     * @param throwable Stack trace
+     * @param pattern Seek string
+     */
+    public static void checkThrowable(Throwable throwable, String pattern) {
+        if (throwable == null) {
+            Assert.fail("query did not yield an exception");
+        }
+        String stackTrace = getStackTrace(throwable);
+        if (stackTrace.indexOf(pattern) < 0) {
+            Assert.fail(
+                "error does not match pattern '" + pattern
+                + "'; error is [" + stackTrace + "]");
+        }
     }
 
     /**

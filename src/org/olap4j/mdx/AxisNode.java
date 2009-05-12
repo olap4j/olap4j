@@ -10,7 +10,6 @@
 package org.olap4j.mdx;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
@@ -38,7 +37,7 @@ public class AxisNode implements ParseTreeNode {
      * @param region Region of source code
      * @param nonEmpty Whether to filter out members of this axis whose cells
      *    are all empty
-     * @param axisDef Which axis (ROWS, COLUMNS, etc.)
+     * @param axis Which axis (ROWS, COLUMNS, etc.)
      * @param dimensionProperties List of dimension properties; if null,
      *   empty list is assumed
      * @param expression Expression to populate the axis
@@ -46,14 +45,17 @@ public class AxisNode implements ParseTreeNode {
     public AxisNode(
         ParseRegion region,
         boolean nonEmpty,
-        Axis axisDef,
+        Axis axis,
         List<IdentifierNode> dimensionProperties,
         ParseTreeNode expression)
     {
         this.region = region;
         this.nonEmpty = nonEmpty;
         this.expression = expression;
-        this.axis = axisDef;
+        this.axis = axis;
+        if (axis == null) {
+            throw new IllegalArgumentException("Axis type must not be null");
+        }
         if (dimensionProperties == null) {
             dimensionProperties = Collections.emptyList();
         }

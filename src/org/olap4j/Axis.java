@@ -117,7 +117,10 @@ public interface Axis {
      * Enumeration of standard, named axes descriptors.
      */
     public enum Standard implements Axis {
-        /** Filter axis, also known as the slicer axis. */
+        /**
+         * Filter axis, also known as the slicer axis, and represented by the
+         * WHERE clause of an MDX query.
+         */
         FILTER,
 
         /** COLUMNS axis, also known as X axis and AXIS(0). */

@@ -10,11 +10,11 @@
 package org.olap4j.mdx;
 
 import org.olap4j.type.Type;
+import org.olap4j.Axis;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Parse tree model for an MDX SELECT statement.
@@ -54,6 +54,19 @@ public class SelectNode implements ParseTreeNode {
         this.withList = withList;
         this.axisList = axisList;
         this.from = from;
+        if (filterAxis == null) {
+            filterAxis =
+                new AxisNode(
+                    null,
+                    false,
+                    Axis.FILTER,
+                    Collections.<IdentifierNode>emptyList(),
+                    null);
+        }
+        if (filterAxis.getAxis() != Axis.FILTER) {
+            throw new IllegalArgumentException(
+                "Filter axis must have type FILTER");
+        }
         this.filterAxis = filterAxis;
         this.cellPropertyList = cellPropertyList;
     }
@@ -117,7 +130,7 @@ public class SelectNode implements ParseTreeNode {
         pw.println();
         pw.print("FROM ");
         from.unparse(writer);
-        if (filterAxis != null) {
+        if (filterAxis.getExpression() != null) {
             pw.println();
             pw.print("WHERE ");
             filterAxis.unparse(writer);
@@ -170,8 +183,15 @@ public class SelectNode implements ParseTreeNode {
     }
 
     /**
-     * Returns the filter axis defined by the WHERE clause of this SelectNode,
-     * or null if there is no filter axis.
+     * Returns the filter axis defined by the WHERE clause of this SelectNode.
+     *
+     * <p>Never returns {@code null}. If there is no WHERE clause, returns an
+     * AxisNode for which {@link org.olap4j.mdx.AxisNode#getExpression()}
+     * returns null.
+     *
+     * <p>You can modify the filter expression by calling
+     * {@link org.olap4j.mdx.AxisNode#getExpression()} on the filter AxisNode;
+     * {@code null} means that there is no filter axis.
      *
      * @return filter axis
      */
@@ -220,7 +240,7 @@ public class SelectNode implements ParseTreeNode {
             MdxUtil.deepCopyList(withList),
             MdxUtil.deepCopyList(axisList),
             this.from != null ? this.from.deepCopy() : null,
-            this.filterAxis != null ? this.filterAxis.deepCopy() : null,
+            this.filterAxis.deepCopy(),
             MdxUtil.deepCopyList(cellPropertyList));
     }
 }

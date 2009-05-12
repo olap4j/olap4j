@@ -1100,12 +1100,27 @@ public class ConnectionTest extends TestCase {
             fail("expected exception, got " + select);
         } catch (Exception e) {
             assertTrue(
-                TestContext.getStackTrace(e).indexOf("Duplicate axis name 'COLUMNS'.")
-                >= 0);
+                TestContext.getStackTrace(e)
+                    .indexOf("Duplicate axis name 'COLUMNS'.") >= 0);
         }
     }
 
     private void checkUnparsedMdx(SelectNode select) {
+        checkUnparsedMdx(
+            select,
+            "WITH\n"
+            + "MEMBER [Measures].[Foo] AS '[Measures].[Bar]', FORMAT_STRING = \"xxx\"\n"
+            + "SELECT\n"
+            + "{[Gender]} ON COLUMNS,\n"
+            + "{[Store].Children} ON ROWS\n"
+            + "FROM [sales]\n"
+            + "WHERE [Time].[1997].[Q4]");
+    }
+
+    private void checkUnparsedMdx(
+        SelectNode select,
+        String expectedMdx)
+    {
         StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter(sw);
         ParseTreeWriter parseTreeWriter = new ParseTreeWriter(pw);
@@ -1113,14 +1128,7 @@ public class ConnectionTest extends TestCase {
         pw.flush();
         String mdx = sw.toString();
         TestContext.assertEqualsVerbose(
-            TestContext.fold("WITH\n" +
-                "MEMBER [Measures].[Foo] AS '[Measures].[Bar]', FORMAT_STRING = \"xxx\"\n" +
-                "SELECT\n" +
-                "{[Gender]} ON COLUMNS,\n" +
-                "{[Store].Children} ON ROWS\n" +
-                "FROM [sales]\n" +
-                "WHERE [Time].[1997].[Q4]"),
-            mdx);
+            TestContext.fold(expectedMdx), mdx);
     }
 
     /**
@@ -1195,6 +1203,78 @@ public class ConnectionTest extends TestCase {
                 new IdentifierNode.NameSegment("Q4")));
 
         checkUnparsedMdx(select);
+    }
+
+    public void testBuildParseTree() {
+        // It is an error to create a select node with a filter axis whose type
+        // is not filter
+        try {
+            SelectNode select = new SelectNode(
+                null,
+                new ArrayList<ParseTreeNode>(),
+                new ArrayList<AxisNode>(),
+                new IdentifierNode(new IdentifierNode.NameSegment("sales")),
+                new AxisNode(
+                    null,
+                    false,
+                    Axis.COLUMNS,
+                    new ArrayList<IdentifierNode>(),
+                    null),
+                new ArrayList<IdentifierNode>());
+            fail("expected error, got " + select);
+        } catch (IllegalArgumentException e) {
+            TestContext.checkThrowable(e, "Filter axis must have type FILTER");
+        }
+
+        // Create a select node with empty filter axis. It is populated with
+        // a filter axis whose expression is null.
+        SelectNode select = new SelectNode(
+            null,
+            new ArrayList<ParseTreeNode>(),
+            new ArrayList<AxisNode>(),
+            new IdentifierNode(new IdentifierNode.NameSegment("sales")),
+            new AxisNode(
+                null,
+                false,
+                Axis.FILTER,
+                new ArrayList<IdentifierNode>(),
+                null),
+            new ArrayList<IdentifierNode>());
+        final AxisNode filterAxis = select.getFilterAxis();
+        assertNotNull(filterAxis);
+        assertNull(filterAxis.getExpression());
+        assertEquals(Axis.FILTER, filterAxis.getAxis());
+
+        // Parses to an expression with no WHERE clause
+        checkUnparsedMdx(
+            select,
+            "SELECT\n"
+            + "FROM [sales]");
+
+        // Set the filter, see if it takes.
+        select.getFilterAxis().setExpression(
+            new CallNode(
+                null,
+                "()",
+                Syntax.Parentheses,
+                new IdentifierNode(
+                    new IdentifierNode.NameSegment("Measures"),
+                    new IdentifierNode.NameSegment("Store Sales")),
+                new IdentifierNode(
+                    new IdentifierNode.NameSegment("Gender"),
+                    new IdentifierNode.NameSegment("M"))));
+        checkUnparsedMdx(
+            select,
+            "SELECT\n"
+            + "FROM [sales]\n"
+            + "WHERE ([Measures].[Store Sales], [Gender].[M])");
+
+        // Set it back to null
+        select.getFilterAxis().setExpression(null);
+        checkUnparsedMdx(
+            select,
+            "SELECT\n"
+            + "FROM [sales]");
     }
 
     /**
