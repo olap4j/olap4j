@@ -355,6 +355,34 @@ public class ConnectionTest extends TestCase {
         }
     }
 
+    public void testDatabaseMetaData() throws SQLException {
+        connection = tester.createConnection();
+        final OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        final OlapDatabaseMetaData databaseMetaData =
+            olapConnection.getMetaData();
+
+        // as per testDriver
+        Driver driver = DriverManager.getDriver(tester.getDriverUrlPrefix());
+        assertNotNull(driver);
+        assertEquals(
+            databaseMetaData.getDriverMajorVersion(),
+            driver.getMajorVersion());
+        assertEquals(
+            databaseMetaData.getDriverMinorVersion(),
+            driver.getMinorVersion());
+        final String driverName = databaseMetaData.getDriverName();
+        // typically a string like "Mondrian olap4j driver"
+        assertTrue(
+            driverName != null
+            && driverName.length() > 10);
+        final String driverVersion = databaseMetaData.getDriverVersion();
+        // typically a string like "0.9" or "3.1.2"
+        assertTrue(
+            driverVersion != null
+            && driverName.length() > 2);
+    }
+
     public void testStatement() throws SQLException {
         connection = tester.createConnection();
         Statement statement = connection.createStatement();

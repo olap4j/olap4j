@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -24,14 +24,21 @@ import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxy;
  * @since Jun 14, 2007
  */
 class FactoryJdbc4Impl implements Factory {
+    /**
+     * Creates a FactoryJdbc4Impl.
+     */
+    public FactoryJdbc4Impl() {
+    }
+
     public Connection newConnection(
+        XmlaOlap4jDriver driver,
         XmlaOlap4jProxy proxy,
         String url,
         Properties info)
         throws SQLException
     {
         return new XmlaOlap4jConnectionJdbc4(
-            this, proxy, url, info);
+            this, driver, proxy, url, info);
     }
 
     public EmptyResultSet newEmptyResultSet(
@@ -73,6 +80,13 @@ class FactoryJdbc4Impl implements Factory {
     // Inner classes
 
     private static class EmptyResultSetJdbc4 extends EmptyResultSet {
+        /**
+         * Creates a EmptyResultSetJdbc4.
+         *
+         * @param olap4jConnection Connection
+         * @param headerList Column names
+         * @param rowList List of row values
+         */
         EmptyResultSetJdbc4(
             XmlaOlap4jConnection olap4jConnection,
             List<String> headerList,
@@ -330,13 +344,24 @@ class FactoryJdbc4Impl implements Factory {
         extends XmlaOlap4jConnection
         implements OlapConnection
     {
+        /**
+         * Creates a XmlaOlap4jConnectionJdbc4.
+         *
+         * @param factory Factory
+         * @param driver Driver
+         * @param proxy Proxy
+         * @param url URL
+         * @param info Extra properties
+         * @throws SQLException on error
+         */
         public XmlaOlap4jConnectionJdbc4(
             Factory factory,
+            XmlaOlap4jDriver driver,
             XmlaOlap4jProxy proxy,
             String url,
             Properties info) throws SQLException
         {
-            super(factory, proxy, url, info);
+            super(factory, driver, proxy, url, info);
         }
 
         public OlapStatement createStatement() {
@@ -399,6 +424,12 @@ class FactoryJdbc4Impl implements Factory {
     }
 
     private static class XmlaOlap4jCellSetJdbc4 extends XmlaOlap4jCellSet {
+        /**
+         * Creates an XmlaOlap4jCellSetJdbc4.
+         *
+         * @param olap4jStatement Statement
+         * @throws OlapException on error
+         */
         XmlaOlap4jCellSetJdbc4(
             XmlaOlap4jStatement olap4jStatement)
             throws OlapException
@@ -645,6 +676,13 @@ class FactoryJdbc4Impl implements Factory {
     private static class XmlaOlap4jPreparedStatementJdbc4
         extends XmlaOlap4jPreparedStatement
     {
+        /**
+         * Creates a XmlaOlap4jPreparedStatementJdbc4.
+         *
+         * @param olap4jConnection Connection
+         * @param mdx MDX query text
+         * @throws OlapException on error
+         */
         XmlaOlap4jPreparedStatementJdbc4(
             XmlaOlap4jConnection olap4jConnection,
             String mdx) throws OlapException
@@ -752,6 +790,11 @@ class FactoryJdbc4Impl implements Factory {
     private static class XmlaOlap4jDatabaseMetaDataJdbc4
         extends XmlaOlap4jDatabaseMetaData
     {
+        /**
+         * Creates an XmlaOlap4jDatabaseMetaDataJdbc4.
+         *
+         * @param olap4jConnection Connection
+         */
         XmlaOlap4jDatabaseMetaDataJdbc4(
             XmlaOlap4jConnection olap4jConnection)
         {

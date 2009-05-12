@@ -90,10 +90,7 @@ import java.util.concurrent.*;
  * @since May 22, 2007
  */
 public class XmlaOlap4jDriver implements Driver {
-    public static final String NAME = "olap4j driver for XML/A";
-    public static final String VERSION = "0.9.5";
-    public static final int MAJOR_VERSION = 0;
-    public static final int MINOR_VERSION = 905;
+
     private final Factory factory;
 
     /**
@@ -141,7 +138,10 @@ public class XmlaOlap4jDriver implements Driver {
     }
 
     /**
-     * Registers this driver.
+     * Registers an instance of XmlaOlap4jDriver.
+     *
+     * <p>Called implicitly on class load, and implements the traditional
+     * 'Class.forName' way of registering JDBC drivers.
      *
      * @throws SQLException on error
      */
@@ -163,7 +163,7 @@ public class XmlaOlap4jDriver implements Driver {
         XmlaOlap4jProxy proxy = createProxy(map);
 
         // returns a connection object to the java API
-        return factory.newConnection(proxy, url, info);
+        return factory.newConnection(this, proxy, url, info);
     }
 
     public boolean acceptsURL(String url) throws SQLException {
@@ -187,12 +187,28 @@ public class XmlaOlap4jDriver implements Driver {
         return list.toArray(new DriverPropertyInfo[list.size()]);
     }
 
+    /**
+     * Returns the driver name. Not in the JDBC API.
+     * @return Driver name
+     */
+    String getName() {
+        return XmlaOlap4jDriverVersion.NAME;
+    }
+
+    /**
+     * Returns the driver version. Not in the JDBC API.
+     * @return Driver version
+     */
+    public String getVersion() {
+        return XmlaOlap4jDriverVersion.VERSION;
+    }
+
     public int getMajorVersion() {
-        return MAJOR_VERSION;
+        return XmlaOlap4jDriverVersion.MAJOR_VERSION;
     }
 
     public int getMinorVersion() {
-        return MINOR_VERSION;
+        return XmlaOlap4jDriverVersion.MINOR_VERSION;
     }
 
     public boolean jdbcCompliant() {
@@ -216,7 +232,7 @@ public class XmlaOlap4jDriver implements Driver {
                 return proxy;
             }
         }
-        return new XmlaOlap4jHttpProxy();
+        return new XmlaOlap4jHttpProxy(this);
     }
 
     /**

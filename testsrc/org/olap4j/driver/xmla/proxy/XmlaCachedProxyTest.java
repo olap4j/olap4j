@@ -25,6 +25,7 @@ import org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache;
  * @version $Id$
  */
 public class XmlaCachedProxyTest extends TestCase {
+    final XmlaOlap4jDriver dummyDriver = new XmlaOlap4jDriver() {};
 
     /**
      * <p>Tests if a simple and valid configuration can be used.
@@ -32,7 +33,7 @@ public class XmlaCachedProxyTest extends TestCase {
      */
     public void testCacheConfig() throws Exception
     {
-        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy();
+        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy(dummyDriver);
         Map<String, String> driverParameters = new HashMap<String, String>();
         Map<String,String> cacheProperties = new HashMap<String, String>();
 
@@ -66,7 +67,7 @@ public class XmlaCachedProxyTest extends TestCase {
      * @throws Exception If the test fails.
      */
     public void testCacheModeError() throws Exception {
-        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy();
+        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy(dummyDriver);
         Map<String, String> driverParameters = new HashMap<String, String>();
         Map<String,String> cacheProperties = new HashMap<String, String>();
 
@@ -109,7 +110,7 @@ public class XmlaCachedProxyTest extends TestCase {
      */
     public void testCacheTimeoutError() throws Exception
     {
-        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy();
+        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy(dummyDriver);
         Map<String, String> driverParameters = new HashMap<String, String>();
         Map<String,String> cacheProperties = new HashMap<String, String>();
 
@@ -159,7 +160,7 @@ public class XmlaCachedProxyTest extends TestCase {
      */
     public void testCacheSizeError() throws Exception
     {
-        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy();
+        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy(dummyDriver);
         Map<String, String> driverParameters = new HashMap<String, String>();
         Map<String,String> cacheProperties = new HashMap<String, String>();
 
@@ -208,7 +209,7 @@ public class XmlaCachedProxyTest extends TestCase {
      */
     public void testCacheNameError() throws Exception
     {
-        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy();
+        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy(dummyDriver);
         Map<String, String> driverParameters = new HashMap<String, String>();
         Map<String,String> cacheProperties = new HashMap<String, String>();
 
@@ -253,7 +254,7 @@ public class XmlaCachedProxyTest extends TestCase {
      */
     public void testCacheSharing() throws Exception
     {
-        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy();
+        XmlaOlap4jCachedProxy proxy = new XmlaOlap4jHttpProxy(dummyDriver);
         Map<String, String> driverParameters = new HashMap<String, String>();
         Map<String,String> cacheProperties = new HashMap<String, String>();
 
@@ -313,7 +314,7 @@ public class XmlaCachedProxyTest extends TestCase {
             // This endures that 1 - the caches are shared in a static manner
             // and that 2 - the cache is reused and it's
             // parameters are not overwritten.
-            proxy = new XmlaOlap4jHttpProxy();
+            proxy = new XmlaOlap4jHttpProxy(dummyDriver);
             proxy.setCache(driverParameters, cacheProperties);
         } catch (Throwable e) {
             fail("The cache is not properly shared since an error should not have been thrown.");

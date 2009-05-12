@@ -22,14 +22,21 @@ import java.util.*;
  * @since Jun 14, 2007
  */
 class FactoryJdbc3Impl implements Factory {
+    /**
+     * Creates a FactoryJdbc3Impl.
+     */
+    public FactoryJdbc3Impl() {
+    }
+
     public Connection newConnection(
+        XmlaOlap4jDriver driver,
         XmlaOlap4jProxy proxy,
         String url,
         Properties info)
         throws SQLException
     {
         return new FactoryJdbc3Impl.XmlaOlap4jConnectionJdbc3(
-            proxy, url, info);
+            driver, proxy, url, info);
     }
 
     public EmptyResultSet newEmptyResultSet(
@@ -106,12 +113,13 @@ class FactoryJdbc3Impl implements Factory {
 
     private class XmlaOlap4jConnectionJdbc3 extends XmlaOlap4jConnection {
         public XmlaOlap4jConnectionJdbc3(
+            XmlaOlap4jDriver driver,
             XmlaOlap4jProxy proxy,
             String url,
             Properties info)
             throws SQLException
         {
-            super(FactoryJdbc3Impl.this, proxy, url, info);
+            super(FactoryJdbc3Impl.this, driver, proxy, url, info);
         }
     }
 

@@ -56,6 +56,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     private static final String CONNECT_STRING_PREFIX = "jdbc:xmla:";
 
+    final XmlaOlap4jDriver driver;
+
     final Factory factory;
 
     final XmlaOlap4jProxy proxy;
@@ -120,6 +122,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * @pre acceptsURL(url)
      *
      * @param factory Factory
+     * @param driver Driver
      * @param proxy Proxy object which receives XML requests
      * @param url Connect-string URL
      * @param info Additional properties
@@ -127,12 +130,14 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      */
     XmlaOlap4jConnection(
         Factory factory,
+        XmlaOlap4jDriver driver,
         XmlaOlap4jProxy proxy,
         String url,
         Properties info)
         throws SQLException
     {
         this.factory = factory;
+        this.driver = driver;
         this.proxy = proxy;
         if (!acceptsURL(url)) {
             // This is not a URL we can handle.

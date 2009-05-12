@@ -132,6 +132,21 @@ test.properties.example" />
 
     <target name="version-properties">
         <echo message="olap4j ${project.revision}${line.separator}" file="VERSION.txt" />
+        <echo file="${src.dir}/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java">/*
+ * Project version information. Generated - do not modify.
+ */
+package org.olap4j.driver.xmla;
+/**
+  * Version information for the XMLA driver. (Generated.)
+  */
+class XmlaOlap4jDriverVersion {
+    static final String NAME = "olap4j driver for XML/A";
+    static final String VERSION = "${project.revision}";
+    static final int MAJOR_VERSION = ${project.revision.major};
+    static final int MINOR_VERSION = ${project.revision.minor};
+}
+
+// End XmlaOlap4jDriverVersion.java</echo>
     </target>
 
     <target name="parser" depends="resolve">

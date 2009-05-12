@@ -219,19 +219,19 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public String getDriverName() throws SQLException {
-        return XmlaOlap4jDriver.NAME;
+        return olap4jConnection.driver.getName();
     }
 
     public String getDriverVersion() throws SQLException {
-        return XmlaOlap4jDriver.VERSION;
+        return olap4jConnection.driver.getVersion();
     }
 
     public int getDriverMajorVersion() {
-        return XmlaOlap4jDriver.MAJOR_VERSION;
+        return olap4jConnection.driver.getMajorVersion();
     }
 
     public int getDriverMinorVersion() {
-        return XmlaOlap4jDriver.MINOR_VERSION;
+        return olap4jConnection.driver.getMinorVersion();
     }
 
     public boolean usesLocalFiles() throws SQLException {

@@ -32,10 +32,15 @@ import org.olap4j.impl.Base64;
  */
 public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
 {
+    private final XmlaOlap4jDriver driver;
+
     /**
      * Creates a XmlaOlap4jHttpProxy.
+     *
+     * @param driver Driver
      */
-    public XmlaOlap4jHttpProxy() {
+    public XmlaOlap4jHttpProxy(XmlaOlap4jDriver driver) {
+        this.driver = driver;
     }
 
     @Override
@@ -54,7 +59,7 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
             urlConnection.setRequestProperty(
                 "User-Agent",
                 "Olap4j("
-                    .concat(XmlaOlap4jDriver.VERSION)
+                    .concat(driver.getVersion())
                     .concat(")"));
             urlConnection.setRequestProperty(
                 "Accept",
