@@ -388,8 +388,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             // was specified by the user.
             List<Catalog> catalogs = this.getCatalogs();
             if (catalogs.size() == 0) {
-                throw new OlapException("There is no catalog " +
-                    "available to query against.");
+                throw new OlapException(
+                    "There is no catalog available to query against.");
             } else {
                 this.catalogName = catalogs.get(0).getName();
             }
@@ -933,10 +933,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     </row>
 
              */
-            final String dimensionUniqueName =
-                stringElement(row, "DIMENSION_UNIQUE_NAME");
-            final XmlaOlap4jDimension dimension =
-                context.olap4jCube.dimensionsByUname.get(dimensionUniqueName);
             final String hierarchyName =
                 stringElement(row, "HIERARCHY_NAME");
             final String hierarchyUniqueName =
@@ -1331,7 +1327,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     Name Level - Store Manager Property</DESCRIPTION>
             </row>
              */
-            String cubeName = stringElement(row, "CUBE_NAME");
             String description = stringElement(row, "DESCRIPTION");
             String uniqueName = stringElement(row, "DESCRIPTION");
             String caption = stringElement(row, "PROPERTY_CAPTION");
