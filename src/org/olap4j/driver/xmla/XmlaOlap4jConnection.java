@@ -386,7 +386,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         if (this.catalogName == null) {
             // This means that no particular catalog name
             // was specified by the user.
-            this.catalogName = this.getCatalogs().get(0).getName();
+            List<Catalog> catalogs = this.getCatalogs();
+            if (catalogs.size() == 0) {
+                throw new OlapException("There is no catalog " +
+                    "available to query against.");
+            } else {
+                this.catalogName = catalogs.get(0).getName();
+            }
         } else {
             // We must verify that the requested catalog name
             // exists in the metadata.
