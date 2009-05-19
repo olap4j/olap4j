@@ -31,7 +31,21 @@ class XmlaOlap4jLevel
     private final Type type;
     private final int cardinality;
     private final NamedList<XmlaOlap4jProperty> propertyList;
+    private final boolean calculated;
 
+    /**
+     * Creates an XmlaOlap4jLevel.
+     *
+     * @param olap4jHierarchy Hierarchy
+     * @param uniqueName Unique name
+     * @param name Name
+     * @param caption Caption
+     * @param description Description
+     * @param depth Distance to root
+     * @param type Level type
+     * @param calculated Whether level is calculated
+     * @param cardinality Number of members in this level
+     */
     XmlaOlap4jLevel(
         final XmlaOlap4jHierarchy olap4jHierarchy,
         String uniqueName, String name,
@@ -39,11 +53,13 @@ class XmlaOlap4jLevel
         String description,
         int depth,
         Type type,
+        boolean calculated,
         int cardinality)
     {
         super(uniqueName, name, caption, description);
         assert olap4jHierarchy != null;
         this.type = type;
+        this.calculated = calculated;
         this.cardinality = cardinality;
         this.depth = depth;
         this.olap4jHierarchy = olap4jHierarchy;
@@ -87,6 +103,10 @@ class XmlaOlap4jLevel
 
     public Dimension getDimension() {
         return olap4jHierarchy.olap4jDimension;
+    }
+
+    public boolean isCalculated() {
+        return calculated;
     }
 
     public Type getLevelType() {

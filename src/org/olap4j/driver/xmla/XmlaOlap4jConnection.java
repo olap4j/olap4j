@@ -954,6 +954,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class LevelHandler extends HandlerImpl<XmlaOlap4jLevel> {
+        public static final int MDLEVEL_TYPE_CALCULATED = 0x0002;
+
         public void handle(Element row, Context context, List<XmlaOlap4jLevel> list) {
             /*
             Example:
@@ -987,15 +989,17 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 stringElement(row, "DESCRIPTION");
             final int levelNumber =
                 integerElement(row, "LEVEL_NUMBER");
+            final Integer levelTypeCode = integerElement(row, "LEVEL_TYPE");
             final Level.Type levelType =
-                Level.Type.forXmlaOrdinal(integerElement(row, "LEVEL_TYPE"));
+                Level.Type.forXmlaOrdinal(levelTypeCode);
+            boolean calculated = (levelTypeCode & MDLEVEL_TYPE_CALCULATED) != 0;
             final int levelCardinality =
                 integerElement(row, "LEVEL_CARDINALITY");
             list.add(
                 new XmlaOlap4jLevel(
                     context.getHierarchy(row), levelUniqueName, levelName,
                     levelCaption, description, levelNumber, levelType,
-                    levelCardinality));
+                    calculated, levelCardinality));
         }
     }
 

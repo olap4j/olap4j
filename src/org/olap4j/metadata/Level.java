@@ -58,6 +58,11 @@ public interface Level extends MetadataElement {
     Level.Type getLevelType();
 
     /**
+     * Returns whether the level is calculated.
+     */
+    boolean isCalculated();
+
+    /**
      * Returns a list of definitions for the properties available to members
      * of this <code>Level</code>.
      *
@@ -95,13 +100,43 @@ public interface Level extends MetadataElement {
     /**
      * Enumeration of the types of a {@link Level}.
      *
-     * <p>Several of the values are defined by XMLA, sans the "MDLEVEL_TYPE_"
-     * prefix to their name. For example, {@link #GEO_CONTINENT} corresponds to
+     * <p>Several of the values are defined by OLE DB for OLAP and/or XML/A,
+     * sans the "MDLEVEL_TYPE_" prefix to their name. For example,
+     * {@link #GEO_CONTINENT} corresponds to
      * the value <code>MDLEVEL_TYPE_GEO_CONTINENT</code> for the
      * <code>LEVEL_TYPE</code> property in the <code>MDSCHEMA_LEVELS</code>
      * schema rowset.
      *
+     * <p>Some of the values are specified by OLE DB for OLAP:
+     * <ul>
+     * <li>MDLEVEL_TYPE_REGULAR         (0x0000)
+     * <li>MDLEVEL_TYPE_ALL             (0x0001)
+     * <li>MDLEVEL_TYPE_TIME_YEARS      (0x0014)
+     * <li>MDLEVEL_TYPE_TIME_HALF_YEAR  (0x0024)
+     * <li>MDLEVEL_TYPE_TIME_QUARTERS   (0x0044)
+     * <li>MDLEVEL_TYPE_TIME_MONTHS     (0x0084)
+     * <li>MDLEVEL_TYPE_TIME_WEEKS      (0x0104)
+     * <li>MDLEVEL_TYPE_TIME_DAYS       (0x0204)
+     * <li>MDLEVEL_TYPE_TIME_HOURS      (0x0304)
+     * <li>MDLEVEL_TYPE_TIME_MINUTES    (0x0404)
+     * <li>MDLEVEL_TYPE_TIME_SECONDS    (0x0804)
+     * <li>MDLEVEL_TYPE_TIME_UNDEFINED  (0x1004)
+     * </ul>
+     *
+     * Some of the OLE DB for OLAP values are as flags, and do not become
+     * values of the enumeration:
+     * <ul>
+     * <li>MDLEVEL_TYPE_UNKNOWN (0x0000) signals that no other flags are set.
+     *     Use {@link #REGULAR}
+     * <li>MDLEVEL_TYPE_CALCULATED (0x0002) indicates that the level is
+     *     calculated. Use {@link Level#isCalculated}.
+     * <li>MDLEVEL_TYPE_TIME (0x0004) indicates that the level is time-related.
+     *     Use {@link #isTime}.
+     * <li>MDLEVEL_TYPE_RESERVED1 (0x0008) is reserved for future use.
+     * </ul>
+     *
      * <p>Some of the values are specified by XMLA:
+     * <ul>
      * <li>MDLEVEL_TYPE_GEO_CONTINENT (0x2001)
      * <li>MDLEVEL_TYPE_GEO_REGION (0x2002)
      * <li>MDLEVEL_TYPE_GEO_COUNTRY (0x2003)
@@ -128,6 +163,7 @@ public interface Level extends MetadataElement {
      * <li>MDLEVEL_TYPE_CHANNEL (0x1061)
      * <li>MDLEVEL_TYPE_REPRESENTATIVE (0x1062)
      * <li>MDLEVEL_TYPE_PROMOTION (0x1071)
+     * </ul>
      *
      * @see Level#getLevelType
      * @see org.olap4j.OlapDatabaseMetaData#getLevels
@@ -137,47 +173,88 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that the level is not related to time.
          */
-        Regular(0),
+        REGULAR(0x0000),
+
+        /**
+         * Indicates that the level contains the 'all' member of its hierarchy.
+         */
+        ALL(0x0001),
+
+        /**
+         * Indicates that a level holds the null member. Does not correspond to
+         * an XMLA or OLE DB value.
+         */
+        NULL(-1),
 
         /**
          * Indicates that a level refers to years.
          * It must be used in a dimension whose type is
          * {@link org.olap4j.metadata.Dimension.Type#TIME}.
          */
-        TimeYears(1),
+        TIME_YEARS(0x0014),
+
+        /**
+         * Indicates that a level refers to half years.
+         * It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         */
+        TIME_HALF_YEAR(0x0024),
 
         /**
          * Indicates that a level refers to quarters.
          * It must be used in a dimension whose type is
          * {@link org.olap4j.metadata.Dimension.Type#TIME}.
          */
-        TimeQuarters(2),
+        TIME_QUARTERS(0x0044),
 
         /**
          * Indicates that a level refers to months.
          * It must be used in a dimension whose type is
          * {@link org.olap4j.metadata.Dimension.Type#TIME}.
          */
-        TimeMonths(3),
+        TIME_MONTHS(0x0084),
 
         /**
          * Indicates that a level refers to weeks.
          * It must be used in a dimension whose type is
          * {@link org.olap4j.metadata.Dimension.Type#TIME}.
          */
-        TimeWeeks(4),
+        TIME_WEEKS(0x0104),
 
         /**
          * Indicates that a level refers to days.
          * It must be used in a dimension whose type is
          * {@link org.olap4j.metadata.Dimension.Type#TIME}.
          */
-        TimeDays(5),
+        TIME_DAYS(0x0204),
 
         /**
-         * Indicates that a level holds the null member.
+         * Indicates that a level refers to hours.
+         * It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
          */
-        Null(6),
+        TIME_HOURS(0x0304),
+
+        /**
+         * Indicates that a level refers to minutes.
+         * It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         */
+        TIME_MINUTES(0x0404),
+
+        /**
+         * Indicates that a level refers to seconds.
+         * It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         */
+        TIME_SECONDS(0x0804),
+
+        /**
+         * Indicates that a level refers to days.
+         * It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         */
+        TIME_UNDEFINED(0x1004),
 
         GEO_CONTINENT(0x2001),
         GEO_REGION(0x2002),
@@ -217,8 +294,14 @@ public interface Level extends MetadataElement {
             }
         }
 
-        private Type(int code) {
-            this.xmlaOrdinal = code;
+        /**
+         * Creates a level type.
+         *
+         * @param xmlaOrdinal Ordinal code in XMLA or OLE DB for OLAP
+         * specification
+         */
+        private Type(int xmlaOrdinal) {
+            this.xmlaOrdinal = xmlaOrdinal;
         }
 
         /**
@@ -248,18 +331,31 @@ public interface Level extends MetadataElement {
 
         /**
          * Returns whether this is a time-related level
-         * ({@link #TimeYears}, {@link #TimeQuarters}, {@link #TimeMonths},
-         * {@link #TimeWeeks}, {@link #TimeDays}).
+         * ({@link #TIME_YEARS},
+         * {@link #TIME_HALF_YEAR},
+         * {@link #TIME_QUARTERS},
+         * {@link #TIME_MONTHS},
+         * {@link #TIME_WEEKS},
+         * {@link #TIME_DAYS},
+         * {@link #TIME_HOURS},
+         * {@link #TIME_MINUTES},
+         * {@link #TIME_SECONDS},
+         * {@link #TIME_UNDEFINED}).
          *
          * @return whether this is a time-related level
          */
         public boolean isTime() {
             switch (this) {
-            case TimeYears:
-            case TimeQuarters:
-            case TimeMonths:
-            case TimeWeeks:
-            case TimeDays:
+            case TIME_YEARS:
+            case TIME_HALF_YEAR:
+            case TIME_QUARTERS:
+            case TIME_MONTHS:
+            case TIME_WEEKS:
+            case TIME_DAYS:
+            case TIME_HOURS:
+            case TIME_MINUTES:
+            case TIME_SECONDS:
+            case TIME_UNDEFINED:
                 return true;
             default:
                 return false;

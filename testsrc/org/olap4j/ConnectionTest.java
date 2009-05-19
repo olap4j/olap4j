@@ -1527,6 +1527,7 @@ public class ConnectionTest extends TestCase {
 
         Cube cube = olapConnection.getSchema().getCubes().get("Sales");
 
+        int z = 0;
         int hierarchyCount = 0;
         for (Dimension dimension : cube.getDimensions()) {
             // Call every method of Dimension
@@ -1570,6 +1571,22 @@ public class ConnectionTest extends TestCase {
                         continue;
                     }
                     int k = 0;
+                    if (level.getName().equals("Year")) {
+                        assertEquals(
+                            Level.Type.TIME_YEARS, level.getLevelType());
+                        assertFalse(level.isCalculated());
+                        ++z;
+                    }
+                    if (level.getName().equals("Gender")) {
+                        assertEquals(Level.Type.REGULAR, level.getLevelType());
+                        assertFalse(level.isCalculated());
+                        ++z;
+                    }
+                    if (level.getName().equals("Measures")) {
+                        assertEquals(Level.Type.REGULAR, level.getLevelType());
+                        assertFalse(level.isCalculated());
+                        ++z;
+                    }
                     for (Member member : level.getMembers()) {
                         assertNotNull(member.getName());
                         assertEquals(level, member.getLevel());
@@ -1593,6 +1610,7 @@ public class ConnectionTest extends TestCase {
             assertNotNull(hierarchy.getName());
         }
         assertEquals(0, hierarchyCount);
+        assertEquals("found Year, Measures, Gender levels", 3, z);
 
         // Look for the Time.Weekly hierarchy, the 2nd hierarchy in the Time
         // dimension.
