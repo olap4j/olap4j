@@ -41,6 +41,8 @@ public class ConnectionTest extends TestCase {
     private static final boolean IS_JDK_16 =
         System.getProperty("java.version").startsWith("1.6.");
 
+    private static final boolean SINGLE_FILTER = true;
+
     /**
      * Simple strategy to prevent connection leaks: each test that needs a
      * connection assigns it to this field, and {@link #tearDown()} closes it
@@ -442,8 +444,9 @@ public class ConnectionTest extends TestCase {
         CellSet cellSet =
             olapStatement.executeOlapQuery(
                 "SELECT {[Measures].[Unit Sales]} on 0,\n"
-                    + "{[Store].Children} on 1\n"
-                    + "FROM [Sales]");
+                + "{[Store].Children} on 1\n"
+                + "FROM [Sales]\n"
+                + "WHERE ([Time].[1997].[Q1], [Gender].[F])");
         List<CellSetAxis> axesList = cellSet.getAxes();
         assertEquals(2, axesList.size());
         final Member rowsMember =
@@ -456,6 +459,46 @@ public class ConnectionTest extends TestCase {
         assertTrue(
             columnsMember.getUniqueName(),
             !(columnsMember instanceof Measure));
+
+        // filter axis
+        final CellSetAxis filterAxis = cellSet.getFilterAxis();
+        assertEquals(1, filterAxis.getPositionCount());
+        final List<Position> positions = filterAxis.getPositions();
+        assertEquals(1, positions.size());
+        final Position pos0 = positions.get(0);
+        assertEquals(0, pos0.getOrdinal());
+        // All members not on other axes are returned on the filter axis.
+        // REVIEW: Is this desired behavior?
+        assertEquals(11, pos0.getMembers().size());
+        assertEquals(
+            "[Gender].[All Gender].[F]",
+            pos0.getMembers().get(8).getUniqueName());
+    }
+
+    public void testCompoundSlicer() throws SQLException {
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        OlapStatement statement = olapConnection.createStatement();
+
+        CellSet cellSet =
+            statement.executeOlapQuery(
+                "SELECT {[Measures].[Unit Sales]} on 0,\n"
+                + "{[Store].Children} on 1\n"
+                + "FROM [Sales]\n"
+                + "WHERE [Time].[1997].[Q1] * [Gender].Members");
+        List<CellSetAxis> axesList = cellSet.getAxes();
+        assertEquals(2, axesList.size());
+        final CellSetAxis filterAxis = cellSet.getFilterAxis();
+        if (SINGLE_FILTER) {
+            assertEquals(1, filterAxis.getPositionCount());
+            return;
+        }
+        assertEquals(3, filterAxis.getPositionCount());
+        final List<Position> filterPositions = filterAxis.getPositions();
+        assertEquals(3, filterPositions.size());
+        assertEquals(2, filterPositions.get(2).getMembers().size());
+        assertEquals("F", filterPositions.get(2).getMembers().get(1).getName());
     }
 
     public void testInvalidStatement() throws SQLException {
@@ -765,6 +808,10 @@ public class ConnectionTest extends TestCase {
         if (cellSet != null) {
             assertEquals(
                 cellSet.getFilterAxis().getAxisMetaData(), axisMetaData);
+            assertEquals(
+                1, cellSet.getFilterAxis().getPositionCount());
+            assertEquals(
+                1, cellSet.getFilterAxis().getPositions().size());
         }
     }
 
@@ -1781,6 +1828,13 @@ public class ConnectionTest extends TestCase {
         assertEquals(1, parent.getDepth());
         assertEquals(member2.getLevel(), parent.getLevel());
         assertEquals(member1, parent);
+        final CellSetAxis filterAxis = cellSet.getFilterAxis();
+        assertEquals(1, filterAxis.getPositionCount());
+        final List<Position> positions = filterAxis.getPositions();
+        assertEquals(1, positions.size());
+        assertEquals(0, positions.get(0).getOrdinal());
+        // All members not on other axes are returned on the filter axis.
+        assertEquals(6, positions.get(0).getMembers().size());
     }
 
     /**
