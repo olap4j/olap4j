@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -17,9 +17,8 @@ import java.security.NoSuchAlgorithmException;
  *
  * @author Luc Boudreau
  * @version $Id$
- *
  */
-class XmlaOlap4jSHAEncoder {
+class XmlaOlap4jShaEncoder {
 
     private static String convertToHex(byte[] data) {
         StringBuilder buf = new StringBuilder();
@@ -38,7 +37,7 @@ class XmlaOlap4jSHAEncoder {
         return buf.toString();
     }
 
-    public static String SHA1(String text) {
+    public static String encodeSha1(String text) {
         MessageDigest md;
         try {
             md = MessageDigest.getInstance("SHA-1");
@@ -60,4 +59,4 @@ class XmlaOlap4jSHAEncoder {
     }
 }
 
-// End XmlaOlap4jSHAEncoder.java
+// End XmlaOlap4jShaEncoder.java

@@ -239,7 +239,9 @@ public class MetadataTest extends TestCase {
         assertContains("LITERAL_NAME=DBLITERAL_QUOTE, LITERAL_VALUE=[, ", s);
     }
 
-    public void testDatabaseMetaDataGetDatabaseProperties() throws SQLException {
+    public void testDatabaseMetaDataGetDatabaseProperties()
+        throws SQLException
+    {
         String s = checkResultSet(
             olapDatabaseMetaData.getDatabaseProperties(
                 dataSourceName, propertyNamePattern),

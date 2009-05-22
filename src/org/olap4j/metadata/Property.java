@@ -262,7 +262,8 @@ public interface Property extends MetadataElement {
 
         /**
          * Definition of the property which holds the
-         * number of parents that this member has. Generally 1, or 0 for root members.
+         * number of parents that this member has. Generally 1, or 0
+         * for root members.
          */
         PARENT_COUNT(Datatype.UNSIGNED_INTEGER, 26, false, "Required. Number of parents that this member has."),
 
@@ -275,8 +276,8 @@ public interface Property extends MetadataElement {
         /**
          * Definition of the internal property which holds the
          * name of the system property which determines whether to show a member
-         * (especially a measure or calculated member) in a user interface such as
-         * JPivot.
+         * (especially a measure or calculated member) in a user interface such
+         * as JPivot.
          */
         $visible(Datatype.BOOLEAN, 28, true, null),
 
@@ -306,8 +307,9 @@ public interface Property extends MetadataElement {
          * Definition of the property which
          * holds the level depth of a member.
          *
-         * <p>Caution: Level depth of members in parent-child hierarchy isn't from their levels.
-         * It's calculated from the underlying data dynamically.
+         * <p>Caution: Level depth of members in parent-child hierarchy isn't
+         * from their levels.  It's calculated from the underlying data
+         * dynamically.
          */
         DEPTH(Datatype.UNSIGNED_INTEGER, 43, true, "The level depth of a member"),
 
@@ -315,14 +317,15 @@ public interface Property extends MetadataElement {
          * Definition of the property which
          * holds the DISPLAY_INFO required by XML/A.
          *
-         * <p>Caution: This property's value is calculated based on a specified MDX query, so its value is dynamic at runtime.
+         * <p>Caution: This property's value is calculated based on a specified
+         * MDX query, so its value is dynamic at runtime.
          */
         DISPLAY_INFO(Datatype.UNSIGNED_INTEGER, 44, false, "Display instruction of a member for XML/A"),
 
         /**
          * Definition of the property which
-         * holds the value of a cell. Is usually numeric (since most measures are
-         * numeric) but is occasionally another type.
+         * holds the value of a cell. Is usually numeric (since most measures
+         * are numeric) but is occasionally another type.
          */
         VALUE(Datatype.VARIANT, 41, false, "The unformatted value of the cell.");
 
@@ -425,15 +428,15 @@ public interface Property extends MetadataElement {
 
         /**
          * Definition of the property which
-         * determines the solve order of a calculated member with respect to other
-         * calculated members.
+         * determines the solve order of a calculated member with respect to
+         * other calculated members.
          */
         SOLVE_ORDER(Datatype.INTEGER, 40, false, "The solve order of the cell."),
 
         /**
          * Definition of the property which
-         * holds the value of a cell. Is usually numeric (since most measures are
-         * numeric) but is occasionally another type.
+         * holds the value of a cell. Is usually numeric (since most measures
+         * are numeric) but is occasionally another type.
          */
         VALUE(Datatype.VARIANT, 41, false, "The unformatted value of the cell."),
 

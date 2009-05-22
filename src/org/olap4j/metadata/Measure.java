@@ -89,12 +89,14 @@ public interface Measure extends Member {
          */
         STD(7),
         /**
-         * Identifies that the measure was derived from a formula that was not any single function above.
+         * Identifies that the measure was derived from a formula that was not
+         * any single function above.
          */
         CALCULATED(127),
 
         /**
-        * Identifies that the measure was derived from an unknown aggregation function or formula.
+        * Identifies that the measure was derived from an unknown aggregation
+        * function or formula.
          */
         UNKNOWN(0);
 

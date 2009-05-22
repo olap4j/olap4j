@@ -36,15 +36,13 @@ class XmlaOlap4jCatalog implements Catalog, Named {
         this.olap4jDatabaseMetaData = olap4jDatabaseMetaData;
         this.name = name;
 
-        /*
-         * Fetching the schemas is a tricky part. There are no XMLA requests to obtain the
-         * available schemas for a given catalog. We therefore need to ask for the cubes,
-         * restricting results on the catalog, and while iterating on the cubes, take the schema
-         * name from this recordset.
-         *
-         * Many servers (SSAS for example) won't support the schema name column in the
-         * returned rowset. This has to be taken into account.
-         */
+        // Fetching the schemas is a tricky part. There are no XMLA requests to
+        // obtain the available schemas for a given catalog. We therefore need
+        // to ask for the cubes, restricting results on the catalog, and while
+        // iterating on the cubes, take the schema name from this recordset.
+        //
+        // Many servers (SSAS for example) won't support the schema name column
+        // in the returned rowset. This has to be taken into account.
         this.schemas =
             new DeferredNamedListImpl<XmlaOlap4jSchema>(
                 XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_CUBES,

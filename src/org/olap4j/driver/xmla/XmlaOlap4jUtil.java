@@ -94,7 +94,7 @@ abstract class XmlaOlap4jUtil {
         DOMParser parser = new DOMParser();
 
         parser.setEntityResolver(entityResolver);
-        parser.setErrorHandler(new SAXErrorHandler());
+        parser.setErrorHandler(new ErrorHandlerImpl());
         parser.setFeature(DEFER_NODE_EXPANSION, false);
         parser.setFeature(NAMESPACES_FEATURE_ID, true);
         parser.setFeature(SCHEMA_VALIDATION_FEATURE_ID, doingValidation);
@@ -115,12 +115,12 @@ abstract class XmlaOlap4jUtil {
     static void checkForParseError(DOMParser parser, Throwable t) {
         final ErrorHandler errorHandler = parser.getErrorHandler();
 
-        if (errorHandler instanceof SAXErrorHandler) {
-            final SAXErrorHandler saxEH = (SAXErrorHandler) errorHandler;
+        if (errorHandler instanceof ErrorHandlerImpl) {
+            final ErrorHandlerImpl saxEH = (ErrorHandlerImpl) errorHandler;
             final List<ErrorInfo> errors = saxEH.getErrors();
 
             if (errors != null && errors.size() > 0) {
-                String errorStr = SAXErrorHandler.formatErrorInfos(saxEH);
+                String errorStr = ErrorHandlerImpl.formatErrorInfos(saxEH);
                 throw new RuntimeException(errorStr, t);
             }
         } else {
@@ -397,7 +397,7 @@ abstract class XmlaOlap4jUtil {
     /**
      * Error handler plus helper methods.
      */
-    static class SAXErrorHandler implements ErrorHandler {
+    static class ErrorHandlerImpl implements ErrorHandler {
         public static final String WARNING_STRING        = "WARNING";
         public static final String ERROR_STRING          = "ERROR";
         public static final String FATAL_ERROR_STRING    = "FATAL";
@@ -415,7 +415,7 @@ abstract class XmlaOlap4jUtil {
             }
         }
 
-        public static String formatErrorInfos(SAXErrorHandler saxEH) {
+        public static String formatErrorInfos(ErrorHandlerImpl saxEH) {
             if (! saxEH.hasErrors()) {
                 return "";
             }
@@ -460,25 +460,32 @@ abstract class XmlaOlap4jUtil {
         }
 
         private List<ErrorInfo> errors;
-        public SAXErrorHandler() {
+
+        public ErrorHandlerImpl() {
         }
+
         public List<ErrorInfo> getErrors() {
             return this.errors;
         }
+
         public boolean hasErrors() {
             return (this.errors != null);
         }
+
         public void warning(SAXParseException exception) throws SAXException {
             addError(new ErrorInfo(SEVERITY_WARNING, exception));
         }
+
         public void error(SAXParseException exception) throws SAXException {
             addError(new ErrorInfo(SEVERITY_ERROR, exception));
         }
+
         public void fatalError(SAXParseException exception)
             throws SAXException
         {
             addError(new ErrorInfo(SEVERITY_FATAL_ERROR, exception));
         }
+
         protected void addError(ErrorInfo ei) {
             if (this.errors == null) {
                 this.errors = new ArrayList<ErrorInfo>();

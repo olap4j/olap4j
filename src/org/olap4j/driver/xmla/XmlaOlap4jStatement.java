@@ -329,7 +329,10 @@ class XmlaOlap4jStatement implements OlapStatement {
         return openCellSet;
     }
 
-    public CellSet executeOlapQuery(SelectNode selectNode) throws OlapException {
+    public CellSet executeOlapQuery(
+        SelectNode selectNode)
+        throws OlapException
+    {
         final String mdx = toString(selectNode);
         return executeOlapQuery(mdx);
     }

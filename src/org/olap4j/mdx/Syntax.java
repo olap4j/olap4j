@@ -205,7 +205,11 @@ public enum Syntax {
      * Defines syntax for expression invoked as <code>CASE ... END</code>.
      */
     Case {
-        public void unparse(String operatorName, List<ParseTreeNode> argList, ParseTreeWriter writer) {
+        public void unparse(
+            String operatorName,
+            List<ParseTreeNode> argList,
+            ParseTreeWriter writer)
+        {
             final PrintWriter pw = writer.getPrintWriter();
             if (operatorName.equals("_CaseTest")) {
                 pw.print("CASE");

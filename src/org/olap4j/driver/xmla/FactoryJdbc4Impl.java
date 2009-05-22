@@ -110,7 +110,9 @@ class FactoryJdbc4Impl implements Factory {
             throw new UnsupportedOperationException();
         }
 
-        public void updateRowId(String columnLabel, RowId x) throws SQLException {
+        public void updateRowId(String columnLabel, RowId x)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -134,7 +136,9 @@ class FactoryJdbc4Impl implements Factory {
             throw new UnsupportedOperationException();
         }
 
-        public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
+        public void updateNClob(int columnIndex, NClob nClob)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -184,7 +188,9 @@ class FactoryJdbc4Impl implements Factory {
             throw new UnsupportedOperationException();
         }
 
-        public Reader getNCharacterStream(String columnLabel) throws SQLException {
+        public Reader getNCharacterStream(String columnLabel)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -239,54 +245,67 @@ class FactoryJdbc4Impl implements Factory {
         public void updateBlob(
             int columnIndex,
             InputStream inputStream,
-            long length) throws SQLException {
+            long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateBlob(
             String columnLabel,
             InputStream inputStream,
-            long length) throws SQLException {
+            long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateClob(
-            int columnIndex, Reader reader, long length) throws SQLException {
+            int columnIndex, Reader reader, long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateClob(
-            String columnLabel, Reader reader, long length) throws SQLException {
+            String columnLabel, Reader reader, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateNClob(
-            int columnIndex, Reader reader, long length) throws SQLException {
+            int columnIndex, Reader reader, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateNClob(
-            String columnLabel, Reader reader, long length) throws SQLException {
+            String columnLabel, Reader reader, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateNCharacterStream(
-            int columnIndex, Reader x) throws SQLException {
+            int columnIndex, Reader x) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateNCharacterStream(
-            String columnLabel, Reader reader) throws SQLException {
+            String columnLabel, Reader reader) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateAsciiStream(
-            int columnIndex, InputStream x) throws SQLException {
+            int columnIndex, InputStream x) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateBinaryStream(
-            int columnIndex, InputStream x) throws SQLException {
+            int columnIndex, InputStream x) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -296,46 +315,56 @@ class FactoryJdbc4Impl implements Factory {
         }
 
         public void updateAsciiStream(
-            String columnLabel, InputStream x) throws SQLException {
+            String columnLabel, InputStream x) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateBinaryStream(
-            String columnLabel, InputStream x) throws SQLException {
+            String columnLabel, InputStream x) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateCharacterStream(
-            String columnLabel, Reader reader) throws SQLException {
+            String columnLabel, Reader reader) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateBlob(
-            int columnIndex, InputStream inputStream) throws SQLException {
+            int columnIndex, InputStream inputStream) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateBlob(
-            String columnLabel, InputStream inputStream) throws SQLException {
-            throw new UnsupportedOperationException();
-        }
-
-        public void updateClob(int columnIndex, Reader reader) throws SQLException {
+            String columnLabel, InputStream inputStream) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateClob(
-            String columnLabel, Reader reader) throws SQLException {
+            int columnIndex, Reader reader) throws SQLException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void updateClob(
+            String columnLabel, Reader reader) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateNClob(
-            int columnIndex, Reader reader) throws SQLException {
+            int columnIndex, Reader reader) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateNClob(
-            String columnLabel, Reader reader) throws SQLException {
+            String columnLabel, Reader reader) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
     }
@@ -400,7 +429,9 @@ class FactoryJdbc4Impl implements Factory {
             throw new UnsupportedOperationException();
         }
 
-        public void setClientInfo(Properties properties) throws SQLClientInfoException {
+        public void setClientInfo(Properties properties)
+            throws SQLClientInfoException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -456,7 +487,9 @@ class FactoryJdbc4Impl implements Factory {
             throw new UnsupportedOperationException();
         }
 
-        public void updateRowId(String columnLabel, RowId x) throws SQLException {
+        public void updateRowId(String columnLabel, RowId x)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -469,16 +502,20 @@ class FactoryJdbc4Impl implements Factory {
         }
 
         public void updateNString(
-            int columnIndex, String nString) throws SQLException {
+            int columnIndex, String nString) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateNString(
-            String columnLabel, String nString) throws SQLException {
+            String columnLabel, String nString) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
-        public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
+        public void updateNClob(int columnIndex, NClob nClob)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -525,17 +562,22 @@ class FactoryJdbc4Impl implements Factory {
             throw new UnsupportedOperationException();
         }
 
-        public Reader getNCharacterStream(String columnLabel) throws SQLException {
+        public Reader getNCharacterStream(String columnLabel)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateNCharacterStream(
-            int columnIndex, Reader x, long length) throws SQLException {
+            int columnIndex, Reader x, long length) throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateNCharacterStream(
-            String columnLabel, Reader reader, long length) throws SQLException {
+            String columnLabel, Reader reader, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -555,17 +597,23 @@ class FactoryJdbc4Impl implements Factory {
         }
 
         public void updateAsciiStream(
-            String columnLabel, InputStream x, long length) throws SQLException {
+            String columnLabel, InputStream x, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateBinaryStream(
-            String columnLabel, InputStream x, long length) throws SQLException {
+            String columnLabel, InputStream x, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void updateCharacterStream(
-            String columnLabel, Reader reader, long length) throws SQLException {
+            String columnLabel, Reader reader, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -589,7 +637,9 @@ class FactoryJdbc4Impl implements Factory {
         }
 
         public void updateClob(
-            String columnLabel, Reader reader, long length) throws SQLException {
+            String columnLabel, Reader reader, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -599,7 +649,9 @@ class FactoryJdbc4Impl implements Factory {
         }
 
         public void updateNClob(
-            String columnLabel, Reader reader, long length) throws SQLException {
+            String columnLabel, Reader reader, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -653,7 +705,9 @@ class FactoryJdbc4Impl implements Factory {
             throw new UnsupportedOperationException();
         }
 
-        public void updateClob(int columnIndex, Reader reader) throws SQLException {
+        public void updateClob(int columnIndex, Reader reader)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -711,12 +765,16 @@ class FactoryJdbc4Impl implements Factory {
             throw new UnsupportedOperationException();
         }
 
-        public void setNClob(int parameterIndex, NClob value) throws SQLException {
+        public void setNClob(int parameterIndex, NClob value)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void setClob(
-            int parameterIndex, Reader reader, long length) throws SQLException {
+            int parameterIndex, Reader reader, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -728,7 +786,9 @@ class FactoryJdbc4Impl implements Factory {
         }
 
         public void setNClob(
-            int parameterIndex, Reader reader, long length) throws SQLException {
+            int parameterIndex, Reader reader, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -738,17 +798,23 @@ class FactoryJdbc4Impl implements Factory {
         }
 
         public void setAsciiStream(
-            int parameterIndex, InputStream x, long length) throws SQLException {
+            int parameterIndex, InputStream x, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void setBinaryStream(
-            int parameterIndex, InputStream x, long length) throws SQLException {
+            int parameterIndex, InputStream x, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
         public void setCharacterStream(
-            int parameterIndex, Reader reader, long length) throws SQLException {
+            int parameterIndex, Reader reader, long length)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -772,7 +838,9 @@ class FactoryJdbc4Impl implements Factory {
             throw new UnsupportedOperationException();
         }
 
-        public void setClob(int parameterIndex, Reader reader) throws SQLException {
+        public void setClob(int parameterIndex, Reader reader)
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -817,11 +885,15 @@ class FactoryJdbc4Impl implements Factory {
             throw new UnsupportedOperationException();
         }
 
-        public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException {
+        public boolean supportsStoredFunctionsUsingCallSyntax()
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 
-        public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
+        public boolean autoCommitFailureClosesAllResultSets()
+            throws SQLException
+        {
             throw new UnsupportedOperationException();
         }
 

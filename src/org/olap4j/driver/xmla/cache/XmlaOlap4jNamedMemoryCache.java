@@ -129,7 +129,9 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
      */
     private static synchronized void initCaches() {
         if (caches == null) {
-            caches = new ConcurrentHashMap<String, XmlaOlap4jConcurrentMemoryCache>();
+            caches =
+                new ConcurrentHashMap<
+                String, XmlaOlap4jConcurrentMemoryCache>();
         }
     }
 
@@ -210,8 +212,9 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
             if (caches.containsKey(id)) {
                 caches.get(id).put(url, request, response);
             } else {
-              throw new RuntimeException(
-                "There are no configured caches of this name yet configured.");
+                throw new RuntimeException(
+                    "There are no configured caches of this name yet "
+                    + "configured.");
             }
         }
     }

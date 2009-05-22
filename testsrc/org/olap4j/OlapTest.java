@@ -108,8 +108,8 @@ public class OlapTest extends TestCase {
             String password = "foodmartpassword";
             String jdbc = "jdbc:mysql://localhost/foodmart?user=foodmartuser&password=foodmartpassword";
 
-            // Create a connection object to the specific implementation of an olap4j source
-            // This is the only provider-specific code
+            // Create a connection object to the specific implementation of an
+            // olap4j source.  This is the only provider-specific code.
             Class.forName("mondrian.olap4j.MondrianOlap4jDriver");
             connection = DriverManager.getConnection(
                 "jdbc:mondrian:Jdbc=" + jdbc
@@ -128,7 +128,8 @@ public class OlapTest extends TestCase {
 
             // The code from here on is generic olap4j stuff
 
-            // Get a list of the schemas available from this connection and dump their names
+            // Get a list of the schemas available from this connection and dump
+            // their names.
             final String catalogName;
             switch (tester.getFlavor()) {
             case MONDRIAN:
@@ -169,17 +170,21 @@ public class OlapTest extends TestCase {
             Cube cube = cubes.get("Sales");
             System.out.println("using cube name=" + cube.getName());
 
-            // create an XML doc to represent the Cube and print it out
-            // This XML would be used by remote clients to enable cube navigation
-            System.out.println(Olap4jXml.xmlToString(Olap4jXml.cubeToDoc(cube)));
+            // Create an XML doc to represent the Cube and print it out.  This
+            // XML would be used by remote clients to enable cube navigation.
+            System.out.println(
+                Olap4jXml.xmlToString(Olap4jXml.cubeToDoc(cube)));
 
-            // Get a list of dimension objects and dump their names, hierarchies, levels
+            // Get a list of dimension objects and dump their names,
+            // hierarchies, levels.
             NamedList<Dimension> dimensions = cube.getDimensions();
             for (Dimension dimension : dimensions) {
                 if (dimension.getDimensionType() == Dimension.Type.MEASURE) {
-                    System.out.println("measures dimension name=" + dimension.getName());
+                    System.out.println(
+                        "measures dimension name=" + dimension.getName());
                 } else {
-                    System.out.println("dimension name=" + dimension.getName());
+                    System.out.println(
+                        "dimension name=" + dimension.getName());
                 }
                 listHierarchies(dimension);
             }
@@ -192,36 +197,57 @@ public class OlapTest extends TestCase {
             QueryDimension productQuery = query.getDimension("Product");
 
             QueryDimension storeQuery = query.getDimension("Store");
-            QueryDimension timeQuery = query.getDimension("Time"); //$NON-NLS-1$
+            QueryDimension timeQuery =
+                query.getDimension("Time"); //$NON-NLS-1$
 
-            listMembers(productQuery.getDimension().getHierarchies().get("Product").getLevels().get("Product Department"));
+            listMembers(
+                productQuery.getDimension().getHierarchies().get("Product")
+                    .getLevels().get("Product Department"));
 
-            listMembers(storeQuery.getDimension().getHierarchies().get("Store").getLevels().get("Store Country"));
+            listMembers(
+                storeQuery.getDimension().getHierarchies().get("Store")
+                    .getLevels().get("Store Country"));
 
             Member productMember = cube.lookupMember("Product", "Drink");
-            Selection selection = productQuery.createSelection(productMember, Selection.Operator.CHILDREN);
+            Selection selection =
+                productQuery.createSelection(
+                    productMember,
+                    Selection.Operator.CHILDREN);
 
-            // Create an XML doc to represent the resolved selection and print it out
-            // This would be used by a client application to enable hierarchy navigation
+            // Create an XML doc to represent the resolved selection and print
+            // it out.  This would be used by a client application to enable
+            // hierarchy navigation.
             List<Member> members = productQuery.resolve(selection);
-            System.out.println(Olap4jXml.xmlToString(Olap4jXml.selectionToDoc(selection, members)));
+            System.out.println(
+                Olap4jXml.xmlToString(
+                    Olap4jXml.selectionToDoc(selection, members)));
 
             // create some selections for Store
             Member usaMember = cube.lookupMember("Store", "USA");
-            Selection usa = storeQuery.createSelection(usaMember, Selection.Operator.CHILDREN);
+            Selection usa =
+                storeQuery.createSelection(
+                    usaMember, Selection.Operator.CHILDREN);
             storeQuery.getSelections().add(usa);
 
             // create some selections for Product
             productQuery.getSelections().clear();
-            Selection productSelection1 = productQuery.createSelection(productMember, Selection.Operator.CHILDREN);
+            Selection productSelection1 =
+                productQuery.createSelection(
+                   productMember,
+                   Selection.Operator.CHILDREN);
             Member productFoodMember = cube.lookupMember("Product", "Food");
-            Selection productSelection2 = productQuery.createSelection(productFoodMember, Selection.Operator.CHILDREN);
+            Selection productSelection2 =
+                productQuery.createSelection(
+                    productFoodMember, Selection.Operator.CHILDREN);
             productQuery.getSelections().add(productSelection1);
             productQuery.getSelections().add(productSelection2);
 
             // create some selections for Time
             Member timeMember = cube.lookupMember("Time", "1997");
-            Selection year97 = timeQuery.createSelection(timeMember, Selection.Operator.CHILDREN);
+            Selection year97 =
+                timeQuery.createSelection(
+                    timeMember,
+                    Selection.Operator.CHILDREN);
             timeQuery.getSelections().add(year97);
 
             // place our dimensions on the axes
@@ -237,26 +263,32 @@ public class OlapTest extends TestCase {
                 assertTrue(e.getMessage().contains("dimension already on this axis"));
             }
 
-            // Create an XML doc to represent the query and print it out
-            // This XML would be used by a client application to persist a query
-            System.out.println(Olap4jXml.xmlToString(Olap4jXml.queryToDoc(query)));
+            // Create an XML doc to represent the query and print it out. This
+            // XML would be used by a client application to persist a query.
+            System.out.println(
+                Olap4jXml.xmlToString(
+                    Olap4jXml.queryToDoc(query)));
 
             query.validate();
             CellSet result = query.execute();
             System.out.println(TestContext.toString(result));
 
-            // Create an XML doc to represent the results and print it out
-            // This XML would be used by a remote client application to get the results
-            System.out.println(Olap4jXml.xmlToString(Olap4jXml.resultToDoc(result)));
+            // Create an XML doc to represent the results and print it out.
+            // This XML would be used by a remote client application to get the
+            // results.
+            System.out.println(
+                Olap4jXml.xmlToString(Olap4jXml.resultToDoc(result)));
 
             // for shits and giggles we'll swap the axes over
             query.swapAxes();
-            System.out.println(Olap4jXml.xmlToString(Olap4jXml.queryToDoc(query)));
+            System.out.println(
+                Olap4jXml.xmlToString(Olap4jXml.queryToDoc(query)));
 
             query.validate();
             result = query.execute();
             System.out.println(result.toString());
-            System.out.println(Olap4jXml.xmlToString(Olap4jXml.resultToDoc(result)));
+            System.out.println(
+                Olap4jXml.xmlToString(Olap4jXml.resultToDoc(result)));
         } catch (Throwable t) {
             t.printStackTrace();
             fail();
@@ -287,8 +319,10 @@ public class OlapTest extends TestCase {
                         Selection.Operator.MEMBER);
             measuresDimension.getSelections().add(storeSalesSelection);
 
-            query.getAxes().get(Axis.ROWS).getDimensions().add(productDimension);
-            query.getAxes().get(Axis.COLUMNS).getDimensions().add(measuresDimension);
+            query.getAxes().get(Axis.ROWS).getDimensions()
+                .add(productDimension);
+            query.getAxes().get(Axis.COLUMNS).getDimensions()
+                .add(measuresDimension);
 
             query.validate();
 
@@ -420,10 +454,12 @@ public class OlapTest extends TestCase {
                         Selection.Operator.MEMBER);
             measuresDimension.getSelections().add(storeSalesSelection);
 
-            query.getAxes().get(Axis.ROWS).getDimensions().add(productDimension);
+            query.getAxes().get(Axis.ROWS).getDimensions()
+                .add(productDimension);
             query.getAxes().get(Axis.ROWS).getDimensions().add(storeDimension);
             query.getAxes().get(Axis.ROWS).getDimensions().add(timeDimension);
-            query.getAxes().get(Axis.COLUMNS).getDimensions().add(measuresDimension);
+            query.getAxes().get(Axis.COLUMNS).getDimensions()
+                .add(measuresDimension);
 
             query.validate();
 
@@ -462,19 +498,24 @@ public class OlapTest extends TestCase {
             productDimension.getSelections().add(drinkSelection);
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            Member storeSalesMember = cube.lookupMember("Measures", "Store Sales");
+            Member storeSalesMember =
+                cube.lookupMember("Measures", "Store Sales");
             Selection storeSalesSelection =
                 measuresDimension.createSelection(storeSalesMember,
                         Selection.Operator.MEMBER);
             measuresDimension.getSelections().add(storeSalesSelection);
 
-            query.getAxes().get(Axis.ROWS).getDimensions().add(productDimension);
-            query.getAxes().get(Axis.COLUMNS).getDimensions().add(measuresDimension);
+            query.getAxes().get(Axis.ROWS).getDimensions()
+                .add(productDimension);
+            query.getAxes().get(Axis.COLUMNS).getDimensions()
+                .add(measuresDimension);
 
             query.validate();
 
             assertEquals(productDimension.getAxis().getLocation(), Axis.ROWS);
-            assertEquals(measuresDimension.getAxis().getLocation(), Axis.COLUMNS);
+            assertEquals(
+                measuresDimension.getAxis().getLocation(),
+                Axis.COLUMNS);
 
             SelectNode mdx = query.getSelect();
             String mdxString = mdx.toString();
@@ -487,7 +528,9 @@ public class OlapTest extends TestCase {
 
             query.swapAxes();
 
-            assertEquals(productDimension.getAxis().getLocation(), Axis.COLUMNS);
+            assertEquals(
+                productDimension.getAxis().getLocation(),
+                Axis.COLUMNS);
             assertEquals(measuresDimension.getAxis().getLocation(), Axis.ROWS);
 
             mdx = query.getSelect();
@@ -519,24 +562,31 @@ public class OlapTest extends TestCase {
             QueryDimension productDimension = query.getDimension("Product");
             Member drinkMember = cube.lookupMember("Product", "Drink");
             Selection drinkSelection =
-                productDimension.createSelection(drinkMember,
-                        Selection.Operator.INCLUDE_CHILDREN);
+                productDimension.createSelection(
+                    drinkMember,
+                    Selection.Operator.INCLUDE_CHILDREN);
             productDimension.getSelections().add(drinkSelection);
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            Member storeSalesMember = cube.lookupMember("Measures", "Store Sales");
+            Member storeSalesMember =
+                cube.lookupMember("Measures", "Store Sales");
             Selection storeSalesSelection =
-                measuresDimension.createSelection(storeSalesMember,
-                        Selection.Operator.MEMBER);
+                measuresDimension.createSelection(
+                    storeSalesMember,
+                    Selection.Operator.MEMBER);
             measuresDimension.getSelections().add(storeSalesSelection);
 
-            query.getAxes().get(Axis.ROWS).getDimensions().add(productDimension);
-            query.getAxes().get(Axis.COLUMNS).getDimensions().add(measuresDimension);
+            query.getAxes().get(Axis.ROWS).getDimensions().add(
+                productDimension);
+            query.getAxes().get(Axis.COLUMNS).getDimensions().add(
+                measuresDimension);
 
             query.validate();
 
             assertEquals(productDimension.getAxis().getLocation(), Axis.ROWS);
-            assertEquals(measuresDimension.getAxis().getLocation(), Axis.COLUMNS);
+            assertEquals(
+                measuresDimension.getAxis().getLocation(),
+                Axis.COLUMNS);
 
             SelectNode mdx = query.getSelect();
             String mdxString = mdx.toString();
@@ -640,7 +690,10 @@ public class OlapTest extends TestCase {
             return doc;
         }
 
-        public static Document selectionToDoc(Selection selection, List<Member> members) {
+        public static Document selectionToDoc(
+            Selection selection,
+            List<Member> members)
+        {
             Document doc = Olap4jXml.newDocument();
             Element root = doc.createElement("olap4j");
             doc.appendChild(root);
@@ -727,8 +780,11 @@ public class OlapTest extends TestCase {
                 root.appendChild(gridNode);
 
                 for (CellSetAxis axis : result.getAxes()) {
-                    for (Hierarchy hierarchy : axis.getAxisMetaData().getHierarchies()) {
-                        Element dimensionNode = dimensionInfoToXml(hierarchy.getDimension(), doc);
+                    for (Hierarchy hierarchy :
+                             axis.getAxisMetaData().getHierarchies())
+                    {
+                        Element dimensionNode =
+                            dimensionInfoToXml(hierarchy.getDimension(), doc);
                         dimensionsNode.appendChild(dimensionNode);
                     }
                 }
@@ -894,7 +950,8 @@ public class OlapTest extends TestCase {
             Document doc,
             Element parent) throws OlapException
         {
-            Element dimensionNode = dimensionInfoToXml(dimension.getDimension(), doc);
+            Element dimensionNode =
+                dimensionInfoToXml(dimension.getDimension(), doc);
             parent.appendChild(dimensionNode);
             Element selectionsNode;
 
@@ -945,7 +1002,11 @@ public class OlapTest extends TestCase {
             return memberNode;
         }
 
-        public static void addCDataNode(String name, String value, Element parent) {
+        public static void addCDataNode(
+            String name,
+            String value,
+            Element parent)
+        {
             Document doc = parent.getOwnerDocument();
             Element node = doc.createElement(name);
             if (value != null) {
@@ -964,7 +1025,11 @@ public class OlapTest extends TestCase {
             parent.appendChild(node);
         }
 
-        public static void addAttribute(String name, String value, Element parent) {
+        public static void addAttribute(
+            String name,
+            String value,
+            Element parent)
+        {
             if (name != null && value != null) {
                 parent.setAttribute(name, value);
             }

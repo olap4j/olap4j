@@ -344,11 +344,15 @@ abstract class XmlaOlap4jPreparedStatement
                     return Number.class;
                 }
 
-                public Class<Dimension> dimensionType(DimensionType dimensionType) {
+                public Class<Dimension> dimensionType(
+                    DimensionType dimensionType)
+                {
                     return Dimension.class;
                 }
 
-                public Class<Hierarchy> hierarchyType(HierarchyType hierarchyType) {
+                public Class<Hierarchy> hierarchyType(
+                    HierarchyType hierarchyType)
+                {
                     return Hierarchy.class;
                 }
 

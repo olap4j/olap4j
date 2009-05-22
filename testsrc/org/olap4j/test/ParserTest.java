@@ -663,7 +663,9 @@ public class ParserTest extends TestCase {
 
         SelectNode selectClone = null; // select.copy();
         assertTrue(selectClone instanceof SelectNode);
-        assertEquals(TestContext.toString(selectClone), TestContext.toString(query));
+        assertEquals(
+            TestContext.toString(selectClone),
+            TestContext.toString(query));
     }
 
     /**

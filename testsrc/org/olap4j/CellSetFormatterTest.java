@@ -118,7 +118,8 @@ public class CellSetFormatterTest extends TestCase {
         COMPACT_RECTANGULAR,
 
         /**
-         * Rectangular format that uses vertical bars and hyphens to draw a grid.
+         * Rectangular format that uses vertical bars and hyphens to draw a
+         * grid.
          */
         RECTANGULAR
     }

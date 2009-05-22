@@ -522,7 +522,9 @@ public class TestContext {
             return tester.getDriverClassName();
         }
 
-        public Connection createConnectionWithUserPassword() throws SQLException {
+        public Connection createConnectionWithUserPassword()
+            throws SQLException
+        {
             return tester.createConnectionWithUserPassword();
         }
 

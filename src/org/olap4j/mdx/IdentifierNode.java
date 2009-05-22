@@ -45,8 +45,8 @@ import java.util.*;
  *     name "Unit Sales"</li>
  * </ul>
  *
- * <p>A more complex example illustrates a compound key. The identifier
- * {@code [Customers].[City].&amp;[San Francisco]&amp;CA&amp;USA.&amp;[cust1234]}
+ * <p>A more complex example illustrates a compound key. The identifier {@code
+ * [Customers].[City].&amp;[San Francisco]&amp;CA&amp;USA.&amp;[cust1234]}
  * contains four segments as follows:
  * <ul>
  * <li>Segment #0 is QUOTED, name "Customers"</li>
@@ -259,7 +259,8 @@ public class IdentifierNode
         while (i < s.length()) {
             char ch = s.charAt(i);
             if (ch == ']') {
-                if (i + 1 < s.length() && s.charAt(i + 1) == ']') { // found ]] => skip
+                if (i + 1 < s.length() && s.charAt(i + 1) == ']') {
+                    // found ]] => skip
                     i += 2;
                 } else {
                     return i;

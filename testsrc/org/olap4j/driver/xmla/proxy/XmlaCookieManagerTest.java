@@ -17,23 +17,24 @@ public class XmlaCookieManagerTest extends TestCase {
 
 
     /**
-     * <p>This simple test makes sure that the cookie manager works as expected. It creates a
-     * connection stub which returns fake Set-Cookie response headers. The cookies are then
-     * stored in the cookie manager and a new connection stub is created. The second connection
-     * is then passed back to the manager and we check if the cookies were applied
-     * to the connection.
+     * This simple test makes sure that the cookie manager works as expected. It
+     * creates a connection stub which returns fake Set-Cookie response
+     * headers. The cookies are then stored in the cookie manager and a new
+     * connection stub is created. The second connection is then passed back to
+     * the manager and we check if the cookies were applied to the connection.
      *
      * @throws Exception
      */
     public void testCookieManager() throws Exception {
-        URLConnectionStub conn = new URLConnectionStub(new URL("http://example.com"));
+        UrlConnectionStub conn =
+            new UrlConnectionStub(new URL("http://example.com"));
         XmlaOlap4jCookieManager manager = new XmlaOlap4jCookieManager();
 
         conn.connect();
 
         manager.storeCookies(conn);
 
-        conn = new URLConnectionStub(new URL("http://example.com"));
+        conn = new UrlConnectionStub(new URL("http://example.com"));
 
         manager.setCookies(conn);
 
@@ -41,15 +42,11 @@ public class XmlaCookieManagerTest extends TestCase {
         assertEquals(cookieValue, conn.getInternalCookieValue());
     }
 
-
-
-
-
-    private static class URLConnectionStub extends HttpURLConnection {
+    private static class UrlConnectionStub extends HttpURLConnection {
         private String internalCookieKey = null;
         private String internalCookieValue = null;
 
-        protected URLConnectionStub(URL u) {
+        protected UrlConnectionStub(URL u) {
             super(u);
         }
 

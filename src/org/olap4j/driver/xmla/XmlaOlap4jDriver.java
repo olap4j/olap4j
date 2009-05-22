@@ -51,37 +51,40 @@ import java.util.concurrent.*;
  * multiple times in the connect string, the first occurrence is used.
  *
  * <table border="1">
- * <tr> <th>Property</th>        <th>Description</th> </tr>
+ * <tr><th>Property</th>     <th>Description</th> </tr>
  *
- * <tr> <td>Server</td>          <td>URL of HTTP server. Required.</td> </tr>
+ * <tr><td>Server</td>       <td>URL of HTTP server. Required.</td> </tr>
  *
- * <tr> <td>Catalog</td>         <td>Catalog name to use.
- *                                   By default, the first one returned by the
- *                                   XMLA server will be used.</td> </tr>
+ * <tr><td>Catalog</td>      <td>Catalog name to use.
+ *                               By default, the first one returned by the
+ *                               XMLA server will be used.</td> </tr>
  *
- * <tr> <td>Provider</td>        <td>Name of the XMLA provider.</td> </tr>
+ * <tr><td>Provider</td>     <td>Name of the XMLA provider.</td> </tr>
  *
- * <tr> <td>DataSource</td>      <td>Name of the XMLA datasource. When using a
- *                                   Mondrian backed XMLA server, be sure to
- *                                   include the full datasource name between
- *                                   quotes.</td> </tr>
+ * <tr><td>DataSource</td>   <td>Name of the XMLA datasource. When using a
+ *                               Mondrian backed XMLA server, be sure to
+ *                               include the full datasource name between
+ *                               quotes.</td> </tr>
  *
- * <tr> <td>Cache</td>           <td><p>Class name of the SOAP cache to use. A built in
- *                                   memory cache is available with
- *                                   org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache.
- *                                   Has to be an implementation of IXmlaOlap4jCache.
- *                                   <p>By default, no SOAP query cache will be used.
- *                                   </td> </tr>
+ * <tr><td>Cache</td>        <td><p>Class name of the SOAP cache to use.
+ *                               Must implement interface
+ *              {@link org.olap4j.driver.xmla.proxy.XmlaOlap4jCachedProxy}.
+ *                               A built-in memory cache is available with
+ *              {@link org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache}.
  *
- * <tr> <td>Cache.*</td>         <td>Properties to transfer to the selected cache
- *                                   implementation. See IXmlaOlap4jCache or your
- *                                   selected implementation for properties details.
- *                                   </td> </tr>
+ *                               <p>By default, no SOAP query cache will be
+ *                               used.</td> </tr>
  *
- * <tr> <td>TestProxyCookie</td>  <td>String that uniquely identifies a proxy
- *                                    object in {@link #PROXY_MAP} via which to
- *                                    send XMLA requests for testing
- *                                    purposes.</td> </tr>
+ * <tr> <td>Cache.*</td>     <td>Properties to transfer to the selected cache
+ *                               implementation. See
+ *                          {@link org.olap4j.driver.xmla.cache.XmlaOlap4jCache}
+ *                               or your selected implementation for properties
+ *                               details.</td> </tr>
+ *
+ * <tr><td>TestProxyCookie</td><td>String that uniquely identifies a proxy
+ *                               object in {@link #PROXY_MAP} via which to
+ *                               send XMLA requests for testing
+ *                               purposes.</td> </tr>
  *
  * </table>
  *

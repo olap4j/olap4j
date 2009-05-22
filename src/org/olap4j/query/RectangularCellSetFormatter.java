@@ -24,27 +24,27 @@ import java.util.*;
  * <p>With non-compact layout:
  *
  * <pre>
- *                          | 1997                                                |
- *                          | Q1                       | Q2                       |
- *                          |                          | 4                        |
- *                          | Unit Sales | Store Sales | Unit Sales | Store Sales |
- * ----+----+---------------+------------+-------------+------------+-------------+
- * USA | CA | Los Angeles   |            |             |            |             |
- *     | WA | Seattle       |            |             |            |             |
- *     | CA | San Francisco |            |             |            |             |
+ *                    | 1997                                                |
+ *                    | Q1                       | Q2                       |
+ *                    |                          | 4                        |
+ *                    | Unit Sales | Store Sales | Unit Sales | Store Sales |
+ * ----+----+---------+------------+-------------+------------+-------------+
+ * USA | CA | Modesto |         12 |        34.5 |         13 |       35.60 |
+ *     | WA | Seattle |         12 |        34.5 |         13 |       35.60 |
+ *     | CA | Fresno  |         12 |        34.5 |         13 |       35.60 |
  * </pre>
  *
  * <p>With compact layout:
  * <pre>
  *
- *                      1997
- *                      Q1                     Q2
- *                                             4
- *                      Unit Sales Store Sales Unit Sales Store Sales
- * === == ============= ========== =========== ========== ===========
- * USA CA Los Angeles           12        34.5         13       35.60
- *     WA Seattle               12        34.5         13       35.60
- *     CA San Francisco         12        34.5         13       35.60
+ *                1997
+ *                Q1                     Q2
+ *                                       4
+ *                Unit Sales Store Sales Unit Sales Store Sales
+ * === == ======= ========== =========== ========== ===========
+ * USA CA Modesto         12        34.5         13       35.60
+ *     WA Seattle         12        34.5         13       35.60
+ *     CA Fresno          12        34.5         13       35.60
  * </pre>
  *
  * <p><b>This class is experimental. It is not part of the olap4j

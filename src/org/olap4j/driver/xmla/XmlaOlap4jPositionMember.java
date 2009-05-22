@@ -160,7 +160,11 @@ class XmlaOlap4jPositionMember
         return member.getPropertyFormattedValue(property);
     }
 
-    public void setProperty(Property property, Object value) throws OlapException {
+    public void setProperty(
+        Property property,
+        Object value)
+        throws OlapException
+    {
         throw new UnsupportedOperationException();
     }
 

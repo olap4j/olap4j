@@ -36,7 +36,10 @@ public interface XmlaOlap4jProxy {
       * class was created, but some proxies out there (MondrianInprocProxy...)
       * still uses this.
       */
-    byte[] get(URL url, String request) throws XmlaOlap4jProxyException,IOException;
+    byte[] get(
+        URL url,
+        String request)
+        throws XmlaOlap4jProxyException, IOException;
 
     /**
      * Submits a request for background execution.

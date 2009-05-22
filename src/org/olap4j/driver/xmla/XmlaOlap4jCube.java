@@ -138,7 +138,8 @@ class XmlaOlap4jCube implements Cube, Named
                     final SoftReference<XmlaOlap4jMember> measureRef =
                         ((CachingMetadataReader) metadataReader).memberMap.get(
                             member.getUniqueName());
-                    // gc not possible - we hold all members in 'measures' field.
+                    // gc not possible - we hold all members in
+                    // 'measures' field.
                     assert measureRef.get() != null;
                     measureList.add((Measure) measureRef.get());
                 }
@@ -319,9 +320,12 @@ class XmlaOlap4jCube implements Cube, Named
         private final Map<String, SoftReference<XmlaOlap4jMember>> memberMap =
             new HashMap<String, SoftReference<XmlaOlap4jMember>>();
 
-        private final Map<XmlaOlap4jLevel, SoftReference<List<XmlaOlap4jMember>>>
-            levelMemberListMap =
-            new HashMap<XmlaOlap4jLevel, SoftReference<List<XmlaOlap4jMember>>>();
+        private final Map<
+            XmlaOlap4jLevel,
+            SoftReference<List<XmlaOlap4jMember>>> levelMemberListMap =
+            new HashMap<
+                XmlaOlap4jLevel,
+                SoftReference<List<XmlaOlap4jMember>>>();
 
         /**
          * Creates a CachingMetadataReader.

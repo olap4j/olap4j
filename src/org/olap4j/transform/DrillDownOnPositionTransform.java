@@ -113,7 +113,9 @@ public class DrillDownOnPositionTransform extends AxisTransform {
 
     // visitor for a tree of expressions inside a query axis
     // (not sure this should go here)
-    class DrillDownOnPositionVisitor implements ParseTreeVisitor<ParseTreeNode> {
+    class DrillDownOnPositionVisitor
+        implements ParseTreeVisitor<ParseTreeNode>
+    {
 
         public ParseTreeNode visit(SelectNode selectNode) {
             // TODO Auto-generated method stub

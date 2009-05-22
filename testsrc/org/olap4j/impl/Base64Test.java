@@ -47,7 +47,8 @@ public class Base64Test extends TestCase
         byte[] decoded = Base64.decode(encoded, 0, encoded.length);
         assertTrue(Arrays.equals(data, decoded));
 
-        Base64.InputStream in = new Base64.InputStream(new ByteArrayInputStream(encoded));
+        Base64.InputStream in =
+            new Base64.InputStream(new ByteArrayInputStream(encoded));
         out_bytes = new ByteArrayOutputStream();
         byte[] buffer = new byte[3];
         for (int n = in.read(buffer); n > 0; n = in.read(buffer)) {

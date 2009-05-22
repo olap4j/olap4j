@@ -92,7 +92,10 @@ abstract class Olap4jNodeConverter {
               toOlap4j(dimension));
     }
 
-    protected static CallNode crossJoin(QueryDimension dim1, QueryDimension dim2) {
+    protected static CallNode crossJoin(
+        QueryDimension dim1,
+        QueryDimension dim2)
+    {
         return
             new CallNode(
                 null,
@@ -179,7 +182,8 @@ abstract class Olap4jNodeConverter {
                     Syntax.Function,
                     generateListSetCall(members),
                     currentMemberNameNode,
-                    LiteralNode.createSymbol(null,dimension.getSortOrder().name())));
+                    LiteralNode.createSymbol(
+                        null, dimension.getSortOrder().name())));
             return orderedList;
         } else {
             return members;
@@ -195,7 +199,10 @@ abstract class Olap4jNodeConverter {
         return null;
     }
 
-    private static ParseTreeNode toOlap4j(Member member, Selection.Operator oper) {
+    private static ParseTreeNode toOlap4j(
+        Member member,
+        Selection.Operator oper)
+    {
         ParseTreeNode node = null;
         try {
             switch (oper) {

@@ -248,8 +248,10 @@ public class XmlaCachedProxyTest extends TestCase {
 
 
     /**
-     * <p>Makes sure that a cache name is properly shared in a static way and
-     * that the parameters are not overwritten by subsequent connection creations.
+     * <p>Makes sure that a cache name is properly shared in a static
+     * way and that the parameters are not overwritten by subsequent
+     * connection creations.
+     *
      * @throws Exception If the test fails.
      */
     public void testCacheSharing() throws Exception

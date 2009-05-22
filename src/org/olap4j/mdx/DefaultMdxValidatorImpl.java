@@ -42,7 +42,9 @@ class DefaultMdxValidatorImpl
         this.selectNode = selectNode;
     }
 
-    public SelectNode validateSelect(SelectNode selectNode) throws OlapException {
+    public SelectNode validateSelect(SelectNode selectNode)
+        throws OlapException
+    {
         return null;
     }
 

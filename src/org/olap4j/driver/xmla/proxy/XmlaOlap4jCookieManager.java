@@ -148,13 +148,16 @@ class XmlaOlap4jCookieManager {
 
     /**
      * Prior to opening a URLConnection, calling this method will set all
-     * unexpired cookies that match the path or subpaths for thi underlying URL
+     * unexpired cookies that match the path or subpaths for thi underlying URL.
      *
-     * The connection MUST NOT have been opened
-     * method or an IOException will be thrown.
+     * <p>The connection MUST NOT have been opened method or an IOException will
+     * be thrown.
      *
-     * @param conn a java.net.URLConnection - must NOT be open, or IOException will be thrown
-     * @throws java.io.IOException Thrown if <i>conn</i> has already been opened.
+     * @param  conn a java.net.URLConnection  - must  NOT be  open, or
+     * IOException will be thrown
+     *
+     * @throws java.io.IOException Thrown if <i>conn</i> has already been
+     * opened.
      */
     public void setCookies(URLConnection conn) {
         // Determines the domain and path to retrieve the appropriate cookies

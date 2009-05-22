@@ -221,7 +221,7 @@ parser code {:
      * returns true because there is a "&lt;Level&gt;.Ordinal" property.</p>
      */
     protected boolean isFunCall(String s) {
-       return funTable.isProperty(s);
+        return funTable.isProperty(s);
     }
 :};
 
@@ -545,7 +545,8 @@ cube_name ::= compound_id ;
 //
 // <dim_hier> ::= [<cube_name>.]<dimension_name>
 //             | [[<cube_name>.]< dimension_name>.]<hierarchy_name>
-// jhyde: Need more lookahead for this to work... just use id in place of dim_hier.
+// jhyde: Need more lookahead for this to work... just use id in place of
+// dim_hier.
 //   dim_hier ::= id;
 //
 // <dimension_name> ::= <identifier>
@@ -895,7 +896,8 @@ value_expression_primary ::=
                     region, j.getName(), Syntax.AmpersandQuotedProperty, i);
             }
         :}
-    |   value_expression_primary:i DOT identifier:j LPAREN exp_list_opt:lis RPAREN:rparen {:
+    |   value_expression_primary:i DOT identifier:j LPAREN exp_list_opt:lis
+        RPAREN:rparen {:
             lis.add(0, i);
             ParseRegion region = createRegion(ileft, rparenright);
             RESULT = new CallNode(region, j.getName(), Syntax.Method, lis);
@@ -905,7 +907,8 @@ value_expression_primary ::=
             RESULT = new CallNode(region, i.getName(), Syntax.Function, lis);
         :}
     |   CAST:cast LPAREN expression:e AS identifier:t RPAREN:rparen {:
-            LiteralNode symbol = LiteralNode.createSymbol(t.getRegion(), t.getName());
+            LiteralNode symbol =
+                LiteralNode.createSymbol(t.getRegion(), t.getName());
             ParseRegion region = createRegion(castleft, rparenright);
             RESULT = new CallNode(region, "CAST", Syntax.Cast, e, symbol);
         :}
@@ -915,7 +918,8 @@ value_expression_primary ::=
             ParseRegion region = createRegion(lparenleft, rparenright);
             RESULT = new CallNode(region, "()", Syntax.Parentheses, lis);
         :}
-    |   LBRACE:lbrace exp_list_opt:lis RBRACE:rbrace {: // set built from sets/tuples
+    |   LBRACE:lbrace exp_list_opt:lis RBRACE:rbrace {:
+            // set built from sets/tuples
             ParseRegion region = createRegion(lbraceleft, rbraceright);
             RESULT = new CallNode(region, "{}", Syntax.Braces, lis);
         :}

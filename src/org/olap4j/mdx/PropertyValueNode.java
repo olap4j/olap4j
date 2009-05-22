@@ -15,10 +15,15 @@ import org.olap4j.type.Type;
  * Parse tree node representing a property-value pair.
  *
  * <p>Property-value pairs are used to define properties of calculated members.
- * For example, in <code>WITH MEMBER [Measures].[Foo] AS ' [Measures].[Unit Sales] ',
- * FORMAT_STRING = 'Bold',
- * SOLVE_ORDER = 2
+ * For example, in
+ *
+ * <blockquote>
+ * <code>WITH MEMBER [Measures].[Foo] AS ' [Measures].[Unit Sales] ',<br/>
+ * &nbsp;&nbsp;FORMAT_STRING = 'Bold',<br/>
+ * &nbsp;&nbsp;SOLVE_ORDER = 2<br/>
  * SELECT ...</code>
+ * </blockquote>
+ *
  * there are two property-value pairs FORMAT_STRING and SOLVE_ORDER.
  *
  * @version $Id$

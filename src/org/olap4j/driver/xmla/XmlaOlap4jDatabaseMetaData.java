@@ -72,8 +72,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
      * Executes a metadata query and returns the result as a JDBC
      * {@link ResultSet}.
      *
-     * @param metadataRequest Name of the metadata request. Corresponds to the XMLA
-     * method name, e.g. "MDSCHEMA_CUBES"
+     * @param metadataRequest Name of the metadata request. Corresponds to the
+     * XMLA method name, e.g. "MDSCHEMA_CUBES"
      *
      * @param patternValues Array of alternating parameter name and value
      * pairs. If the parameter value is null, it is ignored.
@@ -335,7 +335,9 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         throw new UnsupportedOperationException();
     }
 
-    public boolean supportsDifferentTableCorrelationNames() throws SQLException {
+    public boolean supportsDifferentTableCorrelationNames()
+        throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -471,7 +473,9 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         throw new UnsupportedOperationException();
     }
 
-    public boolean supportsCatalogsInPrivilegeDefinitions() throws SQLException {
+    public boolean supportsCatalogsInPrivilegeDefinitions()
+        throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -627,15 +631,21 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         throw new UnsupportedOperationException();
     }
 
-    public boolean supportsTransactionIsolationLevel(int level) throws SQLException {
+    public boolean supportsTransactionIsolationLevel(int level)
+        throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
-    public boolean supportsDataDefinitionAndDataManipulationTransactions() throws SQLException {
+    public boolean supportsDataDefinitionAndDataManipulationTransactions()
+        throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
-    public boolean supportsDataManipulationTransactionsOnly() throws SQLException {
+    public boolean supportsDataManipulationTransactionsOnly()
+        throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -858,7 +868,9 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         throw new UnsupportedOperationException();
     }
 
-    public boolean supportsResultSetHoldability(int holdability) throws SQLException {
+    public boolean supportsResultSetHoldability(int holdability)
+        throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 

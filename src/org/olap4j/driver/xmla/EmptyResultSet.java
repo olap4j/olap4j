@@ -257,7 +257,9 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
         throw new UnsupportedOperationException();
     }
 
-    public InputStream getUnicodeStream(String columnLabel) throws SQLException {
+    public InputStream getUnicodeStream(String columnLabel)
+        throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 

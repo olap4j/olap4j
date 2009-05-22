@@ -771,7 +771,9 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         throw new UnsupportedOperationException();
     }
 
-    public InputStream getUnicodeStream(String columnLabel) throws SQLException {
+    public InputStream getUnicodeStream(String columnLabel)
+        throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 

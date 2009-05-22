@@ -280,7 +280,9 @@ public class Olap4jUtil {
                     }
                     buf.append('.');
                     i = underscore + 1;
-                } else if (percent >= 0 && (percent < underscore || underscore < 0)) {
+                } else if (percent >= 0
+                    && (percent < underscore || underscore < 0))
+                {
                     if (i < percent) {
                     buf.append(
                         quotePattern(value.substring(i, percent)));

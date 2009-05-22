@@ -36,7 +36,8 @@ import java.util.*;
  * @version $Id$
  */
 public class ConnectionTest extends TestCase {
-    private final TestContext.Tester tester = TestContext.instance().getTester();
+    private final TestContext.Tester tester =
+        TestContext.instance().getTester();
 
     private static final boolean IS_JDK_16 =
         System.getProperty("java.version").startsWith("1.6.");
@@ -75,7 +76,8 @@ public class ConnectionTest extends TestCase {
         // deregister driver
         DriverManager.deregisterDriver(driver);
         try {
-            Driver driver2 = DriverManager.getDriver(tester.getDriverUrlPrefix());
+            Driver driver2 =
+                DriverManager.getDriver(tester.getDriverUrlPrefix());
             fail("expected error, got " + driver2);
         } catch (SQLException e) {
             assertEquals("No suitable driver", e.getMessage());
@@ -252,7 +254,8 @@ public class ConnectionTest extends TestCase {
 
         // Trivial unwrap
         assertTrue(((OlapWrapper) connection).isWrapperFor(Connection.class));
-        Connection connection2 = ((OlapWrapper) connection).unwrap(Connection.class);
+        Connection connection2 =
+            ((OlapWrapper) connection).unwrap(Connection.class);
         assertEquals(connection2, connection);
 
         // Silly unwrap
@@ -580,7 +583,8 @@ public class ConnectionTest extends TestCase {
                         assertEquals(ParameterMetaData.parameterModeIn, mode);
                         break;
                     case Type:
-                        int type = parameterMetaData.getParameterType(paramIndex);
+                        int type =
+                            parameterMetaData.getParameterType(paramIndex);
                         assertEquals(Types.OTHER, type);
                         break;
                     case TypeName:
@@ -778,7 +782,9 @@ public class ConnectionTest extends TestCase {
             : cellSetMetaData.getAxesMetaData())
         {
             ++k;
-            assertEquals(Axis.Factory.forOrdinal(k), axisMetaData.getAxisOrdinal());
+            assertEquals(
+                Axis.Factory.forOrdinal(k),
+                axisMetaData.getAxisOrdinal());
             assertEquals(k, axisMetaData.getAxisOrdinal().axisOrdinal());
             assertTrue(axisMetaData.getHierarchies().size() > 0);
             for (Hierarchy hierarchy : axisMetaData.getHierarchies()) {
@@ -1635,7 +1641,8 @@ public class ConnectionTest extends TestCase {
                 // FIXME: implement getExpression in XMLA driver
                 break;
             default:
-                assertTrue(namedSet.getExpression().getType() instanceof SetType);
+                assertTrue(
+                    namedSet.getExpression().getType() instanceof SetType);
             }
         }
         assertTrue(count > 0);
@@ -1825,10 +1832,14 @@ public class ConnectionTest extends TestCase {
         assertEquals("All Employees", member0.getName());
         assertEquals(0, member0.getDepth());
         Member member1 = rowsAxis.getPositions().get(1).getMembers().get(0);
-        assertEquals("[Employees].[All Employees].[Sheri Nowmer]", member1.getUniqueName());
+        assertEquals(
+            "[Employees].[All Employees].[Sheri Nowmer]",
+            member1.getUniqueName());
         assertEquals(1, member1.getDepth());
         assertEquals(1, member1.getLevel().getDepth());
-        assertEquals(member0.getUniqueName(), member1.getParentMember().getUniqueName());
+        assertEquals(
+            member0.getUniqueName(),
+            member1.getParentMember().getUniqueName());
         assertEquals(member0, member1.getParentMember());
         Member member2 = rowsAxis.getPositions().get(2).getMembers().get(0);
         assertTrue(
@@ -1996,7 +2007,8 @@ public class ConnectionTest extends TestCase {
         final AxisNode rowsAxis = select.getAxisList().get(1);
         final Type rowsType = rowsAxis.getExpression().getType();
         assertTrue(rowsType instanceof SetType);
-        MemberType memberType = (MemberType) ((SetType) rowsType).getElementType();
+        MemberType memberType =
+            (MemberType) ((SetType) rowsType).getElementType();
         assertNotNull(memberType.toString());
         // MemberType.getMember is null because we know it belongs to the City
         // level, but no particular member of that level.

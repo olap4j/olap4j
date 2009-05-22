@@ -219,8 +219,8 @@ abstract class XmlaOlap4jAbstractHttpProxy
         // call the get operation to fetch the data later on. It will get cached
         // then.
         //
-        // I still overridden the submit method in case we need some caching done
-        // in the end. - Luc
+        // I still overridden the submit method in case we need some caching
+        // done in the end. - Luc
         return getResponseViaSubmit(url, request);
     }
 

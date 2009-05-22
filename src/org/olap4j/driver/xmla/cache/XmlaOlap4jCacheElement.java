@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Internal POJO class definition for the XmlaOlap4jMemoryCache.
+ *
  * @author Luc Boudreau
  * @version $Id$
  */
@@ -22,7 +23,8 @@ class XmlaOlap4jCacheElement {
     /**
      * The time in miliseconds when the entry was created.
      */
-    private AtomicLong timestamp = new AtomicLong(Calendar.getInstance().getTimeInMillis());
+    private AtomicLong timestamp =
+        new AtomicLong(Calendar.getInstance().getTimeInMillis());
 
 
     /**
@@ -38,14 +40,16 @@ class XmlaOlap4jCacheElement {
 
 
     /**
-     * Updates it's internal time stamp.
+     * Updates this element's internal timestamp.
      */
     public void refreshTimestamp() {
-        this.timestamp.compareAndSet(this.timestamp.longValue(), Calendar.getInstance().getTimeInMillis());
+        this.timestamp.compareAndSet(
+            this.timestamp.longValue(),
+            Calendar.getInstance().getTimeInMillis());
     }
 
     /**
-     * Updates it's internal time stamp.
+     * Updates this element's internal timestamp.
      */
     public void incrementHitCount() {
         this.hitMeter.incrementAndGet();

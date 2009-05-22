@@ -62,7 +62,8 @@ public interface CellSetAxis extends Iterable<Position> {
      * </blockquote>
      * for a filter axis, and
      * <blockquote>
-     * <code>getCellSet().getMetaData().getAxesMetaData().get(getAxisOrdinal().axisOrdinal())</code>
+     * <code>getCellSet().getMetaData().getAxesMetaData().get(
+     * getAxisOrdinal().axisOrdinal())</code>
      * </blockquote>
      * for other axes.
      *

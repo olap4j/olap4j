@@ -148,7 +148,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         Map<String, String> map = parseConnectString(url, info);
 
         this.providerName = map.get(XmlaOlap4jDriver.Property.Provider.name());
-        this.datasourceName = map.get(XmlaOlap4jDriver.Property.DataSource.name());
+        this.datasourceName =
+            map.get(XmlaOlap4jDriver.Property.DataSource.name());
         this.catalogName = map.get(XmlaOlap4jDriver.Property.Catalog.name());
 
         // Set URL of HTTP server.
@@ -294,12 +295,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             } else {
                 // Use first
                 if (rSet.first()) {
-                    this.nativeDatasourceName = rSet.getString(DATA_SOURCE_NAME);
+                    this.nativeDatasourceName =
+                        rSet.getString(DATA_SOURCE_NAME);
                 }
             }
 
-            // Throws exception to the client.
-            //Tells that there are no datasource corresponding to the search criterias.
+            // Throws exception to the client.  Tells that there are
+            // no datasource corresponding to the search criterias.
             if (this.nativeDatasourceName == null) {
                 throw getHelper().createException(
                     "No datasource could be found.");
@@ -545,15 +547,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         };
     }
 
-    public synchronized org.olap4j.metadata.Schema getSchema() throws OlapException {
-            // initializes the olap4jSchema if necessary
-            if (this.olap4jSchema == null) {
-            final XmlaOlap4jCatalog catalog =
-                (XmlaOlap4jCatalog)
+    public synchronized org.olap4j.metadata.Schema getSchema()
+        throws OlapException
+    {
+        // initializes the olap4jSchema if necessary
+        if (this.olap4jSchema == null) {
+            final XmlaOlap4jCatalog catalog = (XmlaOlap4jCatalog)
                 this.olap4jDatabaseMetaData.getCatalogObjects().get(
-                this.getCatalog());
-            this.olap4jSchema = (XmlaOlap4jSchema) catalog.getSchemas()
-                .get(0);
+                    this.getCatalog());
+            this.olap4jSchema = (XmlaOlap4jSchema)
+                catalog.getSchemas().get(0);
             }
         return olap4jSchema;
     }
@@ -805,7 +808,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     static class CatalogHandler
         extends HandlerImpl<XmlaOlap4jCatalog>
     {
-        public void handle(Element row, Context context, List<XmlaOlap4jCatalog> list) {
+        public void handle(
+            Element row,
+            Context context,
+            List<XmlaOlap4jCatalog> list)
+        {
             /*
             Example:
 
@@ -856,27 +863,31 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class DimensionHandler extends HandlerImpl<XmlaOlap4jDimension> {
-        public void handle(Element row, Context context, List<XmlaOlap4jDimension> list) {
+        public void handle(
+            Element row,
+            Context context,
+            List<XmlaOlap4jDimension> list)
+        {
             /*
             Example:
 
-                    <row>
-                        <CATALOG_NAME>FoodMart</CATALOG_NAME>
-                        <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
-                        <CUBE_NAME>HR</CUBE_NAME>
-                        <DIMENSION_NAME>Department</DIMENSION_NAME>
-                        <DIMENSION_UNIQUE_NAME>[Department]</DIMENSION_UNIQUE_NAME>
-                        <DIMENSION_CAPTION>Department</DIMENSION_CAPTION>
-                        <DIMENSION_ORDINAL>6</DIMENSION_ORDINAL>
-                        <DIMENSION_TYPE>3</DIMENSION_TYPE>
-                        <DIMENSION_CARDINALITY>13</DIMENSION_CARDINALITY>
-                        <DEFAULT_HIERARCHY>[Department]</DEFAULT_HIERARCHY>
-                        <DESCRIPTION>HR Cube - Department Dimension</DESCRIPTION>
-                        <IS_VIRTUAL>false</IS_VIRTUAL>
-                        <IS_READWRITE>false</IS_READWRITE>
-                        <DIMENSION_UNIQUE_SETTINGS>0</DIMENSION_UNIQUE_SETTINGS>
-                        <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-                    </row>
+            <row>
+                <CATALOG_NAME>FoodMart</CATALOG_NAME>
+                <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
+                <CUBE_NAME>HR</CUBE_NAME>
+                <DIMENSION_NAME>Department</DIMENSION_NAME>
+                <DIMENSION_UNIQUE_NAME>[Department]</DIMENSION_UNIQUE_NAME>
+                <DIMENSION_CAPTION>Department</DIMENSION_CAPTION>
+                <DIMENSION_ORDINAL>6</DIMENSION_ORDINAL>
+                <DIMENSION_TYPE>3</DIMENSION_TYPE>
+                <DIMENSION_CARDINALITY>13</DIMENSION_CARDINALITY>
+                <DEFAULT_HIERARCHY>[Department]</DEFAULT_HIERARCHY>
+                <DESCRIPTION>HR Cube - Department Dimension</DESCRIPTION>
+                <IS_VIRTUAL>false</IS_VIRTUAL>
+                <IS_READWRITE>false</IS_READWRITE>
+                <DIMENSION_UNIQUE_SETTINGS>0</DIMENSION_UNIQUE_SETTINGS>
+                <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
+            </row>
 
              */
             final String dimensionName =
@@ -909,28 +920,28 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             /*
             Example:
 
-                    <row>
-                        <CATALOG_NAME>FoodMart</CATALOG_NAME>
-                        <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
-                        <CUBE_NAME>Sales</CUBE_NAME>
-                        <DIMENSION_UNIQUE_NAME>[Customers]</DIMENSION_UNIQUE_NAME>
-                        <HIERARCHY_NAME>Customers</HIERARCHY_NAME>
-                        <HIERARCHY_UNIQUE_NAME>[Customers]</HIERARCHY_UNIQUE_NAME>
-                        <HIERARCHY_CAPTION>Customers</HIERARCHY_CAPTION>
-                        <DIMENSION_TYPE>3</DIMENSION_TYPE>
-                        <HIERARCHY_CARDINALITY>10407</HIERARCHY_CARDINALITY>
-                        <DEFAULT_MEMBER>[Customers].[All Customers]</DEFAULT_MEMBER>
-                        <ALL_MEMBER>[Customers].[All Customers]</ALL_MEMBER>
-                        <DESCRIPTION>Sales Cube - Customers Hierarchy</DESCRIPTION>
-                        <STRUCTURE>0</STRUCTURE>
-                        <IS_VIRTUAL>false</IS_VIRTUAL>
-                        <IS_READWRITE>false</IS_READWRITE>
-                        <DIMENSION_UNIQUE_SETTINGS>0</DIMENSION_UNIQUE_SETTINGS>
-                        <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-                        <HIERARCHY_ORDINAL>9</HIERARCHY_ORDINAL>
-                        <DIMENSION_IS_SHARED>true</DIMENSION_IS_SHARED>
-                        <PARENT_CHILD>false</PARENT_CHILD>
-                    </row>
+            <row>
+                <CATALOG_NAME>FoodMart</CATALOG_NAME>
+                <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
+                <CUBE_NAME>Sales</CUBE_NAME>
+                <DIMENSION_UNIQUE_NAME>[Customers]</DIMENSION_UNIQUE_NAME>
+                <HIERARCHY_NAME>Customers</HIERARCHY_NAME>
+                <HIERARCHY_UNIQUE_NAME>[Customers]</HIERARCHY_UNIQUE_NAME>
+                <HIERARCHY_CAPTION>Customers</HIERARCHY_CAPTION>
+                <DIMENSION_TYPE>3</DIMENSION_TYPE>
+                <HIERARCHY_CARDINALITY>10407</HIERARCHY_CARDINALITY>
+                <DEFAULT_MEMBER>[Customers].[All Customers]</DEFAULT_MEMBER>
+                <ALL_MEMBER>[Customers].[All Customers]</ALL_MEMBER>
+                <DESCRIPTION>Sales Cube - Customers Hierarchy</DESCRIPTION>
+                <STRUCTURE>0</STRUCTURE>
+                <IS_VIRTUAL>false</IS_VIRTUAL>
+                <IS_READWRITE>false</IS_READWRITE>
+                <DIMENSION_UNIQUE_SETTINGS>0</DIMENSION_UNIQUE_SETTINGS>
+                <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
+                <HIERARCHY_ORDINAL>9</HIERARCHY_ORDINAL>
+                <DIMENSION_IS_SHARED>true</DIMENSION_IS_SHARED>
+                <PARENT_CHILD>false</PARENT_CHILD>
+            </row>
 
              */
             final String hierarchyName =
@@ -956,27 +967,32 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     static class LevelHandler extends HandlerImpl<XmlaOlap4jLevel> {
         public static final int MDLEVEL_TYPE_CALCULATED = 0x0002;
 
-        public void handle(Element row, Context context, List<XmlaOlap4jLevel> list) {
+        public void handle(
+            Element row,
+            Context context,
+            List<XmlaOlap4jLevel> list)
+        {
             /*
             Example:
 
-                    <row>
-                        <CATALOG_NAME>FoodMart</CATALOG_NAME>
-                        <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
-                        <CUBE_NAME>Sales</CUBE_NAME>
-                        <DIMENSION_UNIQUE_NAME>[Customers]</DIMENSION_UNIQUE_NAME>
-                        <HIERARCHY_UNIQUE_NAME>[Customers]</HIERARCHY_UNIQUE_NAME>
-                        <LEVEL_NAME>(All)</LEVEL_NAME>
-                        <LEVEL_UNIQUE_NAME>[Customers].[(All)]</LEVEL_UNIQUE_NAME>
-                        <LEVEL_CAPTION>(All)</LEVEL_CAPTION>
-                        <LEVEL_NUMBER>0</LEVEL_NUMBER>
-                        <LEVEL_CARDINALITY>1</LEVEL_CARDINALITY>
-                        <LEVEL_TYPE>1</LEVEL_TYPE>
-                        <CUSTOM_ROLLUP_SETTINGS>0</CUSTOM_ROLLUP_SETTINGS>
-                        <LEVEL_UNIQUE_SETTINGS>3</LEVEL_UNIQUE_SETTINGS>
-                        <LEVEL_IS_VISIBLE>true</LEVEL_IS_VISIBLE>
-                        <DESCRIPTION>Sales Cube - Customers Hierarchy(All) Level</DESCRIPTION>
-                    </row>
+            <row>
+                <CATALOG_NAME>FoodMart</CATALOG_NAME>
+                <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
+                <CUBE_NAME>Sales</CUBE_NAME>
+                <DIMENSION_UNIQUE_NAME>[Customers]</DIMENSION_UNIQUE_NAME>
+                <HIERARCHY_UNIQUE_NAME>[Customers]</HIERARCHY_UNIQUE_NAME>
+                <LEVEL_NAME>(All)</LEVEL_NAME>
+                <LEVEL_UNIQUE_NAME>[Customers].[(All)]</LEVEL_UNIQUE_NAME>
+                <LEVEL_CAPTION>(All)</LEVEL_CAPTION>
+                <LEVEL_NUMBER>0</LEVEL_NUMBER>
+                <LEVEL_CARDINALITY>1</LEVEL_CARDINALITY>
+                <LEVEL_TYPE>1</LEVEL_TYPE>
+                <CUSTOM_ROLLUP_SETTINGS>0</CUSTOM_ROLLUP_SETTINGS>
+                <LEVEL_UNIQUE_SETTINGS>3</LEVEL_UNIQUE_SETTINGS>
+                <LEVEL_IS_VISIBLE>true</LEVEL_IS_VISIBLE>
+                <DESCRIPTION>Sales Cube - Customers Hierarchy - (All)
+                Level</DESCRIPTION>
+            </row>
 
              */
             final String levelName =
@@ -1004,23 +1020,27 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class MeasureHandler extends HandlerImpl<XmlaOlap4jMeasure> {
-        public void handle(Element row, Context context, List<XmlaOlap4jMeasure> list)
-            throws OlapException {
+        public void handle(
+            Element row,
+            Context context,
+            List<XmlaOlap4jMeasure> list)
+            throws OlapException
+        {
             /*
             Example:
 
-                    <row>
-                        <CATALOG_NAME>FoodMart</CATALOG_NAME>
-                        <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
-                        <CUBE_NAME>Sales</CUBE_NAME>
-                        <MEASURE_NAME>Profit</MEASURE_NAME>
-                        <MEASURE_UNIQUE_NAME>[Measures].[Profit]</MEASURE_UNIQUE_NAME>
-                        <MEASURE_CAPTION>Profit</MEASURE_CAPTION>
-                        <MEASURE_AGGREGATOR>127</MEASURE_AGGREGATOR>
-                        <DATA_TYPE>130</DATA_TYPE>
-                        <MEASURE_IS_VISIBLE>true</MEASURE_IS_VISIBLE>
-                        <DESCRIPTION>Sales Cube - Profit Member</DESCRIPTION>
-                    </row>
+            <row>
+                <CATALOG_NAME>FoodMart</CATALOG_NAME>
+                <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
+                <CUBE_NAME>Sales</CUBE_NAME>
+                <MEASURE_NAME>Profit</MEASURE_NAME>
+                <MEASURE_UNIQUE_NAME>[Measures].[Profit]</MEASURE_UNIQUE_NAME>
+                <MEASURE_CAPTION>Profit</MEASURE_CAPTION>
+                <MEASURE_AGGREGATOR>127</MEASURE_AGGREGATOR>
+                <DATA_TYPE>130</DATA_TYPE>
+                <MEASURE_IS_VISIBLE>true</MEASURE_IS_VISIBLE>
+                <DESCRIPTION>Sales Cube - Profit Member</DESCRIPTION>
+            </row>
 
              */
             final String measureName =
@@ -1100,8 +1120,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 Arrays.asList(
                     Property.StandardMemberProperty.CATALOG_NAME.name(),
                     Property.StandardMemberProperty.CUBE_NAME.name(),
-                    Property.StandardMemberProperty.DIMENSION_UNIQUE_NAME.name(),
-                    Property.StandardMemberProperty.HIERARCHY_UNIQUE_NAME.name(),
+                    Property.StandardMemberProperty.DIMENSION_UNIQUE_NAME
+                        .name(),
+                    Property.StandardMemberProperty.HIERARCHY_UNIQUE_NAME
+                        .name(),
                     Property.StandardMemberProperty.LEVEL_UNIQUE_NAME.name(),
                     Property.StandardMemberProperty.PARENT_LEVEL.name(),
                     Property.StandardMemberProperty.PARENT_COUNT.name(),
@@ -1118,29 +1140,33 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     Property.StandardMemberProperty.CHILDREN_CARDINALITY.name(),
                     Property.StandardMemberProperty.DEPTH.name()));
 
-        public void handle(Element row, Context context, List<XmlaOlap4jMember> list) {
+        public void handle(
+            Element row,
+            Context context,
+            List<XmlaOlap4jMember> list)
+        {
             /*
             Example:
 
-                    <row>
-                        <CATALOG_NAME>FoodMart</CATALOG_NAME>
-                        <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
-                        <CUBE_NAME>Sales</CUBE_NAME>
-                        <DIMENSION_UNIQUE_NAME>[Gender]</DIMENSION_UNIQUE_NAME>
-                        <HIERARCHY_UNIQUE_NAME>[Gender]</HIERARCHY_UNIQUE_NAME>
-                        <LEVEL_UNIQUE_NAME>[Gender].[Gender]</LEVEL_UNIQUE_NAME>
-                        <LEVEL_NUMBER>1</LEVEL_NUMBER>
-                        <MEMBER_ORDINAL>1</MEMBER_ORDINAL>
-                        <MEMBER_NAME>F</MEMBER_NAME>
-                        <MEMBER_UNIQUE_NAME>[Gender].[All Gender].[F]</MEMBER_UNIQUE_NAME>
-                        <MEMBER_TYPE>1</MEMBER_TYPE>
-                        <MEMBER_CAPTION>F</MEMBER_CAPTION>
-                        <CHILDREN_CARDINALITY>0</CHILDREN_CARDINALITY>
-                        <PARENT_LEVEL>0</PARENT_LEVEL>
-                        <PARENT_UNIQUE_NAME>[Gender].[All Gender]</PARENT_UNIQUE_NAME>
-                        <PARENT_COUNT>1</PARENT_COUNT>
-                        <DEPTH>1</DEPTH>          <!-- mondrian-specific -->
-                    </row>
+            <row>
+                <CATALOG_NAME>FoodMart</CATALOG_NAME>
+                <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
+                <CUBE_NAME>Sales</CUBE_NAME>
+                <DIMENSION_UNIQUE_NAME>[Gender]</DIMENSION_UNIQUE_NAME>
+                <HIERARCHY_UNIQUE_NAME>[Gender]</HIERARCHY_UNIQUE_NAME>
+                <LEVEL_UNIQUE_NAME>[Gender].[Gender]</LEVEL_UNIQUE_NAME>
+                <LEVEL_NUMBER>1</LEVEL_NUMBER>
+                <MEMBER_ORDINAL>1</MEMBER_ORDINAL>
+                <MEMBER_NAME>F</MEMBER_NAME>
+                <MEMBER_UNIQUE_NAME>[Gender].[F]</MEMBER_UNIQUE_NAME>
+                <MEMBER_TYPE>1</MEMBER_TYPE>
+                <MEMBER_CAPTION>F</MEMBER_CAPTION>
+                <CHILDREN_CARDINALITY>0</CHILDREN_CARDINALITY>
+                <PARENT_LEVEL>0</PARENT_LEVEL>
+                <PARENT_UNIQUE_NAME>[Gender].[All Gender]</PARENT_UNIQUE_NAME>
+                <PARENT_COUNT>1</PARENT_COUNT>
+                <DEPTH>1</DEPTH>          <!-- mondrian-specific -->
+            </row>
 
              */
             if (false) {
@@ -1177,7 +1203,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             int childrenCardinality =
                 integerElement(
                     row,
-                    Property.StandardMemberProperty.CHILDREN_CARDINALITY.name());
+                    Property.StandardMemberProperty.CHILDREN_CARDINALITY
+                        .name());
             // If this member is a measure, we want to return an object that
             // implements the Measure interface to all API calls. But we also
             // need to retrieve the properties that occur in MDSCHEMA_MEMBERS
@@ -1200,7 +1227,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             if (depth != null
                 && depth.intValue() != member.getLevel().getDepth())
             {
-                member.setProperty(Property.StandardMemberProperty.DEPTH, depth);
+                member.setProperty(
+                    Property.StandardMemberProperty.DEPTH,
+                    depth);
             }
             list.add(member);
         }
@@ -1228,17 +1257,21 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class NamedSetHandler extends HandlerImpl<XmlaOlap4jNamedSet> {
-        public void handle(Element row, Context context, List<XmlaOlap4jNamedSet> list) {
+        public void handle(
+            Element row,
+            Context context,
+            List<XmlaOlap4jNamedSet> list)
+        {
             /*
             Example:
 
-                    <row>
-                        <CATALOG_NAME>FoodMart</CATALOG_NAME>
-                        <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
-                        <CUBE_NAME>Warehouse</CUBE_NAME>
-                        <SET_NAME>[Top Sellers]</SET_NAME>
-                        <SCOPE>1</SCOPE>
-                    </row>
+            <row>
+                <CATALOG_NAME>FoodMart</CATALOG_NAME>
+                <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
+                <CUBE_NAME>Warehouse</CUBE_NAME>
+                <SET_NAME>[Top Sellers]</SET_NAME>
+                <SCOPE>1</SCOPE>
+            </row>
 
              */
             final String setName =
@@ -1250,8 +1283,15 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class SchemaHandler extends HandlerImpl<XmlaOlap4jSchema> {
-        public void handle(Element row, Context context, List<XmlaOlap4jSchema> list) throws OlapException {
+        public void handle(
+            Element row,
+            Context context,
+            List<XmlaOlap4jSchema> list)
+            throws OlapException
+        {
             /*
+            Example:
+
             <row>
                 <CATALOG_NAME>LOCALDB</CATLAOG_NAME>
                 <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
@@ -1278,9 +1318,15 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             this.catalogName = catalogName;
         }
 
-        public void handle(Element row, Context context, List<XmlaOlap4jSchema> list) throws OlapException
+        public void handle(
+            Element row,
+            Context context,
+            List<XmlaOlap4jSchema> list)
+            throws OlapException
         {
             /*
+            Example:
+
             <row>
                 <CATALOG_NAME>CatalogName</CATLAOG_NAME>
                 <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
@@ -1289,12 +1335,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
              */
 
             /*
-             * We are looking for a schema name from the cubes query restricted on the
-             * catalog name. Some servers don't support nor include the SCHEMA_NAME column
-             * in it's response. If it's null, we convert it to an empty string as to not cause
-             * problems later on.
+             * We are looking for a schema name from the cubes query restricted
+             * on the catalog name. Some servers don't support nor include the
+             * SCHEMA_NAME column in its response. If it's null, we convert it
+             * to an empty string as to not cause problems later on.
              */
-
             String schemaName = stringElement(row, "SCHEMA_NAME");
             String catalogName = stringElement(row, "CATALOG_NAME");
 
@@ -1408,7 +1453,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
          *
          * @param olap4jConnection Connection (must not be null)
          * @param olap4jDatabaseMetaData DatabaseMetaData (may be null)
-         * @param olap4jCatalog Catalog (may be null if DatabaseMetaData is null)
+         * @param olap4jCatalog Catalog (may be null if DatabaseMetaData is
+         * null)
          * @param olap4jSchema Schema (may be null if Catalog is null)
          * @param olap4jCube Cube (may be null if Schema is null)
          * @param olap4jDimension Dimension (may be null if Cube is null)
@@ -1862,7 +1908,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             this.connection = connection;
         }
 
-        public SelectNode validateSelect(SelectNode selectNode) throws OlapException {
+        public SelectNode validateSelect(
+            SelectNode selectNode)
+            throws OlapException
+        {
             StringWriter sw = new StringWriter();
             selectNode.unparse(new ParseTreeWriter(new PrintWriter(sw)));
             String mdx = sw.toString();

@@ -150,7 +150,7 @@ class XmlaOlap4jConcurrentMemoryCache {
 
             // Extract the data from the cache
             XmlaOlap4jCacheElement entry = this.cacheEntries.get(
-                XmlaOlap4jSHAEncoder.SHA1(
+                XmlaOlap4jShaEncoder.encodeSha1(
                     url.toExternalForm() + new String(request)));
 
             // Increment its counter
@@ -182,7 +182,7 @@ class XmlaOlap4jConcurrentMemoryCache {
                 entry.setResponse(response);
 
                 this.cacheEntries.put(
-                    XmlaOlap4jSHAEncoder.SHA1(
+                    XmlaOlap4jShaEncoder.encodeSha1(
                         String.valueOf(url.toExternalForm())
                         + new String(request)),
                         entry);

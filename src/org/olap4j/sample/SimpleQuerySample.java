@@ -154,7 +154,8 @@ public class SimpleQuerySample {
             statement.getParameterMetaData();
 
         // Locate the member "[Store].[USA].[WA].[Seattle]".
-        MemberType type = (MemberType) parameterMetaData.getParameterOlapType(1);
+        MemberType type =
+            (MemberType) parameterMetaData.getParameterOlapType(1);
         Dimension dimension = type.getDimension();
         assert dimension.getName().equals("Store");
         Member allStores =
