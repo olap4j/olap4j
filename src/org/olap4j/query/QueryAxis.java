@@ -12,6 +12,7 @@ package org.olap4j.query;
 import org.olap4j.Axis;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.AbstractList;
 
@@ -80,6 +81,34 @@ public class QueryAxis {
     }
 
     /**
+     * Places a QueryDimension object one position before in the
+     * list of current dimensions. Uses a 0 based index.
+     * For example, to place the 5th dimension on the current axis
+     * one position before, one would need to call pullUp(4),
+     * so the dimension would then use axis index 4 and the previous
+     * dimension at that position gets pushed down one position.
+     * @param index The index of the dimension to move up one notch.
+     * It uses a zero based index.
+     */
+    public void pullUp(int index) {
+        Collections.swap(this.dimensions, index, index - 1);
+    }
+
+    /**
+     * Places a QueryDimension object one position lower in the
+     * list of current dimensions. Uses a 0 based index.
+     * For example, to place the 4th dimension on the current axis
+     * one position lower, one would need to call pushDown(3),
+     * so the dimension would then use axis index 4 and the previous
+     * dimension at that position gets pulled up one position.
+     * @param index The index of the dimension to move down one notch.
+     * It uses a zero based index.
+     */
+    public void pushDown(int index) {
+        Collections.swap(this.dimensions, index, index + 1);
+    }
+
+    /**
      * Returns whether this QueryAxis filters out empty rows.
      * If true, axis filters out empty rows, and the MDX to evaluate the axis
      * will be generated with the "NON EMPTY" expression.
@@ -120,7 +149,9 @@ public class QueryAxis {
         }
 
         public QueryDimension set(int index, QueryDimension dimension) {
-            if (dimension.getAxis() != null) {
+            if (dimension.getAxis() != null &&
+                dimension.getAxis() != QueryAxis.this)
+            {
                 dimension.getAxis().getDimensions().remove(dimension);
             }
             dimension.setAxis(QueryAxis.this);
@@ -131,7 +162,9 @@ public class QueryAxis {
             if (this.contains(dimension)) {
                 throw new IllegalStateException("dimension already on this axis");
             }
-            if (dimension.getAxis() != null) {
+            if (dimension.getAxis() != null &&
+                dimension.getAxis() != QueryAxis.this)
+            {
                 // careful! potential for loop
                 dimension.getAxis().getDimensions().remove(dimension);
             }

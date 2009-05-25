@@ -633,6 +633,101 @@ public class OlapTest extends TestCase {
     }
 
 
+    public void testDimensionsOrder() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+            Query query = new Query("my query", cube);
+
+            // create selections
+
+            QueryDimension productDimension = query.getDimension("Product");
+            Member drinkMember = cube.lookupMember("Product", "Drink");
+            Selection drinkSelection =
+                productDimension.createSelection(drinkMember,
+                        Selection.Operator.CHILDREN);
+            productDimension.getSelections().add(drinkSelection);
+
+            QueryDimension storeDimension = query.getDimension("Store");
+            Member usaMember = cube.lookupMember("Store", "USA");
+            Selection usaSelection =
+                storeDimension.createSelection(usaMember,
+                        Selection.Operator.INCLUDE_CHILDREN);
+            storeDimension.getSelections().add(usaSelection);
+
+            QueryDimension timeDimension = query.getDimension("Time");
+            Member year1997Member = cube.lookupMember("Time", "1997");
+            Selection year1997Selection =
+                timeDimension.createSelection(year1997Member,
+                        Selection.Operator.CHILDREN);
+            timeDimension.getSelections().add(year1997Selection);
+
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            Member storeSalesMember = cube.lookupMember("Measures", "Store Sales");
+            Selection storeSalesSelection =
+                measuresDimension.createSelection(storeSalesMember,
+                        Selection.Operator.MEMBER);
+            measuresDimension.getSelections().add(storeSalesSelection);
+
+            query.getAxes().get(Axis.ROWS).getDimensions().add(productDimension);
+            query.getAxes().get(Axis.ROWS).getDimensions().add(storeDimension);
+            query.getAxes().get(Axis.ROWS).getDimensions().add(timeDimension);
+            query.getAxes().get(Axis.COLUMNS).getDimensions().add(measuresDimension);
+
+            query.validate();
+
+            SelectNode mdx = query.getSelect();
+            String mdxString = mdx.toString();
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
+                    "CrossJoin({[Product].[All Products].[Drink].Children}, " +
+                    "CrossJoin({{[Store].[All Stores].[USA], " +
+                    "[Store].[All Stores].[USA].Children}}, " +
+                    "{[Time].[1997].Children})) ON ROWS\n" +
+                    "FROM [Sales]"));
+
+            // Push down the Products dimension.
+            query.getAxes().get(Axis.ROWS).pushDown(0);
+
+            query.validate();
+
+            mdx = query.getSelect();
+            mdxString = mdx.toString();
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
+                    "CrossJoin({{[Store].[All Stores].[USA], " +
+                    "[Store].[All Stores].[USA].Children}}, " +
+                    "CrossJoin({[Product].[All Products].[Drink].Children}, " +
+                    "{[Time].[1997].Children})) ON ROWS\n" +
+                    "FROM [Sales]"));
+
+            // Pull Up the Time dimension.
+            query.getAxes().get(Axis.ROWS).pullUp(2);
+
+            query.validate();
+
+            mdx = query.getSelect();
+            mdxString = mdx.toString();
+            assertEquals(
+                mdxString,
+                TestContext.fold("SELECT\n" +
+                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
+                    "CrossJoin({{[Store].[All Stores].[USA], " +
+                    "[Store].[All Stores].[USA].Children}}, " +
+                    "CrossJoin({[Time].[1997].Children}, " +
+                    "{[Product].[All Products].[Drink].Children})) ON ROWS\n" +
+                    "FROM [Sales]"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 
 
     public static void listHierarchies(Dimension dimension) {
