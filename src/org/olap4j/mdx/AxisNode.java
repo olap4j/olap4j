@@ -168,7 +168,7 @@ public class AxisNode implements ParseTreeNode {
             this.nonEmpty,
             this.axis,
             MdxUtil.deepCopyList(dimensionProperties),
-            this.expression.deepCopy());
+            this.expression != null ? this.expression.deepCopy() : null);
     }
 }
 
