@@ -252,8 +252,9 @@ public class ConnectStringParserTest extends TestCase {
         checkReplace("cacab", "cab", "bb", "cabb");
 
         // Seek string does not exist.
-        checkReplace("the quick brown fox", "coyote", "wolf",
-                "the quick brown fox");
+        checkReplace(
+            "the quick brown fox", "coyote", "wolf",
+            "the quick brown fox");
 
         // Empty buffer.
         checkReplace("", "coyote", "wolf", "");

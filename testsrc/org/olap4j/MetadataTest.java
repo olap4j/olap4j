@@ -436,7 +436,9 @@ public class MetadataTest extends TestCase {
                 catalogName, "FoodMart", "Sales", null, null, null,
                 "[Time].[1997].[Q2].[4]", null),
             MEMBERS_COLUMN_NAMES);
-        assertEquals(TestContext.fold("CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Time], HIERARCHY_UNIQUE_NAME=[Time], LEVEL_UNIQUE_NAME=[Time].[Month], LEVEL_NUMBER=2, MEMBER_ORDINAL=6, MEMBER_NAME=4, MEMBER_UNIQUE_NAME=[Time].[1997].[Q2].[4], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=4, CHILDREN_CARDINALITY=0, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Time].[1997].[Q2], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"),
+        assertEquals(
+            TestContext.fold(
+                "CATALOG_NAME=" + catalogName + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Time], HIERARCHY_UNIQUE_NAME=[Time], LEVEL_UNIQUE_NAME=[Time].[Month], LEVEL_NUMBER=2, MEMBER_ORDINAL=6, MEMBER_NAME=4, MEMBER_UNIQUE_NAME=[Time].[1997].[Q2].[4], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=4, CHILDREN_CARDINALITY=0, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Time].[1997].[Q2], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"),
             s);
 
         // with treeop

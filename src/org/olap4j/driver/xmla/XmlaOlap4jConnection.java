@@ -831,8 +831,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class CubeHandler extends HandlerImpl<XmlaOlap4jCube> {
-
-        public void handle(Element row, Context context,
+        public void handle(
+            Element row,
+            Context context,
             List<XmlaOlap4jCube> list)
             throws OlapException
         {

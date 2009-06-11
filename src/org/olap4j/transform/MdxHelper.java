@@ -34,8 +34,10 @@ class MdxHelper {
         return new MemberNode(null, m);
     }
 
-    private static CallNode _makePropCallNode(ParseTreeNode node,
-            String funcName) {
+    private static CallNode _makePropCallNode(
+        ParseTreeNode node,
+        String funcName)
+    {
         List<ParseTreeNode> callArgs = new ArrayList<ParseTreeNode>();
         callArgs.add(node);
         return new CallNode(null, funcName, Syntax.Property, callArgs);

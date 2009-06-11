@@ -68,8 +68,8 @@ public class DrillReplaceTransform extends AxisTransform {
         // Position positionToDrill =
         //     TransformUtil.getPositionFromCellSet(axis, positionOrdinalInAxis,
         //          cellSet);
-        memberToDrill = TransformUtil.getMemberFromCellSet(axis,
-                positionOrdinalInAxis, memberOrdinalInPosition, cellSet);
+        memberToDrill = TransformUtil.getMemberFromCellSet(
+            axis, positionOrdinalInAxis, memberOrdinalInPosition, cellSet);
         // pathToMember = getPathToMember(positionToDrill,
         //        memberOrdinalInPosition);
     }

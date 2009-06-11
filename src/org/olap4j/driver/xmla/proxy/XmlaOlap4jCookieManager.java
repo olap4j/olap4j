@@ -128,16 +128,23 @@ class XmlaOlap4jCookieManager {
 
                 while (st.hasMoreTokens()) {
                     String token = st.nextToken();
-                    cookie.put(token.substring(0,
+                    cookie.put(
+                        token.substring(
+                            0,
                             token.indexOf(NAME_VALUE_SEPARATOR)).toLowerCase(),
                             token.substring(
-                                    token.indexOf(NAME_VALUE_SEPARATOR) + 1,
-                                    token.length()));
+                                token.indexOf(NAME_VALUE_SEPARATOR) + 1,
+                                token.length()));
 
-                    if (this.debug  == true) {
-                        System.out.println("Saving cookie : " + token.substring(0,
-                                token.indexOf(NAME_VALUE_SEPARATOR)).toLowerCase() + "="
-                                + token.substring(
+                    if (this.debug) {
+                        System.out.println(
+                            "Saving cookie : "
+                            + token.substring(
+                                0,
+                                token.indexOf(
+                                    NAME_VALUE_SEPARATOR)).toLowerCase()
+                            + "="
+                            + token.substring(
                                 token.indexOf(NAME_VALUE_SEPARATOR) + 1,
                                 token.length()));
                     }

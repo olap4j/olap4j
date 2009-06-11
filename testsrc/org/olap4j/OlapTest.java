@@ -308,15 +308,17 @@ public class OlapTest extends TestCase {
             QueryDimension productDimension = query.getDimension("Product");
             Member drinkMember = cube.lookupMember("Product", "Drink");
             Selection drinkSelection =
-                productDimension.createSelection(drinkMember,
-                        Selection.Operator.CHILDREN);
+                productDimension.createSelection(
+                    drinkMember,
+                    Selection.Operator.CHILDREN);
             productDimension.getSelections().add(drinkSelection);
 
             QueryDimension measuresDimension = query.getDimension("Measures");
             Member storeSalesMember = cube.lookupMember("Measures", "Store Sales");
             Selection storeSalesSelection =
-                measuresDimension.createSelection(storeSalesMember,
-                        Selection.Operator.MEMBER);
+                measuresDimension.createSelection(
+                    storeSalesMember,
+                    Selection.Operator.MEMBER);
             measuresDimension.getSelections().add(storeSalesSelection);
 
             query.getAxes().get(Axis.ROWS).getDimensions()
@@ -339,8 +341,9 @@ public class OlapTest extends TestCase {
 
             productDimension.getSelections().clear();
             drinkSelection =
-                productDimension.createSelection(drinkMember,
-                        Selection.Operator.ANCESTORS);
+                productDimension.createSelection(
+                    drinkMember,
+                    Selection.Operator.ANCESTORS);
             productDimension.getSelections().add(drinkSelection);
 
             query.validate();
@@ -358,8 +361,9 @@ public class OlapTest extends TestCase {
 
             productDimension.getSelections().clear();
             drinkSelection =
-                productDimension.createSelection(drinkMember,
-                        Selection.Operator.DESCENDANTS);
+                productDimension.createSelection(
+                    drinkMember,
+                    Selection.Operator.DESCENDANTS);
             productDimension.getSelections().add(drinkSelection);
 
             query.validate();
@@ -377,8 +381,9 @@ public class OlapTest extends TestCase {
 
             productDimension.getSelections().clear();
             drinkSelection =
-                productDimension.createSelection(drinkMember,
-                        Selection.Operator.INCLUDE_CHILDREN);
+                productDimension.createSelection(
+                    drinkMember,
+                    Selection.Operator.INCLUDE_CHILDREN);
             productDimension.getSelections().add(drinkSelection);
 
             query.validate();
@@ -396,8 +401,9 @@ public class OlapTest extends TestCase {
 
             productDimension.getSelections().clear();
             drinkSelection =
-                productDimension.createSelection(drinkMember,
-                        Selection.Operator.SIBLINGS);
+                productDimension.createSelection(
+                    drinkMember,
+                    Selection.Operator.SIBLINGS);
             productDimension.getSelections().add(drinkSelection);
 
             query.validate();
@@ -429,29 +435,33 @@ public class OlapTest extends TestCase {
             QueryDimension productDimension = query.getDimension("Product");
             Member drinkMember = cube.lookupMember("Product", "Drink");
             Selection drinkSelection =
-                productDimension.createSelection(drinkMember,
-                        Selection.Operator.CHILDREN);
+                productDimension.createSelection(
+                    drinkMember,
+                    Selection.Operator.CHILDREN);
             productDimension.getSelections().add(drinkSelection);
 
             QueryDimension storeDimension = query.getDimension("Store");
             Member usaMember = cube.lookupMember("Store", "USA");
             Selection usaSelection =
-                storeDimension.createSelection(usaMember,
-                        Selection.Operator.INCLUDE_CHILDREN);
+                storeDimension.createSelection(
+                    usaMember,
+                    Selection.Operator.INCLUDE_CHILDREN);
             storeDimension.getSelections().add(usaSelection);
 
             QueryDimension timeDimension = query.getDimension("Time");
             Member year1997Member = cube.lookupMember("Time", "1997");
             Selection year1997Selection =
-                timeDimension.createSelection(year1997Member,
-                        Selection.Operator.CHILDREN);
+                timeDimension.createSelection(
+                    year1997Member,
+                    Selection.Operator.CHILDREN);
             timeDimension.getSelections().add(year1997Selection);
 
             QueryDimension measuresDimension = query.getDimension("Measures");
             Member storeSalesMember = cube.lookupMember("Measures", "Store Sales");
             Selection storeSalesSelection =
-                measuresDimension.createSelection(storeSalesMember,
-                        Selection.Operator.MEMBER);
+                measuresDimension.createSelection(
+                    storeSalesMember,
+                    Selection.Operator.MEMBER);
             measuresDimension.getSelections().add(storeSalesSelection);
 
             query.getAxes().get(Axis.ROWS).getDimensions()
@@ -493,16 +503,18 @@ public class OlapTest extends TestCase {
             QueryDimension productDimension = query.getDimension("Product");
             Member drinkMember = cube.lookupMember("Product", "Drink");
             Selection drinkSelection =
-                productDimension.createSelection(drinkMember,
-                        Selection.Operator.CHILDREN);
+                productDimension.createSelection(
+                    drinkMember,
+                    Selection.Operator.CHILDREN);
             productDimension.getSelections().add(drinkSelection);
 
             QueryDimension measuresDimension = query.getDimension("Measures");
             Member storeSalesMember =
                 cube.lookupMember("Measures", "Store Sales");
             Selection storeSalesSelection =
-                measuresDimension.createSelection(storeSalesMember,
-                        Selection.Operator.MEMBER);
+                measuresDimension.createSelection(
+                    storeSalesMember,
+                    Selection.Operator.MEMBER);
             measuresDimension.getSelections().add(storeSalesSelection);
 
             query.getAxes().get(Axis.ROWS).getDimensions()

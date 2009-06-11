@@ -119,8 +119,9 @@ public class ParserTest extends TestCase {
         List<AxisNode> axes = selectNode.getAxisList();
 
         assertEquals("Number of axes must be 1", 1, axes.size());
-        assertEquals("Axis index name must be correct",
-                expectedName, axes.get(0).getAxis().name());
+        assertEquals(
+            "Axis index name must be correct",
+            expectedName, axes.get(0).getAxis().name());
     }
 
     public void testNegativeCases() throws Exception {
@@ -185,13 +186,15 @@ public class ParserTest extends TestCase {
                     "[measures].[$foo] ON COLUMNS\n" +
                     "FROM sales"));
 
+        // todo: parser off by one
         assertParseQueryFails(
-            "select [measures].$^f^oo on columns from sales", // todo: parser off by one
-                "Unexpected character '\\$'");
+            "select [measures].$^f^oo on columns from sales",
+            "Unexpected character '\\$'");
 
         // ']' unexcpected
-        assertParseQueryFails("select { Customers]^.^Children } on columns from [Sales]",
-                "Unexpected character ']'");
+        assertParseQueryFails(
+            "select { Customers]^.^Children } on columns from [Sales]",
+            "Unexpected character ']'");
     }
 
     public void testUnparse() {
@@ -510,51 +513,63 @@ public class ParserTest extends TestCase {
     }
 
     public void testIsEmpty() {
-        assertParseExpr("[Measures].[Unit Sales] IS EMPTY",
+        assertParseExpr(
+            "[Measures].[Unit Sales] IS EMPTY",
             "([Measures].[Unit Sales] IS EMPTY)");
 
-        assertParseExpr("[Measures].[Unit Sales] IS EMPTY AND 1 IS NULL",
+        assertParseExpr(
+            "[Measures].[Unit Sales] IS EMPTY AND 1 IS NULL",
             "(([Measures].[Unit Sales] IS EMPTY) AND (1.0 IS NULL))");
 
         // FIXME: "NULL" should associate as "IS NULL" rather than "NULL + 56.0"
-        assertParseExpr("- x * 5 is empty is empty is null + 56",
+        assertParseExpr(
+            "- x * 5 is empty is empty is null + 56",
             "(((((- x) * 5.0) IS EMPTY) IS EMPTY) IS (NULL + 56.0))");
     }
 
     public void testIs() {
-        assertParseExpr("[Measures].[Unit Sales] IS [Measures].[Unit Sales] AND [Measures].[Unit Sales] IS NULL",
+        assertParseExpr(
+            "[Measures].[Unit Sales] IS [Measures].[Unit Sales] AND [Measures].[Unit Sales] IS NULL",
             "(([Measures].[Unit Sales] IS [Measures].[Unit Sales]) AND ([Measures].[Unit Sales] IS NULL))");
     }
 
     public void testIsNull() {
-        assertParseExpr("[Measures].[Unit Sales] IS NULL",
+        assertParseExpr(
+            "[Measures].[Unit Sales] IS NULL",
             "([Measures].[Unit Sales] IS NULL)");
 
-        assertParseExpr("[Measures].[Unit Sales] IS NULL AND 1 <> 2",
+        assertParseExpr(
+            "[Measures].[Unit Sales] IS NULL AND 1 <> 2",
             "(([Measures].[Unit Sales] IS NULL) AND (1.0 <> 2.0))");
 
-        assertParseExpr("x is null or y is null and z = 5",
+        assertParseExpr(
+            "x is null or y is null and z = 5",
             "((x IS NULL) OR ((y IS NULL) AND (z = 5.0)))");
 
-        assertParseExpr("(x is null) + 56 > 6",
+        assertParseExpr(
+            "(x is null) + 56 > 6",
             "((((x IS NULL)) + 56.0) > 6.0)");
 
         // FIXME: Should be
         //  "(((((x IS NULL) AND (a = b)) OR ((c = (d + 5.0))) IS NULL) + 5.0)");
-        assertParseExpr("x is null and a = b or c = d + 5 is null + 5",
+        assertParseExpr(
+            "x is null and a = b or c = d + 5 is null + 5",
             "(((x IS NULL) AND (a = b)) OR ((c = (d + 5.0)) IS (NULL + 5.0)))");
     }
 
     public void testNull() {
-        assertParseExpr("Filter({[Measures].[Foo]}, Iif(1 = 2, NULL, 'X'))",
+        assertParseExpr(
+            "Filter({[Measures].[Foo]}, Iif(1 = 2, NULL, 'X'))",
             "Filter({[Measures].[Foo]}, Iif((1.0 = 2.0), NULL, \"X\"))");
     }
 
     public void testCast() {
-        assertParseExpr("Cast([Measures].[Unit Sales] AS Numeric)",
+        assertParseExpr(
+            "Cast([Measures].[Unit Sales] AS Numeric)",
             "CAST([Measures].[Unit Sales] AS Numeric)");
 
-        assertParseExpr("Cast(1 + 2 AS String)",
+        assertParseExpr(
+            "Cast(1 + 2 AS String)",
             "CAST((1.0 + 2.0) AS String)");
     }
 
@@ -682,7 +697,8 @@ public class ParserTest extends TestCase {
         assertParseExpr("+45", "45.0");
 
         // space bad
-        assertParseExprFails("4 ^5^",
+        assertParseExprFails(
+            "4 ^5^",
             "Syntax error at \\[1:35\\], token '5\\.0'");
 
         assertParseExpr("3.14", "3.14");

@@ -254,7 +254,7 @@ public class XmlaOlap4jDriver implements Driver {
         final String request)
     {
         return executor.submit(
-            new Callable<byte[] >() {
+            new Callable<byte[]>() {
                 public byte[] call() throws Exception {
                     return proxy.get(url, request);
                 }

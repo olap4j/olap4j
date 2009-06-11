@@ -960,7 +960,8 @@ public class ConnectionTest extends TestCase {
         assertEquals(5, cell.getOrdinal());
 
         assertEquals(Arrays.asList(1, 2), cell.getCoordinateList());
-        assertEquals("#,###.00",
+        assertEquals(
+            "#,###.00",
             cell.getPropertyValue(Property.StandardCellProperty.FORMAT_STRING));
         assertFalse(cell.isEmpty());
         assertFalse(cell.isError());
@@ -1655,10 +1656,12 @@ public class ConnectionTest extends TestCase {
         assertNotNull(member);
         Member member2 = cube.lookupMember("Product", "All Products", "Food");
         assertEquals(member, member2);
-        assertEquals("[Product].[All Products].[Food]",
+        assertEquals(
+            "[Product].[All Products].[Food]",
             member.getUniqueName());
         assertEquals("Food", member.getName());
-        assertEquals("[Product].[Product Family]",
+        assertEquals(
+            "[Product].[Product Family]",
             member.getLevel().getUniqueName());
         assertEquals(Member.Type.REGULAR, member.getMemberType());
 
@@ -1693,7 +1696,8 @@ public class ConnectionTest extends TestCase {
 
         // All member
         final Member allProductsMember = member.getParentMember();
-        assertEquals("[Product].[All Products]",
+        assertEquals(
+            "[Product].[All Products]",
             allProductsMember.getUniqueName());
         assertEquals("(All)", allProductsMember.getLevel().getName());
         assertEquals("[Product].[(All)]", allProductsMember.getLevel().getUniqueName());

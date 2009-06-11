@@ -101,7 +101,8 @@ abstract class XmlaOlap4jUtil {
         parser.setFeature(VALIDATION_FEATURE_ID, doingValidation);
 
         if (schemaLocationPropertyValue != null) {
-            parser.setProperty(SCHEMA_LOCATION,
+            parser.setProperty(
+                SCHEMA_LOCATION,
                 schemaLocationPropertyValue.replace('\\', '/'));
         }
 
