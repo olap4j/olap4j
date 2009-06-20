@@ -72,9 +72,9 @@ public class TraditionalCellSetFormatter implements CellSetFormatter {
     private static void printRows(
         CellSet cellSet, PrintWriter pw, int axis, List<Integer> pos)
     {
-        CellSetAxis _axis = axis < 0 ?
-            cellSet.getFilterAxis() :
-            cellSet.getAxes().get(axis);
+        CellSetAxis _axis = axis < 0
+            ? cellSet.getFilterAxis()
+            : cellSet.getAxes().get(axis);
         List<Position> positions = _axis.getPositions();
         final int positionCount = positions.size();
         for (int i = 0; i < positionCount; i++) {

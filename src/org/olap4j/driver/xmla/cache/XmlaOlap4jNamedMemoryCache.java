@@ -160,7 +160,8 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
             // Create a cache for this URL if it is not created yet
             if (!caches.containsKey(
                 props.get(
-                    XmlaOlap4jNamedMemoryCache.Property.Name.name()))) {
+                    XmlaOlap4jNamedMemoryCache.Property.Name.name())))
+            {
                 caches.put(
                     (String) props.get(
                         XmlaOlap4jNamedMemoryCache.Property.Name.name()),

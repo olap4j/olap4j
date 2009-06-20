@@ -51,11 +51,11 @@ public class DimensionType implements Type {
     }
 
     public Hierarchy getHierarchy() {
-        return dimension == null ?
-                null :
-                dimension.getHierarchies().size() > 1 ?
-                null :
-                dimension.getHierarchies().get(0);
+        return dimension == null
+            ? null
+            : dimension.getHierarchies().size() > 1
+            ? null
+            : dimension.getHierarchies().get(0);
     }
 
     public Level getLevel() {

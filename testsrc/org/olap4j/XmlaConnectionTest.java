@@ -164,8 +164,8 @@ public class XmlaConnectionTest extends TestCase {
          */
         private void checkup(String request) {
             String hash = Encoder.convertToHex(request.getBytes());
-            if (request.indexOf("<RequestType>MDSCHEMA_CUBES</RequestType>") == -1 &&
-                this.requests.containsKey(hash))
+            if (request.indexOf("<RequestType>MDSCHEMA_CUBES</RequestType>") == -1
+                && this.requests.containsKey(hash))
             {
                 throw new RuntimeException("DOUBLE-REQUEST");
             } else {
@@ -230,21 +230,21 @@ public class XmlaConnectionTest extends TestCase {
                 tester.getWrapper().unwrap(statement, OlapStatement.class);
             CellSet cellSet =
                 olapStatement.executeOlapQuery(
-                    "SELECT\n" +
-                        " {[Measures].[Unit Sales],\n" +
-                        "    [Measures].[Store Sales]} ON COLUMNS\n," +
-                        " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n" +
-                        "FROM [Sales]\n" +
-                        "WHERE [Time].[1997].[Q2]");
+                    "SELECT\n"
+                    + " {[Measures].[Unit Sales],\n"
+                    + "    [Measures].[Store Sales]} ON COLUMNS\n,"
+                    + " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n"
+                    + "FROM [Sales]\n"
+                    + "WHERE [Time].[1997].[Q2]");
             assertNotNull(cellSet);
             cellSet =
                 olapStatement.executeOlapQuery(
-                    "SELECT\n" +
-                        " {[Measures].[Unit Sales],\n" +
-                        "    [Measures].[Store Sales]} ON COLUMNS\n," +
-                        " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n" +
-                        "FROM [Sales]\n" +
-                        "WHERE [Time].[1997].[Q3]");
+                    "SELECT\n"
+                    + " {[Measures].[Unit Sales],\n"
+                    + "    [Measures].[Store Sales]} ON COLUMNS\n,"
+                    + " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n"
+                    + "FROM [Sales]\n"
+                    + "WHERE [Time].[1997].[Q3]");
         } finally {
             XmlaTester.setProxyClassName(oldValue);
         }

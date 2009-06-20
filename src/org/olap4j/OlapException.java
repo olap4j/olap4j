@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -118,8 +118,9 @@ public class OlapException extends SQLException {
      *   or a {@link Position}
      */
     public void setContext(Object context) {
-        if (!(context instanceof Cell) &&
-            !(context instanceof Position)) {
+        if (!(context instanceof Cell)
+            && !(context instanceof Position))
+        {
             throw new IllegalArgumentException(
                 "expected Cell or Position");
         }
@@ -177,8 +178,8 @@ public class OlapException extends SQLException {
             if (startLine == endColumn && startColumn == endLine) {
                 return "line " + startLine + ", column " + startColumn;
             } else {
-                return "line " + startLine + ", column " + startColumn +
-                    " through line " + endLine + ", column " + endColumn;
+                return "line " + startLine + ", column " + startColumn
+                    + " through line " + endLine + ", column " + endColumn;
             }
         }
     }

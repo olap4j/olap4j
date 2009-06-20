@@ -60,9 +60,9 @@ class MdxUtil {
         StringBuilder retString = new StringBuilder(st.length() + 20);
         for (int i = 0; i < st.length(); i++) {
             char c = st.charAt(i);
-            if ((c == ']') &&
-                ((i + 1) < st.length()) &&
-                (st.charAt(i + 1) != '.'))
+            if ((c == ']')
+                && ((i + 1) < st.length())
+                && (st.charAt(i + 1) != '.'))
             {
                 retString.append(']'); // escaping character
             }

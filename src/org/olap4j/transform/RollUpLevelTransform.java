@@ -77,8 +77,8 @@ public class RollUpLevelTransform extends AxisTransform {
     }
 
     public String getDescription() {
-        return "Replaces the member expression on the axis by all members " +
-            "on its parent level";
+        return "Replaces the member expression on the axis by all members "
+            + "on its parent level";
     }
 
     @Override

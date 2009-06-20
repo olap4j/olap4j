@@ -149,8 +149,8 @@ public class QueryAxis {
         }
 
         public QueryDimension set(int index, QueryDimension dimension) {
-            if (dimension.getAxis() != null &&
-                dimension.getAxis() != QueryAxis.this)
+            if (dimension.getAxis() != null
+                && dimension.getAxis() != QueryAxis.this)
             {
                 dimension.getAxis().getDimensions().remove(dimension);
             }
@@ -162,8 +162,8 @@ public class QueryAxis {
             if (this.contains(dimension)) {
                 throw new IllegalStateException("dimension already on this axis");
             }
-            if (dimension.getAxis() != null &&
-                dimension.getAxis() != QueryAxis.this)
+            if (dimension.getAxis() != null
+                && dimension.getAxis() != QueryAxis.this)
             {
                 // careful! potential for loop
                 dimension.getAxis().getDimensions().remove(dimension);

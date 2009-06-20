@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -22,7 +22,8 @@ import java.util.Map;
  * @since Apr 19, 2007
  */
 class Pair<L, R>
-    implements Comparable<Pair<L, R>>, Map.Entry<L, R> {
+    implements Comparable<Pair<L, R>>, Map.Entry<L, R>
+{
     public L left;
     public R right;
 
@@ -40,8 +41,8 @@ class Pair<L, R>
     public boolean equals(Object obj) {
         if (obj instanceof Pair) {
             Pair<L, R> pair = (Pair<L, R>) obj;
-            return Olap4jUtil.equal(this.left, pair.left) &&
-                Olap4jUtil.equal(this.right, pair.right);
+            return Olap4jUtil.equal(this.left, pair.left)
+                && Olap4jUtil.equal(this.right, pair.right);
         }
         return false;
     }

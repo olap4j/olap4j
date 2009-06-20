@@ -150,15 +150,16 @@ public class Query {
                 return false;
             }
             Member member = dimension.getDefaultHierarchy().getDefaultMember();
-            if (queryDimension.getAxis() == null ||
-                queryDimension.getAxis().getLocation() == null) {
+            if (queryDimension.getAxis() == null
+                || queryDimension.getAxis().getLocation() == null)
+            {
                 queryDimension.getSelections().clear();
-                queryDimension.getSelections()
-                    .add(queryDimension.createSelection(member));
+                queryDimension.getSelections().add(
+                    queryDimension.createSelection(member));
             } else {
                 if (queryDimension.getSelections().size() == 0) {
-                    queryDimension.getSelections()
-                        .add(queryDimension.createSelection(member));
+                    queryDimension.getSelections().add(
+                        queryDimension.createSelection(member));
                 }
             }
         }

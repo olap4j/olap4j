@@ -49,13 +49,13 @@ public class LevelType implements Type {
         this.level = level;
         if (level != null) {
             assert hierarchy != null : "hierarchy != null";
-            assert level.getHierarchy() == hierarchy :
-                "level.getHierarchy() == hierarchy";
+            assert level.getHierarchy() == hierarchy
+                : "level.getHierarchy() == hierarchy";
         }
         if (hierarchy != null) {
             assert dimension != null : "dimension != null";
-            assert hierarchy.getDimension() == dimension :
-                "hierarchy.getDimension() == dimension";
+            assert hierarchy.getDimension() == dimension
+                : "hierarchy.getDimension() == dimension";
         }
         StringBuilder buf = new StringBuilder("LevelType<");
         if (level != null) {

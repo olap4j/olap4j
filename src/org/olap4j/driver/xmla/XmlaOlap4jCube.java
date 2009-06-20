@@ -365,8 +365,9 @@ class XmlaOlap4jCube implements Cube, Named
                 final SoftReference<XmlaOlap4jMember> memberRef =
                     this.memberMap.get(memberUniqueName);
                 final XmlaOlap4jMember member;
-                if (memberRef != null &&
-                    (member = memberRef.get()) != null) {
+                if (memberRef != null
+                    && (member = memberRef.get()) != null)
+                {
                     memberMap.put(memberUniqueName, member);
                 } else {
                     remainingMemberUniqueNames.add(memberUniqueName);
@@ -457,7 +458,7 @@ class XmlaOlap4jCube implements Cube, Named
          * @return A map of members with their unique name as a key
          * @throws OlapException Gets thrown for communication errors
          */
-        private Map<String,XmlaOlap4jMember> mondrianMembersLookup(
+        private Map<String, XmlaOlap4jMember> mondrianMembersLookup(
             List<String> memberUniqueNames) throws OlapException
         {
             final XmlaOlap4jConnection.Context context =
@@ -477,8 +478,8 @@ class XmlaOlap4jCube implements Cube, Named
                         "CUBE_NAME", getName(),
                         "MEMBER_UNIQUE_NAME", memberUniqueNames
                     });
-            final Map<String,XmlaOlap4jMember> memberMap =
-                new HashMap<String,XmlaOlap4jMember>(memberUniqueNames.size());
+            final Map<String, XmlaOlap4jMember> memberMap =
+                new HashMap<String, XmlaOlap4jMember>(memberUniqueNames.size());
             for (XmlaOlap4jMember member : memberList) {
                 if (member != null) {
                     memberMap.put(member.getUniqueName(), member);
@@ -493,11 +494,11 @@ class XmlaOlap4jCube implements Cube, Named
          * @return A map of members with their unique name as a key
          * @throws OlapException Gets thrown for communication errors
          */
-        private Map<String,XmlaOlap4jMember> genericMembersLookup(
-                List<String> memberUniqueNames) throws OlapException
+        private Map<String, XmlaOlap4jMember> genericMembersLookup(
+            List<String> memberUniqueNames) throws OlapException
         {
-            final Map<String,XmlaOlap4jMember> memberMap =
-                new HashMap<String,XmlaOlap4jMember>(memberUniqueNames.size());
+            final Map<String, XmlaOlap4jMember> memberMap =
+                new HashMap<String, XmlaOlap4jMember>(memberUniqueNames.size());
             // Iterates through member names
             for (String currentMemberName : memberUniqueNames) {
                 // Only lookup if it is not in the map yet
@@ -557,7 +558,8 @@ class XmlaOlap4jCube implements Cube, Named
             switch (level.getDimension().getDimensionType()) {
             case MEASURE:
                 if (!level.olap4jHierarchy.olap4jDimension.olap4jCube.measures
-                    .isEmpty()) {
+                    .isEmpty())
+                {
                     return Olap4jUtil.cast(
                         level.olap4jHierarchy.olap4jDimension.olap4jCube
                             .measures);

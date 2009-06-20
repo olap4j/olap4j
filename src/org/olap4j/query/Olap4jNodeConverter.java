@@ -168,7 +168,7 @@ abstract class Olap4jNodeConverter {
                 null,
                 "CurrentMember",
                 Syntax.Property,
-                new DimensionNode(null,dimension.getDimension()));
+                new DimensionNode(null, dimension.getDimension()));
             CallNode currentMemberNameNode = new CallNode(
                 null,
                 "Name",

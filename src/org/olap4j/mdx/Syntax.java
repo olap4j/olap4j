@@ -309,9 +309,9 @@ public enum Syntax {
      * @return Whether nodes need to be enclosed in parentheses
      */
     private static boolean needParen(List<ParseTreeNode> args) {
-        return !(args.size() == 1 &&
-            args.get(0) instanceof CallNode &&
-            ((CallNode) args.get(0)).getSyntax() == Parentheses);
+        return !(args.size() == 1
+                 && args.get(0) instanceof CallNode
+                 && ((CallNode) args.get(0)).getSyntax() == Parentheses);
     }
 
     private static void unparseList(

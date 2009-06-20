@@ -143,11 +143,11 @@ public class SimpleQuerySample {
 
         // Prepare a statement.
         PreparedOlapStatement statement = connection.prepareOlapStatement(
-            "select {[Measures].[Unit Sales]} on columns,\n" +
-                "  {TopCount\n(" +
-                "      Parameter(\"Store\", [Store].[USA].[CA]).Children,\n" +
-                "      Parameter(\"Count\", INTEGER))} on rows\n" +
-                "from [Sales]");
+            "select {[Measures].[Unit Sales]} on columns,\n"
+            + "  {TopCount\n("
+            + "      Parameter(\"Store\", [Store].[USA].[CA]).Children,\n"
+            + "      Parameter(\"Count\", INTEGER))} on rows\n"
+            + "from [Sales]");
 
         // Describe the parameters.
         OlapParameterMetaData parameterMetaData =
@@ -192,8 +192,8 @@ public class SimpleQuerySample {
         MdxParserFactory parserFactory = olapConnection.getParserFactory();
         MdxParser parser = parserFactory.createMdxParser(olapConnection);
         SelectNode query = parser.parseSelect(
-            "select {[Measures].[Unit Sales]} on columns\n" +
-                "from [Sales]");
+            "select {[Measures].[Unit Sales]} on columns\n"
+            + "from [Sales]");
         query.getAxisList().get(0).setNonEmpty(false);
 
         // Create statement.

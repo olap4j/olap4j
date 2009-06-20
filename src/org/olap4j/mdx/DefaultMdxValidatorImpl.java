@@ -67,9 +67,9 @@ class DefaultMdxValidatorImpl
         withMemberNode.setExpression(expression);
         final Type type = expression.getType();
         if (!TypeUtil.canEvaluate(type)) {
-            throw new RuntimeException("'Member expression '" +
-                MdxUtil.toString(expression) +
-                "' must not be a set'");
+            throw new RuntimeException(
+                "'Member expression '" + MdxUtil.toString(expression)
+                + "' must not be a set'");
         }
         for (PropertyValueNode prop : withMemberNode.getMemberPropertyList()) {
             prop.accept(this);
@@ -84,9 +84,8 @@ class DefaultMdxValidatorImpl
         if (!TypeUtil.isSet(type)) {
             final IdentifierNode id = withSetNode.getIdentifier();
             final String idString = MdxUtil.toString(id);
-            throw new RuntimeException("Set expression '" +
-                idString +
-                "' must be a set");
+            throw new RuntimeException(
+                "Set expression '" + idString + "' must be a set");
         }
         return withSetNode;
     }
@@ -165,9 +164,8 @@ class DefaultMdxValidatorImpl
         ParseTreeNode exp = axis.getExpression().accept(this);
         final Type type = exp.getType();
         if (!TypeUtil.isSet(type)) {
-            throw new RuntimeException("Axis '" +
-                axis.getAxis().name() +
-                "' expression is not a set");
+            throw new RuntimeException(
+                "Axis '" + axis.getAxis().name() + "' expression is not a set");
         }
     }
 

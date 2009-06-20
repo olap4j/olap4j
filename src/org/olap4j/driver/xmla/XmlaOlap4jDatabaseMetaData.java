@@ -103,7 +103,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
             } else if (value instanceof Wildcard) {
                 final Wildcard wildcard = (Wildcard) value;
                 if (wildcard.pattern.indexOf('%') < 0
-                    && wildcard.pattern.indexOf('_') < 0) {
+                    && wildcard.pattern.indexOf('_') < 0)
+                {
                     patternValueList.add(name);
                     patternValueList.add(wildcard.pattern);
                 } else {
@@ -131,7 +132,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         rowLoop:
         for (Element row : XmlaOlap4jUtil.childElements(root)) {
             final ArrayList<Object> valueList = new ArrayList<Object>();
-            for (Map.Entry<String,Matcher> entry : predicateList.entrySet()) {
+            for (Map.Entry<String, Matcher> entry : predicateList.entrySet()) {
                 final String column = entry.getKey();
                 final String value =
                     XmlaOlap4jUtil.stringElement(row, column);
@@ -327,7 +328,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public boolean supportsConvert(
-        int fromType, int toType) throws SQLException {
+        int fromType, int toType) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -660,7 +662,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     public ResultSet getProcedures(
         String catalog,
         String schemaPattern,
-        String procedureNamePattern) throws SQLException {
+        String procedureNamePattern) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -668,7 +671,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String catalog,
         String schemaPattern,
         String procedureNamePattern,
-        String columnNamePattern) throws SQLException {
+        String columnNamePattern) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -676,7 +680,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String catalog,
         String schemaPattern,
         String tableNamePattern,
-        String types[]) throws SQLException {
+        String types[]) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -698,7 +703,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String catalog,
         String schemaPattern,
         String tableNamePattern,
-        String columnNamePattern) throws SQLException {
+        String columnNamePattern) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -706,14 +712,16 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String catalog,
         String schema,
         String table,
-        String columnNamePattern) throws SQLException {
+        String columnNamePattern) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
     public ResultSet getTablePrivileges(
         String catalog,
         String schemaPattern,
-        String tableNamePattern) throws SQLException {
+        String tableNamePattern) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -722,27 +730,32 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String schema,
         String table,
         int scope,
-        boolean nullable) throws SQLException {
+        boolean nullable) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
     public ResultSet getVersionColumns(
-        String catalog, String schema, String table) throws SQLException {
+        String catalog, String schema, String table) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
     public ResultSet getPrimaryKeys(
-        String catalog, String schema, String table) throws SQLException {
+        String catalog, String schema, String table) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
     public ResultSet getImportedKeys(
-        String catalog, String schema, String table) throws SQLException {
+        String catalog, String schema, String table) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
     public ResultSet getExportedKeys(
-        String catalog, String schema, String table) throws SQLException {
+        String catalog, String schema, String table) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -752,7 +765,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String parentTable,
         String foreignCatalog,
         String foreignSchema,
-        String foreignTable) throws SQLException {
+        String foreignTable) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -765,7 +779,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String schema,
         String table,
         boolean unique,
-        boolean approximate) throws SQLException {
+        boolean approximate) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -774,7 +789,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public boolean supportsResultSetConcurrency(
-        int type, int concurrency) throws SQLException {
+        int type, int concurrency) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -822,7 +838,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String catalog,
         String schemaPattern,
         String typeNamePattern,
-        int[] types) throws SQLException {
+        int[] types) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -849,14 +866,16 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     public ResultSet getSuperTypes(
         String catalog,
         String schemaPattern,
-        String typeNamePattern) throws SQLException {
+        String typeNamePattern) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
     public ResultSet getSuperTables(
         String catalog,
         String schemaPattern,
-        String tableNamePattern) throws SQLException {
+        String tableNamePattern) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 
@@ -864,7 +883,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String catalog,
         String schemaPattern,
         String typeNamePattern,
-        String attributeNamePattern) throws SQLException {
+        String attributeNamePattern) throws SQLException
+    {
         throw new UnsupportedOperationException();
     }
 

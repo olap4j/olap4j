@@ -31,8 +31,8 @@ public class SetType implements Type {
      *   known
      */
     public SetType(Type elementType) {
-        assert elementType instanceof MemberType ||
-                elementType instanceof TupleType;
+        assert elementType instanceof MemberType
+            || elementType instanceof TupleType;
         this.elementType = elementType;
     }
 
@@ -53,18 +53,21 @@ public class SetType implements Type {
     }
 
     public Dimension getDimension() {
-        return elementType == null ? null :
-                elementType.getDimension();
+        return elementType == null
+            ? null
+            : elementType.getDimension();
     }
 
     public Hierarchy getHierarchy() {
-        return elementType == null ? null :
-                elementType.getHierarchy();
+        return elementType == null
+            ? null
+            : elementType.getHierarchy();
     }
 
     public Level getLevel() {
-        return elementType == null ? null :
-                elementType.getLevel();
+        return elementType == null
+            ? null
+            : elementType.getLevel();
     }
 }
 

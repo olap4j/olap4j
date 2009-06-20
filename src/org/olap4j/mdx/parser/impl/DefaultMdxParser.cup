@@ -157,11 +157,14 @@ parser code {:
                     filter.getRegion(), false, Axis.FILTER,
                     Collections.<IdentifierNode>emptyList(), filter);
         // sort axes by ordinal
-        Collections.sort(axisList, new Comparator<AxisNode>() {
-            public int compare(AxisNode o1, AxisNode o2) {
-                return o1.getAxis().axisOrdinal() - o2.getAxis().axisOrdinal();
-            }
-        });
+        Collections.sort(
+            axisList,
+            new Comparator<AxisNode>() {
+                public int compare(AxisNode o1, AxisNode o2) {
+                    return o1.getAxis().axisOrdinal()
+                        - o2.getAxis().axisOrdinal();
+                }
+            });
         return new SelectNode(
             region, withList, axisList, cubeName, filterAxis, cellProps);
     }
@@ -974,7 +977,7 @@ when_list ::=
 
 when_clause ::=
         WHEN value_expression:x THEN value_expression:y {:
-            RESULT = new ParseTreeNode[] {x,y};
+            RESULT = new ParseTreeNode[] {x, y};
         :}
     ;
 
@@ -1382,7 +1385,8 @@ formula_specification ::=
             RESULT.add(e);
         :}
     |   single_formula_specification:hd formula_specification:tl {:
-            tl.add(0,hd); RESULT = tl;
+            tl.add(0, hd);
+            RESULT = tl;
         :}
     ;
 
@@ -1425,7 +1429,7 @@ member_property_def_list ::=
         :}
     |   member_property_definition:hd COMMA member_property_def_list:tl {:
             RESULT = tl;
-            RESULT.add(0,hd);
+            RESULT.add(0, hd);
         :}
     ;
 //

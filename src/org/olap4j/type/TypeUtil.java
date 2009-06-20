@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2005-2008 Julian Hyde
+// Copyright (C) 2005-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -59,9 +59,10 @@ public class TypeUtil {
         type = stripSetType(type);
         if (type instanceof MemberType) {
             return (MemberType) type;
-        } else if (type instanceof DimensionType ||
-                type instanceof HierarchyType ||
-                type instanceof LevelType) {
+        } else if (type instanceof DimensionType
+            || type instanceof HierarchyType
+            || type instanceof LevelType)
+        {
             return MemberType.forType(type);
         } else {
             return null;
@@ -103,11 +104,13 @@ public class TypeUtil {
     }
 
     private static boolean equal(
-            final Hierarchy hierarchy1, final Hierarchy hierarchy2) {
-        if (hierarchy1 == null ||
-                hierarchy2 == null ||
-                hierarchy2.getUniqueName().equals(
-                        hierarchy1.getUniqueName())) {
+        final Hierarchy hierarchy1, final Hierarchy hierarchy2)
+    {
+        if (hierarchy1 == null
+            || hierarchy2 == null
+            || hierarchy2.getUniqueName().equals(
+                hierarchy1.getUniqueName()))
+        {
             // They are compatible.
             return true;
         } else {
@@ -135,9 +138,9 @@ public class TypeUtil {
      *   scalar value.
      */
     public static boolean canEvaluate(Type type) {
-        return ! (type instanceof SetType ||
-                type instanceof CubeType ||
-                type instanceof LevelType);
+        return ! (type instanceof SetType
+                  || type instanceof CubeType
+                  || type instanceof LevelType);
     }
 
     /**
@@ -151,9 +154,9 @@ public class TypeUtil {
     }
 
     private static boolean couldBeMember(Type type) {
-        return type instanceof MemberType ||
-                type instanceof HierarchyType ||
-                type instanceof DimensionType;
+        return type instanceof MemberType
+            || type instanceof HierarchyType
+            || type instanceof DimensionType;
     }
 
     static boolean equal(Object o, Object p) {

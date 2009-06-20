@@ -56,17 +56,21 @@ public class TestContext {
     }
 
     /**
-     * Converts a string constant into environment-specific line endings.
-     * Use this method when specifying the string result expected from a test.
+     * Converts a string constant into platform-specific line endings.
      *
-     * @param string String to convert
-     * @return String with newline characters converted into
+     * @param string String where line endings are represented as linefeed "\n"
+     * @return String where all linefeeds have been converted to
+     * platform-specific (CR+LF on Windows, LF on Unix/Linux)
      */
-    public static String fold(String string) {
+    public static SafeString fold(String string) {
         if (!NL.equals("\n")) {
             string = Olap4jUtil.replace(string, "\n", NL);
         }
-        return string;
+        if (string == null) {
+            return null;
+        } else {
+            return new SafeString(string);
+        }
     }
 
     /**
@@ -121,23 +125,48 @@ public class TestContext {
     }
 
     /**
+     * Checks that an actual string matches an expected string.
+     *
+     * <p>If they do not, throws a {@link ComparisonFailure} and prints the
+     * difference, including the actual string as an easily pasted Java string
+     * literal.
+     *
+     * @param expected Expected string
+     * @param actual Actual string
+     * @param java Whether to generate actual string as a Java string literal
+     * if the values are not equal
+     * @param message Message to display, optional
+     */
+    public static void assertEqualsVerbose(
+        String expected,
+        String actual,
+        boolean java,
+        String message)
+    {
+        assertEqualsVerbose(
+            fold(expected), actual, java, message);
+    }
+
+    /**
      * Checks that an actual string matches an expected string. If they do not,
      * throws a {@link junit.framework.ComparisonFailure} and prints the
      * difference, including the actual string as an easily pasted Java string
      * literal.
      *
-     * @param expected Expected string
+     * @param safeExpected Expected string, where all line endings have been
+     * converted into platform-specific line endings
      * @param actual Actual string returned by test case
      * @param java Whether to print the actual value as a Java string literal
      * if the strings differ
      * @param message Message to print if the strings differ
      */
     public static void assertEqualsVerbose(
-            String expected,
-            String actual,
-            boolean java,
-            String message)
+        SafeString safeExpected,
+        String actual,
+        boolean java,
+        String message)
     {
+        String expected = safeExpected == null ? null : safeExpected.s;
         if ((expected == null) && (actual == null)) {
             return;
         }
@@ -150,8 +179,8 @@ public class TestContext {
             message += NL;
         }
         message +=
-                "Expected:" + NL + expected + NL +
-                "Actual:" + NL + actual + NL;
+            "Expected:" + NL + expected + NL
+            + "Actual:" + NL + actual + NL;
         if (java) {
             message += "Actual java:" + NL + toJavaString(actual) + NL;
         }
@@ -585,6 +614,20 @@ public class TestContext {
          */
         private Property(String path) {
             this.path = path;
+        }
+    }
+
+    /**
+     * Wrapper around a string that indicates that all line endings have been
+     * converted to platform-specific line endings.
+     *
+     * @see TestContext#fold
+     */
+    public static class SafeString {
+        public final String s;
+
+        private SafeString(String s) {
+            this.s = s;
         }
     }
 }

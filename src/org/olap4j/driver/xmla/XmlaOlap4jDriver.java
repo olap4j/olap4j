@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -179,7 +179,7 @@ public class XmlaOlap4jDriver implements Driver {
         List<DriverPropertyInfo> list = new ArrayList<DriverPropertyInfo>();
 
         // Add the contents of info
-        for (Map.Entry<Object,Object> entry : info.entrySet()) {
+        for (Map.Entry<Object, Object> entry : info.entrySet()) {
             list.add(
                 new DriverPropertyInfo(
                     (String) entry.getKey(),

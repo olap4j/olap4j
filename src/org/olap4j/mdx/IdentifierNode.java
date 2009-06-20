@@ -70,8 +70,8 @@ import java.util.*;
  * @author jhyde
  */
 public class IdentifierNode
-    implements ParseTreeNode {
-
+    implements ParseTreeNode
+{
     private final List<Segment> segments;
 
     /**

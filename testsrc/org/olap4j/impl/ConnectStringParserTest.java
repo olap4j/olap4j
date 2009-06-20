@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -39,17 +39,17 @@ public class ConnectStringParserTest extends TestCase {
     public void testParseConnectStringComplex() {
         Map<String, String> properties =
             ConnectStringParser.parseConnectString(
-                "normalProp=value;" +
-                "emptyValue=;" +
-                " spaceBeforeProp=abc;" +
-                " spaceBeforeAndAfterProp =def;" +
-                " space in prop = foo bar ;" +
-                "equalsInValue=foo=bar;" +
-                "semiInProp;Name=value;" +
-                " singleQuotedValue = 'single quoted value ending in space ' ;" +
-                " doubleQuotedValue = \"=double quoted value preceded by equals\" ;" +
-                " singleQuotedValueWithSemi = 'one; two';" +
-                " singleQuotedValueWithSpecials = 'one; two \"three''four=five'");
+                "normalProp=value;"
+                + "emptyValue=;"
+                + " spaceBeforeProp=abc;"
+                + " spaceBeforeAndAfterProp =def;"
+                + " space in prop = foo bar ;"
+                + "equalsInValue=foo=bar;"
+                + "semiInProp;Name=value;"
+                + " singleQuotedValue = 'single quoted value ending in space ' ;"
+                + " doubleQuotedValue = \"=double quoted value preceded by equals\" ;"
+                + " singleQuotedValueWithSemi = 'one; two';"
+                + " singleQuotedValueWithSpecials = 'one; two \"three''four=five'");
         assertEquals(11, properties.size());
         String value;
         value = properties.get("normalProp");
@@ -264,7 +264,8 @@ public class ConnectStringParserTest extends TestCase {
     }
 
     private static void checkReplace(
-            String original, String seek, String replace, String expected) {
+        String original, String seek, String replace, String expected)
+    {
         // Check whether the JDK does what we expect. (If it doesn't it's
         // probably a bug in the test, not the JDK.)
         assertEquals(expected, original.replaceAll(seek, replace));

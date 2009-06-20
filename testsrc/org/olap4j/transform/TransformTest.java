@@ -108,20 +108,20 @@ public class TransformTest extends TestCase {
      */
     public void testDrillReplaceTransform() throws SQLException {
         final String initialMdx =
-            "SELECT {[Measures].[Unit Sales], " +
-                "        [Measures].[Store Cost], " +
-                "        [Measures].[Store Sales]} ON COLUMNS, " +
-                "       {[Product].[All Products]} ON ROWS " +
-                "FROM Sales " +
-                "WHERE ([Time].[1997])";
+            "SELECT {[Measures].[Unit Sales], "
+            + "        [Measures].[Store Cost], "
+            + "        [Measures].[Store Sales]} ON COLUMNS, "
+            + "       {[Product].[All Products]} ON ROWS "
+            + "FROM Sales "
+            + "WHERE ([Time].[1997])";
 
         final String expectedMdx =
-            "SELECT {[Measures].[Unit Sales], " +
-                "        [Measures].[Store Cost], " +
-                "        [Measures].[Store Sales]} ON COLUMNS, " +
-                "       {[Product].[All Products].Children} ON ROWS " +
-                "FROM Sales " +
-                "WHERE ([Time].[1997])";
+            "SELECT {[Measures].[Unit Sales], "
+            + "        [Measures].[Store Cost], "
+            + "        [Measures].[Store Sales]} ON COLUMNS, "
+            + "       {[Product].[All Products].Children} ON ROWS "
+            + "FROM Sales "
+            + "WHERE ([Time].[1997])";
 
         CellSet cellSet = getStatement().executeOlapQuery(initialMdx);
 
@@ -142,20 +142,20 @@ public class TransformTest extends TestCase {
      */
     public void testRollUpLevelTransform() throws SQLException {
         final String initialMdx =
-            "SELECT {[Measures].[Unit Sales], " +
-                "        [Measures].[Store Cost], " +
-                "        [Measures].[Store Sales]} ON COLUMNS, " +
-                "       {[Product].[All Products].[Food].[Deli]} ON ROWS " +
-                "FROM Sales " +
-                "WHERE ([Time].[1997])";
+            "SELECT {[Measures].[Unit Sales], "
+            + "        [Measures].[Store Cost], "
+            + "        [Measures].[Store Sales]} ON COLUMNS, "
+            + "       {[Product].[All Products].[Food].[Deli]} ON ROWS "
+            + "FROM Sales "
+            + "WHERE ([Time].[1997])";
 
         final String expectedMdx =
-            "SELECT {[Measures].[Unit Sales], " +
-                "        [Measures].[Store Cost], " +
-                "        [Measures].[Store Sales]} ON COLUMNS, " +
-                "       {[Product].[All Products].[Food].[Deli].Parent.Level.Members} ON ROWS " +
-                "FROM Sales " +
-                "WHERE ([Time].[1997])";
+            "SELECT {[Measures].[Unit Sales], "
+            + "        [Measures].[Store Cost], "
+            + "        [Measures].[Store Sales]} ON COLUMNS, "
+            + "       {[Product].[All Products].[Food].[Deli].Parent.Level.Members} ON ROWS "
+            + "FROM Sales "
+            + "WHERE ([Time].[1997])";
 
         CellSet cellSet = getStatement().executeOlapQuery(initialMdx);
 
@@ -180,20 +180,20 @@ public class TransformTest extends TestCase {
         // Will fail for now.
 
         final String initialMdx =
-            "SELECT {[Measures].[Unit Sales], " +
-                "        [Measures].[Store Cost], " +
-                "        [Measures].[Store Sales]} ON COLUMNS, " +
-                "       {[Product].[All Products]} ON ROWS " +
-                "FROM Sales " +
-                "WHERE ([Time].[1997])";
+            "SELECT {[Measures].[Unit Sales], "
+            + "        [Measures].[Store Cost], "
+            + "        [Measures].[Store Sales]} ON COLUMNS, "
+            + "       {[Product].[All Products]} ON ROWS "
+            + "FROM Sales "
+            + "WHERE ([Time].[1997])";
 
         final String expectedMdx =
-            "SELECT {[Measures].[Unit Sales], " +
-                "        [Measures].[Store Cost], " +
-                "        [Measures].[Store Sales]} ON COLUMNS, " +
-                "       {[Product].[All Products].Children} ON ROWS " +
-                "FROM Sales " +
-                "WHERE ([Time].[1997])";
+            "SELECT {[Measures].[Unit Sales], "
+            + "        [Measures].[Store Cost], "
+            + "        [Measures].[Store Sales]} ON COLUMNS, "
+            + "       {[Product].[All Products].Children} ON ROWS "
+            + "FROM Sales "
+            + "WHERE ([Time].[1997])";
 
         CellSet cellSet = getStatement().executeOlapQuery(initialMdx);
 

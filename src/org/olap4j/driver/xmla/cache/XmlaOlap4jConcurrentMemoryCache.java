@@ -74,28 +74,31 @@ class XmlaOlap4jConcurrentMemoryCache {
     private int cacheTimeout = DEFAULT_CACHE_TIMEOUT;
 
     /**
-     * Creates a XmlaOlap4jConcurrentMemoryCache.
+     * Creates an XmlaOlap4jConcurrentMemoryCache.
      *
      * @param props Properties
      * @throws IllegalArgumentException
      */
     public XmlaOlap4jConcurrentMemoryCache(
-        Map<String,String> props)
+        Map<String, String> props)
         throws IllegalArgumentException
     {
-        for (Entry<String,String> entry : props.entrySet()) {
-            if (Property.Size.name()
-                    .equalsIgnoreCase(entry.getKey().toString())) {
+        for (Entry<String, String> entry : props.entrySet()) {
+            if (Property.Size.name().equalsIgnoreCase(
+                entry.getKey().toString()))
+            {
                 this.setCacheSize(
                         Integer.parseInt(entry.getValue().toString()));
-            } else if (Property.Timeout.name()
-                    .equalsIgnoreCase(entry.getKey().toString())) {
+            } else if (Property.Timeout.name().equalsIgnoreCase(
+                entry.getKey().toString()))
+            {
                 this.setCacheTimeout(
                         Integer.parseInt(entry.getValue().toString()));
-            } else if (Property.Mode.name()
-                    .equalsIgnoreCase(entry.getKey().toString())) {
+            } else if (Property.Mode.name().equalsIgnoreCase(
+                entry.getKey().toString()))
+            {
                 this.setCacheMode(
-                        entry.getValue().toString());
+                    entry.getValue().toString());
             }
         }
     }
@@ -120,8 +123,8 @@ class XmlaOlap4jConcurrentMemoryCache {
     private void setCacheMode(String mode) {
         if (Mode.valueOf(mode) == null) {
             throw new IllegalArgumentException(
-                "The XmlaOlap4jMemoryCache mode has to be one of " +
-                    Mode.class.getName());
+                "The XmlaOlap4jMemoryCache mode has to be one of "
+                + Mode.class.getName());
         }
         this.evictionMode = Mode.valueOf(mode);
     }
@@ -255,12 +258,12 @@ class XmlaOlap4jConcurrentMemoryCache {
             }
 
             // Checks if this is the oldest entry.
-            if ((makeRoom &&
-                    (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.LIFO
+            if ((makeRoom
+                 && (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.LIFO
                     && entry.getValue().getTimestamp().longValue()
                     < currentEvictedTimestamp))
-                || (makeRoom &&
-                    (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.FIFO
+                || (makeRoom
+                    && (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.FIFO
                     && entry.getValue().getTimestamp().longValue()
                     > currentEvictedTimestamp)))
             {
@@ -307,12 +310,12 @@ class XmlaOlap4jConcurrentMemoryCache {
             }
 
             // Checks if this is the oldest entry.
-            if ((makeRoom &&
-                    (evictionMode == Mode.LFU
+            if ((makeRoom
+                 && (evictionMode == Mode.LFU
                     && entry.getValue().getHitCount().longValue()
                     < currentEvictedHits))
-                || (makeRoom &&
-                    (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.MFU
+                || (makeRoom
+                    && (evictionMode == XmlaOlap4jNamedMemoryCache.Mode.MFU
                     && entry.getValue().getHitCount().longValue()
                     > currentEvictedHits)))
             {

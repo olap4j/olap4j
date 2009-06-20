@@ -109,8 +109,8 @@ abstract class XmlaOlap4jAbstractHttpProxy
 
     @SuppressWarnings("unchecked")
     public void setCache(
-        Map<String,String> config,
-        Map<String,String> properties)
+        Map<String, String> config,
+        Map<String, String> properties)
         throws OlapException
     {
         try {

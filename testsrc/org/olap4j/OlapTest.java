@@ -330,12 +330,12 @@ public class OlapTest extends TestCase {
 
             SelectNode mdx = query.getSelect();
             String mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "{[Product].[All Products].[Drink].Children} ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "{[Product].[All Products].[Drink].Children} ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
 
             // TEST ANCESTORS SELECTION
 
@@ -350,12 +350,12 @@ public class OlapTest extends TestCase {
 
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "{Ascendants([Product].[All Products].[Drink])} ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "{Ascendants([Product].[All Products].[Drink])} ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
 
             // TEST DESCENDANTS SELECTION
 
@@ -370,12 +370,12 @@ public class OlapTest extends TestCase {
 
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "{Descendants([Product].[All Products].[Drink])} ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "{Descendants([Product].[All Products].[Drink])} ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
 
             // TEST INCLUDE_CHILDREN SELECTION
 
@@ -390,12 +390,12 @@ public class OlapTest extends TestCase {
 
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
 
             // TEST SIBLINGS SELECTION
 
@@ -410,12 +410,12 @@ public class OlapTest extends TestCase {
 
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "{[Product].[All Products].[Drink].Siblings} ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "{[Product].[All Products].[Drink].Siblings} ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -475,15 +475,14 @@ public class OlapTest extends TestCase {
 
             SelectNode mdx = query.getSelect();
             String mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "CrossJoin({[Product].[All Products].[Drink].Children}, " +
-                    "CrossJoin({{[Store].[All Stores].[USA], " +
-                    "[Store].[All Stores].[USA].Children}}, " +
-                    "{[Time].[1997].Children})) ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "CrossJoin({[Product].[All Products].[Drink].Children}, "
+                + "CrossJoin({{[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}}, "
+                + "{[Time].[1997].Children})) ON ROWS\n"
+                + "FROM [Sales]", mdxString);
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -524,35 +523,39 @@ public class OlapTest extends TestCase {
 
             query.validate();
 
-            assertEquals(productDimension.getAxis().getLocation(), Axis.ROWS);
             assertEquals(
-                measuresDimension.getAxis().getLocation(),
-                Axis.COLUMNS);
+                Axis.ROWS,
+                productDimension.getAxis().getLocation());
+            assertEquals(
+                Axis.COLUMNS,
+                measuresDimension.getAxis().getLocation());
 
             SelectNode mdx = query.getSelect();
             String mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "{[Product].[All Products].[Drink].Children} ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "{[Product].[All Products].[Drink].Children} ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
 
             query.swapAxes();
 
             assertEquals(
-                productDimension.getAxis().getLocation(),
-                Axis.COLUMNS);
-            assertEquals(measuresDimension.getAxis().getLocation(), Axis.ROWS);
+                Axis.COLUMNS,
+                productDimension.getAxis().getLocation());
+            assertEquals(
+                Axis.ROWS,
+                measuresDimension.getAxis().getLocation());
 
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Product].[All Products].[Drink].Children} ON COLUMNS,\n" +
-                    "{[Measures].[Store Sales]} ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Product].[All Products].[Drink].Children} ON COLUMNS,\n"
+                + "{[Measures].[Store Sales]} ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
 
             query.swapAxes();
         } catch (Exception e) {
@@ -595,49 +598,51 @@ public class OlapTest extends TestCase {
 
             query.validate();
 
-            assertEquals(productDimension.getAxis().getLocation(), Axis.ROWS);
             assertEquals(
-                measuresDimension.getAxis().getLocation(),
-                Axis.COLUMNS);
+                Axis.ROWS,
+                productDimension.getAxis().getLocation());
+            assertEquals(
+                Axis.COLUMNS,
+                measuresDimension.getAxis().getLocation());
 
             SelectNode mdx = query.getSelect();
             String mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
 
             // Sort the products in ascending order.
             query.getDimension("Product").setSortOrder(SortOrder.DESC);
 
             SelectNode sortedMdx = query.getSelect();
             String sortedMdxString = sortedMdx.toString();
-            assertEquals(
-                sortedMdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "{Order({{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}}, [Product].CurrentMember.Name, DESC)} ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "{Order({{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}}, [Product].CurrentMember.Name, DESC)} ON ROWS\n"
+                + "FROM [Sales]",
+                sortedMdxString);
 
             CellSet results = query.execute();
             String s = TestContext.toString(results);
             TestContext.assertEqualsVerbose(
-                    TestContext.fold("Axis #0:\n" +
-                            "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
-                            "Axis #1:\n" +
-                            "{[Measures].[Store Sales]}\n" +
-                            "Axis #2:\n" +
-                            "{[Product].[All Products].[Drink]}\n" +
-                            "{[Product].[All Products].[Drink].[Dairy]}\n" +
-                            "{[Product].[All Products].[Drink].[Beverages]}\n" +
-                            "{[Product].[All Products].[Drink].[Alcoholic Beverages]}\n" +
-                            "Row #0: 48,836.21\n" +
-                            "Row #1: 7,058.60\n" +
-                            "Row #2: 27,748.53\n" +
-                            "Row #3: 14,029.08\n"),
-                    s);
+                "Axis #0:\n"
+                + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Store Sales]}\n"
+                + "Axis #2:\n"
+                + "{[Product].[All Products].[Drink]}\n"
+                + "{[Product].[All Products].[Drink].[Dairy]}\n"
+                + "{[Product].[All Products].[Drink].[Beverages]}\n"
+                + "{[Product].[All Products].[Drink].[Alcoholic Beverages]}\n"
+                + "Row #0: 48,836.21\n"
+                + "Row #1: 7,058.60\n"
+                + "Row #2: 27,748.53\n"
+                + "Row #3: 14,029.08\n",
+                s);
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -658,49 +663,55 @@ public class OlapTest extends TestCase {
             QueryDimension productDimension = query.getDimension("Product");
             Member drinkMember = cube.lookupMember("Product", "Drink");
             Selection drinkSelection =
-                productDimension.createSelection(drinkMember,
-                        Selection.Operator.CHILDREN);
+                productDimension.createSelection(
+                    drinkMember,
+                    Selection.Operator.CHILDREN);
             productDimension.getSelections().add(drinkSelection);
 
             QueryDimension storeDimension = query.getDimension("Store");
             Member usaMember = cube.lookupMember("Store", "USA");
             Selection usaSelection =
-                storeDimension.createSelection(usaMember,
-                        Selection.Operator.INCLUDE_CHILDREN);
+                storeDimension.createSelection(
+                    usaMember,
+                    Selection.Operator.INCLUDE_CHILDREN);
             storeDimension.getSelections().add(usaSelection);
 
             QueryDimension timeDimension = query.getDimension("Time");
             Member year1997Member = cube.lookupMember("Time", "1997");
             Selection year1997Selection =
-                timeDimension.createSelection(year1997Member,
-                        Selection.Operator.CHILDREN);
+                timeDimension.createSelection(
+                    year1997Member,
+                    Selection.Operator.CHILDREN);
             timeDimension.getSelections().add(year1997Selection);
 
             QueryDimension measuresDimension = query.getDimension("Measures");
             Member storeSalesMember = cube.lookupMember("Measures", "Store Sales");
             Selection storeSalesSelection =
-                measuresDimension.createSelection(storeSalesMember,
-                        Selection.Operator.MEMBER);
+                measuresDimension.createSelection(
+                    storeSalesMember,
+                    Selection.Operator.MEMBER);
             measuresDimension.getSelections().add(storeSalesSelection);
 
-            query.getAxes().get(Axis.ROWS).getDimensions().add(productDimension);
+            query.getAxes().get(Axis.ROWS).getDimensions().add(
+                productDimension);
             query.getAxes().get(Axis.ROWS).getDimensions().add(storeDimension);
             query.getAxes().get(Axis.ROWS).getDimensions().add(timeDimension);
-            query.getAxes().get(Axis.COLUMNS).getDimensions().add(measuresDimension);
+            query.getAxes().get(Axis.COLUMNS).getDimensions().add(
+                measuresDimension);
 
             query.validate();
 
             SelectNode mdx = query.getSelect();
             String mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "CrossJoin({[Product].[All Products].[Drink].Children}, " +
-                    "CrossJoin({{[Store].[All Stores].[USA], " +
-                    "[Store].[All Stores].[USA].Children}}, " +
-                    "{[Time].[1997].Children})) ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "CrossJoin({[Product].[All Products].[Drink].Children}, "
+                + "CrossJoin({{[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}}, "
+                + "{[Time].[1997].Children})) ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
 
             // Push down the Products dimension.
             query.getAxes().get(Axis.ROWS).pushDown(0);
@@ -709,15 +720,15 @@ public class OlapTest extends TestCase {
 
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "CrossJoin({{[Store].[All Stores].[USA], " +
-                    "[Store].[All Stores].[USA].Children}}, " +
-                    "CrossJoin({[Product].[All Products].[Drink].Children}, " +
-                    "{[Time].[1997].Children})) ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "CrossJoin({{[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}}, "
+                + "CrossJoin({[Product].[All Products].[Drink].Children}, "
+                + "{[Time].[1997].Children})) ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
 
             // Pull Up the Time dimension.
             query.getAxes().get(Axis.ROWS).pullUp(2);
@@ -726,21 +737,20 @@ public class OlapTest extends TestCase {
 
             mdx = query.getSelect();
             mdxString = mdx.toString();
-            assertEquals(
-                mdxString,
-                TestContext.fold("SELECT\n" +
-                    "{[Measures].[Store Sales]} ON COLUMNS,\n" +
-                    "CrossJoin({{[Store].[All Stores].[USA], " +
-                    "[Store].[All Stores].[USA].Children}}, " +
-                    "CrossJoin({[Time].[1997].Children}, " +
-                    "{[Product].[All Products].[Drink].Children})) ON ROWS\n" +
-                    "FROM [Sales]"));
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "CrossJoin({{[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}}, "
+                + "CrossJoin({[Time].[1997].Children}, "
+                + "{[Product].[All Products].[Drink].Children})) ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
         } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
     }
-
 
     public static void listHierarchies(Dimension dimension) {
         // Get a list of hierarchy objects and dump their names
@@ -887,8 +897,8 @@ public class OlapTest extends TestCase {
                 root.appendChild(gridNode);
 
                 for (CellSetAxis axis : result.getAxes()) {
-                    for (Hierarchy hierarchy :
-                             axis.getAxisMetaData().getHierarchies())
+                    for (Hierarchy hierarchy
+                        : axis.getAxisMetaData().getHierarchies())
                     {
                         Element dimensionNode =
                             dimensionInfoToXml(hierarchy.getDimension(), doc);

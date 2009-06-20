@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -113,9 +113,11 @@ class XmlaOlap4jCookieManager {
 
                 if (st.hasMoreTokens()) {
                     String token = st.nextToken();
-                    String name = token.substring(0, token
-                            .indexOf(NAME_VALUE_SEPARATOR));
-                    String value = token.substring(
+                    String name = token.substring(
+                        0,
+                        token.indexOf(NAME_VALUE_SEPARATOR));
+                    String value =
+                        token.substring(
                             token .indexOf(NAME_VALUE_SEPARATOR) + 1,
                             token.length());
                     domainStore.put(name, cookie);
@@ -185,7 +187,8 @@ class XmlaOlap4jCookieManager {
             // check cookie to ensure path matches  and cookie is not expired
             // if all is cool, add cookie to header string
             if (comparePaths((String) cookie.get(PATH), path)
-                    && isNotExpired((String) cookie.get(EXPIRES))) {
+                && isNotExpired((String) cookie.get(EXPIRES)))
+            {
                 cookieStringBuffer.append(cookieName);
                 cookieStringBuffer.append("=");
                 cookieStringBuffer.append((String) cookie.get(cookieName));
@@ -234,8 +237,9 @@ class XmlaOlap4jCookieManager {
             return true;
         } else if (cookiePath.equals("/")) {
             return true;
-        } else if (targetPath.regionMatches(0, cookiePath, 0, cookiePath
-                .length())) {
+        } else if (targetPath.regionMatches(
+            0, cookiePath, 0, cookiePath.length()))
+        {
             return true;
         } else {
             return false;

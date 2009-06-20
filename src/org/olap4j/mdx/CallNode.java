@@ -86,9 +86,9 @@ public class CallNode implements ParseTreeNode {
             assert name.startsWith("$");
             break;
         default:
-            assert !name.startsWith("$") &&
-                !name.equals("{}") &&
-                !name.equals("()");
+            assert !name.startsWith("$")
+                && !name.equals("{}")
+                && !name.equals("()");
             break;
         }
     }

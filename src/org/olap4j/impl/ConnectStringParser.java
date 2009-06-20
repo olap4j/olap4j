@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -165,8 +165,8 @@ public class ConnectStringParser {
                 return value;
             } else {
                 throw new RuntimeException(
-                        "quoted value ended too soon, at position " + i +
-                        " in '" + s + "'");
+                    "quoted value ended too soon, at position " + i
+                    + " in '" + s + "'");
             }
         } else {
             String value;
@@ -214,9 +214,9 @@ public class ConnectStringParser {
             }
         }
         throw new RuntimeException(
-                "Connect string '" + s +
-                "' contains unterminated quoted value '" +
-                valueBuf.toString() + "'");
+            "Connect string '" + s
+            + "' contains unterminated quoted value '"
+            + valueBuf.toString() + "'");
     }
 
     private static class PropertyMap extends LinkedHashMap<String, String> {
@@ -279,8 +279,9 @@ public class ConnectStringParser {
 
                     sb.append(value);
 
-                    if (value.indexOf(';') >= 0 && value.charAt(
-                        value.length() - 1) != '\'') {
+                    if (value.indexOf(';') >= 0
+                        && value.charAt(value.length() - 1) != '\'')
+                    {
                         sb.append("'");
                     }
                 }

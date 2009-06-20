@@ -150,9 +150,9 @@ public class Olap4jUtil {
      */
     public static AssertionError unexpected(Enum value) {
         return new AssertionError(
-            "Was not expecting value '" + value +
-                "' for enumeration '" + value.getClass().getName() +
-                "' in this context");
+            "Was not expecting value '" + value
+            + "' for enumeration '" + value.getClass().getName()
+            + "' in this context");
     }
 
     /**

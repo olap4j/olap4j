@@ -126,11 +126,11 @@ public class ParseRegion {
      * @return string representation of this ParseRegion
      */
     public String toString() {
-        return "[" + startLine + ":" + startColumn +
-            ((isPoint())
+        return "[" + startLine + ":" + startColumn
+            + ((isPoint())
                 ? ""
-                : ", " + endLine + ":" + endColumn) +
-            "]";
+                : ", " + endLine + ":" + endColumn)
+            + "]";
     }
 
     /**
@@ -152,10 +152,10 @@ public class ParseRegion {
     public boolean equals(Object obj) {
         if (obj instanceof ParseRegion) {
             final ParseRegion that = (ParseRegion) obj;
-            return this.startLine == that.startLine &&
-                this.startColumn == that.startColumn &&
-                this.endLine == that.endLine &&
-                this.endColumn == that.endColumn;
+            return this.startLine == that.startLine
+                && this.startColumn == that.startColumn
+                && this.endLine == that.endLine
+                && this.endColumn == that.endColumn;
         } else {
             return false;
         }

@@ -549,11 +549,11 @@ public class ConnectionTest extends TestCase {
             tester.getWrapper().unwrap(connection, OlapConnection.class);
         PreparedOlapStatement pstmt =
             olapConnection.prepareOlapStatement(
-                "SELECT {\n" +
-                    "   Parameter(\"P1\", [Store], [Store].[USA].[CA]).Parent,\n" +
-                    "   ParamRef(\"P1\").Children} ON 0\n" +
-                    "FROM [Sales]\n" +
-                    "WHERE [Gender].[M]");
+                "SELECT {\n"
+                + "   Parameter(\"P1\", [Store], [Store].[USA].[CA]).Parent,\n"
+                + "   ParamRef(\"P1\").Children} ON 0\n"
+                + "FROM [Sales]\n"
+                + "WHERE [Gender].[M]");
         OlapParameterMetaData parameterMetaData =
             pstmt.getParameterMetaData();
         int paramCount = parameterMetaData.getParameterCount();
@@ -620,21 +620,21 @@ public class ConnectionTest extends TestCase {
         assertEquals(metaData, cellSet.getMetaData());
         String s = TestContext.toString(cellSet);
         TestContext.assertEqualsVerbose(
-            TestContext.fold("Axis #0:\n" +
-                "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender].[M], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
-                "Axis #1:\n" +
-                "{[Store].[All Stores].[USA]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Alameda]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Beverly Hills]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Los Angeles]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[San Diego]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[San Francisco]}\n" +
-                "Row #0: 135,215\n" +
-                "Row #0: \n" +
-                "Row #0: 10,562\n" +
-                "Row #0: 13,574\n" +
-                "Row #0: 12,800\n" +
-                "Row #0: 1,053\n"),
+            "Axis #0:\n"
+            + "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender].[M], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "Axis #1:\n"
+            + "{[Store].[All Stores].[USA]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Alameda]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Los Angeles]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Diego]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Francisco]}\n"
+            + "Row #0: 135,215\n"
+            + "Row #0: \n"
+            + "Row #0: 10,562\n"
+            + "Row #0: 13,574\n"
+            + "Row #0: 12,800\n"
+            + "Row #0: 1,053\n",
             s);
 
         // Bind parameter and re-execute.
@@ -648,22 +648,21 @@ public class ConnectionTest extends TestCase {
         assertIsClosed(cellSet2, false);
         s = TestContext.toString(cellSet2);
         TestContext.assertEqualsVerbose(
-            TestContext.fold(
-                "Axis #0:\n" +
-                    "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender].[M], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
-                    "Axis #1:\n" +
-                    "{[Store].[All Stores].[USA].[CA]}\n" +
-                    "{[Store].[All Stores].[USA].[CA].[San Francisco].[Store 14]}\n" +
-                    "Row #0: 37,989\n" +
-                    "Row #0: 1,053\n"),
+            "Axis #0:\n"
+            + "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender].[M], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "Axis #1:\n"
+            + "{[Store].[All Stores].[USA].[CA]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Francisco].[Store 14]}\n"
+            + "Row #0: 37,989\n"
+            + "Row #0: 1,053\n",
             s);
 
         // Re-execute with a new MDX string.
         CellSet cellSet3 = pstmt.executeOlapQuery("SELECT FROM [Sales] WHERE [Time.Weekly].[1997].[3]");
         TestContext.assertEqualsVerbose(
-            TestContext.fold("Axis #0:\n" +
-                "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time.Weekly].[All Time.Weeklys].[1997].[3], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
-                "9,518"),
+            "Axis #0:\n"
+            + "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time.Weekly].[All Time.Weeklys].[1997].[3], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "9,518",
             TestContext.toString(cellSet3));
 
         // Number of parameters has changed.
@@ -690,16 +689,15 @@ public class ConnectionTest extends TestCase {
             olapConnection.getParserFactory().createMdxParser(olapConnection);
         SelectNode select =
             mdxParser.parseSelect(
-                "select {[Gender]} on columns from [sales]\n" +
-                    "where [Time].[1997].[Q4]");
+                "select {[Gender]} on columns from [sales]\n"
+                + "where [Time].[1997].[Q4]");
         CellSet cellSet5 = pstmt.executeOlapQuery(select);
         TestContext.assertEqualsVerbose(
-            TestContext.fold(
-                "Axis #0:\n" +
-                    "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q4], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
-                    "Axis #1:\n" +
-                    "{[Gender].[All Gender]}\n" +
-                    "Row #0: 72,024\n"),
+            "Axis #0:\n"
+            + "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q4], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "Axis #1:\n"
+            + "{[Gender].[All Gender]}\n"
+            + "Row #0: 72,024\n",
             TestContext.toString(cellSet5));
 
         // Execute.
@@ -731,8 +729,8 @@ public class ConnectionTest extends TestCase {
 
         checkCellSetMetaData1(
             olapConnection,
-            "select {[Gender]} on columns from [sales]\n" +
-            "where [Time].[1997].[Q4]");
+            "select {[Gender]} on columns from [sales]\n"
+            + "where [Time].[1997].[Q4]");
 
         // now a query with no explicit slicer
         checkCellSetMetaData1(
@@ -885,38 +883,38 @@ public class ConnectionTest extends TestCase {
             tester.getWrapper().unwrap(statement, OlapStatement.class);
         final CellSet cellSet =
             olapStatement.executeOlapQuery(
-                "SELECT\n" +
-                    " {[Measures].[Unit Sales],\n" +
-                    "    [Measures].[Store Sales]} ON COLUMNS\n," +
-                    " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n" +
-                    "FROM [Sales]\n" +
-                    "WHERE [Time].[1997].[Q2]");
+                "SELECT\n"
+                + " {[Measures].[Unit Sales],\n"
+                + "    [Measures].[Store Sales]} ON COLUMNS\n,"
+                + " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n"
+                + "FROM [Sales]\n"
+                + "WHERE [Time].[1997].[Q2]");
         String s = TestContext.toString(cellSet);
         assertEquals(
-            TestContext.fold("Axis #0:\n" +
-                "{[Store].[All Stores],"
-                + " [Store Size in SQFT].[All Store Size in SQFTs],"
-                + " [Store Type].[All Store Types],"
-                + " [Time].[1997].[Q2],"
-                + " [Promotion Media].[All Media],"
-                + " [Promotions].[All Promotions],"
-                + " [Customers].[All Customers],"
-                + " [Education Level].[All Education Levels],"
-                + " [Marital Status].[All Marital Status],"
-                + " [Yearly Income].[All Yearly Incomes]}\n"
-                + "Axis #1:\n"
-                + "{[Measures].[Unit Sales]}\n"
-                + "{[Measures].[Store Sales]}\n"
-                + "Axis #2:\n"
-                + "{[Gender].[All Gender].[M], [Product].[All Products].[Drink]}\n"
-                + "{[Gender].[All Gender].[M], [Product].[All Products].[Food]}\n"
-                + "{[Gender].[All Gender].[M], [Product].[All Products].[Non-Consumable]}\n"
-                + "Row #0: 3,023\n"
-                + "Row #0: 6,004.80\n"
-                + "Row #1: 22,558\n"
-                + "Row #1: 47,869.17\n"
-                + "Row #2: 6,037\n"
-                + "Row #2: 12,935.16\n"),
+            "Axis #0:\n"
+            + "{[Store].[All Stores],"
+            + " [Store Size in SQFT].[All Store Size in SQFTs],"
+            + " [Store Type].[All Store Types],"
+            + " [Time].[1997].[Q2],"
+            + " [Promotion Media].[All Media],"
+            + " [Promotions].[All Promotions],"
+            + " [Customers].[All Customers],"
+            + " [Education Level].[All Education Levels],"
+            + " [Marital Status].[All Marital Status],"
+            + " [Yearly Income].[All Yearly Incomes]}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[Unit Sales]}\n"
+            + "{[Measures].[Store Sales]}\n"
+            + "Axis #2:\n"
+            + "{[Gender].[All Gender].[M], [Product].[All Products].[Drink]}\n"
+            + "{[Gender].[All Gender].[M], [Product].[All Products].[Food]}\n"
+            + "{[Gender].[All Gender].[M], [Product].[All Products].[Non-Consumable]}\n"
+            + "Row #0: 3,023\n"
+            + "Row #0: 6,004.80\n"
+            + "Row #1: 22,558\n"
+            + "Row #1: 47,869.17\n"
+            + "Row #2: 6,037\n"
+            + "Row #2: 12,935.16\n",
             s);
     }
 
@@ -927,12 +925,12 @@ public class ConnectionTest extends TestCase {
             tester.getWrapper().unwrap(statement, OlapStatement.class);
         CellSet cellSet =
             olapStatement.executeOlapQuery(
-                "SELECT\n" +
-                    " {[Measures].[Unit Sales],\n" +
-                    "    [Measures].[Store Sales]} ON COLUMNS\n," +
-                    " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n" +
-                    "FROM [Sales]\n" +
-                    "WHERE [Time].[1997].[Q2]");
+                "SELECT\n"
+                + " {[Measures].[Unit Sales],\n"
+                + "    [Measures].[Store Sales]} ON COLUMNS\n,"
+                + " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n"
+                + "FROM [Sales]\n"
+                + "WHERE [Time].[1997].[Q2]");
 
         // cell column#1, row#2
         // cellOrdinal = colOrdinal + rowOrdinal * columnCount
@@ -1041,11 +1039,11 @@ public class ConnectionTest extends TestCase {
         // Null cell
         cellSet =
             olapStatement.executeOlapQuery(
-                "with member [Measures].[X] as 'IIF([Measures].[Store Sales]>10000,[Measures].[Store Sales],Null)'\n" +
-                    "select\n" +
-                    "{[Measures].[X]} on columns,\n" +
-                    "{[Product].[Product Department].members} on rows\n" +
-                    "from Sales");
+                "with member [Measures].[X] as 'IIF([Measures].[Store Sales]>10000,[Measures].[Store Sales],Null)'\n"
+                + "select\n"
+                + "{[Measures].[X]} on columns,\n"
+                + "{[Product].[Product Department].members} on rows\n"
+                + "from Sales");
         cell = cellSet.getCell(0);
         assertFalse(cell.isNull());
         cell = cellSet.getCell(2);
@@ -1156,10 +1154,10 @@ public class ConnectionTest extends TestCase {
             olapConnection.getParserFactory().createMdxParser(olapConnection);
         SelectNode select =
             mdxParser.parseSelect(
-                "with member [Measures].[Foo] as ' [Measures].[Bar] ', FORMAT_STRING='xxx'\n" +
-            " select {[Gender]} on columns, {[Store].Children} on rows\n" +
-            "from [sales]\n" +
-            "where [Time].[1997].[Q4]");
+                "with member [Measures].[Foo] as ' [Measures].[Bar] ', FORMAT_STRING='xxx'\n"
+                + " select {[Gender]} on columns, {[Store].Children} on rows\n"
+                + "from [sales]\n"
+                + "where [Time].[1997].[Q4]");
 
         // unparse
         checkUnparsedMdx(select);
@@ -1167,8 +1165,8 @@ public class ConnectionTest extends TestCase {
         // test that get error if axes do not have unique names
         select =
             mdxParser.parseSelect(
-                "select {[Gender]} on columns, {[Store].Children} on columns\n" +
-                    "from [sales]");
+                "select {[Gender]} on columns, {[Store].Children} on columns\n"
+                + "from [sales]");
 
         if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
             // This test requires validator support.
@@ -1210,7 +1208,7 @@ public class ConnectionTest extends TestCase {
         pw.flush();
         String mdx = sw.toString();
         TestContext.assertEqualsVerbose(
-            TestContext.fold(expectedMdx), mdx);
+            expectedMdx, mdx);
     }
 
     /**
@@ -1425,18 +1423,22 @@ public class ConnectionTest extends TestCase {
         case XMLA:
             // TODO: Fix mondrian's XMLA driver to return members ordered by
             // level then by ordinal as per XMLA spec
-            expected = TestContext.fold("[Time].[1997].[Q2].[4]\n"
+            expected =
+                "[Time].[1997].[Q2].[4]\n"
                 + "[Time].[1997].[Q2].[5]\n"
                 + "[Time].[1997].[Q2].[6]\n"
-                + "[Time].[1997]\n");
+                + "[Time].[1997]\n";
             break;
         default:
-            expected = TestContext.fold("[Time].[1997]\n"
+            expected =
+                "[Time].[1997]\n"
                 + "[Time].[1997].[Q2].[4]\n"
                 + "[Time].[1997].[Q2].[5]\n"
-                + "[Time].[1997].[Q2].[6]\n");
+                + "[Time].[1997].[Q2].[6]\n";
         }
-        assertEquals(expected, memberListToString(memberList));
+        TestContext.assertEqualsVerbose(
+            expected,
+            memberListToString(memberList));
 
         // ask for non-existent member; list should be empty
         memberList =
@@ -1451,7 +1453,7 @@ public class ConnectionTest extends TestCase {
                 EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
                 "Time", "1997", "Q2");
         assertEquals(
-            TestContext.fold("[Time].[1997]\n"),
+            "[Time].[1997]\n",
             memberListToString(memberList));
 
         // ask for parent of root member, should not get null member in list
@@ -1471,20 +1473,20 @@ public class ConnectionTest extends TestCase {
         case XMLA:
             // TODO: fix mondrian's XMLA driver to return members ordered by
             // level then ordinal
-            expected = TestContext.fold("[Time].[1997].[Q2].[4]\n"
-                + "[Time].[1997].[Q2].[5]\n"
-                + "[Time].[1997].[Q2].[6]\n"
-                + "[Time].[1997].[Q1]\n"
-                + "[Time].[1997].[Q3]\n"
-                + "[Time].[1997].[Q4]\n");
+            expected = "[Time].[1997].[Q2].[4]\n"
+                       + "[Time].[1997].[Q2].[5]\n"
+                       + "[Time].[1997].[Q2].[6]\n"
+                       + "[Time].[1997].[Q1]\n"
+                       + "[Time].[1997].[Q3]\n"
+                       + "[Time].[1997].[Q4]\n";
             break;
         default:
-            expected = TestContext.fold("[Time].[1997].[Q1]\n"
-                + "[Time].[1997].[Q2].[4]\n"
-                + "[Time].[1997].[Q2].[5]\n"
-                + "[Time].[1997].[Q2].[6]\n"
-                + "[Time].[1997].[Q3]\n"
-                + "[Time].[1997].[Q4]\n");
+            expected = "[Time].[1997].[Q1]\n"
+                       + "[Time].[1997].[Q2].[4]\n"
+                       + "[Time].[1997].[Q2].[5]\n"
+                       + "[Time].[1997].[Q2].[6]\n"
+                       + "[Time].[1997].[Q3]\n"
+                       + "[Time].[1997].[Q4]\n";
             break;
         }
         assertEquals(
@@ -1497,7 +1499,7 @@ public class ConnectionTest extends TestCase {
                 EnumSet.of(Member.TreeOp.SIBLINGS),
                 "Time", "1997");
         assertEquals(
-            TestContext.fold("[Time].[1998]\n"),
+            "[Time].[1998]\n",
             memberListToString(memberList));
 
         memberList =
@@ -1505,9 +1507,9 @@ public class ConnectionTest extends TestCase {
                 EnumSet.of(Member.TreeOp.SIBLINGS, Member.TreeOp.SELF),
                 "Customers", "USA", "OR");
         assertEquals(
-            TestContext.fold("[Customers].[All Customers].[USA].[CA]\n"
-                + "[Customers].[All Customers].[USA].[OR]\n"
-                + "[Customers].[All Customers].[USA].[WA]\n"),
+            "[Customers].[All Customers].[USA].[CA]\n"
+            + "[Customers].[All Customers].[USA].[OR]\n"
+            + "[Customers].[All Customers].[USA].[WA]\n",
             memberListToString(memberList));
     }
 
@@ -1598,7 +1600,8 @@ public class ConnectionTest extends TestCase {
                         assertNotNull(member.getName());
                         assertEquals(level, member.getLevel());
                         if (dimension.getDimensionType()
-                            == Dimension.Type.MEASURE) {
+                            == Dimension.Type.MEASURE)
+                        {
                             assertTrue(member instanceof Measure);
                         }
                         if (++k > 3) {
@@ -1724,7 +1727,8 @@ public class ConnectionTest extends TestCase {
             }
             if (measure.getName().equals("Profit Growth")
                 || measure.getName().equals("Profit last Period")
-                || measure.getName().equals("Profit")) {
+                || measure.getName().equals("Profit"))
+            {
                 assertEquals(Member.Type.FORMULA, measure.getMemberType());
                 assertTrue(measure.isCalculated());
             } else {
@@ -1761,7 +1765,8 @@ public class ConnectionTest extends TestCase {
         final OlapStatement olapStatement =
             tester.getWrapper().unwrap(statement, OlapStatement.class);
         final CellSet cellSet =
-            olapStatement.executeOlapQuery("SELECT\n"
+            olapStatement.executeOlapQuery(
+                "SELECT\n"
                 + "{[Product].[All Products].[Drink].[Alcoholic Beverages].Children,\n"
                 + "[Product].[All Products].[Food].[Baked Goods].Children} ON COLUMNS,\n"
                 + "CrossJoin([Store].[All Stores].[USA].[CA].Children,\n"
@@ -1769,48 +1774,48 @@ public class ConnectionTest extends TestCase {
                 + "FROM [Sales Ragged]");
         String s = TestContext.toString(cellSet);
         TestContext.assertEqualsVerbose(
-            TestContext.fold("Axis #0:\n" +
-                "{[Measures].[Unit Sales], [Geography].[All Geographys], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
-                "Axis #1:\n" +
-                "{[Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n" +
-                "{[Product].[All Products].[Food].[Baked Goods].[Bread]}\n" +
-                "Axis #2:\n" +
-                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[1]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[2]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[3]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[1]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[2]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[3]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n" +
-                "Row #0: \n" +
-                "Row #0: \n" +
-                "Row #1: \n" +
-                "Row #1: \n" +
-                "Row #2: \n" +
-                "Row #2: \n" +
-                "Row #3: 22\n" +
-                "Row #3: 63\n" +
-                "Row #4: 28\n" +
-                "Row #4: 59\n" +
-                "Row #5: 28\n" +
-                "Row #5: 39\n" +
-                "Row #6: 70\n" +
-                "Row #6: 51\n" +
-                "Row #7: 89\n" +
-                "Row #7: 51\n" +
-                "Row #8: 27\n" +
-                "Row #8: 54\n" +
-                "Row #9: 6\n" +
-                "Row #9: 2\n" +
-                "Row #10: 3\n" +
-                "Row #10: 7\n" +
-                "Row #11: 2\n" +
-                "Row #11: 10\n"),
+            "Axis #0:\n"
+            + "{[Measures].[Unit Sales], [Geography].[All Geographys], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "Axis #1:\n"
+            + "{[Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n"
+            + "{[Product].[All Products].[Food].[Baked Goods].[Bread]}\n"
+            + "Axis #2:\n"
+            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n"
+            + "Row #0: \n"
+            + "Row #0: \n"
+            + "Row #1: \n"
+            + "Row #1: \n"
+            + "Row #2: \n"
+            + "Row #2: \n"
+            + "Row #3: 22\n"
+            + "Row #3: 63\n"
+            + "Row #4: 28\n"
+            + "Row #4: 59\n"
+            + "Row #5: 28\n"
+            + "Row #5: 39\n"
+            + "Row #6: 70\n"
+            + "Row #6: 51\n"
+            + "Row #7: 89\n"
+            + "Row #7: 51\n"
+            + "Row #8: 27\n"
+            + "Row #8: 54\n"
+            + "Row #9: 6\n"
+            + "Row #9: 2\n"
+            + "Row #10: 3\n"
+            + "Row #10: 7\n"
+            + "Row #11: 2\n"
+            + "Row #11: 10\n",
             s);
     }
     /**
@@ -1896,8 +1901,8 @@ public class ConnectionTest extends TestCase {
 
         SelectNode select =
             mdxParser.parseSelect(
-                "select {[Gender]} on columns from [sales]\n" +
-                    "where [Time].[1997].[Q4]");
+                "select {[Gender]} on columns from [sales]\n"
+                + "where [Time].[1997].[Q4]");
 
         // CubeType
 
@@ -1966,9 +1971,9 @@ public class ConnectionTest extends TestCase {
         SelectNode select =
             mdxParser.parseSelect(
                 "select ([Gender], [Store]) on columns\n,"
-                    + "{[Customers].[City].Members} on rows\n"
-                    + "from [sales]\n" +
-                    "where ([Time].[1997].[Q4], [Marital Status].[S])");
+                + "{[Customers].[City].Members} on rows\n"
+                + "from [sales]\n"
+                + "where ([Time].[1997].[Q4], [Marital Status].[S])");
         select = mdxValidator.validateSelect(select);
 
         // a query is not an expression, so does not have a type
@@ -2152,7 +2157,8 @@ public class ConnectionTest extends TestCase {
                 "SELECT [Customers].Members * \n"
                     + " [Time].Members on columns\n"
                     + "from [Sales]");
-            fail("expected exception indicating stmt had been canceled,"
+            fail(
+                "expected exception indicating stmt had been canceled,"
                 + " got cellSet " + cellSet);
         } catch (OlapException e) {
             assertTrue(e.getMessage().indexOf("Query canceled") >= 0);
@@ -2182,7 +2188,8 @@ public class ConnectionTest extends TestCase {
                         + " [Customers].Members * \n"
                         + " [Time].Members on columns\n"
                         + "from [Sales]");
-            fail("expected exception indicating timeout,"
+            fail(
+                "expected exception indicating timeout,"
                 + " got cellSet " + cellSet);
         } catch (OlapException e) {
             assertTrue(e.getMessage().indexOf("Query timeout of ") >= 0);
@@ -2201,62 +2208,62 @@ public class ConnectionTest extends TestCase {
         // the other attributes of members.
         CellSet cellSet =
             olapStatement.executeOlapQuery(
-                    "SELECT " +
-                    "{[Product].[All Products].[Drink].[Alcoholic Beverages].Children, [Product].[All Products].[Food].[Baked Goods].Children} ON COLUMNS, " +
-                    "CrossJoin([Store].[All Stores].[USA].[CA].Children, [Time].[1997].[Q1].Children) ON ROWS " +
-                    "FROM [Sales]");
+                "SELECT "
+                + "{[Product].[All Products].[Drink].[Alcoholic Beverages].Children, [Product].[All Products].[Food].[Baked Goods].Children} ON COLUMNS, "
+                + "CrossJoin([Store].[All Stores].[USA].[CA].Children, [Time].[1997].[Q1].Children) ON ROWS "
+                + "FROM [Sales]");
         TestContext.assertEqualsVerbose(
-            TestContext.fold("Axis #0:\n" +
-                "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
-                "Axis #1:\n" +
-                "{[Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n" +
-                "{[Product].[All Products].[Food].[Baked Goods].[Bread]}\n" +
-                "Axis #2:\n" +
-                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[1]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[2]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[3]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[1]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[2]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[3]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[1]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[2]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[3]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n" +
-                "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n" +
-                "Row #0: \n" +
-                "Row #0: \n" +
-                "Row #1: \n" +
-                "Row #1: \n" +
-                "Row #2: \n" +
-                "Row #2: \n" +
-                "Row #3: 22\n" +
-                "Row #3: 63\n" +
-                "Row #4: 28\n" +
-                "Row #4: 59\n" +
-                "Row #5: 28\n" +
-                "Row #5: 39\n" +
-                "Row #6: 70\n" +
-                "Row #6: 51\n" +
-                "Row #7: 89\n" +
-                "Row #7: 51\n" +
-                "Row #8: 27\n" +
-                "Row #8: 54\n" +
-                "Row #9: 54\n" +
-                "Row #9: 51\n" +
-                "Row #10: 38\n" +
-                "Row #10: 48\n" +
-                "Row #11: 64\n" +
-                "Row #11: 55\n" +
-                "Row #12: 6\n" +
-                "Row #12: 2\n" +
-                "Row #13: 3\n" +
-                "Row #13: 7\n" +
-                "Row #14: 2\n" +
-                "Row #14: 10\n"),
+            "Axis #0:\n"
+            + "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "Axis #1:\n"
+            + "{[Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n"
+            + "{[Product].[All Products].[Food].[Baked Goods].[Bread]}\n"
+            + "Axis #2:\n"
+            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n"
+            + "Row #0: \n"
+            + "Row #0: \n"
+            + "Row #1: \n"
+            + "Row #1: \n"
+            + "Row #2: \n"
+            + "Row #2: \n"
+            + "Row #3: 22\n"
+            + "Row #3: 63\n"
+            + "Row #4: 28\n"
+            + "Row #4: 59\n"
+            + "Row #5: 28\n"
+            + "Row #5: 39\n"
+            + "Row #6: 70\n"
+            + "Row #6: 51\n"
+            + "Row #7: 89\n"
+            + "Row #7: 51\n"
+            + "Row #8: 27\n"
+            + "Row #8: 54\n"
+            + "Row #9: 54\n"
+            + "Row #9: 51\n"
+            + "Row #10: 38\n"
+            + "Row #10: 48\n"
+            + "Row #11: 64\n"
+            + "Row #11: 55\n"
+            + "Row #12: 6\n"
+            + "Row #12: 2\n"
+            + "Row #13: 3\n"
+            + "Row #13: 7\n"
+            + "Row #14: 2\n"
+            + "Row #14: 10\n",
             TestContext.toString(cellSet));
     }
 
@@ -2267,23 +2274,23 @@ public class ConnectionTest extends TestCase {
         final OlapStatement olapStatement = olapConnection.createStatement();
         CellSet cellSet =
             olapStatement.executeOlapQuery(
-                "WITH MEMBER [Measures].[Average Profit] AS" +
-                    "'[Measures].[Profit] / [Measures].[Sales Count]'" +
-                    "SELECT {[Measures].[Average Profit]} ON 0,\n"
-                    + "{[Product].Children} ON 1\n"
-                    + "FROM [Sales]");
+                "WITH MEMBER [Measures].[Average Profit] AS"
+                + "'[Measures].[Profit] / [Measures].[Sales Count]'"
+                + "SELECT {[Measures].[Average Profit]} ON 0,\n"
+                + "{[Product].Children} ON 1\n"
+                + "FROM [Sales]");
         TestContext.assertEqualsVerbose(
-            TestContext.fold("Axis #0:\n" +
-                "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
-                "Axis #1:\n" +
-                "{[Measures].[Average Profit]}\n" +
-                "Axis #2:\n" +
-                "{[Product].[All Products].[Drink]}\n" +
-                "{[Product].[All Products].[Food]}\n" +
-                "{[Product].[All Products].[Non-Consumable]}\n" +
-                "Row #0: $3.68\n" +
-                "Row #1: $3.94\n" +
-                "Row #2: $3.93\n"), TestContext.toString(cellSet));
+            "Axis #0:\n"
+            + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[Average Profit]}\n"
+            + "Axis #2:\n"
+            + "{[Product].[All Products].[Drink]}\n"
+            + "{[Product].[All Products].[Food]}\n"
+            + "{[Product].[All Products].[Non-Consumable]}\n"
+            + "Row #0: $3.68\n"
+            + "Row #1: $3.94\n"
+            + "Row #2: $3.93\n", TestContext.toString(cellSet));
     }
 
     public void testBuildQuery() throws SQLException {
@@ -2339,26 +2346,26 @@ public class ConnectionTest extends TestCase {
         query.getAxisList().add(rowAxis);
         OlapStatement statement = olapConnection.createStatement();
         CellSet cellSet = statement.executeOlapQuery(query);
-        TestContext.assertEqualsVerbose(TestContext.fold(
-            "Axis #0:\n" +
-                "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Education Level].[All Education Levels], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n" +
-                "Axis #1:\n" +
-                "{[Gender].[All Gender]}\n" +
-                "{[Gender].[All Gender].[F]}\n" +
-                "{[Gender].[All Gender].[M]}\n" +
-                "Axis #2:\n" +
-                "{[Customers].[All Customers].[USA].[CA]}\n" +
-                "{[Customers].[All Customers].[USA].[OR]}\n" +
-                "{[Customers].[All Customers].[USA].[WA]}\n" +
-                "Row #0: 74,748\n" +
-                "Row #0: 36,759\n" +
-                "Row #0: 37,989\n" +
-                "Row #1: 67,659\n" +
-                "Row #1: 33,036\n" +
-                "Row #1: 34,623\n" +
-                "Row #2: 124,366\n" +
-                "Row #2: 61,763\n" +
-                "Row #2: 62,603\n"),
+        TestContext.assertEqualsVerbose(
+            "Axis #0:\n"
+            + "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Education Level].[All Education Levels], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "Axis #1:\n"
+            + "{[Gender].[All Gender]}\n"
+            + "{[Gender].[All Gender].[F]}\n"
+            + "{[Gender].[All Gender].[M]}\n"
+            + "Axis #2:\n"
+            + "{[Customers].[All Customers].[USA].[CA]}\n"
+            + "{[Customers].[All Customers].[USA].[OR]}\n"
+            + "{[Customers].[All Customers].[USA].[WA]}\n"
+            + "Row #0: 74,748\n"
+            + "Row #0: 36,759\n"
+            + "Row #0: 37,989\n"
+            + "Row #1: 67,659\n"
+            + "Row #1: 33,036\n"
+            + "Row #1: 34,623\n"
+            + "Row #2: 124,366\n"
+            + "Row #2: 61,763\n"
+            + "Row #2: 62,603\n",
             TestContext.toString(cellSet));
     }
 
@@ -2426,21 +2433,20 @@ public class ConnectionTest extends TestCase {
         }
         pw.flush();
         TestContext.assertEqualsVerbose(
-            TestContext.fold(
-                "ROW:[Bulk Mail] COL:[Unit Sales] CELL:4,320\n" +
-                    "ROW:[Cash Register Handout] COL:[Unit Sales] CELL:6,697\n" +
-                    "ROW:[Daily Paper] COL:[Unit Sales] CELL:7,738\n" +
-                    "ROW:[Daily Paper, Radio] COL:[Unit Sales] CELL:6,891\n" +
-                    "ROW:[Daily Paper, Radio, TV] COL:[Unit Sales] CELL:9,513\n" +
-                    "ROW:[In-Store Coupon] COL:[Unit Sales] CELL:3,798\n" +
-                    "ROW:[No Media] COL:[Unit Sales] CELL:195,448\n" +
-                    "ROW:[Product Attachment] COL:[Unit Sales] CELL:7,544\n" +
-                    "ROW:[Radio] COL:[Unit Sales] CELL:2,454\n" +
-                    "ROW:[Street Handout] COL:[Unit Sales] CELL:5,753\n" +
-                    "ROW:[Sunday Paper] COL:[Unit Sales] CELL:4,339\n" +
-                    "ROW:[Sunday Paper, Radio] COL:[Unit Sales] CELL:5,945\n" +
-                    "ROW:[Sunday Paper, Radio, TV] COL:[Unit Sales] CELL:2,726\n" +
-                    "ROW:[TV] COL:[Unit Sales] CELL:3,607\n"),
+            "ROW:[Bulk Mail] COL:[Unit Sales] CELL:4,320\n"
+            + "ROW:[Cash Register Handout] COL:[Unit Sales] CELL:6,697\n"
+            + "ROW:[Daily Paper] COL:[Unit Sales] CELL:7,738\n"
+            + "ROW:[Daily Paper, Radio] COL:[Unit Sales] CELL:6,891\n"
+            + "ROW:[Daily Paper, Radio, TV] COL:[Unit Sales] CELL:9,513\n"
+            + "ROW:[In-Store Coupon] COL:[Unit Sales] CELL:3,798\n"
+            + "ROW:[No Media] COL:[Unit Sales] CELL:195,448\n"
+            + "ROW:[Product Attachment] COL:[Unit Sales] CELL:7,544\n"
+            + "ROW:[Radio] COL:[Unit Sales] CELL:2,454\n"
+            + "ROW:[Street Handout] COL:[Unit Sales] CELL:5,753\n"
+            + "ROW:[Sunday Paper] COL:[Unit Sales] CELL:4,339\n"
+            + "ROW:[Sunday Paper, Radio] COL:[Unit Sales] CELL:5,945\n"
+            + "ROW:[Sunday Paper, Radio, TV] COL:[Unit Sales] CELL:2,726\n"
+            + "ROW:[TV] COL:[Unit Sales] CELL:3,607\n",
             sw.toString());
     }
 }
