@@ -16,6 +16,7 @@ import org.olap4j.*;
 import org.olap4j.mdx.SelectNode;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.sql.SQLException;
 
 /**
@@ -25,7 +26,7 @@ import java.sql.SQLException;
  * @version $Id$
  * @since May 29, 2007
  */
-public class Query {
+public class Query extends QueryNodeImpl {
 
     protected final String name;
     protected Map<Axis, QueryAxis> axes = new HashMap<Axis, QueryAxis>();
@@ -37,8 +38,7 @@ public class Query {
     protected Map<String, QueryDimension> dimensionMap =
         new HashMap<String, QueryDimension>();
     private final OlapConnection connection;
-    private final SelectionFactory selectionFactory =
-        new SelectionFactory(this);
+    private final SelectionFactory selectionFactory = new SelectionFactory();
 
     public Query(String name, Cube cube) throws SQLException {
         super();
@@ -108,15 +108,38 @@ public class Query {
         tmpDown.addAll(down.getDimensions());
 
         across.getDimensions().clear();
+        Map<Integer,QueryNode> acrossChildList =
+                new HashMap<Integer, QueryNode>();
+        for (int cpt = 0; cpt < tmpAcross.size();cpt++) {
+            acrossChildList.put(Integer.valueOf(cpt), tmpAcross.get(cpt));
+        }
+        across.notifyRemove(acrossChildList);
+
         down.getDimensions().clear();
+        Map<Integer,QueryNode> downChildList =
+            new HashMap<Integer, QueryNode>();
+        for (int cpt = 0; cpt < tmpDown.size();cpt++) {
+            downChildList.put(Integer.valueOf(cpt), tmpDown.get(cpt));
+        }
+        down.notifyRemove(downChildList);
 
         across.getDimensions().addAll(tmpDown);
+        across.notifyAdd(downChildList);
+
         down.getDimensions().addAll(tmpAcross);
+        down.notifyAdd(acrossChildList);
+    }
+
+    public QueryAxis getAxis(Axis axis) {
+        return this.axes.get(axis);
     }
 
     /**
      * Returns a map of the current query's axis.
-     * @return A standard Map object that represents the current query's axis.
+     * <p>Be aware that modifications to this list might
+     * have unpredictable consequences.</p>
+     * @return A standard Map object that represents the
+     * current query's axis.
      */
     public Map<Axis, QueryAxis> getAxes() {
         return axes;
@@ -130,6 +153,25 @@ public class Query {
      */
     public QueryAxis getUnusedAxis() {
         return unused;
+    }
+
+    public void tearDown(boolean closeConnection) {
+        for (Entry<Axis, QueryAxis> entry : this.axes.entrySet()) {
+            entry.getValue().tearDown();
+        }
+        this.axes.clear();
+        this.clearListeners();
+        if (closeConnection) {
+            try {
+                this.connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void tearDown() {
+        this.tearDown(true);
     }
 
     public boolean validate() throws OlapException {
@@ -154,12 +196,11 @@ public class Query {
                 || queryDimension.getAxis().getLocation() == null)
             {
                 queryDimension.getSelections().clear();
-                queryDimension.getSelections().add(
-                    queryDimension.createSelection(member));
+                queryDimension.select(member);
+
             } else {
                 if (queryDimension.getSelections().size() == 0) {
-                    queryDimension.getSelections().add(
-                        queryDimension.createSelection(member));
+                    queryDimension.select(member);
                 }
             }
         }
@@ -195,7 +236,7 @@ public class Query {
      * @return A standard Locale object.
      */
     public Locale getLocale() {
-        // TODO Do queries really support locales?
+        // REVIEW Do queries really support locales?
         return Locale.getDefault();
     }
 

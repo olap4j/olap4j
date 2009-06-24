@@ -13,8 +13,10 @@ import org.olap4j.Axis;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.AbstractList;
+import java.util.Map;
 
 /**
  * An axis within an OLAP {@link Query}.
@@ -26,7 +28,7 @@ import java.util.AbstractList;
  * @version $Id$
  * @since May 29, 2007
  */
-public class QueryAxis {
+public class QueryAxis extends QueryNodeImpl {
 
     protected final List<QueryDimension> dimensions = new DimensionList();
 
@@ -59,11 +61,8 @@ public class QueryAxis {
     /**
      * Returns a list of the dimensions placed on this QueryAxis.
      *
-     * <p>The list is mutable; you may call
-     * <code>getDimensions().clear()</code>,
-     * or <code>getDimensions().add(dimension)</code>, for instance.
-     * When a dimension is added to an axis, it is automatically removed from
-     * its previous axis.</p>
+     * <p>Be aware that modifications to this list might
+     * have unpredictable consequences.</p>
      *
      * @return list of dimensions
      */
@@ -91,7 +90,13 @@ public class QueryAxis {
      * It uses a zero based index.
      */
     public void pullUp(int index) {
+        Map<Integer,QueryNode> removed = new HashMap<Integer, QueryNode>();
+        removed.put(Integer.valueOf(index),this.dimensions.get(index));
+        Map<Integer,QueryNode> added = new HashMap<Integer, QueryNode>();
+        added.put(Integer.valueOf(index - 1),this.dimensions.get(index));
         Collections.swap(this.dimensions, index, index - 1);
+        this.notifyRemove(removed);
+        this.notifyAdd(added);
     }
 
     /**
@@ -105,7 +110,37 @@ public class QueryAxis {
      * It uses a zero based index.
      */
     public void pushDown(int index) {
+        Map<Integer,QueryNode> removed = new HashMap<Integer, QueryNode>();
+        removed.put(Integer.valueOf(index),this.dimensions.get(index));
+        Map<Integer,QueryNode> added = new HashMap<Integer, QueryNode>();
+        added.put(Integer.valueOf(index + 1),this.dimensions.get(index));
         Collections.swap(this.dimensions, index, index + 1);
+        this.notifyRemove(removed);
+        this.notifyAdd(added);
+    }
+
+    /**
+     * Places a {@link QueryDimension} object on this axis.
+     * @param dimension The {@link QueryDimension} object to add
+     * to this axis.
+     */
+    public void addDimension(QueryDimension dimension) {
+        this.getDimensions().add(dimension);
+        Integer index = Integer.valueOf(
+                this.getDimensions().indexOf(dimension));
+        this.notifyAdd(dimension,index);
+    }
+
+    /**
+     * Removes a {@link QueryDimension} object on this axis.
+     * @param dimension The {@link QueryDimension} object to remove
+     * from this axis.
+     */
+    public void removeDimension(QueryDimension dimension) {
+        Integer index = Integer.valueOf(
+                this.getDimensions().indexOf(dimension));
+        this.getDimensions().remove(dimension);
+        this.notifyRemove(dimension,index);
     }
 
     /**
@@ -181,6 +216,14 @@ public class QueryAxis {
             dimension.setAxis(null);
             return dimension;
         }
+    }
+
+    void tearDown() {
+        for (QueryDimension node : this.getDimensions()) {
+            node.tearDown();
+        }
+        this.clearListeners();
+        this.getDimensions().clear();
     }
 }
 

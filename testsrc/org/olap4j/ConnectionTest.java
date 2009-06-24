@@ -891,30 +891,30 @@ public class ConnectionTest extends TestCase {
                 + "WHERE [Time].[1997].[Q2]");
         String s = TestContext.toString(cellSet);
         assertEquals(
-            "Axis #0:\n"
-            + "{[Store].[All Stores],"
-            + " [Store Size in SQFT].[All Store Size in SQFTs],"
-            + " [Store Type].[All Store Types],"
-            + " [Time].[1997].[Q2],"
-            + " [Promotion Media].[All Media],"
-            + " [Promotions].[All Promotions],"
-            + " [Customers].[All Customers],"
-            + " [Education Level].[All Education Levels],"
-            + " [Marital Status].[All Marital Status],"
-            + " [Yearly Income].[All Yearly Incomes]}\n"
-            + "Axis #1:\n"
-            + "{[Measures].[Unit Sales]}\n"
-            + "{[Measures].[Store Sales]}\n"
-            + "Axis #2:\n"
-            + "{[Gender].[All Gender].[M], [Product].[All Products].[Drink]}\n"
-            + "{[Gender].[All Gender].[M], [Product].[All Products].[Food]}\n"
-            + "{[Gender].[All Gender].[M], [Product].[All Products].[Non-Consumable]}\n"
-            + "Row #0: 3,023\n"
-            + "Row #0: 6,004.80\n"
-            + "Row #1: 22,558\n"
-            + "Row #1: 47,869.17\n"
-            + "Row #2: 6,037\n"
-            + "Row #2: 12,935.16\n",
+            TestContext.fold("Axis #0:\n"
+                + "{[Store].[All Stores],"
+                + " [Store Size in SQFT].[All Store Size in SQFTs],"
+                + " [Store Type].[All Store Types],"
+                + " [Time].[1997].[Q2],"
+                + " [Promotion Media].[All Media],"
+                + " [Promotions].[All Promotions],"
+                + " [Customers].[All Customers],"
+                + " [Education Level].[All Education Levels],"
+                + " [Marital Status].[All Marital Status],"
+                + " [Yearly Income].[All Yearly Incomes]}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Unit Sales]}\n"
+                + "{[Measures].[Store Sales]}\n"
+                + "Axis #2:\n"
+                + "{[Gender].[All Gender].[M], [Product].[All Products].[Drink]}\n"
+                + "{[Gender].[All Gender].[M], [Product].[All Products].[Food]}\n"
+                + "{[Gender].[All Gender].[M], [Product].[All Products].[Non-Consumable]}\n"
+                + "Row #0: 3,023\n"
+                + "Row #0: 6,004.80\n"
+                + "Row #1: 22,558\n"
+                + "Row #1: 47,869.17\n"
+                + "Row #2: 6,037\n"
+                + "Row #2: 12,935.16\n").toString(),
             s);
     }
 
@@ -1453,7 +1453,7 @@ public class ConnectionTest extends TestCase {
                 EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
                 "Time", "1997", "Q2");
         assertEquals(
-            "[Time].[1997]\n",
+            TestContext.fold("[Time].[1997]\n").toString(),
             memberListToString(memberList));
 
         // ask for parent of root member, should not get null member in list
@@ -1490,7 +1490,7 @@ public class ConnectionTest extends TestCase {
             break;
         }
         assertEquals(
-            expected,
+            TestContext.fold(expected).toString(),
             memberListToString(memberList));
 
         // siblings of the root member - potentially tricky
@@ -1499,7 +1499,7 @@ public class ConnectionTest extends TestCase {
                 EnumSet.of(Member.TreeOp.SIBLINGS),
                 "Time", "1997");
         assertEquals(
-            "[Time].[1998]\n",
+            TestContext.fold("[Time].[1998]\n").toString(),
             memberListToString(memberList));
 
         memberList =
@@ -1507,9 +1507,9 @@ public class ConnectionTest extends TestCase {
                 EnumSet.of(Member.TreeOp.SIBLINGS, Member.TreeOp.SELF),
                 "Customers", "USA", "OR");
         assertEquals(
-            "[Customers].[All Customers].[USA].[CA]\n"
-            + "[Customers].[All Customers].[USA].[OR]\n"
-            + "[Customers].[All Customers].[USA].[WA]\n",
+            TestContext.fold("[Customers].[All Customers].[USA].[CA]\n"
+                    + "[Customers].[All Customers].[USA].[OR]\n"
+                    + "[Customers].[All Customers].[USA].[WA]\n").toString(),
             memberListToString(memberList));
     }
 

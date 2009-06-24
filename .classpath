@@ -2,28 +2,28 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="testsrc"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-1.5.0_11"/>
+	<classpathentry kind="lib" path="lib/asm-commons.jar"/>
+	<classpathentry kind="lib" path="lib/asm.jar"/>
+	<classpathentry kind="lib" path="lib/javacup.jar"/>
+	<classpathentry kind="lib" path="lib/log4j.jar"/>
+	<classpathentry kind="lib" path="lib/retroweaver-rt.jar"/>
+	<classpathentry kind="lib" path="lib/retroweaver.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="testlib/commons-collections.jar"/>
+	<classpathentry kind="lib" path="testlib/commons-dbcp.jar"/>
+	<classpathentry kind="lib" path="testlib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="testlib/commons-math.jar"/>
+	<classpathentry kind="lib" path="testlib/commons-pool.jar"/>
+	<classpathentry kind="lib" path="testlib/commons-vfs.jar"/>
+	<classpathentry kind="lib" path="testlib/eigenbase-properties.jar"/>
+	<classpathentry kind="lib" path="testlib/eigenbase-resgen.jar"/>
+	<classpathentry kind="lib" path="testlib/eigenbase-xom.jar"/>
+	<classpathentry kind="lib" path="testlib/hsqldb.jar"/>
+	<classpathentry kind="lib" path="testlib/junit.jar"/>
+	<classpathentry kind="lib" path="testlib/pdfdoclet.jar"/>
+	<classpathentry kind="lib" path="testlib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="testlib/simple-jndi.jar"/>
+	<classpathentry kind="lib" path="testlib/mondrian.jar"/>
 	<classpathentry kind="output" path="eclipse-bin"/>
-	<classpathentry kind="lib" path="lib/asm-commons.jar" />
-	<classpathentry kind="lib" path="lib/asm.jar" />
-	<classpathentry kind="lib" path="lib/javacup.jar" />
-	<classpathentry kind="lib" path="lib/log4j.jar" />
-	<classpathentry kind="lib" path="lib/retroweaver-rt.jar" />
-	<classpathentry kind="lib" path="lib/retroweaver.jar" />
-	<classpathentry kind="lib" path="lib/xercesImpl.jar" />
-	<classpathentry kind="lib" path="testlib/commons-collections.jar" />
-	<classpathentry kind="lib" path="testlib/commons-dbcp.jar" />
-	<classpathentry kind="lib" path="testlib/commons-logging.jar" />
-	<classpathentry kind="lib" path="testlib/commons-math.jar" />
-	<classpathentry kind="lib" path="testlib/commons-pool.jar" />
-	<classpathentry kind="lib" path="testlib/commons-vfs.jar" />
-	<classpathentry kind="lib" path="testlib/eigenbase-properties.jar" />
-	<classpathentry kind="lib" path="testlib/eigenbase-resgen.jar" />
-	<classpathentry kind="lib" path="testlib/eigenbase-xom.jar" />
-	<classpathentry kind="lib" path="testlib/hsqldb.jar" />
-	<classpathentry kind="lib" path="testlib/junit.jar" />
-	<classpathentry kind="lib" path="testlib/mondrian.jar" />
-	<classpathentry kind="lib" path="testlib/pdfdoclet.jar" />
-	<classpathentry kind="lib" path="testlib/servlet-api.jar" />
-	<classpathentry kind="lib" path="testlib/simple-jndi.jar" />
 </classpath>

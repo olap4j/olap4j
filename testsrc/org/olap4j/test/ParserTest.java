@@ -157,10 +157,9 @@ public class ParserTest extends TestCase {
         // used to be an error, but no longer
         assertParseQuery(
             "select [member] on axis(5) from sales",
-            TestContext.fold(
-                "SELECT\n"
+            "SELECT\n"
                 + "[member] ON AXIS(5)\n"
-                + "FROM sales"));
+                + "FROM sales");
 
         assertParseQueryFails(
             "select [member] on ^axes^(0) from sales",
@@ -172,20 +171,18 @@ public class ParserTest extends TestCase {
 
         assertParseQuery(
             "select [member] on 555 from sales",
-            TestContext.fold(
-                "SELECT\n"
+            "SELECT\n"
                 + "[member] ON AXIS(555)\n"
-                + "FROM sales"));
+                + "FROM sales");
     }
 
     public void testScannerPunc() {
         // '$' is OK inside brackets but not outside
         assertParseQuery(
             "select [measures].[$foo] on columns from sales",
-            TestContext.fold(
-                "SELECT\n"
+            "SELECT\n"
                 + "[measures].[$foo] ON COLUMNS\n"
-                + "FROM sales"));
+                + "FROM sales");
 
         // todo: parser off by one
         assertParseQueryFails(
@@ -200,20 +197,18 @@ public class ParserTest extends TestCase {
 
     public void testUnparse() {
         checkUnparse(
-            TestContext.fold(
-                "with member [Measures].[Foo] as ' 123 '\n"
+            "with member [Measures].[Foo] as ' 123 '\n"
                 + "select {[Measures].members} on columns,\n"
                 + " CrossJoin([Product].members, {[Gender].Children}) on rows\n"
                 + "from [Sales]\n"
-                + "where [Marital Status].[S]"),
-            TestContext.fold(
-                "WITH\n"
+                + "where [Marital Status].[S]",
+            "WITH\n"
                 + "MEMBER [Measures].[Foo] AS '123.0'\n"
                 + "SELECT\n"
                 + "{[Measures].members} ON COLUMNS,\n"
                 + "CrossJoin([Product].members, {[Gender].Children}) ON ROWS\n"
                 + "FROM [Sales]\n"
-                + "WHERE [Marital Status].[S]"));
+                + "WHERE [Marital Status].[S]");
     }
 
     private void checkUnparse(String queryString, final String expected) {
@@ -471,46 +466,42 @@ public class ParserTest extends TestCase {
     public void testCaseTest() {
         assertParseQuery(
             "with member [Measures].[Foo] as "
-            + " ' case when x = y then \"eq\" when x < y then \"lt\" else \"gt\" end '"
-            + "select {[foo]} on axis(0) from cube",
-            TestContext.fold(
-                "WITH\n"
+                + " ' case when x = y then \"eq\" when x < y then \"lt\" else \"gt\" end '"
+                + "select {[foo]} on axis(0) from cube",
+            "WITH\n"
                 + "MEMBER [Measures].[Foo] AS 'CASE WHEN (x = y) THEN \"eq\" WHEN (x < y) THEN \"lt\" ELSE \"gt\" END'\n"
                 + "SELECT\n"
                 + "{[foo]} ON COLUMNS\n"
-                + "FROM cube"));
+                + "FROM cube");
     }
 
     public void testCaseSwitch() {
         assertParseQuery(
             "with member [Measures].[Foo] as "
-            + " ' case x when 1 then 2 when 3 then 4 else 5 end '"
-            + "select {[foo]} on axis(0) from cube",
-            TestContext.fold(
-                "WITH\n"
+                + " ' case x when 1 then 2 when 3 then 4 else 5 end '"
+                + "select {[foo]} on axis(0) from cube",
+            "WITH\n"
                 + "MEMBER [Measures].[Foo] AS 'CASE x WHEN 1.0 THEN 2.0 WHEN 3.0 THEN 4.0 ELSE 5.0 END'\n"
                 + "SELECT\n"
                 + "{[foo]} ON COLUMNS\n"
-                + "FROM cube"));
+                + "FROM cube");
     }
 
     public void testDimensionProperties() {
         assertParseQuery(
             "select {[foo]} properties p1,   p2 on columns from [cube]",
-            TestContext.fold(
-                "SELECT\n"
+            "SELECT\n"
                 + "{[foo]} DIMENSION PROPERTIES p1, p2 ON COLUMNS\n"
-                + "FROM [cube]"));
+                + "FROM [cube]");
     }
 
     public void testCellProperties() {
         assertParseQuery(
                 "select {[foo]} on columns from [cube] CELL PROPERTIES FORMATTED_VALUE",
-                TestContext.fold(
-                    "SELECT\n"
+                "SELECT\n"
                     + "{[foo]} ON COLUMNS\n"
                     + "FROM [cube]\n"
-                    + "CELL PROPERTIES FORMATTED_VALUE"));
+                    + "CELL PROPERTIES FORMATTED_VALUE");
     }
 
     public void testIsEmpty() {
@@ -735,20 +726,19 @@ public class ParserTest extends TestCase {
         // testcase for the bug.
         assertParseQuery(
             "with member [Measures].[Small Number] as '[Measures].[Store Sales] / 9000'\n"
-            + "select\n"
-            + "{[Measures].[Small Number]} on columns,\n"
-            + "{Filter([Product].[Product Department].members, [Measures].[Small Number] >= 0.3\n"
-            + "and [Measures].[Small Number] <= 0.5000001234)} on rows\n"
-            + "from Sales\n"
-            + "where ([Time].[1997].[Q2].[4])",
-            TestContext.fold(
-                "WITH\n"
+                + "select\n"
+                + "{[Measures].[Small Number]} on columns,\n"
+                + "{Filter([Product].[Product Department].members, [Measures].[Small Number] >= 0.3\n"
+                + "and [Measures].[Small Number] <= 0.5000001234)} on rows\n"
+                + "from Sales\n"
+                + "where ([Time].[1997].[Q2].[4])",
+            "WITH\n"
                 + "MEMBER [Measures].[Small Number] AS '([Measures].[Store Sales] / 9000.0)'\n"
                 + "SELECT\n"
                 + "{[Measures].[Small Number]} ON COLUMNS,\n"
                 + "{Filter([Product].[Product Department].members, (([Measures].[Small Number] >= 0.3) AND ([Measures].[Small Number] <= 0.5000001234)))} ON ROWS\n"
                 + "FROM Sales\n"
-                + "WHERE ([Time].[1997].[Q2].[4])"));
+                + "WHERE ([Time].[1997].[Q2].[4])");
     }
 
     public void testIdentifier() {

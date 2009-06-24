@@ -28,7 +28,8 @@ import org.olap4j.metadata.Member;
  * @version $Id$
  * @since May 30, 2007
  */
-public interface Selection {
+public interface Selection extends QueryNode {
+
     String getName();
 
     void setName(String name);

@@ -21,16 +21,6 @@ import org.olap4j.metadata.Member;
  * @since May 30, 2007
  */
 public class SelectionFactory {
-    private final Query query;
-
-    /**
-     * Creates a SelectionFactory. Called from {@link Query}.
-     *
-     * @param query Owning query
-     */
-    SelectionFactory(Query query) {
-        this.query = query;
-    }
 
     Selection createMemberSelection(
         Member member,
@@ -43,9 +33,7 @@ public class SelectionFactory {
                 member.getHierarchy().getUniqueName(),
                 member.getLevel().getUniqueName(),
                 member.getUniqueName(),
-                operator)
-        {
-        };
+                operator);
     }
 }
 

@@ -14,9 +14,11 @@ import org.olap4j.mdx.IdentifierNode;
 import org.olap4j.mdx.IdentifierNode.Segment;
 import org.olap4j.metadata.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.AbstractList;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -33,7 +35,7 @@ import java.util.TreeSet;
  * @version $Id$
  * @since May 29, 2007
  */
-public class QueryDimension {
+public class QueryDimension extends QueryNodeImpl {
     protected QueryAxis axis;
     protected final List<Selection> selections = new SelectionList();
     private final Query query;
@@ -62,17 +64,54 @@ public class QueryDimension {
         return dimension.getName();
     }
 
-    public Selection createSelection(Member member)
-    {
-        return createSelection(member, Selection.Operator.MEMBER);
+    public void select(String... nameParts) {
+        this.select(Selection.Operator.MEMBER, nameParts);
     }
 
-    public Selection createSelection(
-        Member member,
-        Selection.Operator operator)
+    public void select(Selection.Operator operator,
+            String... nameParts)
     {
-        return query.getSelectionFactory().createMemberSelection(
-            member, operator);
+        try {
+            this.select(
+                    operator,
+                    this.getQuery().getCube().lookupMember(nameParts));
+        } catch (OlapException e) {
+            // Nothing to do, but we'll still log the exception.
+            e.printStackTrace();
+        }
+    }
+
+    public void select(Member member) {
+        select(Selection.Operator.MEMBER, member);
+    }
+
+    public void select(
+            Selection.Operator operator,
+            Member member)
+    {
+        Selection selection =
+                query.getSelectionFactory().createMemberSelection(
+                        member, operator);
+        this.select(selection);
+    }
+
+    private void select(Selection selection) {
+        this.getSelections().add(selection);
+        Integer index = Integer.valueOf(
+                this.getSelections().indexOf(selection));
+        this.notifyAdd(selection,index);
+    }
+
+    public void clearSelection() {
+        Map<Integer,QueryNode> removed = new HashMap<Integer, QueryNode>();
+        for (Selection node : this.selections) {
+            removed.put(
+                    Integer.valueOf(this.selections.indexOf(node)),
+                    node);
+            ((QueryNodeImpl)node).clearListeners();
+        }
+        this.selections.clear();
+        this.notifyRemove(removed);
     }
 
     public static String[] getNameParts(String sel) {
@@ -123,12 +162,10 @@ public class QueryDimension {
     }
 
     /**
-     * Returns a list of the selections within this
-     * <code>QueryDimension</code>.
+     * Returns a list of the selections within this dimension.
      *
-     * <p>The list is mutable; you may call
-     * <code>getSelections().clear()</code>,
-     * or <code>getSelections().add(dimension)</code>, for instance.</p>
+     * <p>Be aware that modifications to this list might
+     * have unpredictable consequences.</p>
      *
      * @return list of selections
      */
@@ -188,6 +225,13 @@ public class QueryDimension {
          * Descending sort order.
          */
         DESC
+    }
+
+    void tearDown() {
+        for (Selection node : this.selections) {
+            ((QueryNodeImpl)node).clearListeners();
+        }
+        this.selections.clear();
     }
 }
 

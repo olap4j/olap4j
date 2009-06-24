@@ -19,7 +19,7 @@ import org.olap4j.metadata.Member;
  * @version $Id$
  * @since May 30, 2007
  */
-abstract class SelectionImpl implements Selection {
+class SelectionImpl extends QueryNodeImpl implements Selection {
 
     protected Member member;
     protected String dimensionName;
@@ -102,6 +102,10 @@ abstract class SelectionImpl implements Selection {
     public void setOperator(Operator operator) {
         assert operator != null;
         this.operator = operator;
+        notifyChange(this,-1);
+    }
+
+    void tearDown() {
     }
 }
 

@@ -624,6 +624,12 @@ public class TestContext {
      * @see TestContext#fold
      */
     public static class SafeString {
+
+        @Override
+        public String toString() {
+            return s;
+        }
+
         public final String s;
 
         private SafeString(String s) {
