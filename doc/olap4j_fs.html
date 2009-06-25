@@ -79,10 +79,10 @@ TABLE TD {
 <h1>olap4j Specification</h1>
 
 <p>Authors: Julian Hyde, Barry Klawans<br>
-Version: 0.9.5 (beta)<br>
+Version: 0.9.7 (beta)<br>
 Revision: $Id: olap4j_fs.html 97 2008-06-09 11:33:50Z jhyde $
 (<a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html?view=log">log</a>)<br>
-Last modified: March 25<sup>th</sup>, 2008.</p>
+Last modified: June 25<sup>th</sup>, 2009.</p>
 <hr noshade="noshade">
 
 <h2><a name="Contents">Contents</a></h2>
@@ -510,49 +510,49 @@ JDBC interfaces Connection and Statement.</p>
 executes a statement:</p>
 
 <div class="code">
+	import java.sql.*;<br>
 	import org.olap4j.*;<br>
   <br>
   Class.forName(&quot;mondrian.olap4j.MondrianOlap4jDriver&quot;);<br>
-  	OlapConnection connection =<br>
+  	Connection connection =<br>
 &nbsp;&nbsp;&nbsp; DriverManager.getConnection(<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot;
-  +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot;
-  +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Role='California manager'&quot;);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:mondrian:Jdbc=jdbc:odbc:MondrianFoodMart;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; + &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; + &quot;Role='California manager'&quot;);<br>
 	OlapWrapper wrapper = (OlapWrapper) connection;<br>
   	OlapConnection olapConnection = wrapper.unwrap(OlapConnection.class);<br>
   	OlapStatement statement = olapConnection.createStatement();<br>
   <br>
-  OlapResult result =<br>
-&nbsp;&nbsp;&nbsp; statement.execute(<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;SELECT {[Measures].[Unit Sales]} ON
-  COLUMNS,\n&quot; +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;&nbsp; {[Product].Members} ON
-  ROWS\n&quot; +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;FROM [Sales]&quot;);</div>
+  	CellSet cellSet =<br>
+&nbsp;&nbsp;&nbsp; statement.executeOlapQuery(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;SELECT {[Measures].[Unit 
+	Sales]} ON COLUMNS,\n&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; + &quot;&nbsp; {[Product].Members} ON 
+	ROWS\n&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; + &quot;FROM [Sales]&quot;);</div>
 
 <p>Here's a piece of code to connect to Microsoft SQL Server Analysis
-Services&#8482; (MSAS) via XML/A. Note that besides the driver class and connect
+Services&#8482; (MSAS) via XML/A. Note that except for the driver class and connect
 string, the code is identical.</p>
 
 <div class="code">
+	import java.sql.*;<br>
 	import org.olap4j.*;<br>
     <br>
     Class.forName(&quot;org.olap4j.driver.xmla.XmlaOlap4jDriver&quot;);<br>
-    OlapConnection connection =<br>
+    Connection connection =<br>
     &nbsp;&nbsp;&nbsp; DriverManager.getConnection(<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:xmla:Server=http://localhost/xmla/msxisapi.dll;&quot;
-  +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Catalog=FoodMart&quot;);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:xmla:Server=http://localhost/xmla/msxisapi.dll;&quot;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	+ &quot;Catalog=FoodMart&quot;);<br>
 	OlapWrapper wrapper = (OlapWrapper) connection;<br>
   	OlapConnection olapConnection = wrapper.unwrap(OlapConnection.class);<br>
 	OlapStatement statement = connection.createStatement();<br>
 	<br>
-    CellSet result =<br>
-    &nbsp;&nbsp;&nbsp; statement.execute(<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;SELECT {[Measures].[Unit Sales]} ON
-  COLUMNS,\n&quot; +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;&nbsp; {[Product].Members} ON
-  ROWS\n&quot; +<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;FROM [Sales]&quot;);</div>
+    CellSet cellSet =<br>
+    &nbsp;&nbsp;&nbsp; statement.executeOlapQuery(<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;SELECT {[Measures].[Unit 
+	Sales]} ON COLUMNS,\n&quot;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; + &quot;&nbsp; {[Product].Members} 
+	ON ROWS\n&quot;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; + &quot;FROM [Sales]&quot;);</div>
 
 <p>In the above examples, a statement was created from a string. As we shall
 see, a statement can also be created from an MDX parse tree.</p>
@@ -581,18 +581,20 @@ the wrapped
 connection. For instance, if you were using DBCP, you could define and use a 
 pooling olap4j data source as follows:</p>
 
-<div class="code">import org.apache.commons.dbcp.*;<br>
+<div class="code">import java.sql.*;<br>
 	import org.olap4j.*;<br>
+	import org.apache.commons.dbcp.*;<br>
 	<br>
 	GenericObjectPool connectionPool =<br>
 &nbsp;&nbsp;&nbsp; new GenericObjectPool(null);<br>
 	ConnectionFactory connectionFactory =<br>
 &nbsp;&nbsp;&nbsp; new DriverManagerConnectionFactory(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-	&quot;jdbc:mondrian:local:Jdbc=jdbc:odbc:MondrianFoodMart;&quot; +<br>
+	&quot;jdbc:mondrian:Jdbc=jdbc:odbc:MondrianFoodMart;&quot;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-	&quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot; +<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Role='California manager'&quot;)<br>
+	+ &quot;Catalog=/WEB-INF/queries/FoodMart.xml;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; + &quot;Role='California manager'&quot;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Properties());<br>
 	PoolableConnectionFactory poolableConnectionFactory =<br>
 &nbsp;&nbsp;&nbsp; new PoolableConnectionFactory(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; connectionFactory, connectionPool, 
@@ -960,27 +962,33 @@ specific instance is chosen based upon the types of its arguments.</p>
 <p>An MDX query model can be converted into a statement. For example,</p>
 
 <div class="code">
+  import org.olap.*;<br>
+	import org.olap4j.mdx.*;<br>
+	<br>
   // Create a query model.<br>
+	OlapConnection connection;<br>
   SelectNode query = new SelectNode();<br>
   query.setFrom(<br>
 &nbsp;&nbsp;&nbsp; new IdentifierNode(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new 
-  IdentifierNode.Segment(&quot;Sales&quot;)));<br>
+  IdentifierNode.NameSegment(&quot;Sales&quot;)));<br>
   query.getAxisList().add(<br>
 &nbsp;&nbsp;&nbsp; new AxisNode(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; null,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Axis.ROWS,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new ArrayList&lt;IdentifierNode&gt;(),<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new CallNode(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; null,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;{}&quot;,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
   Syntax.Braces,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new 
   IdentifierNode(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-  new IdentifierNode.Segment(&quot;Measures&quot;),<br>
+  new IdentifierNode.NameSegment(&quot;Measures&quot;),<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-  new IdentifierNode.Segment(&quot;Unit Sales&quot;))),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Axis.ROWS,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new ArrayList&lt;IdentifierNode&gt;()));<br>
+  new IdentifierNode.NameSegment(&quot;Unit Sales&quot;)))));<br>
   <br>
   // Create a statement based upon the query model.<br>
   OlapStatement stmt;<br>
