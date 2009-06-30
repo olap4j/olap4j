@@ -26,6 +26,7 @@ abstract class XmlaOlap4jElement implements MetadataElement, Named {
     protected final String name;
     protected final String caption;
     protected final String description;
+    private int hash = 0;
 
     XmlaOlap4jElement(
         String uniqueName,
@@ -57,6 +58,14 @@ abstract class XmlaOlap4jElement implements MetadataElement, Named {
 
     public String getDescription(Locale locale) {
         return description;
+    }
+
+    public int hashCode() {
+        // By the book implementation of a hash code identifier.
+        if (this.hash == 0) {
+            hash = (getClass().hashCode() << 8) ^ getUniqueName().hashCode();
+        }
+        return hash;
     }
 }
 

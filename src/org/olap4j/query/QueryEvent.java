@@ -92,7 +92,7 @@ public final class QueryEvent {
     /**
      * Returns a map of objects affected by the event and
      * their index in the list of the source children.
-     * If the event is of type {@link QueryEvent.Type.SELECTION_CHANGED},
+     * If the event is of type QueryEvent.Type.SELECTION_CHANGED,
      * this method will return null because the source object was affected
      * and not the children.
      */

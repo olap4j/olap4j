@@ -19,20 +19,19 @@ package org.olap4j.query;
 interface QueryNode {
 
     /**
-     * Registers a new listener for a {@link QueryNode}.
-     *
-     * @param listener Listener
+     * Registers a new listener for a QueryNode.
+     * @param l The new listener object, implementation of QueryNodeListener
+     * @see org.olap4j.query.QueryNodeListener
      */
-    public void addQueryNodeListener(QueryNodeListener listener);
+    public void addQueryNodeListener(QueryNodeListener l);
 
     /**
-     * De-registers a listener for a {@link QueryNode}.
-     *
-     * <p>REVIEW: Is it an error if the listener does not exist?
-     *
-     * @param listener Listener
+     * De-registers a new listener for a QueryNode.
+     * If the listener object passed as a parameter was not registered,
+     * the method will return silently.
+     * @param l The listener object to de-register.
+     * @see org.olap4j.query.QueryNodeListener
      */
-    public void removeQueryNodeListener(QueryNodeListener listener);
+    public void removeQueryNodeListener(QueryNodeListener l);
 }
-
 // End QueryNode.java

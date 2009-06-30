@@ -18,7 +18,7 @@ package org.olap4j.query;
  */
 public interface QueryNodeListener {
     /**
-     * Invoked when one or more children of a {@link QueryNode} are removed
+     * Invoked when one or more children of a QueryNode are removed
      * from its list.
      *
      * @param event Describes in detail the actual event that just happened.
@@ -26,7 +26,7 @@ public interface QueryNodeListener {
     public void childrenRemoved(QueryEvent event);
 
     /**
-     * Invoked when one or more children are added to a {@link QueryNode}
+     * Invoked when one or more children are added to a QueryNode
      * list of children.
      *
      * @param event Describes in detail the actual event that just happened.
@@ -39,8 +39,8 @@ public interface QueryNodeListener {
      * it only means that its operator value was modified.
      *
      * @param event Describes in detail the actual event that just happened.
-     * @see Selection
-     */
+     * @see org.olap4j.query.Selection
+     **/
     public void selectionChanged(QueryEvent event);
 }
 
