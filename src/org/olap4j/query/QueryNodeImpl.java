@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2009-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -16,8 +16,9 @@ import java.util.Map;
 /**
  * Abstract implementation of QueryNode that
  * implements operations to support listeners.
- * @author Luc Boudreau
  *
+ * @author Luc Boudreau
+ * @version $Id: $
  */
 abstract class QueryNodeImpl implements QueryNode {
 
@@ -41,10 +42,10 @@ abstract class QueryNodeImpl implements QueryNode {
     protected void notifyAdd(QueryNode child, int index)
     {
         QueryEvent event = new QueryEvent(
-                QueryEvent.Type.CHILDREN_ADDED,
-                this,
-                child,
-                index);
+            QueryEvent.Type.CHILDREN_ADDED,
+            this,
+            child,
+            index);
         notifyAddInternal(event);
     }
 
@@ -54,12 +55,12 @@ abstract class QueryNodeImpl implements QueryNode {
      * @param children A map of indexes and children QueryNode
      * objects that were just added.
      */
-    protected void notifyAdd(Map<Integer,QueryNode> children)
+    protected void notifyAdd(Map<Integer, QueryNode> children)
     {
         QueryEvent event = new QueryEvent(
-                QueryEvent.Type.CHILDREN_ADDED,
-                this,
-                children);
+            QueryEvent.Type.CHILDREN_ADDED,
+            this,
+            children);
         notifyAddInternal(event);
     }
 
@@ -81,10 +82,10 @@ abstract class QueryNodeImpl implements QueryNode {
     protected void notifyRemove(QueryNode child, int index)
     {
         QueryEvent event = new QueryEvent(
-                QueryEvent.Type.CHILDREN_REMOVED,
-                this,
-                child,
-                index);
+            QueryEvent.Type.CHILDREN_REMOVED,
+            this,
+            child,
+            index);
         notifyRemoveInternal(event);
     }
 
@@ -94,12 +95,12 @@ abstract class QueryNodeImpl implements QueryNode {
      * @param children A map of indexes and children QueryNode
      * objects that were just added.
      */
-    protected void notifyRemove(Map<Integer,QueryNode> children)
+    protected void notifyRemove(Map<Integer, QueryNode> children)
     {
         QueryEvent event = new QueryEvent(
-                QueryEvent.Type.CHILDREN_REMOVED,
-                this,
-                children);
+            QueryEvent.Type.CHILDREN_REMOVED,
+            this,
+            children);
         notifyRemoveInternal(event);
     }
 
@@ -123,10 +124,10 @@ abstract class QueryNodeImpl implements QueryNode {
     protected void notifyChange(QueryNode child, int index)
     {
         QueryEvent event = new QueryEvent(
-                QueryEvent.Type.SELECTION_CHANGED,
-                this,
-                child,
-                index);
+            QueryEvent.Type.SELECTION_CHANGED,
+            this,
+            child,
+            index);
         notifyChangeInternal(event);
     }
 
@@ -138,12 +139,12 @@ abstract class QueryNodeImpl implements QueryNode {
      * @param index The index of the updated object in its
      * parent's list.
      */
-    protected void notifyChange(Map<Integer,QueryNode> children)
+    protected void notifyChange(Map<Integer, QueryNode> children)
     {
         QueryEvent event = new QueryEvent(
-                QueryEvent.Type.SELECTION_CHANGED,
-                this,
-                children);
+            QueryEvent.Type.SELECTION_CHANGED,
+            this,
+            children);
         notifyChangeInternal(event);
     }
 
@@ -162,4 +163,5 @@ abstract class QueryNodeImpl implements QueryNode {
 
     abstract void tearDown();
 }
+
 // End QueryNodeImpl.java

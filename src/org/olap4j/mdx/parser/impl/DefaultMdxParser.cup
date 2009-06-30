@@ -95,8 +95,8 @@ parser code {:
             return (ParseTreeNode) parse_tree.value;
         } catch (Exception e) {
             throw new RuntimeException(
-                "Syntax error while parsing MDX expression  '" + queryString +
-                "'",
+                "Syntax error while parsing MDX expression  '" + queryString
+                + "'",
                 e);
         } finally {
             this.scanner = null;
@@ -151,9 +151,9 @@ parser code {:
         List<IdentifierNode> cellProps)
     {
         final AxisNode filterAxis =
-            filter == null ?
-                null :
-                new AxisNode(
+            filter == null
+                ? null
+                : new AxisNode(
                     filter.getRegion(), false, Axis.FILTER,
                     Collections.<IdentifierNode>emptyList(), filter);
         // sort axes by ordinal
@@ -202,8 +202,8 @@ parser code {:
                 scanner.createRegion(cur_token.left, cur_token.right);
             throw new MdxParseException(
                 region,
-                "Syntax error at " + region +
-                ", token '" + s + "'");
+                "Syntax error at " + region
+                + ", token '" + s + "'");
         } else {
             throw new RuntimeException(
                 "Syntax error at token '" + s + "'");
@@ -763,7 +763,8 @@ term3 ::=
             ParseRegion region = createRegion(xleft, nright);
             RESULT = new CallNode(region, "IS NULL", Syntax.Postfix, x);
         :}
-    |   term3:x IS term2:y {: // e.g. "x IS y"; but "x IS NULL" is handled elsewhere
+    |   term3:x IS term2:y {:
+            // e.g. "x IS y"; but "x IS NULL" is handled elsewhere
             ParseRegion region = createRegion(xleft, yright);
             RESULT = new CallNode(region, "IS", Syntax.Infix, x, y);
         :}
@@ -1502,8 +1503,8 @@ axis_specification ::=
             if (index < 0 || index != d) {
                 throw new MdxParseException(
                     createRegion(nleft, nright),
-                    "Invalid axis specification. The axis number must be a " +
-                    "non-negative integer, but it was " + d + ".");
+                    "Invalid axis specification. The axis number must be a "
+                    + "non-negative integer, but it was " + d + ".");
             }
 
             Axis axis = Axis.Factory.forOrdinal(index);

@@ -68,13 +68,14 @@ public class QueryDimension extends QueryNodeImpl {
         this.select(Selection.Operator.MEMBER, nameParts);
     }
 
-    public void select(Selection.Operator operator,
-            String... nameParts)
+    public void select(
+        Selection.Operator operator,
+        String... nameParts)
     {
         try {
             this.select(
-                    operator,
-                    this.getQuery().getCube().lookupMember(nameParts));
+                operator,
+                this.getQuery().getCube().lookupMember(nameParts));
         } catch (OlapException e) {
             // Nothing to do, but we'll still log the exception.
             e.printStackTrace();
@@ -99,16 +100,16 @@ public class QueryDimension extends QueryNodeImpl {
         this.getSelections().add(selection);
         Integer index = Integer.valueOf(
                 this.getSelections().indexOf(selection));
-        this.notifyAdd(selection,index);
+        this.notifyAdd(selection, index);
     }
 
     public void clearSelection() {
-        Map<Integer,QueryNode> removed = new HashMap<Integer, QueryNode>();
+        Map<Integer, QueryNode> removed = new HashMap<Integer, QueryNode>();
         for (Selection node : this.selections) {
             removed.put(
-                    Integer.valueOf(this.selections.indexOf(node)),
-                    node);
-            ((QueryNodeImpl)node).clearListeners();
+                Integer.valueOf(this.selections.indexOf(node)),
+                node);
+            ((QueryNodeImpl) node).clearListeners();
         }
         this.selections.clear();
         this.notifyRemove(removed);
@@ -157,7 +158,9 @@ public class QueryDimension extends QueryNodeImpl {
                     set,
                     getNameParts(selection.getName()));
         } catch (Exception e) {
-            throw new OlapException("Error while resolving selection " + selection.toString(), e);
+            throw new OlapException(
+                "Error while resolving selection " + selection.toString(),
+                e);
         }
     }
 
@@ -206,7 +209,8 @@ public class QueryDimension extends QueryNodeImpl {
 
         public void add(int index, Selection selection) {
             if (this.contains(selection)) {
-                throw new IllegalStateException("dimension already contains selection");
+                throw new IllegalStateException(
+                    "dimension already contains selection");
             }
             list.add(index, selection);
         }

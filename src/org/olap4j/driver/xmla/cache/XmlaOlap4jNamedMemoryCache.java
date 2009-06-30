@@ -69,13 +69,17 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
          * The number of entries to maintain in cache under
          * the given cache name.
          */
-        Size("Maximum number of SOAP requests which will be cached under the given cache name."),
+        Size(
+            "Maximum number of SOAP requests which will be cached under the "
+            + "given cache name."),
 
         /**
          * The number of seconds to maintain
          * entries in cache before expiration.
          */
-        Timeout("Maximum TTL of SOAP requests which will be cached under the given cache name."),
+        Timeout(
+            "Maximum TTL of SOAP requests which will be cached under the given "
+            + "cache name."),
 
         /**
          * Eviction mode. Supported eviction modes are

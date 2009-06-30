@@ -123,8 +123,9 @@ class XmlaOlap4jCookieManager {
                     domainStore.put(name, cookie);
                     cookie.put(name, value);
 
-                    if (this.debug  == true) {
-                        System.out.println("Saving cookie : " + name + "=" + value);
+                    if (this.debug) {
+                        System.out.println(
+                            "Saving cookie : " + name + "=" + value);
                     }
                 }
 
@@ -198,7 +199,7 @@ class XmlaOlap4jCookieManager {
             }
         }
         try {
-            if (this.debug  == true
+            if (this.debug
                 && !(cookieStringBuffer.toString().equals("")))
             {
                 System.out.println(

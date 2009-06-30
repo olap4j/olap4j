@@ -103,7 +103,9 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
         // The response will only be available here anyways.
         } catch (Exception e) {
             throw new XmlaOlap4jProxyException(
-                "This proxy encountered an exception while processing the query.", e);
+                "This proxy encountered an exception while processing the "
+                + "query.",
+                e);
         }
     }
 

@@ -129,7 +129,8 @@ public class XmlaTester implements TestContext.Tester {
     public static final String DRIVER_URL_PREFIX = "jdbc:xmla:";
     private static final String USER = "user";
     private static final String PASSWORD = "password";
-    private static String PROXY_CLASS_NAME = "mondrian.olap4j.MondrianInprocProxy";
+    private static String PROXY_CLASS_NAME =
+        "mondrian.olap4j.MondrianInprocProxy";
 }
 
 // End XmlaTester.java

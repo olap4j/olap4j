@@ -90,11 +90,13 @@ public class ConnectStringParserTest extends TestCase {
         Map<String, String> properties;
 
         // ends in semi
-        properties = ConnectStringParser.parseConnectString("foo=true; bar=xxx;");
+        properties =
+            ConnectStringParser.parseConnectString("foo=true; bar=xxx;");
         assertEquals(2, properties.size());
 
         // ends in semi+space
-        properties = ConnectStringParser.parseConnectString("foo=true; bar=xxx; ");
+        properties =
+            ConnectStringParser.parseConnectString("foo=true; bar=xxx; ");
         assertEquals(2, properties.size());
 
         // ends in space
@@ -136,7 +138,9 @@ public class ConnectStringParserTest extends TestCase {
         // compatibility with ODBC connection strings. The ODBC connection
         // string in the following example can be passed in, and it will
         // successfully connect.
-        p("Driver={SQL Server};Server={localhost};Trusted_Connection={yes};db={Northwind};", "Provider", "MSDASQL");
+        p(
+            "Driver={SQL Server};Server={localhost};Trusted_Connection={yes};"
+            + "db={Northwind};", "Provider", "MSDASQL");
         }
 
         // Specifying a Keyword
@@ -150,7 +154,10 @@ public class ConnectStringParserTest extends TestCase {
         p("Provider='MSDASQL';Location='3Northwind'", "Location", "3Northwind");
         // Keywords can contain any printable character except for the equal
         // sign (=).
-        p("Jet OLE DB:System Database=c:\\system.mda", "Jet OLE DB:System Database", "c:\\system.mda");
+        p(
+            "Jet OLE DB:System Database=c:\\system.mda",
+            "Jet OLE DB:System Database",
+            "c:\\system.mda");
         p("Authentication;Info=Column 5", "Authentication;Info", "Column 5");
         // If a keyword contains an equal sign (=), it must be preceded by an
         // additional equal sign to indicate that it is part of the keyword.
@@ -164,21 +171,38 @@ public class ConnectStringParserTest extends TestCase {
         // To include values that contain a semicolon, single-quote character,
         // or double-quote character, the value must be enclosed in double
         // quotes.
-        p("ExtendedProperties=\"Integrated Security='SSPI';Initial Catalog='Northwind'\"", "ExtendedProperties", "Integrated Security='SSPI';Initial Catalog='Northwind'");
+        p(
+            "ExtendedProperties=\"Integrated Security='SSPI';"
+            + "Initial Catalog='Northwind'\"",
+            "ExtendedProperties",
+            "Integrated Security='SSPI';Initial Catalog='Northwind'");
         // If the value contains both a semicolon and a double-quote character,
         // the value can be enclosed in single quotes.
-        p("ExtendedProperties='Integrated Security=\"SSPI\";Databse=\"My Northwind DB\"'", "ExtendedProperties", "Integrated Security=\"SSPI\";Databse=\"My Northwind DB\"");
+        p(
+            "ExtendedProperties='Integrated Security=\"SSPI\";"
+            + "Databse=\"My Northwind DB\"'",
+            "ExtendedProperties",
+            "Integrated Security=\"SSPI\";Databse=\"My Northwind DB\"");
         // The single quote is also useful if the value begins with a
         // double-quote character.
         p("DataSchema='\"MyCustTable\"'", "DataSchema", "\"MyCustTable\"");
         // Conversely, the double quote can be used if the value begins with a
         // single quote.
-        p("DataSchema=\"'MyOtherCustTable'\"", "DataSchema", "'MyOtherCustTable'");
+        p(
+            "DataSchema=\"'MyOtherCustTable'\"",
+            "DataSchema",
+            "'MyOtherCustTable'");
         // If the value contains both single-quote and double-quote characters,
         // the quote character used to enclose the value must be doubled each
         // time it occurs within the value.
-        p("NewRecordsCaption='\"Company''s \"new\" customer\"'", "NewRecordsCaption", "\"Company's \"new\" customer\"");
-        p("NewRecordsCaption=\"\"\"Company's \"\"new\"\" customer\"\"\"", "NewRecordsCaption", "\"Company's \"new\" customer\"");
+        p(
+            "NewRecordsCaption='\"Company''s \"new\" customer\"'",
+            "NewRecordsCaption",
+            "\"Company's \"new\" customer\"");
+        p(
+            "NewRecordsCaption=\"\"\"Company's \"\"new\"\" customer\"\"\"",
+            "NewRecordsCaption",
+            "\"Company's \"new\" customer\"");
         // Setting Values That Use Spaces
         //
         // Any leading or trailing spaces around a keyword or value are
@@ -218,11 +242,19 @@ public class ConnectStringParserTest extends TestCase {
         // If a specific keyword in a keyword=value pair occurs multiple times
         // in a connection string, the last occurrence listed is used in the
         // value set.
-        p("Provider='MSDASQL';Location='Northwind';Cache Authentication='True';Prompt='Complete';Location='Customers'", "Location", "Customers");
+        p(
+            "Provider='MSDASQL';Location='Northwind';"
+            + "Cache Authentication='True';Prompt='Complete';"
+            + "Location='Customers'",
+            "Location",
+            "Customers");
         // One exception to the preceding rule is the Provider keyword. If this
         // keyword occurs multiple times in the string, the first occurrence is
         // used.
-        p("Provider='MSDASQL';Location='Northwind'; Provider='SQLOLEDB'", "Provider", "MSDASQL");
+        p(
+            "Provider='MSDASQL';Location='Northwind'; Provider='SQLOLEDB'",
+            "Provider",
+            "MSDASQL");
         if (false) {
             // (Not supported)
             //

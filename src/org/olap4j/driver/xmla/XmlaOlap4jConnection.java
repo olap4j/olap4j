@@ -836,7 +836,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                         <ROLES>California manager,No HR Cube</ROLES>
                     </row>
              */
-            String catalogName = XmlaOlap4jUtil.stringElement(row, "CATALOG_NAME");
+            String catalogName =
+                XmlaOlap4jUtil.stringElement(row, "CATALOG_NAME");
             // Unused: DESCRIPTION, ROLES
             list.add(
                 new XmlaOlap4jCatalog(
@@ -1328,7 +1329,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         public CatalogSchemaHandler(String catalogName) {
             super();
             if (catalogName == null) {
-                throw new RuntimeException("The CatalogSchemaHandler handler requires a catalog name.");
+                throw new RuntimeException(
+                    "The CatalogSchemaHandler handler requires a catalog "
+                    + "name.");
             }
             this.catalogName = catalogName;
         }
@@ -1891,7 +1894,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         }
     }
 
-    private static final Pattern LOWERCASE_PATTERN = Pattern.compile(".*[a-z].*");
+    private static final Pattern LOWERCASE_PATTERN =
+        Pattern.compile(".*[a-z].*");
 
     static class MetadataColumn {
         final String name;

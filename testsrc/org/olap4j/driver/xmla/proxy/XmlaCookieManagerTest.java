@@ -12,8 +12,8 @@ public class XmlaCookieManagerTest extends TestCase {
 
     private static final String receivedCookieKey = "Set-Cookie";
     public final static String sentCookieKey = "Cookie";
-    public final static String cookieValue = "MyTestCookie=271B79EBCBAAA37C5C51B1979441E5AC";
-
+    public final static String cookieValue =
+        "MyTestCookie=271B79EBCBAAA37C5C51B1979441E5AC";
 
 
     /**

@@ -181,7 +181,8 @@ public class IdentifierNode
      * was {@link Quoting quoted}. For example,
      *
      * <blockquote><code>
-     * parseIdentifier("[Customers].USA.[South Dakota].[Sioux Falls].&amp;[1245]")
+     * parseIdentifier(
+     * "[Customers].USA.[South Dakota].[Sioux Falls].&amp;[1245]")
      * </code></blockquote>
      *
      * returns

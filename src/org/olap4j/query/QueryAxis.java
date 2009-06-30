@@ -90,10 +90,10 @@ public class QueryAxis extends QueryNodeImpl {
      * It uses a zero based index.
      */
     public void pullUp(int index) {
-        Map<Integer,QueryNode> removed = new HashMap<Integer, QueryNode>();
-        removed.put(Integer.valueOf(index),this.dimensions.get(index));
-        Map<Integer,QueryNode> added = new HashMap<Integer, QueryNode>();
-        added.put(Integer.valueOf(index - 1),this.dimensions.get(index));
+        Map<Integer, QueryNode> removed = new HashMap<Integer, QueryNode>();
+        removed.put(Integer.valueOf(index), this.dimensions.get(index));
+        Map<Integer, QueryNode> added = new HashMap<Integer, QueryNode>();
+        added.put(Integer.valueOf(index - 1), this.dimensions.get(index));
         Collections.swap(this.dimensions, index, index - 1);
         this.notifyRemove(removed);
         this.notifyAdd(added);
@@ -110,10 +110,10 @@ public class QueryAxis extends QueryNodeImpl {
      * It uses a zero based index.
      */
     public void pushDown(int index) {
-        Map<Integer,QueryNode> removed = new HashMap<Integer, QueryNode>();
-        removed.put(Integer.valueOf(index),this.dimensions.get(index));
-        Map<Integer,QueryNode> added = new HashMap<Integer, QueryNode>();
-        added.put(Integer.valueOf(index + 1),this.dimensions.get(index));
+        Map<Integer, QueryNode> removed = new HashMap<Integer,  QueryNode>();
+        removed.put(Integer.valueOf(index), this.dimensions.get(index));
+        Map<Integer, QueryNode> added = new HashMap<Integer, QueryNode>();
+        added.put(Integer.valueOf(index + 1), this.dimensions.get(index));
         Collections.swap(this.dimensions, index, index + 1);
         this.notifyRemove(removed);
         this.notifyAdd(added);
@@ -128,7 +128,7 @@ public class QueryAxis extends QueryNodeImpl {
         this.getDimensions().add(dimension);
         Integer index = Integer.valueOf(
                 this.getDimensions().indexOf(dimension));
-        this.notifyAdd(dimension,index);
+        this.notifyAdd(dimension, index);
     }
 
     /**
@@ -140,7 +140,7 @@ public class QueryAxis extends QueryNodeImpl {
         Integer index = Integer.valueOf(
                 this.getDimensions().indexOf(dimension));
         this.getDimensions().remove(dimension);
-        this.notifyRemove(dimension,index);
+        this.notifyRemove(dimension, index);
     }
 
     /**
@@ -195,7 +195,8 @@ public class QueryAxis extends QueryNodeImpl {
 
         public void add(int index, QueryDimension dimension) {
             if (this.contains(dimension)) {
-                throw new IllegalStateException("dimension already on this axis");
+                throw new IllegalStateException(
+                    "dimension already on this axis");
             }
             if (dimension.getAxis() != null
                 && dimension.getAxis() != QueryAxis.this)

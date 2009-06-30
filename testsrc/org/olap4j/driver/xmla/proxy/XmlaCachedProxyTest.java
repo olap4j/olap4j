@@ -320,7 +320,9 @@ public class XmlaCachedProxyTest extends TestCase {
             proxy = new XmlaOlap4jHttpProxy(dummyDriver);
             proxy.setCache(driverParameters, cacheProperties);
         } catch (Throwable e) {
-            fail("The cache is not properly shared since an error should not have been thrown.");
+            fail(
+                "The cache is not properly shared since an error should not "
+                + "have been thrown.");
         }
     }
 

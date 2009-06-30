@@ -108,15 +108,15 @@ public class Query extends QueryNodeImpl {
         tmpDown.addAll(down.getDimensions());
 
         across.getDimensions().clear();
-        Map<Integer,QueryNode> acrossChildList =
-                new HashMap<Integer, QueryNode>();
+        Map<Integer, QueryNode> acrossChildList =
+            new HashMap<Integer, QueryNode>();
         for (int cpt = 0; cpt < tmpAcross.size();cpt++) {
             acrossChildList.put(Integer.valueOf(cpt), tmpAcross.get(cpt));
         }
         across.notifyRemove(acrossChildList);
 
         down.getDimensions().clear();
-        Map<Integer,QueryNode> downChildList =
+        Map<Integer, QueryNode> downChildList =
             new HashMap<Integer, QueryNode>();
         for (int cpt = 0; cpt < tmpDown.size();cpt++) {
             downChildList.put(Integer.valueOf(cpt), tmpDown.get(cpt));

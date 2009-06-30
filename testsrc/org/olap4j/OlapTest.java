@@ -97,7 +97,9 @@ public class OlapTest extends TestCase {
             String schemaName = "FoodMart";
             String userName = "foodmartuser";
             String password = "foodmartpassword";
-            String jdbc = "jdbc:mysql://localhost/foodmart?user=foodmartuser&password=foodmartpassword";
+            String jdbc =
+                "jdbc:mysql://localhost/foodmart?user=foodmartuser"
+                + "&password=foodmartpassword";
 
             // Create a connection object to the specific implementation of an
             // olap4j source.  This is the only provider-specific code.
@@ -217,7 +219,8 @@ public class OlapTest extends TestCase {
                 query.getAxis(Axis.ROWS).addDimension(storeQuery);
                 fail("expected exception");
             } catch (Exception e) {
-                assertTrue(e.getMessage().contains("dimension already on this axis"));
+                assertTrue(
+                    e.getMessage().contains("dimension already on this axis"));
             }
 
             query.validate();
@@ -545,7 +548,6 @@ public class OlapTest extends TestCase {
             timeDimension.select(Selection.Operator.CHILDREN, "Time", "1997");
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-
             measuresDimension.select("Measures", "Store Sales");
 
 

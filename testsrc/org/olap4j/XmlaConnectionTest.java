@@ -164,7 +164,8 @@ public class XmlaConnectionTest extends TestCase {
          */
         private void checkup(String request) {
             String hash = Encoder.convertToHex(request.getBytes());
-            if (request.indexOf("<RequestType>MDSCHEMA_CUBES</RequestType>") == -1
+            if (request.indexOf("<RequestType>MDSCHEMA_CUBES</RequestType>")
+                == -1
                 && this.requests.containsKey(hash))
             {
                 throw new RuntimeException("DOUBLE-REQUEST");
@@ -192,11 +193,14 @@ public class XmlaConnectionTest extends TestCase {
             info.setProperty(
                 XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
             DriverManager.getConnection(
-                "jdbc:xmla:Server=http://foo;Catalog=FoodMart;TestProxyCookie=" + cookie,
+                "jdbc:xmla:Server=http://foo;Catalog=FoodMart;TestProxyCookie="
+                + cookie,
                 info);
         } catch (Throwable t) {
             t.printStackTrace();
-            fail("Non-Trival Call executed during construction of XmlaOlap4j Connection");
+            fail(
+                "Non-Trival Call executed during construction of XmlaOlap4j "
+                + "Connection");
         }
     }
 

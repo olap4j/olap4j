@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2009 Julian Hyde
+// Copyright (C) 2009-2009 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -14,7 +14,9 @@ import java.util.Map;
 
 /**
  * Describes which changes were performed to the query model.
+ *
  * @author Luc Boudreau
+ * @version $Id: $
  */
 public final class QueryEvent {
 
@@ -40,29 +42,34 @@ public final class QueryEvent {
 
     private final QueryNode source;
     private final QueryEvent.Type operation;
-    private Map<Integer,QueryNode> children =
+    private Map<Integer, QueryNode> children =
         new HashMap<Integer, QueryNode>();
 
-    QueryEvent(QueryEvent.Type operation,
-            QueryNode source,
-            QueryNode child,
-            int index)
+    QueryEvent(
+        QueryEvent.Type operation,
+        QueryNode source,
+        QueryNode child,
+        int index)
     {
-        this.children.put(Integer.valueOf(index),child);
+        this.children.put(Integer.valueOf(index), child);
         this.source = source;
         this.operation = operation;
     }
 
-    QueryEvent(QueryEvent.Type operation,
-            QueryNode source,
-            Map<Integer,QueryNode> children) {
+    QueryEvent(
+        QueryEvent.Type operation,
+        QueryNode source,
+        Map<Integer, QueryNode> children)
+    {
         this.children.putAll(children);
         this.source = source;
         this.operation = operation;
     }
 
-    QueryEvent(QueryEvent.Type operation,
-            QueryNode source) {
+    QueryEvent(
+        QueryEvent.Type operation,
+        QueryNode source)
+    {
         this.children = null;
         this.source = source;
         this.operation = operation;
@@ -89,8 +96,9 @@ public final class QueryEvent {
      * this method will return null because the source object was affected
      * and not the children.
      */
-    public Map<Integer,QueryNode> getChildrens() {
+    public Map<Integer, QueryNode> getChildrens() {
         return children;
     }
 }
+
 // End QueryEvent.java

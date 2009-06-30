@@ -351,12 +351,15 @@ public class ConnectionTest extends TestCase {
                 connection.getCatalog();
             } catch (OlapException e) {
                 if (e.getMessage().equals(
-                  "There is no catalog named FoodMartError available to query against."))
+                    "There is no catalog named FoodMartError available to "
+                    + "query against."))
                 {
                     return;
                 }
             }
-            fail("XmlaOlap4jConnection did not detect an inexistant catalog name.");
+            fail(
+                "XmlaOlap4jConnection did not detect an inexistant "
+                + "catalog name.");
         }
     }
 
@@ -658,7 +661,8 @@ public class ConnectionTest extends TestCase {
             s);
 
         // Re-execute with a new MDX string.
-        CellSet cellSet3 = pstmt.executeOlapQuery("SELECT FROM [Sales] WHERE [Time.Weekly].[1997].[3]");
+        CellSet cellSet3 = pstmt.executeOlapQuery(
+            "SELECT FROM [Sales] WHERE [Time.Weekly].[1997].[3]");
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
             + "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time.Weekly].[All Time.Weeklys].[1997].[3], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
@@ -890,31 +894,31 @@ public class ConnectionTest extends TestCase {
                 + "FROM [Sales]\n"
                 + "WHERE [Time].[1997].[Q2]");
         String s = TestContext.toString(cellSet);
-        assertEquals(
-            TestContext.fold("Axis #0:\n"
-                + "{[Store].[All Stores],"
-                + " [Store Size in SQFT].[All Store Size in SQFTs],"
-                + " [Store Type].[All Store Types],"
-                + " [Time].[1997].[Q2],"
-                + " [Promotion Media].[All Media],"
-                + " [Promotions].[All Promotions],"
-                + " [Customers].[All Customers],"
-                + " [Education Level].[All Education Levels],"
-                + " [Marital Status].[All Marital Status],"
-                + " [Yearly Income].[All Yearly Incomes]}\n"
-                + "Axis #1:\n"
-                + "{[Measures].[Unit Sales]}\n"
-                + "{[Measures].[Store Sales]}\n"
-                + "Axis #2:\n"
-                + "{[Gender].[All Gender].[M], [Product].[All Products].[Drink]}\n"
-                + "{[Gender].[All Gender].[M], [Product].[All Products].[Food]}\n"
-                + "{[Gender].[All Gender].[M], [Product].[All Products].[Non-Consumable]}\n"
-                + "Row #0: 3,023\n"
-                + "Row #0: 6,004.80\n"
-                + "Row #1: 22,558\n"
-                + "Row #1: 47,869.17\n"
-                + "Row #2: 6,037\n"
-                + "Row #2: 12,935.16\n").toString(),
+        TestContext.assertEqualsVerbose(
+            "Axis #0:\n"
+            + "{[Store].[All Stores],"
+            + " [Store Size in SQFT].[All Store Size in SQFTs],"
+            + " [Store Type].[All Store Types],"
+            + " [Time].[1997].[Q2],"
+            + " [Promotion Media].[All Media],"
+            + " [Promotions].[All Promotions],"
+            + " [Customers].[All Customers],"
+            + " [Education Level].[All Education Levels],"
+            + " [Marital Status].[All Marital Status],"
+            + " [Yearly Income].[All Yearly Incomes]}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[Unit Sales]}\n"
+            + "{[Measures].[Store Sales]}\n"
+            + "Axis #2:\n"
+            + "{[Gender].[All Gender].[M], [Product].[All Products].[Drink]}\n"
+            + "{[Gender].[All Gender].[M], [Product].[All Products].[Food]}\n"
+            + "{[Gender].[All Gender].[M], [Product].[All Products].[Non-Consumable]}\n"
+            + "Row #0: 3,023\n"
+            + "Row #0: 6,004.80\n"
+            + "Row #1: 22,558\n"
+            + "Row #1: 47,869.17\n"
+            + "Row #2: 6,037\n"
+            + "Row #2: 12,935.16\n",
             s);
     }
 
@@ -1452,8 +1456,8 @@ public class ConnectionTest extends TestCase {
             cube.lookupMembers(
                 EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
                 "Time", "1997", "Q2");
-        assertEquals(
-            TestContext.fold("[Time].[1997]\n").toString(),
+        TestContext.assertEqualsVerbose(
+            "[Time].[1997]\n",
             memberListToString(memberList));
 
         // ask for parent of root member, should not get null member in list
@@ -1473,24 +1477,26 @@ public class ConnectionTest extends TestCase {
         case XMLA:
             // TODO: fix mondrian's XMLA driver to return members ordered by
             // level then ordinal
-            expected = "[Time].[1997].[Q2].[4]\n"
-                       + "[Time].[1997].[Q2].[5]\n"
-                       + "[Time].[1997].[Q2].[6]\n"
-                       + "[Time].[1997].[Q1]\n"
-                       + "[Time].[1997].[Q3]\n"
-                       + "[Time].[1997].[Q4]\n";
+            expected =
+                "[Time].[1997].[Q2].[4]\n"
+                + "[Time].[1997].[Q2].[5]\n"
+                + "[Time].[1997].[Q2].[6]\n"
+                + "[Time].[1997].[Q1]\n"
+                + "[Time].[1997].[Q3]\n"
+                + "[Time].[1997].[Q4]\n";
             break;
         default:
-            expected = "[Time].[1997].[Q1]\n"
-                       + "[Time].[1997].[Q2].[4]\n"
-                       + "[Time].[1997].[Q2].[5]\n"
-                       + "[Time].[1997].[Q2].[6]\n"
-                       + "[Time].[1997].[Q3]\n"
-                       + "[Time].[1997].[Q4]\n";
+            expected =
+                "[Time].[1997].[Q1]\n"
+                + "[Time].[1997].[Q2].[4]\n"
+                + "[Time].[1997].[Q2].[5]\n"
+                + "[Time].[1997].[Q2].[6]\n"
+                + "[Time].[1997].[Q3]\n"
+                + "[Time].[1997].[Q4]\n";
             break;
         }
-        assertEquals(
-            TestContext.fold(expected).toString(),
+        TestContext.assertEqualsVerbose(
+            expected,
             memberListToString(memberList));
 
         // siblings of the root member - potentially tricky
@@ -1498,18 +1504,18 @@ public class ConnectionTest extends TestCase {
             cube.lookupMembers(
                 EnumSet.of(Member.TreeOp.SIBLINGS),
                 "Time", "1997");
-        assertEquals(
-            TestContext.fold("[Time].[1998]\n").toString(),
+        TestContext.assertEqualsVerbose(
+            "[Time].[1998]\n",
             memberListToString(memberList));
 
         memberList =
             cube.lookupMembers(
                 EnumSet.of(Member.TreeOp.SIBLINGS, Member.TreeOp.SELF),
                 "Customers", "USA", "OR");
-        assertEquals(
-            TestContext.fold("[Customers].[All Customers].[USA].[CA]\n"
-                    + "[Customers].[All Customers].[USA].[OR]\n"
-                    + "[Customers].[All Customers].[USA].[WA]\n").toString(),
+        TestContext.assertEqualsVerbose(
+            "[Customers].[All Customers].[USA].[CA]\n"
+            + "[Customers].[All Customers].[USA].[OR]\n"
+            + "[Customers].[All Customers].[USA].[WA]\n",
             memberListToString(memberList));
     }
 
@@ -1703,7 +1709,8 @@ public class ConnectionTest extends TestCase {
             "[Product].[All Products]",
             allProductsMember.getUniqueName());
         assertEquals("(All)", allProductsMember.getLevel().getName());
-        assertEquals("[Product].[(All)]", allProductsMember.getLevel().getUniqueName());
+        assertEquals(
+            "[Product].[(All)]", allProductsMember.getLevel().getUniqueName());
         assertEquals(1, allProductsMember.getLevel().getMembers().size());
         assertTrue(allProductsMember.isAll());
         assertNull(allProductsMember.getParentMember());
@@ -1855,7 +1862,8 @@ public class ConnectionTest extends TestCase {
             member2.getUniqueName().equals(
                 "[Employees].[All Employees].[Derrick Whelply]")
             || member2.getUniqueName().equals(
-                "[Employees].[All Employees].[Sheri Nowmer].[Derrick Whelply]"));
+                "[Employees].[All Employees].[Sheri Nowmer]."
+                + "[Derrick Whelply]"));
         assertEquals(2, member2.getDepth());
         assertEquals(1, member2.getLevel().getDepth());
         final Member parent = member2.getParentMember();
@@ -2004,8 +2012,10 @@ public class ConnectionTest extends TestCase {
         final Cube cube = ((CubeType) select.getFrom().getType()).getCube();
         final Dimension storeDimension = cube.getDimensions().get("Store");
         final Dimension genderDimension = cube.getDimensions().get("Gender");
-        final Dimension measuresDimension = cube.getDimensions().get("Measures");
-        final Dimension customersDimension = cube.getDimensions().get("Customers");
+        final Dimension measuresDimension =
+            cube.getDimensions().get("Measures");
+        final Dimension customersDimension =
+            cube.getDimensions().get("Customers");
         assertTrue(tupleType.usesDimension(storeDimension, false));
         assertTrue(tupleType.usesDimension(genderDimension, false));
         assertFalse(tupleType.usesDimension(measuresDimension, false));
@@ -2115,7 +2125,8 @@ public class ConnectionTest extends TestCase {
             assertEquals("Validation error", e.getMessage());
             assertTrue(
                 TestContext.getStackTrace(e).contains(
-                    "Dimension '[Gender]' appears in more than one independent axis."));
+                    "Dimension '[Gender]' appears in more than one "
+                    + "independent axis."));
         }
     }
 
@@ -2378,7 +2389,8 @@ public class ConnectionTest extends TestCase {
         Cube cube = schema.getCubes().get("Sales");
         Measure measure = cube.getMeasures().get(0);
         assertEquals("Unit Sales", measure.getName());
-        Dimension dimPromotionMedia = cube.getDimensions().get("Promotion Media");
+        Dimension dimPromotionMedia =
+            cube.getDimensions().get("Promotion Media");
         //
         // IdentifierNode cubeNode =
         //    new IdentifierNode(

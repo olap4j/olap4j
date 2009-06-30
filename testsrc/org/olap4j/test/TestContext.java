@@ -625,13 +625,12 @@ public class TestContext {
      */
     public static class SafeString {
 
-        @Override
-        public String toString() {
-            return s;
-        }
-
         public final String s;
 
+        /**
+         * Creates a SafeString.
+         * @param s String
+         */
         private SafeString(String s) {
             this.s = s;
         }
