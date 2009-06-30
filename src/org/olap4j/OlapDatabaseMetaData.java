@@ -482,8 +482,14 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *         function description
      *
      * @exception OlapException if a database access error occurs
+     *
+     * @see #getFunctions(String, String, String)
      * @see #getSearchStringEscape
      */
+    // NOTE: '#getFunctions(String, String, String)' above generates a javadoc
+    // error on JDK 1.5, because it is new in JDBC 4.0/JDK 1.6. But please leave
+    // it in. Most olap4j users run on JDK 1.6 or later, and the javadoc is
+    // intended for them.
     ResultSet getOlapFunctions(
         String functionNamePattern) throws OlapException;
 

@@ -9,8 +9,7 @@
 */
 package org.olap4j.query;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Describes which changes were performed to the query model.
@@ -25,47 +24,67 @@ public final class QueryEvent {
      */
     public static enum Type {
         /**
-         * Some choldren of a QueryNode were removed from
-         * it's list.
+         * Event where one or more children of a QueryNode were removed.
          */
         CHILDREN_REMOVED,
         /**
-         * Some children of a QueryNode were added to
-         * it's list.
+         * Event where one or more nodes were added as children of a QueryNode.
          */
         CHILDREN_ADDED,
         /**
-         * A Selection object operator was changed.
+         * Event where a Selection object operator was changed.
          */
         SELECTION_CHANGED
     }
 
     private final QueryNode source;
     private final QueryEvent.Type operation;
-    private Map<Integer, QueryNode> children =
-        new HashMap<Integer, QueryNode>();
+    private final Map<Integer, QueryNode> children;
 
+    /**
+     * Creates a QueryEvent with a single child.
+     *
+     * @param operation Even type
+     * @param source Query node that generated this event
+     * @param child Child node
+     */
     QueryEvent(
         QueryEvent.Type operation,
         QueryNode source,
         QueryNode child,
         int index)
     {
-        this.children.put(Integer.valueOf(index), child);
+        this.children = Collections.singletonMap(index, child);
         this.source = source;
         this.operation = operation;
     }
 
+    /**
+     * Creates a QueryEvent with multiple children.
+     *
+     * @param operation Even type
+     * @param source Query node that generated this event
+     * @param children Child nodes and their indexes within the parent
+     */
     QueryEvent(
         QueryEvent.Type operation,
         QueryNode source,
         Map<Integer, QueryNode> children)
     {
-        this.children.putAll(children);
+        // copy the map, and make immutable
+        this.children =
+            Collections.unmodifiableMap(
+                new HashMap<Integer, QueryNode>(children));
         this.source = source;
         this.operation = operation;
     }
 
+    /**
+     * Creates a QueryEvent with no children.
+     *
+     * @param operation Even type
+     * @param source Query node that generated this event
+     */
     QueryEvent(
         QueryEvent.Type operation,
         QueryNode source)
@@ -85,6 +104,8 @@ public final class QueryEvent {
     /**
      * Returns the event type.
      */
+    // REVIEW: consider renaming to 'getEventType', or rename enum Type to
+    // Operation.
     public QueryEvent.Type getOperation() {
         return operation;
     }
@@ -92,10 +113,13 @@ public final class QueryEvent {
     /**
      * Returns a map of objects affected by the event and
      * their index in the list of the source children.
-     * If the event is of type QueryEvent.Type.SELECTION_CHANGED,
+     *
+     * <p>If the event is of type {@link QueryEvent.Type#SELECTION_CHANGED},
      * this method will return null because the source object was affected
      * and not the children.
      */
+    // REVIEW: 'children' is already plural. Consider renaming to 'getChildren'
+    // or 'getChildNodes'.
     public Map<Integer, QueryNode> getChildrens() {
         return children;
     }

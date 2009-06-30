@@ -35,12 +35,14 @@ abstract class QueryNodeImpl implements QueryNode {
 
     /**
      * Subclasses should call this helper method to
-     * notify it's listeners that a child was added.
-     * @param child A reference to the child that was added.
-     * @param index The index at which it was added.
+     * notify its listeners that a child was added.
+     *
+     * @param child Child that was added
+     * @param index The index at which it was added
      */
     protected void notifyAdd(QueryNode child, int index)
     {
+        assert child != null;
         QueryEvent event = new QueryEvent(
             QueryEvent.Type.CHILDREN_ADDED,
             this,
@@ -52,11 +54,13 @@ abstract class QueryNodeImpl implements QueryNode {
     /**
      * Subclasses should call this helper method to
      * notify it's listeners that children were added.
+     *
      * @param children A map of indexes and children QueryNode
-     * objects that were just added.
+     *     objects that were added
      */
     protected void notifyAdd(Map<Integer, QueryNode> children)
     {
+        assert children != null;
         QueryEvent event = new QueryEvent(
             QueryEvent.Type.CHILDREN_ADDED,
             this,
@@ -75,12 +79,14 @@ abstract class QueryNodeImpl implements QueryNode {
 
     /**
      * Subclasses should call this helper method to
-     * notify it's listeners that a child was removed.
-     * @param child A reference to the child that was removed.
-     * @param index The index at which it was removed.
+     * notify its listeners that a child was removed.
+     *
+     * @param child Child that was removed
+     * @param index Index of child
      */
     protected void notifyRemove(QueryNode child, int index)
     {
+        assert child != null;
         QueryEvent event = new QueryEvent(
             QueryEvent.Type.CHILDREN_REMOVED,
             this,
@@ -91,12 +97,14 @@ abstract class QueryNodeImpl implements QueryNode {
 
     /**
      * Subclasses should call this helper method to
-     * notify it's listeners that children were added.
+     * notify its listeners that children were added.
+     *
      * @param children A map of indexes and children QueryNode
-     * objects that were just added.
+     *     objects that were removed
      */
     protected void notifyRemove(Map<Integer, QueryNode> children)
     {
+        assert children != null;
         QueryEvent event = new QueryEvent(
             QueryEvent.Type.CHILDREN_REMOVED,
             this,
@@ -115,14 +123,15 @@ abstract class QueryNodeImpl implements QueryNode {
 
     /**
      * Subclasses should call this helper method to
-     * notify it's listeners that a child selection
+     * notify its listeners that a child selection
      * object has a new operator value.
-     * @param child A reference to the child that was updated.
-     * @param index The index of the updated object in its
-     * parent's list.
+     *
+     * @param child Child that was updated
+     * @param index The index of the child among its siblings
      */
     protected void notifyChange(QueryNode child, int index)
     {
+        assert child != null;
         QueryEvent event = new QueryEvent(
             QueryEvent.Type.SELECTION_CHANGED,
             this,
@@ -133,14 +142,15 @@ abstract class QueryNodeImpl implements QueryNode {
 
     /**
      * Subclasses should call this helper method to
-     * notify it's listeners that children selections
+     * notify its listeners that children selections
      * object has a new operator value.
-     * @param child A reference to the child that was updated.
-     * @param index The index of the updated object in its
-     * parent's list.
+     *
+     * @param children A map of indexes and children QueryNode
+     *     objects that were updated
      */
     protected void notifyChange(Map<Integer, QueryNode> children)
     {
+        assert children != null;
         QueryEvent event = new QueryEvent(
             QueryEvent.Type.SELECTION_CHANGED,
             this,

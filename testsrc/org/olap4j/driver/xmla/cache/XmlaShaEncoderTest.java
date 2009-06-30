@@ -14,7 +14,7 @@ import junit.framework.TestCase;
 import org.olap4j.driver.xmla.cache.XmlaOlap4jShaEncoder;
 
 /**
- * <p>Test for {@ink org.olap4j.driver.xmla.cache.XmlaOlap4jShaEncoder}.
+ * <p>Test for {@link org.olap4j.driver.xmla.cache.XmlaOlap4jShaEncoder}.
  *
  * @author Luc Boudreau
  * @version $Id$
