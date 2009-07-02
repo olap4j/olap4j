@@ -136,6 +136,12 @@ class XmlaOlap4jLevel
     public int getCardinality() {
         return cardinality;
     }
+
+    public boolean equeals(Object obj) {
+        return (obj instanceof XmlaOlap4jLevel) &&
+            this.uniqueName.equals(
+                ((XmlaOlap4jLevel)obj).getUniqueName());
+    }
 }
 
 // End XmlaOlap4jLevel.java

@@ -315,6 +315,12 @@ class XmlaOlap4jMember
     public Member getDataMember() {
         throw new UnsupportedOperationException();
     }
+
+    public boolean equeals(Object obj) {
+        return (obj instanceof XmlaOlap4jMember) &&
+            this.uniqueName.equals(
+                ((XmlaOlap4jMember)obj).getUniqueName());
+    }
 }
 
 // End XmlaOlap4jMember.java

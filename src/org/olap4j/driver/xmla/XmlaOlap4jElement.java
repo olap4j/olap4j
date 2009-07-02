@@ -67,6 +67,10 @@ abstract class XmlaOlap4jElement implements MetadataElement, Named {
         }
         return hash;
     }
+
+    // Keep this declaration abstract as a reminder to
+    // overriding classes.
+    abstract public boolean equeals(Object obj);
 }
 
 // End XmlaOlap4jElement.java

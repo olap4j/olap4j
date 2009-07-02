@@ -78,6 +78,12 @@ class XmlaOlap4jHierarchy
         list.addAll(memberList);
         return Olap4jUtil.cast(list);
     }
+
+    public boolean equeals(Object obj) {
+        return (obj instanceof XmlaOlap4jHierarchy) &&
+            this.uniqueName.equals(
+                ((XmlaOlap4jHierarchy)obj).getUniqueName());
+    }
 }
 
 // End XmlaOlap4jHierarchy.java
