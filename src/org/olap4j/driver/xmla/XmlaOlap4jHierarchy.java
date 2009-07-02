@@ -79,7 +79,7 @@ class XmlaOlap4jHierarchy
         return Olap4jUtil.cast(list);
     }
 
-    public boolean equeals(Object obj) {
+    public boolean equals(Object obj) {
         return (obj instanceof XmlaOlap4jHierarchy) &&
             this.uniqueName.equals(
                 ((XmlaOlap4jHierarchy)obj).getUniqueName());

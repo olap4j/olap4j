@@ -63,7 +63,7 @@ class XmlaOlap4jDimension
         return hierarchies.get(0);
     }
 
-    public boolean equeals(Object obj) {
+    public boolean equals(Object obj) {
         return (obj instanceof XmlaOlap4jDimension) &&
             this.uniqueName.equals(
                 ((XmlaOlap4jDimension)obj).getUniqueName());

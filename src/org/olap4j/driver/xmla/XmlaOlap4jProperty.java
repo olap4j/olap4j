@@ -63,7 +63,7 @@ class XmlaOlap4jProperty
         return contentType;
     }
 
-    public boolean equeals(Object obj) {
+    public boolean equals(Object obj) {
         return (obj instanceof XmlaOlap4jProperty) &&
             this.uniqueName.equals(
                 ((XmlaOlap4jProperty)obj).getUniqueName());

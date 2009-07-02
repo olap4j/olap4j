@@ -70,7 +70,7 @@ abstract class XmlaOlap4jElement implements MetadataElement, Named {
 
     // Keep this declaration abstract as a reminder to
     // overriding classes.
-    abstract public boolean equeals(Object obj);
+    abstract public boolean equals(Object obj);
 }
 
 // End XmlaOlap4jElement.java
