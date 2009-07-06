@@ -138,9 +138,9 @@ class XmlaOlap4jLevel
     }
 
     public boolean equals(Object obj) {
-        return (obj instanceof XmlaOlap4jLevel) &&
-            this.uniqueName.equals(
-                ((XmlaOlap4jLevel)obj).getUniqueName());
+        return (obj instanceof XmlaOlap4jLevel)
+            && this.uniqueName.equals(
+                ((XmlaOlap4jLevel) obj).getUniqueName());
     }
 }
 

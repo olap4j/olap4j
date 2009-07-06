@@ -58,14 +58,14 @@ public class OlapTreeTest extends TestCase {
         Schema schema = olapConnection.getSchema();
         Cube cube = schema.getCubes().get("Sales");
 
-        Map<Dimension,String> dimensionMap =
-            new HashMap<Dimension,String>();
+        Map<Dimension, String> dimensionMap =
+            new HashMap<Dimension, String>();
         Dimension dim1 = cube.getDimensions().get("Promotion Media");
         dimensionMap.put(dim1, "Test1");
         assertTrue(dimensionMap.containsKey(dim1));
         assertEquals("Test1", dimensionMap.get(dim1));
 
-        Map<Hierarchy,String> hierarchyMap =
+        Map<Hierarchy, String> hierarchyMap =
             new HashMap<Hierarchy, String>();
         Hierarchy hchy1 = dim1.getDefaultHierarchy();
         hierarchyMap.put(hchy1, "Test2");

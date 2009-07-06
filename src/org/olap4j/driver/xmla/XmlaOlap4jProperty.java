@@ -64,9 +64,9 @@ class XmlaOlap4jProperty
     }
 
     public boolean equals(Object obj) {
-        return (obj instanceof XmlaOlap4jProperty) &&
-            this.uniqueName.equals(
-                ((XmlaOlap4jProperty)obj).getUniqueName());
+        return (obj instanceof XmlaOlap4jProperty)
+            && this.uniqueName.equals(
+                ((XmlaOlap4jProperty) obj).getUniqueName());
     }
 }
 

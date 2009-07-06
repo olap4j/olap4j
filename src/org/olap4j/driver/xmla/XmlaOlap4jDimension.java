@@ -64,9 +64,9 @@ class XmlaOlap4jDimension
     }
 
     public boolean equals(Object obj) {
-        return (obj instanceof XmlaOlap4jDimension) &&
-            this.uniqueName.equals(
-                ((XmlaOlap4jDimension)obj).getUniqueName());
+        return (obj instanceof XmlaOlap4jDimension)
+            && this.uniqueName.equals(
+                ((XmlaOlap4jDimension) obj).getUniqueName());
     }
 }
 

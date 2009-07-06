@@ -80,9 +80,9 @@ class XmlaOlap4jHierarchy
     }
 
     public boolean equals(Object obj) {
-        return (obj instanceof XmlaOlap4jHierarchy) &&
-            this.uniqueName.equals(
-                ((XmlaOlap4jHierarchy)obj).getUniqueName());
+        return (obj instanceof XmlaOlap4jHierarchy)
+            && this.uniqueName.equals(
+                ((XmlaOlap4jHierarchy) obj).getUniqueName());
     }
 }
 
