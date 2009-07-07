@@ -12,6 +12,7 @@ import org.olap4j.mdx.SelectNode;
 import org.olap4j.metadata.*;
 import org.olap4j.query.*;
 import org.olap4j.query.QueryDimension.SortOrder;
+import org.olap4j.query.Selection.Operator;
 import org.olap4j.test.TestContext;
 
 import java.sql.Connection;
@@ -603,6 +604,77 @@ public class OlapTest extends TestCase {
                 + "{[Product].[All Products].[Drink].Children})) ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    /**
+     * This test makes sure that the generated MDX model is not affected
+     * by subsequent operations performed on the source query model.
+     */
+    public void testQueryVersusParseTreeIndependence() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+
+            // Setup a base query.
+            Query query = new Query("my query", cube);
+
+            QueryDimension productDimension = query.getDimension("Product");
+            productDimension.select(
+                    Selection.Operator.INCLUDE_CHILDREN, "Product", "Drink");
+
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            measuresDimension.select("Measures", "Store Sales");
+
+            query.getAxis(Axis.ROWS).addDimension(productDimension);
+            query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+
+            query.validate();
+
+            assertEquals(
+                Axis.ROWS,
+                productDimension.getAxis().getLocation());
+            assertEquals(
+                Axis.COLUMNS,
+                measuresDimension.getAxis().getLocation());
+
+            // These variables are important. We will evaluate those
+            // to decide if there are links between the MDX and the Query
+            SelectNode originalMdx = query.getSelect();
+            String originalMdxString = originalMdx.toString();
+
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n"
+                + "FROM [Sales]",
+                originalMdxString);
+
+            // change selections
+            measuresDimension.select(
+                Selection.Operator.SIBLINGS, "Measures", "Customer Count");
+            productDimension.select(
+                Selection.Operator.SIBLINGS,
+                "Product", "All Products", "Drink", "Alcoholic Beverages");
+
+            // Add something to crossjoin with
+            query.getAxis(Axis.COLUMNS).addDimension(
+                query.getDimension("Gender"));
+            query.getDimension("Gender").select(Operator.CHILDREN, "Gender",
+                "All Gender");
+
+            query.getAxis(Axis.UNUSED).addDimension(
+                query.getDimension("Product"));
+
+            query.validate();
+
+            // Check if the MDX object tree is still the same
+            assertEquals(originalMdxString, originalMdx.toString());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
