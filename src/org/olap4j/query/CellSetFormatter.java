@@ -10,7 +10,6 @@
 package org.olap4j.query;
 
 import org.olap4j.CellSet;
-
 import java.io.PrintWriter;
 
 /**

@@ -37,7 +37,8 @@ import java.util.TreeSet;
  */
 public class QueryDimension extends QueryNodeImpl {
     protected QueryAxis axis;
-    protected final List<Selection> selections = new SelectionList();
+    protected final List<Selection> inclusions = new SelectionList();
+    protected final List<Selection> exclusions = new SelectionList();
     private final Query query;
     protected Dimension dimension;
     private SortOrder sortOrder = null;
@@ -64,16 +65,52 @@ public class QueryDimension extends QueryNodeImpl {
         return dimension.getName();
     }
 
+    @Deprecated
     public void select(String... nameParts) {
-        this.select(Selection.Operator.MEMBER, nameParts);
+        this.include(nameParts);
     }
 
+    @Deprecated
     public void select(
         Selection.Operator operator,
         String... nameParts)
     {
+        this.include(operator, nameParts);
+    }
+
+    @Deprecated
+    public void select(Member member) {
+        this.include(member);
+    }
+
+    @Deprecated
+    public void select(
+            Selection.Operator operator,
+            Member member)
+    {
+        this.include(operator, member);
+    }
+
+    /**
+     * Clears the current member inclusions from this query dimension.
+     * @deprecated This method is deprecated in favor of
+     * {@link QueryDimension#clearInclusions()}
+     */
+    @Deprecated
+    public void clearSelection() {
+        this.clearInclusions();
+    }
+
+    public void include(String... nameParts) {
+        this.include(Selection.Operator.MEMBER, nameParts);
+    }
+
+    public void include(
+        Selection.Operator operator,
+        String... nameParts)
+    {
         try {
-            this.select(
+            this.include(
                 operator,
                 this.getQuery().getCube().lookupMember(nameParts));
         } catch (OlapException e) {
@@ -82,36 +119,97 @@ public class QueryDimension extends QueryNodeImpl {
         }
     }
 
-    public void select(Member member) {
-        select(Selection.Operator.MEMBER, member);
+    public void include(Member member) {
+        include(Selection.Operator.MEMBER, member);
     }
 
-    public void select(
+    public void include(
             Selection.Operator operator,
             Member member)
     {
-        Selection selection =
-                query.getSelectionFactory().createMemberSelection(
-                        member, operator);
-        this.select(selection);
+        if (member.getDimension().equals(this.dimension)) {
+            Selection selection =
+                    query.getSelectionFactory().createMemberSelection(
+                            member, operator);
+            this.include(selection);
+        }
     }
 
-    private void select(Selection selection) {
-        this.getSelections().add(selection);
+    private void include(Selection selection) {
+        this.getInclusions().add(selection);
         Integer index = Integer.valueOf(
-                this.getSelections().indexOf(selection));
+                this.getInclusions().indexOf(selection));
         this.notifyAdd(selection, index);
     }
 
-    public void clearSelection() {
+    /**
+     * Clears the current member inclusions from this query dimension.
+     */
+    public void clearInclusions() {
         Map<Integer, QueryNode> removed = new HashMap<Integer, QueryNode>();
-        for (Selection node : this.selections) {
+        for (Selection node : this.inclusions) {
             removed.put(
-                Integer.valueOf(this.selections.indexOf(node)),
+                Integer.valueOf(this.inclusions.indexOf(node)),
                 node);
             ((QueryNodeImpl) node).clearListeners();
         }
-        this.selections.clear();
+        this.inclusions.clear();
+        this.notifyRemove(removed);
+    }
+
+    public void exclude(String... nameParts) {
+        this.exclude(Selection.Operator.MEMBER, nameParts);
+    }
+
+    public void exclude(
+        Selection.Operator operator,
+        String... nameParts)
+    {
+        try {
+            this.exclude(
+                operator,
+                this.getQuery().getCube().lookupMember(nameParts));
+        } catch (OlapException e) {
+            // Nothing to do, but we'll still log the exception.
+            e.printStackTrace();
+        }
+    }
+
+    public void exclude(Member member) {
+        exclude(Selection.Operator.MEMBER, member);
+    }
+
+    public void exclude(
+            Selection.Operator operator,
+            Member member)
+    {
+        if (member.getDimension().equals(this.dimension)) {
+            Selection selection =
+                    query.getSelectionFactory().createMemberSelection(
+                            member, operator);
+            this.exclude(selection);
+        }
+    }
+
+    private void exclude(Selection selection) {
+        this.getExclusions().add(selection);
+        Integer index = Integer.valueOf(
+                this.getExclusions().indexOf(selection));
+        this.notifyAdd(selection, index);
+    }
+
+    /**
+     * Clears the current member inclusions from this query dimension.
+     */
+    public void clearExclusions() {
+        Map<Integer, QueryNode> removed = new HashMap<Integer, QueryNode>();
+        for (Selection node : this.exclusions) {
+            removed.put(
+                Integer.valueOf(this.exclusions.indexOf(node)),
+                node);
+            ((QueryNodeImpl) node).clearListeners();
+        }
+        this.exclusions.clear();
         this.notifyRemove(removed);
     }
 
@@ -165,15 +263,39 @@ public class QueryDimension extends QueryNodeImpl {
     }
 
     /**
-     * Returns a list of the selections within this dimension.
+     * Returns a list of the inclusions within this dimension.
+     * <p>Be aware that modifications to this list might
+     * have unpredictable consequences.</p>
+     * @deprecated Use {@link QueryDimension#getInclusions()}
+     * @return list of inclusions
+     */
+    @Deprecated
+    public List<Selection> getSelections() {
+        return this.getInclusions();
+    }
+
+    /**
+     * Returns a list of the inclusions within this dimension.
      *
      * <p>Be aware that modifications to this list might
      * have unpredictable consequences.</p>
      *
-     * @return list of selections
+     * @return list of inclusions
      */
-    public List<Selection> getSelections() {
-        return selections;
+    public List<Selection> getInclusions() {
+        return inclusions;
+    }
+
+    /**
+     * Returns a list of the exclusions within this dimension.
+     *
+     * <p>Be aware that modifications to this list might
+     * have unpredictable consequences.</p>
+     *
+     * @return list of exclusions
+     */
+    public List<Selection> getExclusions() {
+        return exclusions;
     }
 
     public Dimension getDimension() {
@@ -232,10 +354,14 @@ public class QueryDimension extends QueryNodeImpl {
     }
 
     void tearDown() {
-        for (Selection node : this.selections) {
+        for (Selection node : this.inclusions) {
             ((QueryNodeImpl)node).clearListeners();
         }
-        this.selections.clear();
+        for (Selection node : this.exclusions) {
+            ((QueryNodeImpl)node).clearListeners();
+        }
+        this.inclusions.clear();
+        this.exclusions.clear();
     }
 }
 

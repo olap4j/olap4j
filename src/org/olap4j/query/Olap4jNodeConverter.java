@@ -114,13 +114,12 @@ abstract class Olap4jNodeConverter {
         CallNode callNode = null;
         int numDimensions = axis.getDimensions().size();
         if (axis.getLocation() == Axis.FILTER) {
-            // need a tuple
-            // need a crossjoin
+            // REVIEW : This part is not right. Fix this.
             List<ParseTreeNode> members = new ArrayList<ParseTreeNode>();
             for (int dimNo = 0; dimNo < numDimensions; dimNo++) {
                 QueryDimension dimension =
                     axis.getDimensions().get(dimNo);
-                if (dimension.getSelections().size() == 1) {
+                if (dimension.getInclusions().size() == 1) {
                     members.addAll(toOlap4j(dimension));
                 }
             }
@@ -159,10 +158,15 @@ abstract class Olap4jNodeConverter {
     }
 
     private static List<ParseTreeNode> toOlap4j(QueryDimension dimension) {
-        List<ParseTreeNode> members = new ArrayList<ParseTreeNode>();
-        for (Selection selection : dimension.getSelections()) {
-            members.add(toOlap4j(selection));
+        // Let's build a first list of included members.
+        List<ParseTreeNode> includeList = new ArrayList<ParseTreeNode>();
+        for (Selection selection : dimension.getInclusions()) {
+            includeList.add(toOlap4j(selection));
         }
+
+        // If a sort order was specified, we need to wrap the inclusions in an
+        // Order() mdx function.
+        List<ParseTreeNode> orderedList = new ArrayList<ParseTreeNode>();
         if (dimension.getSortOrder() != null) {
             CallNode currentMemberNode = new CallNode(
                 null,
@@ -174,20 +178,41 @@ abstract class Olap4jNodeConverter {
                 "Name",
                 Syntax.Property,
                 currentMemberNode);
-            List<ParseTreeNode> orderedList = new ArrayList<ParseTreeNode>();
             orderedList.add(
                 new CallNode(
                     null,
                     "Order",
                     Syntax.Function,
-                    generateListSetCall(members),
+                    generateListSetCall(includeList),
                     currentMemberNameNode,
                     LiteralNode.createSymbol(
                         null, dimension.getSortOrder().name())));
-            return orderedList;
         } else {
-            return members;
+            orderedList.addAll(includeList);
         }
+
+        // We're not done yet. We might have to exclude members from the
+        // inclusion, so we might have to wrap the list in a mdx Except()
+        // function call.
+        List<ParseTreeNode> listWithExclusions =
+            new ArrayList<ParseTreeNode>();
+        if (dimension.getExclusions().size() > 0) {
+            List<ParseTreeNode> excludedMembers =
+                new ArrayList<ParseTreeNode>();
+            for (Selection selection : dimension.getExclusions()) {
+                excludedMembers.add(toOlap4j(selection));
+            }
+            listWithExclusions.add(
+                new CallNode(
+                    null,
+                    "Except",
+                    Syntax.Function,
+                    generateListSetCall(orderedList),
+                    generateListSetCall(excludedMembers)));
+        } else {
+            listWithExclusions.addAll(orderedList);
+        }
+        return listWithExclusions;
     }
 
     private static ParseTreeNode toOlap4j(Selection selection) {

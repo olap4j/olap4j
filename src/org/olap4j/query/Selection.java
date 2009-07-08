@@ -13,7 +13,10 @@ import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Member;
 
 /**
- * A selection of members from an OLAP dimension hierarchy.
+ * A selection of members from an OLAP dimension hierarchy. The selection
+ * is a conceptual list of members from a given hierarchy. Once a selection
+ * object is created, one can decide to include or exclude this selection
+ * of members from the resulting query.
  *
  * <p>Concrete subclasses of this represent a real selection.
  * Selections include things such as 'children of', 'siblings of',

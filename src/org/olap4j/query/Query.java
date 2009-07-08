@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 import java.sql.SQLException;
 
 /**
- * Query model.
+ * Base query model object.
  *
  * @author jhyde, jdixon
  * @version $Id$
@@ -37,6 +37,11 @@ public class Query extends QueryNodeImpl {
     protected final Cube cube;
     protected Map<String, QueryDimension> dimensionMap =
         new HashMap<String, QueryDimension>();
+    /**
+     * Whether or not to select the default hierarchy and default
+     * member on a dimension if no explicit selections were performed.
+     */
+    protected boolean selectDefaultMembers = true;
     private final OlapConnection connection;
     private final SelectionFactory selectionFactory = new SelectionFactory();
 
@@ -174,37 +179,68 @@ public class Query extends QueryNodeImpl {
         this.tearDown(true);
     }
 
-    public boolean validate() throws OlapException {
-        /*
-         * FIXME What's the exact purpose of this validation process?
-         * To start with, it doesn't even really validate... it iterates
-         * over the cube dimensions, but it should iterate over the selected
-         * query dimensions instead, thus saving computation time.
-         * Second, it doesn't actually validate. It just selects default
-         * dimension members in the default hierarchy. Do we really want
-         * to add such arbitrary behavior in a query layer?
-         * This needs work. I'll put something in the tracker.
-         */
-        for (Dimension dimension :  cube.getDimensions()) {
-            QueryDimension queryDimension =
-                getDimension(dimension.getName());
-            if (queryDimension == null) {
-                return false;
-            }
-            Member member = dimension.getDefaultHierarchy().getDefaultMember();
-            if (queryDimension.getAxis() == null
-                || queryDimension.getAxis().getLocation() == null)
-            {
-                queryDimension.getSelections().clear();
-                queryDimension.select(member);
-
-            } else {
-                if (queryDimension.getSelections().size() == 0) {
-                    queryDimension.select(member);
+    /**
+     * Validates the current query structure. If a dimension axis has
+     * been placed on an axis but no selections were performed on it,
+     * the default hierarchy and default member will be selected. This
+     * can be turned off by invoking the
+     * {@link Query#setSelectDefaultMembers(boolean)} method.
+     * @throws OlapException If the query is not valid, an exception
+     * will be thrown and it's message will describe exactly what to fix.
+     */
+    public void validate() throws OlapException {
+        try {
+            // First, perform default selections if needed.
+            if (this.selectDefaultMembers) {
+                // Perform default selection on the dimensions on the rows axis.
+                for (QueryDimension dimension : this.getAxis(Axis.ROWS)
+                    .getDimensions())
+                {
+                    if (dimension.getInclusions().size() == 0) {
+                        Member defaultMember = dimension.getDimension()
+                            .getDefaultHierarchy().getDefaultMember();
+                        dimension.include(defaultMember);
+                    }
+                }
+                // Perform default selection on the
+                // dimensions on the columns axis.
+                for (QueryDimension dimension : this.getAxis(Axis.COLUMNS)
+                    .getDimensions())
+                {
+                    if (dimension.getInclusions().size() == 0) {
+                        Member defaultMember = dimension.getDimension()
+                            .getDefaultHierarchy().getDefaultMember();
+                        dimension.include(defaultMember);
+                    }
+                }
+                // Perform default selection on the dimensions
+                // on the filter axis.
+                for (QueryDimension dimension : this.getAxis(Axis.FILTER)
+                    .getDimensions())
+                {
+                    if (dimension.getInclusions().size() == 0) {
+                        Member defaultMember = dimension.getDimension()
+                            .getDefaultHierarchy().getDefaultMember();
+                        dimension.include(defaultMember);
+                    }
                 }
             }
+
+            // We at least need a dimension on the rows and on the columns axis.
+            if (this.getAxis(Axis.ROWS).getDimensions().size() == 0) {
+                throw new OlapException(
+                    "A valid Query requires at least one dimension on the rows axis.");
+            }
+            if (this.getAxis(Axis.COLUMNS).getDimensions().size() == 0) {
+                throw new OlapException(
+                    "A valid Query requires at least one dimension on the columns axis.");
+            }
+
+            // Try to build a select tree.
+            this.getSelect();
+        } catch (Exception e) {
+            throw new OlapException("Query validation failed.", e);
         }
-        return true;
     }
 
     /**
@@ -247,6 +283,18 @@ public class Query extends QueryNodeImpl {
      */
     SelectionFactory getSelectionFactory() {
         return selectionFactory;
+    }
+
+    /**
+     * Behavior setter for a query. By default, if a dimension is placed on
+     * an axis but no selections are made, the default hierarchy and
+     * the default member will be selected when validating the query.
+     * This behavior can be turned off by this setter.
+     * @param selectDefaultMembers Enables or disables the default
+     * member and hierarchy selection upon validation.
+     */
+    public void setSelectDefaultMembers(boolean selectDefaultMembers) {
+        this.selectDefaultMembers = selectDefaultMembers;
     }
 }
 

@@ -199,16 +199,18 @@ public class OlapTest extends TestCase {
             Member productMember = cube.lookupMember("Product", "Drink");
 
             // create some selections for Store
-            storeQuery.select(
+            storeQuery.include(
                     Selection.Operator.CHILDREN, "Store", "USA");
 
             // create some selections for Product
-            productQuery.clearSelection();
-            productQuery.select(Selection.Operator.CHILDREN, productMember);
-            productQuery.select(Selection.Operator.CHILDREN, "Product", "Food");
+            productQuery.clearInclusions();
+            productQuery.include(
+                    Selection.Operator.CHILDREN, productMember);
+            productQuery.include(
+                    Selection.Operator.CHILDREN, "Product", "Food");
 
             // create some selections for Time
-            timeQuery.select(Selection.Operator.CHILDREN, "Time", "1997");
+            timeQuery.include(Selection.Operator.CHILDREN, "Time", "1997");
 
             // place our dimensions on the axes
             query.getAxis(Axis.COLUMNS).addDimension(productQuery);
@@ -249,11 +251,11 @@ public class OlapTest extends TestCase {
             // TEST CHILDREN SELECTION
 
             QueryDimension productDimension = query.getDimension("Product");
-            productDimension.select(
+            productDimension.include(
                     Selection.Operator.CHILDREN, "Product", "Drink");
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.select("Measures", "Store Sales");
+            measuresDimension.include("Measures", "Store Sales");
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
@@ -271,8 +273,8 @@ public class OlapTest extends TestCase {
 
             // TEST ANCESTORS SELECTION
 
-            productDimension.clearSelection();
-            productDimension.select(
+            productDimension.clearInclusions();
+            productDimension.include(
                     Selection.Operator.ANCESTORS, "Product", "Drink");
 
             query.validate();
@@ -288,8 +290,8 @@ public class OlapTest extends TestCase {
 
             // TEST DESCENDANTS SELECTION
 
-            productDimension.clearSelection();
-            productDimension.select(
+            productDimension.clearInclusions();
+            productDimension.include(
                     Selection.Operator.DESCENDANTS, "Product", "Drink");
 
             query.validate();
@@ -305,8 +307,8 @@ public class OlapTest extends TestCase {
 
             // TEST INCLUDE_CHILDREN SELECTION
 
-            productDimension.clearSelection();
-            productDimension.select(
+            productDimension.clearInclusions();
+            productDimension.include(
                     Selection.Operator.INCLUDE_CHILDREN, "Product", "Drink");
 
             query.validate();
@@ -322,8 +324,8 @@ public class OlapTest extends TestCase {
 
             // TEST SIBLINGS SELECTION
 
-            productDimension.clearSelection();
-            productDimension.select(
+            productDimension.clearInclusions();
+            productDimension.include(
                     Selection.Operator.SIBLINGS, "Product", "Drink");
 
             query.validate();
@@ -353,18 +355,18 @@ public class OlapTest extends TestCase {
             // create selections
 
             QueryDimension productDimension = query.getDimension("Product");
-            productDimension.select(
+            productDimension.include(
                     Selection.Operator.CHILDREN, "Product", "Drink");
 
             QueryDimension storeDimension = query.getDimension("Store");
-            storeDimension.select(
+            storeDimension.include(
                     Selection.Operator.INCLUDE_CHILDREN, "Store", "USA");
 
             QueryDimension timeDimension = query.getDimension("Time");
-            timeDimension.select(Selection.Operator.CHILDREN, "Time", "1997");
+            timeDimension.include(Selection.Operator.CHILDREN, "Time", "1997");
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.select("Measures", "Store Sales");
+            measuresDimension.include("Measures", "Store Sales");
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.ROWS).addDimension(storeDimension);
@@ -400,11 +402,11 @@ public class OlapTest extends TestCase {
             // create selections
 
             QueryDimension productDimension = query.getDimension("Product");
-            productDimension.select(
+            productDimension.include(
                     Selection.Operator.CHILDREN, "Product", "Drink");
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.select("Measures", "Store Sales");
+            measuresDimension.include("Measures", "Store Sales");
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
@@ -463,11 +465,11 @@ public class OlapTest extends TestCase {
             // create selections
 
             QueryDimension productDimension = query.getDimension("Product");
-            productDimension.select(
+            productDimension.include(
                     Selection.Operator.INCLUDE_CHILDREN, "Product", "Drink");
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.select("Measures", "Store Sales");
+            measuresDimension.include("Measures", "Store Sales");
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
@@ -537,19 +539,19 @@ public class OlapTest extends TestCase {
             // create selections
 
             QueryDimension productDimension = query.getDimension("Product");
-            productDimension.select(
+            productDimension.include(
                     Selection.Operator.CHILDREN, "Product", "Drink");
 
             QueryDimension storeDimension = query.getDimension("Store");
-            storeDimension.select(
+            storeDimension.include(
                     Selection.Operator.INCLUDE_CHILDREN, "Store", "USA");
 
             QueryDimension timeDimension = query.getDimension("Time");
 
-            timeDimension.select(Selection.Operator.CHILDREN, "Time", "1997");
+            timeDimension.include(Selection.Operator.CHILDREN, "Time", "1997");
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.select("Measures", "Store Sales");
+            measuresDimension.include("Measures", "Store Sales");
 
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
@@ -625,11 +627,11 @@ public class OlapTest extends TestCase {
             Query query = new Query("my query", cube);
 
             QueryDimension productDimension = query.getDimension("Product");
-            productDimension.select(
+            productDimension.include(
                     Selection.Operator.INCLUDE_CHILDREN, "Product", "Drink");
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.select("Measures", "Store Sales");
+            measuresDimension.include("Measures", "Store Sales");
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
@@ -656,16 +658,18 @@ public class OlapTest extends TestCase {
                 originalMdxString);
 
             // change selections
-            measuresDimension.select(
+            measuresDimension.include(
                 Selection.Operator.SIBLINGS, "Measures", "Customer Count");
-            productDimension.select(
+            productDimension.include(
                 Selection.Operator.SIBLINGS,
                 "Product", "All Products", "Drink", "Alcoholic Beverages");
 
             // Add something to crossjoin with
-            query.getAxis(Axis.COLUMNS).addDimension(
+            query.getAxis(Axis.ROWS).addDimension(
                 query.getDimension("Gender"));
-            query.getDimension("Gender").select(Operator.CHILDREN, "Gender",
+            query.getDimension("Gender").include(
+                Operator.CHILDREN,
+                "Gender",
                 "All Gender");
 
             query.getAxis(Axis.UNUSED).addDimension(
@@ -675,6 +679,128 @@ public class OlapTest extends TestCase {
 
             // Check if the MDX object tree is still the same
             assertEquals(originalMdxString, originalMdx.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    public void testExclusionModes() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+
+            // Setup a base query.
+            Query query = new Query("my query", cube);
+            QueryDimension productDimension = query.getDimension("Product");
+            productDimension.include(
+                Selection.Operator.CHILDREN,
+                "Product", "Drink",
+                "Beverages");
+            productDimension.include(
+                Selection.Operator.CHILDREN,
+                "Product",
+                "Food",
+                "Frozen Foods");
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            measuresDimension.include("Measures", "Sales Count");
+            QueryDimension timeDimension = query.getDimension("Time");
+            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+            query.getAxis(Axis.ROWS).addDimension(productDimension);
+            query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+            query.getAxis(Axis.FILTER).addDimension(timeDimension);
+            query.validate();
+
+            // Validate the generated MDX
+            String mdxString = query.getSelect().toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+                + "{[Product].[All Products].[Drink].[Beverages].Children, [Product].[All Products].[Food].[Frozen Foods].Children} ON ROWS\n"
+                + "FROM [Sales]\n"
+                + "WHERE ([Time].[1997].[Q3].[7])",
+                mdxString);
+
+            // Validate the returned results
+            CellSet results = query.execute();
+            String resultsString = TestContext.toString(results);
+            TestContext.assertEqualsVerbose(
+                "Axis #0:\n"
+                + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q3].[7], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Sales Count]}\n"
+                + "Axis #2:\n"
+                + "{[Product].[All Products].[Drink].[Beverages].[Carbonated Beverages]}\n"
+                + "{[Product].[All Products].[Drink].[Beverages].[Drinks]}\n"
+                + "{[Product].[All Products].[Drink].[Beverages].[Hot Beverages]}\n"
+                + "{[Product].[All Products].[Drink].[Beverages].[Pure Juice Beverages]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Breakfast Foods]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Frozen Desserts]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Frozen Entrees]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Meat]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Pizza]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Vegetables]}\n"
+                + "Row #0: 103\n"
+                + "Row #1: 65\n"
+                + "Row #2: 125\n"
+                + "Row #3: 100\n"
+                + "Row #4: 143\n"
+                + "Row #5: 185\n"
+                + "Row #6: 68\n"
+                + "Row #7: 81\n"
+                + "Row #8: 105\n"
+                + "Row #9: 212\n",
+                resultsString);
+
+            // Exclude the Carbonated Beverages because they are not good
+            // for your health.
+            query.getDimension("Product").exclude(
+                "Product",
+                "Drink",
+                "Beverages",
+                "Carbonated Beverages");
+
+            // Validate the generated MDX
+            query.validate();
+            mdxString = query.getSelect().toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+                + "{Except({[Product].[All Products].[Drink].[Beverages].Children, [Product].[All Products].[Food].[Frozen Foods].Children}, {[Product].[All Products].[Drink].[Beverages].[Carbonated Beverages]})} ON ROWS\n"
+                + "FROM [Sales]\n"
+                + "WHERE ([Time].[1997].[Q3].[7])",
+                mdxString);
+
+            // Validate the returned results
+            results = query.execute();
+            resultsString = TestContext.toString(results);
+            TestContext.assertEqualsVerbose(
+                "Axis #0:\n"
+                + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q3].[7], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Sales Count]}\n"
+                + "Axis #2:\n"
+                + "{[Product].[All Products].[Drink].[Beverages].[Drinks]}\n"
+                + "{[Product].[All Products].[Drink].[Beverages].[Hot Beverages]}\n"
+                + "{[Product].[All Products].[Drink].[Beverages].[Pure Juice Beverages]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Breakfast Foods]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Frozen Desserts]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Frozen Entrees]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Meat]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Pizza]}\n"
+                + "{[Product].[All Products].[Food].[Frozen Foods].[Vegetables]}\n"
+                + "Row #0: 65\n"
+                + "Row #1: 125\n"
+                + "Row #2: 100\n"
+                + "Row #3: 143\n"
+                + "Row #4: 185\n"
+                + "Row #5: 68\n"
+                + "Row #6: 81\n"
+                + "Row #7: 105\n"
+                + "Row #8: 212\n",
+                resultsString);
         } catch (Exception e) {
             e.printStackTrace();
             fail();

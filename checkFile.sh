@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: //open/util/bin/checkFile#10 $
+# $Id: //open/util/bin/checkFile#23 $
 # Checks that a file is valid.
 # Used by perforce submit trigger, via runTrigger.
 # The file is deemed to be valid if this command produces no output.
@@ -8,7 +8,7 @@
 #   checkFile [ --depotPath <depotPath> ] <file> 
 #
 # runTrigger uses first form, with a temporary file, e.g.
-#   checkFile --depotPath /tmp/foo.txt //depot/src/foo/Bar.java
+#   checkFile --depotPath //depot/src/foo/Bar.java /tmp/foo.txt
 #
 # The second form is useful for checking files in the client before you
 # try to submit them:
@@ -37,6 +37,7 @@ usage() {
 doCheck() {
     filePath="$1"
     file="$2"
+    maxLineLength="$3"
 
     # CHECKFILE_IGNORE is an environment variable that contains a callback
     # to decide whether to check this file. The command or function should
@@ -55,7 +56,7 @@ doCheck() {
     */mondrian/gui/MondrianGuiDef.java| \
     */mondrian/xmla/DataSourcesConfig.java| \
     */mondrian/rolap/aggmatcher/DefaultDef.java| \
-    */mondrian/resource/MondrianResource.java| \
+    */mondrian/resource/MondrianResource*.java| \
     */mondrian/olap/Parser.java| \
     */mondrian/olap/ParserSym.java)
         # mondrian.util.Base64 is checked in as is, so don't check it
@@ -65,9 +66,53 @@ doCheck() {
 
     # Exceptions for olap4j
     */org/olap4j/mdx/parser/impl/*.java| \
-    */org/olap4j/mdx/parser/impl/*.cup| \
     */org/olap4j/impl/Base64.java)
         return
+        ;;
+
+    # Exceptions for farrago
+    */farrago/classes/* | \
+    */farrago/catalog/* | \
+    */farrago/examples/rng/src/net/sf/farrago/rng/parserimpl/*.java | \
+    */farrago/examples/rng/src/net/sf/farrago/rng/resource/FarragoRngResource*.java | \
+    */farrago/examples/rng/catalog/net/sf/farrago/rng/rngmodel/* | \
+    */farrago/examples/rng/catalog/java/* | \
+    */farrago/jdbc4/*.java | \
+    */farrago/src/net/sf/farrago/FarragoMetadataFactoryImpl.java | \
+    */farrago/src/net/sf/farrago/FarragoMetadataFactory.java | \
+    */farrago/src/net/sf/farrago/parser/impl/*.java | \
+    */farrago/src/net/sf/farrago/resource/FarragoResource*.java | \
+    */farrago/src/net/sf/farrago/resource/FarragoInternalQuery*.java | \
+    */farrago/src/net/sf/farrago/test/FarragoSqlTestWrapper.java | \
+    */farrago/src/org/eigenbase/jdbc4/*.java | \
+    */farrago/src/org/eigenbase/lurql/parser/*.java | \
+    */farrago/src/org/eigenbase/resource/EigenbaseResource*.java | \
+    */farrago/src/org/eigenbase/sql/parser/impl/*.java)
+        return
+        ;;
+
+    # Exceptions for fennel
+    */fennel/CMakeFiles/CompilerIdCXX/CMakeCXXCompilerId.cpp | \
+    */fennel/calculator/CalcGrammar.tab.cpp | \
+    */fennel/calculator/CalcGrammar.cpp | \
+    */fennel/calculator/CalcGrammar.h | \
+    */fennel/calculator/CalcLexer.cpp | \
+    */fennel/calculator/CalcLexer.h | \
+    */fennel/common/FemGeneratedEnums.h | \
+    */fennel/common/FennelResource.cpp | \
+    */fennel/common/FennelResource.h | \
+    */fennel/config.h | \
+    */fennel/farrago/FemGeneratedClasses.h | \
+    */fennel/farrago/FemGeneratedMethods.h | \
+    */fennel/farrago/NativeMethods.h)
+        return
+        ;;
+
+    # Skip our own test files, unless we are testing.
+    */util/test/CheckFile1.*)
+        if [ ! "$test" ]; then
+            return
+        fi
         ;;
 
     # Only validate .java and .cup files at present.
@@ -78,228 +123,54 @@ doCheck() {
         ;;
     esac
 
+    # Set maxLineLength if it is not already set. ('checkFile --opened'
+    # sets it to the strictest value, 80).
+    if [ ! "$maxLineLength" ]; then
+        case "$filePath" in
+        */aspen/*)
+            if [ "$strict" ]; then
+                maxLineLength=80
+            else
+                maxLineLength=95
+            fi
+            ;;
+        */mondrian/*)
+            if [ "$strict" ]; then
+                maxLineLength=80
+            else
+                maxLineLength=90
+            fi
+            ;;
+        *)
+            maxLineLength=80
+            ;;
+        esac
+    fi
+
     # Check whether there are tabs, or lines end with spaces
     # todo: check for ' ;'
     # todo: check that every file has copyright/license header
     # todo: check that every class has javadoc
     # todo: check that every top-level class has @author and @version
     # todo: check c++ files
+    if [ ! -f "$CHECKFILE_AWK" ]
+    then
+        CHECKFILE_AWK="$(dirname $(readlink -f $0))/checkFile.awk"
+    fi
     cat "$file" |
-    awk '
-function error(fname, linum, msg) {
-    printf "%s: %d: %s\n", fname, linum, msg;
-    if (0) print; # for debug
+    gawk -f "$CHECKFILE_AWK" \
+        -v fname="$filePath" \
+        -v lenient="$lenient" \
+        -v maxLineLength="$maxLineLength"
 }
-function matchFile(fname) {
-    return fname ~ "/mondrian/" \
-       || fname ~ "/org/olap4j/" \
-       || fname ~ "/aspen/" \
-       || fname ~ "/com/sqlstream/" \
-       || !lenient;
-}
-function isCpp(fname) {
-#print  "isCpp(" fname  ") = " (fname ~ /\.(cpp|h)$/);
-    return fname ~ /\.(cpp|h)$/;
-}
-function push(val) {
-   switchStack[switchStackLen++] = val;
-}
-function pop() {
-   --switchStackLen
-   val = switchStack[switchStackLen];
-   delete switchStack[switchStackLen];
-   return val;
-}
-BEGIN {
-    # pre-compute regexp for single-quoted strings
-    apos = sprintf("%c", 39);
-    pattern = apos "(\\" apos "|[^" apos "])*" apos;
-}
-{
-    if (previousLineEndedInBrace > 0) {
-        --previousLineEndedInBrace;
-    }
-    s = $0;
-    # replace strings
-    gsub(/"(\\"|[^"])*"/, "string", s);
-    # replace single-quoted strings
-    gsub(pattern, "string", s);
-    if (inComment && $0 ~ /\*\//) {
-        # end of multiline comment "*/"
-        inComment = 0;
-        gsub(/^.*\*\//, "/* comment */", s);
-    } else if (inComment) {
-        s = "/* comment */";
-    } else if ($0 ~ /\/\*/ && $0 !~ /\/\*.*\*\//) {
-        # beginning of multiline comment "/*"
-        inComment = 1;
-        gsub(/\/\*.*$/, "/* comment */", s);
-    } else {
-        # mask out /* */ comments
-        gsub(/\/\*.*$/, "/* comment */", s);
-    }
-    # mask out // comments
-    gsub(/\/\/.*$/, "// comment", s);
-}
-/ $/ {
-    error(fname, FNR, "Line ends in space");
-}
-/[\t]/ {
-    error(fname, FNR, "Tab character");
-}
-s ~ /\<if\>.*;$/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else {
-        error(fname, FNR, "if followed by statement on same line");
-    }
-}
-s ~ /\<(if|while|for|switch|catch|do|synchronized)\(/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (s !~ /(    )+(if|while|for|switch|synchronized|assert|} catch|do)/) {
-        error(fname, FNR, "if/while/for/switch/synchronized/catch/do must be correctly indented");
-    } else {
-        error(fname, FNR, "if/while/for/switch/synchronized/catch/do must be followed by space");
-    }
-}
-s ~ /\<switch\>/ {
-    push(switchCol);
-    switchCol = index($0, "switch");
-}
-s ~ /{/ {
-    braceCol = index($0, "{");
-    if (braceCol == switchCol) {
-        push(switchCol);
-    }
-}
-s ~ /}/ {
-    braceCol = index($0, "}");
-    if (braceCol == switchCol) {
-        switchCol = pop();
-    }
-}
-s ~ /\<(case|default)\>/ {
-    caseDefaultCol = match($0, /case|default/);
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (caseDefaultCol != switchCol) {
-        error(fname, FNR, "case/default must be aligned with switch");
-    }
-}
-s ~ /\<assert\(/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (isCpp(fname)) {} # rule only applies to java
-    else if (s !~ /(    )+(assert)/) {
-        error(fname, FNR, "assert must be correctly indented");
-    } else {
-        error(fname, FNR, "assert must be followed by space");
-    }
-}
-s ~ /\<else\>/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (isCpp(fname) && s ~ /^# *else$/) {} # ignore "#else"
-    else if (s !~ /(    )+} else (if |{$|{ *\/\/|{ *\/\*)/) {
-        error(fname, FNR, "else must be preceded by } and followed by { or if and correctly indented");
-    }
-}
-s ~ /\<try\>/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (s !~ /(    )+try {/) {
-        error(fname, FNR, "try must be followed by space {, and correctly indented");
-    }
-}
-s ~ /\<catch\>/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (s !~ /(    )+} catch /) {
-        error(fname, FNR, "catch must be preceded by }, followed by space, and correctly indented");
-    }
-}
-s ~ /\<finally\>/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (s !~ /(    )+} finally {/) {
-        error(fname, FNR, "finally must be preceded by }, followed by space {, and correctly indented");
-    }
-}
-s ~ /[]A-Za-z0-9()](+|-|\*|\/|%|=|==|+=|-=|\*=|\/=|>|<|>=|<=|!=|&|&&|\||\|\||^|\?|:) *[A-Za-z0-9(]/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (s ~ /<.*>/) {} # ignore templates
-    else if (s ~ /\(-/) {} # ignore case "foo(-1)"
-    else if (s ~ /[eE][+-][0-9]/) {} # ignore e.g. 1e-5
-    else if (s ~ /(case.*|default):$/) {} # ignore e.g. "case 5:"
-    else if (isCpp(fname) && s ~ /[^ ][*&]/) {} # ignore e.g. "Foo* p;" in c++ - debatable
-    else if (isCpp(fname) && s ~ /\<operator.*\(/) {} # ignore e.g. "operator++()" in c++
-    else {
-        error(fname, FNR, "operator must be preceded by space");
-    }
-}
-s ~ /[]A-Za-z0-9()] *(+|-|\*|\/|%|=|==|+=|-=|\*=|\/=|>|<|>=|<=|!=|&|&&|\||\|\||^|\?|:)[A-Za-z0-9(]/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (s ~ /<.*>/) {} # ignore templates
-    else if (s ~ /(\(|return |case |= )-/) {} # ignore prefix -
-    else if (s ~ /(case.*|default):$/) {} # ignore e.g. "case 5:"
-    else if (s ~ /[eE][+-][0-9]/) {} # ignore e.g. 1e-5
-    else if (isCpp(fname) && s ~ /[*&][^ ]/) {} # ignore e.g. "Foo *p;" in c++
-    else if (isCpp(fname) && s ~ /\<operator[^ ]+\(/) {} # ignore e.g. "operator++()" in c++
-    else {
-        error(fname, FNR, "operator must be followed by space");
-    }
-}
-s ~ /[[(] / {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else {
-        error(fname, FNR, "( or [ must not be preceded by space");
-    }
-}
-s ~ / [])]/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (s ~ /^ *\)/ && previousLineEndedInBrace) {} # ignore "bar(new Foo() { } );"
-    else {
-        error(fname, FNR, ") or ] must not be followed by space");
-    }
-}
-s ~ /}/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (s !~ /}( |;|,|$|\))/) {
-        error(fname, FNR, "} must be followed by space");
-    } else if (s !~ /(    )*}/) {
-        error(fname, FNR, "} must be at start of line and correctly indented");
-    }
-}
-s ~ /{/ {
-    if (!matchFile(fname)) {} # todo: enable for farrago
-    else if (s ~ /(\]\)?|=) *{/) {} # ignore e.g. "(int[]) {1, 2}" or "int[] x = {1, 2}"
-    else if (s ~ /\({/) {} # ignore e.g. @SuppressWarnings({"unchecked"})
-    else if (s ~ /{ *(\/\/|\/\*)/) {} # ignore e.g. "do { // a comment"
-    else if (fname ~ /\.cup$/) {} # ignore .cup file, which has {:
-    else if (s ~ / {}$/) {} # ignore e.g. "Constructor() {}"
-    else if (s ~ /{}/) { # e.g. "Constructor(){}"
-        error(fname, FNR, "{} must be preceded by space and at end of line");
-    } else if (isCpp(fname) && s ~ /{ *\\$/) {
-        # ignore - "{" can be followed by "\" in c macro
-    } else if (s !~ /{$/) {
-        error(fname, FNR, "{ must be at end of line");
-    } else if (s !~ /(^| ){/) {
-        error(fname, FNR, "{ must be preceded by space or at start of line");
-    }
-}
-/./ {
-    lastNonEmptyLine = $0;
-}
-/}$/ {
-    previousLineEndedInBrace = 2;
-}
-{
-    next;
-}
-END {
-    # Compute basename. If fname="/foo/bar/baz.txt" then basename="baz.txt".
-    basename = fname;
-    gsub(".*/", "", basename);
-    terminator = "// End " basename;
-    if (lastNonEmptyLine != terminator) {
-        error(fname, FNR, sprintf("Last line should be %c%s%c", 39, terminator, 39));
-    }
-}' fname="$filePath" lenient="$lenient"
 
-}
+# 'test' is an undocumented flag, overriding the default behavior which is
+# to ignore our own test files
+test=
+if [ "$1" == --test ]; then
+    test=true
+    shift
+fi
 
 lenient=
 if [ "$1" == --lenient ]; then
@@ -310,6 +181,12 @@ fi
 if [ "$1" == --help ]; then
     usage
     exit 0
+fi
+
+strict=
+if [ "$1" == --strict ]; then
+    strict=true
+    shift
 fi
 
 depotPath=
@@ -326,10 +203,10 @@ fi
 
 if [ "$opened" ]; then
     p4 opened |
-    awk -F'#' '{print $1}' |
+    gawk -F'#' '{print $1}' |
     while read line; do
-        file=$(p4 where "$line" | awk '{print $3}' | tr \\\\ /)
-        doCheck "$file" "$file"
+        file=$(p4 where "$line" | gawk '{print $3}' | tr \\\\ /)
+        doCheck "$file" "$file" "80"
     done
 else
     for file in "$@"; do
@@ -337,9 +214,8 @@ else
         if [ "$depotPath" ]; then
             filePath="$depotPath"
         fi
-        doCheck "$filePath" "$file"
+        doCheck "$filePath" "$file" ""
     done
 fi
 
 # End checkFile
-
