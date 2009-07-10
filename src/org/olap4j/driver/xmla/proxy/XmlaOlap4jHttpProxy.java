@@ -47,9 +47,10 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
     public byte[] getResponse(URL url, String request)
         throws XmlaOlap4jProxyException
     {
+        URLConnection urlConnection = null;
         try {
             // Open connection to manipulate the properties
-            URLConnection urlConnection = url.openConnection();
+            urlConnection = url.openConnection();
             urlConnection.setDoOutput(true);
 
             // Set headers
@@ -102,6 +103,26 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
         // All exceptions should be trapped here.
         // The response will only be available here anyways.
         } catch (Exception e) {
+            // In order to prevent the JDK from keeping this connection
+            // in WAIT mode, we need to empty the error stream cache.
+            try {
+                final int espCode = 
+                    ((HttpURLConnection)urlConnection).getResponseCode();
+                InputStream errorStream =
+                    ((HttpURLConnection)urlConnection).getErrorStream();
+                
+                final ByteArrayOutputStream baos =
+                    new ByteArrayOutputStream();
+                final byte[] buf = new byte[1024];
+                int count;
+                while ((count = errorStream.read(buf)) > 0) {
+                    baos.write(buf, 0, count);
+                }
+                errorStream.close();
+                baos.close();
+            } catch(IOException ex) {
+                // Well, we tried. No point notifying the user here.
+            }
             throw new XmlaOlap4jProxyException(
                 "This proxy encountered an exception while processing the "
                 + "query.",
