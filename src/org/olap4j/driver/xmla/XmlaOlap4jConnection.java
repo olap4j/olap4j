@@ -631,6 +631,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     Element xxx(String request) throws OlapException {
         byte[] bytes;
+        if (DEBUG) {
+            System.out.println("********************************************");
+            System.out.println("** SENDING REQUEST :");
+            System.out.println(request);
+        }
         try {
             bytes = proxy.get(serverUrl, request);
         } catch (IOException e) {
@@ -671,6 +676,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         // </SOAP-ENV:Envelope>
         final Element envelope = doc.getDocumentElement();
         if (DEBUG) {
+            System.out.println("** SERVER RESPONSE :");
             System.out.println(XmlaOlap4jUtil.toString(doc, true));
         }
         assert envelope.getLocalName().equals("Envelope");
@@ -879,6 +885,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class DimensionHandler extends HandlerImpl<XmlaOlap4jDimension> {
+        private final XmlaOlap4jCube cubeForCallback;
+        public DimensionHandler(XmlaOlap4jCube dimensionsByUname) {
+            this.cubeForCallback = dimensionsByUname;
+        }
         public void handle(
             Element row,
             Context context,
@@ -920,15 +930,22 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 Dimension.Type.forXmlaOrdinal(dimensionType);
             final String defaultHierarchyUniqueName =
                 stringElement(row, "DEFAULT_HIERARCHY");
-            list.add(
-                new XmlaOlap4jDimension(
+            XmlaOlap4jDimension dimension = new XmlaOlap4jDimension(
                     context.olap4jCube, dimensionUniqueName, dimensionName,
                     dimensionCaption, description, type,
-                    defaultHierarchyUniqueName));
+                    defaultHierarchyUniqueName);
+            list.add(dimension);
+            this.cubeForCallback.dimensionsByUname.put(
+                dimension.getUniqueName(),
+                dimension);
         }
     }
 
     static class HierarchyHandler extends HandlerImpl<XmlaOlap4jHierarchy> {
+        private final XmlaOlap4jCube cubeForCallback;
+        public HierarchyHandler(XmlaOlap4jCube cubeForCallback) {
+            this.cubeForCallback = cubeForCallback;
+        }
         public void handle(
             Element row, Context context, List<XmlaOlap4jHierarchy> list)
             throws OlapException
@@ -972,16 +989,27 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 stringElement(row, "ALL_MEMBER");
             final String defaultMemberUniqueName =
                 stringElement(row, "DEFAULT_MEMBER");
-            list.add(
-                new XmlaOlap4jHierarchy(
-                    context.getDimension(row), hierarchyUniqueName,
-                    hierarchyName, hierarchyCaption, description,
-                    allMember != null, defaultMemberUniqueName));
+            XmlaOlap4jHierarchy hierarchy = new XmlaOlap4jHierarchy(
+                context.getDimension(row),
+                hierarchyUniqueName,
+                hierarchyName,
+                hierarchyCaption,
+                description,
+                allMember != null,
+                defaultMemberUniqueName);
+            list.add(hierarchy);
+            cubeForCallback.hierarchiesByUname.put(
+                hierarchy.getUniqueName(),
+                hierarchy);
         }
     }
 
     static class LevelHandler extends HandlerImpl<XmlaOlap4jLevel> {
         public static final int MDLEVEL_TYPE_CALCULATED = 0x0002;
+        private final XmlaOlap4jCube cubeForCallback;
+        public LevelHandler(XmlaOlap4jCube cubeForCallback) {
+            this.cubeForCallback = cubeForCallback;
+        }
 
         public void handle(
             Element row,
@@ -1027,15 +1055,22 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             boolean calculated = (levelTypeCode & MDLEVEL_TYPE_CALCULATED) != 0;
             final int levelCardinality =
                 integerElement(row, "LEVEL_CARDINALITY");
-            list.add(
-                new XmlaOlap4jLevel(
-                    context.getHierarchy(row), levelUniqueName, levelName,
-                    levelCaption, description, levelNumber, levelType,
-                    calculated, levelCardinality));
+            XmlaOlap4jLevel level = new XmlaOlap4jLevel(
+                context.getHierarchy(row), levelUniqueName, levelName,
+                levelCaption, description, levelNumber, levelType,
+                calculated, levelCardinality);
+            list.add(level);
+            cubeForCallback.levelsByUname.put(
+                level.getUniqueName(),
+                level);
         }
     }
 
     static class MeasureHandler extends HandlerImpl<XmlaOlap4jMeasure> {
+        private final XmlaOlap4jDimension measuresDimension;
+        public MeasureHandler(XmlaOlap4jDimension measuresDimension) {
+            this.measuresDimension = measuresDimension;
+        }
         public void handle(
             Element row,
             Context context,
@@ -1551,7 +1586,24 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             }
             final String hierarchyUniqueName =
                 stringElement(row, "HIERARCHY_UNIQUE_NAME");
-            return getCube(row).hierarchiesByUname.get(hierarchyUniqueName);
+            XmlaOlap4jHierarchy hierarchy =
+                getCube(row).hierarchiesByUname.get(hierarchyUniqueName);
+            if (hierarchy == null) {
+                // Apparently, the code has requested a member that is
+                // not queried for yet. We must force the initialization
+                // of the dimension tree first.
+                final String dimensionUniqueName =
+                    stringElement(row, "DIMENSION_UNIQUE_NAME");
+                String dimensionName =
+                    Olap4jUtil.uniqueNameToStringArray(dimensionUniqueName)[0];
+                XmlaOlap4jDimension dimension =
+                    getCube(row).dimensions.get(dimensionName);
+                dimension.getHierarchies().size();
+                // Now we attempt to resolve again
+                hierarchy =
+                    getCube(row).hierarchiesByUname.get(hierarchyUniqueName);
+            }
+            return hierarchy;
         }
 
         XmlaOlap4jCube getCube(Element row) {
@@ -1567,7 +1619,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             }
             final String dimensionUniqueName =
                 stringElement(row, "DIMENSION_UNIQUE_NAME");
-            return getCube(row).dimensionsByUname.get(dimensionUniqueName);
+            XmlaOlap4jDimension dimension = getCube(row)
+                .dimensionsByUname.get(dimensionUniqueName);
+            // Apparently, the code has requested a member that is
+            // not queried for yet.
+            if (dimension == null) {
+                final String dimensionName =
+                    stringElement(row, "DIMENSION_NAME");
+                return getCube(row).dimensions.get(dimensionName);
+            }
+            return dimension;
         }
 
         public XmlaOlap4jLevel getLevel(Element row) {
@@ -1576,7 +1637,25 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             }
             final String levelUniqueName =
                 stringElement(row, "LEVEL_UNIQUE_NAME");
-            return getCube(row).levelsByUname.get(levelUniqueName);
+            XmlaOlap4jLevel level =
+                getCube(row).levelsByUname.get(levelUniqueName);
+            if (level == null) {
+                // Apparently, the code has requested a member that is
+                // not queried for yet. We must force the initialization
+                // of the dimension tree first.
+                final String dimensionUniqueName =
+                    stringElement(row, "DIMENSION_UNIQUE_NAME");
+                String dimensionName =
+                    Olap4jUtil.uniqueNameToStringArray(dimensionUniqueName)[0];
+                XmlaOlap4jDimension dimension =
+                    getCube(row).dimensions.get(dimensionName);
+                for (Hierarchy hierarchyInit : dimension.getHierarchies()) {
+                    hierarchyInit.getLevels().size();
+                }
+                // Now we attempt to resolve again
+                level = getCube(row).levelsByUname.get(levelUniqueName);
+            }
+            return level;
         }
 
         public XmlaOlap4jCatalog getCatalog(Element row) throws OlapException {

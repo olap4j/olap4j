@@ -54,7 +54,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
                 new XmlaOlap4jConnection.Context(
                     olap4jConnection, this, null, null, null, null, null,
                     null),
-                new XmlaOlap4jConnection.CatalogHandler());
+                new XmlaOlap4jConnection.CatalogHandler(),
+                null);
     }
 
     /**

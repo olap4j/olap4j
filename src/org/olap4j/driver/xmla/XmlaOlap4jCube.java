@@ -30,18 +30,15 @@ class XmlaOlap4jCube implements Cube, Named
     private final String name;
     private final String description;
 
-    final NamedList<XmlaOlap4jDimension> dimensions =
-        new NamedListImpl<XmlaOlap4jDimension>();
+    final NamedList<XmlaOlap4jDimension> dimensions;
     final Map<String, XmlaOlap4jDimension> dimensionsByUname =
         new HashMap<String, XmlaOlap4jDimension>();
-    private final NamedList<XmlaOlap4jHierarchy> hierarchies =
-        new NamedListImpl<XmlaOlap4jHierarchy>();
+    private NamedList<XmlaOlap4jHierarchy> hierarchies = null;
     final Map<String, XmlaOlap4jHierarchy> hierarchiesByUname =
         new HashMap<String, XmlaOlap4jHierarchy>();
     final Map<String, XmlaOlap4jLevel> levelsByUname =
         new HashMap<String, XmlaOlap4jLevel>();
-    private final NamedList<XmlaOlap4jMeasure> measures =
-        new NamedListImpl<XmlaOlap4jMeasure>();
+    final NamedList<XmlaOlap4jMeasure> measures;
     private final NamedList<XmlaOlap4jNamedSet> namedSets =
         new NamedListImpl<XmlaOlap4jNamedSet>();
     private final MetadataReader metadataReader;
@@ -78,77 +75,32 @@ class XmlaOlap4jCube implements Cube, Named
             "SCHEMA_NAME", olap4jSchema.getName(),
             "CUBE_NAME", getName()
         };
-        // populate dimensions (without their hierarchies at first)
-        olap4jConnection.populateList(
-            dimensions, context,
+
+        this.dimensions = new DeferredNamedListImpl<XmlaOlap4jDimension>(
             XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_DIMENSIONS,
-            new XmlaOlap4jConnection.DimensionHandler(),
-            restrictions);
-        for (XmlaOlap4jDimension dimension : dimensions) {
-            dimensionsByUname.put(dimension.getUniqueName(), dimension);
-        }
-        // populate hierarchies (referencing dimensions)
-        olap4jConnection.populateList(
-            hierarchies, context,
-            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_HIERARCHIES,
-            new XmlaOlap4jConnection.HierarchyHandler(),
-            restrictions);
-        // now we have hierarchies, populate dimension->hierarchy and
-        // cube->hierarchy mappings
-        for (XmlaOlap4jHierarchy hierarchy : hierarchies) {
-            hierarchy.olap4jDimension.hierarchies.add(hierarchy);
-            hierarchiesByUname.put(hierarchy.getUniqueName(), hierarchy);
-        }
-        // populate levels (referencing hierarchies); use a temp list because
-        // we don't need a mapping from cube->level
-        NamedList<XmlaOlap4jLevel> levels =
-            new NamedListImpl<XmlaOlap4jLevel>();
-        olap4jConnection.populateList(
-            levels, context,
-            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_LEVELS,
-            new XmlaOlap4jConnection.LevelHandler(),
-            restrictions);
-        // now we have levels, populate hierarchy->level and cube->level
-        // mappings
-        for (XmlaOlap4jLevel level : levels) {
-            level.olap4jHierarchy.levels.add(level);
-            levelsByUname.put(level.getUniqueName(), level);
-        }
-        // populate measures
-        olap4jConnection.populateList(
-            measures, context,
+            new XmlaOlap4jConnection.Context(
+                    olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
+                        .olap4jConnection,
+                    olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData,
+                    olap4jSchema.olap4jCatalog,
+                    olap4jSchema,
+                    this, null, null, null),
+                new XmlaOlap4jConnection.DimensionHandler(this),
+                restrictions);
+
+        this.measures = new DeferredNamedListImpl<XmlaOlap4jMeasure>(
             XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEASURES,
-            new XmlaOlap4jConnection.MeasureHandler(),
-            restrictions);
-        // replace temporary member versions of measures in cache with final
-        // measures
-        for (XmlaOlap4jMeasure measure : measures) {
-            ((CachingMetadataReader) metadataReader).memberMap.put(
-                measure.getUniqueName(),
-                new SoftReference<XmlaOlap4jMember>(measure));
-        }
-        if (!measures.isEmpty()) {
-            final XmlaOlap4jHierarchy measuresHierarchy =
-                measures.get(0).getHierarchy();
-            for (XmlaOlap4jLevel level : measuresHierarchy.levels) {
-                final List<Member> memberList = level.getMembers();
-                final List<Measure> measureList =
-                    new ArrayList<Measure>(memberList.size());
-                for (Member member : memberList) {
-                    final SoftReference<XmlaOlap4jMember> measureRef =
-                        ((CachingMetadataReader) metadataReader).memberMap.get(
-                            member.getUniqueName());
-                    // gc not possible - we hold all members in
-                    // 'measures' field.
-                    assert measureRef.get() != null;
-                    measureList.add((Measure) measureRef.get());
-                }
-                ((CachingMetadataReader) metadataReader).levelMemberListMap.put(
-                    level,
-                    new SoftReference<List<XmlaOlap4jMember>>(
-                        Olap4jUtil.<XmlaOlap4jMember>cast(measureList)));
-            }
-        }
+            new XmlaOlap4jConnection.Context(
+                    olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
+                        .olap4jConnection,
+                    olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData,
+                    olap4jSchema.olap4jCatalog,
+                    olap4jSchema,
+                    this, null, null, null),
+                new XmlaOlap4jConnection.MeasureHandler(
+                    this.dimensions.get("Measures")),
+                restrictions);
+
         // populate named sets
         olap4jConnection.populateList(
             namedSets, context,
@@ -182,6 +134,15 @@ class XmlaOlap4jCube implements Cube, Named
     }
 
     public NamedList<Hierarchy> getHierarchies() {
+        // This is a costly operation. It forces the init
+        // of all dimensions and all hierarchies.
+        // We differ it to this point.
+        if (this.hierarchies == null) {
+            this.hierarchies = new NamedListImpl<XmlaOlap4jHierarchy>();
+            for (XmlaOlap4jDimension dim : this.dimensions) {
+                this.hierarchies.addAll(dim.hierarchies);
+            }
+        }
         return Olap4jUtil.cast(hierarchies);
     }
 
@@ -349,9 +310,14 @@ class XmlaOlap4jCube implements Cube, Named
             }
             final XmlaOlap4jMember member =
                 super.lookupMemberByUniqueName(memberUniqueName);
-            memberMap.put(
-                memberUniqueName,
-                new SoftReference<XmlaOlap4jMember>(member));
+            if (member != null
+                    && !member.getDimension()
+                        .type.equals(Dimension.Type.MEASURE))
+            {
+                memberMap.put(
+                    memberUniqueName,
+                    new SoftReference<XmlaOlap4jMember>(member));
+            }
             return member;
         }
 
@@ -383,9 +349,14 @@ class XmlaOlap4jCube implements Cube, Named
                 for (String memberName : remainingMemberUniqueNames) {
                     XmlaOlap4jMember member = memberMap.get(memberName);
                     if (member != null) {
-                        this.memberMap.put(
-                            memberName,
-                            new SoftReference<XmlaOlap4jMember>(member));
+                        if (!(member instanceof Measure)
+                            && !(member.getDimension().type
+                                .equals(Dimension.Type.MEASURE)))
+                        {
+                            this.memberMap.put(
+                                memberName,
+                                new SoftReference<XmlaOlap4jMember>(member));
+                        }
                     }
                 }
             }
@@ -405,9 +376,13 @@ class XmlaOlap4jCube implements Cube, Named
             }
             final List<XmlaOlap4jMember> memberList =
                 super.getLevelMembers(level);
-            levelMemberListMap.put(
-                level,
-                new SoftReference<List<XmlaOlap4jMember>>(memberList));
+            if (!level.olap4jHierarchy.olap4jDimension.type
+                .equals(Dimension.Type.MEASURE))
+            {
+                levelMemberListMap.put(
+                    level,
+                    new SoftReference<List<XmlaOlap4jMember>>(memberList));
+            }
             return memberList;
         }
     }
@@ -533,11 +508,15 @@ class XmlaOlap4jCube implements Cube, Named
                     XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEMBERS,
                     new XmlaOlap4jConnection.MemberHandler(),
                     new Object[] {
-                        "CATALOG_NAME", olap4jSchema.olap4jCatalog.getName(),
-                        "SCHEMA_NAME", olap4jSchema.getName(),
+                        "CATALOG_NAME",
+                        olap4jSchema.olap4jCatalog.getName(),
+                        "SCHEMA_NAME",
+                        olap4jSchema.getName(),
                         "CUBE_NAME", getName(),
-                        "MEMBER_UNIQUE_NAME", memberUniqueName,
-                        "TREE_OP", String.valueOf(treeOpMask)
+                        "MEMBER_UNIQUE_NAME",
+                        memberUniqueName,
+                        "TREE_OP",
+                        String.valueOf(treeOpMask)
                     });
         }
 

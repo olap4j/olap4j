@@ -48,7 +48,8 @@ class XmlaOlap4jSchema implements Schema, Named {
                 olap4jCatalog,
                 this,
                 null, null, null, null),
-            new XmlaOlap4jConnection.CubeHandler());
+            new XmlaOlap4jConnection.CubeHandler(),
+            null);
     }
 
     public int hashCode() {

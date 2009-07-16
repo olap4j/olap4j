@@ -51,7 +51,8 @@ class XmlaOlap4jCatalog implements Catalog, Named {
                     olap4jDatabaseMetaData,
                     this,
                     null, null, null, null, null),
-                new XmlaOlap4jConnection.CatalogSchemaHandler(this.name));
+                new XmlaOlap4jConnection.CatalogSchemaHandler(this.name),
+                null);
     }
 
     public int hashCode() {

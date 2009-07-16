@@ -50,15 +50,19 @@ class DeferredNamedListImpl<T extends Named>
     protected final XmlaOlap4jConnection.MetadataRequest metadataRequest;
     protected final XmlaOlap4jConnection.Context context;
     protected final XmlaOlap4jConnection.Handler<T> handler;
+    protected final Object[] restrictions;
 
     DeferredNamedListImpl(
         XmlaOlap4jConnection.MetadataRequest metadataRequest,
         XmlaOlap4jConnection.Context context,
-        XmlaOlap4jConnection.Handler<T> handler)
+        XmlaOlap4jConnection.Handler<T> handler,
+        Object[] restrictions)
     {
         this.metadataRequest = metadataRequest;
         this.context = context;
         this.handler = handler;
+        this.restrictions = (restrictions == null)
+            ? new Object[0] : restrictions;
     }
 
     private NamedList<T> getList() {
@@ -100,7 +104,7 @@ class DeferredNamedListImpl<T extends Named>
 
     protected void populateList(NamedList<T> list) throws OlapException {
         context.olap4jConnection.populateList(
-            list, context, metadataRequest, handler, new Object[0]);
+            list, context, metadataRequest, handler, restrictions);
     }
 
     private enum State {

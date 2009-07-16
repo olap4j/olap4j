@@ -26,8 +26,7 @@ class XmlaOlap4jDimension
 {
     final XmlaOlap4jCube olap4jCube;
     final Type type;
-    final NamedList<XmlaOlap4jHierarchy> hierarchies =
-        new NamedListImpl<XmlaOlap4jHierarchy>();
+    final NamedList<XmlaOlap4jHierarchy> hierarchies;
     private final String defaultHierarchyUniqueName;
 
     XmlaOlap4jDimension(
@@ -44,6 +43,30 @@ class XmlaOlap4jDimension
         assert olap4jCube != null;
         this.olap4jCube = olap4jCube;
         this.type = type;
+
+        String[] dimensionRestrictions = {
+            "CATALOG_NAME",
+            olap4jCube.olap4jSchema.olap4jCatalog.getName(),
+            "SCHEMA_NAME",
+            olap4jCube.olap4jSchema.getName(),
+            "CUBE_NAME",
+            olap4jCube.getName(),
+            "DIMENSION_UNIQUE_NAME",
+            getUniqueName()
+        };
+
+        this.hierarchies = new DeferredNamedListImpl<XmlaOlap4jHierarchy>(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_HIERARCHIES,
+            new XmlaOlap4jConnection.Context(
+                olap4jCube.olap4jSchema.olap4jCatalog
+                    .olap4jDatabaseMetaData.olap4jConnection,
+                olap4jCube.olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData,
+                olap4jCube.olap4jSchema.olap4jCatalog,
+                olap4jCube.olap4jSchema,
+                olap4jCube,
+                this, null, null),
+            new XmlaOlap4jConnection.HierarchyHandler(olap4jCube),
+            dimensionRestrictions);
     }
 
     public NamedList<Hierarchy> getHierarchies() {

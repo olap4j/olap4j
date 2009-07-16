@@ -11,6 +11,8 @@ package org.olap4j.impl;
 import org.olap4j.metadata.NamedList;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility methods common to multiple olap4j driver implementations.
@@ -347,6 +349,19 @@ public class Olap4jUtil {
      */
     public static RuntimeException needToImplement(Object o) {
         throw new UnsupportedOperationException("need to implement " + o);
+    }
+
+    public static String[] uniqueNameToStringArray(String uniqueName) {
+        List<String> trail = new ArrayList<String>();
+        Pattern regex = Pattern.compile("([^\\[\\]\\.]*)");
+        Matcher matcher = regex.matcher(uniqueName);
+        while (matcher.find()) {
+            String match = matcher.group();
+            if (!match.equals("")) {
+                trail.add(match);
+            }
+        }
+        return trail.toArray(new String[trail.size()]);
     }
 
     @SuppressWarnings({"unchecked"})

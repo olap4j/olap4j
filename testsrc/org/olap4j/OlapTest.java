@@ -71,7 +71,7 @@ public class OlapTest extends TestCase {
 
             // Use the first schema
             Schema schema = schemas.get(0);
-            System.out.println("using schema name=" + schema.getName());
+//            System.out.println("using schema name=" + schema.getName());
 
             // Get a list of cube objects and dump their names
             NamedList<Cube> cubes = schema.getCubes();
@@ -136,9 +136,9 @@ public class OlapTest extends TestCase {
             }
             Catalog catalog = olapConnection.getCatalogs().get(catalogName);
             NamedList<Schema> schemas = catalog.getSchemas();
-            for (Schema schema : schemas) {
-                System.out.println("schema name=" + schema.getName());
-            }
+//            for (Schema schema : schemas) {
+//                System.out.println("schema name=" + schema.getName());
+//            }
 
             if (schemas.size() == 0) {
                 // No schemas were present
@@ -147,13 +147,13 @@ public class OlapTest extends TestCase {
 
             // Use the first schema
             Schema schema = schemas.get(0);
-            System.out.println("using schema name=" + schema.getName());
+//            System.out.println("using schema name=" + schema.getName());
 
             // Get a list of cube objects and dump their names
             NamedList<Cube> cubes = schema.getCubes();
-            for (Cube cube : cubes) {
-                System.out.println("cube name=" + cube.getName());
-            }
+//            for (Cube cube : cubes) {
+//                System.out.println("cube name=" + cube.getName());
+//            }
 
             if (cubes.size() == 0) {
                 // no cubes where present
@@ -165,17 +165,17 @@ public class OlapTest extends TestCase {
 
             // Get a list of dimension objects and dump their names,
             // hierarchies, levels.
-            NamedList<Dimension> dimensions = cube.getDimensions();
-            for (Dimension dimension : dimensions) {
-                if (dimension.getDimensionType() == Dimension.Type.MEASURE) {
-                    System.out.println(
-                        "measures dimension name=" + dimension.getName());
-                } else {
-                    System.out.println(
-                        "dimension name=" + dimension.getName());
-                }
-                listHierarchies(dimension);
-            }
+//            NamedList<Dimension> dimensions = cube.getDimensions();
+//            for (Dimension dimension : dimensions) {
+//                if (dimension.getDimensionType() == Dimension.Type.MEASURE) {
+//                    System.out.println(
+//                        "measures dimension name=" + dimension.getName());
+//                } else {
+//                    System.out.println(
+//                        "dimension name=" + dimension.getName());
+//                }
+//                listHierarchies(dimension);
+//            }
 
             // The code from this point on is for the Foodmart schema
 
@@ -824,9 +824,9 @@ public class OlapTest extends TestCase {
 
     public static void listMembers(Level level) throws OlapException {
         List<Member> members = level.getMembers();
-        for (Member member : members) {
-            System.out.println("member name=" + member.getName());
-        }
+//        for (Member member : members) {
+//            System.out.println("member name=" + member.getName());
+//        }
     }
 
     public static void main(String args[]) {

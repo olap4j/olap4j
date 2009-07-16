@@ -31,6 +31,7 @@ class XmlaOlap4jLevel
     private final Type type;
     private final int cardinality;
     private final NamedList<XmlaOlap4jProperty> propertyList;
+    final NamedList<XmlaOlap4jMember> memberList;
     private final boolean calculated;
 
     /**
@@ -63,34 +64,88 @@ class XmlaOlap4jLevel
         this.cardinality = cardinality;
         this.depth = depth;
         this.olap4jHierarchy = olap4jHierarchy;
+
+        String[] levelRestrictions = {
+                "CATALOG_NAME",
+                olap4jHierarchy.olap4jDimension.olap4jCube
+                    .olap4jSchema.olap4jCatalog.getName(),
+                "SCHEMA_NAME",
+                olap4jHierarchy.olap4jDimension.olap4jCube
+                    .olap4jSchema.getName(),
+                "CUBE_NAME",
+                olap4jHierarchy.olap4jDimension.olap4jCube.getName(),
+                "DIMENSION_UNIQUE_NAME",
+                olap4jHierarchy.olap4jDimension.getUniqueName(),
+                "HIERARCHY_UNIQUE_NAME",
+                olap4jHierarchy.getUniqueName(),
+                "LEVEL_UNIQUE_NAME",
+                getUniqueName()
+            };
+
         this.propertyList = new DeferredNamedListImpl<XmlaOlap4jProperty>(
             XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_PROPERTIES,
             new XmlaOlap4jConnection.Context(this),
-            new XmlaOlap4jConnection.PropertyHandler())
-        {
-            protected void populateList(
-                NamedList<XmlaOlap4jProperty> list) throws OlapException
+            new XmlaOlap4jConnection.PropertyHandler(),
+            levelRestrictions);
+
+        try {
+            if (olap4jHierarchy.olap4jDimension.getDimensionType()
+                    .equals(Dimension.Type.MEASURE))
             {
-                context.olap4jConnection.populateList(
-                    list, context, metadataRequest, handler,
-                    new Object[] {
-                        "CATALOG_NAME",
+                String[] restrictions = {
+                    "CATALOG_NAME",
+                    olap4jHierarchy.olap4jDimension.olap4jCube.olap4jSchema
+                        .olap4jCatalog.getName(),
+                    "SCHEMA_NAME",
+                    olap4jHierarchy.olap4jDimension.olap4jCube.olap4jSchema
+                        .getName(),
+                    "CUBE_NAME",
+                    olap4jHierarchy.olap4jDimension.olap4jCube.getName()
+                };
+                this.memberList = Olap4jUtil.cast(
+                    new DeferredNamedListImpl<XmlaOlap4jMeasure>(
+                        XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEASURES,
+                        new XmlaOlap4jConnection.Context(
+                            olap4jHierarchy.olap4jDimension
+                                .olap4jCube.olap4jSchema
+                                .olap4jCatalog.olap4jDatabaseMetaData
+                                .olap4jConnection,
+                            olap4jHierarchy.olap4jDimension
+                                .olap4jCube.olap4jSchema
+                                .olap4jCatalog.olap4jDatabaseMetaData,
+                            olap4jHierarchy.olap4jDimension.olap4jCube
+                                .olap4jSchema.olap4jCatalog,
+                            olap4jHierarchy.olap4jDimension.olap4jCube
+                                .olap4jSchema,
+                            olap4jHierarchy.olap4jDimension.olap4jCube,
+                            olap4jHierarchy.olap4jDimension,
+                            olap4jHierarchy,
+                            this),
+                        new XmlaOlap4jConnection.MeasureHandler(
+                            olap4jHierarchy.olap4jDimension),
+                            restrictions));
+            } else {
+                this.memberList = new DeferredNamedListImpl<XmlaOlap4jMember>(
+                    XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEMBERS,
+                    new XmlaOlap4jConnection.Context(
                         olap4jHierarchy.olap4jDimension.olap4jCube.olap4jSchema
-                            .olap4jCatalog.getName(),
-                        "SCHEMA_NAME",
+                            .olap4jCatalog.olap4jDatabaseMetaData
+                            .olap4jConnection,
                         olap4jHierarchy.olap4jDimension.olap4jCube.olap4jSchema
-                            .getName(),
-                        "CUBE_NAME",
-                        olap4jHierarchy.olap4jDimension.olap4jCube.getName(),
-                        "DIMENSION_UNIQUE_NAME",
-                        olap4jHierarchy.olap4jDimension.getUniqueName(),
-                        "HIERARCHY_UNIQUE_NAME",
-                        olap4jHierarchy.getUniqueName(),
-                        "LEVEL_UNIQUE_NAME",
-                        getUniqueName()
-                    });
+                            .olap4jCatalog.olap4jDatabaseMetaData,
+                        olap4jHierarchy.olap4jDimension.olap4jCube.olap4jSchema
+                            .olap4jCatalog,
+                        olap4jHierarchy.olap4jDimension.olap4jCube.olap4jSchema,
+                        olap4jHierarchy.olap4jDimension.olap4jCube,
+                        olap4jHierarchy.olap4jDimension,
+                        olap4jHierarchy,
+                        this),
+                    new XmlaOlap4jConnection.MemberHandler(),
+                    levelRestrictions);
             }
-        };
+        } catch (OlapException e) {
+            throw new RuntimeException("Programming error", e);
+        }
     }
 
     public int getDepth() {
@@ -128,9 +183,7 @@ class XmlaOlap4jLevel
     }
 
     public List<Member> getMembers() throws OlapException {
-        return Olap4jUtil.cast(
-            olap4jHierarchy.olap4jDimension.olap4jCube.getMetadataReader()
-                .getLevelMembers(this));
+        return Olap4jUtil.cast(this.memberList);
     }
 
     public int getCardinality() {
