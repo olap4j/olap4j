@@ -132,6 +132,19 @@ public class QueryAxis extends QueryNodeImpl {
     }
 
     /**
+     * Places a {@link QueryDimension} object on this axis at
+     * a specific index.
+     * @param dimension The {@link QueryDimension} object to add
+     * to this axis.
+     * @param index The position (0 based) onto which to place
+     * the QueryDimension
+     */
+    public void addDimension(int index, QueryDimension dimension) {
+        this.getDimensions().add(index, dimension);
+        this.notifyAdd(dimension, index);
+    }
+
+    /**
      * Removes a {@link QueryDimension} object on this axis.
      * @param dimension The {@link QueryDimension} object to remove
      * from this axis.
