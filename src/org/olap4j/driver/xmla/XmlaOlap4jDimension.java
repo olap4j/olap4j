@@ -28,6 +28,7 @@ class XmlaOlap4jDimension
     final Type type;
     final NamedList<XmlaOlap4jHierarchy> hierarchies;
     private final String defaultHierarchyUniqueName;
+    private final int ordinal;
 
     XmlaOlap4jDimension(
         XmlaOlap4jCube olap4jCube,
@@ -36,13 +37,15 @@ class XmlaOlap4jDimension
         String caption,
         String description,
         Type type,
-        String defaultHierarchyUniqueName)
+        String defaultHierarchyUniqueName,
+        int ordinal)
     {
         super(uniqueName, name, caption, description);
         this.defaultHierarchyUniqueName = defaultHierarchyUniqueName;
         assert olap4jCube != null;
         this.olap4jCube = olap4jCube;
         this.type = type;
+        this.ordinal = ordinal;
 
         String[] dimensionRestrictions = {
             "CATALOG_NAME",
@@ -90,6 +93,10 @@ class XmlaOlap4jDimension
         return (obj instanceof XmlaOlap4jDimension)
             && this.uniqueName.equals(
                 ((XmlaOlap4jDimension) obj).getUniqueName());
+    }
+
+    public int getOrdinal() {
+        return ordinal;
     }
 }
 

@@ -24,12 +24,6 @@ import java.util.AbstractList;
  * collections loaded immediately, loading the catalog would immediately load
  * all sub-objects into memory, taking a lot of memory and time.
  *
- * <p>(The above description is only intended to be illustrative. The XMLA
- * driver schema does not use deferred lists at every level; in particular,
- * it loads each cube in one swoop, fetching all dimensions, hierarchies and
- * levels of that cube, in order to reduce the number of metadata requests
- * submitted.)</p>
- *
  * <p>This class is not gc-friendly at present. Once populated,
  * <code>DeferredNamedListImpl</code> holds hard references
  * to the objects it contains, so they are not available to be

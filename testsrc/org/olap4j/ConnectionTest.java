@@ -2487,6 +2487,31 @@ public class ConnectionTest extends TestCase {
             + "ROW:[TV] COL:[Unit Sales] CELL:3,607\n",
             sw.toString());
     }
+
+    /**
+     * Verifies the order of dimensions; they must conform to their
+     * ordinal value.
+     * @throws Exception If something turns sour.
+     */
+    public void testCubeDimensionsOrder() throws Exception {
+        String dimNames = "[Measures];[Store];[Store Size in SQFT];"
+            + "[Store Type];[Time];[Product];[Promotion Media];[Promotions];"
+            + "[Customers];[Education Level];[Gender];[Marital Status];"
+            + "[Yearly Income];";
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        Cube cube = olapConnection.getSchema().getCubes().get("Sales");
+        StringBuilder sb = new StringBuilder();
+        for (Dimension dimension : cube.getDimensions()) {
+            sb.append(dimension.getUniqueName())
+                .append(";");
+        }
+        TestContext.assertEqualsVerbose(
+            dimNames,
+            sb.toString());
+    }
 }
 
 // End ConnectionTest.java
