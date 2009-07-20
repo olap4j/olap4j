@@ -930,17 +930,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 Dimension.Type.forXmlaOrdinal(dimensionType);
             final String defaultHierarchyUniqueName =
                 stringElement(row, "DEFAULT_HIERARCHY");
-            final Integer dimensionOrdinal =
-                integerElement(row, "DIMENSION_ORDINAL");
             XmlaOlap4jDimension dimension = new XmlaOlap4jDimension(
                     context.olap4jCube, dimensionUniqueName, dimensionName,
                     dimensionCaption, description, type,
                     defaultHierarchyUniqueName);
-            if (dimensionOrdinal != null) {
-                list.add(dimensionOrdinal.intValue(), dimension);
-            } else {
                 list.add(dimension);
-            }
             this.cubeForCallback.dimensionsByUname.put(
                 dimension.getUniqueName(),
                 dimension);
