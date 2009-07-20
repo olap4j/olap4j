@@ -106,11 +106,10 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
             // In order to prevent the JDK from keeping this connection
             // in WAIT mode, we need to empty the error stream cache.
             try {
-                final int espCode = 
+                final int espCode =
                     ((HttpURLConnection)urlConnection).getResponseCode();
                 InputStream errorStream =
                     ((HttpURLConnection)urlConnection).getErrorStream();
-                
                 final ByteArrayOutputStream baos =
                     new ByteArrayOutputStream();
                 final byte[] buf = new byte[1024];
