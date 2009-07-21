@@ -212,7 +212,41 @@ abstract class Olap4jNodeConverter {
         } else {
             listWithExclusions.addAll(orderedList);
         }
-        return listWithExclusions;
+
+        // Do we need to wrap it all in a Hierarchize function?
+        List<ParseTreeNode> listWithHierarchy =
+            new ArrayList<ParseTreeNode>();
+        if (dimension.getHierarchizeMode() != null) {
+            CallNode hierarchyNode;
+            // There are two modes available, PRE and POST.
+            if (dimension.getHierarchizeMode().equals(
+                QueryDimension.HierarchizeMode.PRE))
+            {
+                // In pre mode, we don't add the "POST" literal.
+                hierarchyNode = new CallNode(
+                    null,
+                    "Hierarchize",
+                    Syntax.Function,
+                    generateListSetCall(listWithExclusions));
+            } else if (dimension.getHierarchizeMode().equals(
+                    QueryDimension.HierarchizeMode.POST))
+            {
+                hierarchyNode = new CallNode(
+                    null,
+                    "Hierarchize",
+                    Syntax.Function,
+                    generateListSetCall(listWithExclusions),
+                    LiteralNode.createSymbol(
+                            null, dimension.getHierarchizeMode().name()));
+            } else {
+                throw new RuntimeException("Missing value handler.");
+            }
+            listWithHierarchy.add(hierarchyNode);
+        } else {
+            listWithHierarchy.addAll(listWithExclusions);
+        }
+
+        return listWithHierarchy;
     }
 
     private static ParseTreeNode toOlap4j(Selection selection) {

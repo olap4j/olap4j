@@ -42,6 +42,7 @@ public class QueryDimension extends QueryNodeImpl {
     private final Query query;
     protected Dimension dimension;
     private SortOrder sortOrder = null;
+    private HierarchizeMode hierarchizeMode = null;
 
     public QueryDimension(Query query, Dimension dimension) {
         super();
@@ -314,6 +315,20 @@ public class QueryDimension extends QueryNodeImpl {
         return this.sortOrder;
     }
 
+    public HierarchizeMode getHierarchizeMode() {
+        return hierarchizeMode;
+    }
+
+    /**
+     * Triggers the hierarchization of the included members within this
+     * QueryDimension.
+     * @param hierarchizeMode Whether or not to include the POST litteral
+     * inside the Hierarchize() MDX function call.
+     */
+    public void setHierarchizeMode(HierarchizeMode hierarchizeMode) {
+        this.hierarchizeMode = hierarchizeMode;
+    }
+
     private class SelectionList extends AbstractList<Selection> {
         private final List<Selection> list = new ArrayList<Selection>();
 
@@ -351,6 +366,17 @@ public class QueryDimension extends QueryNodeImpl {
          * Descending sort order.
          */
         DESC
+    }
+
+    public static enum HierarchizeMode {
+        /**
+         * Parents are placed before children.
+         */
+        PRE,
+        /**
+         * Parents are placed after children
+         */
+        POST
     }
 
     void tearDown() {

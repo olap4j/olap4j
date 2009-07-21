@@ -11,6 +11,7 @@ package org.olap4j;
 import org.olap4j.mdx.SelectNode;
 import org.olap4j.metadata.*;
 import org.olap4j.query.*;
+import org.olap4j.query.QueryDimension.HierarchizeMode;
 import org.olap4j.query.QueryDimension.SortOrder;
 import org.olap4j.query.Selection.Operator;
 import org.olap4j.test.TestContext;
@@ -604,6 +605,73 @@ public class OlapTest extends TestCase {
                 + "[Store].[All Stores].[USA].Children}}, "
                 + "CrossJoin({[Time].[1997].Children}, "
                 + "{[Product].[All Products].[Drink].Children})) ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    public void testDimensionsHierarchize() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+            Query query = new Query("my query", cube);
+
+            // create selections
+
+            QueryDimension productDimension = query.getDimension("Product");
+            productDimension.include(
+                    Selection.Operator.CHILDREN, "Product", "Drink");
+
+            QueryDimension storeDimension = query.getDimension("Store");
+            storeDimension.include(
+                    Selection.Operator.INCLUDE_CHILDREN, "Store", "USA");
+            storeDimension.setHierarchizeMode(HierarchizeMode.POST);
+
+            QueryDimension timeDimension = query.getDimension("Time");
+
+            timeDimension.include(Selection.Operator.CHILDREN, "Time", "1997");
+
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            measuresDimension.include("Measures", "Store Sales");
+
+
+            query.getAxis(Axis.ROWS).addDimension(productDimension);
+            query.getAxis(Axis.ROWS).addDimension(storeDimension);
+            query.getAxis(Axis.ROWS).addDimension(timeDimension);
+            query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+
+            query.validate();
+
+            SelectNode mdx = query.getSelect();
+            String mdxString = mdx.toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "CrossJoin({[Product].[All Products].[Drink].Children}, "
+                + "CrossJoin({Hierarchize({{[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}}, POST)}, "
+                + "{[Time].[1997].Children})) ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
+
+            storeDimension.setHierarchizeMode(HierarchizeMode.PRE);
+
+            query.validate();
+
+            mdx = query.getSelect();
+            mdxString = mdx.toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "CrossJoin({[Product].[All Products].[Drink].Children}, "
+                + "CrossJoin({Hierarchize({{[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}})}, "
+                + "{[Time].[1997].Children})) ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
         } catch (Exception e) {
