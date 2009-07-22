@@ -119,7 +119,7 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
                 }
                 errorStream.close();
                 baos.close();
-            } catch(IOException ex) {
+            } catch (IOException ex) {
                 // Well, we tried. No point notifying the user here.
             }
             throw new XmlaOlap4jProxyException(
