@@ -70,6 +70,22 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
                 getEncodingCharsetName()
                     .concat(";q=1"));
 
+            // Some servers expect a SOAPAction header.
+            // TODO There is bound to be a better way to do this.
+            if (request.contains(
+                "<Discover xmlns=\"urn:schemas-microsoft-com:xml-analysis\""))
+            {
+                urlConnection.setRequestProperty(
+                    "SOAPAction",
+                    "urn:schemas-microsoft-com:xml-analysis:Discover");
+            } else if (request.contains(
+                "<Execute xmlns=\"urn:schemas-microsoft-com:xml-analysis\""))
+            {
+                urlConnection.setRequestProperty(
+                        "SOAPAction",
+                        "urn:schemas-microsoft-com:xml-analysis:Execute");
+            }
+
             // Encode credentials for basic authentication
             if (url.getUserInfo() != null) {
                 String encoding =
