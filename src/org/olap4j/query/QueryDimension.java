@@ -357,17 +357,40 @@ public class QueryDimension extends QueryNodeImpl {
         }
     }
 
+    /**
+     * Defines in what order to perform the sort.
+     */
     public static enum SortOrder {
         /**
-         * Ascending sort order.
+         * Ascending sort order. Members of
+         * the same hierarchy are still kept together.
          */
         ASC,
         /**
-         * Descending sort order.
+         * Descending sort order. Members of
+         * the same hierarchy are still kept together.
          */
-        DESC
+        DESC,
+        /**
+         * Sorts in ascending order, but does not
+         * maintain members of a same hierarchy
+         * together. This is known as a "break
+         * hierarchy ascending sort".
+         */
+        BASC,
+        /**
+         * Sorts in descending order, but does not
+         * maintain members of a same hierarchy
+         * together. This is known as a "break
+         * hierarchy descending sort".
+         */
+        BDESC
     }
 
+    /**
+     * Defines in which way the hierarchize operation
+     * should be performed.
+     */
     public static enum HierarchizeMode {
         /**
          * Parents are placed before children.
