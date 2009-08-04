@@ -149,12 +149,33 @@ abstract class Olap4jNodeConverter {
                         callNode);
             }
         }
+
+        // We might need to sort the whole axis.
+        ParseTreeNode sortedNode = null;
+        if (axis.getSortOrder() != null) {
+            LiteralNode evaluatorNode =
+                 LiteralNode.createSymbol(
+                     null,
+                     axis.getSortIdentifierNodeName());
+            sortedNode =
+                new CallNode(
+                    null,
+                    "Order",
+                    Syntax.Function,
+                    callNode,
+                    evaluatorNode,
+                    LiteralNode.createSymbol(
+                        null, axis.getSortOrder().name()));
+        } else {
+            sortedNode = callNode;
+        }
+
         return new AxisNode(
             null,
             axis.isNonEmpty(),
             axis.getLocation(),
             new ArrayList<IdentifierNode>(),
-            callNode);
+            sortedNode);
     }
 
     private static List<ParseTreeNode> toOlap4j(QueryDimension dimension) {

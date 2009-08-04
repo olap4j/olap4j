@@ -10,6 +10,9 @@
 package org.olap4j.query;
 
 import org.olap4j.Axis;
+import org.olap4j.OlapException;
+import org.olap4j.metadata.Measure;
+import org.olap4j.metadata.Member;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +38,8 @@ public class QueryAxis extends QueryNodeImpl {
     private final Query query;
     protected Axis location = null;
     private boolean nonEmpty;
+    private SortOrder sortOrder = null;
+    private String sortEvaluationLiteral = null;
 
     /**
      * Creates a QueryAxis.
@@ -238,6 +243,124 @@ public class QueryAxis extends QueryNodeImpl {
         }
         this.clearListeners();
         this.getDimensions().clear();
+    }
+
+    /**
+     * Defines in what order to perform the sort.
+     */
+    public static enum SortOrder {
+        /**
+         * Ascending sort order. Members of
+         * the same hierarchy are still kept together.
+         */
+        ASC,
+        /**
+         * Descending sort order. Members of
+         * the same hierarchy are still kept together.
+         */
+        DESC,
+        /**
+         * Sorts in ascending order, but does not
+         * maintain members of a same hierarchy
+         * together. This is known as a "break
+         * hierarchy ascending sort".
+         */
+        BASC,
+        /**
+         * Sorts in descending order, but does not
+         * maintain members of a same hierarchy
+         * together. This is known as a "break
+         * hierarchy descending sort".
+         */
+        BDESC
+    }
+
+    /**
+     * <p>Sorts the axis according to the supplied order
+     * and member unique name.
+     * <p>Using this method will try to resolve the supplied name
+     * parts from the underlying cube and find the corresponding
+     * member. This member will then be passed as a sort evaluation
+     * expression.
+     * @param order The {@link QueryAxis.SortOrder} in which to
+     * sort the axis.
+     * @param nameParts The unique name parts of the sort
+     * evaluation expression.
+     * @throws OlapException If the supplied member cannot be resolved
+     * with {@link org.olap4j.metadata.Cube#lookupMember(String...)}
+     */
+    public void sort(SortOrder order, String... nameParts)
+        throws OlapException
+    {
+        assert order != null;
+        assert nameParts != null;
+        Member member = query.getCube().lookupMember(nameParts);
+        if (member != null) {
+            sort(order, member);
+        } else {
+            throw new OlapException("Cannot find member.");
+        }
+    }
+
+    /**
+     * <p>Sorts the axis according to the supplied order
+     * and member.
+     * <p>This method is most commonly called by passing
+     * it a {@link Measure}.
+     * @param order The {@link QueryAxis.SortOrder} in which to
+     * sort the axis.
+     * @param member The member that will be used as a sort
+     * evaluation expression.
+     */
+    public void sort(SortOrder order, Member member) {
+        assert order != null;
+        assert member != null;
+        sort(order, member.getUniqueName());
+    }
+
+    /**
+     * <p>Sorts the axis according to the supplied order
+     * and evaluation expression.
+     * <p>The string value passed as the sortIdentifierNodeName
+     * parameter willb e used literally as a sort evaluator.
+     * @param order The {@link QueryAxis.SortOrder} in which to
+     * sort the axis.
+     * @param sortEvaluationLiteral The literal expression that
+     * will be used to sort against.
+     */
+    public void sort(SortOrder order, String sortEvaluationLiteral) {
+        assert order != null;
+        assert sortEvaluationLiteral != null;
+        this.sortOrder = order;
+        this.sortEvaluationLiteral = sortEvaluationLiteral;
+    }
+
+    /**
+     * Clears the sort parameters from this axis.
+     */
+    public void clearSort() {
+        this.sortEvaluationLiteral = null;
+        this.sortOrder = null;
+    }
+
+    /**
+     * Returns the current sort order in which this
+     * axis will be sorted. Might return null of none
+     * is currently specified.
+     * @return The {@link SortOrder}
+     */
+    public SortOrder getSortOrder() {
+        return this.sortOrder;
+    }
+
+    /**
+     * Returns the current sort evaluation expression,
+     * or null if none are currently defined.
+     * @return The string literal that will be used in the
+     * MDX Order() function.
+     */
+    public String getSortIdentifierNodeName() {
+        return sortEvaluationLiteral;
     }
 }
 

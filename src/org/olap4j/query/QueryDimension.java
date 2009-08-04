@@ -307,12 +307,29 @@ public class QueryDimension extends QueryNodeImpl {
         this.dimension = dimension;
     }
 
+    /**
+     * Sorts the dimension members by name in the
+     * order supplied as a parameter.
+     * @param order The {@link SortOrder} to use.
+     */
     public void setSortOrder(SortOrder order) {
         this.sortOrder = order;
     }
 
+    /**
+     * Returns the current order in which the
+     * dimension members are sorted.
+     * @return A value of {@link SortOrder}
+     */
     public SortOrder getSortOrder() {
         return this.sortOrder;
+    }
+
+    /**
+     * Clears the current sorting settings.
+     */
+    public void clearSort() {
+        this.sortOrder = null;
     }
 
     public HierarchizeMode getHierarchizeMode() {
@@ -322,7 +339,11 @@ public class QueryDimension extends QueryNodeImpl {
     /**
      * Triggers the hierarchization of the included members within this
      * QueryDimension.
-     * @param hierarchizeMode Whether or not to include the POST litteral
+     * <p>The dimension inclusions will be wrapped in an MDX Hierarchize
+     * function call.
+     * @param hierarchizeMode If parents should be included before or after
+     * their children. (Equivalent to the POST/PRE MDX literal for the
+     * Hierarchize() function)
      * inside the Hierarchize() MDX function call.
      */
     public void setHierarchizeMode(HierarchizeMode hierarchizeMode) {

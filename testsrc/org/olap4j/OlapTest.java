@@ -472,8 +472,12 @@ public class OlapTest extends TestCase {
             QueryDimension measuresDimension = query.getDimension("Measures");
             measuresDimension.include("Measures", "Store Sales");
 
+            QueryDimension timeDimension = query.getDimension("Time");
+            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+            query.getAxis(Axis.FILTER).addDimension(timeDimension);
 
             query.validate();
 
@@ -490,7 +494,8 @@ public class OlapTest extends TestCase {
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
                 + "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n"
-                + "FROM [Sales]",
+                + "FROM [Sales]\n"
+                + "WHERE ([Time].[1997].[Q3].[7])",
                 mdxString);
 
             // Sort the products in ascending order.
@@ -502,14 +507,15 @@ public class OlapTest extends TestCase {
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
                 + "{Order({{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}}, [Product].CurrentMember.Name, DESC)} ON ROWS\n"
-                + "FROM [Sales]",
+                + "FROM [Sales]\n"
+                + "WHERE ([Time].[1997].[Q3].[7])",
                 sortedMdxString);
 
             CellSet results = query.execute();
             String s = TestContext.toString(results);
             TestContext.assertEqualsVerbose(
                 "Axis #0:\n"
-                + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+                + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q3].[7], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
                 + "Axis #1:\n"
                 + "{[Measures].[Store Sales]}\n"
                 + "Axis #2:\n"
@@ -517,10 +523,10 @@ public class OlapTest extends TestCase {
                 + "{[Product].[All Products].[Drink].[Dairy]}\n"
                 + "{[Product].[All Products].[Drink].[Beverages]}\n"
                 + "{[Product].[All Products].[Drink].[Alcoholic Beverages]}\n"
-                + "Row #0: 48,836.21\n"
-                + "Row #1: 7,058.60\n"
-                + "Row #2: 27,748.53\n"
-                + "Row #3: 14,029.08\n",
+                + "Row #0: 4,409.58\n"
+                + "Row #1: 629.69\n"
+                + "Row #2: 2,477.02\n"
+                + "Row #3: 1,302.87\n",
                 s);
         } catch (Exception e) {
             e.printStackTrace();
@@ -528,6 +534,87 @@ public class OlapTest extends TestCase {
         }
     }
 
+    public void testSortAxis() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+            Query query = new Query("my query", cube);
+
+            // create selections
+
+            QueryDimension productDimension = query.getDimension("Product");
+            productDimension.include(
+                    Selection.Operator.INCLUDE_CHILDREN, "Product", "Drink");
+
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            measuresDimension.include("Measures", "Store Sales");
+
+            QueryDimension timeDimension = query.getDimension("Time");
+            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+
+            query.getAxis(Axis.ROWS).addDimension(productDimension);
+            query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+            query.getAxis(Axis.FILTER).addDimension(timeDimension);
+
+            query.validate();
+
+            assertEquals(
+                Axis.ROWS,
+                productDimension.getAxis().getLocation());
+            assertEquals(
+                Axis.COLUMNS,
+                measuresDimension.getAxis().getLocation());
+
+            SelectNode mdx = query.getSelect();
+            String mdxString = mdx.toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n"
+                + "FROM [Sales]\n"
+                + "WHERE ([Time].[1997].[Q3].[7])",
+                mdxString);
+
+            // Sort the rows in ascending order.
+            query.getAxis(Axis.ROWS).sort(
+                org.olap4j.query.QueryAxis.SortOrder.BASC,
+                "Measures",
+                "Store Sales");
+
+            SelectNode sortedMdx = query.getSelect();
+            String sortedMdxString = sortedMdx.toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "Order({{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}}, [Measures].[Store Sales], BASC) ON ROWS\n"
+                + "FROM [Sales]\n"
+                + "WHERE ([Time].[1997].[Q3].[7])",
+                sortedMdxString);
+
+            CellSet results = query.execute();
+            String s = TestContext.toString(results);
+            TestContext.assertEqualsVerbose(
+                "Axis #0:\n"
+                + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q3].[7], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Store Sales]}\n"
+                + "Axis #2:\n"
+                + "{[Product].[All Products].[Drink].[Dairy]}\n"
+                + "{[Product].[All Products].[Drink].[Alcoholic Beverages]}\n"
+                + "{[Product].[All Products].[Drink].[Beverages]}\n"
+                + "{[Product].[All Products].[Drink]}\n"
+                + "Row #0: 629.69\n"
+                + "Row #1: 1,302.87\n"
+                + "Row #2: 2,477.02\n"
+                + "Row #3: 4,409.58\n",
+                s);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 
     public void testDimensionsOrder() {
         try {
@@ -548,7 +635,6 @@ public class OlapTest extends TestCase {
                     Selection.Operator.INCLUDE_CHILDREN, "Store", "USA");
 
             QueryDimension timeDimension = query.getDimension("Time");
-
             timeDimension.include(Selection.Operator.CHILDREN, "Time", "1997");
 
             QueryDimension measuresDimension = query.getDimension("Measures");
