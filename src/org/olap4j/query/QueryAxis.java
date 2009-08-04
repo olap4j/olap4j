@@ -276,6 +276,21 @@ public class QueryAxis extends QueryNodeImpl {
     }
 
     /**
+     * <p>Sorts the axis according to the supplied order. The sort evaluation
+     * expression will be the default member of the default hierarchy of
+     * the dimension named "Measures".
+     * @param order The {@link SortOrder} to apply
+     * @throws OlapException If an error occurs while resolving
+     * the default measure of the underlying cube.
+     */
+    public void sort(SortOrder order) throws OlapException {
+        sort(
+            order,
+            query.getCube().getDimensions().get("Measures")
+                .getDefaultHierarchy().getDefaultMember());
+    }
+
+    /**
      * <p>Sorts the axis according to the supplied order
      * and member unique name.
      * <p>Using this method will try to resolve the supplied name
