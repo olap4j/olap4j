@@ -364,6 +364,22 @@ public class Olap4jUtil {
         return trail.toArray(new String[trail.size()]);
     }
 
+    /**
+     * Converts the contents of an array of strings to
+     * a proper String representation.
+     */
+    public static String stringArrayToString(String[] array) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < array.length; i++) {
+            sb.append(array[i]);
+            if (i < (array.length - 1)) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
     @SuppressWarnings({"unchecked"})
     public static <T> NamedList<T> emptyNamedList() {
         return (NamedList<T>) EMPTY_NAMED_LIST;

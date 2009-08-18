@@ -22,7 +22,7 @@ import java.sql.SQLException;
 /**
  * Base query model object.
  *
- * @author jhyde, jdixon
+ * @author jhyde, jdixon, Luc Boudreau
  * @version $Id$
  * @since May 29, 2007
  */
@@ -45,6 +45,13 @@ public class Query extends QueryNodeImpl {
     private final OlapConnection connection;
     private final SelectionFactory selectionFactory = new SelectionFactory();
 
+    /**
+     * Constructs a Query object.
+     * @param name Any arbitrary name to give to this query.
+     * @param cube A Cube object against which to build a query.
+     * @throws SQLException If an error occurs while accessing the
+     * cube's underlying connection.
+     */
     public Query(String name, Cube cube) throws SQLException {
         super();
         this.name = name;
@@ -160,6 +167,13 @@ public class Query extends QueryNodeImpl {
         return unused;
     }
 
+    /**
+     * Safely disposes of all underlying objects of this
+     * query.
+     * @param closeConnection Whether or not to call the
+     * {@link OlapConnection#close()} method of the underlying
+     * connection.
+     */
     public void tearDown(boolean closeConnection) {
         for (Entry<Axis, QueryAxis> entry : this.axes.entrySet()) {
             entry.getValue().tearDown();
@@ -175,6 +189,11 @@ public class Query extends QueryNodeImpl {
         }
     }
 
+    /**
+     * Safely disposes of all underlying objects of this
+     * query and closes the underlying {@link OlapConnection}.
+     * <p>Equivalent of calling Query.tearDown(true).
+     */
     public void tearDown() {
         this.tearDown(true);
     }

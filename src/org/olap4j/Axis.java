@@ -29,6 +29,8 @@ public interface Axis {
     /**
      * @deprecated Will be removed before olap4j 1.0.
      */
+    // REVIEW: Is it wise to remove this axis enum value?
+    // It's existence IS relevant.
     Standard UNUSED = null;
 
     /**

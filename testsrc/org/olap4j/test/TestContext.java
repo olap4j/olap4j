@@ -18,7 +18,7 @@ import org.olap4j.*;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.mdx.ParseTreeWriter;
-import org.olap4j.query.TraditionalCellSetFormatter;
+import org.olap4j.layout.TraditionalCellSetFormatter;
 
 import org.apache.commons.dbcp.*;
 import junit.framework.ComparisonFailure;

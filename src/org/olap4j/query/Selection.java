@@ -27,7 +27,7 @@ import org.olap4j.metadata.Member;
  * any members whereas a Member represents a single member that is known to
  * exist.
  *
- * @author jdixon, jhyde
+ * @author jdixon, jhyde, Luc Boudreau
  * @version $Id$
  * @since May 30, 2007
  */
@@ -50,8 +50,43 @@ public interface Selection extends QueryNode {
     // @pre operator != null
     void setOperator(Operator operator);
 
+    /**
+     * Defines which selection operators are allowed, relative to
+     * a root member.
+     */
     public enum Operator {
-        MEMBER, CHILDREN, INCLUDE_CHILDREN, SIBLINGS, ANCESTORS, DESCENDANTS;
+        /**
+         * Only the root member will be selected.
+         */
+        MEMBER,
+        /**
+         * Only the children of the root member will be selected.
+         * This excludes the root member itself.
+         * <p>Implemented via the MDX .Children member property.
+         */
+        CHILDREN,
+        /**
+         * The root member will be selected along with all it's
+         * children.
+         */
+        INCLUDE_CHILDREN,
+        /**
+         * Will select the root member along with all it's siblings.
+         * <p>Implemented via the MDX .Siblings member property.
+         */
+        SIBLINGS,
+        /**
+         * Selects the set of the ascendants of a specified member,
+         * including the member itself.
+         * <p>Implemented via the MDX Ascendants() function.
+         */
+        ANCESTORS,
+        /**
+         * Selects the set of the descendants of a specified member,
+         * including the member itself.
+         * <p>Implemented via the MDX Descendants() function.
+         */
+        DESCENDANTS;
     }
 }
 

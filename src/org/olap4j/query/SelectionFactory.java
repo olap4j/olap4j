@@ -20,7 +20,7 @@ import org.olap4j.metadata.Member;
  * @version $Id$
  * @since May 30, 2007
  */
-public class SelectionFactory {
+class SelectionFactory {
 
     Selection createMemberSelection(
         Member member,

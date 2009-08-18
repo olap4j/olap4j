@@ -15,7 +15,7 @@ import org.olap4j.mdx.parser.MdxParserFactory;
 import org.olap4j.mdx.*;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Member;
-import org.olap4j.query.RectangularCellSetFormatter;
+import org.olap4j.layout.RectangularCellSetFormatter;
 import org.olap4j.type.MemberType;
 
 import java.io.PrintWriter;

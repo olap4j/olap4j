@@ -12,8 +12,8 @@ package org.olap4j;
 import junit.framework.TestCase;
 
 import org.olap4j.test.TestContext;
-import org.olap4j.query.TraditionalCellSetFormatter;
-import org.olap4j.query.RectangularCellSetFormatter;
+import org.olap4j.layout.TraditionalCellSetFormatter;
+import org.olap4j.layout.RectangularCellSetFormatter;
 
 import java.sql.SQLException;
 import java.sql.Connection;

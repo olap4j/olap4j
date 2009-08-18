@@ -10,6 +10,7 @@
 package org.olap4j.query;
 
 import org.olap4j.OlapException;
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.IdentifierNode;
 import org.olap4j.mdx.IdentifierNode.Segment;
 import org.olap4j.metadata.*;
@@ -31,7 +32,7 @@ import java.util.TreeSet;
  * Dimension object in any way so a single Dimension object
  * can be referenced by many QueryDimension objects.
  *
- * @author jdixon, jhyde
+ * @author jdixon, jhyde, Luc Boudreau
  * @version $Id$
  * @since May 29, 2007
  */
@@ -67,14 +68,14 @@ public class QueryDimension extends QueryNodeImpl {
     }
 
     @Deprecated
-    public void select(String... nameParts) {
+    public void select(String... nameParts) throws OlapException {
         this.include(nameParts);
     }
 
     @Deprecated
     public void select(
         Selection.Operator operator,
-        String... nameParts)
+        String... nameParts) throws OlapException
     {
         this.include(operator, nameParts);
     }
@@ -102,28 +103,64 @@ public class QueryDimension extends QueryNodeImpl {
         this.clearInclusions();
     }
 
-    public void include(String... nameParts) {
+    /**
+     * Selects members and includes them in the query.
+     * <p>This method selects and includes a single member with the
+     * {@link Selection.Operator#MEMBER} operator.
+     * @param nameParts Name of the member to select and include.
+     * @throws OlapException If no member corresponding to the supplied
+     * name parts could be resolved in the cube.
+     */
+    public void include(String... nameParts) throws OlapException {
         this.include(Selection.Operator.MEMBER, nameParts);
     }
 
+    /**
+     * Selects members and includes them in the query.
+     * <p>This method selects and includes a member along with it's
+     * relatives, depending on the supplied {@link Selection.Operator}
+     * operator.
+     * @param operator Selection operator that defines what relatives of the
+     * supplied member name to include along.
+     * @param nameParts Name of the root member to select and include.
+     * @throws OlapException If no member corresponding to the supplied
+     * name parts could be resolved in the cube.
+     */
     public void include(
         Selection.Operator operator,
-        String... nameParts)
+        String... nameParts) throws OlapException
     {
-        try {
+        Member member = this.getQuery().getCube().lookupMember(nameParts);
+        if (member == null) {
+            throw new OlapException(
+                "Unable to find a member with name "
+                    + Olap4jUtil.stringArrayToString(nameParts));
+        } else {
             this.include(
                 operator,
-                this.getQuery().getCube().lookupMember(nameParts));
-        } catch (OlapException e) {
-            // Nothing to do, but we'll still log the exception.
-            e.printStackTrace();
+                member);
         }
     }
 
+    /**
+     * Selects members and includes them in the query.
+     * <p>This method selects and includes a single member with the
+     * {@link Selection.Operator#MEMBER} selection operator.
+     * @param member The member to select and include in the query.
+     */
     public void include(Member member) {
         include(Selection.Operator.MEMBER, member);
     }
 
+    /**
+     * Selects members and includes them in the query.
+     * <p>This method selects and includes a member along with it's
+     * relatives, depending on the supplied {@link Selection.Operator}
+     * operator.
+     * @param operator Selection operator that defines what relatives of the
+     * supplied member name to include along.
+     * @param member Root member to select and include.
+     */
     public void include(
             Selection.Operator operator,
             Member member)
@@ -136,6 +173,10 @@ public class QueryDimension extends QueryNodeImpl {
         }
     }
 
+    /**
+     * Includes a selection of members in the query.
+     * @param selection The selection of members to include.
+     */
     private void include(Selection selection) {
         this.getInclusions().add(selection);
         Integer index = Integer.valueOf(
@@ -158,28 +199,64 @@ public class QueryDimension extends QueryNodeImpl {
         this.notifyRemove(removed);
     }
 
-    public void exclude(String... nameParts) {
+    /**
+     * Selects members and excludes them from the query.
+     * <p>This method selects and excludes a single member with the
+     * {@link Selection.Operator#MEMBER} operator.
+     * @param nameParts Name of the member to select and exclude.
+     * @throws OlapException If no member corresponding to the supplied
+     * name parts could be resolved in the cube.
+     */
+    public void exclude(String... nameParts) throws OlapException {
         this.exclude(Selection.Operator.MEMBER, nameParts);
     }
 
+    /**
+     * Selects members and excludes them from the query.
+     * <p>This method selects and excludes a member along with it's
+     * relatives, depending on the supplied {@link Selection.Operator}
+     * operator.
+     * @param operator Selection operator that defines what relatives of the
+     * supplied member name to exclude along.
+     * @param nameParts Name of the root member to select and exclude.
+     * @throws OlapException If no member corresponding to the supplied
+     * name parts could be resolved in the cube.
+     */
     public void exclude(
         Selection.Operator operator,
-        String... nameParts)
+        String... nameParts) throws OlapException
     {
-        try {
+        Member rootMember = this.getQuery().getCube().lookupMember(nameParts);
+        if (rootMember == null) {
+            throw new OlapException(
+                "Unable to find a member with name "
+                    + Olap4jUtil.stringArrayToString(nameParts));
+        } else {
             this.exclude(
                 operator,
-                this.getQuery().getCube().lookupMember(nameParts));
-        } catch (OlapException e) {
-            // Nothing to do, but we'll still log the exception.
-            e.printStackTrace();
+                rootMember);
         }
     }
 
+    /**
+     * Selects members and excludes them from the query.
+     * <p>This method selects and excludes a single member with the
+     * {@link Selection.Operator#MEMBER} selection operator.
+     * @param member The member to select and exclude from the query.
+     */
     public void exclude(Member member) {
         exclude(Selection.Operator.MEMBER, member);
     }
 
+    /**
+     * Selects members and excludes them from the query.
+     * <p>This method selects and excludes a member along with it's
+     * relatives, depending on the supplied {@link Selection.Operator}
+     * operator.
+     * @param operator Selection operator that defines what relatives of the
+     * supplied member name to exclude along.
+     * @param member Root member to select and exclude.
+     */
     public void exclude(
             Selection.Operator operator,
             Member member)
@@ -192,6 +269,10 @@ public class QueryDimension extends QueryNodeImpl {
         }
     }
 
+    /**
+     * Excludes a selection of members from the query.
+     * @param selection The selection of members to exclude.
+     */
     private void exclude(Selection selection) {
         this.getExclusions().add(selection);
         Integer index = Integer.valueOf(
@@ -223,6 +304,14 @@ public class QueryDimension extends QueryNodeImpl {
         return nameParts;
     }
 
+    /**
+     * Resolves a selection of members into an actual list
+     * of the root member and it's relatives selected by the Selection object.
+     * @param selection The selection of members to resolve.
+     * @return A list of the actual members selected by the selection object.
+     * @throws OlapException If resolving the selections triggers an exception
+     * while looking up members in the underlying cube.
+     */
     public List<Member> resolve(Selection selection) throws OlapException
     {
         assert selection != null;
@@ -299,10 +388,25 @@ public class QueryDimension extends QueryNodeImpl {
         return exclusions;
     }
 
+    /**
+     * Returns the underlying dimension object onto which
+     * this query dimension is based.
+     * <p>Returns a mutable object so operations on it have
+     * unpredictable consequences.
+     * @return The underlying dimension representation.
+     */
     public Dimension getDimension() {
         return dimension;
     }
 
+    /**
+     * Forces a change onto which dimension is the current
+     * base of this QueryDimension object.
+     * <p>Forcing a change in the duimension assignment has
+     * unpredictable consequences.
+     * @param dimension The new dimension to assign to this
+     * query dimension.
+     */
     public void setDimension(Dimension dimension) {
         this.dimension = dimension;
     }
@@ -312,7 +416,7 @@ public class QueryDimension extends QueryNodeImpl {
      * order supplied as a parameter.
      * @param order The {@link SortOrder} to use.
      */
-    public void setSortOrder(SortOrder order) {
+    public void sort(SortOrder order) {
         this.sortOrder = order;
     }
 
@@ -332,6 +436,12 @@ public class QueryDimension extends QueryNodeImpl {
         this.sortOrder = null;
     }
 
+    /**
+     * Returns the current mode of hierarchyzation, or null
+     * if no hierarchyzation is currently performed.
+     * @return Either a hierarchyzation mode value or null
+     * if no hierarchyzation is currently performed.
+     */
     public HierarchizeMode getHierarchizeMode() {
         return hierarchizeMode;
     }
@@ -348,6 +458,13 @@ public class QueryDimension extends QueryNodeImpl {
      */
     public void setHierarchizeMode(HierarchizeMode hierarchizeMode) {
         this.hierarchizeMode = hierarchizeMode;
+    }
+
+    /**
+     * Tells the QueryDimension not to hierarchyze it's included selections.
+     */
+    public void clearHierarchizeMode() {
+        this.hierarchizeMode = null;
     }
 
     private class SelectionList extends AbstractList<Selection> {
@@ -376,36 +493,6 @@ public class QueryDimension extends QueryNodeImpl {
         public Selection remove(int index) {
             return list.remove(index);
         }
-    }
-
-    /**
-     * Defines in what order to perform the sort.
-     */
-    public static enum SortOrder {
-        /**
-         * Ascending sort order. Members of
-         * the same hierarchy are still kept together.
-         */
-        ASC,
-        /**
-         * Descending sort order. Members of
-         * the same hierarchy are still kept together.
-         */
-        DESC,
-        /**
-         * Sorts in ascending order, but does not
-         * maintain members of a same hierarchy
-         * together. This is known as a "break
-         * hierarchy ascending sort".
-         */
-        BASC,
-        /**
-         * Sorts in descending order, but does not
-         * maintain members of a same hierarchy
-         * together. This is known as a "break
-         * hierarchy descending sort".
-         */
-        BDESC
     }
 
     /**

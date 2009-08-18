@@ -27,7 +27,7 @@ import java.util.Map;
  * <p>An axis has a location (columns, rows, etc) and has zero or more
  * dimensions that are placed on it.
  *
- * @author jdixon
+ * @author jdixon, Luc Boudreau
  * @version $Id$
  * @since May 29, 2007
  */
@@ -246,36 +246,6 @@ public class QueryAxis extends QueryNodeImpl {
     }
 
     /**
-     * Defines in what order to perform the sort.
-     */
-    public static enum SortOrder {
-        /**
-         * Ascending sort order. Members of
-         * the same hierarchy are still kept together.
-         */
-        ASC,
-        /**
-         * Descending sort order. Members of
-         * the same hierarchy are still kept together.
-         */
-        DESC,
-        /**
-         * Sorts in ascending order, but does not
-         * maintain members of a same hierarchy
-         * together. This is known as a "break
-         * hierarchy ascending sort".
-         */
-        BASC,
-        /**
-         * Sorts in descending order, but does not
-         * maintain members of a same hierarchy
-         * together. This is known as a "break
-         * hierarchy descending sort".
-         */
-        BDESC
-    }
-
-    /**
      * <p>Sorts the axis according to the supplied order. The sort evaluation
      * expression will be the default member of the default hierarchy of
      * the dimension named "Measures".
@@ -297,7 +267,7 @@ public class QueryAxis extends QueryNodeImpl {
      * parts from the underlying cube and find the corresponding
      * member. This member will then be passed as a sort evaluation
      * expression.
-     * @param order The {@link QueryAxis.SortOrder} in which to
+     * @param order The {@link SortOrder} in which to
      * sort the axis.
      * @param nameParts The unique name parts of the sort
      * evaluation expression.
@@ -322,7 +292,7 @@ public class QueryAxis extends QueryNodeImpl {
      * and member.
      * <p>This method is most commonly called by passing
      * it a {@link Measure}.
-     * @param order The {@link QueryAxis.SortOrder} in which to
+     * @param order The {@link SortOrder} in which to
      * sort the axis.
      * @param member The member that will be used as a sort
      * evaluation expression.
@@ -338,7 +308,7 @@ public class QueryAxis extends QueryNodeImpl {
      * and evaluation expression.
      * <p>The string value passed as the sortIdentifierNodeName
      * parameter willb e used literally as a sort evaluator.
-     * @param order The {@link QueryAxis.SortOrder} in which to
+     * @param order The {@link SortOrder} in which to
      * sort the axis.
      * @param sortEvaluationLiteral The literal expression that
      * will be used to sort against.

@@ -12,13 +12,11 @@ import org.olap4j.mdx.SelectNode;
 import org.olap4j.metadata.*;
 import org.olap4j.query.*;
 import org.olap4j.query.QueryDimension.HierarchizeMode;
-import org.olap4j.query.QueryDimension.SortOrder;
 import org.olap4j.query.Selection.Operator;
 import org.olap4j.test.TestContext;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -66,20 +64,17 @@ public class OlapTest extends TestCase {
             Catalog catalog = olapConnection.getCatalogs().get(catalogName);
             NamedList<Schema> schemas = catalog.getSchemas();
             if (schemas.size() == 0) {
-                System.out.println("No Schemas found in catalog");
                 return null;
             }
 
             // Use the first schema
             Schema schema = schemas.get(0);
-//            System.out.println("using schema name=" + schema.getName());
 
             // Get a list of cube objects and dump their names
             NamedList<Cube> cubes = schema.getCubes();
 
             if (cubes.size() == 0) {
                 // no cubes where present
-                System.out.println("No Cubes found in schema");
                 return null;
             }
 
@@ -137,9 +132,6 @@ public class OlapTest extends TestCase {
             }
             Catalog catalog = olapConnection.getCatalogs().get(catalogName);
             NamedList<Schema> schemas = catalog.getSchemas();
-//            for (Schema schema : schemas) {
-//                System.out.println("schema name=" + schema.getName());
-//            }
 
             if (schemas.size() == 0) {
                 // No schemas were present
@@ -148,13 +140,9 @@ public class OlapTest extends TestCase {
 
             // Use the first schema
             Schema schema = schemas.get(0);
-//            System.out.println("using schema name=" + schema.getName());
 
             // Get a list of cube objects and dump their names
             NamedList<Cube> cubes = schema.getCubes();
-//            for (Cube cube : cubes) {
-//                System.out.println("cube name=" + cube.getName());
-//            }
 
             if (cubes.size() == 0) {
                 // no cubes where present
@@ -163,20 +151,6 @@ public class OlapTest extends TestCase {
 
             // take the "Sales" cube
             Cube cube = cubes.get("Sales");
-
-            // Get a list of dimension objects and dump their names,
-            // hierarchies, levels.
-//            NamedList<Dimension> dimensions = cube.getDimensions();
-//            for (Dimension dimension : dimensions) {
-//                if (dimension.getDimensionType() == Dimension.Type.MEASURE) {
-//                    System.out.println(
-//                        "measures dimension name=" + dimension.getName());
-//                } else {
-//                    System.out.println(
-//                        "dimension name=" + dimension.getName());
-//                }
-//                listHierarchies(dimension);
-//            }
 
             // The code from this point on is for the Foodmart schema
 
@@ -188,14 +162,6 @@ public class OlapTest extends TestCase {
             QueryDimension storeQuery = query.getDimension("Store");
             QueryDimension timeQuery =
                 query.getDimension("Time"); //$NON-NLS-1$
-
-            listMembers(
-                productQuery.getDimension().getHierarchies().get("Product")
-                    .getLevels().get("Product Department"));
-
-            listMembers(
-                storeQuery.getDimension().getHierarchies().get("Store")
-                    .getLevels().get("Store Country"));
 
             Member productMember = cube.lookupMember("Product", "Drink");
 
@@ -499,7 +465,7 @@ public class OlapTest extends TestCase {
                 mdxString);
 
             // Sort the products in ascending order.
-            query.getDimension("Product").setSortOrder(SortOrder.DESC);
+            query.getDimension("Product").sort(SortOrder.DESC);
 
             SelectNode sortedMdx = query.getSelect();
             String sortedMdxString = sortedMdx.toString();
@@ -579,7 +545,7 @@ public class OlapTest extends TestCase {
 
             // Sort the rows in ascending order.
             query.getAxis(Axis.ROWS).sort(
-                org.olap4j.query.QueryAxis.SortOrder.BASC,
+                SortOrder.BASC,
                 "Measures",
                 "Store Sales");
 
@@ -959,28 +925,6 @@ public class OlapTest extends TestCase {
             e.printStackTrace();
             fail();
         }
-    }
-
-    public static void listHierarchies(Dimension dimension) {
-        // Get a list of hierarchy objects and dump their names
-        for (Hierarchy hierarchy : dimension.getHierarchies()) {
-            System.out.println("hierarchy name=" + hierarchy.getName());
-            listLevels(hierarchy);
-        }
-    }
-
-    public static void listLevels(Hierarchy hierarchy) {
-        // Get a list of level objects and dump their names
-        for (Level level : hierarchy.getLevels()) {
-            System.out.println("level name=" + level.getName());
-        }
-    }
-
-    public static void listMembers(Level level) throws OlapException {
-        List<Member> members = level.getMembers();
-//        for (Member member : members) {
-//            System.out.println("member name=" + member.getName());
-//        }
     }
 
     public static void main(String args[]) {
