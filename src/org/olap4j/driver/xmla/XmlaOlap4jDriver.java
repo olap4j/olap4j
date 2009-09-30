@@ -99,8 +99,19 @@ public class XmlaOlap4jDriver implements Driver {
     /**
      * Executor shared by all connections making asynchronous XMLA calls.
      */
-    private static final ExecutorService executor =
-        Executors.newCachedThreadPool();
+    private static final ExecutorService executor;
+
+    static {
+        executor = Executors.newCachedThreadPool(
+            new ThreadFactory() {
+                public Thread newThread(Runnable r) {
+                    Thread t = Executors.defaultThreadFactory().newThread(r);
+                    t.setDaemon(true);
+                    return t;
+               }
+            }
+        );
+    }
 
     private static int nextCookie;
 
