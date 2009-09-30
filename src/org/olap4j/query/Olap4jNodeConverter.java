@@ -105,11 +105,12 @@ abstract class Olap4jNodeConverter {
                 getMemberSet(dim2));
     }
 
-    //
-    // This method merges the selections into a single
-    // MDX axis selection.  Right now we do a simple
-    // crossjoin
-    //
+    /*
+     * This method merges the selections into a single
+     * MDX axis selection.  Right now we do a simple
+     * crossjoin.
+     * It might return null if there are no dimensions placed on the axis.
+     */
     private static AxisNode toOlap4j(QueryAxis axis) {
         CallNode callNode = null;
         int numDimensions = axis.getDimensions().size();
@@ -124,6 +125,8 @@ abstract class Olap4jNodeConverter {
                 }
             }
             callNode = generateListTupleCall(members);
+        } else if (numDimensions == 0) {
+            return null;
         } else if (numDimensions == 1) {
             QueryDimension dimension = axis.getDimensions().get(0);
             List<ParseTreeNode> members = toOlap4j(dimension);
@@ -339,7 +342,10 @@ abstract class Olap4jNodeConverter {
     private static List<AxisNode> toOlap4j(List<QueryAxis> axes) {
         final ArrayList<AxisNode> axisList = new ArrayList<AxisNode>();
         for (QueryAxis axis : axes) {
-            axisList.add(toOlap4j(axis));
+            AxisNode axisNode = toOlap4j(axis);
+            if (axisNode != null) {
+                axisList.add(toOlap4j(axis));
+            }
         }
         return axisList;
     }
