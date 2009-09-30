@@ -49,7 +49,8 @@ class XmlaOlap4jPositionMember
         assert member != null;
         assert propertyValues != null;
         this.member = member;
-        this.propertyValues = propertyValues;
+        this.propertyValues = new HashMap<Property, String>();
+        this.propertyValues.putAll(propertyValues);
     }
 
     public boolean equals(Object obj) {
