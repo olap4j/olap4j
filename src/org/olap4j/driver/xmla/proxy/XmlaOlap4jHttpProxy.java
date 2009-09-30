@@ -130,10 +130,12 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
                     new ByteArrayOutputStream();
                 final byte[] buf = new byte[1024];
                 int count;
-                while ((count = errorStream.read(buf)) > 0) {
-                    baos.write(buf, 0, count);
+                if (errorStream != null) {
+                    while ((count = errorStream.read(buf)) > 0) {
+                        baos.write(buf, 0, count);
+                    }
+                    errorStream.close();
                 }
-                errorStream.close();
                 baos.close();
             } catch (IOException ex) {
                 // Well, we tried. No point notifying the user here.
