@@ -168,6 +168,28 @@ public interface Cell {
      * @throws OlapException if a database error occurs
      */
     ResultSet drillThrough() throws OlapException;
+
+    /**
+     * Sets the value of a cell.
+     *
+     * <p>When this method may be called depends on the provider. But typically,
+     * the connection must at least have an active scenario; see
+     * {@link OlapConnection#setScenario(Scenario)}.
+     *
+     * <p>The number and type of additional arguments specified in the
+     * {@code allocationArgs} parameter depends on the allocation policy chosen.
+     * Some policies, such as {@link AllocationPolicy#EQUAL_ALLOCATION}, do not
+     * require any additional arguments, in which case {@code allocationArgs}
+     * may be {@code null}.
+     *
+     * @param value Cell value
+     * @param allocationPolicy Allocation policy
+     * @param allocationArgs Allocation policy arguments
+     */
+    void setValue(
+        Object value,
+        AllocationPolicy allocationPolicy,
+        Object... allocationArgs);
 }
 
 // End Cell.java

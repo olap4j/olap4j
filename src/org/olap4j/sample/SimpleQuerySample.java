@@ -206,7 +206,7 @@ public class SimpleQuerySample {
      * Prints a cell set.
      *
      * <p>For more sophisticated printing of cell sets, see
-     * {@link org.olap4j.query.CellSetFormatter}.
+     * {@link org.olap4j.layout.CellSetFormatter}.
      *
      * @param cellSet Cell set
      */

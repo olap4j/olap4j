@@ -23,9 +23,9 @@ import java.io.PrintWriter;
 /**
  * Unit test for converting MDX CellSets to text.
  *
- * @see org.olap4j.query.CellSetFormatter
- * @see org.olap4j.query.RectangularCellSetFormatter
- * @see org.olap4j.query.TraditionalCellSetFormatter
+ * @see org.olap4j.layout.CellSetFormatter
+ * @see org.olap4j.layout.RectangularCellSetFormatter
+ * @see org.olap4j.layout.TraditionalCellSetFormatter
  *
  * @author jhyde
  * @version $Id$

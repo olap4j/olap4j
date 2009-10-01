@@ -611,6 +611,18 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return roleName;
     }
 
+    public Scenario createScenario() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setScenario(Scenario scenario) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Scenario getScenario() {
+        throw new UnsupportedOperationException();
+    }
+
     <T extends Named> void populateList(
         List<T> list,
         Context context,

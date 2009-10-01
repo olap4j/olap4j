@@ -102,6 +102,14 @@ class XmlaOlap4jCell implements Cell {
     public ResultSet drillThrough() throws OlapException {
         throw new UnsupportedOperationException();
     }
+
+    public void setValue(
+        Object value,
+        AllocationPolicy allocationPolicy,
+        Object... allocationArgs)
+    {
+        throw new UnsupportedOperationException();
+    }
 }
 
 // End XmlaOlap4jCell.java
