@@ -927,6 +927,62 @@ public class OlapTest extends TestCase {
         }
     }
 
+    public void testNonMandatoryQueryAxis() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+            Query query = new Query("my query", cube);
+
+            // create selections
+
+            QueryDimension productDimension = query.getDimension("Product");
+            productDimension.include(
+                    Selection.Operator.CHILDREN, "Product", "Drink");
+
+            QueryDimension storeDimension = query.getDimension("Store");
+            storeDimension.include(
+                    Selection.Operator.INCLUDE_CHILDREN, "Store", "USA");
+            storeDimension.setHierarchizeMode(HierarchizeMode.POST);
+
+            QueryDimension timeDimension = query.getDimension("Time");
+
+            timeDimension.include(Selection.Operator.CHILDREN, "Time", "1997");
+
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            measuresDimension.include("Measures", "Store Sales");
+
+
+            //query.getAxis(Axis.ROWS).addDimension(productDimension);
+            //query.getAxis(Axis.ROWS).addDimension(storeDimension);
+            //query.getAxis(Axis.ROWS).addDimension(timeDimension);
+            query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+
+            //query.validate();
+
+            SelectNode mdx = query.getSelect();
+            String mdxString = mdx.toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS\n"
+                + "FROM [Sales]",
+                mdxString);
+
+            try {
+                query.validate();
+                fail();
+            } catch (OlapException e) {
+                assertEquals(0, e.getCause().getMessage().indexOf(
+                    "A valid Query requires at least one "
+                    + "dimension on the rows axis."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
     public static void main(String args[]) {
         OlapTest olapTest = new OlapTest();
 
