@@ -8,6 +8,7 @@
 */
 package org.olap4j.driver.xmla;
 
+import org.olap4j.impl.ArrayMap;
 import org.olap4j.metadata.*;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.OlapException;
@@ -49,7 +50,7 @@ class XmlaOlap4jPositionMember
         assert member != null;
         assert propertyValues != null;
         this.member = member;
-        this.propertyValues = new HashMap<Property, String>();
+        this.propertyValues = new ArrayMap<Property, String>();
         this.propertyValues.putAll(propertyValues);
     }
 
