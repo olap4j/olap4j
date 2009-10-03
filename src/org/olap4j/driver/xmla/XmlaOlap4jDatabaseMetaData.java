@@ -92,7 +92,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
             new XmlaOlap4jConnection.Context(
                 olap4jConnection, null, null, null, null, null, null, null);
         List<String> patternValueList = new ArrayList<String>();
-        Map<String, Matcher> predicateList = new ArrayMap<String, Matcher>();
+        Map<String, Matcher> predicateList = new HashMap<String, Matcher>();
         for (int i = 0; i < patternValues.length; i += 2) {
             String name = (String) patternValues[i];
             assert metadataRequest.getColumn(name) != null

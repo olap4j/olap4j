@@ -97,6 +97,96 @@ public class ArrayMapTest extends TestCase {
         map.remove("George");
         assertEquals(2, map.size());
     }
+
+    /**
+     * Oops, forgot that I had written the first test and wrote another. Mostly
+     * overlap with {@link #testArrayMap()}, but can't hurt.
+     */
+    public void testArrayMap2() {
+        final ArrayMap<String, Integer> map = new ArrayMap<String, Integer>();
+        final HashMap<String, Integer> hashMap = new HashMap<String, Integer>();
+        assertEquals(0, map.size());
+        assertEquals(map, hashMap);
+        assertEquals(map.hashCode(), hashMap.hashCode());
+
+        // put
+        map.put("foo", 0);
+        assertEquals(1, map.size());
+        assertEquals(1, map.keySet().size());
+        assertEquals(1, map.values().size());
+
+        // equivalence to hashmap
+        hashMap.put("foo", 0);
+        assertEquals(map, hashMap);
+        assertEquals(hashMap, map);
+        assertEquals(map.hashCode(), hashMap.hashCode());
+
+        // containsKey, get
+        assertTrue(map.containsKey("foo"));
+        assertFalse(map.containsKey("bar"));
+        assertEquals(Integer.valueOf(0), map.get("foo"));
+        assertNull(map.get("baz"));
+
+        // putall
+        final Map<String, Integer> hashMap2 = new HashMap<String, Integer>();
+        hashMap2.put("bar", 1);
+        hashMap2.put("foo", 2);
+        hashMap2.put("baz", 0);
+        map.putAll(hashMap2);
+        hashMap.putAll(hashMap2);
+        assertEquals(3, map.size());
+        assertEquals(map, hashMap);
+        assertEquals(hashMap, map);
+        assertEquals(map.hashCode(), hashMap.hashCode());
+        assertEquals(map.keySet(), hashMap.keySet());
+        // values collections have same contents, not necessarily in same order
+        assertEquals(
+            new HashSet<Integer>(map.values()),
+            new HashSet<Integer>(hashMap.values()));
+
+        // replace existing key
+        map.put("foo", -5);
+        hashMap.put("foo", -5);
+        assertEquals(3, map.size());
+        assertEquals(Integer.valueOf(-5), map.get("foo"));
+        assertEquals(map, hashMap);
+        assertEquals(hashMap, map);
+
+        // null key
+        assertFalse(map.containsKey(null));
+        map.put(null, 75);
+        assertEquals(Integer.valueOf(75), map.get(null));
+        assertTrue(map.containsKey(null));
+
+        // null value
+        map.put("zzzz", null);
+        assertTrue(map.containsKey("zzzz"));
+        assertNull(map.get("zzzz"));
+
+        // compare to hashmap
+        hashMap.put(null, 75);
+        hashMap.put("zzzz", null);
+        assertEquals(map, hashMap);
+        assertEquals(hashMap, map);
+
+        // isEmpty, clear
+        assertFalse(map.isEmpty());
+        map.clear();
+        assertTrue(map.isEmpty());
+        assertEquals(0, map.size());
+
+        // putAll to populate empty map (uses different code path than putAll
+        // on non-empty map)
+        final ArrayMap<String, Integer> map2 =
+            new ArrayMap<String, Integer>();
+        map2.putAll(hashMap);
+        assertEquals(map2, hashMap);
+
+        // copy constructor
+        final ArrayMap<String, Integer> map3 =
+            new ArrayMap<String, Integer>(hashMap);
+        assertEquals(map3, hashMap);
+    }
 }
 
 // End ArrayMapTest.java

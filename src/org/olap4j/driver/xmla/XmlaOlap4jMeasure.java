@@ -11,6 +11,8 @@ package org.olap4j.driver.xmla;
 import org.olap4j.impl.Named;
 import org.olap4j.metadata.*;
 
+import java.util.Collections;
+
 /**
  * Implementation of {@link org.olap4j.metadata.Measure}
  * for XML/A providers.
@@ -43,7 +45,7 @@ class XmlaOlap4jMeasure
             olap4jLevel, uniqueName, name, caption, description,
             parentMemberUniqueName,
             aggregator == Aggregator.CALCULATED ? Type.FORMULA : Type.MEASURE,
-            0, ordinal);
+            0, ordinal, Collections.<Property, Object>emptyMap());
         assert olap4jLevel.olap4jHierarchy.olap4jDimension.type
             == Dimension.Type.MEASURE;
         this.aggregator = aggregator;

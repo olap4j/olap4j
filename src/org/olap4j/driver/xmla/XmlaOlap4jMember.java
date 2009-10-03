@@ -45,8 +45,7 @@ class XmlaOlap4jMember
     private XmlaOlap4jMember parentMember;
     private final int childMemberCount;
     private final int ordinal;
-    private final ArrayMap<Property, Object> propertyValueMap =
-        new ArrayMap<Property, Object>();
+    private final ArrayMap<Property, Object> propertyValueMap;
 
     XmlaOlap4jMember(
         XmlaOlap4jLevel olap4jLevel,
@@ -57,7 +56,8 @@ class XmlaOlap4jMember
         String parentMemberUniqueName,
         Type type,
         int childMemberCount,
-        int ordinal)
+        int ordinal,
+        Map<Property, Object> propertyValueMap)
     {
         super(uniqueName, name, caption, description);
         this.ordinal = ordinal;
@@ -67,6 +67,8 @@ class XmlaOlap4jMember
         this.parentMemberUniqueName = parentMemberUniqueName;
         this.type = type;
         this.childMemberCount = childMemberCount;
+        this.propertyValueMap =
+            new ArrayMap<Property, Object>(propertyValueMap);
     }
 
     public int hashCode() {

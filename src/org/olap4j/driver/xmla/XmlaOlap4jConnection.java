@@ -1224,6 +1224,14 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     Property.StandardMemberProperty.CHILDREN_CARDINALITY.name(),
                     Property.StandardMemberProperty.DEPTH.name()));
 
+        /**
+         * Cached value returned by the {@link Member.Type#values} method, which
+         * calls {@link Class#getEnumConstants()} and unfortunately clones an
+         * array every time.
+         */
+        private static final Member.Type[] MEMBER_TYPE_VALUES =
+            Member.Type.values();
+
         public void handle(
             Element row,
             Context context,
@@ -1276,7 +1284,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     row,
                     Property.StandardMemberProperty.PARENT_UNIQUE_NAME.name());
             Member.Type memberType =
-                Member.Type.values()[
+                MEMBER_TYPE_VALUES[
                     integerElement(
                         row,
                         Property.StandardMemberProperty.MEMBER_TYPE.name())];
@@ -1289,17 +1297,15 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     row,
                     Property.StandardMemberProperty.CHILDREN_CARDINALITY
                         .name());
-            // If this member is a measure, we want to return an object that
-            // implements the Measure interface to all API calls. But we also
-            // need to retrieve the properties that occur in MDSCHEMA_MEMBERS
-            // that are not available in MDSCHEMA_MEASURES, so we create a
-            // member for internal use.
-            XmlaOlap4jMember member =
-                new XmlaOlap4jMember(
-                    context.getLevel(row), memberUniqueName, memberName,
-                    memberCaption, "", parentUniqueName, memberType,
-                    childrenCardinality, memberOrdinal);
-            addUserDefinedDimensionProperties(row, member);
+
+            // Gather member property values into a temporary map, so we can
+            // create the member with all properties known. XmlaOlap4jMember
+            // uses an ArrayMap for property values and it is not efficient to
+            // add entries to the map one at a time.
+            final XmlaOlap4jLevel level = context.getLevel(row);
+            final Map<Property, Object> map =
+                new HashMap<Property, Object>();
+            addUserDefinedDimensionProperties(row, level, map);
 
             // Usually members have the same depth as their level. (Ragged and
             // parent-child hierarchies are an exception.) Only store depth for
@@ -1309,18 +1315,30 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     row,
                     Property.StandardMemberProperty.DEPTH.name());
             if (depth != null
-                && depth.intValue() != member.getLevel().getDepth())
+                && depth.intValue() != level.getDepth())
             {
-                member.setProperty(
+                map.put(
                     Property.StandardMemberProperty.DEPTH,
                     depth);
             }
+
+            // If this member is a measure, we want to return an object that
+            // implements the Measure interface to all API calls. But we also
+            // need to retrieve the properties that occur in MDSCHEMA_MEMBERS
+            // that are not available in MDSCHEMA_MEASURES, so we create a
+            // member for internal use.
+            XmlaOlap4jMember member =
+                new XmlaOlap4jMember(
+                    level, memberUniqueName, memberName,
+                    memberCaption, "", parentUniqueName, memberType,
+                    childrenCardinality, memberOrdinal, map);
             list.add(member);
         }
 
         private void addUserDefinedDimensionProperties(
             Element row,
-            XmlaOlap4jMember member)
+            XmlaOlap4jLevel level,
+            Map<Property, Object> map)
         {
             NodeList nodes = row.getChildNodes();
             for (int i = 0; i < nodes.getLength(); i++) {
@@ -1328,12 +1346,12 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 if (EXCLUDED_PROPERTY_NAMES.contains(node.getLocalName())) {
                     continue;
                 }
-                for (Property property : member.getLevel().getProperties()) {
+                for (Property property : level.getProperties()) {
                     if (property instanceof XmlaOlap4jProperty
                         && property.getName().equalsIgnoreCase(
                         node.getLocalName()))
                     {
-                        member.setProperty(property, node.getTextContent());
+                        map.put(property, node.getTextContent());
                     }
                 }
             }

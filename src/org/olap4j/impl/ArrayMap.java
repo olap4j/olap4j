@@ -53,6 +53,51 @@ public class ArrayMap<K, V>
         }
     }
 
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Map)) {
+            return false;
+        }
+        Map<K, V> m = (Map<K, V>) o;
+        if (m.size() != size()) {
+            return false;
+        }
+        try {
+            Iterator<Entry<K, V>> i = entrySet().iterator();
+            while (i.hasNext()) {
+                Entry<K, V> e = i.next();
+                K key = e.getKey();
+                V value = e.getValue();
+                if (value == null) {
+                    if (!(m.get(key) == null && m.containsKey(key))) {
+                        return false;
+                    }
+                } else {
+                    if (!value.equals(m.get(key))) {
+                        return false;
+                    }
+                }
+            }
+        } catch (ClassCastException unused) {
+            return false;
+        } catch (NullPointerException unused) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public int hashCode() {
+        int h = 0;
+        Iterator<Entry<K, V>> i = entrySet().iterator();
+        while (i.hasNext()) {
+            h += i.next().hashCode();
+        }
+        return h;
+    }
+
     public int size() {
         return keyValues.length / 2;
     }
@@ -130,8 +175,22 @@ public class ArrayMap<K, V>
     }
 
     public void putAll(Map<? extends K, ? extends V> m) {
-        for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
-            put(entry.getKey(), entry.getValue());
+        if (keyValues.length == 0) {
+            // Efficient implementation of common case where map is initially
+            // empty; otherwise we have O(n^2) reallocs.
+            keyValues = new Object[m.size() * 2];
+            int i = 0;
+            for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
+                keyValues[i++] = entry.getKey();
+                keyValues[i++] = entry.getValue();
+            }
+        } else {
+            // This algorithm is O(n^2): not great if m is large. But it's
+            // difficult to preallocate the array if we don't know how many
+            // keys overlap between this and m.
+            for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
+                put(entry.getKey(), entry.getValue());
+            }
         }
     }
 

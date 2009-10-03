@@ -48,11 +48,11 @@ class Pair<L, R>
     }
 
     public int hashCode() {
-        int k = (left == null) ? 0 : left.hashCode();
-        int k1 = (right == null) ? 0 : right.hashCode();
-        return ((k << 4) | k) ^ k1;
+        // formula required by Map contract
+        final int k = left == null ? 0 : left.hashCode();
+        final int k1 = right == null ? 0 : right.hashCode();
+        return k ^ k1;
     }
-
 
     public int compareTo(Pair<L, R> that) {
         int c = compare((Comparable) this.left, (Comparable)that.left);
