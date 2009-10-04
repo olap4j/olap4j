@@ -98,3 +98,5 @@ public enum AllocationPolicy {
      */
     WEIGHTED_INCREMENT,
 }
+
+// End AllocationPolicy.java
