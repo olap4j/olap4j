@@ -235,6 +235,42 @@ public class Olap4jUtilTest extends TestCase {
         assertEquals(arrayList, list3);
         assertEquals(arrayList.hashCode(), list3.hashCode());
     }
+
+    /**
+     * Unit test for {@link Olap4jUtil#parseUniqueName(String)}. 
+     */
+    public void testUniqueNameToStringArray() {
+        List<String> a;
+
+        a = Olap4jUtil.parseUniqueName("foo.bar");
+        assertEquals(2, a.size());
+        assertEquals("foo", a.get(0));
+        assertEquals("bar", a.get(1));
+
+        // with spaces
+        a = Olap4jUtil.parseUniqueName("[foo bar].[baz]");
+        assertEquals(2, a.size());
+        assertEquals("foo bar", a.get(0));
+        assertEquals("baz", a.get(1));
+
+        // with dots
+        a = Olap4jUtil.parseUniqueName("[foo.bar].[baz]");
+        assertEquals(3, a.size());
+        assertEquals("foo", a.get(0));
+        assertEquals("bar", a.get(1));
+        assertEquals("baz", a.get(2));
+
+        // Unique names can have '&'s in them. I'm not sure that this is the
+        // behavior we want, but this test at least documents the current
+        // behavior.
+        a = Olap4jUtil.parseUniqueName("[customers].&[baz]&[2]");
+        assertEquals(5, a.size());
+        assertEquals("customers", a.get(0));
+        assertEquals("&", a.get(1));
+        assertEquals("baz", a.get(2));
+        assertEquals("&", a.get(3));
+        assertEquals("2", a.get(4));
+    }
 }
 
 // End Olap4jUtilTest.java

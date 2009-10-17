@@ -351,7 +351,18 @@ public class Olap4jUtil {
         throw new UnsupportedOperationException("need to implement " + o);
     }
 
-    public static String[] uniqueNameToStringArray(String uniqueName) {
+    /**
+     * Parses a unique name.
+     *
+     * <p>For example, {@code uniqueNameToStringArray("[foo].[bar]")} returns
+     * {@code ["foo", "bar"]}.
+     *
+     * @see org.olap4j.mdx.IdentifierNode#parseIdentifier(String)
+     *
+     * @param uniqueName Unique name
+     * @return Parsed unique name
+     */
+    public static List<String> parseUniqueName(String uniqueName) {
         List<String> trail = new ArrayList<String>();
         Pattern regex = Pattern.compile("([^\\[\\]\\.]*)");
         Matcher matcher = regex.matcher(uniqueName);
@@ -361,7 +372,7 @@ public class Olap4jUtil {
                 trail.add(match);
             }
         }
-        return trail.toArray(new String[trail.size()]);
+        return trail;
     }
 
     /**

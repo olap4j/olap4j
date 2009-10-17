@@ -1672,7 +1672,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 final String dimensionUniqueName =
                     stringElement(row, "DIMENSION_UNIQUE_NAME");
                 String dimensionName =
-                    Olap4jUtil.uniqueNameToStringArray(dimensionUniqueName)[0];
+                    Olap4jUtil.parseUniqueName(dimensionUniqueName).get(0);
                 XmlaOlap4jDimension dimension =
                     getCube(row).dimensions.get(dimensionName);
                 dimension.getHierarchies().size();
@@ -1723,7 +1723,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 final String dimensionUniqueName =
                     stringElement(row, "DIMENSION_UNIQUE_NAME");
                 String dimensionName =
-                    Olap4jUtil.uniqueNameToStringArray(dimensionUniqueName)[0];
+                    Olap4jUtil.parseUniqueName(dimensionUniqueName).get(0);
                 XmlaOlap4jDimension dimension =
                     getCube(row).dimensions.get(dimensionName);
                 for (Hierarchy hierarchyInit : dimension.getHierarchies()) {
