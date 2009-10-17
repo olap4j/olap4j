@@ -94,7 +94,7 @@ public class MetadataTest extends TestCase {
     private static final List<String> SCHEMAS_COLUMN_NAMES = Arrays.asList(
         "TABLE_SCHEM", "TABLE_CAT");
     private static final List<String> ACTIONS_COLUMN_NAMES = Arrays.asList(
-        "SCHEMA_NAME", "CUBE_NAME", "ACTION_NAME", "COORDINATE",
+        "CATALOG_NAME", "SCHEMA_NAME", "CUBE_NAME", "ACTION_NAME", "COORDINATE",
         "COORDINATE_TYPE");
 
     public MetadataTest() throws SQLException {
@@ -274,18 +274,34 @@ public class MetadataTest extends TestCase {
         String s = checkResultSet(
             olapDatabaseMetaData.getCatalogs(),
             CATALOGS_COLUMN_NAMES);
-        TestContext.assertEqualsVerbose(
-            "TABLE_CAT=" + catalogName + "\n",
-            s);
+        final String expected;
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+            // XMLA test uses dummy duplicate catalog to make sure that we
+            // get all catalogs
+            expected =
+                "TABLE_CAT=" + catalogName + "\n"
+                + "TABLE_CAT=" + catalogName + "2\n";
+        } else {
+            expected = "TABLE_CAT=" + catalogName + "\n";
+        }
+        TestContext.assertEqualsVerbose(expected, s);
     }
 
     public void testDatabaseMetaDataGetSchemas() throws SQLException {
         String s = checkResultSet(
             olapDatabaseMetaData.getSchemas(),
             SCHEMAS_COLUMN_NAMES);
-        TestContext.assertEqualsVerbose(
-            "TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "\n",
-            s);
+        final String expected;
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+            // XMLA test uses dummy duplicate catalog to make sure that we
+            // get all catalogs
+            expected =
+                "TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "\n"
+                + "TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "2\n";
+        } else {
+            expected = "TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "\n";
+        }
+        TestContext.assertEqualsVerbose(expected, s);
     }
 
     public void testDatabaseMetaDataGetLiterals() throws SQLException {
@@ -350,6 +366,25 @@ public class MetadataTest extends TestCase {
             "CATALOG_NAME=" + catalogName
             + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, ",
             s);
+        final int lineCount = linecount(s);
+
+        // again, but with null catalog name. should yield twice as many
+        // cubes on xmla, where we have two identical catalogs
+        s = checkResultSet(
+            olapDatabaseMetaData.getCubes(
+                catalogName,
+                null,
+                null),
+            CUBE_COLUMN_NAMES);
+        assertContains(
+            "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, ",
+            s);
+        final int lineCount2 = linecount(s);
+
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+            assertEquals(lineCount2, lineCount * 2);
+        }
 
         s = checkResultSet(
             olapDatabaseMetaData.getCubes(

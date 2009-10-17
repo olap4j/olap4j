@@ -90,7 +90,7 @@ class XmlaOlap4jLevel
 
         try {
             if (olap4jHierarchy.olap4jDimension.getDimensionType()
-                    .equals(Dimension.Type.MEASURE))
+                == Dimension.Type.MEASURE)
             {
                 String[] restrictions = {
                     "CATALOG_NAME",

@@ -35,7 +35,7 @@ class XmlaOlap4jPositionMember
     implements XmlaOlap4jMemberBase
 {
     private final XmlaOlap4jMemberBase member;
-    private final Map<Property, String> propertyValues;
+    private final Map<Property, Object> propertyValues;
 
     /**
      * Creates a XmlaOlap4jPositionMember.
@@ -45,12 +45,12 @@ class XmlaOlap4jPositionMember
      */
     XmlaOlap4jPositionMember(
         XmlaOlap4jMemberBase member,
-        Map<Property, String> propertyValues)
+        Map<Property, Object> propertyValues)
     {
         assert member != null;
         assert propertyValues != null;
         this.member = member;
-        this.propertyValues = new ArrayMap<Property, String>(propertyValues);
+        this.propertyValues = new ArrayMap<Property, Object>(propertyValues);
     }
 
     public boolean equals(Object obj) {
@@ -156,7 +156,7 @@ class XmlaOlap4jPositionMember
         // come back as part of axis tuple. Unformatted property is best we
         // can do.
         if (propertyValues.containsKey(property)) {
-            return propertyValues.get(property);
+            return String.valueOf(propertyValues.get(property));
         }
         return member.getPropertyFormattedValue(property);
     }

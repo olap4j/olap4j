@@ -533,6 +533,7 @@ public class ConnectionTest extends TestCase {
             columnsMember.getUniqueName(),
             !(columnsMember instanceof Measure));
     }
+
     public void testInvalidStatement() throws SQLException {
         connection = tester.createConnection();
         Statement statement = connection.createStatement();
@@ -1557,7 +1558,10 @@ public class ConnectionTest extends TestCase {
         // Schema
         boolean found = false;
         for (Catalog catalog : olapConnection.getCatalogs()) {
+            assertSame(olapConnection.getMetaData(), catalog.getMetaData());
+            assertNotNull(catalog.getName());
             for (Schema schema : catalog.getSchemas()) {
+                assertSame(schema.getCatalog(), catalog);
                 if (schema.equals(olapConnection.getSchema())) {
                     found = true;
                     break;
@@ -1565,6 +1569,16 @@ public class ConnectionTest extends TestCase {
             }
         }
         assertTrue(found);
+
+        // We engineered the XMLA test environment to have two catalogs.
+        switch (tester.getFlavor()) {
+        case XMLA:
+            assertEquals(2, olapConnection.getCatalogs().size());
+            break;
+        case MONDRIAN:
+            assertEquals(1, olapConnection.getCatalogs().size());
+            break;
+        }
 
         Cube cube = olapConnection.getSchema().getCubes().get("Sales");
 
@@ -2149,9 +2163,11 @@ public class ConnectionTest extends TestCase {
             fail("expected parse error, got " + select);
         } catch (OlapException e) {
             assertEquals("Validation error", e.getMessage());
+            final String stackTrace = TestContext.getStackTrace(e);
             assertTrue(
-                TestContext.getStackTrace(e).contains(
-                    "Dimension '[Gender]' appears in more than one "
+                stackTrace,
+                stackTrace.contains(
+                    "Hierarchy '[Gender]' appears in more than one "
                     + "independent axis."));
         }
     }

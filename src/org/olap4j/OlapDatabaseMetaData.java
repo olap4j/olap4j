@@ -44,6 +44,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * <p>Specification as for XML/A MDSCHEMA_ACTIONS schema rowset.
      *
      * <p>Each action description has the following columns:
+     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) => The name of
+     *         the database.</li>
      * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) => The name of
      *         the schema to which this action belongs.</li>
      * <li><b>CUBE_NAME</b> String => The name of the cube to which this action

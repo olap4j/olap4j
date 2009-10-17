@@ -29,6 +29,20 @@ class XmlaOlap4jMeasure
     private final Datatype datatype;
     private final boolean visible;
 
+    /**
+     * Creates an XmlaOlap4jMeasure.
+     *
+     * @param olap4jLevel Level
+     * @param uniqueName Unique name
+     * @param name Name
+     * @param caption Caption
+     * @param description Description
+     * @param parentMemberUniqueName Unique name of parent, or null if no parent
+     * @param aggregator Aggregator
+     * @param datatype Data type
+     * @param visible Whether visible
+     * @param ordinal Ordinal in its hierarchy
+     */
     XmlaOlap4jMeasure(
         XmlaOlap4jLevel olap4jLevel,
         String uniqueName,

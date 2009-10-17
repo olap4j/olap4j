@@ -45,8 +45,22 @@ class XmlaOlap4jMember
     private XmlaOlap4jMember parentMember;
     private final int childMemberCount;
     private final int ordinal;
-    private final ArrayMap<Property, Object> propertyValueMap;
+    private final Map<Property, Object> propertyValueMap;
 
+    /**
+     * Creates an XmlaOlap4jMember.
+     *
+     * @param olap4jLevel Level
+     * @param uniqueName Unique name
+     * @param name Name
+     * @param caption Caption
+     * @param description Description
+     * @param parentMemberUniqueName Unique name of parent, or null if no parent
+     * @param type Type
+     * @param childMemberCount Number of children
+     * @param ordinal Ordinal in its hierarchy
+     * @param propertyValueMap Property values
+     */
     XmlaOlap4jMember(
         XmlaOlap4jLevel olap4jLevel,
         String uniqueName,
@@ -67,8 +81,12 @@ class XmlaOlap4jMember
         this.parentMemberUniqueName = parentMemberUniqueName;
         this.type = type;
         this.childMemberCount = childMemberCount;
-        this.propertyValueMap =
-            new ArrayMap<Property, Object>(propertyValueMap);
+        if (propertyValueMap.isEmpty()) {
+            this.propertyValueMap = Collections.emptyMap();
+        } else {
+            this.propertyValueMap =
+                new ArrayMap<Property, Object>(propertyValueMap);
+        }
     }
 
     public int hashCode() {
@@ -316,12 +334,6 @@ class XmlaOlap4jMember
 
     public Member getDataMember() {
         throw new UnsupportedOperationException();
-    }
-
-    public boolean equeals(Object obj) {
-        return (obj instanceof XmlaOlap4jMember)
-            && this.uniqueName.equals(
-                ((XmlaOlap4jMember) obj).getUniqueName());
     }
 }
 

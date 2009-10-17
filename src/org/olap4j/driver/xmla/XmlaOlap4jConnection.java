@@ -765,6 +765,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             "</RequestType>\n"
             + "    <Restrictions>\n"
             + "      <RestrictionList>\n");
+        String catalogName = null;
         if (restrictions.length > 0) {
             if (restrictions.length % 2 != 0) {
                 throw new IllegalArgumentException();
@@ -778,6 +779,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     buf.append(xmlEncode(value));
                     buf.append("</").append(restriction).append(">");
 
+                    // To remind ourselves to generate a <Catalog> restriction
+                    // if the request supports it.
+                    if (restriction.equals("CATALOG_NAME")) {
+                        catalogName = value;
+                    }
                 } else {
                     //noinspection unchecked
                     List<String> valueList = (List<String>) o;
@@ -802,10 +808,30 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             buf.append("</DataSourceInfo>\n");
         }
 
-     // Add the catalog node only if this request requires it.
-        if (metadataRequest.requiresCatalogName()) {
+        // If the request requires catalog name, and one wasn't specified in the
+        // restrictions, use the connection's current catalog.
+        if (catalogName == null
+            && metadataRequest.requiresCatalogName())
+        {
+            catalogName = context.olap4jConnection.getCatalog();
+        }
+
+        // Add the catalog node only if this request has specified it as a
+        // restriction.
+        //
+        // For low-level objects like cube, the restriction is optional; you can
+        // specify null to not restrict, "" to match cubes whose catalog name is
+        // empty, or a string (not interpreted as a wild card). (See
+        // OlapDatabaseMetaData.getCubes API doc for more details.) We assume
+        // that the request provides the restriction only if it is valid.
+        //
+        // For high level objects like data source and catalog, the catalog
+        // restriction does not make sense.
+        if (catalogName != null
+            && metadataRequest.allowsCatalogName())
+        {
             buf.append("        <Catalog>");
-            buf.append(xmlEncode(context.olap4jConnection.getCatalog()));
+            buf.append(xmlEncode(catalogName));
             buf.append("</Catalog>\n");
         }
 
@@ -1819,6 +1845,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             new MetadataColumn("SCHEMA_NAME"),
             new MetadataColumn("SCHEMA_OWNER")),
         MDSCHEMA_ACTIONS(
+            new MetadataColumn("CATALOG_NAME"),
             new MetadataColumn("SCHEMA_NAME"),
             new MetadataColumn("CUBE_NAME"),
             new MetadataColumn("ACTION_NAME"),
@@ -2009,7 +2036,26 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
          * @return whether this request requires a CatalogName element
          */
         public boolean requiresCatalogName() {
-            return (this != DBSCHEMA_CATALOGS && this != DISCOVER_DATASOURCES);
+            // If we don't specifiy CatalogName in the properties of an
+            // MDSCHEMA_FUNCTIONS request, Mondrian's XMLA provider will give
+            // us the whole set of functions multiplied by the number of
+            // catalogs. JDBC (and Mondrian) assumes that functions belong to a
+            // catalog whereas XMLA (and SSAS) assume that functions belong to
+            // the database. Always specifying a catalog is the easiest way to
+            // reconcile them.
+            return this == MDSCHEMA_FUNCTIONS;
+        }
+
+        /**
+         * Returns whether this request allows a
+         * {@code &lt;CatalogName&gt;} element in the properties section of the
+         * request. Even for requests that allow it, it is usually optional.
+         *
+         * @return whether this request allows a CatalogName element
+         */
+        public boolean allowsCatalogName() {
+            return this != DBSCHEMA_CATALOGS
+                && this != DISCOVER_DATASOURCES;
         }
 
         /**

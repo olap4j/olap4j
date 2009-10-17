@@ -182,6 +182,42 @@ abstract class XmlaOlap4jCellSet implements CellSet {
          */
 
         final Element axesNode = findChild(root, MDDATASET_NS, "Axes");
+
+        // First pass, gather up a list of member unique names to fetch
+        // all at once.
+        //
+        // NOTE: This approach allows the driver to fetch a large number
+        // of members in one round trip, which is much more efficient.
+        // However, if the axis has a very large number of members, the map
+        // may use too much memory. This is an unresolved issue.
+        final MetadataReader metadataReader =
+            metaData.cube.getMetadataReader();
+        final Map<String, XmlaOlap4jMember> memberMap =
+            new HashMap<String, XmlaOlap4jMember>();
+        List<String> uniqueNames = new ArrayList<String>();
+        for (Element axisNode : findChildren(axesNode, MDDATASET_NS, "Axis")) {
+            final Element tuplesNode =
+                findChild(axisNode, MDDATASET_NS, "Tuples");
+
+            for (Element tupleNode
+                : findChildren(tuplesNode, MDDATASET_NS, "Tuple"))
+            {
+                for (Element memberNode
+                    : findChildren(tupleNode, MDDATASET_NS, "Member"))
+                {
+                    final String uname = stringElement(memberNode, "UName");
+                    uniqueNames.add(uname);
+                }
+            }
+        }
+
+        // Fetch all members on all axes. Hopefully it can all be done in one
+        // round trip, or they are in cache already.
+        metadataReader.lookupMembersByUniqueName(uniqueNames, memberMap);
+
+        // Second pass, populate the axis.
+        final Map<Property, Object> propertyValues =
+            new HashMap<Property, Object>();
         for (Element axisNode : findChildren(axesNode, MDDATASET_NS, "Axis")) {
             final String axisName = axisNode.getAttribute("name");
             final Axis axis = lookupAxis(axisName);
@@ -194,35 +230,6 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             }
             final Element tuplesNode =
                 findChild(axisNode, MDDATASET_NS, "Tuples");
-            int ordinal = 0;
-            final Map<Property, String> propertyValues =
-                new HashMap<Property, String>();
-
-            // First pass, gather up a list of member unique names to fetch
-            // all at once.
-            //
-            // NOTE: This approach allows the driver to fetch a large number
-            // of members in one round trip, which is much more efficient.
-            // However, if the axis has a very large number of members, the map
-            // may use too much memory. This is an unresolved issue.
-            final MetadataReader metadataReader =
-                metaData.cube.getMetadataReader();
-            final Map<String, XmlaOlap4jMember> memberMap =
-                new HashMap<String, XmlaOlap4jMember>();
-            List<String> uniqueNames = new ArrayList<String>();
-            for (Element tupleNode
-                : findChildren(tuplesNode, MDDATASET_NS, "Tuple"))
-            {
-                for (Element memberNode
-                    : findChildren(tupleNode, MDDATASET_NS, "Member"))
-                {
-                    final String uname = stringElement(memberNode, "UName");
-                    uniqueNames.add(uname);
-                }
-            }
-            metadataReader.lookupMembersByUniqueName(uniqueNames, memberMap);
-
-            // Second pass, populate the axis.
             for (Element tupleNode
                 : findChildren(tuplesNode, MDDATASET_NS, "Tuple"))
             {
@@ -264,12 +271,11 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                     members.add(member);
                 }
                 cellSetAxis.positions.add(
-                    new XmlaOlap4jPosition(members, ordinal++));
+                    new XmlaOlap4jPosition(
+                        members, cellSetAxis.positions.size()));
             }
         }
 
-        final Map<Property, Object> propertyValues =
-            new HashMap<Property, Object>();
         final Element cellDataNode = findChild(root, MDDATASET_NS, "CellData");
         for (Element cell : findChildren(cellDataNode, MDDATASET_NS, "Cell")) {
             propertyValues.clear();

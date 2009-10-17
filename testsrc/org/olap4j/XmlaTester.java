@@ -47,9 +47,19 @@ public class XmlaTester implements TestContext.Tester {
         final String catalogUrl =
             properties.getProperty(
                 TestContext.Property.XMLA_CATALOG_URL.path);
+        if (catalogUrl == null) {
+            throw new RuntimeException(
+                "Property " + TestContext.Property.XMLA_CATALOG_URL.path
+                + " must be specified");
+        }
+
+        // Include the same catalog URL twice with different catalog names. This
+        // allows us to detect whether operations are restricting to the current
+        // catalog. (Some should, most should not.)
         Map<String, String> catalogNameUrls =
             new HashMap<String, String>();
         catalogNameUrls.put("FoodMart", catalogUrl);
+        catalogNameUrls.put("FoodMart2", catalogUrl);
         String urlString =
             properties.getProperty(TestContext.Property.CONNECT_URL.path);
 

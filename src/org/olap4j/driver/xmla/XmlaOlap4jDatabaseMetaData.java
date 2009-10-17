@@ -967,6 +967,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     {
         return getMetadata(
             XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_ACTIONS,
+            "CATALOG_NAME", catalog,
             "SCHEMA_NAME", wildcard(schemaPattern),
             "CUBE_NAME", wildcard(cubeNamePattern),
             "ACTION_NAME", wildcard(actionNamePattern));
@@ -1056,6 +1057,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     {
         return getMetadata(
             XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_DIMENSIONS,
+            "CATALOG_NAME", catalog,
             "SCHEMA_NAME", wildcard(schemaPattern),
             "CUBE_NAME", wildcard(cubeNamePattern),
             "DIMENSION_NAME", wildcard(dimensionNamePattern));
