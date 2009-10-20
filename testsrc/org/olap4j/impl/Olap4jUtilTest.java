@@ -237,7 +237,7 @@ public class Olap4jUtilTest extends TestCase {
     }
 
     /**
-     * Unit test for {@link Olap4jUtil#parseUniqueName(String)}. 
+     * Unit test for {@link Olap4jUtil#parseUniqueName(String)}.
      */
     public void testUniqueNameToStringArray() {
         List<String> a;
