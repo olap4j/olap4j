@@ -9,9 +9,7 @@
 */
 package org.olap4j.query;
 
-import org.olap4j.metadata.Cube;
-import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Member;
+import org.olap4j.metadata.*;
 import org.olap4j.*;
 import org.olap4j.mdx.SelectNode;
 
@@ -56,9 +54,10 @@ public class Query extends QueryNodeImpl {
         super();
         this.name = name;
         this.cube = cube;
+        final Catalog catalog = cube.getSchema().getCatalog();
         this.connection =
-            cube.getSchema().getCatalog().getMetaData()
-                .getConnection().unwrap(OlapConnection.class);
+            catalog.getMetaData().getConnection().unwrap(OlapConnection.class);
+        this.connection.setCatalog(catalog.getName());
         this.unused = new QueryAxis(this, null);
         for (Dimension dimension : cube.getDimensions()) {
             QueryDimension queryDimension = new QueryDimension(
@@ -265,14 +264,21 @@ public class Query extends QueryNodeImpl {
     /**
      * Executes the query against the current OlapConnection and returns
      * a CellSet object representation of the data.
+     *
      * @return A proper CellSet object that represents the query execution
-     * results.
+     *     results.
      * @throws OlapException If something goes sour, an OlapException will
-     * be thrown to the caller. It could be caused by many things, like
-     * a stale connection. Look at the root cause for more details.
+     *     be thrown to the caller. It could be caused by many things, like
+     *     a stale connection. Look at the root cause for more details.
      */
     public CellSet execute() throws OlapException {
         SelectNode mdx = getSelect();
+        final Catalog catalog = cube.getSchema().getCatalog();
+        try {
+            this.connection.setCatalog(catalog.getName());
+        } catch (SQLException e) {
+            throw new OlapException("Error while executing query", e);
+        }
         OlapStatement olapStatement = connection.createStatement();
         return olapStatement.executeOlapQuery(mdx);
     }
