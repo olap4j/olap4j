@@ -12,6 +12,7 @@ package org.olap4j.driver.xmla;
 import org.olap4j.OlapDatabaseMetaData;
 import org.olap4j.OlapException;
 import org.olap4j.impl.Named;
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
 
 /**
@@ -25,7 +26,7 @@ import org.olap4j.metadata.*;
 class XmlaOlap4jCatalog implements Catalog, Named {
     final XmlaOlap4jDatabaseMetaData olap4jDatabaseMetaData;
     private final String name;
-    private final DeferredNamedListImpl<XmlaOlap4jSchema> schemas;
+    final DeferredNamedListImpl<XmlaOlap4jSchema> schemas;
 
     XmlaOlap4jCatalog(
         XmlaOlap4jDatabaseMetaData olap4jDatabaseMetaData,
@@ -68,7 +69,7 @@ class XmlaOlap4jCatalog implements Catalog, Named {
     }
 
     public NamedList<Schema> getSchemas() throws OlapException {
-        return (NamedList) schemas;
+        return Olap4jUtil.cast(schemas);
     }
 
     public String getName() {

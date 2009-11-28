@@ -52,7 +52,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      */
     private XmlaOlap4jSchema olap4jSchema;
 
-    private final XmlaOlap4jDatabaseMetaData olap4jDatabaseMetaData;
+    final XmlaOlap4jDatabaseMetaData olap4jDatabaseMetaData;
 
     private static final String CONNECT_STRING_PREFIX = "jdbc:xmla:";
 
@@ -71,7 +71,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     private Locale locale;
     private String catalogName;
-    private static final boolean DEBUG = false;
+    private final String driverCatalogName;
     private String roleName;
 
     /**
@@ -95,6 +95,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     private String nativeDatasourceName;
     private boolean autoCommit;
     private boolean readOnly;
+
+    private static final boolean DEBUG = false;
 
     /**
      * Name of the "DATA_SOURCE_NAME" column returned from
@@ -150,7 +152,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         this.providerName = map.get(XmlaOlap4jDriver.Property.Provider.name());
         this.datasourceName =
             map.get(XmlaOlap4jDriver.Property.DataSource.name());
-        this.catalogName = map.get(XmlaOlap4jDriver.Property.Catalog.name());
+        this.driverCatalogName =
+            map.get(XmlaOlap4jDriver.Property.Catalog.name());
+        this.catalogName = driverCatalogName;
 
         // Set URL of HTTP server.
         String serverUrl = map.get(XmlaOlap4jDriver.Property.Server.name());
@@ -369,7 +373,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     public NamedList<Catalog> getCatalogs() {
-        return olap4jDatabaseMetaData.getCatalogObjects();
+        return Olap4jUtil.cast(olap4jDatabaseMetaData.getCatalogObjects());
     }
 
     public void setReadOnly(boolean readOnly) throws SQLException {
@@ -385,6 +389,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     public String getCatalog() throws OlapException {
+        // REVIEW: All this logic to deduce and check catalog name should be
+        // done on initialization (construction, or setCatalog), not here. This
+        // method should be very quick.
+
         if (this.catalogName == null) {
             // This means that no particular catalog name
             // was specified by the user.
@@ -392,6 +400,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             if (catalogs.size() == 0) {
                 throw new OlapException(
                     "There is no catalog available to query against.");
+            } else if (driverCatalogName != null) {
+                this.catalogName = driverCatalogName;
             } else {
                 this.catalogName = catalogs.get(0).getName();
             }
@@ -563,12 +573,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     {
         // initializes the olap4jSchema if necessary
         if (this.olap4jSchema == null) {
-            final XmlaOlap4jCatalog catalog = (XmlaOlap4jCatalog)
+            final XmlaOlap4jCatalog catalog =
                 this.olap4jDatabaseMetaData.getCatalogObjects().get(
-                    this.getCatalog());
-            this.olap4jSchema = (XmlaOlap4jSchema)
-                catalog.getSchemas().get(0);
-            }
+                    getCatalog());
+            this.olap4jSchema = catalog.schemas.get(0);
+        }
         return olap4jSchema;
     }
 
@@ -632,7 +641,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     {
         String request =
             generateRequest(context, metadataRequest, restrictions);
-        Element root = xxx(request);
+        Element root = executeMetadataRequest(request);
         for (Element o : childElements(root)) {
             if (o.getLocalName().equals("row")) {
                 handler.handle(o, context, list);
@@ -641,7 +650,15 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         handler.sortList(list);
     }
 
-    Element xxx(String request) throws OlapException {
+    /**
+     * Executes an XMLA metadata request and returns the root element of the
+     * response.
+     *
+     * @param request XMLA request string
+     * @return Root element of the response
+     * @throws OlapException on error
+     */
+    Element executeMetadataRequest(String request) throws OlapException {
         byte[] bytes;
         if (DEBUG) {
             System.out.println("********************************************");
@@ -751,8 +768,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     {
         final String content = "Data";
         final String encoding = proxy.getEncodingCharsetName();
-        final StringBuilder buf = new StringBuilder(
-            "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n"
+        final StringBuilder buf =
+            new StringBuilder(
+                "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n"
                 + "<SOAP-ENV:Envelope\n"
                 + "    xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
                 + "    SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
@@ -765,7 +783,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             "</RequestType>\n"
             + "    <Restrictions>\n"
             + "      <RestrictionList>\n");
-        String catalogName = null;
+        String restrictedCatalogName = null;
         if (restrictions.length > 0) {
             if (restrictions.length % 2 != 0) {
                 throw new IllegalArgumentException();
@@ -776,20 +794,20 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 if (o instanceof String) {
                     buf.append("<").append(restriction).append(">");
                     final String value = (String) o;
-                    buf.append(xmlEncode(value));
+                    xmlEncode(buf, value);
                     buf.append("</").append(restriction).append(">");
 
                     // To remind ourselves to generate a <Catalog> restriction
                     // if the request supports it.
                     if (restriction.equals("CATALOG_NAME")) {
-                        catalogName = value;
+                        restrictedCatalogName = value;
                     }
                 } else {
                     //noinspection unchecked
                     List<String> valueList = (List<String>) o;
                     for (String value : valueList) {
                         buf.append("<").append(restriction).append(">");
-                        buf.append(xmlEncode(value));
+                        xmlEncode(buf, value);
                         buf.append("</").append(restriction).append(">");
                     }
                 }
@@ -804,16 +822,26 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         // Add the datasource node only if this request requires it.
         if (metadataRequest.requiresDatasourceName()) {
             buf.append("        <DataSourceInfo>");
-            buf.append(xmlEncode(context.olap4jConnection.getDataSourceInfo()));
+            xmlEncode(buf, context.olap4jConnection.getDataSourceInfo());
             buf.append("</DataSourceInfo>\n");
+        }
+
+        String requestCatalogName = null;
+        if (restrictedCatalogName != null
+            && restrictedCatalogName.length() > 0)
+        {
+            requestCatalogName = restrictedCatalogName;
         }
 
         // If the request requires catalog name, and one wasn't specified in the
         // restrictions, use the connection's current catalog.
-        if (catalogName == null
+        if (context.olap4jCatalog != null) {
+            requestCatalogName = context.olap4jCatalog.getName();
+        }
+        if (requestCatalogName == null
             && metadataRequest.requiresCatalogName())
         {
-            catalogName = context.olap4jConnection.getCatalog();
+            requestCatalogName = context.olap4jConnection.getCatalog();
         }
 
         // Add the catalog node only if this request has specified it as a
@@ -827,16 +855,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         //
         // For high level objects like data source and catalog, the catalog
         // restriction does not make sense.
-        if (catalogName != null
+        if (requestCatalogName != null
             && metadataRequest.allowsCatalogName())
         {
             buf.append("        <Catalog>");
-            buf.append(xmlEncode(catalogName));
+            xmlEncode(buf, requestCatalogName);
             buf.append("</Catalog>\n");
         }
 
         buf.append("        <Content>");
-        buf.append(xmlEncode(content));
+        xmlEncode(buf, content);
         buf.append(
             "</Content>\n"
             + "      </PropertyList>\n"
@@ -850,16 +878,33 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     /**
      * Encodes a string for use in an XML CDATA section.
      *
-     * @param value to be xml encoded
-     * @return an XML encode string or the value is not required.
+     * @param value Value to be xml encoded
+     * @param buf Buffer to append to
      */
-    private static String xmlEncode(String value) {
-        value = Olap4jUtil.replace(value, "&", "&amp;");
-        value = Olap4jUtil.replace(value, "<", "&lt;");
-        value = Olap4jUtil.replace(value, ">", "&gt;");
-        value = Olap4jUtil.replace(value, "\"", "&quot;");
-        value = Olap4jUtil.replace(value, "'", "&apos;");
-        return value;
+    private static void xmlEncode(StringBuilder buf, String value) {
+        final int n = value.length();
+        for (int i = 0; i < n; ++i) {
+            char c = value.charAt(i);
+            switch (c) {
+            case '&':
+                buf.append("&amp;");
+                break;
+            case '<':
+                buf.append("&lt;");
+                break;
+            case '>':
+                buf.append("&gt;");
+                break;
+            case '"':
+                buf.append("&quot;");
+                break;
+            case '\'':
+                buf.append("&apos;");
+                break;
+            default:
+                buf.append(c);
+            }
+        }
     }
 
     // ~ inner classes --------------------------------------------------------
@@ -1464,20 +1509,19 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             </row>
              */
 
-            /*
-             * We are looking for a schema name from the cubes query restricted
-             * on the catalog name. Some servers don't support nor include the
-             * SCHEMA_NAME column in its response. If it's null, we convert it
-             * to an empty string as to not cause problems later on.
-             */
-            String schemaName = stringElement(row, "SCHEMA_NAME");
-            String catalogName = stringElement(row, "CATALOG_NAME");
-
-            if (this.catalogName.equals(catalogName)) {
+            // We are looking for a schema name from the cubes query restricted
+            // on the catalog name. Some servers don't support nor include the
+            // SCHEMA_NAME column in its response. If it's null, we convert it
+            // to an empty string as to not cause problems later on.
+            final String schemaName = stringElement(row, "SCHEMA_NAME");
+            final String catalogName = stringElement(row, "CATALOG_NAME");
+            final String schemaName2 = (schemaName == null) ? "" : schemaName;
+            if (this.catalogName.equals(catalogName)
+                && ((NamedList<XmlaOlap4jSchema>)list).get(schemaName2) == null)
+            {
                 list.add(
                     new XmlaOlap4jSchema(
-                        context.getCatalog(row),
-                        (schemaName == null) ? "" : schemaName));
+                        context.getCatalog(row), schemaName2));
             }
         }
     }
@@ -2054,8 +2098,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
          * @return whether this request allows a CatalogName element
          */
         public boolean allowsCatalogName() {
-            return this != DBSCHEMA_CATALOGS
-                && this != DISCOVER_DATASOURCES;
+            return true;
         }
 
         /**

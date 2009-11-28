@@ -65,8 +65,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
      *
      * @return List of catalog objects
      */
-    NamedList<Catalog> getCatalogObjects() {
-        return Olap4jUtil.cast(catalogs);
+    NamedList<XmlaOlap4jCatalog> getCatalogObjects() {
+        return catalogs;
     }
 
     /**
@@ -128,7 +128,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
                 patternValueList.toArray(
                     new String[patternValueList.size()]));
 
-        final Element root = olap4jConnection.xxx(request);
+        final Element root = olap4jConnection.executeMetadataRequest(request);
         List<List<Object>> rowList = new ArrayList<List<Object>>();
         rowLoop:
         for (Element row : XmlaOlap4jUtil.childElements(root)) {
@@ -1022,7 +1022,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String request =
             olap4jConnection.generateRequest(
                 context, metadataRequest, new Object[0]);
-        final Element root = olap4jConnection.xxx(request);
+        final Element root = olap4jConnection.executeMetadataRequest(request);
         StringBuilder buf = new StringBuilder();
         for (Element row : XmlaOlap4jUtil.childElements(root)) {
             if (buf.length() > 0) {

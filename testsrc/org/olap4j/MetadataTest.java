@@ -370,9 +370,10 @@ public class MetadataTest extends TestCase {
 
         // again, but with null catalog name. should yield twice as many
         // cubes on xmla, where we have two identical catalogs
+        olapDatabaseMetaData.getConnection().setCatalog(null);
         s = checkResultSet(
             olapDatabaseMetaData.getCubes(
-                catalogName,
+                null,
                 null,
                 null),
             CUBE_COLUMN_NAMES);
@@ -381,11 +382,30 @@ public class MetadataTest extends TestCase {
             + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, ",
             s);
         final int lineCount2 = linecount(s);
-
         if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
-            assertEquals(lineCount2, lineCount * 2);
+            assertEquals(lineCount * 2, lineCount2);
         }
 
+        // Null catalog specified in metadata request, but connection has a
+        // catalog. Should return all cubes, ignoring the connection's catalog.
+        olapDatabaseMetaData.getConnection().setCatalog(catalogName);
+        s = checkResultSet(
+            olapDatabaseMetaData.getCubes(
+                null,
+                null,
+                null),
+            CUBE_COLUMN_NAMES);
+        assertContains(
+            "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, ",
+            s);
+        final int lineCount3 = linecount(s);
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+            assertEquals(lineCount * 2, lineCount3);
+        }
+
+        // If we ask for 'Warehouse and Sales' cube we should get it, but
+        // nothing else.
         s = checkResultSet(
             olapDatabaseMetaData.getCubes(
                 catalogName,
@@ -395,6 +415,7 @@ public class MetadataTest extends TestCase {
         assertContains(", CUBE_NAME=Warehouse and Sales,", s);
         assertNotContains(", CUBE_NAME=Warehouse,", s);
 
+        // If we ask for a pattern, should get multiple hits.
         s = checkResultSet(
             olapDatabaseMetaData.getCubes(
                 catalogName,
@@ -403,6 +424,7 @@ public class MetadataTest extends TestCase {
             CUBE_COLUMN_NAMES);
         assertTrue(s.contains(", CUBE_NAME=Warehouse and Sales"));
         assertTrue(s.contains(", CUBE_NAME=Warehouse"));
+        assertFalse(s.contains(", CUBE_NAME=Sales"));
     }
 
     public void testGetCatalogs() throws SQLException {
