@@ -172,10 +172,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             serverUrl = serverUrl.replaceFirst(
                 ":\\/\\/([^@]*@){0,1}",
                 "://"
-                    .concat(map.get("user"))
-                    .concat(":")
-                    .concat(map.get("password")
-                    .concat("@")));
+                + map.get("user")
+                + ":"
+                + map.get("password")
+                + "@");
         }
 
         // Initialize the SOAP cache if needed
