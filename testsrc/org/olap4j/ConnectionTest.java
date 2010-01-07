@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2009 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -289,6 +289,20 @@ public class ConnectionTest extends TestCase {
         } catch (IllegalArgumentException e) {
             // Set if back
             olapConnection.setLocale(Locale.getDefault());
+        }
+
+        // Get, set role, get available role names.
+        final String s = olapConnection.getRoleName(); // ok if s is null
+        olapConnection.setRoleName(null);
+        assertNull(olapConnection.getRoleName());
+        olapConnection.setRoleName(s);
+        // ok if role names list is null
+        final List<String> roleNames = olapConnection.getAvailableRoleNames();
+        if (roleNames != null && s != null) {
+            assertTrue(
+                "role name " + s + " should be in available role names "
+                + roleNames,
+                roleNames.contains(s));
         }
 
         // Unwrap the mondrian connection.
@@ -1389,7 +1403,7 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
-     * Tests the {@link Cube#lookupMember(String[])} method.
+     * Tests the {@link Cube#lookupMember(String...)} method.
      */
     public void testCubeLookupMember() throws Exception {
         Class.forName(tester.getDriverClassName());
@@ -1436,7 +1450,7 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
-     * Tests the {@link Cube#lookupMembers(java.util.Set, String[])} method.
+     * Tests the {@link Cube#lookupMembers(java.util.Set, String...)} method.
      */
     public void testCubeLookupMembers() throws Exception {
         Class.forName(tester.getDriverClassName());

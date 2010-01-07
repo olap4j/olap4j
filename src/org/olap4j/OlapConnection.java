@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -13,6 +13,7 @@ import org.olap4j.mdx.parser.MdxParserFactory;
 import org.olap4j.metadata.*;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -113,6 +114,15 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * @return name of the role in which this connection executes queries
      */
     String getRoleName();
+
+    /**
+     * Returns a list of the names of roles that are available for this user to
+     * execute queries.
+     *
+     * @return a list of role names, or null if the available roles are not
+     *    known
+     */
+    List<String> getAvailableRoleNames();
 
     /**
      * Creates a Scenario.
