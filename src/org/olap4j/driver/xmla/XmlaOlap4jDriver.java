@@ -297,7 +297,7 @@ public class XmlaOlap4jDriver implements Driver {
     public enum Property {
         TestProxyCookie(
             "String that uniquely identifies a proxy object via which to send "
-                + "XMLA requests for testing purposes."),
+            + "XMLA requests for testing purposes."),
         Server("URL of HTTP server"),
         Catalog("Catalog name"),
         Provider("Name of the datasource provider"),

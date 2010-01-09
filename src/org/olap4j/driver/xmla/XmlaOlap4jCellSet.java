@@ -661,8 +661,8 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         if (ordinal < 0 || ordinal >= modulo) {
             throw new IndexOutOfBoundsException(
                 "Cell ordinal " + ordinal
-                    + ") lies outside CellSet bounds ("
-                    + getBoundsAsString() + ")");
+                + ") lies outside CellSet bounds ("
+                + getBoundsAsString() + ")");
         }
         return list;
     }
@@ -682,9 +682,9 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             if (coordinate < 0 || coordinate >= axis.getPositionCount()) {
                 throw new IndexOutOfBoundsException(
                     "Coordinate " + coordinate
-                        + " of axis " + k
-                        + " is out of range ("
-                        + getBoundsAsString() + ")");
+                    + " of axis " + k
+                    + " is out of range ("
+                    + getBoundsAsString() + ")");
             }
             ordinal += coordinate * modulo;
             modulo *= axis.getPositionCount();

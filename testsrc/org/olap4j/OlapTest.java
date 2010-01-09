@@ -103,9 +103,9 @@ public class OlapTest extends TestCase {
             Class.forName("mondrian.olap4j.MondrianOlap4jDriver");
             connection = DriverManager.getConnection(
                 "jdbc:mondrian:Jdbc=" + jdbc
-                    + ";User=" + userName
-                    + ";Password=" + password
-                    + ";Catalog=" + schemaUri);
+                + ";User=" + userName
+                + ";Password=" + password
+                + ";Catalog=" + schemaUri);
             } else {
                 connection = tester.createConnection();
             }

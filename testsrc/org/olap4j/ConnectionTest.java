@@ -1098,9 +1098,9 @@ public class ConnectionTest extends TestCase {
         cellSet =
             olapStatement.executeOlapQuery(
                 "select from [Sales]\n"
-                    + "where ([Time].[1997].[Q4].[12],\n"
-                    + "  [Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Portsmouth].[Portsmouth Imported Beer],\n"
-                    + "  [Store].[All Stores].[USA].[WA].[Bellingham])");
+                + "where ([Time].[1997].[Q4].[12],\n"
+                + "  [Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Portsmouth].[Portsmouth Imported Beer],\n"
+                + "  [Store].[All Stores].[USA].[WA].[Bellingham])");
         cell = cellSet.getCell(0);
         assertTrue(cell.isEmpty());
 
@@ -1108,7 +1108,7 @@ public class ConnectionTest extends TestCase {
         cellSet =
             olapStatement.executeOlapQuery(
                 "with member [Measures].[Foo] as ' Dimensions(-1).Name '\n"
-                    + "select {[Measures].[Foo]} on columns from [Sales]");
+                + "select {[Measures].[Foo]} on columns from [Sales]");
         cell = cellSet.getCell(0);
         switch (tester.getFlavor()) {
         case XMLA:
@@ -1894,8 +1894,8 @@ public class ConnectionTest extends TestCase {
         final CellSet cellSet =
             olapConnection.createStatement().executeOlapQuery(
                 "select {[Measures].[Org Salary]} on 0,\n"
-                    + " Head([Employees].Members, 10) DIMENSION PROPERTIES DEPTH ON 1\n"
-                    + "from [HR]");
+                + " Head([Employees].Members, 10) DIMENSION PROPERTIES DEPTH ON 1\n"
+                + "from [HR]");
         final CellSetAxis rowsAxis = cellSet.getAxes().get(1);
         assertEquals(10, rowsAxis.getPositionCount());
         Member member0 = rowsAxis.getPositions().get(0).getMembers().get(0);
@@ -2124,8 +2124,8 @@ public class ConnectionTest extends TestCase {
         SelectNode select =
             mdxParser.parseSelect(
                 "select ([Gender], [Store]) on columns\n,"
-                    + "{[Customers].[City].Members} on rows\n"
-                    + "from [sales]");
+                + "{[Customers].[City].Members} on rows\n"
+                + "from [sales]");
         select = mdxValidator.validateSelect(select);
         AxisNode filterAxis = select.getFilterAxis();
         assertNotNull(filterAxis);
@@ -2135,9 +2135,9 @@ public class ConnectionTest extends TestCase {
             select =
                 mdxParser.parseSelect(
                     "select ([Gender], [Store]) on columns\n,"
-                        + "{[Customers].[City].Members} on rows\n"
-                        + "from [sales]\n"
-                        + "where ()");
+                    + "{[Customers].[City].Members} on rows\n"
+                    + "from [sales]\n"
+                    + "where ()");
             fail("expected parse error, got " + select);
         } catch (RuntimeException e) {
             assertTrue(
@@ -2166,8 +2166,8 @@ public class ConnectionTest extends TestCase {
         SelectNode select =
             mdxParser.parseSelect(
                 "select ([Gender], [Store]) on columns\n,"
-                    + "crossjoin([Customers].[City].Members, [Gender].members) on rows\n"
-                    + "from [sales]");
+                + "crossjoin([Customers].[City].Members, [Gender].members) on rows\n"
+                + "from [sales]");
         AxisNode filterAxis = select.getFilterAxis();
         assertNotNull(filterAxis);
         assertNull(filterAxis.getExpression());
@@ -2222,8 +2222,8 @@ public class ConnectionTest extends TestCase {
         try {
             final CellSet cellSet = olapStatement.executeOlapQuery(
                 "SELECT [Customers].Members * \n"
-                    + " [Time].Members on columns\n"
-                    + "from [Sales]");
+                + " [Time].Members on columns\n"
+                + "from [Sales]");
             fail(
                 "expected exception indicating stmt had been canceled,"
                 + " got cellSet " + cellSet);
@@ -2252,9 +2252,9 @@ public class ConnectionTest extends TestCase {
             final CellSet cellSet =
                 olapStatement.executeOlapQuery(
                     "SELECT [Store].Members * \n"
-                        + " [Customers].Members * \n"
-                        + " [Time].Members on columns\n"
-                        + "from [Sales]");
+                    + " [Customers].Members * \n"
+                    + " [Time].Members on columns\n"
+                    + "from [Sales]");
             fail(
                 "expected exception indicating timeout,"
                 + " got cellSet " + cellSet);
