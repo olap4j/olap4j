@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -10,6 +10,7 @@ package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
 import org.olap4j.impl.ArrayMap;
+import org.olap4j.impl.UnmodifiableArrayMap;
 import org.olap4j.metadata.Property;
 
 import java.sql.ResultSet;
@@ -42,12 +43,9 @@ class XmlaOlap4jCell implements Cell {
         this.value = value;
         this.formattedValue = formattedValue;
 
-        // Use emptyMap and ArrayMap for memory efficiency, because cells
+        // Use an ArrayMap for memory efficiency, because cells
         // typically have few properties, but there are a lot of cells
-        this.propertyValues =
-            propertyValues.isEmpty()
-                ? Collections.<Property, Object>emptyMap()
-                : new ArrayMap<Property, Object>(propertyValues);
+        this.propertyValues = UnmodifiableArrayMap.of(propertyValues);
     }
 
     public CellSet getCellSet() {

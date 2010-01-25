@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -10,6 +10,7 @@ package org.olap4j.test;
 
 import junit.framework.TestCase;
 import org.olap4j.impl.ArrayMap;
+import org.olap4j.impl.UnmodifiableArrayMap;
 
 import java.util.*;
 
@@ -177,15 +178,191 @@ public class ArrayMapTest extends TestCase {
 
         // putAll to populate empty map (uses different code path than putAll
         // on non-empty map)
-        final ArrayMap<String, Integer> map2 =
+        final Map<String, Integer> map2 =
             new ArrayMap<String, Integer>();
         map2.putAll(hashMap);
         assertEquals(map2, hashMap);
 
         // copy constructor
-        final ArrayMap<String, Integer> map3 =
+        final Map<String, Integer> map3 =
             new ArrayMap<String, Integer>(hashMap);
         assertEquals(map3, hashMap);
+
+        // of
+        final Map<String, Integer> map4 =
+            ArrayMap.of(
+                "foo", -5,
+                "bar", 1,
+                "baz", 0,
+                null, 75,
+                "zzzz", null);
+        assertEquals(map4, hashMap);
+
+        // toString
+        assertEquals(
+            "{foo=-5, bar=1, baz=0, null=75, zzzz=null}",
+            map4.toString());
+        assertEquals("{}", new ArrayMap<String, Integer>().toString());
+    }
+
+
+    /**
+     * Test for {@link org.olap4j.impl.UnmodifiableArrayMap}.
+     */
+    public void testUnmodifiableArrayMap() {
+        Map<String, Integer> map;
+        final Map<String, Integer> hashMap = new HashMap<String, Integer>();
+
+        map = new UnmodifiableArrayMap<String, Integer>(hashMap);
+        assertEquals(0, map.size());
+        assertEquals(map, hashMap);
+        assertEquals(map.hashCode(), hashMap.hashCode());
+
+        // put
+        try {
+            int x = map.put("foo", 0);
+            fail("expected fail, got " + x);
+        } catch (UnsupportedOperationException e) {
+            // ok
+        }
+
+        hashMap.put("foo", 0);
+        map = new UnmodifiableArrayMap<String, Integer>(hashMap);
+        assertEquals(1, map.size());
+        assertEquals(1, map.keySet().size());
+        assertEquals(1, map.values().size());
+
+        // equivalence to hashmap
+        assertEquals(map, hashMap);
+        assertEquals(hashMap, map);
+        assertEquals(map.hashCode(), hashMap.hashCode());
+
+        // containsKey, get
+        assertTrue(map.containsKey("foo"));
+        assertFalse(map.containsKey("bar"));
+        assertEquals(Integer.valueOf(0), map.get("foo"));
+        assertNull(map.get("baz"));
+
+        // putall
+        final Map<String, Integer> hashMap2 = new HashMap<String, Integer>();
+        hashMap2.put("bar", 1);
+        hashMap2.put("foo", 2);
+        hashMap2.put("baz", 0);
+        try {
+            map.putAll(hashMap2);
+            fail("expected fail");
+        } catch (UnsupportedOperationException e) {
+            // ok
+        }
+        hashMap.putAll(hashMap2);
+        map = new UnmodifiableArrayMap<String, Integer>(hashMap);
+        assertEquals(3, map.size());
+        assertEquals(map, hashMap);
+        assertEquals(hashMap, map);
+        assertEquals(map.hashCode(), hashMap.hashCode());
+        assertEquals(map.keySet(), hashMap.keySet());
+        // values collections have same contents, not necessarily in same order
+        assertEquals(
+            new HashSet<Integer>(map.values()),
+            new HashSet<Integer>(hashMap.values()));
+
+        // replace existing key
+        try {
+            int x = map.put("foo", -5);
+            fail("expected fail, got " + x);
+        } catch (UnsupportedOperationException e) {
+            // ok
+        }
+        hashMap.put("foo", -5);
+        map = new UnmodifiableArrayMap<String, Integer>(hashMap);
+        assertEquals(3, map.size());
+        assertEquals(Integer.valueOf(-5), map.get("foo"));
+        assertEquals(map, hashMap);
+        assertEquals(hashMap, map);
+
+        // null key
+        assertFalse(map.containsKey(null));
+        hashMap.put(null, 75);
+        map = new UnmodifiableArrayMap<String, Integer>(hashMap);
+        assertEquals(Integer.valueOf(75), map.get(null));
+        assertTrue(map.containsKey(null));
+
+        // null value
+        hashMap.put("zzzz", null);
+        map = new UnmodifiableArrayMap<String, Integer>(hashMap);
+        assertTrue(map.containsKey("zzzz"));
+        assertNull(map.get("zzzz"));
+
+        // compare to hashmap
+        assertEquals(map, hashMap);
+        assertEquals(hashMap, map);
+
+        // isEmpty, clear
+        assertFalse(map.isEmpty());
+        try {
+            map.clear();
+            fail("expected fail");
+        } catch (UnsupportedOperationException e) {
+            // ok
+        }
+        assertTrue(
+            new UnmodifiableArrayMap<String, Integer>(
+                Collections.<String, Integer>emptyMap()).isEmpty());
+
+        // copy constructor
+        final Map<String, Integer> map3 =
+            new UnmodifiableArrayMap<String, Integer>(hashMap);
+        assertEquals(map3, hashMap);
+
+        // of
+        final Map<String, Integer> map4 =
+            UnmodifiableArrayMap.of(
+                "foo", -5,
+                "bar", 1,
+                "baz", 0,
+                null, 75,
+                "zzzz", null);
+        assertEquals(map4, hashMap);
+
+        // order is preserved
+        final List<String> keyList = Arrays.asList(
+            "foo", "bar", "baz", null, "zzzz");
+        assertEquals(
+            new ArrayList<String>(map4.keySet()), keyList);
+        final List<Integer> valueList = Arrays.asList(-5, 1, 0, 75, null);
+        assertEquals(
+            new ArrayList<Integer>(map4.values()), valueList);
+        final Iterator<Integer> valueIter = valueList.iterator();
+        final Iterator<String> keyIter = keyList.iterator();
+        for (Map.Entry<String, Integer> entry : map4.entrySet()) {
+            assertEquals(entry.getKey(), keyIter.next());
+            assertEquals(entry.getValue(), valueIter.next());
+        }
+        assertFalse(keyIter.hasNext());
+        assertFalse(valueIter.hasNext());
+
+        // of(Map) - zero entries
+        hashMap.clear();
+        final Map<String, Integer> map5 = UnmodifiableArrayMap.of(hashMap);
+        assertTrue(map5 == Collections.<String, Integer>emptyMap());
+
+        // of(Map) - one entry
+        hashMap.put("foo", -5);
+        final Map<String, Integer> map6 = UnmodifiableArrayMap.of(hashMap);
+        assertTrue(
+            map6.getClass() == Collections.singletonMap("7", "y").getClass());
+
+        // of(Map) - 2 or more entries
+        hashMap.put("bar", 1);
+        hashMap.put("baz", 0);
+        final Map<String, Integer> map7 = UnmodifiableArrayMap.of(hashMap);
+        assertEquals(map7, hashMap);
+
+        // toString
+        assertEquals(
+            "{foo=-5, bar=1, baz=0, null=75, zzzz=null}",
+            map4.toString());
+        assertEquals("{}", map5.toString());
     }
 }
 

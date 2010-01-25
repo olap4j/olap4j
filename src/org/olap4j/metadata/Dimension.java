@@ -3,16 +3,13 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2009 Julian Hyde
+// Copyright (C) 2006-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.metadata;
 
 import org.olap4j.OlapException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * An organized hierarchy of categories, known as levels, that describes data
@@ -73,7 +70,7 @@ public interface Dimension extends MetadataElement {
      * @see Member.Type
      * @see Dimension#getDimensionType
      */
-    public enum Type {
+    public enum Type implements XmlaConstant {
         /**
          * Indicates that the dimension is not related to time.
          */
@@ -106,14 +103,17 @@ public interface Dimension extends MetadataElement {
 
         private final int xmlaOrdinal;
 
-        private static final Map<Integer, Type> xmlaOrdinalTypeMap;
+        private static final Dictionary<Type> DICTIONARY =
+            DictionaryImpl.forClass(Type.class);
 
-        static {
-            Map<Integer, Type> map = new HashMap<Integer, Type>();
-            for (Type type : values()) {
-                map.put(type.xmlaOrdinal, type);
-            }
-            xmlaOrdinalTypeMap = map;
+        /**
+         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
+         * of all values of this enumeration.
+         *
+         * @return Dictionary of all values
+         */
+        public static Dictionary<Type> getDictionary() {
+            return DICTIONARY;
         }
 
         /**
@@ -125,26 +125,16 @@ public interface Dimension extends MetadataElement {
             this.xmlaOrdinal = xmlaOrdinal;
         }
 
-        /**
-         * Returns the ordinal code as specified by XMLA.
-         *
-         * <p>For example, the XMLA specification says that the ordinal of
-         * {@link #PRODUCTS} is 8.
-         *
-         * @return ordinal code as specified by XMLA.
-         */
-        public final int xmlaOrdinal() {
-            return xmlaOrdinal;
+        public String xmlaName() {
+            return "MD_DIMTYPE_" + name();
         }
 
-        /**
-         * Returns the type whose XMLA ordinal code is as given.
-         *
-         * @param xmlaOrdinal Ordinal code as specified by XMLA
-         * @return Dimension type, or null
-         */
-        public static Type forXmlaOrdinal(int xmlaOrdinal) {
-            return xmlaOrdinalTypeMap.get(xmlaOrdinal);
+        public String getDescription() {
+            return "";
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
         }
     }
 }

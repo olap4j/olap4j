@@ -3,13 +3,11 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.metadata;
-
-import java.util.*;
 
 /**
  * Data value of primary interest to the user browsing the cube.
@@ -52,7 +50,7 @@ public interface Measure extends Member {
      * which corresponds to the value {@link #SUM},
      * whose {@link #xmlaOrdinal} is 1.
      */
-    enum Aggregator {
+    enum Aggregator implements XmlaConstant {
         /**
          * Identifies that the measure was derived using the
          * SUM aggregation function.
@@ -101,15 +99,8 @@ public interface Measure extends Member {
         UNKNOWN(0);
 
         private final int xmlaOrdinal;
-
-        private static final Map<Integer, Aggregator> xmlaMap =
-            new HashMap<Integer, Aggregator>();
-
-        static {
-            for (Aggregator aggregator : values()) {
-                xmlaMap.put(aggregator.xmlaOrdinal, aggregator);
-            }
-        }
+        private static final DictionaryImpl<Aggregator> DICTIONARY =
+            DictionaryImpl.forClass(Aggregator.class);
 
         /**
          * Creates an Aggregator.
@@ -121,29 +112,26 @@ public interface Measure extends Member {
             this.xmlaOrdinal = xmlaOrdinal;
         }
 
-        /**
-         * Returns the ordinal code as specified by XMLA.
-         *
-         * <p>For example, the XMLA specification says that the ordinal of
-         * {@link #CALCULATED} is 127.
-         *
-         * @return ordinal code as specified by XMLA.
-         */
-        public final int xmlaOrdinal() {
+        public String xmlaName() {
+            return "MDMEASURE_AGGR_" + name();
+        }
+
+        public String getDescription() {
+            return "";
+        }
+
+        public int xmlaOrdinal() {
             return xmlaOrdinal;
         }
 
         /**
-         * Looks up an Aggregator by its XMLA ordinal.
+         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
+         * of all values of this enumeration.
          *
-         * @param xmlaOrdinal Ordinal of an Aggregator according to the XMLA
-         * specification.
-         *
-         * @return Aggregator with the given ordinal, or null if there is no
-         * such Aggregator
+         * @return Dictionary of all values
          */
-        public static Aggregator forXmlaOrdinal(int xmlaOrdinal) {
-            return xmlaMap.get(xmlaOrdinal);
+        public static Dictionary<Aggregator> getDictionary() {
+            return DICTIONARY;
         }
     }
 }

@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -168,7 +168,7 @@ public interface Level extends MetadataElement {
      * @see Level#getLevelType
      * @see org.olap4j.OlapDatabaseMetaData#getLevels
      */
-    public enum Type {
+    public enum Type implements XmlaConstant {
 
         /**
          * Indicates that the level is not related to time.
@@ -285,13 +285,17 @@ public interface Level extends MetadataElement {
 
         private final int xmlaOrdinal;
 
-        private static final Map<Integer, Type> xmlaMap =
-            new HashMap<Integer, Type>();
+        private static final Dictionary<Type> DICTIONARY =
+            DictionaryImpl.forClass(Type.class);
 
-        static {
-            for (Type type : values()) {
-                xmlaMap.put(type.xmlaOrdinal, type);
-            }
+        /**
+         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
+         * of all values of this enumeration.
+         *
+         * @return Dictionary of all values
+         */
+        public static Dictionary<Type> getDictionary() {
+            return DICTIONARY;
         }
 
         /**
@@ -304,29 +308,16 @@ public interface Level extends MetadataElement {
             this.xmlaOrdinal = xmlaOrdinal;
         }
 
-        /**
-         * Returns the ordinal code as specified by XMLA.
-         *
-         * <p>For example, the XMLA specification says that the ordinal of
-         * {@link #CUSTOMER_HOUSEHOLD} is 0x1023.
-         *
-         * @return ordinal code as specified by XMLA.
-         */
-        public int xmlaOrdinal() {
-            return xmlaOrdinal;
+        public String xmlaName() {
+            return "MDLEVEL_TYPE_" + name();
         }
 
-        /**
-         * Looks up a Type by its XMLA ordinal.
-         *
-         * @param xmlaOrdinal Ordinal of a level Type according to XMLA
-         * specification.
-         *
-         * @return Type with the given ordinal, or null if there is no such
-         * Type
-         */
-        public static Type forXmlaOrdinal(int xmlaOrdinal) {
-            return xmlaMap.get(xmlaOrdinal);
+        public String getDescription() {
+            return "";
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
         }
 
         /**

@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2009 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -53,6 +53,27 @@ public class ArrayMap<K, V>
         }
     }
 
+    /**
+     * Returns an array map with given contents.
+     *
+     * @param key First key
+     * @param value First value
+     * @param keyValues Second and sequent key/value pairs
+     * @param <K> Key type
+     * @param <V> Value type
+     * @return Map with given contents
+     */
+    public static <K, V> Map<K, V> of(
+        K key,
+        V value,
+        Object... keyValues)
+    {
+        // Because ArrayMap is so bad at bulk inserts, it makes sense to build
+        // another map (HashMap) just so we can populate the ArrayMap in one
+        // shot.
+        return new ArrayMap<K, V>(Olap4jUtil.mapOf(key, value, keyValues));
+    }
+
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -65,9 +86,7 @@ public class ArrayMap<K, V>
             return false;
         }
         try {
-            Iterator<Entry<K, V>> i = entrySet().iterator();
-            while (i.hasNext()) {
-                Entry<K, V> e = i.next();
+            for (Entry<K, V> e : entrySet()) {
                 K key = e.getKey();
                 V value = e.getValue();
                 if (value == null) {
@@ -208,6 +227,27 @@ public class ArrayMap<K, V>
 
     public Set<Entry<K, V>> entrySet() {
         return new EntrySet();
+    }
+
+    public String toString() {
+        Iterator<Entry<K, V>> i = entrySet().iterator();
+        if (! i.hasNext()) {
+            return "{}";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append('{');
+        for (;;) {
+            Entry<K, V> e = i.next();
+            K key = e.getKey();
+            V value = e.getValue();
+            sb.append(key == this ? "(this Map)" : key);
+            sb.append('=');
+            sb.append(value == this ? "(this Map)" : value);
+            if (! i.hasNext()) {
+                return sb.append('}').toString();
+            }
+            sb.append(", ");
+        }
     }
 
     private class KeySet extends AbstractSet<K> {

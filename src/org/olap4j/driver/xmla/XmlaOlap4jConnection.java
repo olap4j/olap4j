@@ -196,7 +196,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * Returns the error-handler
      * @return Error-handler
      */
-    private final XmlaHelper getHelper() {
+    private XmlaHelper getHelper() {
         return helper;
     }
 
@@ -975,6 +975,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     static class DimensionHandler extends HandlerImpl<XmlaOlap4jDimension> {
         private final XmlaOlap4jCube cubeForCallback;
+
         public DimensionHandler(XmlaOlap4jCube dimensionsByUname) {
             this.cubeForCallback = dimensionsByUname;
         }
@@ -1016,7 +1017,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             final int dimensionType =
                 integerElement(row, "DIMENSION_TYPE");
             final Dimension.Type type =
-                Dimension.Type.forXmlaOrdinal(dimensionType);
+                Dimension.Type.getDictionary().forOrdinal(dimensionType);
             final String defaultHierarchyUniqueName =
                 stringElement(row, "DEFAULT_HIERARCHY");
             final Integer dimensionOrdinal =
@@ -1117,6 +1118,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     static class LevelHandler extends HandlerImpl<XmlaOlap4jLevel> {
         public static final int MDLEVEL_TYPE_CALCULATED = 0x0002;
         private final XmlaOlap4jCube cubeForCallback;
+
         public LevelHandler(XmlaOlap4jCube cubeForCallback) {
             this.cubeForCallback = cubeForCallback;
         }
@@ -1161,7 +1163,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 integerElement(row, "LEVEL_NUMBER");
             final Integer levelTypeCode = integerElement(row, "LEVEL_TYPE");
             final Level.Type levelType =
-                Level.Type.forXmlaOrdinal(levelTypeCode);
+                Level.Type.getDictionary().forOrdinal(levelTypeCode);
             boolean calculated = (levelTypeCode & MDLEVEL_TYPE_CALCULATED) != 0;
             final int levelCardinality =
                 integerElement(row, "LEVEL_CARDINALITY");
@@ -1178,6 +1180,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     static class MeasureHandler extends HandlerImpl<XmlaOlap4jMeasure> {
         private final XmlaOlap4jDimension measuresDimension;
+
         public MeasureHandler(XmlaOlap4jDimension measuresDimension) {
             this.measuresDimension = measuresDimension;
         }
@@ -1213,10 +1216,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             final String description =
                 stringElement(row, "DESCRIPTION");
             final Measure.Aggregator measureAggregator =
-                Measure.Aggregator.forXmlaOrdinal(
-                    integerElement(row, "MEASURE_AGGREGATOR"));
+                Measure.Aggregator.getDictionary().forOrdinal(
+                    integerElement(
+                        row, "MEASURE_AGGREGATOR"));
             final Datatype datatype =
-                Datatype.forXmlaOrdinal(
+                Datatype.getDictionary().forOrdinal(
                     integerElement(row, "DATA_TYPE"));
             final boolean measureIsVisible =
                 booleanElement(row, "MEASURE_IS_VISIBLE");
@@ -1533,6 +1537,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class PropertyHandler extends HandlerImpl<XmlaOlap4jProperty> {
+
         public void handle(
             Element row,
             Context context, List<XmlaOlap4jProperty> list) throws OlapException
@@ -1561,17 +1566,18 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             String caption = stringElement(row, "PROPERTY_CAPTION");
             String name = stringElement(row, "PROPERTY_NAME");
             Datatype dataType =
-                Datatype.forXmlaOrdinal(
+                Datatype.getDictionary().forOrdinal(
                     integerElement(row, "DATA_TYPE"));
             final Integer contentTypeOrdinal =
                 integerElement(row, "PROPERTY_CONTENT_TYPE");
             Property.ContentType contentType =
                 contentTypeOrdinal == null
                     ? null
-                    : Property.ContentType.forXmlaOrdinal(contentTypeOrdinal);
+                    : Property.ContentType.getDictionary().forOrdinal(
+                        contentTypeOrdinal);
             int propertyType = integerElement(row, "PROPERTY_TYPE");
             Set<Property.TypeFlag> type =
-                Property.TypeFlag.forMask(propertyType);
+                Property.TypeFlag.getDictionary().forMask(propertyType);
             list.add(
                 new XmlaOlap4jProperty(
                     uniqueName, name, caption, description, dataType, type,

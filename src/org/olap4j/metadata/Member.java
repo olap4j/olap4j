@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -310,51 +310,79 @@ public interface Member extends MetadataElement {
      *
      * @see org.olap4j.OlapDatabaseMetaData#getMembers
      */
-    public enum TreeOp {
+    public enum TreeOp implements XmlaConstant {
         /**
          * Tree operation which returns only the immediate children.
          */
-        CHILDREN(1),
+        CHILDREN(
+            1,
+            "Tree operation which returns only the immediate children."),
 
         /**
          * Tree operation which returns members on the same level.
          */
-        SIBLINGS(2),
+        SIBLINGS(
+            2,
+            "Tree operation which returns members on the same level."),
 
         /**
          * Tree operation which returns only the immediate parent.
          */
-        PARENT(4),
+        PARENT(
+            4,
+            "Tree operation which returns only the immediate parent."),
 
         /**
          * Tree operation which returns itself in the list of returned rows.
          */
-        SELF(8),
+        SELF(
+            8,
+            "Tree operation which returns itself in the list of returned "
+            + "rows."),
 
         /**
          * Tree operation which returns all of the descendants.
          */
-        DESCENDANTS(16),
+        DESCENDANTS(
+            16,
+            "Tree operation which returns all of the descendants."),
 
         /**
          * Tree operation which returns all of the ancestors.
          */
-        ANCESTORS(32);
+        ANCESTORS(
+            32,
+            "Tree operation which returns all of the ancestors.");
 
         private final int xmlaOrdinal;
+        private String description;
 
-        private TreeOp(int userOrdinal) {
-            this.xmlaOrdinal = userOrdinal;
-        }
+        private static final Dictionary<TreeOp> DICTIONARY =
+            DictionaryImpl.forClass(TreeOp.class);
 
         /**
-         * Returns the ordinal code as specified by XMLA.
+         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
+         * of all values of this enumeration.
          *
-         * <p>For example, the XMLA specification says that the ordinal of
-         * {@link #ANCESTORS} is 32.
-         *
-         * @return ordinal code as specified by XMLA.
+         * @return Dictionary of all values
          */
+        public static Dictionary<TreeOp> getDictionary() {
+            return DICTIONARY;
+        }
+
+        private TreeOp(int xmlaOrdinal, String description) {
+            this.xmlaOrdinal = xmlaOrdinal;
+            this.description = description;
+        }
+
+        public String xmlaName() {
+            return "MDTREEOP_" + name();
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
         public int xmlaOrdinal() {
             return xmlaOrdinal;
         }

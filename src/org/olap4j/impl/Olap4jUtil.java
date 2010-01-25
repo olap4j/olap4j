@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -141,6 +141,38 @@ public class Olap4jUtil {
     @SuppressWarnings({"unchecked"})
     public static <T> NamedList<T> cast(NamedList<?> list) {
         return (NamedList<T>) list;
+    }
+
+    /**
+     * Returns a hashmap with given contents.
+     *
+     * <p>Use this method in initializers. Type parameters are inferred from
+     * context, and the contents are initialized declaratively. For example,
+     *
+     * <blockquote><code>Map&lt;String, Integer&gt; population =<br/>
+     * &nbsp;&nbsp;Olap4jUtil.mapOf(<br/>
+     * &nbsp;&nbsp;&nbsp;&nbsp;"UK", 65000000,<br/>
+     * &nbsp;&nbsp;&nbsp;&nbsp;"USA", 300000000);</code></blockquote>
+     *
+     * @see org.olap4j.impl.UnmodifiableArrayMap#of(Object, Object, Object...)
+     * @see org.olap4j.impl.ArrayMap#of(Object, Object, Object...)
+     *
+     * @param key First key
+     * @param value First value
+     * @param keyValues Second and sequent key/value pairs
+     * @param <K> Key type
+     * @param <V> Value type
+     * @return Map with given contents
+     */
+    public static <K, V> Map<K, V> mapOf(K key, V value, Object... keyValues)
+    {
+        final Map<K, V> map = new LinkedHashMap<K, V>(1 + keyValues.length);
+        map.put(key, value);
+        for (int i = 0; i < keyValues.length;) {
+            //noinspection unchecked
+            map.put((K) keyValues[i++], (V) keyValues[i++]);
+        }
+        return map;
     }
 
     /**

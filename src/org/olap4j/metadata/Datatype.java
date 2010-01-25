@@ -3,14 +3,11 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.metadata;
-
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Enumeration of the allowable data types of a Property or Measure.
@@ -22,7 +19,7 @@ import java.util.HashMap;
  * @version $Id$
  * @since Aug 23, 2006
  */
-public enum Datatype {
+public enum Datatype implements XmlaConstant {
     /*
     * The following values exactly match VARENUM
     * in Automation and may be used in VARIANT.
@@ -88,15 +85,11 @@ public enum Datatype {
         + "integer.");
 
     private final int xmlaOrdinal;
+    private String dbTypeIndicator;
+    private String description;
 
-    private static final Map<Integer, Datatype> xmlaMap =
-        new HashMap<Integer, Datatype>();
-
-    static {
-        for (Datatype datatype : values()) {
-            xmlaMap.put(datatype.xmlaOrdinal, datatype);
-        }
-    }
+    private static final DictionaryImpl<Datatype> DICTIONARY =
+        DictionaryImpl.forClass(Datatype.class);
 
     Datatype(
         int xmlaOrdinal,
@@ -104,21 +97,31 @@ public enum Datatype {
         String description)
     {
         this.xmlaOrdinal = xmlaOrdinal;
+        this.dbTypeIndicator = dbTypeIndicator;
+        this.description = description;
+    }
+
+    public String xmlaName() {
+        return dbTypeIndicator;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int xmlaOrdinal() {
+        return xmlaOrdinal;
     }
 
     /**
-     * Looks up a Datatype by its XMLA ordinal.
+     * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
+     * of all values of this enumeration.
      *
-     * @param xmlaOrdinal Ordinal of a Datatype according to the XMLA
-     * specification.
-     *
-     * @return Datatype with the given ordinal, or null if there is no
-     * such Datatype
+     * @return Dictionary of all values
      */
-    public static Datatype forXmlaOrdinal(int xmlaOrdinal) {
-        return xmlaMap.get(xmlaOrdinal);
+    public static Dictionary<Datatype> getDictionary() {
+        return DICTIONARY;
     }
-
 }
 
 // End Datatype.java

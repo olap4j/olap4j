@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -52,7 +52,7 @@ public interface Property extends MetadataElement {
      * In this case, {@link Property#getType} will return the {@link Set}
      * {{@link #MEMBER}, {@link #BLOB}}.
      */
-    enum TypeFlag {
+    enum TypeFlag implements XmlaConstant {
         /**
          * Identifies a property of a member. This property can be used in the
          * DIMENSION PROPERTIES clause of the SELECT statement.
@@ -76,64 +76,39 @@ public interface Property extends MetadataElement {
          */
         BLOB(8);
 
-        public final int xmlaOrdinal;
-        private static final Map<Integer, TypeFlag> xmlaMap =
-            new HashMap<Integer, TypeFlag>();
+        private final int xmlaOrdinal;
 
-        static {
-            for (TypeFlag typeFlag : values()) {
-                xmlaMap.put(typeFlag.xmlaOrdinal, typeFlag);
-            }
-        }
-
-        private static final Set<TypeFlag> CELL_TYPE_FLAG =
+        public static final Set<TypeFlag> CELL_TYPE_FLAG =
             Collections.unmodifiableSet(EnumSet.of(TypeFlag.CELL));
-        private static final Set<TypeFlag> MEMBER_TYPE_FLAG =
+        public static final Set<TypeFlag> MEMBER_TYPE_FLAG =
             Collections.unmodifiableSet(EnumSet.of(TypeFlag.MEMBER));
+        private static final DictionaryImpl<TypeFlag> DICTIONARY =
+            DictionaryImpl.forClass(TypeFlag.class);
 
         private TypeFlag(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
         }
 
-        /**
-         * Looks up a TypeFlag by its XMLA ordinal.
-         *
-         * @param xmlaOrdinal Ordinal of a TypeFlag according to the XMLA
-         * specification.
-         *
-         * @return TypeFlag with the given ordinal, or null if there is no
-         * such TypeFlag
-         */
-        public static TypeFlag forXmlaOrdinal(int xmlaOrdinal) {
-            return xmlaMap.get(xmlaOrdinal);
+        public String xmlaName() {
+            return "MDPROP_" + name();
+        }
+
+        public String getDescription() {
+            return null;
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
         }
 
         /**
-         * Creates a set of TypeFlag values by parsing a mask.
+         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
+         * of all values of this enumeration.
          *
-         * <p>For example, <code>forMask(9)</code> returns the set
-         * {{@link #MEMBER}, {@link #BLOB}} because 9 = MEMBER (1) | BLOB (8).
-         *
-         * @param xmlaOrdinalMask Bit mask
-         * @return Set of TypeFlag values
+         * @return Dictionary of all values
          */
-        public static Set<TypeFlag> forMask(int xmlaOrdinalMask) {
-            switch (xmlaOrdinalMask) {
-            // Optimize common cases {MEMBER} and {CELL}.
-            case 1:
-                return MEMBER_TYPE_FLAG;
-            case 2:
-                return CELL_TYPE_FLAG;
-            default:
-                Set<TypeFlag> type =
-                    EnumSet.noneOf(TypeFlag.class);
-                for (TypeFlag typeFlag : values()) {
-                    if ((xmlaOrdinalMask & typeFlag.xmlaOrdinal) != 0) {
-                        type.add(typeFlag);
-                    }
-                }
-                return type;
-            }
+        public static Dictionary<TypeFlag> getDictionary() {
+            return DICTIONARY;
         }
     }
 
@@ -171,7 +146,9 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             10,
             false,
-            "Optional. The name of the catalog to which this member belongs. NULL if the provider does not support catalogs."),
+            null,
+            "Optional. The name of the catalog to which this member belongs. "
+            + "NULL if the provider does not support catalogs."),
 
         /**
          * Definition of the property which
@@ -181,7 +158,9 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             11,
             false,
-            "Optional. The name of the schema to which this member belongs. NULL if the provider does not support schemas."),
+            null,
+            "Optional. The name of the schema to which this member belongs. "
+            + "NULL if the provider does not support schemas."),
 
         /**
          * Definition of the property which
@@ -191,7 +170,7 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             12,
             false,
-            "Required. Name of the cube to which this member belongs."),
+            null, "Required. Name of the cube to which this member belongs."),
 
         /**
          * Definition of the property which
@@ -201,7 +180,10 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             13,
             false,
-            "Required. Unique name of the dimension to which this member belongs. For providers that generate unique names by qualification, each component of this name is delimited."),
+            null,
+            "Required. Unique name of the dimension to which this member "
+            + "belongs. For providers that generate unique names by "
+            + "qualification, each component of this name is delimited."),
 
         /**
          * Definition of the property which
@@ -211,7 +193,11 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             14,
             false,
-            "Required. Unique name of the hierarchy. If the member belongs to more than one hierarchy, there is one row for each hierarchy to which it belongs. For providers that generate unique names by qualification, each component of this name is delimited."),
+            null,
+            "Required. Unique name of the hierarchy. If the member belongs to "
+            + "more than one hierarchy, there is one row for each hierarchy "
+            + "to which it belongs. For providers that generate unique names "
+            + "by qualification, each component of this name is delimited."),
 
         /**
          * Definition of the property which
@@ -221,7 +207,10 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             15,
             false,
-            "Required. Unique name of the level to which the member belongs. For providers that generate unique names by qualification, each component of this name is delimited."),
+            null,
+            "Required. Unique name of the level to which the member belongs. "
+            + "For providers that generate unique names by qualification, "
+            + "each component of this name is delimited."),
 
         /**
          * Definition of the property which
@@ -231,7 +220,9 @@ public interface Property extends MetadataElement {
             Datatype.UNSIGNED_INTEGER,
             16,
             false,
-            "Required. The distance of the member from the root of the hierarchy. The root level is zero."),
+            null,
+            "Required. The distance of the member from the root of the "
+            + "hierarchy. The root level is zero."),
 
         /**
          * Definition of the property which
@@ -241,7 +232,11 @@ public interface Property extends MetadataElement {
             Datatype.UNSIGNED_INTEGER,
             17,
             false,
-            "Required. Ordinal number of the member. Sort rank of the member when members of this dimension are sorted in their natural sort order. If providers do not have the concept of natural ordering, this should be the rank when sorted by MEMBER_NAME."),
+            null,
+            "Required. Ordinal number of the member. Sort rank of the member "
+            + "when members of this dimension are sorted in their natural "
+            + "sort order. If providers do not have the concept of natural "
+            + "ordering, this should be the rank when sorted by MEMBER_NAME."),
 
         /**
          * Definition of the property which
@@ -251,6 +246,7 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             18,
             false,
+            null,
             "Required. Name of the member."),
 
         /**
@@ -261,7 +257,10 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             19,
             false,
-            "Required. Unique name of the member. For providers that generate unique names by qualification, each component of this name is delimited."),
+            null,
+            "Required. Unique name of the member. For providers that generate "
+            + "unique names by qualification, each component of this name is "
+            + "delimited."),
 
         /**
          * Definition of the property which
@@ -271,7 +270,15 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             20,
             false,
-            "Required. Type of the member. Can be one of the following values: MDMEMBER_Datatype.TYPE_REGULAR, MDMEMBER_Datatype.TYPE_ALL, MDMEMBER_Datatype.TYPE_FORMULA, MDMEMBER_Datatype.TYPE_MEASURE, MDMEMBER_Datatype.TYPE_UNKNOWN. MDMEMBER_Datatype.TYPE_FORMULA takes precedence over MDMEMBER_Datatype.TYPE_MEASURE. Therefore, if there is a formula (calculated) member on the Measures dimension, it is listed as MDMEMBER_Datatype.TYPE_FORMULA."),
+            null,
+            "Required. Type of the member. Can be one of the following values: "
+            + "MDMEMBER_Datatype.TYPE_REGULAR, MDMEMBER_Datatype.TYPE_ALL, "
+            + "MDMEMBER_Datatype.TYPE_FORMULA, MDMEMBER_Datatype.TYPE_MEASURE, "
+            + "MDMEMBER_Datatype.TYPE_UNKNOWN. MDMEMBER_Datatype.TYPE_FORMULA "
+            + "takes precedence over MDMEMBER_Datatype.TYPE_MEASURE. "
+            + "Therefore, if there is a formula (calculated) member on the "
+            + "Measures dimension, it is listed as "
+            + "MDMEMBER_Datatype.TYPE_FORMULA."),
 
         /**
          * Definition of the property which
@@ -281,6 +288,7 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             21,
             false,
+            null,
             "Optional. Member GUID. NULL if no GUID exists."),
 
         /**
@@ -292,7 +300,10 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             22,
             false,
-            "Required. A label or caption associated with the member. Used primarily for display purposes. If a caption does not exist, MEMBER_NAME is returned."),
+            null,
+            "Required. A label or caption associated with the member. Used "
+            + "primarily for display purposes. If a caption does not exist, "
+            + "MEMBER_NAME is returned."),
 
         /**
          * Definition of the property which holds the
@@ -302,7 +313,10 @@ public interface Property extends MetadataElement {
             Datatype.UNSIGNED_INTEGER,
             23,
             false,
-            "Required. Number of children that the member has. This can be an estimate, so consumers should not rely on this to be the exact count. Providers should return the best estimate possible."),
+            null,
+            "Required. Number of children that the member has. This can be an "
+            + "estimate, so consumers should not rely on this to be the exact "
+            + "count. Providers should return the best estimate possible."),
 
         /**
          * Definition of the property which holds the
@@ -312,7 +326,9 @@ public interface Property extends MetadataElement {
             Datatype.UNSIGNED_INTEGER,
             24,
             false,
-            "Required. The distance of the member's parent from the root level of the hierarchy. The root level is zero."),
+            null,
+            "Required. The distance of the member's parent from the root level "
+            + "of the hierarchy. The root level is zero."),
 
         /**
          * Definition of the property which holds the
@@ -322,7 +338,11 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             25,
             false,
-            "Required. Unique name of the member's parent. NULL is returned for any members at the root level. For providers that generate unique names by qualification, each component of this name is delimited."),
+            null,
+            "Required. Unique name of the member's parent. NULL is returned "
+            + "for any members at the root level. For providers that generate "
+            + "unique names by qualification, each component of this name is "
+            + "delimited."),
 
         /**
          * Definition of the property which holds the
@@ -333,6 +353,7 @@ public interface Property extends MetadataElement {
             Datatype.UNSIGNED_INTEGER,
             26,
             false,
+            null,
             "Required. Number of parents that this member has."),
 
         /**
@@ -343,6 +364,7 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             27,
             false,
+            null,
             "Optional. A human-readable description of the member."),
 
         /**
@@ -355,6 +377,7 @@ public interface Property extends MetadataElement {
             Datatype.BOOLEAN,
             28,
             true,
+            null,
             null),
 
         /**
@@ -368,6 +391,7 @@ public interface Property extends MetadataElement {
             Datatype.VARIANT,
             29,
             true,
+            null,
             "Optional. The value of the member key. Null for composite keys."),
 
         /**
@@ -379,7 +403,9 @@ public interface Property extends MetadataElement {
             Datatype.BOOLEAN,
             30,
             false,
-            "Required. Whether the member is a placeholder member for an empty position in a dimension hierarchy."),
+            null,
+            "Required. Whether the member is a placeholder member for an empty "
+            + "position in a dimension hierarchy."),
 
         /**
          * Definition of the property that indicates whether the member is a
@@ -389,6 +415,7 @@ public interface Property extends MetadataElement {
             Datatype.BOOLEAN,
             31,
             false,
+            null,
             "Required. whether the member is a data member"),
 
         /**
@@ -403,6 +430,7 @@ public interface Property extends MetadataElement {
             Datatype.UNSIGNED_INTEGER,
             43,
             true,
+            null,
             "The level depth of a member"),
 
         /**
@@ -416,6 +444,7 @@ public interface Property extends MetadataElement {
             Datatype.UNSIGNED_INTEGER,
             44,
             false,
+            null,
             "Display instruction of a member for XML/A"),
 
         /**
@@ -427,6 +456,7 @@ public interface Property extends MetadataElement {
             Datatype.VARIANT,
             41,
             false,
+            null,
             "The unformatted value of the cell.");
 
         private final Datatype type;
@@ -437,6 +467,7 @@ public interface Property extends MetadataElement {
             Datatype type,
             int ordinal,
             boolean internal,
+            Class<? extends Enum> enumClazz,
             String description)
         {
 //            assert ordinal == ordinal();
@@ -466,7 +497,7 @@ public interface Property extends MetadataElement {
         }
 
         public Set<TypeFlag> getType() {
-            return TypeFlag.forMask(TypeFlag.MEMBER.xmlaOrdinal);
+            return TypeFlag.MEMBER_TYPE_FLAG;
         }
 
         public ContentType getContentType() {
@@ -502,43 +533,64 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             30,
             false,
-            "The background color for displaying the VALUE or FORMATTED_VALUE property. For more information, see FORE_COLOR and BACK_COLOR Contents."),
+            null,
+            "The background color for displaying the VALUE or FORMATTED_VALUE "
+            + "property. For more information, see FORE_COLOR and BACK_COLOR "
+            + "Contents."),
 
         CELL_EVALUATION_LIST(
             Datatype.STRING,
             31,
             false,
-            "The semicolon-delimited list of evaluated formulas applicable to the cell, in order from lowest to highest solve order. For more information about solve order, see Understanding Pass Order and Solve Order"),
+            null,
+            "The semicolon-delimited list of evaluated formulas applicable to "
+            + "the cell, in order from lowest to highest solve order. For more "
+            + "information about solve order, see Understanding Pass Order and "
+            + "Solve Order"),
 
         CELL_ORDINAL(
             Datatype.UNSIGNED_INTEGER,
             32,
             false,
+            null,
             "The ordinal number of the cell in the dataset."),
 
         FORE_COLOR(
             Datatype.STRING,
             33,
             false,
-            "The foreground color for displaying the VALUE or FORMATTED_VALUE property. For more information, see FORE_COLOR and BACK_COLOR Contents."),
+            null,
+            "The foreground color for displaying the VALUE or FORMATTED_VALUE "
+            + "property. For more information, see FORE_COLOR and BACK_COLOR "
+            + "Contents."),
 
         FONT_NAME(
             Datatype.STRING,
             34,
             false,
-            "The font to be used to display the VALUE or FORMATTED_VALUE property."),
+            null,
+            "The font to be used to display the VALUE or FORMATTED_VALUE "
+            + "property."),
 
         FONT_SIZE(
             Datatype.STRING,
             35,
             false,
-            "Font size to be used to display the VALUE or FORMATTED_VALUE property."),
+            null,
+            "Font size to be used to display the VALUE or FORMATTED_VALUE "
+            + "property."),
 
         FONT_FLAGS(
             Datatype.UNSIGNED_INTEGER,
             36,
             false,
-            "The bitmask detailing effects on the font. The value is the result of a bitwise OR operation of one or more of the following constants: MDFF_BOLD  = 1, MDFF_ITALIC = 2, MDFF_UNDERLINE = 4, MDFF_STRIKEOUT = 8. For example, the value 5 represents the combination of bold (MDFF_BOLD) and underline (MDFF_UNDERLINE) font effects."),
+            XmlaConstants.FontFlag.class,
+            "The bitmask detailing effects on the font. The value is the "
+            + "result of a bitwise OR operation of one or more of the "
+            + "following constants: MDFF_BOLD  = 1, MDFF_ITALIC = 2, "
+            + "MDFF_UNDERLINE = 4, MDFF_STRIKEOUT = 8. For example, the value "
+            + "5 represents the combination of bold (MDFF_BOLD) and underline "
+            + "(MDFF_UNDERLINE) font effects."),
 
         /**
          * Definition of the property which
@@ -548,7 +600,9 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             37,
             false,
-            "The character string that represents a formatted display of the VALUE property."),
+            null,
+            "The character string that represents a formatted display of the "
+            + "VALUE property."),
 
         /**
          * Definition of the property which
@@ -558,13 +612,17 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             38,
             false,
-            "The format string used to create the FORMATTED_VALUE property value. For more information, see FORMAT_STRING Contents."),
+            null,
+            "The format string used to create the FORMATTED_VALUE property "
+            + "value. For more information, see FORMAT_STRING Contents."),
 
         NON_EMPTY_BEHAVIOR(
             Datatype.STRING,
             39,
             false,
-            "The measure used to determine the behavior of calculated members when resolving empty cells."),
+            null,
+            "The measure used to determine the behavior of calculated members "
+            + "when resolving empty cells."),
 
         /**
          * Definition of the property which
@@ -575,6 +633,7 @@ public interface Property extends MetadataElement {
             Datatype.INTEGER,
             40,
             false,
+            null,
             "The solve order of the cell."),
 
         /**
@@ -586,6 +645,7 @@ public interface Property extends MetadataElement {
             Datatype.VARIANT,
             41,
             false,
+            null,
             "The unformatted value of the cell."),
 
         /**
@@ -601,7 +661,31 @@ public interface Property extends MetadataElement {
             Datatype.STRING,
             42,
             false,
-            "The datatype of the cell.");
+            null,
+            "The datatype of the cell."),
+
+        LANGUAGE(
+            Datatype.UNSIGNED_INTEGER,
+            0,
+            false,
+            null,
+            "The locale where the FORMAT_STRING will be applied. LANGUAGE is "
+            + "usually used for currency conversion."),
+
+        ACTION_TYPE(
+            Datatype.UNSIGNED_INTEGER,
+            0,
+            false,
+            null,
+            "A bitmask that indicates which types of actions exist on the "
+            + "cell."),
+
+        UPDATEABLE(
+            Datatype.UNSIGNED_INTEGER,
+            0,
+            false,
+            XmlaConstants.Updateable.class,
+            "A value that indicates whether the cell can be updated.");
 
         /**
          * The datatype of the property.
@@ -614,6 +698,7 @@ public interface Property extends MetadataElement {
             Datatype type,
             int ordinal,
             boolean internal,
+            Class<? extends Enum> enumClazz,
             String description)
         {
             this.type = type;
@@ -626,7 +711,7 @@ public interface Property extends MetadataElement {
         }
 
         public Set<TypeFlag> getType() {
-            return TypeFlag.forMask(TypeFlag.CELL.xmlaOrdinal);
+            return TypeFlag.CELL_TYPE_FLAG;
         }
 
         public String getName() {
@@ -662,7 +747,7 @@ public interface Property extends MetadataElement {
      * which corresponds to the value {@link #CAPTION},
      * whose {@link #xmlaOrdinal} is 0x21.
      */
-    enum ContentType {
+    enum ContentType implements XmlaConstant {
         REGULAR(0x00),
         ID(0x01),
         RELATION_TO_PARENT(0x02),
@@ -730,43 +815,33 @@ public interface Property extends MetadataElement {
         VERSION(0xC1);
 
         private final int xmlaOrdinal;
-
-        private static final Map<Integer, ContentType> xmlaMap =
-            new HashMap<Integer, ContentType>();
-
-        static {
-            for (ContentType contentType : values()) {
-                xmlaMap.put(contentType.xmlaOrdinal, contentType);
-            }
-        }
-
-        /**
-         * Returns the ordinal code as specified by XMLA.
-         *
-         * <p>For example, the XMLA specification says that the ordinal of
-         * {@link #FORMATTING_FONT_EFFECTS} is 0xA4.
-         *
-         * @return ordinal code as specified by XMLA.
-         */
-        public int xmlaOrdinal() {
-            return xmlaOrdinal;
-        }
+        private static final DictionaryImpl<ContentType> DICTIONARY =
+            DictionaryImpl.forClass(ContentType.class);
 
         private ContentType(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
         }
 
+        public String xmlaName() {
+            return "MD_PROPTYPE_" + name();
+        }
+
+        public String getDescription() {
+            return null;
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
+        }
+
         /**
-         * Looks up a ContentType by its XMLA ordinal.
+         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
+         * of all values of this enumeration.
          *
-         * @param xmlaOrdinal Ordinal of a ContentType according to the XMLA
-         * specification.
-         *
-         * @return ContentType with the given ordinal, or null if there is no
-         * such ContentType
+         * @return Dictionary of all values
          */
-        public static ContentType forXmlaOrdinal(int xmlaOrdinal) {
-            return xmlaMap.get(xmlaOrdinal);
+        public static Dictionary<ContentType> getDictionary() {
+            return DICTIONARY;
         }
     }
 }
