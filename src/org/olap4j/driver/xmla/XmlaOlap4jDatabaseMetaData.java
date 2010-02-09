@@ -132,6 +132,14 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         List<List<Object>> rowList = new ArrayList<List<Object>>();
         rowLoop:
         for (Element row : XmlaOlap4jUtil.childElements(root)) {
+            if (row.getNamespaceURI() != null
+                    && !row.getNamespaceURI().equals(
+                            "urn:schemas-microsoft-com:xml-analysis:rowset"))
+            {
+                // Ignore any vendor specific namespaced elements that
+                // are not part of the rowset namespace
+                continue;
+            }
             final ArrayList<Object> valueList = new ArrayList<Object>();
             for (Map.Entry<String, Matcher> entry : predicateList.entrySet()) {
                 final String column = entry.getKey();
