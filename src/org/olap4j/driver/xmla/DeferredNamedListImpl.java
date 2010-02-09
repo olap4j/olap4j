@@ -69,7 +69,7 @@ class DeferredNamedListImpl<T extends Named>
                 populateList(list);
                 state = State.POPULATED;
             } catch (OlapException e) {
-            	state = State.NEW;
+                state = State.NEW;
                 // TODO: fetch metadata on getCollection() method, so we
                 // can't get an exception while traversing the list
                 throw new RuntimeException(e);
