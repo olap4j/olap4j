@@ -1461,7 +1461,8 @@ public class ConnectionTest extends TestCase {
 
         List<Member> memberList =
             cube.lookupMembers(
-                EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.CHILDREN),
+                Olap4jUtil.enumSetOf(
+                    Member.TreeOp.ANCESTORS, Member.TreeOp.CHILDREN),
                 "Time", "1997", "Q2");
         String expected;
         switch (tester.getFlavor()) {
@@ -1488,14 +1489,16 @@ public class ConnectionTest extends TestCase {
         // ask for non-existent member; list should be empty
         memberList =
             cube.lookupMembers(
-                EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.CHILDREN),
+                Olap4jUtil.enumSetOf(
+                    Member.TreeOp.ANCESTORS, Member.TreeOp.CHILDREN),
                 "Time", "1997", "Q5");
         assertTrue(memberList.isEmpty());
 
         // ask for parent & ancestors; should not get duplicates
         memberList =
             cube.lookupMembers(
-                EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
+                Olap4jUtil.enumSetOf(
+                    Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
                 "Time", "1997", "Q2");
         TestContext.assertEqualsVerbose(
             "[Time].[1997]\n",
@@ -1504,7 +1507,8 @@ public class ConnectionTest extends TestCase {
         // ask for parent of root member, should not get null member in list
         memberList =
             cube.lookupMembers(
-                EnumSet.of(Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
+                Olap4jUtil.enumSetOf(
+                    Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
                 "Product");
         assertTrue(memberList.isEmpty());
 
@@ -1512,7 +1516,8 @@ public class ConnectionTest extends TestCase {
         // hierarchically ordered (as always)
         memberList =
             cube.lookupMembers(
-                EnumSet.of(Member.TreeOp.SIBLINGS, Member.TreeOp.CHILDREN),
+                Olap4jUtil.enumSetOf(
+                    Member.TreeOp.SIBLINGS, Member.TreeOp.CHILDREN),
                 "Time", "1997", "Q2");
         switch (tester.getFlavor()) {
         case XMLA:
@@ -1543,7 +1548,7 @@ public class ConnectionTest extends TestCase {
         // siblings of the root member - potentially tricky
         memberList =
             cube.lookupMembers(
-                EnumSet.of(Member.TreeOp.SIBLINGS),
+                Olap4jUtil.enumSetOf(Member.TreeOp.SIBLINGS),
                 "Time", "1997");
         TestContext.assertEqualsVerbose(
             "[Time].[1998]\n",
@@ -1551,7 +1556,8 @@ public class ConnectionTest extends TestCase {
 
         memberList =
             cube.lookupMembers(
-                EnumSet.of(Member.TreeOp.SIBLINGS, Member.TreeOp.SELF),
+                Olap4jUtil.enumSetOf(
+                    Member.TreeOp.SIBLINGS, Member.TreeOp.SELF),
                 "Customers", "USA", "OR");
         TestContext.assertEqualsVerbose(
             "[Customers].[All Customers].[USA].[CA]\n"
@@ -1773,7 +1779,8 @@ public class ConnectionTest extends TestCase {
 
         assertEquals("MEMBER_CAPTION", property.getName());
         assertEquals("MEMBER_CAPTION", property.getUniqueName());
-        assertEquals(EnumSet.of(Property.TypeFlag.MEMBER), property.getType());
+        assertEquals(
+            Olap4jUtil.enumSetOf(Property.TypeFlag.MEMBER), property.getType());
         assertEquals(Datatype.STRING, property.getDatatype());
 
         // Measures

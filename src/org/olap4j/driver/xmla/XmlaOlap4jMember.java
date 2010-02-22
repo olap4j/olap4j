@@ -99,7 +99,7 @@ class XmlaOlap4jMember
         getCube()
             .getMetadataReader()
             .lookupMemberRelatives(
-                EnumSet.of(TreeOp.CHILDREN),
+                Olap4jUtil.enumSetOf(TreeOp.CHILDREN),
                 uniqueName,
                 list);
         return list;

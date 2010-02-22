@@ -3,12 +3,14 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.impl;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -24,8 +26,21 @@ import java.util.regex.Pattern;
  * @since Feb 5, 2007
  */
 public class Olap4jUtilCompatibleJdk15 implements Olap4jUtilCompatible {
-    public String quotePattern(String s) {
+    public final String quotePattern(String s) {
         return Pattern.quote(s);
+    }
+
+    public final <E extends Enum<E>> Set<E> enumSetOf(E first, E... rest) {
+        return EnumSet.of(first, rest);
+    }
+
+    public final <E extends Enum<E>> Set<E> enumSetNoneOf(Class<E> elementType)
+    {
+        return EnumSet.noneOf(elementType);
+    }
+
+    public final <E extends Enum<E>> Set<E> enumSetAllOf(Class<E> elementType) {
+        return EnumSet.allOf(elementType);
     }
 }
 

@@ -9,6 +9,8 @@
 */
 package org.olap4j.metadata;
 
+import org.olap4j.impl.Olap4jUtil;
+
 import java.util.*;
 
 /**
@@ -79,9 +81,11 @@ public interface Property extends MetadataElement {
         private final int xmlaOrdinal;
 
         public static final Set<TypeFlag> CELL_TYPE_FLAG =
-            Collections.unmodifiableSet(EnumSet.of(TypeFlag.CELL));
+            Collections.unmodifiableSet(
+                Olap4jUtil.enumSetOf(TypeFlag.CELL));
         public static final Set<TypeFlag> MEMBER_TYPE_FLAG =
-            Collections.unmodifiableSet(EnumSet.of(TypeFlag.MEMBER));
+            Collections.unmodifiableSet(
+                Olap4jUtil.enumSetOf(TypeFlag.MEMBER));
         private static final DictionaryImpl<TypeFlag> DICTIONARY =
             DictionaryImpl.forClass(TypeFlag.class);
 

@@ -386,7 +386,7 @@ public class Olap4jUtil {
     /**
      * Parses a unique name.
      *
-     * <p>For example, {@code uniqueNameToStringArray("[foo].[bar]")} returns
+     * <p>For example, <tt>uniqueNameToStringArray("[foo].[bar]")</tt> returns
      * {@code ["foo", "bar"]}.
      *
      * @see org.olap4j.mdx.IdentifierNode#parseIdentifier(String)
@@ -410,6 +410,9 @@ public class Olap4jUtil {
     /**
      * Converts the contents of an array of strings to
      * a proper String representation.
+     *
+     * @param array Array of strings
+     * @return string representation of the array
      */
     public static String stringArrayToString(String[] array) {
         StringBuilder sb = new StringBuilder("[");
@@ -426,6 +429,48 @@ public class Olap4jUtil {
     @SuppressWarnings({"unchecked"})
     public static <T> NamedList<T> emptyNamedList() {
         return (NamedList<T>) EMPTY_NAMED_LIST;
+    }
+
+    /**
+     * Equivalent to {@link java.util.EnumSet#of(Enum, Enum[])} on JDK 1.5 or
+     * later. Otherwise, returns an ordinary set.
+     *
+     * @param first an element that the set is to contain initially
+     * @param rest the remaining elements the set is to contain initially
+     * @throws NullPointerException if any of the specified elements are null,
+     *     or if <tt>rest</tt> is null
+     * @return an enum set initially containing the specified elements
+     */
+    public static <E extends Enum<E>> Set<E> enumSetOf(E first, E... rest) {
+        return compatible.enumSetOf(first, rest);
+    }
+
+    /**
+     * Equivalent to {@link java.util.EnumSet#noneOf(Class)} on JDK 1.5 or
+     * later. Otherwise, returns an ordinary set.
+     *
+     * @param elementType the class object of the element type for this enum
+     *     set
+     * @return an empty enum set
+     */
+    public static <E extends Enum<E>> Set<E> enumSetNoneOf(
+        Class<E> elementType)
+    {
+        return compatible.enumSetNoneOf(elementType);
+    }
+
+    /**
+     * Equivalent to {@link java.util.EnumSet#allOf(Class)} on JDK 1.5 or later.
+     * Otherwise, returns an ordinary set.
+
+     * @param elementType the class object of the element type for this enum
+     *     set
+     * @return an enum set containing all elements of the given enum class
+     */
+    public static <E extends Enum<E>> Set<E> enumSetAllOf(
+        Class<E> elementType)
+    {
+        return compatible.enumSetAllOf(elementType);
     }
 
     private enum DummyEnum {

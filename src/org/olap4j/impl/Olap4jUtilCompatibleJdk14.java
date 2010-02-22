@@ -3,11 +3,13 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.impl;
+
+import java.util.*;
 
 /**
  * Implementation of {@link Olap4jUtilCompatible} which runs in
@@ -18,7 +20,7 @@ package org.olap4j.impl;
  * @since Feb 5, 2007
  */
 public class Olap4jUtilCompatibleJdk14 implements Olap4jUtilCompatible {
-    public String quotePattern(String s) {
+    public final String quotePattern(String s) {
         int slashEIndex = s.indexOf("\\E");
         if (slashEIndex == -1) {
             return "\\Q" + s + "\\E";
@@ -34,6 +36,22 @@ public class Olap4jUtilCompatibleJdk14 implements Olap4jUtilCompatible {
         sb.append(s.substring(current, s.length()));
         sb.append("\\E");
         return sb.toString();
+    }
+
+    public final <E extends Enum<E>> Set<E> enumSetOf(E first, E... rest) {
+        HashSet<E> set = new HashSet<E>();
+        set.add(first);
+        set.addAll(Arrays.asList(rest));
+        return set;
+    }
+
+    public final <E extends Enum<E>> Set<E> enumSetNoneOf(Class<E> elementType)
+    {
+        return new HashSet<E>();
+    }
+
+    public final <E extends Enum<E>> Set<E> enumSetAllOf(Class<E> elementType) {
+        return new HashSet<E>(Arrays.asList(elementType.getEnumConstants()));
     }
 }
 
