@@ -17,6 +17,8 @@ import org.olap4j.test.TestContext;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -347,10 +349,10 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "CrossJoin({[Product].[All Products].[Drink].Children}, "
-                + "CrossJoin({{[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}}, "
-                + "{[Time].[1997].Children})) ON ROWS\n"
+                + "CrossJoin([Product].[All Products].[Drink].Children, "
+                + "CrossJoin({[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}, "
+                + "[Time].[1997].Children)) ON ROWS\n"
                 + "FROM [Sales]", mdxString);
         } catch (Exception e) {
             e.printStackTrace();
@@ -500,6 +502,114 @@ public class OlapTest extends TestCase {
         }
     }
 
+    public void testSelectionContext() {
+      try {
+        Cube cube = getFoodmartCube("Sales");
+        if (cube == null) {
+            fail("Could not find Sales cube");
+        }
+        Query query = new Query("my query", cube);
+
+        // create selections
+
+        QueryDimension productDimension = query.getDimension("Product");
+        productDimension.include(
+                Selection.Operator.INCLUDE_CHILDREN, "Product", "All Products");
+
+        QueryDimension timeDimension = query.getDimension("Time");
+        timeDimension.include(Selection.Operator.MEMBER, "Time", "Year", "1997");
+
+        Selection selection = timeDimension.include(Selection.Operator.CHILDREN, "Time", "Year", "1997");
+        selection.addContext(productDimension.createSelection("Product", "All Products", "Drink"));
+        
+        // [Store].[All Stores]
+        QueryDimension storeDimension = query.getDimension("Store");
+        storeDimension.include(Selection.Operator.MEMBER, "Store", "All Stores");
+        
+        Selection children = storeDimension.include(Selection.Operator.CHILDREN, "Store", "All Stores");
+        children.addContext(productDimension.createSelection("Product", "All Products", "Drink"));
+        children.addContext(timeDimension.createSelection("Time", "1997", "Q3"));
+
+        QueryDimension measuresDimension = query.getDimension("Measures");
+        measuresDimension.include("Measures", "Store Sales");
+
+        query.getAxis(Axis.ROWS).addDimension(productDimension);
+        query.getAxis(Axis.ROWS).addDimension(timeDimension);
+        query.getAxis(Axis.ROWS).addDimension(storeDimension);
+
+        query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+
+        query.validate();
+
+        assertEquals(
+            Axis.ROWS,
+            productDimension.getAxis().getLocation());
+        assertEquals(
+            Axis.COLUMNS,
+            measuresDimension.getAxis().getLocation());
+
+        SelectNode mdx = query.getSelect();
+        String mdxString = mdx.toString();
+        TestContext.assertEqualsVerbose(
+            "SELECT\n"
+            + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+            + "Hierarchize(Union(CrossJoin({[Product].[All Products], [Product].[All Products].Children}, CrossJoin({[Time].[1997]}, {[Store].[All Stores]})), Union(CrossJoin({[Product].[All Products].[Drink]}, CrossJoin({[Time].[1997].[Q3]}, [Store].[All Stores].Children)), CrossJoin({[Product].[All Products].[Drink]}, CrossJoin([Time].[1997].Children, {[Store].[All Stores]}))))) ON ROWS\n"
+            + "FROM [Sales]",
+            mdxString);
+
+        // Sort the rows in ascending order.
+        query.getAxis(Axis.ROWS).sort(
+            SortOrder.ASC,
+            "Measures",
+            "Store Sales");
+
+        SelectNode sortedMdx = query.getSelect();
+        String sortedMdxString = sortedMdx.toString();
+        TestContext.assertEqualsVerbose(
+            "SELECT\n"
+            + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+            + "Order(Hierarchize(Union(CrossJoin({[Product].[All Products], [Product].[All Products].Children}, CrossJoin({[Time].[1997]}, {[Store].[All Stores]})), Union(CrossJoin({[Product].[All Products].[Drink]}, CrossJoin({[Time].[1997].[Q3]}, [Store].[All Stores].Children)), CrossJoin({[Product].[All Products].[Drink]}, CrossJoin([Time].[1997].Children, {[Store].[All Stores]}))))), [Measures].[Store Sales], ASC) ON ROWS\n"
+            + "FROM [Sales]"
+            ,
+            sortedMdxString);
+
+        CellSet results = query.execute();
+        String s = TestContext.toString(results);
+        TestContext.assertEqualsVerbose(
+                "Axis #0:\n"
+                + "{[Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Store Sales]}\n"
+                + "Axis #2:\n"
+                + "{[Product].[All Products], [Time].[1997], [Store].[All Stores]}\n"
+                + "{[Product].[All Products].[Drink], [Time].[1997], [Store].[All Stores]}\n"
+                + "{[Product].[All Products].[Drink], [Time].[1997].[Q1], [Store].[All Stores]}\n"
+                + "{[Product].[All Products].[Drink], [Time].[1997].[Q2], [Store].[All Stores]}\n"
+                + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores]}\n"
+                + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[Canada]}\n"
+                + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[Mexico]}\n"
+                + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[USA]}\n"
+                + "{[Product].[All Products].[Drink], [Time].[1997].[Q4], [Store].[All Stores]}\n"
+                + "{[Product].[All Products].[Non-Consumable], [Time].[1997], [Store].[All Stores]}\n"
+                + "{[Product].[All Products].[Food], [Time].[1997], [Store].[All Stores]}\n"
+                + "Row #0: 565,238.13\n"
+                + "Row #1: 48,836.21\n"
+                + "Row #2: 11,585.80\n"
+                + "Row #3: 11,914.58\n"
+                + "Row #4: 11,994.00\n"
+                + "Row #5: \n"
+                + "Row #6: \n"
+                + "Row #7: 11,994.00\n"
+                + "Row #8: 13,341.83\n"
+                + "Row #9: 107,366.33\n"
+                + "Row #10: 409,035.59\n",
+            s);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        fail();
+	    }
+    }
+
     public void testSortAxis() {
         try {
             Cube cube = getFoodmartCube("Sales");
@@ -619,10 +729,10 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "CrossJoin({[Product].[All Products].[Drink].Children}, "
-                + "CrossJoin({{[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}}, "
-                + "{[Time].[1997].Children})) ON ROWS\n"
+                + "CrossJoin([Product].[All Products].[Drink].Children, "
+                + "CrossJoin({[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}, "
+                + "[Time].[1997].Children)) ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
 
@@ -636,10 +746,10 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "CrossJoin({{[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}}, "
-                + "CrossJoin({[Product].[All Products].[Drink].Children}, "
-                + "{[Time].[1997].Children})) ON ROWS\n"
+                + "CrossJoin({[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}, "
+                + "CrossJoin([Product].[All Products].[Drink].Children, "
+                + "[Time].[1997].Children)) ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
 
@@ -653,10 +763,10 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "CrossJoin({{[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}}, "
-                + "CrossJoin({[Time].[1997].Children}, "
-                + "{[Product].[All Products].[Drink].Children})) ON ROWS\n"
+                + "CrossJoin({[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}, "
+                + "CrossJoin([Time].[1997].Children, "
+                + "[Product].[All Products].[Drink].Children)) ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
         } catch (Exception e) {
@@ -665,6 +775,9 @@ public class OlapTest extends TestCase {
         }
     }
 
+    /**
+     * Note: hierarchize mode only works when a single dimension is selected 
+     */
     public void testDimensionsHierarchize() {
         try {
             Cube cube = getFoodmartCube("Sales");
@@ -675,26 +788,15 @@ public class OlapTest extends TestCase {
 
             // create selections
 
-            QueryDimension productDimension = query.getDimension("Product");
-            productDimension.include(
-                    Selection.Operator.CHILDREN, "Product", "Drink");
-
             QueryDimension storeDimension = query.getDimension("Store");
             storeDimension.include(
                     Selection.Operator.INCLUDE_CHILDREN, "Store", "USA");
             storeDimension.setHierarchizeMode(HierarchizeMode.POST);
 
-            QueryDimension timeDimension = query.getDimension("Time");
-
-            timeDimension.include(Selection.Operator.CHILDREN, "Time", "1997");
-
             QueryDimension measuresDimension = query.getDimension("Measures");
             measuresDimension.include("Measures", "Store Sales");
 
-
-            query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.ROWS).addDimension(storeDimension);
-            query.getAxis(Axis.ROWS).addDimension(timeDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
 
             query.validate();
@@ -704,10 +806,8 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "CrossJoin({[Product].[All Products].[Drink].Children}, "
-                + "CrossJoin({Hierarchize({{[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}}, POST)}, "
-                + "{[Time].[1997].Children})) ON ROWS\n"
+                + "{Hierarchize({{[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}}, POST)} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
 
@@ -720,10 +820,8 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "CrossJoin({[Product].[All Products].[Drink].Children}, "
-                + "CrossJoin({Hierarchize({{[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}})}, "
-                + "{[Time].[1997].Children})) ON ROWS\n"
+                + "{Hierarchize({{[Store].[All Stores].[USA], "
+                + "[Store].[All Stores].[USA].Children}})} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
         } catch (Exception e) {

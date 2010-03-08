@@ -9,6 +9,9 @@
 */
 package org.olap4j.query;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Member;
 
@@ -28,6 +31,7 @@ class SelectionImpl extends QueryNodeImpl implements Selection {
     protected String memberName;
     protected Dimension dimension;
     protected Operator operator = Operator.MEMBER;
+    protected List<Selection> selectionContext;
 
     /**
      * Creates a SelectionImpl.
@@ -106,6 +110,21 @@ class SelectionImpl extends QueryNodeImpl implements Selection {
     }
 
     void tearDown() {
+    }
+
+    public List<Selection> getSelectionContext() {
+    	return selectionContext;
+    }
+
+    public void addContext(Selection selection) {
+    	if (selectionContext == null) {
+    		selectionContext = new ArrayList<Selection>();
+    	}
+    	selectionContext.add(selection);
+    }
+
+    public void removeContext(Selection selection) {
+    	selectionContext.remove(selection);
     }
 }
 

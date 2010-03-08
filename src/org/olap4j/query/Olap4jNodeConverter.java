@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import mondrian.olap.Util;
+
 import org.olap4j.Axis;
 import org.olap4j.mdx.AxisNode;
 import org.olap4j.mdx.CallNode;
@@ -82,27 +84,93 @@ abstract class Olap4jNodeConverter {
                 Syntax.Parentheses,
                 cnodes);
     }
-
-    protected static CallNode getMemberSet(QueryDimension dimension) {
-        return
-            new CallNode(
-              null,
-              "{}",
-              Syntax.Braces,
-              toOlap4j(dimension));
+    
+    protected static CallNode generateCrossJoin(List<Selection> selections) {
+    	ParseTreeNode sel1 = toOlap4j(selections.remove(0));
+  		if (sel1 instanceof MemberNode) {
+  			sel1 = generateSetCall(sel1);
+  		}
+    	if (selections.size() == 1) {
+    		ParseTreeNode sel2 = toOlap4j(selections.get(0));
+    		if (sel2 instanceof MemberNode) {
+    			sel2 = generateSetCall(sel2);
+    		}
+    		
+    		return new CallNode( null, "CrossJoin", Syntax.Function, sel1, sel2);
+    	} else {
+    		return new CallNode( null, "CrossJoin", Syntax.Function, sel1, generateCrossJoin(selections));
+    	}
     }
+    
+    protected static CallNode generateUnion(List<List<Selection>> unions) {
+    	if (unions.size() > 2) {
+    		List<Selection> first = unions.remove(0);
+    		return new CallNode( null, "Union", Syntax.Function, generateCrossJoin(first), generateUnion(unions));
+    	} else {
+    		return new CallNode( null, "Union", Syntax.Function, generateCrossJoin(unions.get(0)), generateCrossJoin(unions.get(1)));
+    	}
+    }
+    
+    protected static CallNode generateHierarchizeUnion(List<List<Selection>> unions) {
+    	return new CallNode(null, "Hierarchize", Syntax.Function, 
+    			generateUnion(unions)
+    	);
+    }
+    
+    /**
+     * 
+		 * Algorithm: 
+		 *  - generate all combinations of dimension groups
+		 *  - skip the selection if has a context
+		 *  - for all the selections with context, resolve them last
+		 *  - union all combinations
+     */
+    private static void generateUnionsRecursively(QueryAxis axis, int dim, List<Selection> curr, List<List<Selection>> unions, List<Selection> selsWithContext, List<List<Selection>> contextUnions) {
+    	for (Selection sel : axis.getDimensions().get(dim).getInclusions()) {
 
-    protected static CallNode crossJoin(
-        QueryDimension dim1,
-        QueryDimension dim2)
-    {
-        return
-            new CallNode(
-                null,
-                "CrossJoin",
-                Syntax.Function,
-                getMemberSet(dim1),
-                getMemberSet(dim2));
+    		if (sel.getSelectionContext() != null && sel.getSelectionContext().size() > 0) {
+      		// selections that have a context are treated differently than the 
+    			// rest of the MDX generation
+  				if (!selsWithContext.contains(sel)) {
+  					ArrayList<Selection> sels = new ArrayList<Selection>();
+  					for (int i = 0; i < axis.getDimensions().size(); i++) {
+  						if (dim == i) {
+  							sels.add(sel);
+  						} else {
+  							// return the selections in the correct dimensional order
+  							QueryDimension dimension = axis.getDimensions().get(i);
+  							boolean found = false;
+  							for (Selection selection : sel.getSelectionContext()) {
+  								if (selection.getDimension().equals(dimension.getDimension())) {
+  									sels.add(selection);
+  									found = true;
+  								}
+  							}
+  							if (!found) {
+  								// add the first selection of the dimension
+  								if (dimension.getInclusions().size() > 0) {
+  									sels.add(dimension.getInclusions().get(0));
+  								}
+  							}
+  						}
+  					}
+  					contextUnions.add(sels);
+  					selsWithContext.add(sel);
+  				}
+    		} else {
+    			List<Selection> ncurr = new ArrayList<Selection>();
+    			if (curr != null) {
+    				ncurr.addAll(curr);
+    			}
+    			ncurr.add(sel);
+    			if (dim == axis.getDimensions().size() - 1) {
+    				// last dimension
+    				unions.add(ncurr);
+    			} else {
+    				generateUnionsRecursively(axis, dim + 1, ncurr, unions, selsWithContext, contextUnions);
+    			}
+    		}
+    	}
     }
 
     /*
@@ -131,26 +199,18 @@ abstract class Olap4jNodeConverter {
             QueryDimension dimension = axis.getDimensions().get(0);
             List<ParseTreeNode> members = toOlap4j(dimension);
             callNode = generateListSetCall(members);
-        } else if (numDimensions == 2) {
-            callNode =
-                crossJoin(
-                    axis.getDimensions().get(0),
-                    axis.getDimensions().get(1));
         } else {
-            // need a longer crossjoin
-            // start from the back of the list;
-            List<QueryDimension> dims = axis.getDimensions();
-            callNode = getMemberSet(dims.get(dims.size() - 1));
-            for (int i = dims.size() - 2; i >= 0; i--) {
-                CallNode memberSet = getMemberSet(dims.get(i));
-                callNode =
-                    new CallNode(
-                        null,
-                        "CrossJoin",
-                        Syntax.Function,
-                        memberSet,
-                        callNode);
-            }
+        	// generate union sets of selections in each dimension
+        	List<List<Selection>> unions = new ArrayList<List<Selection>>();
+        	List<Selection> selsWithContext = new ArrayList<Selection>();
+        	List<List<Selection>> contextUnions = new ArrayList<List<Selection>>();
+        	generateUnionsRecursively(axis, 0, null, unions, selsWithContext, contextUnions);
+        	unions.addAll(contextUnions);
+        	if (unions.size() > 1) {
+        		callNode = generateHierarchizeUnion(unions);
+        	} else {
+        		callNode = generateCrossJoin(unions.get(0));
+        	}
         }
 
         // We might need to sort the whole axis.

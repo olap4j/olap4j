@@ -111,9 +111,13 @@ public class QueryDimension extends QueryNodeImpl {
      * @throws OlapException If no member corresponding to the supplied
      * name parts could be resolved in the cube.
      */
-    public void include(String... nameParts) throws OlapException {
-        this.include(Selection.Operator.MEMBER, nameParts);
+    public Selection include(String... nameParts) throws OlapException {
+        return this.include(Selection.Operator.MEMBER, nameParts);
     }
+
+    public Selection createSelection(String... nameParts) throws OlapException {
+      return this.createSelection(Selection.Operator.MEMBER, nameParts);
+  }
 
     /**
      * Selects members and includes them in the query.
@@ -126,7 +130,7 @@ public class QueryDimension extends QueryNodeImpl {
      * @throws OlapException If no member corresponding to the supplied
      * name parts could be resolved in the cube.
      */
-    public void include(
+    public Selection include(
         Selection.Operator operator,
         String... nameParts) throws OlapException
     {
@@ -136,7 +140,23 @@ public class QueryDimension extends QueryNodeImpl {
                 "Unable to find a member with name "
                     + Olap4jUtil.stringArrayToString(nameParts));
         } else {
-            this.include(
+            return this.include(
+                operator,
+                member);
+        }
+    }
+    
+    public Selection createSelection(
+        Selection.Operator operator,
+        String... nameParts) throws OlapException
+    {
+        Member member = this.getQuery().getCube().lookupMember(nameParts);
+        if (member == null) {
+            throw new OlapException(
+                "Unable to find a member with name "
+                    + Olap4jUtil.stringArrayToString(nameParts));
+        } else {
+            return this.createSelection(
                 operator,
                 member);
         }
@@ -148,8 +168,12 @@ public class QueryDimension extends QueryNodeImpl {
      * {@link Selection.Operator#MEMBER} selection operator.
      * @param member The member to select and include in the query.
      */
-    public void include(Member member) {
-        include(Selection.Operator.MEMBER, member);
+    public Selection include(Member member) {
+        return include(Selection.Operator.MEMBER, member);
+    }
+
+    public Selection createSelection(Member member) {
+      return createSelection(Selection.Operator.MEMBER, member);
     }
 
     /**
@@ -161,7 +185,29 @@ public class QueryDimension extends QueryNodeImpl {
      * supplied member name to include along.
      * @param member Root member to select and include.
      */
-    public void include(
+    public Selection createSelection(
+            Selection.Operator operator,
+            Member member)
+    {
+        if (member.getDimension().equals(this.dimension)) {
+            Selection selection =
+                    query.getSelectionFactory().createMemberSelection(
+                            member, operator);
+            return selection;
+        }
+        return null;
+    }
+
+    /**
+     * Selects members and includes them in the query.
+     * <p>This method selects and includes a member along with it's
+     * relatives, depending on the supplied {@link Selection.Operator}
+     * operator.
+     * @param operator Selection operator that defines what relatives of the
+     * supplied member name to include along.
+     * @param member Root member to select and include.
+     */
+    public Selection include(
             Selection.Operator operator,
             Member member)
     {
@@ -170,7 +216,9 @@ public class QueryDimension extends QueryNodeImpl {
                     query.getSelectionFactory().createMemberSelection(
                             member, operator);
             this.include(selection);
+            return selection;
         }
+        return null;
     }
 
     /**
@@ -437,10 +485,11 @@ public class QueryDimension extends QueryNodeImpl {
     }
 
     /**
-     * Returns the current mode of hierarchyzation, or null
-     * if no hierarchyzation is currently performed.
-     * @return Either a hierarchyzation mode value or null
-     * if no hierarchyzation is currently performed.
+     * Returns the current mode of hierarchization, or null
+     * if no hierarchization is currently performed.
+     * This capability is only available when a single dimension is selected on an axis.
+     * @return Either a hierarchization mode value or null
+     * if no hierarchization is currently performed.
      */
     public HierarchizeMode getHierarchizeMode() {
         return hierarchizeMode;
@@ -451,6 +500,7 @@ public class QueryDimension extends QueryNodeImpl {
      * QueryDimension.
      * <p>The dimension inclusions will be wrapped in an MDX Hierarchize
      * function call.
+     * This capability is only available when a single dimension is selected on an axis. 
      * @param hierarchizeMode If parents should be included before or after
      * their children. (Equivalent to the POST/PRE MDX literal for the
      * Hierarchize() function)
@@ -461,7 +511,8 @@ public class QueryDimension extends QueryNodeImpl {
     }
 
     /**
-     * Tells the QueryDimension not to hierarchyze it's included selections.
+     * Tells the QueryDimension not to hierarchize it's included selections.
+     * This capability is only available when a single dimension is selected on an axis.
      */
     public void clearHierarchizeMode() {
         this.hierarchizeMode = null;

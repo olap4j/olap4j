@@ -9,6 +9,8 @@
 */
 package org.olap4j.query;
 
+import java.util.List;
+
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Member;
 
@@ -42,6 +44,17 @@ public interface Selection extends QueryNode {
     Dimension getDimension();
 
     String getHierarchyName();
+
+    /**
+     * The selection context includes selections from other dimensions that help determine the entire
+     * context of a selection, so drill down is possible.
+     * @return list of selections
+     */
+    List<Selection> getSelectionContext();
+
+    void addContext(Selection selection);
+
+    void removeContext(Selection selection);
 
     String getLevelName();
 
