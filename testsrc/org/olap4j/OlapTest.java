@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2009 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -502,8 +502,7 @@ public class OlapTest extends TestCase {
         }
     }
 
-    public void testSelectionContext() {
-      try {
+    public void testSelectionContext() throws Exception {
         Cube cube = getFoodmartCube("Sales");
         if (cube == null) {
             fail("Could not find Sales cube");
@@ -511,24 +510,34 @@ public class OlapTest extends TestCase {
         Query query = new Query("my query", cube);
 
         // create selections
-
         QueryDimension productDimension = query.getDimension("Product");
         productDimension.include(
-                Selection.Operator.INCLUDE_CHILDREN, "Product", "All Products");
+            Selection.Operator.INCLUDE_CHILDREN, "Product", "All Products");
 
         QueryDimension timeDimension = query.getDimension("Time");
-        timeDimension.include(Selection.Operator.MEMBER, "Time", "Year", "1997");
+        timeDimension.include(
+            Selection.Operator.MEMBER, "Time", "Year", "1997");
 
-        Selection selection = timeDimension.include(Selection.Operator.CHILDREN, "Time", "Year", "1997");
-        selection.addContext(productDimension.createSelection("Product", "All Products", "Drink"));
-        
+        Selection selection =
+            timeDimension.include(
+                Selection.Operator.CHILDREN, "Time", "Year", "1997");
+        selection.addContext(
+            productDimension.createSelection(
+                "Product", "All Products", "Drink"));
+
         // [Store].[All Stores]
         QueryDimension storeDimension = query.getDimension("Store");
-        storeDimension.include(Selection.Operator.MEMBER, "Store", "All Stores");
-        
-        Selection children = storeDimension.include(Selection.Operator.CHILDREN, "Store", "All Stores");
-        children.addContext(productDimension.createSelection("Product", "All Products", "Drink"));
-        children.addContext(timeDimension.createSelection("Time", "1997", "Q3"));
+        storeDimension.include(
+            Selection.Operator.MEMBER, "Store", "All Stores");
+
+        Selection children =
+            storeDimension.include(
+                Selection.Operator.CHILDREN, "Store", "All Stores");
+        children.addContext(
+            productDimension.createSelection(
+                "Product", "All Products", "Drink"));
+        children.addContext(
+            timeDimension.createSelection("Time", "1997", "Q3"));
 
         QueryDimension measuresDimension = query.getDimension("Measures");
         measuresDimension.include("Measures", "Store Sales");
@@ -569,45 +578,40 @@ public class OlapTest extends TestCase {
             "SELECT\n"
             + "{[Measures].[Store Sales]} ON COLUMNS,\n"
             + "Order(Hierarchize(Union(CrossJoin({[Product].[All Products], [Product].[All Products].Children}, CrossJoin({[Time].[1997]}, {[Store].[All Stores]})), Union(CrossJoin({[Product].[All Products].[Drink]}, CrossJoin({[Time].[1997].[Q3]}, [Store].[All Stores].Children)), CrossJoin({[Product].[All Products].[Drink]}, CrossJoin([Time].[1997].Children, {[Store].[All Stores]}))))), [Measures].[Store Sales], ASC) ON ROWS\n"
-            + "FROM [Sales]"
-            ,
+            + "FROM [Sales]",
             sortedMdxString);
 
         CellSet results = query.execute();
         String s = TestContext.toString(results);
         TestContext.assertEqualsVerbose(
-                "Axis #0:\n"
-                + "{[Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
-                + "Axis #1:\n"
-                + "{[Measures].[Store Sales]}\n"
-                + "Axis #2:\n"
-                + "{[Product].[All Products], [Time].[1997], [Store].[All Stores]}\n"
-                + "{[Product].[All Products].[Drink], [Time].[1997], [Store].[All Stores]}\n"
-                + "{[Product].[All Products].[Drink], [Time].[1997].[Q1], [Store].[All Stores]}\n"
-                + "{[Product].[All Products].[Drink], [Time].[1997].[Q2], [Store].[All Stores]}\n"
-                + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores]}\n"
-                + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[Canada]}\n"
-                + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[Mexico]}\n"
-                + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[USA]}\n"
-                + "{[Product].[All Products].[Drink], [Time].[1997].[Q4], [Store].[All Stores]}\n"
-                + "{[Product].[All Products].[Non-Consumable], [Time].[1997], [Store].[All Stores]}\n"
-                + "{[Product].[All Products].[Food], [Time].[1997], [Store].[All Stores]}\n"
-                + "Row #0: 565,238.13\n"
-                + "Row #1: 48,836.21\n"
-                + "Row #2: 11,585.80\n"
-                + "Row #3: 11,914.58\n"
-                + "Row #4: 11,994.00\n"
-                + "Row #5: \n"
-                + "Row #6: \n"
-                + "Row #7: 11,994.00\n"
-                + "Row #8: 13,341.83\n"
-                + "Row #9: 107,366.33\n"
-                + "Row #10: 409,035.59\n",
+            "Axis #0:\n"
+            + "{[Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[Store Sales]}\n"
+            + "Axis #2:\n"
+            + "{[Product].[All Products], [Time].[1997], [Store].[All Stores]}\n"
+            + "{[Product].[All Products].[Drink], [Time].[1997], [Store].[All Stores]}\n"
+            + "{[Product].[All Products].[Drink], [Time].[1997].[Q1], [Store].[All Stores]}\n"
+            + "{[Product].[All Products].[Drink], [Time].[1997].[Q2], [Store].[All Stores]}\n"
+            + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores]}\n"
+            + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[Canada]}\n"
+            + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[Mexico]}\n"
+            + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[USA]}\n"
+            + "{[Product].[All Products].[Drink], [Time].[1997].[Q4], [Store].[All Stores]}\n"
+            + "{[Product].[All Products].[Non-Consumable], [Time].[1997], [Store].[All Stores]}\n"
+            + "{[Product].[All Products].[Food], [Time].[1997], [Store].[All Stores]}\n"
+            + "Row #0: 565,238.13\n"
+            + "Row #1: 48,836.21\n"
+            + "Row #2: 11,585.80\n"
+            + "Row #3: 11,914.58\n"
+            + "Row #4: 11,994.00\n"
+            + "Row #5: \n"
+            + "Row #6: \n"
+            + "Row #7: 11,994.00\n"
+            + "Row #8: 13,341.83\n"
+            + "Row #9: 107,366.33\n"
+            + "Row #10: 409,035.59\n",
             s);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        fail();
-	    }
     }
 
     public void testSortAxis() {
@@ -776,7 +780,7 @@ public class OlapTest extends TestCase {
     }
 
     /**
-     * Note: hierarchize mode only works when a single dimension is selected 
+     * Note: hierarchize mode only works when a single dimension is selected.
      */
     public void testDimensionsHierarchize() {
         try {

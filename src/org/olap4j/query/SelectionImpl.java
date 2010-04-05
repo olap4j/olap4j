@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -113,18 +113,18 @@ class SelectionImpl extends QueryNodeImpl implements Selection {
     }
 
     public List<Selection> getSelectionContext() {
-    	return selectionContext;
+        return selectionContext;
     }
 
     public void addContext(Selection selection) {
-    	if (selectionContext == null) {
-    		selectionContext = new ArrayList<Selection>();
-    	}
-    	selectionContext.add(selection);
+        if (selectionContext == null) {
+            selectionContext = new ArrayList<Selection>();
+        }
+        selectionContext.add(selection);
     }
 
     public void removeContext(Selection selection) {
-    	selectionContext.remove(selection);
+        selectionContext.remove(selection);
     }
 }
 

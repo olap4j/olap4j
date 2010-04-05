@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2009 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -116,7 +116,7 @@ public class QueryDimension extends QueryNodeImpl {
     }
 
     public Selection createSelection(String... nameParts) throws OlapException {
-      return this.createSelection(Selection.Operator.MEMBER, nameParts);
+        return this.createSelection(Selection.Operator.MEMBER, nameParts);
   }
 
     /**
@@ -145,7 +145,7 @@ public class QueryDimension extends QueryNodeImpl {
                 member);
         }
     }
-    
+
     public Selection createSelection(
         Selection.Operator operator,
         String... nameParts) throws OlapException
@@ -173,7 +173,7 @@ public class QueryDimension extends QueryNodeImpl {
     }
 
     public Selection createSelection(Member member) {
-      return createSelection(Selection.Operator.MEMBER, member);
+        return createSelection(Selection.Operator.MEMBER, member);
     }
 
     /**
@@ -487,9 +487,12 @@ public class QueryDimension extends QueryNodeImpl {
     /**
      * Returns the current mode of hierarchization, or null
      * if no hierarchization is currently performed.
-     * This capability is only available when a single dimension is selected on an axis.
+     *
+     * <p>This capability is only available when a single dimension is
+     * selected on an axis
+     *
      * @return Either a hierarchization mode value or null
-     * if no hierarchization is currently performed.
+     *     if no hierarchization is currently performed.
      */
     public HierarchizeMode getHierarchizeMode() {
         return hierarchizeMode;
@@ -498,9 +501,13 @@ public class QueryDimension extends QueryNodeImpl {
     /**
      * Triggers the hierarchization of the included members within this
      * QueryDimension.
+     *
      * <p>The dimension inclusions will be wrapped in an MDX Hierarchize
      * function call.
-     * This capability is only available when a single dimension is selected on an axis. 
+     *
+     * <p>This capability is only available when a single dimension is
+     * selected on an axis.
+     *
      * @param hierarchizeMode If parents should be included before or after
      * their children. (Equivalent to the POST/PRE MDX literal for the
      * Hierarchize() function)
@@ -511,8 +518,11 @@ public class QueryDimension extends QueryNodeImpl {
     }
 
     /**
-     * Tells the QueryDimension not to hierarchize it's included selections.
-     * This capability is only available when a single dimension is selected on an axis.
+     * Tells the QueryDimension not to hierarchize its included
+     * selections.
+     *
+     * <p>This capability is only available when a single dimension is
+     * selected on an axis.
      */
     public void clearHierarchizeMode() {
         this.hierarchizeMode = null;

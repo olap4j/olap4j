@@ -86,7 +86,7 @@ public class ConnectStringParserTest extends TestCase {
      * Testcase for bug 1938151, "StringIndexOutOfBoundsException instead of a
      * meaningful error"
      */
-    public void testBug1938151 () {
+    public void testBug1938151() {
         Map<String, String> properties;
 
         // ends in semi

@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2008 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -46,8 +46,10 @@ public interface Selection extends QueryNode {
     String getHierarchyName();
 
     /**
-     * The selection context includes selections from other dimensions that help determine the entire
-     * context of a selection, so drill down is possible.
+     * The selection context includes selections from other dimensions that
+     * help determine the entire context of a selection, so drill down is
+     * possible.
+     *
      * @return list of selections
      */
     List<Selection> getSelectionContext();

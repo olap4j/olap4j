@@ -2556,15 +2556,17 @@ public class ConnectionTest extends TestCase {
      * <p>Test case for
      * <a href="http://sourceforge.net/tracker/?func=detail&aid=2951656&group_id=168953&atid=848534">
      * bug 2951656, "Olap4j should not throw IllegalArgumentException"</a>.
+     *
+     * @throws java.sql.SQLException on error
      */
-    public void _testDimensionProperties() throws SQLException {
+    public void testDimensionProperties() throws SQLException {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
         String mdx =
             "select {[Product].[Product Family].Members} ON COLUMNS,\n"
             + "{[Store].[Store Name].Members}\n"
-            + "  DIMENSION PROPERTIES [Store].[Store Sqft] ON ROWS\n"
+            + "  DIMENSION PROPERTIES [Store].[Store Name].[Store Sqft] ON ROWS\n"
             + "from [Sales]\n"
             + "where [Measures].[Unit Sales]";
         PreparedOlapStatement pstmt =
