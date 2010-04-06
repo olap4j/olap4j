@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -22,7 +22,6 @@ import org.olap4j.OlapConnection;
  * @since Aug 22, 2006
  */
 public class DefaultMdxParserImpl implements MdxParser {
-    private final OlapConnection connection;
     private boolean debug = false;
     private boolean load = false;
     private final FunTable funTable = new FunTable() {
@@ -31,14 +30,17 @@ public class DefaultMdxParserImpl implements MdxParser {
         }
     };
 
+    @Deprecated
     public DefaultMdxParserImpl(OlapConnection olapConnection) {
         super();
-        connection = olapConnection;
+    }
+
+    public DefaultMdxParserImpl() {
+        super();
     }
 
     public SelectNode parseSelect(String mdx) {
         return new DefaultMdxParser().parseSelect(
-            connection,
             mdx,
             debug,
             funTable,
@@ -47,7 +49,6 @@ public class DefaultMdxParserImpl implements MdxParser {
 
     public ParseTreeNode parseExpression(String mdx) {
         return new DefaultMdxParser().parseExpression(
-            connection,
             mdx,
             debug,
             funTable);

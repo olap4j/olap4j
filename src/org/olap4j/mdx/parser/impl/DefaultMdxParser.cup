@@ -4,14 +4,13 @@
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
 // Copyright (C) 1999-2002 Kana Software, Inc.
-// Copyright (C) 2002-2009 Julian Hyde and others.
+// Copyright (C) 2002-2010 Julian Hyde and others.
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 
 import java_cup.runtime.*;
 import java.util.*;
-import org.olap4j.OlapConnection;
 import org.olap4j.Axis;
 import org.olap4j.mdx.*;
 import org.olap4j.mdx.parser.MdxParseException;
@@ -21,7 +20,6 @@ parser code {:
     // Generated from $Id$
     Scanner scanner;
     private String queryString;
-    private OlapConnection mdxConnection;
     private DefaultMdxParserImpl.FunTable funTable;
     private boolean load;
 
@@ -31,14 +29,13 @@ parser code {:
     ParseTreeNode recursivelyParseExp(String s)
     {
         return new DefaultMdxParser().parseExpression(
-            mdxConnection, s, false, funTable);
+            s, false, funTable);
     }
 
     /**
       * Parses a string to create a {@link SelectNode}.
       */
     SelectNode parseSelect(
-        OlapConnection mdxConnection,
         String queryString,
         boolean debug,
         DefaultMdxParserImpl.FunTable funTable,
@@ -46,7 +43,6 @@ parser code {:
     {
         Symbol parse_tree = null;
         this.scanner = new StringScanner(queryString, debug);
-        this.mdxConnection = mdxConnection;
         this.queryString = queryString;
         this.funTable = funTable;
         this.load = load;
@@ -63,7 +59,6 @@ parser code {:
                 e);
         } finally {
             this.scanner = null;
-            this.mdxConnection = null;
             this.queryString = null;
             this.funTable = null;
         }
@@ -73,7 +68,6 @@ parser code {:
       * Parses a string to create an expression.
       */
     ParseTreeNode parseExpression(
-        OlapConnection mdxConnection,
         String queryString,
         boolean debug,
         DefaultMdxParserImpl.FunTable funTable)
@@ -83,7 +77,6 @@ parser code {:
             debug,
             new StringScanner(queryString, debug),
             new int[] {DefaultMdxParserSym._VALUE_EXPRESSION});
-        this.mdxConnection = mdxConnection;
         this.queryString = queryString;
         this.funTable = funTable;
         try {
@@ -100,7 +93,6 @@ parser code {:
                 e);
         } finally {
             this.scanner = null;
-            this.mdxConnection = null;
             this.queryString = null;
             this.funTable = null;
         }
