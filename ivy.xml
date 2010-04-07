@@ -25,9 +25,6 @@
     <dependency org="javacup" name="javacup" rev="10k" 
       transitive="false" />
 
-    <dependency org="log4j" name="log4j" rev="1.2.9" 
-      transitive="false" />
-
     <!-- get retroweaver from Pentaho repo since ibilio one is corrupted -->
     <dependency org="retroweaver" name="retroweaver" rev="1.2.4"
       transitive="false" />
@@ -39,6 +36,9 @@
       transitive="false" />
 
     <!--  test deps here  -->
+
+    <dependency org="log4j" name="log4j" rev="1.2.9" 
+      transitive="false" conf="test->default" />
 
     <dependency org="commons-dbcp" name="commons-dbcp" rev="1.1" 
       transitive="false" conf="test->default" />

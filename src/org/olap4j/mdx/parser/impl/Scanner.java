@@ -9,7 +9,6 @@
 */
 package org.olap4j.mdx.parser.impl;
 
-import org.apache.log4j.Logger;
 import org.olap4j.mdx.ParseRegion;
 import org.olap4j.mdx.parser.MdxParseException;
 
@@ -31,7 +30,6 @@ import java_cup.runtime.Symbol;
  * @author jhyde
  */
 class Scanner {
-    private static final Logger LOGGER = Logger.getLogger(Scanner.class);
 
     /** single lookahead character */
     protected int nextChar;
@@ -194,20 +192,6 @@ class Scanner {
         advance();
     }
 
-    private Symbol trace(Symbol s) {
-        if (debug) {
-            String name = null;
-            if (s.sym < reservedWords.length) {
-                name = reservedWords[s.sym];
-            }
-
-            LOGGER.error("Scanner returns #" + s.sym +
-                (name == null ? "" : ":" + name) +
-                (s.value == null ? "" : "(" + s.value.toString() + ")"));
-        }
-        return s;
-    }
-
     private void initResword(int id, String s) {
         reservedWordIds.put(s, id);
         if (id > iMaxResword) {
@@ -302,7 +286,7 @@ class Scanner {
         int iPrevPrevChar = iPrevChar;
         this.iPrevChar = iChar;
         this.previousSymbol = id;
-        return trace(new Symbol(id, iPrevPrevChar, iChar, o));
+        return new Symbol(id, iPrevPrevChar, iChar, o);
     }
 
     /**
