@@ -343,6 +343,7 @@ TYPICAL TARGET SEQUENCE
     </fileset>
     <pathelement location="${classes.dir}" />
     <pathelement location="${testclasses.dir}" />
+    <pathelement location="${org.olap4j.test.driverClasspath}" />
   </path>
 
   <!-- Setup the classpath used for javadoc -->
