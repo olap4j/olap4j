@@ -69,7 +69,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
      *
      * @return Error handler
      */
-    private final XmlaHelper getHelper() {
+    private XmlaHelper getHelper() {
         return olap4jStatement.olap4jConnection.helper;
     }
 
@@ -221,8 +221,10 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         for (Element axisNode : findChildren(axesNode, MDDATASET_NS, "Axis")) {
             final String axisName = axisNode.getAttribute("name");
             final Axis axis = lookupAxis(axisName);
+            final ArrayList<Position> positions = new ArrayList<Position>();
             final XmlaOlap4jCellSetAxis cellSetAxis =
-                new XmlaOlap4jCellSetAxis(this, axis);
+                new XmlaOlap4jCellSetAxis(
+                    this, axis, Collections.unmodifiableList(positions));
             if (axis.isFilter()) {
                 filterAxis = cellSetAxis;
             } else {
@@ -270,10 +272,23 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                     }
                     members.add(member);
                 }
-                cellSetAxis.positions.add(
+                positions.add(
                     new XmlaOlap4jPosition(
-                        members, cellSetAxis.positions.size()));
+                        members, positions.size()));
             }
+        }
+
+        // olap4j requires a filter axis even if XMLA does not return one. If
+        // XMLA does not return one, presumably there was no WHERE clause and
+        // therefore the filter axis has a single position containing 0 members
+        if (filterAxis == null) {
+            filterAxis =
+                new XmlaOlap4jCellSetAxis(
+                    this,
+                    Axis.FILTER,
+                    Collections.<Position>singletonList(
+                        new XmlaOlap4jPosition(
+                            Collections.<Member>emptyList(), 0)));
         }
 
         final Element cellDataNode = findChild(root, MDDATASET_NS, "CellData");
@@ -469,6 +484,14 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 axisMetaDataList.add(axisMetaData);
             }
         }
+        if (filterAxisMetaData == null) {
+            filterAxisMetaData =
+                new XmlaOlap4jCellSetAxisMetaData(
+                    olap4jStatement.olap4jConnection,
+                    Axis.FILTER,
+                    Collections.<Hierarchy>emptyList(),
+                    Collections.<XmlaOlap4jCellSetMemberProperty>emptyList());
+        }
         final Element cellInfo =
             findChild(olapInfo, MDDATASET_NS, "CellInfo");
         List<XmlaOlap4jCellProperty> cellProperties =
@@ -497,7 +520,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
      * @param databaseMetaData Database metadata
      * @param cubeName Cube name
      * @return Cube, or null if not found
-     * @throws OlapException
+     * @throws OlapException on error
      */
     private XmlaOlap4jCube lookupCube(
         XmlaOlap4jDatabaseMetaData databaseMetaData,
@@ -524,7 +547,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
      * @param cube Cube
      * @param hierarchyName Name (or unique name) of hierarchy.
      * @return Hierarchy
-     * @throws OlapException
+     * @throws OlapException on error
      */
     private Hierarchy lookupHierarchy(XmlaOlap4jCube cube, String hierarchyName)
         throws OlapException

@@ -12,7 +12,6 @@ package org.olap4j.mdx.parser.impl;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.mdx.SelectNode;
 import org.olap4j.mdx.ParseTreeNode;
-import org.olap4j.OlapConnection;
 
 /**
  * Default implementation of {@link org.olap4j.mdx.parser.MdxParser MDX Parser}.
@@ -23,18 +22,15 @@ import org.olap4j.OlapConnection;
  */
 public class DefaultMdxParserImpl implements MdxParser {
     private boolean debug = false;
-    private boolean load = false;
     private final FunTable funTable = new FunTable() {
         public boolean isProperty(String s) {
             return s.equals("CHILDREN");
         }
     };
 
-    @Deprecated
-    public DefaultMdxParserImpl(OlapConnection olapConnection) {
-        super();
-    }
-
+    /**
+     * Creates a DefaultMdxParserImpl.
+     */
     public DefaultMdxParserImpl() {
         super();
     }
@@ -43,8 +39,7 @@ public class DefaultMdxParserImpl implements MdxParser {
         return new DefaultMdxParser().parseSelect(
             mdx,
             debug,
-            funTable,
-            load);
+            funTable);
     }
 
     public ParseTreeNode parseExpression(String mdx) {

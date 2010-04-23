@@ -42,8 +42,6 @@ public class ConnectionTest extends TestCase {
     private static final boolean IS_JDK_16 =
         System.getProperty("java.version").startsWith("1.6.");
 
-    private static final boolean SINGLE_FILTER = true;
-
     /**
      * Simple strategy to prevent connection leaks: each test that needs a
      * connection assigns it to this field, and {@link #tearDown()} closes it
@@ -487,12 +485,26 @@ public class ConnectionTest extends TestCase {
         assertEquals(1, positions.size());
         final Position pos0 = positions.get(0);
         assertEquals(0, pos0.getOrdinal());
-        // All members not on other axes are returned on the filter axis.
-        // REVIEW: Is this desired behavior?
-        assertEquals(11, pos0.getMembers().size());
-        assertEquals(
-            "[Gender].[All Gender].[F]",
-            pos0.getMembers().get(8).getUniqueName());
+        // The filter contains members explicitly returned. It does not contain
+        // the members of hierarchies not mentioned on any axis (e.g.
+        // [Marital Status]).
+        assertEquals(2, pos0.getMembers().size());
+        assertEquals("Q1", pos0.getMembers().get(0).getName());
+        assertEquals("F", pos0.getMembers().get(1).getName());
+
+        // If the query has no WHERE clause, the CellSet has a filter axis, but
+        // it has one position and zero members (i.e. equivalent to "WHERE ()".)
+        CellSet cellSetNoSlicer =
+            olapStatement.executeOlapQuery(
+                "SELECT {[Measures].[Unit Sales]} on 0,\n"
+                + "{[Store].Children} on 1\n"
+                + "FROM [Sales]");
+        assertEquals(2, cellSetNoSlicer.getAxes().size());
+        final CellSetAxis filterAxisNoSlicer = cellSetNoSlicer.getFilterAxis();
+        assertNotNull(filterAxisNoSlicer);
+        assertEquals(1, filterAxisNoSlicer.getPositionCount());
+        final Position position = filterAxisNoSlicer.getPositions().get(0);
+        assertEquals(0, position.getMembers().size());
     }
 
     public void testCompoundSlicer() throws SQLException {
@@ -510,15 +522,23 @@ public class ConnectionTest extends TestCase {
         List<CellSetAxis> axesList = cellSet.getAxes();
         assertEquals(2, axesList.size());
         final CellSetAxis filterAxis = cellSet.getFilterAxis();
-        if (SINGLE_FILTER) {
+        final Tester.Flavor flavor =
+            TestContext.instance().getTester().getFlavor();
+        switch (flavor) {
+        case MONDRIAN:
             assertEquals(1, filterAxis.getPositionCount());
-            return;
+            break;
+        case XMLA:
+            assertEquals(3, filterAxis.getPositionCount());
+            final List<Position> filterPositions = filterAxis.getPositions();
+            assertEquals(3, filterPositions.size());
+            final Position filterPosition = filterPositions.get(2);
+            assertEquals(2, filterPosition.getMembers().size());
+            assertEquals("M", filterPosition.getMembers().get(1).getName());
+            break;
+        default:
+            throw Olap4jUtil.unexpected(flavor);
         }
-        assertEquals(3, filterAxis.getPositionCount());
-        final List<Position> filterPositions = filterAxis.getPositions();
-        assertEquals(3, filterPositions.size());
-        assertEquals(2, filterPositions.get(2).getMembers().size());
-        assertEquals("F", filterPositions.get(2).getMembers().get(1).getName());
     }
 
     public void testMeasureVersusMemberCasting() throws Exception {
@@ -665,14 +685,14 @@ public class ConnectionTest extends TestCase {
         String s = TestContext.toString(cellSet);
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender].[M], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "{[Gender].[M]}\n"
             + "Axis #1:\n"
-            + "{[Store].[All Stores].[USA]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Alameda]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Los Angeles]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Diego]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Francisco]}\n"
+            + "{[Store].[USA]}\n"
+            + "{[Store].[USA].[CA].[Alameda]}\n"
+            + "{[Store].[USA].[CA].[Beverly Hills]}\n"
+            + "{[Store].[USA].[CA].[Los Angeles]}\n"
+            + "{[Store].[USA].[CA].[San Diego]}\n"
+            + "{[Store].[USA].[CA].[San Francisco]}\n"
             + "Row #0: 135,215\n"
             + "Row #0: \n"
             + "Row #0: 10,562\n"
@@ -693,10 +713,10 @@ public class ConnectionTest extends TestCase {
         s = TestContext.toString(cellSet2);
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender].[M], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "{[Gender].[M]}\n"
             + "Axis #1:\n"
-            + "{[Store].[All Stores].[USA].[CA]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Francisco].[Store 14]}\n"
+            + "{[Store].[USA].[CA]}\n"
+            + "{[Store].[USA].[CA].[San Francisco].[Store 14]}\n"
             + "Row #0: 37,989\n"
             + "Row #0: 1,053\n",
             s);
@@ -706,7 +726,7 @@ public class ConnectionTest extends TestCase {
             "SELECT FROM [Sales] WHERE [Time.Weekly].[1997].[3]");
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time.Weekly].[All Time.Weeklys].[1997].[3], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "{[Time.Weekly].[1997].[3]}\n"
             + "9,518",
             TestContext.toString(cellSet3));
 
@@ -739,7 +759,7 @@ public class ConnectionTest extends TestCase {
         CellSet cellSet5 = pstmt.executeOlapQuery(select);
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q4], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "{[Time].[1997].[Q4]}\n"
             + "Axis #1:\n"
             + "{[Gender].[All Gender]}\n"
             + "Row #0: 72,024\n",
@@ -819,8 +839,8 @@ public class ConnectionTest extends TestCase {
         assertEquals("Sales", cellSetMetaData.getCube().getName());
 
         int k = -1;
-        final Set<Dimension> unseenDimensions =
-            new HashSet<Dimension>(cellSetMetaData.getCube().getDimensions());
+        final Set<Hierarchy> unseenHierarchies =
+            new HashSet<Hierarchy>(cellSetMetaData.getCube().getHierarchies());
         for (CellSetAxisMetaData axisMetaData
             : cellSetMetaData.getAxesMetaData())
         {
@@ -830,9 +850,7 @@ public class ConnectionTest extends TestCase {
                 axisMetaData.getAxisOrdinal());
             assertEquals(k, axisMetaData.getAxisOrdinal().axisOrdinal());
             assertTrue(axisMetaData.getHierarchies().size() > 0);
-            for (Hierarchy hierarchy : axisMetaData.getHierarchies()) {
-                unseenDimensions.remove(hierarchy.getDimension());
-            }
+            unseenHierarchies.removeAll(axisMetaData.getHierarchies());
             assertTrue(axisMetaData.getProperties().size() == 0);
             if (cellSet != null) {
                 final CellSetAxisMetaData cellSetAxisMetaData =
@@ -846,13 +864,17 @@ public class ConnectionTest extends TestCase {
         assertNotNull(axisMetaData);
         assertEquals(Axis.FILTER, axisMetaData.getAxisOrdinal());
         assertTrue(axisMetaData.getHierarchies().size() >= 0);
-        final Set<Hierarchy> unseenHierarchies = new HashSet<Hierarchy>();
-        for (Dimension unseenDimension : unseenDimensions) {
-            unseenHierarchies.add(unseenDimension.getDefaultHierarchy());
+        if (false) {
+            // The slicer used to contain all hierarchies not seen on other
+            // axes. No longer true.
+            assertEquals(
+                new HashSet<Hierarchy>(axisMetaData.getHierarchies()),
+                unseenHierarchies);
+        } else {
+            for (Hierarchy hierarchy : axisMetaData.getHierarchies()) {
+                assertTrue(unseenHierarchies.contains(hierarchy));
+            }
         }
-        assertEquals(
-            new HashSet<Hierarchy>(axisMetaData.getHierarchies()),
-            unseenHierarchies);
         assertTrue(axisMetaData.getProperties().size() == 0);
         if (cellSet != null) {
             assertEquals(
@@ -937,23 +959,14 @@ public class ConnectionTest extends TestCase {
         String s = TestContext.toString(cellSet);
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Store].[All Stores],"
-            + " [Store Size in SQFT].[All Store Size in SQFTs],"
-            + " [Store Type].[All Store Types],"
-            + " [Time].[1997].[Q2],"
-            + " [Promotion Media].[All Media],"
-            + " [Promotions].[All Promotions],"
-            + " [Customers].[All Customers],"
-            + " [Education Level].[All Education Levels],"
-            + " [Marital Status].[All Marital Status],"
-            + " [Yearly Income].[All Yearly Incomes]}\n"
+            + "{[Time].[1997].[Q2]}\n"
             + "Axis #1:\n"
             + "{[Measures].[Unit Sales]}\n"
             + "{[Measures].[Store Sales]}\n"
             + "Axis #2:\n"
-            + "{[Gender].[All Gender].[M], [Product].[All Products].[Drink]}\n"
-            + "{[Gender].[All Gender].[M], [Product].[All Products].[Food]}\n"
-            + "{[Gender].[All Gender].[M], [Product].[All Products].[Non-Consumable]}\n"
+            + "{[Gender].[M], [Product].[Drink]}\n"
+            + "{[Gender].[M], [Product].[Food]}\n"
+            + "{[Gender].[M], [Product].[Non-Consumable]}\n"
             + "Row #0: 3,023\n"
             + "Row #0: 6,004.80\n"
             + "Row #1: 22,558\n"
@@ -1560,9 +1573,9 @@ public class ConnectionTest extends TestCase {
                     Member.TreeOp.SIBLINGS, Member.TreeOp.SELF),
                 "Customers", "USA", "OR");
         TestContext.assertEqualsVerbose(
-            "[Customers].[All Customers].[USA].[CA]\n"
-            + "[Customers].[All Customers].[USA].[OR]\n"
-            + "[Customers].[All Customers].[USA].[WA]\n",
+            "[Customers].[USA].[CA]\n"
+            + "[Customers].[USA].[OR]\n"
+            + "[Customers].[USA].[WA]\n",
             memberListToString(memberList));
     }
 
@@ -1725,9 +1738,7 @@ public class ConnectionTest extends TestCase {
         assertNotNull(member);
         Member member2 = cube.lookupMember("Product", "All Products", "Food");
         assertEquals(member, member2);
-        assertEquals(
-            "[Product].[All Products].[Food]",
-            member.getUniqueName());
+        assertEquals("[Product].[Food]", member.getUniqueName());
         assertEquals("Food", member.getName());
         assertEquals(
             "[Product].[Product Family]",
@@ -1843,23 +1854,23 @@ public class ConnectionTest extends TestCase {
         String s = TestContext.toString(cellSet);
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Measures].[Unit Sales], [Geography].[All Geographys], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "{}\n"
             + "Axis #1:\n"
-            + "{[Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n"
-            + "{[Product].[All Products].[Food].[Baked Goods].[Bread]}\n"
+            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n"
+            + "{[Product].[Food].[Baked Goods].[Bread]}\n"
             + "Axis #2:\n"
-            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[3]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[3]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[USA].[CA].[Alameda], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[USA].[CA].[Alameda], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[USA].[CA].[Alameda], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n"
             + "Row #0: \n"
             + "Row #0: \n"
             + "Row #1: \n"
@@ -1909,9 +1920,7 @@ public class ConnectionTest extends TestCase {
         assertEquals("All Employees", member0.getName());
         assertEquals(0, member0.getDepth());
         Member member1 = rowsAxis.getPositions().get(1).getMembers().get(0);
-        assertEquals(
-            "[Employees].[All Employees].[Sheri Nowmer]",
-            member1.getUniqueName());
+        assertEquals("[Employees].[Sheri Nowmer]", member1.getUniqueName());
         assertEquals(1, member1.getDepth());
         assertEquals(1, member1.getLevel().getDepth());
         assertEquals(
@@ -1921,17 +1930,14 @@ public class ConnectionTest extends TestCase {
         Member member2 = rowsAxis.getPositions().get(2).getMembers().get(0);
         assertTrue(
             member2.getUniqueName().equals(
-                "[Employees].[All Employees].[Derrick Whelply]")
+                "[Employees].[Derrick Whelply]")
             || member2.getUniqueName().equals(
-                "[Employees].[All Employees].[Sheri Nowmer]."
-                + "[Derrick Whelply]"));
+                "[Employees].[Sheri Nowmer].[Derrick Whelply]"));
         assertEquals(2, member2.getDepth());
         assertEquals(1, member2.getLevel().getDepth());
         final Member parent = member2.getParentMember();
         assertNotNull(parent);
-        assertEquals(
-            "[Employees].[All Employees].[Sheri Nowmer]",
-            parent.getUniqueName());
+        assertEquals("[Employees].[Sheri Nowmer]", parent.getUniqueName());
         assertEquals(1, parent.getDepth());
         assertEquals(member2.getLevel(), parent.getLevel());
         assertEquals(member1, parent);
@@ -1940,8 +1946,8 @@ public class ConnectionTest extends TestCase {
         final List<Position> positions = filterAxis.getPositions();
         assertEquals(1, positions.size());
         assertEquals(0, positions.get(0).getOrdinal());
-        // All members not on other axes are returned on the filter axis.
-        assertEquals(6, positions.get(0).getMembers().size());
+        // No WHERE clause, therefore slicer is empty (but not null).
+        assertEquals(0, positions.get(0).getMembers().size());
     }
 
     /**
@@ -2107,7 +2113,7 @@ public class ConnectionTest extends TestCase {
         final Type filterType = filterAxis.getExpression().getType();
         assertTrue(filterType instanceof TupleType);
         assertEquals(
-            "TupleType<MemberType<member=[Time].[1997].[Q4]>, MemberType<member=[Marital Status].[All Marital Status].[S]>>",
+            "TupleType<MemberType<member=[Time].[1997].[Q4]>, MemberType<member=[Marital Status].[S]>>",
             filterType.toString());
     }
 
@@ -2284,30 +2290,30 @@ public class ConnectionTest extends TestCase {
             olapStatement.executeOlapQuery(
                 "SELECT "
                 + "{[Product].[All Products].[Drink].[Alcoholic Beverages].Children, [Product].[All Products].[Food].[Baked Goods].Children} ON COLUMNS, "
-                + "CrossJoin([Store].[All Stores].[USA].[CA].Children, [Time].[1997].[Q1].Children) ON ROWS "
+                + "CrossJoin([Store].[USA].[CA].Children, [Time].[1997].[Q1].Children) ON ROWS "
                 + "FROM [Sales]");
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Measures].[Unit Sales], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "{}\n"
             + "Axis #1:\n"
-            + "{[Product].[All Products].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n"
-            + "{[Product].[All Products].[Food].[Baked Goods].[Bread]}\n"
+            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n"
+            + "{[Product].[Food].[Baked Goods].[Bread]}\n"
             + "Axis #2:\n"
-            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Alameda], [Time].[1997].[Q1].[3]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[3]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Diego], [Time].[1997].[Q1].[3]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[All Stores].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[USA].[CA].[Alameda], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[USA].[CA].[Alameda], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[USA].[CA].[Alameda], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[USA].[CA].[San Diego], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[USA].[CA].[San Diego], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[USA].[CA].[San Diego], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n"
             + "Row #0: \n"
             + "Row #0: \n"
             + "Row #1: \n"
@@ -2355,13 +2361,13 @@ public class ConnectionTest extends TestCase {
                 + "FROM [Sales]");
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "{}\n"
             + "Axis #1:\n"
             + "{[Measures].[Average Profit]}\n"
             + "Axis #2:\n"
-            + "{[Product].[All Products].[Drink]}\n"
-            + "{[Product].[All Products].[Food]}\n"
-            + "{[Product].[All Products].[Non-Consumable]}\n"
+            + "{[Product].[Drink]}\n"
+            + "{[Product].[Food]}\n"
+            + "{[Product].[Non-Consumable]}\n"
             + "Row #0: $3.68\n"
             + "Row #1: $3.94\n"
             + "Row #2: $3.93\n", TestContext.toString(cellSet));
@@ -2422,15 +2428,15 @@ public class ConnectionTest extends TestCase {
         CellSet cellSet = statement.executeOlapQuery(query);
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Measures].[Unit Sales], [Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997], [Product].[All Products], [Promotion Media].[All Media], [Promotions].[All Promotions], [Education Level].[All Education Levels], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "{}\n"
             + "Axis #1:\n"
             + "{[Gender].[All Gender]}\n"
-            + "{[Gender].[All Gender].[F]}\n"
-            + "{[Gender].[All Gender].[M]}\n"
+            + "{[Gender].[F]}\n"
+            + "{[Gender].[M]}\n"
             + "Axis #2:\n"
-            + "{[Customers].[All Customers].[USA].[CA]}\n"
-            + "{[Customers].[All Customers].[USA].[OR]}\n"
-            + "{[Customers].[All Customers].[USA].[WA]}\n"
+            + "{[Customers].[USA].[CA]}\n"
+            + "{[Customers].[USA].[OR]}\n"
+            + "{[Customers].[USA].[WA]}\n"
             + "Row #0: 74,748\n"
             + "Row #0: 36,759\n"
             + "Row #0: 37,989\n"
@@ -2559,7 +2565,7 @@ public class ConnectionTest extends TestCase {
      *
      * @throws java.sql.SQLException on error
      */
-    public void testDimensionProperties() throws SQLException {
+    public void _testDimensionProperties() throws SQLException {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);

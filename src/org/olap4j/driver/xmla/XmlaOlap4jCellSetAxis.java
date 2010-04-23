@@ -23,22 +23,23 @@ import java.util.*;
 class XmlaOlap4jCellSetAxis implements CellSetAxis {
     private final XmlaOlap4jCellSet olap4jCellSet;
     private final Axis axis;
-    final List<Position> positions = new ArrayList<Position>();
-    private final List<Position> immutablePositions =
-        Collections.unmodifiableList(positions);
+    final List<Position> positions;
 
     /**
      * Creates an XmlaOlap4jCellSetAxis.
      *
      * @param olap4jCellSet Cell set
      * @param axis Axis identifier
+     * @param positions List of positions. Caller must ensure it is immutable
      */
     public XmlaOlap4jCellSetAxis(
         XmlaOlap4jCellSet olap4jCellSet,
-        Axis axis)
+        Axis axis,
+        List<Position> positions)
     {
         this.olap4jCellSet = olap4jCellSet;
         this.axis = axis;
+        this.positions = positions;
     }
 
     public Axis getAxisOrdinal() {
@@ -60,7 +61,7 @@ class XmlaOlap4jCellSetAxis implements CellSetAxis {
     }
 
     public List<Position> getPositions() {
-        return immutablePositions;
+        return positions;
     }
 
     public int getPositionCount() {
@@ -68,7 +69,7 @@ class XmlaOlap4jCellSetAxis implements CellSetAxis {
     }
 
     public ListIterator<Position> iterator() {
-        return immutablePositions.listIterator();
+        return positions.listIterator();
     }
 }
 

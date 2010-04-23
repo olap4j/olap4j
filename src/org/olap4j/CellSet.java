@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -15,7 +15,7 @@ import java.sql.ResultSet;
 /**
  * Result of executing an OLAP Statement.
  *
- * <p>An <codeOlapResultSet</code> consists of a set of (typically two) axes,
+ * <p>A <code>CellSet</code> consists of a set of (typically two) axes,
  * each populated with a sequence of members, and a collection of cells at the
  * intersection of these axes.
  *
@@ -71,16 +71,23 @@ public interface CellSet extends ResultSet, OlapWrapper {
      * axis, 1 the rows axis, and so forth.
      *
      * @return list of CellSetAxis objects containing the result
+     *
+     * @see #getFilterAxis()
      */
     List<CellSetAxis> getAxes();
 
     /**
      * Retrieves the CellSetAxis representing the filter axis.
      *
-     * <p>This axis always has one row, and contains one member for each
-     * dimension not included in any other axis. Some of these dimensions may
+     * <p>This axis always has one position, and members of
+     * dimensions not included in any other axis. Some of these dimensions may
      * have been explicitly mentioned in the WHERE clause of the MDX statement;
      * others dimensions are represented by their default member.
+     *
+     * <p>In particular, if the query has no WHERE clause, the axis has a single
+     * position as usual, but the position has no members.
+     *
+     * <p>The filter axis is not included in the {@link #getAxes()} collection.
      *
      * @return the filter axis
      */

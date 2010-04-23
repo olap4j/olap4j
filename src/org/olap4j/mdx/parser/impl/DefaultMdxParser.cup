@@ -21,7 +21,6 @@ parser code {:
     Scanner scanner;
     private String queryString;
     private DefaultMdxParserImpl.FunTable funTable;
-    private boolean load;
 
     /**
       * Recursively parses an expression.
@@ -38,14 +37,12 @@ parser code {:
     SelectNode parseSelect(
         String queryString,
         boolean debug,
-        DefaultMdxParserImpl.FunTable funTable,
-        boolean load)
+        DefaultMdxParserImpl.FunTable funTable)
     {
         Symbol parse_tree = null;
         this.scanner = new StringScanner(queryString, debug);
         this.queryString = queryString;
         this.funTable = funTable;
-        this.load = load;
         try {
             if (debug) {
                 parse_tree = debug_parse();

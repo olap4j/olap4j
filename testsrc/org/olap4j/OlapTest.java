@@ -17,8 +17,6 @@ import org.olap4j.test.TestContext;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.ArrayList;
-import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -236,7 +234,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{[Product].[All Products].[Drink].Children} ON ROWS\n"
+                + "{[Product].[Drink].Children} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
 
@@ -253,7 +251,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{Ascendants([Product].[All Products].[Drink])} ON ROWS\n"
+                + "{Ascendants([Product].[Drink])} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
 
@@ -270,7 +268,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{Descendants([Product].[All Products].[Drink])} ON ROWS\n"
+                + "{Descendants([Product].[Drink])} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
 
@@ -287,7 +285,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n"
+                + "{{[Product].[Drink], [Product].[Drink].Children}} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
 
@@ -304,7 +302,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{[Product].[All Products].[Drink].Siblings} ON ROWS\n"
+                + "{[Product].[Drink].Siblings} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
         } catch (Exception e) {
@@ -349,9 +347,9 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "CrossJoin([Product].[All Products].[Drink].Children, "
-                + "CrossJoin({[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}, "
+                + "CrossJoin([Product].[Drink].Children, "
+                + "CrossJoin({[Store].[USA], "
+                + "[Store].[USA].Children}, "
                 + "[Time].[1997].Children)) ON ROWS\n"
                 + "FROM [Sales]", mdxString);
         } catch (Exception e) {
@@ -394,7 +392,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{[Product].[All Products].[Drink].Children} ON ROWS\n"
+                + "{[Product].[Drink].Children} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
 
@@ -411,7 +409,7 @@ public class OlapTest extends TestCase {
             mdxString = mdx.toString();
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
-                + "{[Product].[All Products].[Drink].Children} ON COLUMNS,\n"
+                + "{[Product].[Drink].Children} ON COLUMNS,\n"
                 + "{[Measures].[Store Sales]} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
@@ -461,7 +459,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n"
+                + "{{[Product].[Drink], [Product].[Drink].Children}} ON ROWS\n"
                 + "FROM [Sales]\n"
                 + "WHERE ([Time].[1997].[Q3].[7])",
                 mdxString);
@@ -474,7 +472,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{Order({{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}}, [Product].CurrentMember.Name, DESC)} ON ROWS\n"
+                + "{Order({{[Product].[Drink], [Product].[Drink].Children}}, [Product].CurrentMember.Name, DESC)} ON ROWS\n"
                 + "FROM [Sales]\n"
                 + "WHERE ([Time].[1997].[Q3].[7])",
                 sortedMdxString);
@@ -483,14 +481,14 @@ public class OlapTest extends TestCase {
             String s = TestContext.toString(results);
             TestContext.assertEqualsVerbose(
                 "Axis #0:\n"
-                + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q3].[7], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+                + "{[Time].[1997].[Q3].[7]}\n"
                 + "Axis #1:\n"
                 + "{[Measures].[Store Sales]}\n"
                 + "Axis #2:\n"
-                + "{[Product].[All Products].[Drink]}\n"
-                + "{[Product].[All Products].[Drink].[Dairy]}\n"
-                + "{[Product].[All Products].[Drink].[Beverages]}\n"
-                + "{[Product].[All Products].[Drink].[Alcoholic Beverages]}\n"
+                + "{[Product].[Drink]}\n"
+                + "{[Product].[Drink].[Dairy]}\n"
+                + "{[Product].[Drink].[Beverages]}\n"
+                + "{[Product].[Drink].[Alcoholic Beverages]}\n"
                 + "Row #0: 4,409.58\n"
                 + "Row #1: 629.69\n"
                 + "Row #2: 2,477.02\n"
@@ -562,7 +560,7 @@ public class OlapTest extends TestCase {
         TestContext.assertEqualsVerbose(
             "SELECT\n"
             + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-            + "Hierarchize(Union(CrossJoin({[Product].[All Products], [Product].[All Products].Children}, CrossJoin({[Time].[1997]}, {[Store].[All Stores]})), Union(CrossJoin({[Product].[All Products].[Drink]}, CrossJoin({[Time].[1997].[Q3]}, [Store].[All Stores].Children)), CrossJoin({[Product].[All Products].[Drink]}, CrossJoin([Time].[1997].Children, {[Store].[All Stores]}))))) ON ROWS\n"
+            + "Hierarchize(Union(CrossJoin({[Product].[All Products], [Product].[All Products].Children}, CrossJoin({[Time].[1997]}, {[Store].[All Stores]})), Union(CrossJoin({[Product].[Drink]}, CrossJoin({[Time].[1997].[Q3]}, [Store].[All Stores].Children)), CrossJoin({[Product].[Drink]}, CrossJoin([Time].[1997].Children, {[Store].[All Stores]}))))) ON ROWS\n"
             + "FROM [Sales]",
             mdxString);
 
@@ -577,7 +575,7 @@ public class OlapTest extends TestCase {
         TestContext.assertEqualsVerbose(
             "SELECT\n"
             + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-            + "Order(Hierarchize(Union(CrossJoin({[Product].[All Products], [Product].[All Products].Children}, CrossJoin({[Time].[1997]}, {[Store].[All Stores]})), Union(CrossJoin({[Product].[All Products].[Drink]}, CrossJoin({[Time].[1997].[Q3]}, [Store].[All Stores].Children)), CrossJoin({[Product].[All Products].[Drink]}, CrossJoin([Time].[1997].Children, {[Store].[All Stores]}))))), [Measures].[Store Sales], ASC) ON ROWS\n"
+            + "Order(Hierarchize(Union(CrossJoin({[Product].[All Products], [Product].[All Products].Children}, CrossJoin({[Time].[1997]}, {[Store].[All Stores]})), Union(CrossJoin({[Product].[Drink]}, CrossJoin({[Time].[1997].[Q3]}, [Store].[All Stores].Children)), CrossJoin({[Product].[Drink]}, CrossJoin([Time].[1997].Children, {[Store].[All Stores]}))))), [Measures].[Store Sales], ASC) ON ROWS\n"
             + "FROM [Sales]",
             sortedMdxString);
 
@@ -585,21 +583,21 @@ public class OlapTest extends TestCase {
         String s = TestContext.toString(results);
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+            + "{}\n"
             + "Axis #1:\n"
             + "{[Measures].[Store Sales]}\n"
             + "Axis #2:\n"
             + "{[Product].[All Products], [Time].[1997], [Store].[All Stores]}\n"
-            + "{[Product].[All Products].[Drink], [Time].[1997], [Store].[All Stores]}\n"
-            + "{[Product].[All Products].[Drink], [Time].[1997].[Q1], [Store].[All Stores]}\n"
-            + "{[Product].[All Products].[Drink], [Time].[1997].[Q2], [Store].[All Stores]}\n"
-            + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores]}\n"
-            + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[Canada]}\n"
-            + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[Mexico]}\n"
-            + "{[Product].[All Products].[Drink], [Time].[1997].[Q3], [Store].[All Stores].[USA]}\n"
-            + "{[Product].[All Products].[Drink], [Time].[1997].[Q4], [Store].[All Stores]}\n"
-            + "{[Product].[All Products].[Non-Consumable], [Time].[1997], [Store].[All Stores]}\n"
-            + "{[Product].[All Products].[Food], [Time].[1997], [Store].[All Stores]}\n"
+            + "{[Product].[Drink], [Time].[1997], [Store].[All Stores]}\n"
+            + "{[Product].[Drink], [Time].[1997].[Q1], [Store].[All Stores]}\n"
+            + "{[Product].[Drink], [Time].[1997].[Q2], [Store].[All Stores]}\n"
+            + "{[Product].[Drink], [Time].[1997].[Q3], [Store].[All Stores]}\n"
+            + "{[Product].[Drink], [Time].[1997].[Q3], [Store].[Canada]}\n"
+            + "{[Product].[Drink], [Time].[1997].[Q3], [Store].[Mexico]}\n"
+            + "{[Product].[Drink], [Time].[1997].[Q3], [Store].[USA]}\n"
+            + "{[Product].[Drink], [Time].[1997].[Q4], [Store].[All Stores]}\n"
+            + "{[Product].[Non-Consumable], [Time].[1997], [Store].[All Stores]}\n"
+            + "{[Product].[Food], [Time].[1997], [Store].[All Stores]}\n"
             + "Row #0: 565,238.13\n"
             + "Row #1: 48,836.21\n"
             + "Row #2: 11,585.80\n"
@@ -652,7 +650,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n"
+                + "{{[Product].[Drink], [Product].[Drink].Children}} ON ROWS\n"
                 + "FROM [Sales]\n"
                 + "WHERE ([Time].[1997].[Q3].[7])",
                 mdxString);
@@ -668,7 +666,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "Order({{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}}, [Measures].[Store Sales], BASC) ON ROWS\n"
+                + "Order({{[Product].[Drink], [Product].[Drink].Children}}, [Measures].[Store Sales], BASC) ON ROWS\n"
                 + "FROM [Sales]\n"
                 + "WHERE ([Time].[1997].[Q3].[7])",
                 sortedMdxString);
@@ -677,14 +675,14 @@ public class OlapTest extends TestCase {
             String s = TestContext.toString(results);
             TestContext.assertEqualsVerbose(
                 "Axis #0:\n"
-                + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q3].[7], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+                + "{[Time].[1997].[Q3].[7]}\n"
                 + "Axis #1:\n"
                 + "{[Measures].[Store Sales]}\n"
                 + "Axis #2:\n"
-                + "{[Product].[All Products].[Drink].[Dairy]}\n"
-                + "{[Product].[All Products].[Drink].[Alcoholic Beverages]}\n"
-                + "{[Product].[All Products].[Drink].[Beverages]}\n"
-                + "{[Product].[All Products].[Drink]}\n"
+                + "{[Product].[Drink].[Dairy]}\n"
+                + "{[Product].[Drink].[Alcoholic Beverages]}\n"
+                + "{[Product].[Drink].[Beverages]}\n"
+                + "{[Product].[Drink]}\n"
                 + "Row #0: 629.69\n"
                 + "Row #1: 1,302.87\n"
                 + "Row #2: 2,477.02\n"
@@ -733,9 +731,9 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "CrossJoin([Product].[All Products].[Drink].Children, "
-                + "CrossJoin({[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}, "
+                + "CrossJoin([Product].[Drink].Children, "
+                + "CrossJoin({[Store].[USA], "
+                + "[Store].[USA].Children}, "
                 + "[Time].[1997].Children)) ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
@@ -750,9 +748,9 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "CrossJoin({[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}, "
-                + "CrossJoin([Product].[All Products].[Drink].Children, "
+                + "CrossJoin({[Store].[USA], "
+                + "[Store].[USA].Children}, "
+                + "CrossJoin([Product].[Drink].Children, "
                 + "[Time].[1997].Children)) ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
@@ -767,10 +765,10 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "CrossJoin({[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}, "
+                + "CrossJoin({[Store].[USA], "
+                + "[Store].[USA].Children}, "
                 + "CrossJoin([Time].[1997].Children, "
-                + "[Product].[All Products].[Drink].Children)) ON ROWS\n"
+                + "[Product].[Drink].Children)) ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
         } catch (Exception e) {
@@ -810,8 +808,8 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{Hierarchize({{[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}}, POST)} ON ROWS\n"
+                + "{Hierarchize({{[Store].[USA], "
+                + "[Store].[USA].Children}}, POST)} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
 
@@ -824,8 +822,8 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{Hierarchize({{[Store].[All Stores].[USA], "
-                + "[Store].[All Stores].[USA].Children}})} ON ROWS\n"
+                + "{Hierarchize({{[Store].[USA], "
+                + "[Store].[USA].Children}})} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
         } catch (Exception e) {
@@ -875,7 +873,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "{{[Product].[All Products].[Drink], [Product].[All Products].[Drink].Children}} ON ROWS\n"
+                + "{{[Product].[Drink], [Product].[Drink].Children}} ON ROWS\n"
                 + "FROM [Sales]",
                 originalMdxString);
 
@@ -940,7 +938,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Sales Count]} ON COLUMNS,\n"
-                + "{[Product].[All Products].[Drink].[Beverages].Children, [Product].[All Products].[Food].[Frozen Foods].Children} ON ROWS\n"
+                + "{[Product].[Drink].[Beverages].Children, [Product].[Food].[Frozen Foods].Children} ON ROWS\n"
                 + "FROM [Sales]\n"
                 + "WHERE ([Time].[1997].[Q3].[7])",
                 mdxString);
@@ -950,20 +948,20 @@ public class OlapTest extends TestCase {
             String resultsString = TestContext.toString(results);
             TestContext.assertEqualsVerbose(
                 "Axis #0:\n"
-                + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q3].[7], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+                + "{[Time].[1997].[Q3].[7]}\n"
                 + "Axis #1:\n"
                 + "{[Measures].[Sales Count]}\n"
                 + "Axis #2:\n"
-                + "{[Product].[All Products].[Drink].[Beverages].[Carbonated Beverages]}\n"
-                + "{[Product].[All Products].[Drink].[Beverages].[Drinks]}\n"
-                + "{[Product].[All Products].[Drink].[Beverages].[Hot Beverages]}\n"
-                + "{[Product].[All Products].[Drink].[Beverages].[Pure Juice Beverages]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Breakfast Foods]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Frozen Desserts]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Frozen Entrees]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Meat]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Pizza]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Vegetables]}\n"
+                + "{[Product].[Drink].[Beverages].[Carbonated Beverages]}\n"
+                + "{[Product].[Drink].[Beverages].[Drinks]}\n"
+                + "{[Product].[Drink].[Beverages].[Hot Beverages]}\n"
+                + "{[Product].[Drink].[Beverages].[Pure Juice Beverages]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Breakfast Foods]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Frozen Desserts]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Frozen Entrees]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Meat]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Pizza]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Vegetables]}\n"
                 + "Row #0: 103\n"
                 + "Row #1: 65\n"
                 + "Row #2: 125\n"
@@ -990,7 +988,7 @@ public class OlapTest extends TestCase {
             TestContext.assertEqualsVerbose(
                 "SELECT\n"
                 + "{[Measures].[Sales Count]} ON COLUMNS,\n"
-                + "{Except({[Product].[All Products].[Drink].[Beverages].Children, [Product].[All Products].[Food].[Frozen Foods].Children}, {[Product].[All Products].[Drink].[Beverages].[Carbonated Beverages]})} ON ROWS\n"
+                + "{Except({[Product].[Drink].[Beverages].Children, [Product].[Food].[Frozen Foods].Children}, {[Product].[Drink].[Beverages].[Carbonated Beverages]})} ON ROWS\n"
                 + "FROM [Sales]\n"
                 + "WHERE ([Time].[1997].[Q3].[7])",
                 mdxString);
@@ -1000,19 +998,19 @@ public class OlapTest extends TestCase {
             resultsString = TestContext.toString(results);
             TestContext.assertEqualsVerbose(
                 "Axis #0:\n"
-                + "{[Store].[All Stores], [Store Size in SQFT].[All Store Size in SQFTs], [Store Type].[All Store Types], [Time].[1997].[Q3].[7], [Promotion Media].[All Media], [Promotions].[All Promotions], [Customers].[All Customers], [Education Level].[All Education Levels], [Gender].[All Gender], [Marital Status].[All Marital Status], [Yearly Income].[All Yearly Incomes]}\n"
+                + "{[Time].[1997].[Q3].[7]}\n"
                 + "Axis #1:\n"
                 + "{[Measures].[Sales Count]}\n"
                 + "Axis #2:\n"
-                + "{[Product].[All Products].[Drink].[Beverages].[Drinks]}\n"
-                + "{[Product].[All Products].[Drink].[Beverages].[Hot Beverages]}\n"
-                + "{[Product].[All Products].[Drink].[Beverages].[Pure Juice Beverages]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Breakfast Foods]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Frozen Desserts]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Frozen Entrees]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Meat]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Pizza]}\n"
-                + "{[Product].[All Products].[Food].[Frozen Foods].[Vegetables]}\n"
+                + "{[Product].[Drink].[Beverages].[Drinks]}\n"
+                + "{[Product].[Drink].[Beverages].[Hot Beverages]}\n"
+                + "{[Product].[Drink].[Beverages].[Pure Juice Beverages]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Breakfast Foods]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Frozen Desserts]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Frozen Entrees]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Meat]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Pizza]}\n"
+                + "{[Product].[Food].[Frozen Foods].[Vegetables]}\n"
                 + "Row #0: 65\n"
                 + "Row #1: 125\n"
                 + "Row #2: 100\n"
