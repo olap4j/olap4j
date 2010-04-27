@@ -243,9 +243,13 @@ class XmlaOlap4jMember
             case PARENT_COUNT:
                 return 1;
             case PARENT_LEVEL:
-                return member.getParentMember().getLevel().getDepth();
+                return member.getParentMember() == null
+                    ? 0
+                    : member.getParentMember().getLevel().getDepth();
             case PARENT_UNIQUE_NAME:
-                return member.getParentMember().getUniqueName();
+                return member.getParentMember() == null
+                    ? null
+                    : member.getParentMember().getUniqueName();
             case SCHEMA_NAME:
                 return member.getCube().olap4jSchema.getName();
             case VALUE:

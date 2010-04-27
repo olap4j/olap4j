@@ -1738,6 +1738,9 @@ public class ConnectionTest extends TestCase {
         assertNotNull(member);
         Member member2 = cube.lookupMember("Product", "All Products", "Food");
         assertEquals(member, member2);
+        final Member bread =
+            cube.lookupMember("Product", "Food", "Baked Goods", "Bread");
+
         assertEquals("[Product].[Food]", member.getUniqueName());
         assertEquals("Food", member.getName());
         assertEquals(
@@ -1793,6 +1796,27 @@ public class ConnectionTest extends TestCase {
         assertEquals(
             Olap4jUtil.enumSetOf(Property.TypeFlag.MEMBER), property.getType());
         assertEquals(Datatype.STRING, property.getDatatype());
+
+        // PARENT_LEVEL property
+        final Property parentLevelProperty = propertyList.get("PARENT_LEVEL");
+        assertNotNull(parentLevelProperty);
+        assertEquals(
+            0, allProductsMember.getPropertyValue(parentLevelProperty));
+        assertEquals(0, member.getPropertyValue(parentLevelProperty));
+        assertEquals(2, bread.getPropertyValue(parentLevelProperty));
+
+        // PARENT_UNIQUE_NAME property
+        final Property parentUniqueNameProperty =
+            propertyList.get("PARENT_UNIQUE_NAME");
+        assertNotNull(parentUniqueNameProperty);
+        assertNull(
+            allProductsMember.getPropertyValue(parentUniqueNameProperty));
+        assertEquals(
+            "[Product].[All Products]",
+            member.getPropertyValue(parentUniqueNameProperty));
+        assertEquals(
+            "[Product].[Food].[Baked Goods]",
+            bread.getPropertyValue(parentUniqueNameProperty));
 
         // Measures
         int k = -1;
