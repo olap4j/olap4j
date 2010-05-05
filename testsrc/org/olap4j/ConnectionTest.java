@@ -677,11 +677,17 @@ public class ConnectionTest extends TestCase {
             }
         }
 
+        if (tester.getFlavor() == Tester.Flavor.XMLA) // TODO: upgrade mondrian
+        assertEquals("Sales", pstmt.getCube().getName());
+
         // Check metadata exists. (Support for this method is optional.)
         final CellSetMetaData metaData = pstmt.getMetaData();
+        assertEquals("Sales", metaData.getCube().getName());
 
         CellSet cellSet = pstmt.executeQuery();
         assertEquals(metaData, cellSet.getMetaData());
+        assertEquals("Sales", metaData.getCube().getName());
+
         String s = TestContext.toString(cellSet);
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
