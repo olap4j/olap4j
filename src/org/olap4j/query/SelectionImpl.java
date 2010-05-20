@@ -6,7 +6,7 @@
 // Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
-*/
+ */
 package org.olap4j.query;
 
 import java.util.ArrayList;
@@ -39,12 +39,12 @@ class SelectionImpl extends QueryNodeImpl implements Selection {
      * @pre operator != null
      */
     public SelectionImpl(
-        Member member,
-        Dimension dimension,
-        String hierarchyName,
-        String levelName,
-        String memberName,
-        Operator operator)
+            Member member,
+            Dimension dimension,
+            String hierarchyName,
+            String levelName,
+            String memberName,
+            Operator operator)
     {
         super();
         this.member = member;
@@ -53,6 +53,55 @@ class SelectionImpl extends QueryNodeImpl implements Selection {
         this.levelName = levelName;
         this.memberName = memberName;
         this.operator = operator;
+    }
+
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+            + ((member == null) ? 0 : member.getUniqueName().hashCode());
+        result = prime * result
+            + ((operator == null) ? 0 : operator.hashCode());
+        result = prime * result
+            + ((selectionContext == null) ? 0 : selectionContext.hashCode());
+        return result;
+    }
+
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof SelectionImpl)) {
+            return false;
+        }
+        SelectionImpl other = (SelectionImpl) obj;
+        if (member == null) {
+            if (other.member != null) {
+                return false;
+            }
+        } else if (!member.getUniqueName().equals(
+                        other.member.getUniqueName()))
+        {
+            return false;
+        }
+        if (operator == null) {
+            if (other.operator != null) {
+                return false;
+            }
+        } else if (!operator.equals(other.operator)) {
+            return false;
+        }
+        if (selectionContext == null) {
+            if (other.selectionContext != null) {
+                return false;
+            }
+        } else if (!selectionContext.equals(other.selectionContext)) {
+            return false;
+        }
+        return true;
     }
 
     public String getName() {
