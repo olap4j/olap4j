@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2009 Julian Hyde
+// Copyright (C) 2007-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -181,6 +181,14 @@ abstract class XmlaOlap4jPreparedStatement
         int parameterIndex, InputStream x, int length) throws SQLException
     {
         getParameter(parameterIndex).setValue(x);
+    }
+
+    public void unset(int parameterIndex) throws SQLException {
+        getParameter(parameterIndex).unset();
+    }
+
+    public boolean isSet(int parameterIndex) throws SQLException {
+        return getParameter(parameterIndex).isSet();
     }
 
     public void clearParameters() throws SQLException {
@@ -461,6 +469,8 @@ abstract class XmlaOlap4jPreparedStatement
     private interface Parameter {
         String getName();
         void setValue(Object o);
+        void unset();
+        boolean isSet();
     }
 }
 

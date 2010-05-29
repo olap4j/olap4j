@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2008 Julian Hyde
+// Copyright (C) 2006-2010 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -94,6 +94,30 @@ public interface PreparedOlapStatement
      */
     Cube getCube();
 
+    /**
+     * Returns whether the value of the designated parameter is set.
+     *
+     * <p>To set the value call one of the {@link #setInt setXxx} methods. To
+     * unset the value, call {@link #unset}.
+     *
+     * @param parameterIndex the first parameter is 1, the second is 2, ...
+     * @return whether the parameter's value has been set
+     *        <code>ParameterMetaData.parameterNoNulls</code>,
+     *        <code>ParameterMetaData.parameterNullable</code>, or
+     *        <code>ParameterMetaData.parameterNullableUnknown</code>
+    * @exception java.sql.SQLException if a database access error occurs
+     */
+    boolean isSet(int parameterIndex) throws SQLException;
+
+    /**
+     * Unsets the value of the designated parameter.
+     *
+     * @see #isSet(int)
+     *
+     * @param parameterIndex the first parameter is 1, the second is 2, ...
+    * @exception java.sql.SQLException if a database access error occurs
+     */
+    void unset(int parameterIndex) throws SQLException;
 }
 
 // End PreparedOlapStatement.java

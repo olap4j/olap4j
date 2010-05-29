@@ -663,6 +663,8 @@ public class ConnectionTest extends TestCase {
                             "MemberType<hierarchy=[Store]>",
                             olapType.toString());
                         break;
+                    default:
+                        throw Olap4jUtil.unexpected(method);
                     }
                     if (paramIndex != 1) {
                         fail("expected exception");
@@ -689,7 +691,7 @@ public class ConnectionTest extends TestCase {
         assertEquals("Sales", metaData.getCube().getName());
 
         String s = TestContext.toString(cellSet);
-        TestContext.assertEqualsVerbose(
+        final String expected =
             "Axis #0:\n"
             + "{[Gender].[M]}\n"
             + "Axis #1:\n"
@@ -704,28 +706,44 @@ public class ConnectionTest extends TestCase {
             + "Row #0: 10,562\n"
             + "Row #0: 13,574\n"
             + "Row #0: 12,800\n"
-            + "Row #0: 1,053\n",
-            s);
+            + "Row #0: 1,053\n";
+        TestContext.assertEqualsVerbose(expected, s);
 
         // Bind parameter and re-execute.
         final List<Position> positions =
             cellSet.getAxes().get(0).getPositions();
         final Member member =
             positions.get(positions.size() - 1).getMembers().get(0);
+        assertFalse(pstmt.isSet(1));
+
+        // parameter is 'set' even if value is null
+        pstmt.setObject(1, null);
+        assertTrue(pstmt.isSet(1));
+
+        pstmt.unset(1);
+        assertFalse(pstmt.isSet(1));
+
         pstmt.setObject(1, member);
+        assertTrue(pstmt.isSet(1));
         CellSet cellSet2 = pstmt.executeQuery();
         assertIsClosed(cellSet, true);
         assertIsClosed(cellSet2, false);
         s = TestContext.toString(cellSet2);
-        TestContext.assertEqualsVerbose(
+        final String expected2 =
             "Axis #0:\n"
             + "{[Gender].[M]}\n"
             + "Axis #1:\n"
             + "{[Store].[USA].[CA]}\n"
             + "{[Store].[USA].[CA].[San Francisco].[Store 14]}\n"
             + "Row #0: 37,989\n"
-            + "Row #0: 1,053\n",
-            s);
+            + "Row #0: 1,053\n";
+        TestContext.assertEqualsVerbose(expected2, s);
+
+        // Unset parameter and re-execute.
+        pstmt.unset(1);
+        cellSet = pstmt.executeQuery();
+        s = TestContext.toString(cellSet);
+        TestContext.assertEqualsVerbose(expected, s);
 
         // Re-execute with a new MDX string.
         CellSet cellSet3 = pstmt.executeOlapQuery(
@@ -1754,17 +1772,27 @@ public class ConnectionTest extends TestCase {
             member.getLevel().getUniqueName());
         assertEquals(Member.Type.REGULAR, member.getMemberType());
 
+        assertEquals(
+            "[Product].[Food].[Baked Goods]",
+            bread.getParentMember().getUniqueName());
+        final List<Member> list = bread.getAncestorMembers();
+        assertEquals(3, list.size());
+        assertEquals(
+            "[Product].[Food].[Baked Goods]", list.get(0).getUniqueName());
+        assertEquals("[Product].[Food]", list.get(1).getUniqueName());
+        assertEquals("[Product].[All Products]", list.get(2).getUniqueName());
+
         assertEquals("Food", member.getCaption(null));
 
         if (tester.getFlavor() != Tester.Flavor.XMLA) {
-          assertNull(member.getDescription(null));
-          assertEquals(1, member.getDepth());
-          assertEquals(-1, member.getSolveOrder());
-          assertFalse(member.isHidden());
-          assertNull(member.getDataMember());
-          assertFalse(member.isCalculatedInQuery());
+            assertNull(member.getDescription(null));
+            assertEquals(1, member.getDepth());
+            assertEquals(-1, member.getSolveOrder());
+            assertFalse(member.isHidden());
+            assertNull(member.getDataMember());
+            assertFalse(member.isCalculatedInQuery());
         } else {
-          assertEquals("", member.getDescription(null));
+            assertEquals("", member.getDescription(null));
         }
 
         switch (tester.getFlavor()) {
@@ -1847,14 +1875,20 @@ public class ConnectionTest extends TestCase {
             assertNotNull(measure.getName());
             assertNotNull(measure.getAggregator());
             assertTrue(measure.getDatatype() != null);
-            measureNameSet.add(measure.getName());
+            // mondrian's olap4j driver returns the invisible member
+            // [Measures].[Profit last Period]; the xmla driver does not,
+            // because XMLA by default does not return invisible measures.
+            if (measure.getName().equals("Profit last Period")) {
+                assertFalse(measure.isVisible());
+            } else {
+                measureNameSet.add(measure.getName());
+            }
         }
         assertEquals(
             new HashSet<String>(
                 Arrays.asList(
                     "Unit Sales",
                     "Customer Count",
-                    "Profit last Period",
                     "Profit",
                     "Profit Growth",
                     "Promotion Sales",
