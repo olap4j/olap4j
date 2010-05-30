@@ -97,15 +97,17 @@ public interface PreparedOlapStatement
     /**
      * Returns whether the value of the designated parameter is set.
      *
-     * <p>To set the value call one of the {@link #setInt setXxx} methods. To
+     * <p>Note that you cannot tell whether the parameter is set by looking to
+     * see whether the value is {@code null}, because {@code null} is a valid
+     * parameter value. When a parameter is not set, its value is derived by
+     * evaluating its default expression.
+     *
+     * <p>To set the value call one of the {@link #setObject setXxx} methods. To
      * unset the value, call {@link #unset}.
      *
      * @param parameterIndex the first parameter is 1, the second is 2, ...
      * @return whether the parameter's value has been set
-     *        <code>ParameterMetaData.parameterNoNulls</code>,
-     *        <code>ParameterMetaData.parameterNullable</code>, or
-     *        <code>ParameterMetaData.parameterNullableUnknown</code>
-    * @exception java.sql.SQLException if a database access error occurs
+     * @exception java.sql.SQLException if a database access error occurs
      */
     boolean isSet(int parameterIndex) throws SQLException;
 
@@ -115,7 +117,7 @@ public interface PreparedOlapStatement
      * @see #isSet(int)
      *
      * @param parameterIndex the first parameter is 1, the second is 2, ...
-    * @exception java.sql.SQLException if a database access error occurs
+     * @exception java.sql.SQLException if a database access error occurs
      */
     void unset(int parameterIndex) throws SQLException;
 }
