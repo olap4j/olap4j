@@ -42,8 +42,7 @@ class XmlaOlap4jCube implements Cube, Named
         new ArrayList<XmlaOlap4jMeasure>();
     private final HashMap<String, XmlaOlap4jMeasure> measuresMap =
         new HashMap<String, XmlaOlap4jMeasure>();
-    private final NamedList<XmlaOlap4jNamedSet> namedSets =
-        new NamedListImpl<XmlaOlap4jNamedSet>();
+    private final NamedList<XmlaOlap4jNamedSet> namedSets;
     private final MetadataReader metadataReader;
 
     /**
@@ -99,10 +98,9 @@ class XmlaOlap4jCube implements Cube, Named
         }
 
         // populate named sets
-        olap4jConnection.populateList(
-            namedSets,
-            context,
+        namedSets = new DeferredNamedListImpl<XmlaOlap4jNamedSet>(
             XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_SETS,
+            context,
             new XmlaOlap4jConnection.NamedSetHandler(),
             restrictions);
     }
