@@ -57,6 +57,34 @@ public interface OlapStatement extends Statement, OlapWrapper {
      * or another thread cancels the statement (see {@link #cancel()})
      */
     CellSet executeOlapQuery(SelectNode selectNode) throws OlapException;
+
+    /**
+     * Adds a listener to be notified of events to {@link CellSet}s created by
+     * this statement.
+     *
+     * <p>NOTE: You may wonder why this method belongs to the
+     * {@link OlapStatement} class and not {@code CellSet}. If the method
+     * belonged to {@code CellSet} there would be a window between creation and
+     * registering a listener during which events might be lost, whereas
+     * registering the listener with the statement ensures that the listener is
+     * attached immediately that the cell set is opened. It follows that
+     * registering a listener does not affect the cell set <em>currently
+     * open</em> (if any), and that no events will be received if the statement
+     * has no open cell sets.
+     *
+     * @param granularity Granularity of cell set events to listen for
+     *
+     * @param listener Listener to be notified of changes
+     *
+     * @throws OlapException if granularity is not one supported by this server,
+     *   per the
+     *   {@link OlapDatabaseMetaData#getSupportedCellSetListenerGranularities()}
+     *   method
+     */
+    void addListener(
+        CellSetListener.Granularity granularity,
+        CellSetListener listener)
+        throws OlapException;
 }
 
 // End OlapStatement.java

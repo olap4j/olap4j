@@ -957,7 +957,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
      *
      * @return Error handler
      */
-    private final XmlaHelper getHelper() {
+    private XmlaHelper getHelper() {
         return olap4jConnection.helper;
     }
 
@@ -966,6 +966,13 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     // implement OlapDatabaseMetaData
+
+    public Set<CellSetListener.Granularity>
+        getSupportedCellSetListenerGranularities()
+        throws OlapException
+    {
+        return Collections.emptySet();
+    }
 
     public ResultSet getActions(
         String catalog,
@@ -1175,7 +1182,6 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
             "CUBE_NAME", wildcard(cubeNamePattern),
             "SET_NAME", wildcard(setNamePattern));
     }
-
 
     /**
      * Wrapper which indicates that a restriction is to be treated as a

@@ -343,6 +343,15 @@ class XmlaOlap4jStatement implements OlapStatement {
         return executeOlapQuery(mdx);
     }
 
+    public void addListener(
+        CellSetListener.Granularity granularity,
+        CellSetListener listener)
+        throws OlapException
+    {
+        throw getHelper().createException(
+            "This driver does not support the cell listener API.");
+    }
+
     /**
      * Waits for an XMLA request to complete.
      *

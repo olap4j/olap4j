@@ -39,6 +39,21 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
     OlapConnection getConnection() throws SQLException;
 
     /**
+     * Returns the granularity of changes to cell sets that the database is
+     * capable of providing.
+     *
+     * <p>It's optional whether an olap4j provider supports cellset listeners,
+     * and also optional which granularities it supports. If the provider does
+     * not support the cell set listener API, returns an empty set. Never
+     * returns null.
+     *
+     * @return set of the granularities that are supported when listening for
+     * changes to a cell set, never null
+     */
+    Set<CellSetListener.Granularity> getSupportedCellSetListenerGranularities()
+        throws OlapException;
+
+    /**
      * Retrieves a result set describing the Actions in this database.
      *
      * <p>Specification as for XML/A MDSCHEMA_ACTIONS schema rowset.
