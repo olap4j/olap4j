@@ -271,6 +271,75 @@ public class Olap4jUtilTest extends TestCase {
         assertEquals("&", a.get(3));
         assertEquals("2", a.get(4));
     }
+
+    public void testParseFormattedCellValue() {
+        // no formatting
+        checkParseFormattedCellValue("123", "123", "{}");
+
+        // no formatting, value contains '|'
+        checkParseFormattedCellValue("12|3", "12|3", "{}");
+
+        // empty string
+        checkParseFormattedCellValue("", "", "{}");
+
+        // one property
+        checkParseFormattedCellValue("|123|style=red|", "123", "{style=red}");
+
+        // multiple properties
+        checkParseFormattedCellValue(
+            "|123|style=red|arrow=up|", "123", "{arrow=up, style=red}");
+
+        // invalid property value -- we don't care
+        checkParseFormattedCellValue(
+            "|123|style=red|arrow=asdas|", "123", "{arrow=asdas, style=red}");
+
+        // empty value
+        checkParseFormattedCellValue("||style=red|", "", "{style=red}");
+
+        // empty property value
+        checkParseFormattedCellValue(
+            "|abc|style=|foo=bar|", "abc", "{foo=bar, style=}");
+
+        // REVIEW: spaces in property value cause it not to be recognized as a
+        // property
+        checkParseFormattedCellValue(
+            "|abc|style=xx|foo=bar  baz|", "abcfoo=bar  baz", "{style=xx}");
+
+        // spaces in property value recognized, provided property value is
+        // enclosed in quotes
+        checkParseFormattedCellValue(
+            "|abc|style=xx|foo='bar  baz'|", "abc", "{foo=bar  baz, style=xx}");
+
+        // '=' in property value
+        checkParseFormattedCellValue(
+            "|abc|style=xx|foo=baz=zz|", "abc", "{foo=baz=zz, style=xx}");
+
+        // missing '|' terminator
+        checkParseFormattedCellValue(
+            "|abc|foo=bar", "abc", "{foo=bar}");
+
+        // null value
+        try {
+            String s =
+                Olap4jUtil.parseFormattedCellValue(
+                    null, new HashMap<String, String>());
+            fail("expected NPE, got " + s);
+        } catch (NullPointerException e) {
+            // ok
+        }
+    }
+
+    private void checkParseFormattedCellValue(
+        String formattedCellValue,
+        String expectedCellValue,
+        String expectedProperties)
+    {
+        final TreeMap<String, String> map = new TreeMap<String, String>();
+        final String cellValue =
+            Olap4jUtil.parseFormattedCellValue(formattedCellValue, map);
+        assertEquals("cell value", expectedCellValue, cellValue);
+        assertEquals("properties", expectedProperties, map.toString());
+    }
 }
 
 // End Olap4jUtilTest.java

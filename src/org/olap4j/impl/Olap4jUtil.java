@@ -53,6 +53,12 @@ public class Olap4jUtil {
     private static final NamedList<?> EMPTY_NAMED_LIST =
         new EmptyNamedList();
 
+    private static final Pattern CELL_VALUE_REGEX1 =
+        Pattern.compile("\\s*([a-zA-Z][\\w\\.]*)\\s*=\\s*'([^']*)'");
+
+    private static final Pattern CELL_VALUE_REGEX2 =
+        Pattern.compile("\\s*([a-zA-Z][\\w\\.]*)\\s*=\\s*([^\\s]*)");
+
     static {
         String className;
         if (PreJdk15 || Retrowoven) {
@@ -471,6 +477,87 @@ public class Olap4jUtil {
         Class<E> elementType)
     {
         return compatible.enumSetAllOf(elementType);
+    }
+
+    /**
+     * Parses a formatted cell values.
+     *
+     * <p>There is a customary way of including formatting infornation in cell
+     * values (started with Microsoft OLAP Services, and continued by JPivot and
+     * now Pentaho Analyzer). This method parses out the formatted value that
+     * should be displayed on the screen and also any properties present.
+     *
+     * <p>Examples:<ul>
+     * <li>"$123" no formatting information</li>
+     * <li>"|$123|style=red|" print in red style</li>
+     * <li>"|$123|style=red|arrow=up|" print in red style with an up arrow</li>
+     * </ul>
+     *
+     * <h4>Properties</h4>
+     *
+     * <table border="1">
+     * <tr>
+     *     <th>Name</th>
+     *     <th>Value</th>
+     *     <th>Description</th>
+     * </tr>
+     * <tr>
+     *     <td>style</td>
+     *     <td>red|green|yellow</td>
+     *     <td>renders the Member in that color</td>
+     * </tr>
+     * <tr>
+     *     <td>link</td>
+     *     <td>a url</td>
+     *     <td>creates a hyperlink on the member</td>
+     * </tr>
+     * <tr>
+     *     <td>arrow</td>
+     *     <td>up|down|blank</td>
+     *     <td>paints an arrow image</td>
+     * </tr>
+     * <tr>
+     *     <td>image</td>
+     *     <td>a uri. If the uri starts with "/" the context name will be
+     *         prepended</td>
+     *     <td>paints image</td>
+     * </tr>
+     * </table>
+     *
+     * @param formattedValue Formatted cell value
+     * @param map Map into which to place (property, value) pairs
+     * @return Formatted cell value with properties removed
+     */
+    public static String parseFormattedCellValue(
+        String formattedValue,
+        Map<String, String> map)
+    {
+        if (formattedValue.startsWith("|")) {
+            String[] strs = formattedValue.substring(1).split("\\|");
+            formattedValue = strs[0]; // original value
+            for (int i = 1; i < strs.length; i++) {
+                Matcher m = CELL_VALUE_REGEX1.matcher(strs[i]);
+                if (m.matches()) {
+                    String propName = m.group(1); // property name
+                    String propValue = m.group(2); // property value
+                    map.put(propName, propValue);
+                    continue;
+                }
+
+                m = CELL_VALUE_REGEX2.matcher(strs[i]);
+                if (m.matches()) {
+                    String propName = m.group(1); // property name
+                    String propValue = m.group(2); // property value
+                    map.put(propName, propValue);
+                    continue;
+                }
+
+                // it is not a key=value pair
+                // we add the String to the formatted value
+                formattedValue += strs[i];
+            }
+        }
+        return formattedValue;
     }
 
     private enum DummyEnum {
