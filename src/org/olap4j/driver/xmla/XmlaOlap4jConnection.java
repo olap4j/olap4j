@@ -96,7 +96,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     private boolean autoCommit;
     private boolean readOnly;
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     /**
      * Name of the "DATA_SOURCE_NAME" column returned from
@@ -1088,10 +1088,15 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             </row>
 
              */
-            final String hierarchyName =
-                stringElement(row, "HIERARCHY_NAME");
+
             final String hierarchyUniqueName =
                 stringElement(row, "HIERARCHY_UNIQUE_NAME");
+            // SAP BW doesn't return a HIERARCHY_NAME attribute,
+            // so try to use the unique name instead
+            final String hierarchyName =
+                stringElement(row, "HIERARCHY_NAME") == null
+                    ? hierarchyUniqueName
+                    : stringElement(row, "HIERARCHY_NAME");
             final String hierarchyCaption =
                 stringElement(row, "HIERARCHY_CAPTION");
             final String description =
@@ -1151,10 +1156,15 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             </row>
 
              */
-            final String levelName =
-                stringElement(row, "LEVEL_NAME");
+
             final String levelUniqueName =
                 stringElement(row, "LEVEL_UNIQUE_NAME");
+            // SAP BW doesn't return a HIERARCHY_NAME attribute,
+            // so try to use the unique name instead
+            final String levelName =
+                stringElement(row, "LEVEL_NAME") == null
+                    ? levelUniqueName
+                    : stringElement(row, "LEVEL_NAME");
             final String levelCaption =
                 stringElement(row, "LEVEL_CAPTION");
             final String description =
@@ -1219,44 +1229,36 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 Measure.Aggregator.getDictionary().forOrdinal(
                     integerElement(
                         row, "MEASURE_AGGREGATOR"));
-            final Datatype datatype =
-                Datatype.getDictionary().forOrdinal(
+            final Datatype datatype;
+            Datatype ordinalDatatype =
+                Datatype.getDictionary().forName(
+                    stringElement(row, "DATA_TYPE"));
+            if (ordinalDatatype == null) {
+                datatype = Datatype.getDictionary().forOrdinal(
                     integerElement(row, "DATA_TYPE"));
+            } else {
+                datatype = ordinalDatatype;
+            }
             final boolean measureIsVisible =
                 booleanElement(row, "MEASURE_IS_VISIBLE");
-            // REVIEW: We're making a lot of assumptions about where Measures
-            // live.
-            final XmlaOlap4jLevel measuresLevel =
-                (XmlaOlap4jLevel)
-                    context.getCube(row).getHierarchies().get("Measures")
-                        .getLevels().get(0);
 
-            // Every measure is a member. MDSCHEMA_MEASURES does not return all
-            // properties of measures, so lookup the corresponding member. In
-            // particular, we need the ordinal.
-            if (list.isEmpty()) {
-                // First call this method, ask for all members of the measures
-                // level. This should ensures that we get all members in one
-                // round trip.
-                final List<Member> measureMembers = measuresLevel.getMembers();
-                Olap4jUtil.discard(measureMembers);
-            }
-            Member member =
+            final Member member =
                 context.getCube(row).getMetadataReader()
                     .lookupMemberByUniqueName(
                         measureUniqueName);
-            final int ordinal;
-            if (member != null) {
-                ordinal = member.getOrdinal();
-            } else {
-                ordinal = -1;
+
+            if (member == null) {
+                throw new OlapException(
+                    "The server failed to resolve a member with the same unique name as a measure named "
+                    + measureUniqueName);
             }
 
             list.add(
                 new XmlaOlap4jMeasure(
-                    measuresLevel, measureUniqueName, measureName,
-                    measureCaption, description, null, measureAggregator,
-                    datatype, measureIsVisible, ordinal));
+                    (XmlaOlap4jLevel)member.getLevel(), measureUniqueName,
+                    measureName, measureCaption, description, null,
+                    measureAggregator, datatype, measureIsVisible,
+                    member.getOrdinal()));
         }
 
         public void sortList(List<XmlaOlap4jMeasure> list) {
@@ -1565,9 +1567,18 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             String uniqueName = stringElement(row, "DESCRIPTION");
             String caption = stringElement(row, "PROPERTY_CAPTION");
             String name = stringElement(row, "PROPERTY_NAME");
-            Datatype dataType =
-                Datatype.getDictionary().forOrdinal(
+            Datatype datatype;
+
+            Datatype ordinalDatatype =
+                Datatype.getDictionary().forName(
+                    stringElement(row, "DATA_TYPE"));
+            if (ordinalDatatype == null) {
+                datatype = Datatype.getDictionary().forOrdinal(
                     integerElement(row, "DATA_TYPE"));
+            } else {
+                datatype = ordinalDatatype;
+            }
+
             final Integer contentTypeOrdinal =
                 integerElement(row, "PROPERTY_CONTENT_TYPE");
             Property.ContentType contentType =
@@ -1580,7 +1591,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 Property.TypeFlag.getDictionary().forMask(propertyType);
             list.add(
                 new XmlaOlap4jProperty(
-                    uniqueName, name, caption, description, dataType, type,
+                    uniqueName, name, caption, description, datatype, type,
                     contentType));
         }
     }

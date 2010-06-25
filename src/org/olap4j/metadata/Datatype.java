@@ -82,7 +82,102 @@ public enum Datatype implements XmlaConstant {
         + "actual length of the string is determined from the bound length "
         + "value. The maximum length of the string is the number of allocated "
         + "bytes divided by sizeof(wchar_t) and truncated to the nearest "
-        + "integer.");
+        + "integer."),
+
+    /**
+     * Used by SAP BW. Represents a Character
+     */
+    ACCP(1000, "ACCP", "SAP BW Character"),
+
+    /**
+     * Used by SAP BW. Represents a CHAR
+     */
+    CHAR(1001, "CHAR", "SAP BW CHAR"),
+
+    /**
+     * Used by SAP BW. Represents a CHAR
+     */
+    CUKY(1002, "CUKY", "SAP BW CHAR"),
+
+    /**
+     * Used by SAP BW. Represents a Currency - Packed decimal, Integer
+     */
+    CURR(1003, "CURR", "SAP BW Currency - Packed decimal, Integer"),
+
+    /**
+     * Used by SAP BW. Represents a Date
+     */
+    DATS(1004, "DATS", "SAP BW Date"),
+
+    /**
+     * Used by SAP BW. Represents a Decimal
+     */
+    DEC (1005, "DEC", "SAP BW Decimal"),
+
+    /**
+     * Used by SAP BW. Represents a Point
+     */
+    FLTP(1006, "FLTP", "SAP BW Floating Point"),
+
+    /**
+     * Used by SAP BW. Represents a Byte
+     */
+    INT1(1007, "INT1", "SAP BW Byte"),
+
+    /**
+     * Used by SAP BW. Represents a Small integer
+     */
+    INT2(1008, "INT2", "SAP BW Small integer"),
+
+    /**
+     * Used by SAP BW. Represents an Integer
+     */
+    INT4(1009, "INT4", "SAP BW Integer"),
+
+    /**
+     * Used by SAP BW. Represents a Text
+     */
+    LCHR(1010, "LCHR", "SAP BW Text"),
+
+    /**
+     * Used by SAP BW. Represents a Numeric
+     */
+    NUMC(1011, "NUMC", "SAP BW Numeric"),
+
+    /**
+     * Used by SAP BW. Represents a Tiny Int
+     */
+    PREC(1012, "PREC", "SAP BW Tiny Int"),
+
+    /**
+     * Used by SAP BW. Represents a QUAN Integer
+     */
+    QUAN(1013, "QUAN", "SAP BW QUAN Integer"),
+
+    /**
+     * Used by SAP BW. Represents a String
+     */
+    SSTR(1014, "SSTR", "SAP BW String"),
+
+    /**
+     * Used by SAP BW. Represents a Long String
+     */
+    STRG(1015, "STRG", "SAP BW Long String"),
+
+    /**
+     * Used by SAP BW. Represents a Time
+     */
+    TIMS(1016, "TIMS", "SAP BW Time"),
+
+    /**
+     * Used by SAP BW. Represents a Varchar
+     */
+    VARC(1017, "VARC", "SAP BW Varchar"),
+
+    /**
+     * Used by SAP BW. Represents a Long String for Units
+     */
+    UNIT(1018, "UNIT", "SAP BW Long String for Units");
 
     private final int xmlaOrdinal;
     private String dbTypeIndicator;
@@ -101,14 +196,24 @@ public enum Datatype implements XmlaConstant {
         this.description = description;
     }
 
+    /**
+     * The internal name of this Datatype.
+     * Might not be unique across Datatype instances.
+     */
     public String xmlaName() {
         return dbTypeIndicator;
     }
 
+    /**
+     * Human readable description of a Datatype instance.
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Unique identifier of a Datatype instance.
+     */
     public int xmlaOrdinal() {
         return xmlaOrdinal;
     }
