@@ -96,7 +96,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     private boolean autoCommit;
     private boolean readOnly;
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     /**
      * Name of the "DATA_SOURCE_NAME" column returned from
