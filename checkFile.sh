@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: //open/util/bin/checkFile#23 $
+# $Id: //open/mondrian-release/3.2/bin/checkFile.sh#2 $
 # Checks that a file is valid.
 # Used by perforce submit trigger, via runTrigger.
 # The file is deemed to be valid if this command produces no output.
@@ -25,6 +25,8 @@ usage() {
     echo "checkFile  [ <options> ] --opened"
     echo "    Checks all files that are opened for edit in the current"
     echo "    perforce client."
+    echo "checkFile  [ <options> ] --under <dir>"
+    echo "    Recursively checks all files under a given directory."
     echo "checkFile --help"
     echo "    Prints this help."
     echo
@@ -86,6 +88,7 @@ doCheck() {
     */farrago/src/net/sf/farrago/test/FarragoSqlTestWrapper.java | \
     */farrago/src/org/eigenbase/jdbc4/*.java | \
     */farrago/src/org/eigenbase/lurql/parser/*.java | \
+    */farrago/src/com/lucidera/lurql/parser/*.java | \
     */farrago/src/org/eigenbase/resource/EigenbaseResource*.java | \
     */farrago/src/org/eigenbase/sql/parser/impl/*.java)
         return
@@ -93,6 +96,11 @@ doCheck() {
 
     # Exceptions for fennel
     */fennel/CMakeFiles/CompilerIdCXX/CMakeCXXCompilerId.cpp | \
+    */fennel/disruptivetech/calc/CalcGrammar.tab.cpp | \
+    */fennel/disruptivetech/calc/CalcGrammar.cpp | \
+    */fennel/disruptivetech/calc/CalcGrammar.h | \
+    */fennel/disruptivetech/calc/CalcLexer.cpp | \
+    */fennel/disruptivetech/calc/CalcLexer.h | \
     */fennel/calculator/CalcGrammar.tab.cpp | \
     */fennel/calculator/CalcGrammar.cpp | \
     */fennel/calculator/CalcGrammar.h | \
@@ -118,6 +126,7 @@ doCheck() {
     # Only validate .java and .cup files at present.
     *.java|*.cup|*.h|*.cpp)
         ;;
+
     *)
         return
         ;;
@@ -126,25 +135,7 @@ doCheck() {
     # Set maxLineLength if it is not already set. ('checkFile --opened'
     # sets it to the strictest value, 80).
     if [ ! "$maxLineLength" ]; then
-        case "$filePath" in
-        */aspen/*)
-            if [ "$strict" ]; then
-                maxLineLength=80
-            else
-                maxLineLength=95
-            fi
-            ;;
-        */mondrian/*)
-            if [ "$strict" ]; then
-                maxLineLength=80
-            else
-                maxLineLength=90
-            fi
-            ;;
-        *)
-            maxLineLength=80
-            ;;
-        esac
+        maxLineLength=80
     fi
 
     # Check whether there are tabs, or lines end with spaces
@@ -153,16 +144,29 @@ doCheck() {
     # todo: check that every class has javadoc
     # todo: check that every top-level class has @author and @version
     # todo: check c++ files
-    if [ ! -f "$CHECKFILE_AWK" ]
-    then
-        CHECKFILE_AWK="$(dirname $(readlink -f $0))/checkFile.awk"
+    if test "$deferred" ; then
+        echo "$file" >> "${deferred_file}"
+    else
+        gawk -f "$CHECKFILE_AWK" \
+            -v fname="$filePath" \
+            -v lenient="$lenient" \
+            -v maxLineLength="$maxLineLength" \
+            "$file"
     fi
-    cat "$file" |
-    gawk -f "$CHECKFILE_AWK" \
-        -v fname="$filePath" \
-        -v lenient="$lenient" \
-        -v maxLineLength="$maxLineLength"
 }
+
+doCheckDeferred() {
+    if [ -s "${deferred_file}" ]; then
+        maxLineLength=80
+        cat "${deferred_file}" |
+        xargs gawk -f "$CHECKFILE_AWK" \
+            -v lenient="$lenient" \
+            -v maxLineLength="$maxLineLength"
+   fi
+   rm -f "${deferred_file}"
+}
+
+export deferred=true
 
 # 'test' is an undocumented flag, overriding the default behavior which is
 # to ignore our own test files
@@ -192,18 +196,57 @@ fi
 depotPath=
 if [ "$1" == --depotPath ]; then
     depotPath="$2"
+    deferred=
     shift 2
 fi
 
 opened=
 if [ "$1" == --opened ]; then
     opened=true
+    deferred=
     shift
 fi
 
-if [ "$opened" ]; then
+under=
+if [ "$1" == --under ]; then
+    if [ "$opened" ]; then
+        echo "Cannot specify both --under and --opened"
+        exit 1
+    fi
+    if [ ! -d "$2" ]; then
+        echo "--under requires a directory; '$2' not found"
+        exit 1
+    fi
+    under="$2"
+    shift 2
+fi
+
+if [ "$1" == --opened ]; then
+    echo "Cannot specify both --under and --opened"
+    exit 1
+fi
+
+if [ ! -f "$CHECKFILE_AWK" ]
+then
+    export CHECKFILE_AWK="$(dirname $(readlink -f $0))/checkFile.awk"
+fi
+
+export deferred_file=/tmp/checkFile_deferred_$$.txt
+rm -f "${deferred_file}"
+
+(
+if [ "$under" ]; then
+    find "$under" -type f |
+    while read file; do
+        filePath="$file"
+        if [ "$depotPath" ]; then
+            filePath="$depotPath"
+        fi
+        doCheck "$filePath" "$file" ""
+    done
+elif [ "$opened" ]; then
     p4 opened |
-    gawk -F'#' '{print $1}' |
+    gawk -F'#' '$2 !~ / - delete/ {print $1}' |
     while read line; do
         file=$(p4 where "$line" | gawk '{print $3}' | tr \\\\ /)
         doCheck "$file" "$file" "80"
@@ -217,5 +260,17 @@ else
         doCheck "$filePath" "$file" ""
     done
 fi
+
+if test "$deferred"; then
+    doCheckDeferred
+fi
+) | tee /tmp/checkFile_output_$$.txt
+
+status=0
+if [ -s /tmp/checkFile_output_$$.txt ]; then
+    status=1
+fi
+
+exit $status
 
 # End checkFile
