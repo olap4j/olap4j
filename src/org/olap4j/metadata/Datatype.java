@@ -112,7 +112,7 @@ public enum Datatype implements XmlaConstant {
     /**
      * Used by SAP BW. Represents a Decimal
      */
-    DEC (1005, "DEC", "SAP BW Decimal"),
+    DEC(1005, "DEC", "SAP BW Decimal"),
 
     /**
      * Used by SAP BW. Represents a Point
