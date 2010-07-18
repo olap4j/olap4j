@@ -790,6 +790,37 @@ public class ParserTest extends TestCase {
     }
 
     /**
+     * Test case for empty expressions. Test case for <a href=
+  "http://sf.net/tracker/?func=detail&aid=3030772&group_id=168953&atid=848534"
+     * > bug 3030772, "DrilldownLevelTop parser error"</a>.
+     */
+    public void testEmptyExpr() {
+        assertParseQuery(
+            "select NON EMPTY HIERARCHIZE(\n"
+            + "  {DrillDownLevelTop(\n"
+            + "     {[Product].[All Products]},3,,[Measures].[Unit Sales])}"
+            + "  ) ON COLUMNS\n"
+            + "from [Sales]\n",
+            "SELECT\n"
+            + "NON EMPTY HIERARCHIZE({DrillDownLevelTop({[Product].[All Products]}, 3.0, , [Measures].[Unit Sales])}) ON COLUMNS\n"
+            + "FROM [Sales]");
+
+        // more advanced; the actual test case in the bug
+        assertParseQuery(
+            "SELECT {[Measures].[NetSales]}"
+            + " DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON COLUMNS ,"
+            + " NON EMPTY HIERARCHIZE(AddCalculatedMembers("
+            + "{DrillDownLevelTop({[ProductDim].[Name].[All]}, 10, ,"
+            + " [Measures].[NetSales])}))"
+            + " DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON ROWS "
+            + "FROM [cube]",
+            "SELECT\n"
+            + "{[Measures].[NetSales]} DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON COLUMNS,\n"
+            + "NON EMPTY HIERARCHIZE(AddCalculatedMembers({DrillDownLevelTop({[ProductDim].[Name].[All]}, 10.0, , [Measures].[NetSales])})) DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON ROWS\n"
+            + "FROM [cube]");
+    }
+
+    /**
      * Parses an MDX query and asserts that the result is as expected when
      * unparsed.
      *

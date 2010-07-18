@@ -85,6 +85,9 @@ public class CallNode implements ParseTreeNode {
         case Internal:
             assert name.startsWith("$");
             break;
+        case Empty:
+            assert name.equals("");
+            break;
         default:
             assert !name.startsWith("$")
                 && !name.equals("{}")

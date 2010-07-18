@@ -284,7 +284,27 @@ public enum Syntax {
      * Defines syntax for expression invoked <code>object&#46;[&PROPERTY]</code>
      * (a variant of {@link #Property}).
      */
-    AmpersandQuotedProperty;
+    AmpersandQuotedProperty,
+
+    /**
+     * Defines the syntax for an empty expression. Empty expressions can occur
+     * within function calls, and are denoted by a pair of commas with only
+     * whitespace between them, for example
+     *
+     * <blockquote>
+     * <code>DrillDownLevelTop({[Product].[All Products]}, 3, ,
+     *  [Measures].[Unit Sales])</code>
+     * </blockquote>
+     */
+    Empty {
+        public void unparse(
+            String operatorName,
+            List<ParseTreeNode> argList,
+            ParseTreeWriter writer)
+        {
+            assert argList.size() == 0;
+        }
+    };
 
     /**
      * Converts a call to a function of this syntax into source code.

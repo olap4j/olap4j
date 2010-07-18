@@ -336,6 +336,7 @@ non terminal ParseTreeNode
     case_expression,
     else_clause_opt,
     expression,
+    expression_or_empty,
     factor,
     filter_specification,
     term,
@@ -1244,6 +1245,13 @@ expression ::=
         :}
     |   value_expression
     ;
+expression_or_empty ::=
+        expression
+    |   /* empty */ {:
+            final ParseRegion region = createRegion(0, 0);
+            RESULT = new CallNode(region, "", Syntax.Empty);
+        :}
+    ;
 exp_list_opt ::=
         /* empty */ {:
             RESULT = new LinkedList();
@@ -1255,7 +1263,7 @@ exp_list ::=
             RESULT = new LinkedList();
             RESULT.add(e);
         :}
-    |   expression:e COMMA exp_list:list {:
+    |   expression_or_empty:e COMMA exp_list:list {:
             list.add(0, e); RESULT = list;
         :}
     ;
