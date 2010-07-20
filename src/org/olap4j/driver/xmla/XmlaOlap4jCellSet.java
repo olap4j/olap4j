@@ -534,6 +534,9 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                     if (cubeName.equals(cube.getName())) {
                         return (XmlaOlap4jCube) cube;
                     }
+                    if (cubeName.equals("[" + cube.getName() + "]")) {
+                        return (XmlaOlap4jCube) cube;
+                    }
                 }
             }
         }

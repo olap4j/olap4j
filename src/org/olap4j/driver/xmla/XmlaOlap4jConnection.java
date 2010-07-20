@@ -1095,8 +1095,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             // so try to use the unique name instead
             final String hierarchyName =
                 stringElement(row, "HIERARCHY_NAME") == null
-                    ? hierarchyUniqueName
-                    : stringElement(row, "HIERARCHY_NAME");
+                ? (hierarchyUniqueName != null
+                        ? hierarchyUniqueName.replaceAll("^\\[", "")
+                             .replaceAll("\\]$", "")
+                        : null)
+                : stringElement(row, "HIERARCHY_NAME");
             final String hierarchyCaption =
                 stringElement(row, "HIERARCHY_CAPTION");
             final String description =
@@ -1163,7 +1166,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             // so try to use the unique name instead
             final String levelName =
                 stringElement(row, "LEVEL_NAME") == null
-                    ? levelUniqueName
+                    ? (levelUniqueName != null
+                            ? levelUniqueName.replaceAll("^\\[", "")
+                                    .replaceAll("\\]$", "")
+                            : null)
                     : stringElement(row, "LEVEL_NAME");
             final String levelCaption =
                 stringElement(row, "LEVEL_CAPTION");
