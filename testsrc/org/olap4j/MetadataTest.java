@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
 import org.olap4j.test.TestContext;
+import org.olap4j.test.TestContext.Tester;
 
 import java.sql.*;
 import java.util.*;
@@ -179,6 +180,7 @@ public class MetadataTest extends TestCase {
         DatabaseMetaData databaseMetaData = connection.getMetaData();
         switch (tester.getFlavor()) {
         case XMLA:
+        case REMOTE_XMLA:
             // FIXME: implement getDatabaseXxxVersion in XMLA driver
             break;
         default:
@@ -218,6 +220,7 @@ public class MetadataTest extends TestCase {
                 olapDatabaseMetaData.getDriverName()));
         switch (tester.getFlavor()) {
         case XMLA:
+        case REMOTE_XMLA:
             // FIXME: implement getDatabaseXxxVersion in XMLA driver
             break;
         default:
@@ -257,6 +260,9 @@ public class MetadataTest extends TestCase {
                 + " AUTHENTICATION_MODE=null\n",
                 s);
             break;
+        case REMOTE_XMLA:
+            // This can be anything, depending on the remote server.
+            break;
         case XMLA:
             TestContext.assertEqualsVerbose(
                 "DATA_SOURCE_NAME=MondrianFoodMart,"
@@ -276,7 +282,9 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getCatalogs(),
             CATALOGS_COLUMN_NAMES);
         final String expected;
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
+                || tester.getFlavor() != Tester.Flavor.REMOTE_XMLA)
+        {
             // XMLA test uses dummy duplicate catalog to make sure that we
             // get all catalogs
             expected =
@@ -293,7 +301,9 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getSchemas(),
             SCHEMAS_COLUMN_NAMES);
         final String expected;
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
+                || tester.getFlavor() != Tester.Flavor.REMOTE_XMLA)
+        {
             // XMLA test uses dummy duplicate catalog to make sure that we
             // get all catalogs
             expected =
@@ -383,7 +393,9 @@ public class MetadataTest extends TestCase {
             + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, ",
             s);
         final int lineCount2 = linecount(s);
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
+                || tester.getFlavor() != Tester.Flavor.REMOTE_XMLA)
+        {
             assertEquals(lineCount * 2, lineCount2);
         }
 

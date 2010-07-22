@@ -101,6 +101,7 @@ public class ConnectionTest extends TestCase {
                 new Properties());
         switch (tester.getFlavor()) {
         case XMLA:
+        case REMOTE_XMLA:
             break;
         default:
             assertTrue(driverPropertyInfos.length > 0);
@@ -238,6 +239,18 @@ public class ConnectionTest extends TestCase {
         case XMLA:
             // in-process XMLA test does not support username/password
             break;
+
+        case REMOTE_XMLA:
+            // connect using username/password
+            connection = tester.createConnectionWithUserPassword();
+            assertNotNull(connection);
+
+            // connect with URL only
+            connection = DriverManager.getConnection(tester.getURL());
+            assertNotNull(connection);
+
+            connection.close();
+            break;
         }
         assertTrue(connection.isClosed());
     }
@@ -324,7 +337,9 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testXmlaCatalogParameter() throws Exception {
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
+                || tester.getFlavor() != Tester.Flavor.XMLA)
+        {
             // We won't use the tester itself since we want to test
             // creating a connection with and without a Catalog parameter.
             Properties info = new Properties();
@@ -529,6 +544,7 @@ public class ConnectionTest extends TestCase {
             assertEquals(1, filterAxis.getPositionCount());
             break;
         case XMLA:
+        case REMOTE_XMLA:
             assertEquals(3, filterAxis.getPositionCount());
             final List<Position> filterPositions = filterAxis.getPositions();
             assertEquals(3, filterPositions.size());
@@ -583,6 +599,7 @@ public class ConnectionTest extends TestCase {
         } catch (OlapException e) {
             switch (tester.getFlavor()) {
             case XMLA:
+            case REMOTE_XMLA:
                 assertTrue(e.getMessage().indexOf(
                     "XMLA MDX parse failed") >= 0);
                 break;
@@ -625,6 +642,7 @@ public class ConnectionTest extends TestCase {
         // XMLA driver does not support parameters yet.
         switch (tester.getFlavor()) {
         case XMLA:
+        case REMOTE_XMLA:
             assertEquals(0, paramCount);
             return;
         }
@@ -1022,8 +1040,10 @@ public class ConnectionTest extends TestCase {
         // access method 1
         Cell cell = cellSet.getCell(5);
         assertEquals(5, cell.getOrdinal());
-        if (tester.getFlavor() != TestContext.Tester.Flavor.XMLA) { // FIXME
-        assertEquals(12935.16, cell.getValue());
+        if (tester.getFlavor() != TestContext.Tester.Flavor.XMLA // FIXME
+            || tester.getFlavor() != TestContext.Tester.Flavor.REMOTE_XMLA)
+        {
+            assertEquals(12935.16, cell.getValue());
         }
         assertEquals(12935.16, cell.getDoubleValue());
         assertEquals("12,935.16", cell.getFormattedValue());
@@ -1050,6 +1070,7 @@ public class ConnectionTest extends TestCase {
 
         switch (tester.getFlavor()) {
         case XMLA:
+        case REMOTE_XMLA:
             // TODO: implement drill-through in XMLA driver
             break;
         default:
@@ -1149,6 +1170,7 @@ public class ConnectionTest extends TestCase {
         cell = cellSet.getCell(0);
         switch (tester.getFlavor()) {
         case XMLA:
+        case REMOTE_XMLA:
             // FIXME: mondrian's XMLA provider doesn't indicate that a cell is
             // an error
             break;
@@ -1250,7 +1272,9 @@ public class ConnectionTest extends TestCase {
                 "select {[Gender]} on columns, {[Store].Children} on columns\n"
                 + "from [sales]");
 
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
+                || tester.getFlavor() != Tester.Flavor.XMLA)
+        {
             // This test requires validator support.
             return;
         }
@@ -1504,6 +1528,7 @@ public class ConnectionTest extends TestCase {
         String expected;
         switch (tester.getFlavor()) {
         case XMLA:
+        case REMOTE_XMLA:
             // TODO: Fix mondrian's XMLA driver to return members ordered by
             // level then by ordinal as per XMLA spec
             expected =
@@ -1558,6 +1583,7 @@ public class ConnectionTest extends TestCase {
                 "Time", "1997", "Q2");
         switch (tester.getFlavor()) {
         case XMLA:
+        case REMOTE_XMLA:
             // TODO: fix mondrian's XMLA driver to return members ordered by
             // level then ordinal
             expected =
@@ -1629,6 +1655,9 @@ public class ConnectionTest extends TestCase {
 
         // We engineered the XMLA test environment to have two catalogs.
         switch (tester.getFlavor()) {
+        case REMOTE_XMLA:
+            assertEquals(1, olapConnection.getCatalogs().size());
+            break;
         case XMLA:
             assertEquals(2, olapConnection.getCatalogs().size());
             break;
@@ -1745,6 +1774,7 @@ public class ConnectionTest extends TestCase {
             namedSet.getDescription(Locale.getDefault());
             switch (tester.getFlavor()) {
             case XMLA:
+            case REMOTE_XMLA:
                 // FIXME: implement getExpression in XMLA driver
                 break;
             default:
@@ -1784,7 +1814,9 @@ public class ConnectionTest extends TestCase {
 
         assertEquals("Food", member.getCaption(null));
 
-        if (tester.getFlavor() != Tester.Flavor.XMLA) {
+        if (tester.getFlavor() != Tester.Flavor.XMLA
+                && tester.getFlavor() != Tester.Flavor.REMOTE_XMLA)
+        {
             assertNull(member.getDescription(null));
             assertEquals(1, member.getDepth());
             assertEquals(-1, member.getSolveOrder());
@@ -2022,7 +2054,9 @@ public class ConnectionTest extends TestCase {
      * @throws Throwable on error
      */
     public void testCubeType() throws Throwable {
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
+                || tester.getFlavor() == TestContext.Tester.Flavor.REMOTE_XMLA)
+        {
             // This test requires validator support.
             return;
         }
@@ -2089,7 +2123,9 @@ public class ConnectionTest extends TestCase {
      * @throws Throwable on error
      */
     public void testAxisType() throws Throwable {
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
+                || tester.getFlavor() == TestContext.Tester.Flavor.REMOTE_XMLA)
+        {
             // This test requires validator support.
             return;
         }
@@ -2182,7 +2218,9 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testParseQueryWithNoFilter() throws Exception {
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
+                || tester.getFlavor() != Tester.Flavor.REMOTE_XMLA)
+        {
             // This test requires validator support.
             return;
         }
@@ -2224,7 +2262,9 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testValidateError() throws Exception {
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
+        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
+                || tester.getFlavor() != Tester.Flavor.XMLA)
+        {
             // This test requires validator support.
             return;
         }

@@ -520,7 +520,8 @@ public class TestContext {
 
         enum Flavor {
             MONDRIAN,
-            XMLA
+            XMLA,
+            REMOTE_XMLA
         }
     }
 
@@ -595,6 +596,24 @@ public class TestContext {
          * driver.
          */
         XMLA_CATALOG_URL("org.olap4j.XmlaTester.CatalogUrl"),
+
+        /**
+         * Test property related to the remote XMLA tester.
+         * Must be a valid XMLA driver URL.
+         */
+        REMOTE_XMLA_URL("org.olap4j.RemoteXmlaTester.JdbcUrl"),
+
+        /**
+         * Test property related to the remote XMLA tester.
+         * User name to use.
+         */
+        REMOTE_XMLA_USERNAME("org.olap4j.RemoteXmlaTester.Username"),
+
+        /**
+         * Test property related to the remote XMLA tester.
+         * Password to use.
+         */
+        REMOTE_XMLA_PASSWORD("org.olap4j.RemoteXmlaTester.Password"),
 
         /**
          * Test property that indicates the wrapper to place around the

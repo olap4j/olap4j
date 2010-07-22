@@ -57,6 +57,7 @@ public class OlapTest extends TestCase {
                 catalogName = "LOCALDB";
                 break;
             case XMLA:
+            case REMOTE_XMLA:
             default:
                 catalogName = "FoodMart";
                 break;
@@ -126,6 +127,7 @@ public class OlapTest extends TestCase {
                 catalogName = "LOCALDB";
                 break;
             case XMLA:
+            case REMOTE_XMLA:
             default:
                 catalogName = "FoodMart";
                 break;
