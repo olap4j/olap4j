@@ -9,11 +9,15 @@
 */
 package org.olap4j.mdx;
 
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.impl.UnmodifiableArrayList;
 import org.olap4j.type.Type;
-
-import java.util.*;
 
 /**
  * Multi-part identifier.
@@ -205,73 +209,44 @@ public class IdentifierNode
      * invalid
      */
     public static List<Segment> parseIdentifier(String identifier)  {
-        if (!identifier.startsWith("[")) {
-            return Collections.<Segment>singletonList(
-                new NameSegment(null, identifier, Quoting.UNQUOTED));
-        }
-
+        String[] nodes = identifier.split("\\.");
         List<Segment> list = new ArrayList<Segment>();
-        int i = 0;
-        Quoting type;
-        while (i < identifier.length()) {
-            if (identifier.charAt(i) != '&' && identifier.charAt(i) != '[') {
-                throw new IllegalArgumentException(
-                    "Invalid member identifier '" + identifier + "'");
-            }
-
-            if (identifier.charAt(i) ==  '&') {
-                i++;
-                type = Quoting.KEY;
-            } else {
-                type = Quoting.QUOTED;
-            }
-
-            if (identifier.charAt(i) != '[') {
-                throw new IllegalArgumentException(
-                    "Invalid member identifier '" + identifier + "'");
-            }
-
-            int j = getEndIndex(identifier, i + 1);
-            if (j == -1) {
-                throw new IllegalArgumentException(
-                    "Invalid member identifier '" + identifier + "'");
-            }
-
-            list.add(
-                new NameSegment(
-                    null,
-                    Olap4jUtil.replace(
-                        identifier.substring(i + 1, j), "]]", "]"),
-                    type));
-
-            i = j + 2;
+        for (String node : nodes) {
+            list.add(parseSegment(node));
         }
         return list;
     }
 
     /**
-     * Returns the end of the current segment.
-     *
-     * @param s Identifier string
-     * @param i Start of identifier segment
-     * @return End of segment
+     * Parses a MDX Identifier Node into a Segment
+     * @param node MDX Identifier Node
+     * @return Segment of Identifier Node
      */
-    private static int getEndIndex(String s, int i) {
-        while (i < s.length()) {
-            char ch = s.charAt(i);
-            if (ch == ']') {
-                if (i + 1 < s.length() && s.charAt(i + 1) == ']') {
-                    // found ]] => skip
-                    i += 2;
-                } else {
-                    return i;
-                }
-            } else {
-                i++;
-            }
+    private static Segment parseSegment(String node) {
+        Pattern patternQuoted = Pattern.compile("^\\[(.*)\\]$");
+        // This pattern identifies a Key node
+        // For Example: "&CA" or "&[CA]"
+        Pattern patternKey = Pattern.compile("^&[\\[]{0,1}(.*)[\\]]{0,1}");
+        Matcher quotedMatcher = patternQuoted.matcher(node);
+        Matcher keyMatcher = patternKey.matcher(node);
+
+        Quoting type = Quoting.QUOTED;
+        String value;
+
+        if (quotedMatcher.matches()) {
+            type = Quoting.QUOTED;
+            value = quotedMatcher.group(1);
+        } else if (keyMatcher.matches()) {
+            type = Quoting.KEY;
+            value = keyMatcher.group(1);
+        } else {
+            type = Quoting.UNQUOTED;
+            value = node;
         }
-        return -1;
+
+        return new NameSegment(null, value, type);
     }
+
 
     /**
      * Returns string quoted in [...].
