@@ -338,7 +338,7 @@ public class ConnectionTest extends TestCase {
 
     public void testXmlaCatalogParameter() throws Exception {
         if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
-                || tester.getFlavor() != Tester.Flavor.XMLA)
+                || tester.getFlavor() == Tester.Flavor.REMOTE_XMLA)
         {
             // We won't use the tester itself since we want to test
             // creating a connection with and without a Catalog parameter.

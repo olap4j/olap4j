@@ -283,7 +283,7 @@ public class MetadataTest extends TestCase {
             CATALOGS_COLUMN_NAMES);
         final String expected;
         if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
-                || tester.getFlavor() != Tester.Flavor.REMOTE_XMLA)
+                || tester.getFlavor() == Tester.Flavor.REMOTE_XMLA)
         {
             // XMLA test uses dummy duplicate catalog to make sure that we
             // get all catalogs
@@ -302,7 +302,7 @@ public class MetadataTest extends TestCase {
             SCHEMAS_COLUMN_NAMES);
         final String expected;
         if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
-                || tester.getFlavor() != Tester.Flavor.REMOTE_XMLA)
+                || tester.getFlavor() == Tester.Flavor.REMOTE_XMLA)
         {
             // XMLA test uses dummy duplicate catalog to make sure that we
             // get all catalogs
@@ -394,7 +394,7 @@ public class MetadataTest extends TestCase {
             s);
         final int lineCount2 = linecount(s);
         if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
-                || tester.getFlavor() != Tester.Flavor.REMOTE_XMLA)
+                || tester.getFlavor() == Tester.Flavor.REMOTE_XMLA)
         {
             assertEquals(lineCount * 2, lineCount2);
         }

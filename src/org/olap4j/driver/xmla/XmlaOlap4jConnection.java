@@ -62,7 +62,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     final XmlaOlap4jProxy proxy;
 
-    private boolean closed;
+    private boolean closed = false;
 
     /**
      * URL of the HTTP server to which to send XML requests.
