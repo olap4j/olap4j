@@ -18,7 +18,7 @@ import org.olap4j.OlapConnection;
 import org.olap4j.OlapStatement;
 import org.olap4j.OlapWrapper;
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
-import org.olap4j.layout.TraditionalCellSetFormatter;
+import org.olap4j.layout.RectangularCellSetFormatter;
 
 /**
  * This class demonstrates how to connect the {@link XmlaOlap4jDriver}
@@ -49,10 +49,14 @@ public class PaloConnection {
                 "SELECT {[store].[USA]} ON COLUMNS , {[Account].[1000]} ON ROWS\n"
                 + "FROM [Budget]");
 
-        TraditionalCellSetFormatter formatter =
-            new TraditionalCellSetFormatter();
+        // We use the utility formatter.
+        RectangularCellSetFormatter formatter =
+            new RectangularCellSetFormatter(false);
 
-        formatter.format(cellSet, new PrintWriter(System.out));
+        // Print out.
+        PrintWriter writer = new PrintWriter(System.out);
+        formatter.format(cellSet, writer);
+        writer.flush();
 
         statement.close();
         connection.close();
