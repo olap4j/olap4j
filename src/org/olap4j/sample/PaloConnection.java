@@ -53,6 +53,9 @@ public class PaloConnection {
             new TraditionalCellSetFormatter();
 
         formatter.format(cellSet, new PrintWriter(System.out));
+
+        statement.close();
+        connection.close();
     }
 }
 
