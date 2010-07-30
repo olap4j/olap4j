@@ -135,7 +135,7 @@ parser code {:
         ParseRegion region,
         List<ParseTreeNode> withList,
         List<AxisNode> axisList,
-        IdentifierNode cubeName,
+        ParseTreeNode from,
         ParseTreeNode filter,
         List<IdentifierNode> cellProps)
     {
@@ -155,7 +155,7 @@ parser code {:
                 }
             });
         return new SelectNode(
-            region, withList, axisList, cubeName, filterAxis, cellProps);
+            region, withList, axisList, from, filterAxis, cellProps);
     }
 
     // Override lr_parser methods for NLS.  With this error handling scheme,
@@ -334,6 +334,7 @@ non terminal AxisNode
     axis_specification;
 non terminal ParseTreeNode
     case_expression,
+    cube_specification_or_select_statement,
     else_clause_opt,
     expression,
     expression_or_empty,
@@ -1320,7 +1321,15 @@ exp_list ::=
 //                         FROM [<cube_specification>]
 //                         WHERE [<filter_specification>]
 //                         [<cell_props>]
+//                    |
+//                        [WITH <formula_specification>]
+//                         SELECT [<axis_specification>
+//                                [, <axis_specification>...]]
+//                         FROM ( select_statement )
+//                         WHERE [<filter_specification>]
+//                         [<cell_props>]
 // jhyde: The above is wrong... you can omit 'WHERE'.
+
 statement ::=
         select_statement
     |   _VALUE_EXPRESSION value_expression:e {:
@@ -1328,10 +1337,17 @@ statement ::=
         :}
     ;
 
+cube_specification_or_select_statement ::=
+        cube_specification
+    |   LPAREN select_statement:s RPAREN {:
+            RESULT = s;
+        :}
+    ;
+
 select_statement ::=
         with_formula_specification_opt:f
         SELECT:select axis_specification_list_opt:a
-        FROM cube_specification:c
+        FROM cube_specification_or_select_statement:c
         where_clause_opt:w
         cell_props_opt:cp {:
             ParseRegion region = createRegion(selectleft, selectright);

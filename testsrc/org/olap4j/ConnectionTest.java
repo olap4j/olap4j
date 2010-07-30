@@ -1308,10 +1308,8 @@ public class ConnectionTest extends TestCase {
         String expectedMdx)
     {
         StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
-        ParseTreeWriter parseTreeWriter = new ParseTreeWriter(pw);
+        ParseTreeWriter parseTreeWriter = new ParseTreeWriter(sw);
         select.unparse(parseTreeWriter);
-        pw.flush();
         String mdx = sw.toString();
         TestContext.assertEqualsVerbose(
             expectedMdx, mdx);
@@ -1324,11 +1322,13 @@ public class ConnectionTest extends TestCase {
     public void testUnparsing() {
         // Note that the select statement constructed here is equivalent
         // to the one in testParsing.
+        final IdentifierNode cubeName =
+            new IdentifierNode(new IdentifierNode.NameSegment("sales"));
         SelectNode select = new SelectNode(
             null,
             new ArrayList<ParseTreeNode>(),
             new ArrayList<AxisNode>(),
-            new IdentifierNode(new IdentifierNode.NameSegment("sales")),
+            cubeName,
             new AxisNode(
                 null,
                 false,
@@ -1388,7 +1388,36 @@ public class ConnectionTest extends TestCase {
                 new IdentifierNode.NameSegment("1997"),
                 new IdentifierNode.NameSegment("Q4")));
 
+        assertEquals(select.getFrom(), cubeName);
         checkUnparsedMdx(select);
+
+        // Now with a subquery in the FROM clause.
+        SelectNode subSelect = new SelectNode(
+            null,
+            new ArrayList<ParseTreeNode>(),
+            new ArrayList<AxisNode>(),
+            new IdentifierNode(new IdentifierNode.NameSegment("warehouse")),
+            new AxisNode(
+                null,
+                false,
+                Axis.FILTER,
+                new ArrayList<IdentifierNode>(),
+                null),
+            new ArrayList<IdentifierNode>());
+        select.setFrom(subSelect);
+
+        assertEquals(select.getFrom(), subSelect);
+        checkUnparsedMdx(
+            select,
+            "WITH\n"
+            + "MEMBER [Measures].[Foo] AS '[Measures].[Bar]', FORMAT_STRING = \"xxx\"\n"
+            + "SELECT\n"
+            + "{[Gender]} ON COLUMNS,\n"
+            + "{[Store].Children} ON ROWS\n"
+            + "FROM (\n"
+            + "    SELECT\n"
+            + "    FROM [warehouse])\n"
+            + "WHERE [Time].[1997].[Q4]");
     }
 
     public void testBuildParseTree() {

@@ -81,15 +81,16 @@ public class TestContext {
      */
     public static String toString(ParseTreeNode node) {
         StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        ParseTreeWriter parseTreeWriter = new ParseTreeWriter(pw);
+        ParseTreeWriter parseTreeWriter = new ParseTreeWriter(sw);
         node.unparse(parseTreeWriter);
-        pw.flush();
         return sw.toString();
     }
 
     /**
      * Formats a {@link org.olap4j.CellSet}.
+     *
+     * @param cellSet Cell set
+     * @return String representation of cell set
      */
     public static String toString(CellSet cellSet) {
         StringWriter sw = new StringWriter();

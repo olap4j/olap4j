@@ -43,10 +43,8 @@ class MdxUtil {
 
     static String toString(ParseTreeNode node) {
         StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        ParseTreeWriter parseTreeWriter = new ParseTreeWriter(pw);
+        ParseTreeWriter parseTreeWriter = new ParseTreeWriter(sw);
         node.unparse(parseTreeWriter);
-        pw.flush();
         return sw.toString();
     }
 

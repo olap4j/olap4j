@@ -38,7 +38,7 @@ public class SelectNode implements ParseTreeNode {
      * @param withList List of members and sets defined in this query using
      *   a <code>WITH</code> clause
      * @param axisList List of axes
-     * @param from Name of cube
+     * @param from Contents of FROM clause (name of cube, or subquery)
      * @param filterAxis Filter axis
      * @param cellPropertyList List of properties
      */
@@ -102,9 +102,8 @@ public class SelectNode implements ParseTreeNode {
 
     public String toString() {
         StringWriter sw = new StringWriter();
-        ParseTreeWriter pw = new ParseTreeWriter(new PrintWriter(sw));
+        ParseTreeWriter pw = new ParseTreeWriter(sw);
         unparse(pw);
-        sw.flush();
         return sw.toString();
     }
 
@@ -129,7 +128,15 @@ public class SelectNode implements ParseTreeNode {
         }
         pw.println();
         pw.print("FROM ");
-        from.unparse(writer);
+        if (from instanceof SelectNode) {
+            writer.indent();
+            pw.println("(");
+            from.unparse(writer);
+            pw.print(")");
+            writer.outdent();
+        } else {
+            from.unparse(writer);
+        }
         if (filterAxis.getExpression() != null) {
             pw.println();
             pw.print("WHERE ");
@@ -201,7 +208,8 @@ public class SelectNode implements ParseTreeNode {
 
     /**
      * Returns the node representing the FROM clause of this SELECT statement.
-     * The node is typically an {@link IdentifierNode} or a {@link CubeNode}.
+     * The node is typically an {@link IdentifierNode}, a {@link CubeNode} or
+     * a {@link SelectNode}.
      *
      * @return FROM clause
      */
@@ -217,10 +225,10 @@ public class SelectNode implements ParseTreeNode {
      * a {@link org.olap4j.mdx.CubeNode} referencing an explicit
      * {@link org.olap4j.metadata.Cube} object.
      *
-     * @param fromNode FROM clause
+     * @param from FROM clause
      */
-    public void setFrom(ParseTreeNode fromNode) {
-        this.from = fromNode;
+    public void setFrom(ParseTreeNode from) {
+        this.from = from;
     }
 
     /**

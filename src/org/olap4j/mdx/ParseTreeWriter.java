@@ -10,6 +10,7 @@
 package org.olap4j.mdx;
 
 import java.io.PrintWriter;
+import java.io.Writer;
 
 /**
  * Writer for MDX parse tree.
@@ -38,23 +39,70 @@ import java.io.PrintWriter;
  */
 public class ParseTreeWriter {
     private final PrintWriter pw;
+    private int linePrefixLength;
+    private String linePrefix;
+
+    private static final int INDENT = 4;
+    private static String bigString = "                ";
 
     /**
      * Creates a ParseTreeWriter.
      *
-     * @param pw Underlying writer
+     * @param w Underlying writer
      */
-    public ParseTreeWriter(PrintWriter pw) {
-        this.pw = pw;
+    public ParseTreeWriter(Writer w) {
+        this.pw = new PrintWriter(w) {
+            @Override
+            public void println() {
+                super.println();
+                print(linePrefix);
+            }
+
+        };
+        this.linePrefixLength = 0;
+        setPrefix();
     }
 
     /**
-     * Returns the underlying writer.
+     * Returns the print writer.
      *
-     * @return underlying writer
+     * @return print writer
      */
     public PrintWriter getPrintWriter() {
         return pw;
+    }
+
+    /**
+     * Increases the indentation level.
+     */
+    public void indent() {
+        linePrefixLength += INDENT;
+        setPrefix();
+    }
+
+    private void setPrefix() {
+        linePrefix = spaces(linePrefixLength);
+    }
+
+    /**
+     * Decreases the indentation level.
+     */
+    public void outdent() {
+        linePrefixLength -= INDENT;
+        setPrefix();
+    }
+
+    /**
+     * Returns a string of N spaces.
+     * @param n Number of spaces
+     * @return String of N spaces
+     */
+    private static synchronized String spaces(int n)
+    {
+        while (n > bigString.length()) {
+            bigString = bigString + bigString;
+        }
+        return bigString.substring(0, n);
     }
 }
 

@@ -821,6 +821,22 @@ public class ParserTest extends TestCase {
     }
 
     /**
+     * Test case for SELECT in the FROM clause.
+     */
+    public void testInnerSelect() {
+        assertParseQuery(
+            "SELECT FROM "
+            + "(SELECT ({[ProductDim].[Product Group].&[Mobile Phones]}) "
+            + "ON COLUMNS FROM [cube]) CELL PROPERTIES VALUE",
+            "SELECT\n"
+            + "FROM (\n"
+            + "    SELECT\n"
+            + "    ({[ProductDim].[Product Group].&[Mobile Phones]}) ON COLUMNS\n"
+            + "    FROM [cube])\n"
+            + "CELL PROPERTIES VALUE");
+    }
+
+    /**
      * Parses an MDX query and asserts that the result is as expected when
      * unparsed.
      *

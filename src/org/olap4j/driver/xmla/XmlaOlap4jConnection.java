@@ -2180,7 +2180,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             throws OlapException
         {
             StringWriter sw = new StringWriter();
-            selectNode.unparse(new ParseTreeWriter(new PrintWriter(sw)));
+            selectNode.unparse(new ParseTreeWriter(sw));
             String mdx = sw.toString();
             final XmlaOlap4jConnection olap4jConnection =
                 (XmlaOlap4jConnection) connection;
