@@ -372,7 +372,8 @@ public class Olap4jUtilTest extends TestCase {
         assertEquals("Q3", segments.get(2).getName());
 
         // spaces ignored after unquoted segment
-        segments = IdentifierNode.parseIdentifier("[Time . Weekly ] . 1997 . [Q3]");
+        segments =
+            IdentifierNode.parseIdentifier("[Time . Weekly ] . 1997 . [Q3]");
         assertEquals(3, segments.size());
         assertEquals("Time . Weekly ", segments.get(0).getName());
         assertEquals("1997", segments.get(1).getName());
@@ -461,20 +462,20 @@ public class Olap4jUtilTest extends TestCase {
         assertEquals(3, s2.getKeyParts().size());
         final IdentifierNode.NameSegment s2k0 = s2.getKeyParts().get(0);
         assertEquals("San Francisco", s2k0.getName());
-        assertEquals( IdentifierNode.Quoting.QUOTED, s2k0.getQuoting());
+        assertEquals(IdentifierNode.Quoting.QUOTED, s2k0.getQuoting());
         final IdentifierNode.NameSegment s2k1 = s2.getKeyParts().get(1);
         assertEquals("CA", s2k1.getName());
-        assertEquals( IdentifierNode.Quoting.QUOTED, s2k0.getQuoting());
+        assertEquals(IdentifierNode.Quoting.QUOTED, s2k0.getQuoting());
         final IdentifierNode.NameSegment s2k2 = s2.getKeyParts().get(0);
         assertEquals("San Francisco", s2k2.getName());
-        assertEquals( IdentifierNode.Quoting.QUOTED, s2k2.getQuoting());
+        assertEquals(IdentifierNode.Quoting.QUOTED, s2k2.getQuoting());
         IdentifierNode.KeySegment s3 =
             (IdentifierNode.KeySegment) segments.get(3);
         assertNull(s3.getName());
         assertEquals(1, s3.getKeyParts().size());
         final IdentifierNode.NameSegment s3k0 = s3.getKeyParts().get(0);
         assertEquals("cust1234", s3k0.getName());
-        assertEquals( IdentifierNode.Quoting.QUOTED, s3k0.getQuoting());
+        assertEquals(IdentifierNode.Quoting.QUOTED, s3k0.getQuoting());
     }
 
     /**

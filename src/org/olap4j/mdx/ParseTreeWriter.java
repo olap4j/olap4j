@@ -57,7 +57,6 @@ public class ParseTreeWriter {
                 super.println();
                 print(linePrefix);
             }
-
         };
         this.linePrefixLength = 0;
         setPrefix();
