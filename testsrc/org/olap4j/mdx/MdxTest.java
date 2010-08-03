@@ -80,6 +80,9 @@ public class MdxTest extends TestCase {
         assertEquals(
             "a [bracket] in it",
             segments.get(2).getName());
+        assertEquals(
+            IdentifierNode.Quoting.QUOTED,
+            segments.get(2).getQuoting());
 
         segments = IdentifierNode.parseIdentifier(
             "[Worklog].[All].[calendar-[LANGUAGE]].js]");
@@ -88,21 +91,21 @@ public class MdxTest extends TestCase {
             "calendar-[LANGUAGE].js",
             segments.get(2).getName());
 
-        try {
-            segments = IdentifierNode.parseIdentifier("[foo].bar");
-            fail("expected exception, got " + segments);
-        } catch (IllegalArgumentException e) {
-            assertEquals(
-                "Invalid member identifier '[foo].bar'",
-                e.getMessage());
-        }
+        segments = IdentifierNode.parseIdentifier("[foo].bar");
+        assertEquals(2, segments.size());
+        assertEquals(
+            IdentifierNode.Quoting.QUOTED,
+            segments.get(0).getQuoting());
+        assertEquals(
+            IdentifierNode.Quoting.UNQUOTED,
+            segments.get(1).getQuoting());
 
         try {
             segments = IdentifierNode.parseIdentifier("[foo].[bar");
             fail("expected exception, got " + segments);
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
             assertEquals(
-                "Invalid member identifier '[foo].[bar'",
+                "Expected ']', in member identifier '[foo].[bar'",
                 e.getMessage());
         }
     }

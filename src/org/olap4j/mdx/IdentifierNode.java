@@ -15,8 +15,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.olap4j.impl.Olap4jUtil;
-import org.olap4j.impl.UnmodifiableArrayList;
+import org.olap4j.impl.*;
 import org.olap4j.type.Type;
 
 /**
@@ -199,7 +198,7 @@ public class IdentifierNode
      * Segment("1245", KEY) }
      * </code></blockquote>
      *
-     * @see org.olap4j.metadata.Cube#lookupMember(String[])
+     * @see org.olap4j.metadata.Cube#lookupMember(String...)
      *
      * @param identifier MDX identifier string
      *
@@ -209,44 +208,8 @@ public class IdentifierNode
      * invalid
      */
     public static List<Segment> parseIdentifier(String identifier)  {
-        String[] nodes = identifier.split("\\.");
-        List<Segment> list = new ArrayList<Segment>();
-        for (String node : nodes) {
-            list.add(parseSegment(node));
-        }
-        return list;
+        return IdentifierParser.parseIdentifier(identifier);
     }
-
-    /**
-     * Parses a MDX Identifier Node into a Segment
-     * @param node MDX Identifier Node
-     * @return Segment of Identifier Node
-     */
-    private static Segment parseSegment(String node) {
-        Pattern patternQuoted = Pattern.compile("^\\[(.*)\\]$");
-        // This pattern identifies a Key node
-        // For Example: "&CA" or "&[CA]"
-        Pattern patternKey = Pattern.compile("^&[\\[]{0,1}(.*)[\\]]{0,1}");
-        Matcher quotedMatcher = patternQuoted.matcher(node);
-        Matcher keyMatcher = patternKey.matcher(node);
-
-        Quoting type = Quoting.QUOTED;
-        String value;
-
-        if (quotedMatcher.matches()) {
-            type = Quoting.QUOTED;
-            value = quotedMatcher.group(1);
-        } else if (keyMatcher.matches()) {
-            type = Quoting.KEY;
-            value = keyMatcher.group(1);
-        } else {
-            type = Quoting.UNQUOTED;
-            value = node;
-        }
-
-        return new NameSegment(null, value, type);
-    }
-
 
     /**
      * Returns string quoted in [...].

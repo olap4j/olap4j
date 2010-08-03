@@ -9,6 +9,8 @@
 package org.olap4j.impl;
 
 import junit.framework.TestCase;
+import org.olap4j.mdx.IdentifierNode;
+import org.olap4j.mdx.ParseRegion;
 
 import java.util.*;
 
@@ -339,6 +341,309 @@ public class Olap4jUtilTest extends TestCase {
             Olap4jUtil.parseFormattedCellValue(formattedCellValue, map);
         assertEquals("cell value", expectedCellValue, cellValue);
         assertEquals("properties", expectedProperties, map.toString());
+    }
+
+    /**
+     * Tests the {@link IdentifierNode#parseIdentifier} method.
+     */
+    public void testParseIdentifier() {
+        List<IdentifierNode.Segment> segments =
+            IdentifierNode.parseIdentifier(
+                "[string].[with].[a [bracket]] in it]");
+        assertEquals(3, segments.size());
+        assertEquals("a [bracket] in it", segments.get(2).getName());
+
+        segments =
+            IdentifierNode.parseIdentifier(
+                "[Worklog].[All].[calendar-[LANGUAGE]].js]");
+        assertEquals(3, segments.size());
+        assertEquals("calendar-[LANGUAGE].js", segments.get(2).getName());
+
+        // allow spaces before, after and between
+        segments = IdentifierNode.parseIdentifier("  [foo] . [bar].[baz]  ");
+        assertEquals(3, segments.size());
+        assertEquals("foo", segments.get(0).getName());
+
+        // first segment not quoted
+        segments = IdentifierNode.parseIdentifier("Time.1997.[Q3]");
+        assertEquals(3, segments.size());
+        assertEquals("Time", segments.get(0).getName());
+        assertEquals("1997", segments.get(1).getName());
+        assertEquals("Q3", segments.get(2).getName());
+
+        // spaces ignored after unquoted segment
+        segments = IdentifierNode.parseIdentifier("[Time . Weekly ] . 1997 . [Q3]");
+        assertEquals(3, segments.size());
+        assertEquals("Time . Weekly ", segments.get(0).getName());
+        assertEquals("1997", segments.get(1).getName());
+        assertEquals("Q3", segments.get(2).getName());
+
+        // identifier ending in '.' is invalid
+        try {
+            segments = IdentifierNode.parseIdentifier("[foo].[bar].");
+            fail("expected exception, got " + segments);
+        } catch (IllegalArgumentException e) {
+            assertEquals(
+                "Expected identifier after '.', in member identifier "
+                + "'[foo].[bar].'",
+                e.getMessage());
+        }
+
+        try {
+            segments = IdentifierNode.parseIdentifier("[foo].[bar");
+            fail("expected exception, got " + segments);
+        } catch (IllegalArgumentException e) {
+            assertEquals(
+                "Expected ']', in member identifier '[foo].[bar'",
+                e.getMessage());
+        }
+
+        try {
+            segments = IdentifierNode.parseIdentifier("[Foo].[Bar], [Baz]");
+            fail("expected exception, got " + segments);
+        } catch (IllegalArgumentException e) {
+            assertEquals(
+                "Invalid member identifier '[Foo].[Bar], [Baz]'",
+                e.getMessage());
+        }
+
+        // test case for bug 3036629, "Patch 328 breaks test".
+        segments = IdentifierNode.parseIdentifier(
+            "[ProductFilterDim].[Product Main Group Name].&[Maingroup (xyz)]");
+        assertEquals(3, segments.size());
+        final IdentifierNode.Segment s0 = segments.get(0);
+        assertEquals("ProductFilterDim", s0.getName());
+        assertEquals(IdentifierNode.Quoting.QUOTED, s0.getQuoting());
+        final IdentifierNode.Segment s1 = segments.get(1);
+        assertEquals("Product Main Group Name", s1.getName());
+        assertEquals(IdentifierNode.Quoting.QUOTED, s1.getQuoting());
+        assertTrue(segments.get(2) instanceof IdentifierNode.KeySegment);
+        IdentifierNode.KeySegment s2 =
+            (IdentifierNode.KeySegment) segments.get(2);
+        assertEquals(1, s2.getKeyParts().size());
+        final IdentifierNode.NameSegment s2k0 = s2.getKeyParts().get(0);
+        assertEquals("Maingroup (xyz)", s2k0.getName());
+        assertEquals(IdentifierNode.Quoting.QUOTED, s2k0.getQuoting());
+    }
+
+    /**
+     * Advanced test for the {@link IdentifierNode#parseIdentifier} method.
+     */
+    public void testParseIdentifierAdvanced() {
+        List<IdentifierNode.Segment> segments;
+
+        // detailed example, per javadoc
+        //
+        // A more complex example illustrates a compound key. The identifier
+        // [Customers].[City].&[San Francisco]&CA&USA.&[cust1234]
+        // contains four segments as follows:
+        //
+        // * Segment #0 is QUOTED, name "Customers"
+        // * Segment #1 is QUOTED, name "City"
+        // * Segment #2 is a KEY. It has 3 sub-segments:
+        //    ** Sub-segment #0 is QUOTED, name "San Francisco"
+        //    ** Sub-segment #1 is UNQUOTED, name "CA"
+        //    ** Sub-segment #2 is UNQUOTED, name "USA"
+        // * Segment #3 is a KEY. It has 1 sub-segment:
+        //    ** Sub-segment #0 is QUOTED, name "cust1234"</li>
+        segments = IdentifierNode.parseIdentifier(
+            "[Customers].[City].&[San Francisco]&CA&USA.&[cust1234]");
+        assertEquals(4, segments.size());
+        final IdentifierNode.Segment s0 = segments.get(0);
+        assertEquals("Customers", s0.getName());
+        assertEquals(IdentifierNode.Quoting.QUOTED, s0.getQuoting());
+        final IdentifierNode.Segment s1 = segments.get(1);
+        assertEquals("City", s1.getName());
+        assertEquals(IdentifierNode.Quoting.QUOTED, s1.getQuoting());
+        assertTrue(segments.get(2) instanceof IdentifierNode.KeySegment);
+        IdentifierNode.KeySegment s2 =
+            (IdentifierNode.KeySegment) segments.get(2);
+        assertEquals(3, s2.getKeyParts().size());
+        final IdentifierNode.NameSegment s2k0 = s2.getKeyParts().get(0);
+        assertEquals("San Francisco", s2k0.getName());
+        assertEquals( IdentifierNode.Quoting.QUOTED, s2k0.getQuoting());
+        final IdentifierNode.NameSegment s2k1 = s2.getKeyParts().get(1);
+        assertEquals("CA", s2k1.getName());
+        assertEquals( IdentifierNode.Quoting.QUOTED, s2k0.getQuoting());
+        final IdentifierNode.NameSegment s2k2 = s2.getKeyParts().get(0);
+        assertEquals("San Francisco", s2k2.getName());
+        assertEquals( IdentifierNode.Quoting.QUOTED, s2k2.getQuoting());
+        IdentifierNode.KeySegment s3 =
+            (IdentifierNode.KeySegment) segments.get(3);
+        assertNull(s3.getName());
+        assertEquals(1, s3.getKeyParts().size());
+        final IdentifierNode.NameSegment s3k0 = s3.getKeyParts().get(0);
+        assertEquals("cust1234", s3k0.getName());
+        assertEquals( IdentifierNode.Quoting.QUOTED, s3k0.getQuoting());
+    }
+
+    /**
+     * Tests the {@link IdentifierParser#parseIdentifierList(String)} method.
+     */
+    public void testParseIdentifierList() {
+        List<List<IdentifierNode.Segment>> list;
+
+        list = IdentifierParser.parseIdentifierList("{foo, baz.baz}");
+        assertEquals(2, list.size());
+        assertEquals(1, list.get(0).size());
+        assertEquals(2, list.get(1).size());
+
+        // now without braces
+        list = IdentifierParser.parseIdentifierList("foo, baz.baz");
+        assertEquals(2, list.size());
+
+        // now with spaces
+        list = IdentifierParser.parseIdentifierList(" {  foo , baz.baz }   ");
+        assertEquals(2, list.size());
+
+        // now with spaces & without braces
+        list = IdentifierParser.parseIdentifierList(" {  foo , baz.baz }   ");
+        assertEquals(2, list.size());
+
+        // now with keys
+        list = IdentifierParser.parseIdentifierList(
+            "{foo , baz.&k0&k1.&m0 . boo}");
+        assertEquals(2, list.size());
+        assertEquals(1, list.get(0).size());
+        assertEquals(4, list.get(1).size());
+        assertEquals("baz", list.get(1).get(0).getName());
+        final IdentifierNode.Segment id1s1 = list.get(1).get(1);
+        assertEquals(2, id1s1.getKeyParts().size());
+        assertEquals("k0", id1s1.getKeyParts().get(0).getName());
+        assertEquals("k1", id1s1.getKeyParts().get(1).getName());
+        final IdentifierNode.Segment id1s2 = list.get(1).get(2);
+        assertEquals(1, id1s2.getKeyParts().size());
+        assertEquals("m0", id1s2.getKeyParts().get(0).getName());
+        assertEquals("boo", list.get(1).get(3).getName());
+        assertEquals("[baz, &k0&k1, &m0, boo]", list.get(1).toString());
+
+        // now with mismatched braces
+        try {
+            list = IdentifierParser.parseIdentifierList(" {  foo , baz.baz ");
+            fail("expected error, got " + list);
+        } catch (RuntimeException e) {
+            assertEquals(
+                "mismatched '{' and '}' in ' {  foo , baz.baz '",
+                e.getMessage());
+        }
+
+        // now with mismatched braces
+        try {
+            list = IdentifierParser.parseIdentifierList("  foo , baz.baz } ");
+            fail("expected error, got " + list);
+        } catch (RuntimeException e) {
+            assertEquals(
+                "mismatched '{' and '}' in '  foo , baz.baz } '",
+                e.getMessage());
+        }
+
+        // empty string yields empty list
+        list = IdentifierParser.parseIdentifierList("{}");
+        assertEquals(0, list.size());
+        list = IdentifierParser.parseIdentifierList(" {  } ");
+        assertEquals(0, list.size());
+        list = IdentifierParser.parseIdentifierList("");
+        assertEquals(0, list.size());
+        list = IdentifierParser.parseIdentifierList(" \t\n");
+        assertEquals(0, list.size());
+    }
+
+    public void testParseTupleList() {
+        final StringBuilder buf = new StringBuilder();
+        final IdentifierParser.Builder builder =
+            new IdentifierParser.Builder() {
+                public void tupleComplete() {
+                    buf.append("<tuple>");
+                }
+
+                public void memberComplete() {
+                    buf.append("<member>");
+                }
+
+                public void segmentComplete(
+                    ParseRegion region,
+                    String name,
+                    IdentifierNode.Quoting quoting,
+                    Syntax syntax)
+                {
+                    if (quoting == IdentifierNode.Quoting.QUOTED) {
+                        buf.append("[").append(name).append("]");
+                    } else {
+                        buf.append(name);
+                    }
+                    buf.append("<").append(syntax).append(">");
+                }
+            };
+
+        // Set of tuples.
+        buf.setLength(0);
+        IdentifierParser.parseTupleList(
+            builder, "{([Foo]), ([Bar].[Baz].&k0&[k1].&[k2])}");
+        assertEquals(
+            "[Foo]<NAME><member><tuple>"
+            + "[Bar]<NAME>[Baz]<NAME>"
+            + "k0<FIRST_KEY>[k1]<NEXT_KEY>[k2]<FIRST_KEY>"
+            + "<member><tuple>",
+            buf.toString());
+
+        // Set of members.
+        buf.setLength(0);
+        try {
+            IdentifierParser.parseTupleList(builder, "{[Foo], [Bar].[Baz]}");
+            fail("expected error");
+        } catch (IllegalArgumentException e) {
+            assertEquals(
+                "expected '(' at position 2 in '{[Foo], [Bar].[Baz]}'",
+                e.getMessage());
+        }
+
+        // Empty set.
+        // TODO: this shouldn't fail
+        buf.setLength(0);
+        try {
+            IdentifierParser.parseTupleList(builder, "{ }");
+            fail("expected error");
+        } catch (IllegalArgumentException e) {
+            assertEquals(
+                "expected '(' at position 3 in '{ }'",
+                e.getMessage());
+        }
+
+        // Empty set (no brackets).
+        // TODO: this shouldn't fail
+        buf.setLength(0);
+        try {
+            IdentifierParser.parseTupleList(builder, "");
+            fail("expected error");
+        } catch (IllegalArgumentException e) {
+            assertEquals(
+                "expected '{' at position 1 in ''",
+                e.getMessage());
+        }
+
+        // Set of mixed tuples & members.
+        // TODO: this shouldn't fail
+        buf.setLength(0);
+        try {
+            IdentifierParser.parseTupleList(
+                builder, "{([A], [Tuple]), [A].Member}");
+        } catch (IllegalArgumentException e) {
+            assertEquals(
+                "expected '(' at position 18 in '{([A], [Tuple]), [A].Member}'",
+                e.getMessage());
+        }
+
+        // Same, but no braces.
+        // TODO: this shouldn't fail
+        buf.setLength(0);
+        try {
+            IdentifierParser.parseTupleList(
+                builder, "([A], [Tuple]), [A].Member");
+        } catch (IllegalArgumentException e) {
+            assertEquals(
+                "expected '{' at position 1 in '([A], [Tuple]), [A].Member'",
+                e.getMessage());
+        }
     }
 }
 
