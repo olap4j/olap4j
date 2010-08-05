@@ -1,6 +1,6 @@
 # $Id$
 
-olap4j, release 0.9.4 (beta)
+olap4j, release 0.9.8 (beta)
 
 Contents of this distribution
 -----------------------------
@@ -17,60 +17,32 @@ olap4j requires the following files at run time:
 
 * lib/olap4j.jar (or lib/olap4j-jdk14.jar if you are running JDK 1.4)
 * lib/javacup.jar
-* lib/log4j-1.2.9.jar
+* lib/asm.jar
+* lib/asm-commons.jar
+
+If you use the JDK 1.4 compatible jar, you will also need:
+
+* lib/retroweaver.jar
+* lib/retroweaver-rt.jar
+
+If you are using the XML/A driver, you will also need:
+
+* lib/xercesImpl.jar
 
 Building olap4j from source
 ---------------------------
 
 1. Unzip olap4j-<version>-src.zip.
-2. Create a lib directory in the root directory of the source tree, and copy
-   all JAR files from olap4j-<version>/lib into it.
-3. Create a testlib directory in the root directory of the source tree, and
-   copy all JAR files from olap4j-<version>/testlib into it.
-4. Set JAVA_HOME to a JDK version 1.5 or 1.6 home, and put $JAVA_HOME/bin
+2. Set JAVA_HOME to a JDK version 1.5 home, and put $JAVA_HOME/bin
    (%JAVA_HOME%\bin for Windows) on your path.
-5. In the root of the source tree, run 'ant'.
-
-Building a jar file
--------------------
-
-The above process is sufficient for running tests; however, due to differences
-between the versions of JDBC included with JDK 1.5 and JDK 1.6, it produces a
-set of class files which will only run on the JDK under which they were built.
-
-To produce a jar file which will work on both versions, you need to use a more
-complicated process. The steps are as follows:
-
-1. Install both JDK 1.5 and JDK 1.6.
-2. Set JAVA_HOME to the JDK 1.5 home, and put $JAVA_HOME/bin (or %JAVA_HOME%\bin
-   for Windows) on your path.
-3. If you are running UNIX or Linux, edit buildJdk16.sh and change the line
-   'export JAVA_HOME=...' to point to your JDK 1.6 installation.
-4. If you are running Windows, edit buildJdk16.bat and change the line 'set
-   JAVA_HOME=...' to point to your JDK 1.6 installation.
-5. In the root of the source tree, run 'ant clean' then 'ant jar'.
-
-Running the test suite
-----------------------
-
-Follow the instructions for 'Building olap4j from source'. Then:
-
-1. Download the latest mondrian release and use the
-   MondrianFoodMartLoader utility to load the sample database into the DBMS of
-   your choice.
-2. In the root of the source tree, create a file called "test.properties"
-   describing your environment. The easiest way to this is to copy
-   "test.properties.example" and customize it. Note that you will need to
-   specify the location of the FoodMart.xml in your mondrian distribution
-   and the URL of your database.
-3. If your database requires a JDBC driver, edit build.xml and add the location
-   of the driver to the "project.classpath" path.
-4. In the root of the source tree, run 'ant test'.
+3. Edit buildJdk16.bat and buildJdk16.sh and set the JAVA_HOME variable
+   to a valid home directory of a Java 6 installation.
+4. In the root of the source tree, run 'ant'.
 
 Writing a simple program
 ------------------------
 
-You can now write and run a simple program against olap4j. For example,
+You can now write and run a simple program against olap4j. For example, under Java 6,
 
         import org.olap4j.*;
         import org.olap4j.metadata.Member;
