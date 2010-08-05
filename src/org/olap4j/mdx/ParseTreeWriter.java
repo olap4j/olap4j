@@ -48,6 +48,15 @@ public class ParseTreeWriter {
     /**
      * Creates a ParseTreeWriter.
      *
+     * @param pw Underlying writer
+     */
+    public ParseTreeWriter(PrintWriter pw) {
+        this((Writer)pw);
+    }
+
+    /**
+     * Creates a ParseTreeWriter.
+     *
      * @param w Underlying writer
      */
     public ParseTreeWriter(Writer w) {
