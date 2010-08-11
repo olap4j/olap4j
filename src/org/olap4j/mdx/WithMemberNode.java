@@ -63,7 +63,12 @@ public class WithMemberNode implements ParseTreeNode {
         pw.print("MEMBER ");
         name.unparse(writer);
         pw.print(" AS '");
-        expression.unparse(writer);
+        writer.setInsideSingleQuote(true);
+        try {
+            expression.unparse(writer);
+        } finally {
+            writer.setInsideSingleQuote(false);
+        }
         pw.print("'");
         if (memberPropertyList != null) {
             for (PropertyValueNode memberProperty : memberPropertyList) {

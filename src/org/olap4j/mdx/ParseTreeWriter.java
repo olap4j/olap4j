@@ -41,6 +41,7 @@ public class ParseTreeWriter {
     private final PrintWriter pw;
     private int linePrefixLength;
     private String linePrefix;
+    private boolean isInsideSingleQuote;
 
     private static final int INDENT = 4;
     private static String bigString = "                ";
@@ -111,6 +112,14 @@ public class ParseTreeWriter {
             bigString = bigString + bigString;
         }
         return bigString.substring(0, n);
+    }
+
+    boolean isInsideSingleQuote() {
+      return isInsideSingleQuote;
+    }
+
+    void setInsideSingleQuote(boolean isInsideSingleQuote) {
+      this.isInsideSingleQuote = isInsideSingleQuote;
     }
 }
 

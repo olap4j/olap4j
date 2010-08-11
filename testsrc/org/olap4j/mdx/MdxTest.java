@@ -12,6 +12,10 @@ import junit.framework.TestCase;
 
 import java.util.*;
 
+import org.olap4j.mdx.parser.MdxParser;
+import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
+import org.olap4j.test.TestContext;
+
 /**
  * Testcase for org.olap4j.mdx package.
  *
@@ -108,6 +112,25 @@ public class MdxTest extends TestCase {
                 "Expected ']', in member identifier '[foo].[bar'",
                 e.getMessage());
         }
+    }
+
+    /**
+     * Tests that escaped single quotes ('') nested inside a quoted
+     * part of a query are unparsed as escaped quotes as well.
+     */
+    public void testQuoteEscaping() {
+        final String query =
+            "WITH\n"
+            + "MEMBER [CustomerDim].[CustomerName].[XL_QZX] AS 'Aggregate"
+            + "({[CustomerDim].[CustomerName].&[ABC INT''L],"
+            + " [CustomerDim].[CustomerName].&[XYZ]})'\n"
+            + "SELECT\n"
+            + "{[Measures].[Sales]} ON COLUMNS\n"
+            + "FROM [cube]\n"
+            + "WHERE ([CustomerDim].[CustomerName].[XL_QZX])";
+        final MdxParser parser = new DefaultMdxParserImpl();
+        final SelectNode rootNode = parser.parseSelect(query);
+        assertEquals(query,TestContext.unfold(rootNode.toString()));
     }
 }
 

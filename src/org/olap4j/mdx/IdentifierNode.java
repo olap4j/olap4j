@@ -165,7 +165,11 @@ public class IdentifierNode
     }
 
     public void unparse(ParseTreeWriter writer) {
-        writer.getPrintWriter().print(toString());
+        String str = toString();
+        if(writer.isInsideSingleQuote()) {
+            str = str.replace("'", "''");
+        }
+        writer.getPrintWriter().print(str);
     }
 
     public String toString() {

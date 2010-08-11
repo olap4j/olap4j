@@ -74,6 +74,25 @@ public class TestContext {
     }
 
     /**
+     * Reverses the effect of {@link #fold}; converts platform-specific line
+     * endings in a string info linefeeds.
+     *
+     * @param string String where all linefeeds have been converted to
+     * platform-specific (CR+LF on Windows, LF on Unix/Linux)
+     * @return String where line endings are represented as linefeed "\n"
+     */
+    public static String unfold(String string) {
+        if (!NL.equals("\n")) {
+            string = Olap4jUtil.replace(string, NL, "\n");
+        }
+        if (string == null) {
+            return null;
+        } else {
+            return string;
+        }
+    }
+
+    /**
      * Converts an MDX parse tree to an MDX string
      *
      * @param node Parse tree
