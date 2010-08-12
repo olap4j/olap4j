@@ -1295,7 +1295,8 @@ public class ConnectionTest extends TestCase {
         checkUnparsedMdx(
             select,
             "WITH\n"
-            + "MEMBER [Measures].[Foo] AS '[Measures].[Bar]', FORMAT_STRING = \"xxx\"\n"
+            + "MEMBER [Measures].[Foo] AS\n"
+            + "    [Measures].[Bar], FORMAT_STRING = \"xxx\"\n"
             + "SELECT\n"
             + "{[Gender]} ON COLUMNS,\n"
             + "{[Store].Children} ON ROWS\n"
@@ -1410,7 +1411,8 @@ public class ConnectionTest extends TestCase {
         checkUnparsedMdx(
             select,
             "WITH\n"
-            + "MEMBER [Measures].[Foo] AS '[Measures].[Bar]', FORMAT_STRING = \"xxx\"\n"
+            + "MEMBER [Measures].[Foo] AS\n"
+            + "    [Measures].[Bar], FORMAT_STRING = \"xxx\"\n"
             + "SELECT\n"
             + "{[Gender]} ON COLUMNS,\n"
             + "{[Store].Children} ON ROWS\n"

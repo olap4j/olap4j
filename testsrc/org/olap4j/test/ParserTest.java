@@ -203,7 +203,8 @@ public class ParserTest extends TestCase {
             + "from [Sales]\n"
             + "where [Marital Status].[S]",
             "WITH\n"
-            + "MEMBER [Measures].[Foo] AS '123.0'\n"
+            + "MEMBER [Measures].[Foo] AS\n"
+            + "    123.0\n"
             + "SELECT\n"
             + "{[Measures].members} ON COLUMNS,\n"
             + "CrossJoin([Product].members, {[Gender].Children}) ON ROWS\n"
@@ -469,7 +470,8 @@ public class ParserTest extends TestCase {
             + " ' case when x = y then \"eq\" when x < y then \"lt\" else \"gt\" end '"
             + "select {[foo]} on axis(0) from cube",
             "WITH\n"
-            + "MEMBER [Measures].[Foo] AS 'CASE WHEN (x = y) THEN \"eq\" WHEN (x < y) THEN \"lt\" ELSE \"gt\" END'\n"
+            + "MEMBER [Measures].[Foo] AS\n"
+            + "    CASE WHEN (x = y) THEN \"eq\" WHEN (x < y) THEN \"lt\" ELSE \"gt\" END\n"
             + "SELECT\n"
             + "{[foo]} ON COLUMNS\n"
             + "FROM cube");
@@ -481,7 +483,8 @@ public class ParserTest extends TestCase {
             + " ' case x when 1 then 2 when 3 then 4 else 5 end '"
             + "select {[foo]} on axis(0) from cube",
             "WITH\n"
-            + "MEMBER [Measures].[Foo] AS 'CASE x WHEN 1.0 THEN 2.0 WHEN 3.0 THEN 4.0 ELSE 5.0 END'\n"
+            + "MEMBER [Measures].[Foo] AS\n"
+            + "    CASE x WHEN 1.0 THEN 2.0 WHEN 3.0 THEN 4.0 ELSE 5.0 END\n"
             + "SELECT\n"
             + "{[foo]} ON COLUMNS\n"
             + "FROM cube");
@@ -735,7 +738,8 @@ public class ParserTest extends TestCase {
             + "from Sales\n"
             + "where ([Time].[1997].[Q2].[4])",
             "WITH\n"
-            + "MEMBER [Measures].[Small Number] AS '([Measures].[Store Sales] / 9000.0)'\n"
+            + "MEMBER [Measures].[Small Number] AS\n"
+            + "    ([Measures].[Store Sales] / 9000.0)\n"
             + "SELECT\n"
             + "{[Measures].[Small Number]} ON COLUMNS,\n"
             + "{Filter([Product].[Product Department].members, (([Measures].[Small Number] >= 0.3) AND ([Measures].[Small Number] <= 0.5000001234)))} ON ROWS\n"
