@@ -12,8 +12,6 @@ package org.olap4j.mdx;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.olap4j.impl.*;
 import org.olap4j.type.Type;
@@ -165,11 +163,7 @@ public class IdentifierNode
     }
 
     public void unparse(ParseTreeWriter writer) {
-        String str = toString();
-        if(writer.isInsideSingleQuote()) {
-            str = str.replace("'", "''");
-        }
-        writer.getPrintWriter().print(str);
+        writer.getPrintWriter().print(this);
     }
 
     public String toString() {

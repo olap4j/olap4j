@@ -62,20 +62,18 @@ public class WithMemberNode implements ParseTreeNode {
         PrintWriter pw = writer.getPrintWriter();
         pw.print("MEMBER ");
         name.unparse(writer);
-        pw.print(" AS '");
-        writer.setInsideSingleQuote(true);
-        try {
-            expression.unparse(writer);
-        } finally {
-            writer.setInsideSingleQuote(false);
-        }
-        pw.print("'");
+        writer.indent();
+        pw.println(" AS");
+        // The MDX language, and olap4j's parser, allows formulas in calculated
+        // members and sets to be specified with and without single quotes.
+        expression.unparse(writer);
         if (memberPropertyList != null) {
             for (PropertyValueNode memberProperty : memberPropertyList) {
                 pw.print(", ");
                 memberProperty.unparse(writer);
             }
         }
+        writer.outdent();
     }
 
     /**

@@ -54,9 +54,10 @@ public class WithSetNode implements ParseTreeNode {
         PrintWriter pw = writer.getPrintWriter();
         pw.print("SET ");
         name.unparse(writer);
-        pw.print(" AS '");
+        writer.indent();
+        pw.println(" AS");
         expression.unparse(writer);
-        pw.print("'");
+        writer.outdent();
     }
 
     /**
