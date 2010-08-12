@@ -2712,6 +2712,20 @@ public class ConnectionTest extends TestCase {
             olapConnection.prepareOlapStatement(mdx);
         pstmt.executeQuery();
     }
+
+    /**
+     * <p>This test relates to
+     * sourceforge.net/projects/olap4j/forums/forum/577988/topic/3803726
+     *
+     * <p>Drivers should return a transaction isolation of
+     * {@link Connection#TRANSACTION_NONE}
+     */
+    public void testTransactionIsolation() throws SQLException {
+        connection = tester.createConnection();
+        assertEquals(
+            Connection.TRANSACTION_NONE,
+            connection.getTransactionIsolation());
+    }
 }
 
 // End ConnectionTest.java
