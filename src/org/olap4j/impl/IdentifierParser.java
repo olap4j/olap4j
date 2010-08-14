@@ -395,7 +395,7 @@ public class IdentifierParser {
          * @param name Name
          * @param quoting Quoting style
          * @param syntax Whether this is a name segment, first part of a key
-         *     segment, or contiuation of a key segment
+         *     segment, or continuation of a key segment
          */
         void segmentComplete(
             ParseRegion region,
@@ -412,12 +412,12 @@ public class IdentifierParser {
 
     /**
      * Implementation of {@link org.olap4j.impl.IdentifierParser.Builder}
-     * that collects the segments that make up the name of a memberin a list.
+     * that collects the segments that make up the name of a member in a list.
      * It cannot handle tuples or lists of members.
      */
-    private static class MemberBuilder implements Builder {
-        final List<IdentifierNode.NameSegment> subSegments;
-        final List<IdentifierNode.Segment> segmentList;
+    public static class MemberBuilder implements Builder {
+        protected final List<IdentifierNode.NameSegment> subSegments;
+        protected final List<IdentifierNode.Segment> segmentList;
 
         public MemberBuilder() {
             segmentList = new ArrayList<IdentifierNode.Segment>();
@@ -461,7 +461,12 @@ public class IdentifierParser {
         }
     }
 
-    private static class MemberListBuilder extends MemberBuilder {
+    /**
+     * Implementation of {@link org.olap4j.impl.IdentifierParser.Builder}
+     * that collects segments into members,
+     * then collects members into lists.
+     */
+    public static class MemberListBuilder extends MemberBuilder {
         final List<List<IdentifierNode.Segment>> list =
             new ArrayList<List<IdentifierNode.Segment>>();
 
