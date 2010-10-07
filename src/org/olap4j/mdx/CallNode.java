@@ -188,6 +188,43 @@ public class CallNode implements ParseTreeNode {
             this.syntax,
             MdxUtil.deepCopyList(argList));
     }
+   
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((argList == null) ? 0 : argList.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((syntax == null) ? 0 : syntax.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        CallNode other = (CallNode) obj;
+        if (argList == null) {
+            if (other.argList != null)
+                return false;
+        } else if (!argList.equals(other.argList))
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        if (syntax == null) {
+            if (other.syntax != null)
+                return false;
+        } else if (!syntax.equals(other.syntax))
+            return false;
+        return true;
+    }
 }
 
 // End CallNode.java

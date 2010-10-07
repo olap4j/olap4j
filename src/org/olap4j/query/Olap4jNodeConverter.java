@@ -83,13 +83,14 @@ abstract class Olap4jNodeConverter {
                 cnodes);
     }
 
-    protected static CallNode generateCrossJoin(List<Selection> selections) {
-        ParseTreeNode sel1 = toOlap4j(selections.remove(0));
+    protected static CallNode generateCrossJoin(List<ParseTreeNode> selections)
+    {
+        ParseTreeNode sel1 = selections.remove(0);
         if (sel1 instanceof MemberNode) {
             sel1 = generateSetCall(sel1);
         }
         if (selections.size() == 1) {
-            ParseTreeNode sel2 = toOlap4j(selections.get(0));
+            ParseTreeNode sel2 = selections.get(0);
             if (sel2 instanceof MemberNode) {
                 sel2 = generateSetCall(sel2);
             }
@@ -102,9 +103,9 @@ abstract class Olap4jNodeConverter {
         }
     }
 
-    protected static CallNode generateUnion(List<List<Selection>> unions) {
+    protected static CallNode generateUnion(List<List<ParseTreeNode>> unions) {
         if (unions.size() > 2) {
-            List<Selection> first = unions.remove(0);
+            List<ParseTreeNode> first = unions.remove(0);
             return new CallNode(
                 null, "Union", Syntax.Function,
                 generateCrossJoin(first),
@@ -118,7 +119,7 @@ abstract class Olap4jNodeConverter {
     }
 
     protected static CallNode generateHierarchizeUnion(
-        List<List<Selection>> unions)
+        List<List<ParseTreeNode>> unions)
     {
         return new CallNode(
             null, "Hierarchize", Syntax.Function,
@@ -136,27 +137,79 @@ abstract class Olap4jNodeConverter {
     private static void generateUnionsRecursively(
         QueryAxis axis,
         int dim,
-        List<Selection> curr,
-        List<List<Selection>> unions,
+        List<ParseTreeNode> curr,
+        List<List<ParseTreeNode>> unions,
         List<Selection> selsWithContext,
-        List<List<Selection>> contextUnions)
+        List<List<ParseTreeNode>> contextUnions)
     {
-        for (Selection sel : axis.getDimensions().get(dim).getInclusions()) {
+        ParseTreeNode exceptSet = null;
+        QueryDimension qDim = axis.getDimensions().get(dim);
+
+        List<Selection> exclusionSelections = qDim.getExclusions();
+        List<ParseTreeNode> exclusionNodes = new ArrayList<ParseTreeNode>();
+
+        // Check if any exclusions are selected for this dimension
+        // and convert them to a list of nodes and then later a set
+        for (Selection exclusion : exclusionSelections) {
+            exclusionNodes.add(toOlap4j(exclusion));
+        }
+        if (exclusionNodes.size() > 0) {
+            exceptSet = generateListSetCall(exclusionNodes);
+        }
+
+        for (Selection sel : qDim.getInclusions()) {
+            ParseTreeNode selectionNode = toOlap4j(sel);
+            // If a sort Order was specified for this dimension
+            // apply it for this inclusion
+            if (qDim.getSortOrder() != null) {
+                CallNode currentMemberNode = new CallNode(
+                        null,
+                        "CurrentMember",
+                        Syntax.Property,
+                        new DimensionNode(null, sel.getDimension()));
+                    CallNode currentMemberNameNode = new CallNode(
+                        null,
+                        "Name",
+                        Syntax.Property,
+                        currentMemberNode);
+                    selectionNode =
+                        new CallNode(
+                            null,
+                            "Order",
+                            Syntax.Function,
+                            generateSetCall(selectionNode),
+                            currentMemberNameNode,
+                            LiteralNode.createSymbol(
+                                null,
+                                qDim.getSortOrder().name()));
+            }
+            // If there are exlclusions wrap the ordered selection
+            // in an Except() function
+            if (exceptSet != null) {
+                selectionNode = new CallNode(
+                                    null,
+                                    "Except",
+                                    Syntax.Function,
+                                    generateSetCall(selectionNode),
+                                    exceptSet);
+            }
             if (sel.getSelectionContext() != null
                 && sel.getSelectionContext().size() > 0)
             {
                 // selections that have a context are treated
                 // differently than the rest of the MDX generation
                 if (!selsWithContext.contains(sel)) {
-                    ArrayList<Selection> sels = new ArrayList<Selection>();
+                    ArrayList<ParseTreeNode> sels =
+                        new ArrayList<ParseTreeNode>();
                     for (int i = 0; i < axis.getDimensions().size(); i++) {
                         if (dim == i) {
-                            sels.add(sel);
+                            sels.add(selectionNode);
                         } else {
                             // return the selections in the correct
                             // dimensional order
                             QueryDimension dimension =
                                 axis.getDimensions().get(i);
+
                             boolean found = false;
                             for (Selection selection
                                 : sel.getSelectionContext())
@@ -164,14 +217,14 @@ abstract class Olap4jNodeConverter {
                                 if (selection.getDimension().equals(
                                     dimension.getDimension()))
                                 {
-                                    sels.add(selection);
+                                    sels.add(toOlap4j(selection));
                                     found = true;
                                 }
                             }
                             if (!found) {
                                 // add the first selection of the dimension
                                 if (dimension.getInclusions().size() > 0) {
-                                    sels.add(dimension.getInclusions().get(0));
+                                    sels.add(toOlap4j(dimension.getInclusions().get(0)));
                                 }
                             }
                         }
@@ -180,11 +233,11 @@ abstract class Olap4jNodeConverter {
                     selsWithContext.add(sel);
                 }
             } else {
-                List<Selection> ncurr = new ArrayList<Selection>();
+                List<ParseTreeNode> ncurr = new ArrayList<ParseTreeNode>();
                 if (curr != null) {
                     ncurr.addAll(curr);
                 }
-                ncurr.add(sel);
+                ncurr.add(selectionNode);
                 if (dim == axis.getDimensions().size() - 1) {
                     // last dimension
                     unions.add(ncurr);
@@ -206,18 +259,7 @@ abstract class Olap4jNodeConverter {
     private static AxisNode toOlap4j(QueryAxis axis) {
         CallNode callNode = null;
         int numDimensions = axis.getDimensions().size();
-        if (axis.getLocation() == Axis.FILTER) {
-            // REVIEW : This part is not right. Fix this.
-            List<ParseTreeNode> members = new ArrayList<ParseTreeNode>();
-            for (int dimNo = 0; dimNo < numDimensions; dimNo++) {
-                QueryDimension dimension =
-                    axis.getDimensions().get(dimNo);
-                if (dimension.getInclusions().size() == 1) {
-                    members.addAll(toOlap4j(dimension));
-                }
-            }
-            callNode = generateListTupleCall(members);
-        } else if (numDimensions == 0) {
+        if (numDimensions == 0) {
             return null;
         } else if (numDimensions == 1) {
             QueryDimension dimension = axis.getDimensions().get(0);
@@ -225,10 +267,11 @@ abstract class Olap4jNodeConverter {
             callNode = generateListSetCall(members);
         } else {
             // generate union sets of selections in each dimension
-            List<List<Selection>> unions = new ArrayList<List<Selection>>();
+            List<List<ParseTreeNode>> unions =
+                new ArrayList<List<ParseTreeNode>>();
             List<Selection> selsWithContext = new ArrayList<Selection>();
-            List<List<Selection>> contextUnions =
-                new ArrayList<List<Selection>>();
+            List<List<ParseTreeNode>> contextUnions =
+                new ArrayList<List<ParseTreeNode>>();
             generateUnionsRecursively(
                 axis, 0, null, unions, selsWithContext, contextUnions);
             unions.addAll(contextUnions);
