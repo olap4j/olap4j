@@ -463,7 +463,7 @@ public class OlapTest extends TestCase {
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
                 + "{{[Product].[Drink], [Product].[Drink].Children}} ON ROWS\n"
                 + "FROM [Sales]\n"
-                + "WHERE ([Time].[1997].[Q3].[7])",
+                + "WHERE {[Time].[1997].[Q3].[7]}",
                 mdxString);
 
             // Sort the products in ascending order.
@@ -476,7 +476,7 @@ public class OlapTest extends TestCase {
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
                 + "{Order({{[Product].[Drink], [Product].[Drink].Children}}, [Product].CurrentMember.Name, DESC)} ON ROWS\n"
                 + "FROM [Sales]\n"
-                + "WHERE ([Time].[1997].[Q3].[7])",
+                + "WHERE {[Time].[1997].[Q3].[7]}",
                 sortedMdxString);
 
             CellSet results = query.execute();
@@ -654,7 +654,7 @@ public class OlapTest extends TestCase {
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
                 + "{{[Product].[Drink], [Product].[Drink].Children}} ON ROWS\n"
                 + "FROM [Sales]\n"
-                + "WHERE ([Time].[1997].[Q3].[7])",
+                + "WHERE {[Time].[1997].[Q3].[7]}",
                 mdxString);
 
             // Sort the rows in ascending order.
@@ -670,7 +670,7 @@ public class OlapTest extends TestCase {
                 + "{[Measures].[Store Sales]} ON COLUMNS,\n"
                 + "Order({{[Product].[Drink], [Product].[Drink].Children}}, [Measures].[Store Sales], BASC) ON ROWS\n"
                 + "FROM [Sales]\n"
-                + "WHERE ([Time].[1997].[Q3].[7])",
+                + "WHERE {[Time].[1997].[Q3].[7]}",
                 sortedMdxString);
 
             CellSet results = query.execute();
@@ -942,7 +942,7 @@ public class OlapTest extends TestCase {
                 + "{[Measures].[Sales Count]} ON COLUMNS,\n"
                 + "{[Product].[Drink].[Beverages].Children, [Product].[Food].[Frozen Foods].Children} ON ROWS\n"
                 + "FROM [Sales]\n"
-                + "WHERE ([Time].[1997].[Q3].[7])",
+                + "WHERE {[Time].[1997].[Q3].[7]}",
                 mdxString);
 
             // Validate the returned results
@@ -992,7 +992,7 @@ public class OlapTest extends TestCase {
                 + "{[Measures].[Sales Count]} ON COLUMNS,\n"
                 + "{Except({[Product].[Drink].[Beverages].Children, [Product].[Food].[Frozen Foods].Children}, {[Product].[Drink].[Beverages].[Carbonated Beverages]})} ON ROWS\n"
                 + "FROM [Sales]\n"
-                + "WHERE ([Time].[1997].[Q3].[7])",
+                + "WHERE {[Time].[1997].[Q3].[7]}",
                 mdxString);
 
             // Validate the returned results
