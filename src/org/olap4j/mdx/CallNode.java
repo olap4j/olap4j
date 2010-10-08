@@ -188,7 +188,7 @@ public class CallNode implements ParseTreeNode {
             this.syntax,
             MdxUtil.deepCopyList(argList));
     }
-   
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -201,28 +201,37 @@ public class CallNode implements ParseTreeNode {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         CallNode other = (CallNode) obj;
         if (argList == null) {
-            if (other.argList != null)
+            if (other.argList != null) {
                 return false;
-        } else if (!argList.equals(other.argList))
+            }
+        } else if (!argList.equals(other.argList)) {
             return false;
+        }
         if (name == null) {
-            if (other.name != null)
+            if (other.name != null) {
                 return false;
-        } else if (!name.equals(other.name))
+            }
+        } else if (!name.equals(other.name)) {
             return false;
+        }
         if (syntax == null) {
-            if (other.syntax != null)
+            if (other.syntax != null) {
                 return false;
-        } else if (!syntax.equals(other.syntax))
+            }
+        } else if (!syntax.equals(other.syntax)) {
             return false;
+        }
         return true;
     }
 }

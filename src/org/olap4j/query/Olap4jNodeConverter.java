@@ -224,7 +224,8 @@ abstract class Olap4jNodeConverter {
                             if (!found) {
                                 // add the first selection of the dimension
                                 if (dimension.getInclusions().size() > 0) {
-                                    sels.add(toOlap4j(dimension.getInclusions().get(0)));
+                                    sels.add(toOlap4j(
+                                            dimension.getInclusions().get(0)));
                                 }
                             }
                         }

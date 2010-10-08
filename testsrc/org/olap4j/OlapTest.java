@@ -502,6 +502,139 @@ public class OlapTest extends TestCase {
         }
     }
 
+    public void testSortMultipleDimension() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+            Query query = new Query("my query", cube);
+
+            // create selections
+
+            QueryDimension productDimension = query.getDimension("Product");
+            productDimension.include(
+                    Selection.Operator.CHILDREN, "Product", "Drink");
+
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            measuresDimension.include("Measures", "Store Sales");
+
+            QueryDimension timeDimension = query.getDimension("Time");
+            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+
+            query.getAxis(Axis.ROWS).addDimension(timeDimension);
+            query.getAxis(Axis.ROWS).addDimension(productDimension);
+            query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+
+            query.validate();
+
+            assertEquals(
+                Axis.ROWS,
+                timeDimension.getAxis().getLocation());
+            assertEquals(
+                Axis.ROWS,
+                productDimension.getAxis().getLocation());
+            assertEquals(
+                Axis.COLUMNS,
+                measuresDimension.getAxis().getLocation());
+
+            SelectNode mdx = query.getSelect();
+            String mdxString = mdx.toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "CrossJoin({[Time].[1997].[Q3].[7]}, [Product].[Drink].Children) ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
+
+            // Sort the products in ascending order.
+            query.getDimension("Product").sort(SortOrder.DESC);
+
+            SelectNode sortedMdx = query.getSelect();
+            String sortedMdxString = sortedMdx.toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "CrossJoin({[Time].[1997].[Q3].[7]}, Order({[Product].[Drink].Children}, [Product].CurrentMember.Name, DESC)) ON ROWS\n"
+                + "FROM [Sales]",
+                sortedMdxString);
+
+            CellSet results = query.execute();
+            String s = TestContext.toString(results);
+            TestContext.assertEqualsVerbose(
+                "Axis #0:\n"
+                + "{}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Store Sales]}\n"
+                + "Axis #2:\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Drink].[Dairy]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Drink].[Beverages]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Drink].[Alcoholic Beverages]}\n"
+                + "Row #0: 629.69\n"
+                + "Row #1: 2,477.02\n"
+                + "Row #2: 1,302.87\n",
+                s);
+
+            // Just to be sure we execute the sort on a NON EMPTY axis again
+            query.getAxis(Axis.ROWS).setNonEmpty(true);
+            productDimension.clearInclusions();
+            productDimension.include(
+                    Selection.Operator.CHILDREN, "Product", "Food");
+
+            SelectNode sortedMdxNonEmpty = query.getSelect();
+            String sortedMdxNonEmptyString = sortedMdxNonEmpty.toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "NON EMPTY CrossJoin({[Time].[1997].[Q3].[7]}, Order({[Product].[Food].Children}, [Product].CurrentMember.Name, DESC)) ON ROWS\n"
+                + "FROM [Sales]",
+                sortedMdxNonEmptyString);
+
+            CellSet results2 = query.execute();
+            String s2 = TestContext.toString(results2);
+            TestContext.assertEqualsVerbose(
+                "Axis #0:\n"
+                + "{}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Store Sales]}\n"
+                + "Axis #2:\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Starchy Foods]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Snacks]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Snack Foods]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Seafood]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Produce]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Meat]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Frozen Foods]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Eggs]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Deli]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Dairy]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Canned Products]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Canned Foods]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Breakfast Foods]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Baking Goods]}\n"
+                + "{[Time].[1997].[Q3].[7], [Product].[Food].[Baked Goods]}\n"
+                + "Row #0: 1,059.06\n"
+                + "Row #1: 1,248.92\n"
+                + "Row #2: 6,342.01\n"
+                + "Row #3: 383.20\n"
+                + "Row #4: 7,084.85\n"
+                + "Row #5: 304.61\n"
+                + "Row #6: 5,027.30\n"
+                + "Row #7: 930.70\n"
+                + "Row #8: 2,222.69\n"
+                + "Row #9: 2,896.81\n"
+                + "Row #10: 250.84\n"
+                + "Row #11: 3,301.38\n"
+                + "Row #12: 551.95\n"
+                + "Row #13: 3,232.70\n"
+                + "Row #14: 1,487.74\n",
+                s2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
     public void testSelectionContext() throws Exception {
         Cube cube = getFoodmartCube("Sales");
         if (cube == null) {
@@ -1029,6 +1162,194 @@ public class OlapTest extends TestCase {
         }
     }
 
+    public void testExclusionMultipleDimensionModes() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+
+            // Setup a base query.
+            Query query = new Query("my query", cube);
+            QueryDimension productDimension = query.getDimension("Product");
+            productDimension.include(
+                Selection.Operator.CHILDREN,
+                "Product", "Drink",
+                "Beverages");
+            productDimension.include(
+                Selection.Operator.CHILDREN,
+                "Product",
+                "Food",
+                "Frozen Foods");
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            measuresDimension.include("Measures", "Sales Count");
+            QueryDimension timeDimension = query.getDimension("Time");
+            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+            QueryDimension storeDimension = query.getDimension("Store");
+            storeDimension.include(
+                    Selection.Operator.MEMBER, "Store", "USA");
+            query.getAxis(Axis.ROWS).addDimension(storeDimension);
+            query.getAxis(Axis.ROWS).addDimension(productDimension);
+            query.getAxis(Axis.FILTER).addDimension(timeDimension);
+            query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+
+            query.validate();
+
+            // Validate the generated MDX
+            String mdxString = query.getSelect().toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+                + "Hierarchize(Union(CrossJoin({[Store].[USA]}, [Product].[Drink].[Beverages].Children), CrossJoin({[Store].[USA]}, [Product].[Food].[Frozen Foods].Children))) ON ROWS\n"
+                + "FROM [Sales]\n"
+                + "WHERE {[Time].[1997].[Q3].[7]}",
+                mdxString);
+
+            // Validate the returned results
+            CellSet results = query.execute();
+            String resultsString = TestContext.toString(results);
+            TestContext.assertEqualsVerbose(
+                "Axis #0:\n"
+                + "{[Time].[1997].[Q3].[7]}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Sales Count]}\n"
+                + "Axis #2:\n"
+                + "{[Store].[USA], [Product].[Drink].[Beverages].[Carbonated Beverages]}\n"
+                + "{[Store].[USA], [Product].[Drink].[Beverages].[Drinks]}\n"
+                + "{[Store].[USA], [Product].[Drink].[Beverages].[Hot Beverages]}\n"
+                + "{[Store].[USA], [Product].[Drink].[Beverages].[Pure Juice Beverages]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Breakfast Foods]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Frozen Desserts]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Frozen Entrees]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Meat]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Pizza]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Vegetables]}\n"
+                + "Row #0: 103\n"
+                + "Row #1: 65\n"
+                + "Row #2: 125\n"
+                + "Row #3: 100\n"
+                + "Row #4: 143\n"
+                + "Row #5: 185\n"
+                + "Row #6: 68\n"
+                + "Row #7: 81\n"
+                + "Row #8: 105\n"
+                + "Row #9: 212\n",
+                resultsString);
+
+            // Exclude the Carbonated Beverages because they are not good
+            // for your health.
+            query.getDimension("Product").exclude(
+                "Product",
+                "Drink",
+                "Beverages",
+                "Carbonated Beverages");
+
+            // Validate the generated MDX
+            query.validate();
+            mdxString = query.getSelect().toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+                + "Hierarchize(Union(CrossJoin({[Store].[USA]}, Except({[Product].[Drink].[Beverages].Children}, {[Product].[Drink].[Beverages].[Carbonated Beverages]})), CrossJoin({[Store].[USA]}, Except({[Product].[Food].[Frozen Foods].Children}, {[Product].[Drink].[Beverages].[Carbonated Beverages]})))) ON ROWS\n"
+                + "FROM [Sales]\n"
+                + "WHERE {[Time].[1997].[Q3].[7]}",
+                mdxString);
+
+            // Validate the returned results
+            results = query.execute();
+            resultsString = TestContext.toString(results);
+            TestContext.assertEqualsVerbose(
+                "Axis #0:\n"
+                + "{[Time].[1997].[Q3].[7]}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Sales Count]}\n"
+                + "Axis #2:\n"
+                + "{[Store].[USA], [Product].[Drink].[Beverages].[Drinks]}\n"
+                + "{[Store].[USA], [Product].[Drink].[Beverages].[Hot Beverages]}\n"
+                + "{[Store].[USA], [Product].[Drink].[Beverages].[Pure Juice Beverages]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Breakfast Foods]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Frozen Desserts]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Frozen Entrees]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Meat]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Pizza]}\n"
+                + "{[Store].[USA], [Product].[Food].[Frozen Foods].[Vegetables]}\n"
+                + "Row #0: 65\n"
+                + "Row #1: 125\n"
+                + "Row #2: 100\n"
+                + "Row #3: 143\n"
+                + "Row #4: 185\n"
+                + "Row #5: 68\n"
+                + "Row #6: 81\n"
+                + "Row #7: 105\n"
+                + "Row #8: 212\n",
+                resultsString);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    public void testCompoundFilter() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+
+            // Setup a base query.
+            Query query = new Query("my query", cube);
+            QueryDimension productDimension = query.getDimension("Product");
+            productDimension.include(
+                Selection.Operator.MEMBER,
+                "Product", "Drink",
+                "Beverages");
+            productDimension.include(
+                Selection.Operator.MEMBER,
+                "Product",
+                "Food",
+                "Frozen Foods");
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            measuresDimension.include("Measures", "Sales Count");
+            QueryDimension timeDimension = query.getDimension("Time");
+            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+            QueryDimension storeDimension = query.getDimension("Store");
+            storeDimension.include(
+                    Selection.Operator.MEMBER, "Store", "USA");
+            query.getAxis(Axis.ROWS).addDimension(storeDimension);
+            query.getAxis(Axis.FILTER).addDimension(productDimension);
+            query.getAxis(Axis.FILTER).addDimension(timeDimension);
+            query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+
+            query.validate();
+
+            // Validate the generated MDX
+            String mdxString = query.getSelect().toString();
+            TestContext.assertEqualsVerbose(
+                    "SELECT\n"
+                    + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+                    + "{[Store].[USA]} ON ROWS\n"
+                    + "FROM [Sales]\n"
+                    + "WHERE Hierarchize(Union(CrossJoin({[Product].[Drink].[Beverages]}, {[Time].[1997].[Q3].[7]}), CrossJoin({[Product].[Food].[Frozen Foods]}, {[Time].[1997].[Q3].[7]})))",
+                mdxString);
+
+            // Validate the returned results
+            CellSet results = query.execute();
+            String resultsString = TestContext.toString(results);
+            TestContext.assertEqualsVerbose(
+                    "Axis #0:\n"
+                    + "{[Product].[Drink].[Beverages], [Time].[1997].[Q3].[7]}\n"
+                    + "{[Product].[Food].[Frozen Foods], [Time].[1997].[Q3].[7]}\n"
+                    + "Axis #1:\n"
+                    + "{[Measures].[Sales Count]}\n"
+                    + "Axis #2:\n"
+                    + "{[Store].[USA]}\n"
+                    + "Row #0: 1,187\n",
+                    resultsString);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
     public void testNonMandatoryQueryAxis() {
         try {
             Cube cube = getFoodmartCube("Sales");
