@@ -58,7 +58,11 @@ public class TraditionalCellSetFormatter implements CellSetFormatter {
         for (int i = 0; i < axisCount; i++) {
             pos.add(-1);
         }
-        printRows(cellSet, pw, axisCount - 1, pos);
+        if (axisCount == 0) {
+            printCell(cellSet, pw, pos);
+        } else {
+            printRows(cellSet, pw, axisCount - 1, pos);
+        }
     }
 
     /**
@@ -72,30 +76,21 @@ public class TraditionalCellSetFormatter implements CellSetFormatter {
     private static void printRows(
         CellSet cellSet, PrintWriter pw, int axis, List<Integer> pos)
     {
-        CellSetAxis _axis = axis < 0
-            ? cellSet.getFilterAxis()
-            : cellSet.getAxes().get(axis);
-        List<Position> positions = _axis.getPositions();
+        final CellSetAxis _axis = cellSet.getAxes().get(axis);
+        final List<Position> positions = _axis.getPositions();
         final int positionCount = positions.size();
         for (int i = 0; i < positionCount; i++) {
-            if (axis < 0) {
-                if (i > 0) {
-                    pw.print(", ");
-                }
+            pos.set(axis, i);
+            if (axis == 0) {
+                int row =
+                    axis + 1 < pos.size()
+                        ? pos.get(axis + 1)
+                        : 0;
+                pw.print("Row #" + row + ": ");
                 printCell(cellSet, pw, pos);
+                pw.println();
             } else {
-                pos.set(axis, i);
-                if (axis == 0) {
-                    int row =
-                        axis + 1 < pos.size()
-                            ? pos.get(axis + 1)
-                            : 0;
-                    pw.print("Row #" + row + ": ");
-                }
                 printRows(cellSet, pw, axis - 1, pos);
-                if (axis == 0) {
-                    pw.println();
-                }
             }
         }
     }

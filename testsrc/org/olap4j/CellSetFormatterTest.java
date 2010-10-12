@@ -127,8 +127,6 @@ public class CellSetFormatterTest extends TestCase {
     // ~ Tests follow ==========================================================
 
     public void testQuery1Traditional() throws SQLException {
-        final TestContext.Tester.Flavor flavor =
-            TestContext.instance().getTester().getFlavor();
         assertFormat(
             query1,
             Format.TRADITIONAL,
@@ -314,6 +312,91 @@ public class CellSetFormatterTest extends TestCase {
             + "|            |     | CA |             |\n"
             + "|            |     |    | Los Angeles |\n"
             + "|            |     | WA |             |\n");
+    }
+
+    public void testFilter() throws SQLException {
+        final String queryString =
+            "select\n"
+            + "  crossjoin(\n"
+            + "    {[Time].[1997].[Q1], [Time].[1997].[Q2].[4]},\n"
+            + "    {[Measures].[Unit Sales]}) on 0,\n"
+            + "  {[USA].[CA].[Los Angeles],\n"
+            + "   [USA].[CA].[San Francisco]} on 1\n"
+            + "FROM [Sales]\n"
+            + "WHERE ([Gender].[M], [Marital Status].[S])";
+
+        assertFormat(
+            queryString,
+            Format.TRADITIONAL,
+            "Axis #0:\n"
+            + "{[Gender].[M], [Marital Status].[S]}\n"
+            + "Axis #1:\n"
+            + "{[Time].[1997].[Q1], [Measures].[Unit Sales]}\n"
+            + "{[Time].[1997].[Q2].[4], [Measures].[Unit Sales]}\n"
+            + "Axis #2:\n"
+            + "{[Store].[USA].[CA].[Los Angeles]}\n"
+            + "{[Store].[USA].[CA].[San Francisco]}\n"
+            + "Row #0: 1,615\n"
+            + "Row #0: 594\n"
+            + "Row #1: 101\n"
+            + "Row #1: 55\n");
+
+        // TODO: rectagular formatter should print filter
+        assertFormat(
+            queryString,
+            Format.COMPACT_RECTANGULAR,
+            "                     1997       \n"
+            + "                     Q1         Q2\n"
+            + "                                4\n"
+            + "                     Unit Sales Unit Sales\n"
+            + "=== == ============= ========== ==========\n"
+            + "USA CA Los Angeles        1,615        594\n"
+            + "       San Francisco        101         55\n");
+
+        // TODO: rectagular formatter should print filter
+        assertFormat(
+            queryString,
+            Format.RECTANGULAR,
+            "|                          | 1997                    |\n"
+            + "|                          | Q1         | Q2         |\n"
+            + "|                          |            | 4          |\n"
+            + "|                          | Unit Sales | Unit Sales |\n"
+            + "+-----+----+---------------+------------+------------+\n"
+            + "| USA | CA | Los Angeles   |      1,615 |        594 |\n"
+            + "|     |    | San Francisco |        101 |         55 |\n");
+    }
+
+    public void testFilterCompound() throws SQLException {
+        final String queryString =
+            "select\n"
+            + "  crossjoin(\n"
+            + "    {[Time].[1997].[Q1], [Time].[1997].[Q2].[4]},\n"
+            + "    {[Measures].[Unit Sales]}) on 0,\n"
+            + "  {[USA].[CA].[Los Angeles],\n"
+            + "   [USA].[CA].[San Francisco]} on 1\n"
+            + "FROM [Sales]\n"
+            + "WHERE [Gender].Children * [Marital Status].Members";
+
+        assertFormat(
+            queryString,
+            Format.TRADITIONAL,
+            "Axis #0:\n"
+            + "{[Gender].[F], [Marital Status].[All Marital Status]}\n"
+            + "{[Gender].[F], [Marital Status].[M]}\n"
+            + "{[Gender].[F], [Marital Status].[S]}\n"
+            + "{[Gender].[M], [Marital Status].[All Marital Status]}\n"
+            + "{[Gender].[M], [Marital Status].[M]}\n"
+            + "{[Gender].[M], [Marital Status].[S]}\n"
+            + "Axis #1:\n"
+            + "{[Time].[1997].[Q1], [Measures].[Unit Sales]}\n"
+            + "{[Time].[1997].[Q2].[4], [Measures].[Unit Sales]}\n"
+            + "Axis #2:\n"
+            + "{[Store].[USA].[CA].[Los Angeles]}\n"
+            + "{[Store].[USA].[CA].[San Francisco]}\n"
+            + "Row #0: 6,373\n"
+            + "Row #0: 1,865\n"
+            + "Row #1: 439\n"
+            + "Row #1: 149\n");
     }
 
     public void testZeroAxesRectangular() throws SQLException {

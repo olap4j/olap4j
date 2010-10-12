@@ -114,7 +114,7 @@ public class TestContext {
     public static String toString(CellSet cellSet) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-            new TraditionalCellSetFormatter().format(cellSet, pw);
+        new TraditionalCellSetFormatter().format(cellSet, pw);
         pw.flush();
         return sw.toString();
     }

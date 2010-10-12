@@ -522,7 +522,12 @@ public class ConnectionTest extends TestCase {
         assertEquals(0, position.getMembers().size());
     }
 
-    public void testCompoundSlicer() throws SQLException {
+    /**
+     * Tests a filter with more than one position.
+     *
+     * @throws SQLException on error
+     */
+    public void testCompoundFilter() throws SQLException {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
@@ -531,30 +536,76 @@ public class ConnectionTest extends TestCase {
         CellSet cellSet =
             statement.executeOlapQuery(
                 "SELECT {[Measures].[Unit Sales]} on 0,\n"
-                + "{[Store].Children} on 1\n"
+                + "{[Product].Children} on 1\n"
                 + "FROM [Sales]\n"
                 + "WHERE [Time].[1997].[Q1] * [Gender].Members");
         List<CellSetAxis> axesList = cellSet.getAxes();
         assertEquals(2, axesList.size());
         final CellSetAxis filterAxis = cellSet.getFilterAxis();
-        final Tester.Flavor flavor =
-            TestContext.instance().getTester().getFlavor();
-        switch (flavor) {
-        case MONDRIAN:
-            assertEquals(1, filterAxis.getPositionCount());
-            break;
-        case XMLA:
-        case REMOTE_XMLA:
-            assertEquals(3, filterAxis.getPositionCount());
-            final List<Position> filterPositions = filterAxis.getPositions();
-            assertEquals(3, filterPositions.size());
-            final Position filterPosition = filterPositions.get(2);
-            assertEquals(2, filterPosition.getMembers().size());
-            assertEquals("M", filterPosition.getMembers().get(1).getName());
-            break;
-        default:
-            throw Olap4jUtil.unexpected(flavor);
-        }
+        assertEquals(3, filterAxis.getPositionCount());
+        final List<Position> filterPositions = filterAxis.getPositions();
+        assertEquals(3, filterPositions.size());
+        final Position filterPosition = filterPositions.get(2);
+        assertEquals(2, filterPosition.getMembers().size());
+        assertEquals("M", filterPosition.getMembers().get(1).getName());
+    }
+
+    /**
+     * Tests a filter with zero positions.
+     *
+     * @throws SQLException on error
+     */
+    public void testEmptyFilter() throws SQLException {
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        OlapStatement statement = olapConnection.createStatement();
+
+        CellSet cellSet =
+            statement.executeOlapQuery(
+                "SELECT {[Measures].[Unit Sales]} on 0,\n"
+                + "{[Product].Children} on 1\n"
+                + "FROM [Sales]\n"
+                + "WHERE [Time].[1997].[Q1] * [Gender].Parent");
+        List<CellSetAxis> axesList = cellSet.getAxes();
+        assertEquals(2, axesList.size());
+        final CellSetAxis filterAxis = cellSet.getFilterAxis();
+        assertEquals(0, filterAxis.getPositionCount());
+        final List<Position> filterPositions = filterAxis.getPositions();
+        assertEquals(0, filterPositions.size());
+        assertEquals(2, filterAxis.getAxisMetaData().getHierarchies().size());
+        final Cell cell = cellSet.getCell(Arrays.asList(0, 0));
+        assertTrue(cell.isNull());
+    }
+
+    /**
+     * Tests a query with no filter (no WHERE clause).
+     *
+     * @throws SQLException on error
+     */
+    public void testMissingFilter() throws SQLException {
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        OlapStatement statement = olapConnection.createStatement();
+        CellSet cellSet =
+            statement.executeOlapQuery(
+                "SELECT {[Measures].[Unit Sales]} on 0,\n"
+                + "{[Product].Children} on 1\n"
+                + "FROM [Sales]\n");
+        List<CellSetAxis> axesList = cellSet.getAxes();
+        assertEquals(2, axesList.size());
+        final CellSetAxis filterAxis = cellSet.getFilterAxis();
+        assertEquals(1, filterAxis.getPositionCount());
+        final List<Position> filterPositions = filterAxis.getPositions();
+        assertEquals(1, filterPositions.size());
+        final Position position = filterPositions.get(0);
+        assertEquals(0, position.getMembers().size());
+        assertEquals(
+            0, filterAxis.getAxisMetaData().getHierarchies().size());
+        assertTrue(filterAxis.getAxisMetaData().getHierarchies().isEmpty());
+        final Cell cell = cellSet.getCell(Arrays.asList(0, 0));
+        assertEquals("24,597", cell.getFormattedValue());
     }
 
     public void testMeasureVersusMemberCasting() throws Exception {
