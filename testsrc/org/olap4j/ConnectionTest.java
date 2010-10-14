@@ -2588,8 +2588,7 @@ public class ConnectionTest extends TestCase {
         SelectNode query = new SelectNode();
         ParseTreeNode cubeNode;
         if (useCubeObject) {
-            cubeNode = new IdentifierNode(
-                IdentifierNode.parseIdentifier(cube.getUniqueName()));
+            cubeNode = IdentifierNode.parseIdentifier(cube.getUniqueName());
         } else {
             cubeNode = new CubeNode(null, cube);
         }
@@ -2599,15 +2598,13 @@ public class ConnectionTest extends TestCase {
                 null, false, Axis.COLUMNS, null,
                 new CallNode(
                     null, "MEMBERS", Syntax.Property,
-                    new IdentifierNode(
-                        IdentifierNode.parseIdentifier("[Gender]"))));
+                    IdentifierNode.parseIdentifier("[Gender]")));
         AxisNode rowAxis =
             new AxisNode(
                 null, false, Axis.ROWS, null,
                 new CallNode(
                     null, "CHILDREN", Syntax.Property,
-                    new IdentifierNode(
-                        IdentifierNode.parseIdentifier("[Customers].[USA]"))));
+                    IdentifierNode.parseIdentifier("[Customers].[USA]")));
         query.getAxisList().add(columnAxis);
         query.getAxisList().add(rowAxis);
         OlapStatement statement = olapConnection.createStatement();

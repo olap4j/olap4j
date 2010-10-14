@@ -192,12 +192,21 @@ public enum Syntax {
             List<ParseTreeNode> argList,
             ParseTreeWriter writer)
         {
-            unparseList(
-                writer,
-                argList,
-                "(",
-                ", ",
-                ")");
+            if (argList.size() == 1
+                && argList.get(0) instanceof CallNode
+                && needParen(((CallNode) argList.get(0)).getArgList()))
+            {
+                // The parenthesized expression is going to defensively
+                // parenthesize itself. So, don't add another layer.
+                argList.get(0).unparse(writer);
+            } else {
+                unparseList(
+                    writer,
+                    argList,
+                    "(",
+                    ", ",
+                    ")");
+            }
         }
     },
 

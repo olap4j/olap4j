@@ -176,9 +176,11 @@ public class IdentifierNode
     }
 
     /**
-     * Parses an MDX identifier into a list of segments.
+     * Parses an MDX identifier string into an
+     * {@link org.olap4j.mdx.IdentifierNode}.
      *
-     * <p>Each segment is a name combined with a description of how the name
+     * <p>It contains a list of {@link IdentifierNode.Segment segments}, each
+     * of which is a name combined with a description of how the name
      * was {@link Quoting quoted}. For example,
      *
      * <blockquote><code>
@@ -186,27 +188,27 @@ public class IdentifierNode
      * "[Customers].USA.[South Dakota].[Sioux Falls].&amp;[1245]")
      * </code></blockquote>
      *
-     * returns
+     * returns an IdentifierNode consisting of the following segments:
      *
-     * <blockquote><code>
-     * { Segment("Customers", QUOTED),
-     * Segment("USA", UNQUOTED),
-     * Segment("South Dakota", QUOTED),
-     * Segment("Sioux Falls", QUOTED),
-     * Segment("1245", KEY) }
-     * </code></blockquote>
+     * <code><ul>
+     * <li>Segment("Customers", QUOTED),
+     * <li>Segment("USA", UNQUOTED),
+     * <li>Segment("South Dakota", QUOTED),
+     * <li>Segment("Sioux Falls", QUOTED),
+     * <li>Segment("1245", KEY)
+     * </ul></code>
      *
      * @see org.olap4j.metadata.Cube#lookupMember(String...)
      *
      * @param identifier MDX identifier string
      *
-     * @return List of name segments
+     * @return Identifier parse tree node
      *
      * @throws IllegalArgumentException if the format of the identifier is
      * invalid
      */
-    public static List<Segment> parseIdentifier(String identifier)  {
-        return IdentifierParser.parseIdentifier(identifier);
+    public static IdentifierNode parseIdentifier(String identifier)  {
+        return new IdentifierNode(IdentifierParser.parseIdentifier(identifier));
     }
 
     /**
@@ -279,7 +281,8 @@ public class IdentifierNode
      * {@link org.olap4j.mdx.IdentifierNode.KeySegment KeySegment}.
      *
      * <p>To parse an identifier into a list of segments, use the method
-     * {@link IdentifierNode#parseIdentifier(String)}.</p>
+     * {@link IdentifierNode#parseIdentifier(String)} and then call
+     * {@link IdentifierNode#getSegmentList()} on the resulting node.</p>
      */
     public interface Segment {
 

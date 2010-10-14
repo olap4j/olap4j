@@ -79,7 +79,7 @@ public class MdxTest extends TestCase {
     public void testParseIdentifier() {
         List<IdentifierNode.Segment> segments =
             IdentifierNode.parseIdentifier(
-                "[string].[with].[a [bracket]] in it]");
+                "[string].[with].[a [bracket]] in it]").getSegmentList();
         assertEquals(3, segments.size());
         assertEquals(
             "a [bracket] in it",
@@ -89,13 +89,13 @@ public class MdxTest extends TestCase {
             segments.get(2).getQuoting());
 
         segments = IdentifierNode.parseIdentifier(
-            "[Worklog].[All].[calendar-[LANGUAGE]].js]");
+            "[Worklog].[All].[calendar-[LANGUAGE]].js]").getSegmentList();
         assertEquals(3, segments.size());
         assertEquals(
             "calendar-[LANGUAGE].js",
             segments.get(2).getName());
 
-        segments = IdentifierNode.parseIdentifier("[foo].bar");
+        segments = IdentifierNode.parseIdentifier("[foo].bar").getSegmentList();
         assertEquals(2, segments.size());
         assertEquals(
             IdentifierNode.Quoting.QUOTED,
@@ -105,7 +105,8 @@ public class MdxTest extends TestCase {
             segments.get(1).getQuoting());
 
         try {
-            segments = IdentifierNode.parseIdentifier("[foo].[bar");
+            segments =
+                IdentifierNode.parseIdentifier("[foo].[bar").getSegmentList();
             fail("expected exception, got " + segments);
         } catch (RuntimeException e) {
             assertEquals(

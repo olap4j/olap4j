@@ -10,6 +10,7 @@
 package org.olap4j.query;
 
 import org.olap4j.OlapException;
+import org.olap4j.impl.IdentifierParser;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.IdentifierNode;
 import org.olap4j.mdx.IdentifierNode.Segment;
@@ -344,7 +345,7 @@ public class QueryDimension extends QueryNodeImpl {
     }
 
     public static String[] getNameParts(String sel) {
-        List<Segment> list = IdentifierNode.parseIdentifier(sel);
+        List<Segment> list = IdentifierParser.parseIdentifier(sel);
         String nameParts[] = new String[list.size()];
         for (int i = 0; i < list.size(); i++) {
             nameParts[i] = list.get(i).getName();

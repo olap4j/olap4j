@@ -19,6 +19,7 @@ import org.olap4j.Axis;
 
 import java.sql.SQLException;
 import java.sql.Connection;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -543,7 +544,7 @@ public class ParserTest extends TestCase {
 
         assertParseExpr(
             "(x is null) + 56 > 6",
-            "((((x IS NULL)) + 56.0) > 6.0)");
+            "(((x IS NULL) + 56.0) > 6.0)");
 
         // FIXME: Should be:
         //  "(((((x IS NULL) AND (a = b)) OR ((c = (d + 5.0))) IS NULL) + 5.0)"
@@ -835,9 +836,55 @@ public class ParserTest extends TestCase {
             "SELECT\n"
             + "FROM (\n"
             + "    SELECT\n"
-            + "    ({[ProductDim].[Product Group].&[Mobile Phones]}) ON COLUMNS\n"
+            + "    {[ProductDim].[Product Group].&[Mobile Phones]} ON COLUMNS\n"
             + "    FROM [cube])\n"
             + "CELL PROPERTIES VALUE");
+    }
+
+    /**
+     * Test case for adding to WITH clause.
+     */
+    public void testWithAdd() {
+        SelectNode selectNode = new SelectNode();
+        IdentifierNode startDate =
+            new IdentifierNode(
+                new IdentifierNode.NameSegment("Date"),
+                new IdentifierNode.NameSegment("2010-01-03"));
+        IdentifierNode endDate =
+            new IdentifierNode(
+                new IdentifierNode.NameSegment("Date"),
+                new IdentifierNode.NameSegment("2010-10-03"));
+        IdentifierNode name =
+            new IdentifierNode(
+                new IdentifierNode.NameSegment("Date"),
+                new IdentifierNode.NameSegment("Date Range"));
+        CallNode cn = new CallNode(null, ":", Syntax.Infix, startDate, endDate);
+        ParseTreeNode exp =
+            new CallNode(
+                null,
+                "Aggregate",
+                Syntax.Function,
+                new CallNode(
+                    null,
+                    "{}",
+                    Syntax.Braces,
+                    cn));
+        WithMemberNode withMemberNode =
+            new WithMemberNode(
+                null, name, exp, Collections.<PropertyValueNode>emptyList());
+        selectNode.setFrom(
+            IdentifierNode.parseIdentifier("Sales"));
+        selectNode.getWithList().add(withMemberNode);
+        final String queryString = selectNode.toString();
+        TestContext.assertEqualsVerbose(
+            "WITH\n"
+            + "MEMBER [Date].[Date Range] AS\n"
+            + "    Aggregate({([Date].[2010-01-03] : [Date].[2010-10-03])})\n"
+            + "SELECT\n"
+            + "FROM Sales",
+            queryString);
+        // check that unparsed string is valid
+        assertParseQuery(queryString, TestContext.unfold(queryString));
     }
 
     /**

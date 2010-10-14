@@ -228,7 +228,7 @@ public class Olap4jUtilTest extends TestCase {
         assertEquals("y", copyList.get(1));
 
         // test the of(Collection) method
-        final ArrayList<String> arrayList = new ArrayList<String>();
+        final List<String> arrayList = new ArrayList<String>();
         arrayList.add("foo");
         arrayList.add("bar");
         final UnmodifiableArrayList<String> list3 =
@@ -348,24 +348,24 @@ public class Olap4jUtilTest extends TestCase {
      */
     public void testParseIdentifier() {
         List<IdentifierNode.Segment> segments =
-            IdentifierNode.parseIdentifier(
+            IdentifierParser.parseIdentifier(
                 "[string].[with].[a [bracket]] in it]");
         assertEquals(3, segments.size());
         assertEquals("a [bracket] in it", segments.get(2).getName());
 
         segments =
-            IdentifierNode.parseIdentifier(
+            IdentifierParser.parseIdentifier(
                 "[Worklog].[All].[calendar-[LANGUAGE]].js]");
         assertEquals(3, segments.size());
         assertEquals("calendar-[LANGUAGE].js", segments.get(2).getName());
 
         // allow spaces before, after and between
-        segments = IdentifierNode.parseIdentifier("  [foo] . [bar].[baz]  ");
+        segments = IdentifierParser.parseIdentifier("  [foo] . [bar].[baz]  ");
         assertEquals(3, segments.size());
         assertEquals("foo", segments.get(0).getName());
 
         // first segment not quoted
-        segments = IdentifierNode.parseIdentifier("Time.1997.[Q3]");
+        segments = IdentifierParser.parseIdentifier("Time.1997.[Q3]");
         assertEquals(3, segments.size());
         assertEquals("Time", segments.get(0).getName());
         assertEquals("1997", segments.get(1).getName());
@@ -373,7 +373,7 @@ public class Olap4jUtilTest extends TestCase {
 
         // spaces ignored after unquoted segment
         segments =
-            IdentifierNode.parseIdentifier("[Time . Weekly ] . 1997 . [Q3]");
+            IdentifierParser.parseIdentifier("[Time . Weekly ] . 1997 . [Q3]");
         assertEquals(3, segments.size());
         assertEquals("Time . Weekly ", segments.get(0).getName());
         assertEquals("1997", segments.get(1).getName());
@@ -381,7 +381,7 @@ public class Olap4jUtilTest extends TestCase {
 
         // identifier ending in '.' is invalid
         try {
-            segments = IdentifierNode.parseIdentifier("[foo].[bar].");
+            segments = IdentifierParser.parseIdentifier("[foo].[bar].");
             fail("expected exception, got " + segments);
         } catch (IllegalArgumentException e) {
             assertEquals(
@@ -391,7 +391,7 @@ public class Olap4jUtilTest extends TestCase {
         }
 
         try {
-            segments = IdentifierNode.parseIdentifier("[foo].[bar");
+            segments = IdentifierParser.parseIdentifier("[foo].[bar");
             fail("expected exception, got " + segments);
         } catch (IllegalArgumentException e) {
             assertEquals(
@@ -400,7 +400,7 @@ public class Olap4jUtilTest extends TestCase {
         }
 
         try {
-            segments = IdentifierNode.parseIdentifier("[Foo].[Bar], [Baz]");
+            segments = IdentifierParser.parseIdentifier("[Foo].[Bar], [Baz]");
             fail("expected exception, got " + segments);
         } catch (IllegalArgumentException e) {
             assertEquals(
@@ -409,7 +409,7 @@ public class Olap4jUtilTest extends TestCase {
         }
 
         // test case for bug 3036629, "Patch 328 breaks test".
-        segments = IdentifierNode.parseIdentifier(
+        segments = IdentifierParser.parseIdentifier(
             "[ProductFilterDim].[Product Main Group Name].&[Maingroup (xyz)]");
         assertEquals(3, segments.size());
         final IdentifierNode.Segment s0 = segments.get(0);
@@ -447,7 +447,7 @@ public class Olap4jUtilTest extends TestCase {
         //    ** Sub-segment #2 is UNQUOTED, name "USA"
         // * Segment #3 is a KEY. It has 1 sub-segment:
         //    ** Sub-segment #0 is QUOTED, name "cust1234"</li>
-        segments = IdentifierNode.parseIdentifier(
+        segments = IdentifierParser.parseIdentifier(
             "[Customers].[City].&[San Francisco]&CA&USA.&[cust1234]");
         assertEquals(4, segments.size());
         final IdentifierNode.Segment s0 = segments.get(0);
