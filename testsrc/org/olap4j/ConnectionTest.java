@@ -25,6 +25,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.*;
 
+import static org.olap4j.test.TestContext.nameList;
+
 /**
  * Unit test for olap4j Driver and Connection classes.
  *
@@ -1375,7 +1377,7 @@ public class ConnectionTest extends TestCase {
         // Note that the select statement constructed here is equivalent
         // to the one in testParsing.
         final IdentifierNode cubeName =
-            new IdentifierNode(new IdentifierNode.NameSegment("sales"));
+            new IdentifierNode(new NameSegment("sales"));
         SelectNode select = new SelectNode(
             null,
             new ArrayList<ParseTreeNode>(),
@@ -1392,11 +1394,11 @@ public class ConnectionTest extends TestCase {
             new WithMemberNode(
                 null,
                 new IdentifierNode(
-                    new IdentifierNode.NameSegment("Measures"),
-                    new IdentifierNode.NameSegment("Foo")),
+                    new NameSegment("Measures"),
+                    new NameSegment("Foo")),
                 new IdentifierNode(
-                    new IdentifierNode.NameSegment("Measures"),
-                    new IdentifierNode.NameSegment("Bar")),
+                    new NameSegment("Measures"),
+                    new NameSegment("Bar")),
                 Arrays.asList(
                     new PropertyValueNode(
                         null,
@@ -1417,7 +1419,7 @@ public class ConnectionTest extends TestCase {
                     Arrays.asList(
                         (ParseTreeNode)
                         new IdentifierNode(
-                            new IdentifierNode.NameSegment("Gender"))))));
+                            new NameSegment("Gender"))))));
         select.getAxisList().add(
             new AxisNode(
                 null,
@@ -1433,12 +1435,12 @@ public class ConnectionTest extends TestCase {
                         "Children",
                         Syntax.Property,
                         new IdentifierNode(
-                            new IdentifierNode.NameSegment("Store"))))));
+                            new NameSegment("Store"))))));
         select.getFilterAxis().setExpression(
             new IdentifierNode(
-                new IdentifierNode.NameSegment("Time"),
-                new IdentifierNode.NameSegment("1997"),
-                new IdentifierNode.NameSegment("Q4")));
+                new NameSegment("Time"),
+                new NameSegment("1997"),
+                new NameSegment("Q4")));
 
         assertEquals(select.getFrom(), cubeName);
         checkUnparsedMdx(select);
@@ -1448,7 +1450,7 @@ public class ConnectionTest extends TestCase {
             null,
             new ArrayList<ParseTreeNode>(),
             new ArrayList<AxisNode>(),
-            new IdentifierNode(new IdentifierNode.NameSegment("warehouse")),
+            new IdentifierNode(new NameSegment("warehouse")),
             new AxisNode(
                 null,
                 false,
@@ -1481,7 +1483,7 @@ public class ConnectionTest extends TestCase {
                 null,
                 new ArrayList<ParseTreeNode>(),
                 new ArrayList<AxisNode>(),
-                new IdentifierNode(new IdentifierNode.NameSegment("sales")),
+                new IdentifierNode(new NameSegment("sales")),
                 new AxisNode(
                     null,
                     false,
@@ -1500,7 +1502,7 @@ public class ConnectionTest extends TestCase {
             null,
             new ArrayList<ParseTreeNode>(),
             new ArrayList<AxisNode>(),
-            new IdentifierNode(new IdentifierNode.NameSegment("sales")),
+            new IdentifierNode(new NameSegment("sales")),
             new AxisNode(
                 null,
                 false,
@@ -1526,11 +1528,11 @@ public class ConnectionTest extends TestCase {
                 "()",
                 Syntax.Parentheses,
                 new IdentifierNode(
-                    new IdentifierNode.NameSegment("Measures"),
-                    new IdentifierNode.NameSegment("Store Sales")),
+                    new NameSegment("Measures"),
+                    new NameSegment("Store Sales")),
                 new IdentifierNode(
-                    new IdentifierNode.NameSegment("Gender"),
-                    new IdentifierNode.NameSegment("M"))));
+                    new NameSegment("Gender"),
+                    new NameSegment("M"))));
         checkUnparsedMdx(
             select,
             "SELECT\n"
@@ -1546,7 +1548,7 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
-     * Tests the {@link Cube#lookupMember(String...)} method.
+     * Tests the {@link Cube#lookupMember(java.util.List} method.
      */
     public void testCubeLookupMember() throws Exception {
         Class.forName(tester.getDriverClassName());
@@ -1556,8 +1558,7 @@ public class ConnectionTest extends TestCase {
         Cube cube = olapConnection.getSchema().getCubes().get("Sales Ragged");
 
         Member member =
-            cube.lookupMember(
-                "Time", "1997", "Q2");
+            cube.lookupMember(nameList("Time", "1997", "Q2"));
         assertEquals("[Time].[1997].[Q2]", member.getUniqueName());
 
         // Member.getChildMemberCount
@@ -1575,25 +1576,23 @@ public class ConnectionTest extends TestCase {
         assertNull(childMembers.get("1"));
 
         member =
-            cube.lookupMember(
-                "Time", "1997", "Q5");
+            cube.lookupMember(nameList("Time", "1997", "Q5"));
         assertNull(member);
 
         // arguably this should return [Customers].[All Customers]; but it
         // makes a bit more sense for it to return null
         member =
-            cube.lookupMember(
-                "Customers");
+            cube.lookupMember(nameList("Customers"));
         assertNull(member);
 
         member =
-            cube.lookupMember(
-                "Customers", "All Customers");
+            cube.lookupMember(nameList("Customers", "All Customers"));
         assertTrue(member.isAll());
     }
 
     /**
-     * Tests the {@link Cube#lookupMembers(java.util.Set, String...)} method.
+     * Tests the {@link Cube#lookupMembers(java.util.Set, java.util.List)}
+     * method.
      */
     public void testCubeLookupMembers() throws Exception {
         Class.forName(tester.getDriverClassName());
@@ -1606,7 +1605,7 @@ public class ConnectionTest extends TestCase {
             cube.lookupMembers(
                 Olap4jUtil.enumSetOf(
                     Member.TreeOp.ANCESTORS, Member.TreeOp.CHILDREN),
-                "Time", "1997", "Q2");
+                nameList("Time", "1997", "Q2"));
         String expected;
         switch (tester.getFlavor()) {
         case XMLA:
@@ -1635,7 +1634,7 @@ public class ConnectionTest extends TestCase {
             cube.lookupMembers(
                 Olap4jUtil.enumSetOf(
                     Member.TreeOp.ANCESTORS, Member.TreeOp.CHILDREN),
-                "Time", "1997", "Q5");
+                nameList("Time", "1997", "Q5"));
         assertTrue(memberList.isEmpty());
 
         // ask for parent & ancestors; should not get duplicates
@@ -1643,7 +1642,7 @@ public class ConnectionTest extends TestCase {
             cube.lookupMembers(
                 Olap4jUtil.enumSetOf(
                     Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
-                "Time", "1997", "Q2");
+                nameList("Time", "1997", "Q2"));
         TestContext.assertEqualsVerbose(
             "[Time].[1997]\n",
             memberListToString(memberList));
@@ -1653,7 +1652,7 @@ public class ConnectionTest extends TestCase {
             cube.lookupMembers(
                 Olap4jUtil.enumSetOf(
                     Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
-                "Product");
+                nameList("Product"));
         assertTrue(memberList.isEmpty());
 
         // ask for siblings and children, and the results should be
@@ -1662,7 +1661,7 @@ public class ConnectionTest extends TestCase {
             cube.lookupMembers(
                 Olap4jUtil.enumSetOf(
                     Member.TreeOp.SIBLINGS, Member.TreeOp.CHILDREN),
-                "Time", "1997", "Q2");
+                nameList("Time", "1997", "Q2"));
         switch (tester.getFlavor()) {
         case XMLA:
         case REMOTE_XMLA:
@@ -1694,7 +1693,7 @@ public class ConnectionTest extends TestCase {
         memberList =
             cube.lookupMembers(
                 Olap4jUtil.enumSetOf(Member.TreeOp.SIBLINGS),
-                "Time", "1997");
+                nameList("Time", "1997"));
         TestContext.assertEqualsVerbose(
             "[Time].[1998]\n",
             memberListToString(memberList));
@@ -1703,7 +1702,7 @@ public class ConnectionTest extends TestCase {
             cube.lookupMembers(
                 Olap4jUtil.enumSetOf(
                     Member.TreeOp.SIBLINGS, Member.TreeOp.SELF),
-                "Customers", "USA", "OR");
+                nameList("Customers", "USA", "OR"));
         TestContext.assertEqualsVerbose(
             "[Customers].[USA].[CA]\n"
             + "[Customers].[USA].[OR]\n"
@@ -1868,14 +1867,21 @@ public class ConnectionTest extends TestCase {
 
         // ~ Member
 
-        Member member = cube.lookupMember("Product", "Food", "Marshmallows");
+        Member member =
+            cube.lookupMember(
+                nameList("Product", "Food", "Marshmallows"));
         assertNull(member); // we don't sell marshmallows!
-        member = cube.lookupMember("Product", "Food");
+        member =
+            cube.lookupMember(
+                nameList("Product", "Food"));
         assertNotNull(member);
-        Member member2 = cube.lookupMember("Product", "All Products", "Food");
+        Member member2 =
+            cube.lookupMember(
+                nameList("Product", "All Products", "Food"));
         assertEquals(member, member2);
         final Member bread =
-            cube.lookupMember("Product", "Food", "Baked Goods", "Bread");
+            cube.lookupMember(
+                nameList("Product", "Food", "Baked Goods", "Bread"));
 
         assertEquals("[Product].[Food]", member.getUniqueName());
         assertEquals("Food", member.getName());

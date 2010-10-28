@@ -20,6 +20,8 @@ import java.sql.DriverManager;
 
 import junit.framework.TestCase;
 
+import static org.olap4j.test.TestContext.nameList;
+
 /**
  * Unit test illustrating sequence of calls to olap4j API from a graphical
  * client.
@@ -165,21 +167,23 @@ public class OlapTest extends TestCase {
             QueryDimension timeQuery =
                 query.getDimension("Time"); //$NON-NLS-1$
 
-            Member productMember = cube.lookupMember("Product", "Drink");
+            Member productMember =
+                cube.lookupMember(nameList("Product", "Drink"));
 
             // create some selections for Store
             storeQuery.include(
-                    Selection.Operator.CHILDREN, "Store", "USA");
+                Selection.Operator.CHILDREN, nameList("Store", "USA"));
 
             // create some selections for Product
             productQuery.clearInclusions();
             productQuery.include(
                     Selection.Operator.CHILDREN, productMember);
             productQuery.include(
-                    Selection.Operator.CHILDREN, "Product", "Food");
+                Selection.Operator.CHILDREN, nameList("Product", "Food"));
 
             // create some selections for Time
-            timeQuery.include(Selection.Operator.CHILDREN, "Time", "1997");
+            timeQuery.include(
+                Selection.Operator.CHILDREN, nameList("Time", "1997"));
 
             // place our dimensions on the axes
             query.getAxis(Axis.COLUMNS).addDimension(productQuery);
@@ -221,10 +225,10 @@ public class OlapTest extends TestCase {
 
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
-                    Selection.Operator.CHILDREN, "Product", "Drink");
+                Selection.Operator.CHILDREN, nameList("Product", "Drink"));
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Store Sales");
+            measuresDimension.include(nameList("Measures", "Store Sales"));
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
@@ -244,7 +248,7 @@ public class OlapTest extends TestCase {
 
             productDimension.clearInclusions();
             productDimension.include(
-                    Selection.Operator.ANCESTORS, "Product", "Drink");
+                Selection.Operator.ANCESTORS, nameList("Product", "Drink"));
 
             query.validate();
 
@@ -261,7 +265,7 @@ public class OlapTest extends TestCase {
 
             productDimension.clearInclusions();
             productDimension.include(
-                    Selection.Operator.DESCENDANTS, "Product", "Drink");
+                Selection.Operator.DESCENDANTS, nameList("Product", "Drink"));
 
             query.validate();
 
@@ -278,7 +282,8 @@ public class OlapTest extends TestCase {
 
             productDimension.clearInclusions();
             productDimension.include(
-                    Selection.Operator.INCLUDE_CHILDREN, "Product", "Drink");
+                Selection.Operator.INCLUDE_CHILDREN,
+                nameList("Product", "Drink"));
 
             query.validate();
 
@@ -295,7 +300,7 @@ public class OlapTest extends TestCase {
 
             productDimension.clearInclusions();
             productDimension.include(
-                    Selection.Operator.SIBLINGS, "Product", "Drink");
+                Selection.Operator.SIBLINGS, nameList("Product", "Drink"));
 
             query.validate();
 
@@ -325,17 +330,18 @@ public class OlapTest extends TestCase {
 
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
-                    Selection.Operator.CHILDREN, "Product", "Drink");
+                Selection.Operator.CHILDREN, nameList("Product", "Drink"));
 
             QueryDimension storeDimension = query.getDimension("Store");
             storeDimension.include(
-                    Selection.Operator.INCLUDE_CHILDREN, "Store", "USA");
+                Selection.Operator.INCLUDE_CHILDREN, nameList("Store", "USA"));
 
             QueryDimension timeDimension = query.getDimension("Time");
-            timeDimension.include(Selection.Operator.CHILDREN, "Time", "1997");
+            timeDimension.include(
+                Selection.Operator.CHILDREN, nameList("Time", "1997"));
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Store Sales");
+            measuresDimension.include(nameList("Measures", "Store Sales"));
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.ROWS).addDimension(storeDimension);
@@ -372,10 +378,10 @@ public class OlapTest extends TestCase {
 
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
-                    Selection.Operator.CHILDREN, "Product", "Drink");
+                Selection.Operator.CHILDREN, nameList("Product", "Drink"));
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Store Sales");
+            measuresDimension.include(nameList("Measures", "Store Sales"));
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
@@ -435,13 +441,14 @@ public class OlapTest extends TestCase {
 
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
-                    Selection.Operator.INCLUDE_CHILDREN, "Product", "Drink");
+                Selection.Operator.INCLUDE_CHILDREN,
+                nameList("Product", "Drink"));
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Store Sales");
+            measuresDimension.include(nameList("Measures", "Store Sales"));
 
             QueryDimension timeDimension = query.getDimension("Time");
-            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+            timeDimension.include(nameList("Time", "Year", "1997", "Q3", "7"));
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
@@ -514,13 +521,13 @@ public class OlapTest extends TestCase {
 
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
-                    Selection.Operator.CHILDREN, "Product", "Drink");
+                Selection.Operator.CHILDREN, nameList("Product", "Drink"));
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Store Sales");
+            measuresDimension.include(nameList("Measures", "Store Sales"));
 
             QueryDimension timeDimension = query.getDimension("Time");
-            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+            timeDimension.include(nameList("Time", "Year", "1997", "Q3", "7"));
 
             query.getAxis(Axis.ROWS).addDimension(timeDimension);
             query.getAxis(Axis.ROWS).addDimension(productDimension);
@@ -579,7 +586,7 @@ public class OlapTest extends TestCase {
             query.getAxis(Axis.ROWS).setNonEmpty(true);
             productDimension.clearInclusions();
             productDimension.include(
-                    Selection.Operator.CHILDREN, "Product", "Food");
+                Selection.Operator.CHILDREN, nameList("Product", "Food"));
 
             SelectNode sortedMdxNonEmpty = query.getSelect();
             String sortedMdxNonEmptyString = sortedMdxNonEmpty.toString();
@@ -645,35 +652,36 @@ public class OlapTest extends TestCase {
         // create selections
         QueryDimension productDimension = query.getDimension("Product");
         productDimension.include(
-            Selection.Operator.INCLUDE_CHILDREN, "Product", "All Products");
+            Selection.Operator.INCLUDE_CHILDREN,
+            nameList("Product", "All Products"));
 
         QueryDimension timeDimension = query.getDimension("Time");
         timeDimension.include(
-            Selection.Operator.MEMBER, "Time", "Year", "1997");
+            Selection.Operator.MEMBER, nameList("Time", "Year", "1997"));
 
         Selection selection =
             timeDimension.include(
-                Selection.Operator.CHILDREN, "Time", "Year", "1997");
+                Selection.Operator.CHILDREN, nameList("Time", "Year", "1997"));
         selection.addContext(
             productDimension.createSelection(
-                "Product", "All Products", "Drink"));
+                nameList("Product", "All Products", "Drink")));
 
         // [Store].[All Stores]
         QueryDimension storeDimension = query.getDimension("Store");
         storeDimension.include(
-            Selection.Operator.MEMBER, "Store", "All Stores");
+            Selection.Operator.MEMBER, nameList("Store", "All Stores"));
 
         Selection children =
             storeDimension.include(
-                Selection.Operator.CHILDREN, "Store", "All Stores");
+                Selection.Operator.CHILDREN, nameList("Store", "All Stores"));
         children.addContext(
             productDimension.createSelection(
-                "Product", "All Products", "Drink"));
+                nameList("Product", "All Products", "Drink")));
         children.addContext(
-            timeDimension.createSelection("Time", "1997", "Q3"));
+            timeDimension.createSelection(nameList("Time", "1997", "Q3")));
 
         QueryDimension measuresDimension = query.getDimension("Measures");
-        measuresDimension.include("Measures", "Store Sales");
+        measuresDimension.include(nameList("Measures", "Store Sales"));
 
         query.getAxis(Axis.ROWS).addDimension(productDimension);
         query.getAxis(Axis.ROWS).addDimension(timeDimension);
@@ -702,8 +710,7 @@ public class OlapTest extends TestCase {
         // Sort the rows in ascending order.
         query.getAxis(Axis.ROWS).sort(
             SortOrder.ASC,
-            "Measures",
-            "Store Sales");
+            nameList("Measures", "Store Sales"));
 
         SelectNode sortedMdx = query.getSelect();
         String sortedMdxString = sortedMdx.toString();
@@ -759,18 +766,18 @@ public class OlapTest extends TestCase {
 
 
         productDimension.include(
-                Selection.Operator.MEMBER, "Product", "All Products");
+            Selection.Operator.MEMBER, nameList("Product", "All Products"));
         productDimension.include(
-                Selection.Operator.CHILDREN, "Product", "All Products");
+            Selection.Operator.CHILDREN, nameList("Product", "All Products"));
         QueryDimension timeDimension = query.getDimension("Time");
         Selection selection = timeDimension.include(
-            Selection.Operator.CHILDREN, "Time", "Year", "1997");
+            Selection.Operator.CHILDREN, nameList("Time", "Year", "1997"));
         selection.addContext(
-                productDimension.createSelection(
-                        "Product", "All Products"));
+            productDimension.createSelection(
+                nameList("Product", "All Products")));
 
         QueryDimension measuresDimension = query.getDimension("Measures");
-        measuresDimension.include("Measures", "Store Sales");
+        measuresDimension.include(nameList("Measures", "Store Sales"));
 
         query.getAxis(Axis.ROWS).addDimension(productDimension);
         query.getAxis(Axis.ROWS).addDimension(timeDimension);
@@ -852,13 +859,14 @@ public class OlapTest extends TestCase {
 
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
-                    Selection.Operator.INCLUDE_CHILDREN, "Product", "Drink");
+                Selection.Operator.INCLUDE_CHILDREN,
+                nameList("Product", "Drink"));
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Store Sales");
+            measuresDimension.include(nameList("Measures", "Store Sales"));
 
             QueryDimension timeDimension = query.getDimension("Time");
-            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+            timeDimension.include(nameList("Time", "Year", "1997", "Q3", "7"));
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
@@ -886,8 +894,7 @@ public class OlapTest extends TestCase {
             // Sort the rows in ascending order.
             query.getAxis(Axis.ROWS).sort(
                 SortOrder.BASC,
-                "Measures",
-                "Store Sales");
+                nameList("Measures", "Store Sales"));
 
             SelectNode sortedMdx = query.getSelect();
             String sortedMdxString = sortedMdx.toString();
@@ -934,17 +941,18 @@ public class OlapTest extends TestCase {
 
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
-                    Selection.Operator.CHILDREN, "Product", "Drink");
+                Selection.Operator.CHILDREN, nameList("Product", "Drink"));
 
             QueryDimension storeDimension = query.getDimension("Store");
             storeDimension.include(
-                    Selection.Operator.INCLUDE_CHILDREN, "Store", "USA");
+                Selection.Operator.INCLUDE_CHILDREN, nameList("Store", "USA"));
 
             QueryDimension timeDimension = query.getDimension("Time");
-            timeDimension.include(Selection.Operator.CHILDREN, "Time", "1997");
+            timeDimension.include(
+                Selection.Operator.CHILDREN, nameList("Time", "1997"));
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Store Sales");
+            measuresDimension.include(nameList("Measures", "Store Sales"));
 
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
@@ -1020,11 +1028,11 @@ public class OlapTest extends TestCase {
 
             QueryDimension storeDimension = query.getDimension("Store");
             storeDimension.include(
-                    Selection.Operator.INCLUDE_CHILDREN, "Store", "USA");
+                Selection.Operator.INCLUDE_CHILDREN, nameList("Store", "USA"));
             storeDimension.setHierarchizeMode(HierarchizeMode.POST);
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Store Sales");
+            measuresDimension.include(nameList("Measures", "Store Sales"));
 
             query.getAxis(Axis.ROWS).addDimension(storeDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
@@ -1076,10 +1084,10 @@ public class OlapTest extends TestCase {
 
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
-                    Selection.Operator.INCLUDE_CHILDREN, "Product", "Drink");
+                Selection.Operator.INCLUDE_CHILDREN, nameList("Product", "Drink"));
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Store Sales");
+            measuresDimension.include(nameList("Measures", "Store Sales"));
 
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
@@ -1107,20 +1115,20 @@ public class OlapTest extends TestCase {
 
             // change selections
             measuresDimension.include(
-                Selection.Operator.SIBLINGS, "Measures", "Customer Count");
+                Selection.Operator.SIBLINGS,
+                nameList("Measures", "Customer Count"));
             productDimension.include(
                 Selection.Operator.SIBLINGS,
-                "Product", "All Products", "Drink", "Alcoholic Beverages");
+                nameList(
+                    "Product", "All Products", "Drink", "Alcoholic Beverages"));
 
             // Add something to crossjoin with
             query.getAxis(Axis.ROWS).addDimension(
                 query.getDimension("Gender"));
             query.getDimension("Gender").include(
-                Operator.CHILDREN,
-                "Gender",
-                "All Gender");
+                Operator.CHILDREN, nameList("Gender", "All Gender"));
 
-            query.getAxis(Axis.UNUSED).addDimension(
+            query.getAxis(null).addDimension(
                 query.getDimension("Product"));
 
             query.validate();
@@ -1145,17 +1153,14 @@ public class OlapTest extends TestCase {
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
                 Selection.Operator.CHILDREN,
-                "Product", "Drink",
-                "Beverages");
+                nameList("Product", "Drink", "Beverages"));
             productDimension.include(
                 Selection.Operator.CHILDREN,
-                "Product",
-                "Food",
-                "Frozen Foods");
+                nameList("Product", "Food", "Frozen Foods"));
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Sales Count");
+            measuresDimension.include(nameList("Measures", "Sales Count"));
             QueryDimension timeDimension = query.getDimension("Time");
-            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+            timeDimension.include(nameList("Time", "Year", "1997", "Q3", "7"));
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
             query.getAxis(Axis.FILTER).addDimension(timeDimension);
@@ -1205,10 +1210,8 @@ public class OlapTest extends TestCase {
             // Exclude the Carbonated Beverages because they are not good
             // for your health.
             query.getDimension("Product").exclude(
-                "Product",
-                "Drink",
-                "Beverages",
-                "Carbonated Beverages");
+                nameList(
+                    "Product", "Drink", "Beverages", "Carbonated Beverages"));
 
             // Validate the generated MDX
             query.validate();
@@ -1267,20 +1270,17 @@ public class OlapTest extends TestCase {
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
                 Selection.Operator.CHILDREN,
-                "Product", "Drink",
-                "Beverages");
+                nameList("Product", "Drink", "Beverages"));
             productDimension.include(
                 Selection.Operator.CHILDREN,
-                "Product",
-                "Food",
-                "Frozen Foods");
+                nameList("Product", "Food", "Frozen Foods"));
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Sales Count");
+            measuresDimension.include(nameList("Measures", "Sales Count"));
             QueryDimension timeDimension = query.getDimension("Time");
-            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+            timeDimension.include(nameList("Time", "Year", "1997", "Q3", "7"));
             QueryDimension storeDimension = query.getDimension("Store");
             storeDimension.include(
-                    Selection.Operator.MEMBER, "Store", "USA");
+                Selection.Operator.MEMBER, nameList("Store", "USA"));
             query.getAxis(Axis.ROWS).addDimension(storeDimension);
             query.getAxis(Axis.ROWS).addDimension(productDimension);
             query.getAxis(Axis.FILTER).addDimension(timeDimension);
@@ -1332,10 +1332,8 @@ public class OlapTest extends TestCase {
             // Exclude the Carbonated Beverages because they are not good
             // for your health.
             query.getDimension("Product").exclude(
-                "Product",
-                "Drink",
-                "Beverages",
-                "Carbonated Beverages");
+                nameList(
+                    "Product", "Drink", "Beverages", "Carbonated Beverages"));
 
             // Validate the generated MDX
             query.validate();
@@ -1394,20 +1392,17 @@ public class OlapTest extends TestCase {
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
                 Selection.Operator.MEMBER,
-                "Product", "Drink",
-                "Beverages");
+                nameList("Product", "Drink", "Beverages"));
             productDimension.include(
                 Selection.Operator.MEMBER,
-                "Product",
-                "Food",
-                "Frozen Foods");
+                nameList("Product", "Food", "Frozen Foods"));
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Sales Count");
+            measuresDimension.include(nameList("Measures", "Sales Count"));
             QueryDimension timeDimension = query.getDimension("Time");
-            timeDimension.include("Time", "Year", "1997", "Q3", "7");
+            timeDimension.include(nameList("Time", "Year", "1997", "Q3", "7"));
             QueryDimension storeDimension = query.getDimension("Store");
             storeDimension.include(
-                    Selection.Operator.MEMBER, "Store", "USA");
+                Selection.Operator.MEMBER, nameList("Store", "USA"));
             query.getAxis(Axis.ROWS).addDimension(storeDimension);
             query.getAxis(Axis.FILTER).addDimension(productDimension);
             query.getAxis(Axis.FILTER).addDimension(timeDimension);
@@ -1455,19 +1450,20 @@ public class OlapTest extends TestCase {
 
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
-                    Selection.Operator.CHILDREN, "Product", "Drink");
+                Selection.Operator.CHILDREN, nameList("Product", "Drink"));
 
             QueryDimension storeDimension = query.getDimension("Store");
             storeDimension.include(
-                    Selection.Operator.INCLUDE_CHILDREN, "Store", "USA");
+                Selection.Operator.INCLUDE_CHILDREN, nameList("Store", "USA"));
             storeDimension.setHierarchizeMode(HierarchizeMode.POST);
 
             QueryDimension timeDimension = query.getDimension("Time");
 
-            timeDimension.include(Selection.Operator.CHILDREN, "Time", "1997");
+            timeDimension.include(
+                Selection.Operator.CHILDREN, nameList("Time", "1997"));
 
             QueryDimension measuresDimension = query.getDimension("Measures");
-            measuresDimension.include("Measures", "Store Sales");
+            measuresDimension.include(nameList("Measures", "Store Sales"));
 
 
             //query.getAxis(Axis.ROWS).addDimension(productDimension);

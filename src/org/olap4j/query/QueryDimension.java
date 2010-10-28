@@ -11,9 +11,7 @@ package org.olap4j.query;
 
 import org.olap4j.OlapException;
 import org.olap4j.impl.IdentifierParser;
-import org.olap4j.impl.Olap4jUtil;
-import org.olap4j.mdx.IdentifierNode;
-import org.olap4j.mdx.IdentifierNode.Segment;
+import org.olap4j.mdx.IdentifierSegment;
 import org.olap4j.metadata.*;
 
 import java.util.HashMap;
@@ -68,63 +66,37 @@ public class QueryDimension extends QueryNodeImpl {
         return dimension.getName();
     }
 
-    @Deprecated
-    public void select(String... nameParts) throws OlapException {
-        this.include(nameParts);
-    }
-
-    @Deprecated
-    public void select(
-        Selection.Operator operator,
-        String... nameParts) throws OlapException
-    {
-        this.include(operator, nameParts);
-    }
-
-    @Deprecated
-    public void select(Member member) {
-        this.include(member);
-    }
-
-    @Deprecated
-    public void select(
-            Selection.Operator operator,
-            Member member)
-    {
-        this.include(operator, member);
-    }
-
-    /**
-     * Clears the current member inclusions from this query dimension.
-     * @deprecated This method is deprecated in favor of
-     * {@link QueryDimension#clearInclusions()}
-     */
-    @Deprecated
-    public void clearSelection() {
-        this.clearInclusions();
-    }
-
     /**
      * Selects members and includes them in the query.
+     *
      * <p>This method selects and includes a single member with the
      * {@link Selection.Operator#MEMBER} operator.
+     *
      * @param nameParts Name of the member to select and include.
      * @throws OlapException If no member corresponding to the supplied
      * name parts could be resolved in the cube.
      */
-    public Selection include(String... nameParts) throws OlapException {
+    public Selection include(
+        List<IdentifierSegment> nameParts)
+        throws OlapException
+    {
         return this.include(Selection.Operator.MEMBER, nameParts);
     }
 
-    public Selection createSelection(String... nameParts) throws OlapException {
+    public Selection createSelection(
+        List<IdentifierSegment> nameParts)
+        throws OlapException
+    {
         return this.createSelection(Selection.Operator.MEMBER, nameParts);
-  }
+    }
 
     /**
      * Selects members and includes them in the query.
-     * <p>This method selects and includes a member along with it's
+     *
+     * <p>This method selects and includes a member along with its
      * relatives, depending on the supplied {@link Selection.Operator}
      * operator.
+     *
      * @param operator Selection operator that defines what relatives of the
      * supplied member name to include along.
      * @param nameParts Name of the root member to select and include.
@@ -133,34 +105,30 @@ public class QueryDimension extends QueryNodeImpl {
      */
     public Selection include(
         Selection.Operator operator,
-        String... nameParts) throws OlapException
+        List<IdentifierSegment> nameParts) throws OlapException
     {
         Member member = this.getQuery().getCube().lookupMember(nameParts);
         if (member == null) {
             throw new OlapException(
-                "Unable to find a member with name "
-                    + Olap4jUtil.stringArrayToString(nameParts));
-        } else {
-            return this.include(
-                operator,
-                member);
+                "Unable to find a member with name " + nameParts);
         }
+        return this.include(
+            operator,
+            member);
     }
 
     public Selection createSelection(
         Selection.Operator operator,
-        String... nameParts) throws OlapException
+        List<IdentifierSegment> nameParts) throws OlapException
     {
         Member member = this.getQuery().getCube().lookupMember(nameParts);
         if (member == null) {
             throw new OlapException(
-                "Unable to find a member with name "
-                    + Olap4jUtil.stringArrayToString(nameParts));
-        } else {
-            return this.createSelection(
-                operator,
-                member);
+                "Unable to find a member with name " + nameParts);
         }
+        return this.createSelection(
+            operator,
+            member);
     }
 
     /**
@@ -250,21 +218,28 @@ public class QueryDimension extends QueryNodeImpl {
 
     /**
      * Selects members and excludes them from the query.
+     *
      * <p>This method selects and excludes a single member with the
      * {@link Selection.Operator#MEMBER} operator.
+     *
      * @param nameParts Name of the member to select and exclude.
      * @throws OlapException If no member corresponding to the supplied
      * name parts could be resolved in the cube.
      */
-    public void exclude(String... nameParts) throws OlapException {
+    public void exclude(
+        List<IdentifierSegment> nameParts)
+        throws OlapException
+    {
         this.exclude(Selection.Operator.MEMBER, nameParts);
     }
 
     /**
      * Selects members and excludes them from the query.
-     * <p>This method selects and excludes a member along with it's
+     *
+     * <p>This method selects and excludes a member along with its
      * relatives, depending on the supplied {@link Selection.Operator}
      * operator.
+     *
      * @param operator Selection operator that defines what relatives of the
      * supplied member name to exclude along.
      * @param nameParts Name of the root member to select and exclude.
@@ -273,18 +248,16 @@ public class QueryDimension extends QueryNodeImpl {
      */
     public void exclude(
         Selection.Operator operator,
-        String... nameParts) throws OlapException
+        List<IdentifierSegment> nameParts) throws OlapException
     {
         Member rootMember = this.getQuery().getCube().lookupMember(nameParts);
         if (rootMember == null) {
             throw new OlapException(
-                "Unable to find a member with name "
-                    + Olap4jUtil.stringArrayToString(nameParts));
-        } else {
-            this.exclude(
-                operator,
-                rootMember);
+                "Unable to find a member with name " + nameParts);
         }
+        this.exclude(
+            operator,
+            rootMember);
     }
 
     /**
@@ -344,15 +317,6 @@ public class QueryDimension extends QueryNodeImpl {
         this.notifyRemove(removed);
     }
 
-    public static String[] getNameParts(String sel) {
-        List<Segment> list = IdentifierParser.parseIdentifier(sel);
-        String nameParts[] = new String[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            nameParts[i] = list.get(i).getName();
-        }
-        return nameParts;
-    }
-
     /**
      * Resolves a selection of members into an actual list
      * of the root member and it's relatives selected by the Selection object.
@@ -393,24 +357,12 @@ public class QueryDimension extends QueryNodeImpl {
             return
                 query.getCube().lookupMembers(
                     set,
-                    getNameParts(selection.getName()));
+                    IdentifierParser.parseIdentifier(selection.getName()));
         } catch (Exception e) {
             throw new OlapException(
                 "Error while resolving selection " + selection.toString(),
                 e);
         }
-    }
-
-    /**
-     * Returns a list of the inclusions within this dimension.
-     * <p>Be aware that modifications to this list might
-     * have unpredictable consequences.</p>
-     * @deprecated Use {@link QueryDimension#getInclusions()}
-     * @return list of inclusions
-     */
-    @Deprecated
-    public List<Selection> getSelections() {
-        return this.getInclusions();
     }
 
     /**

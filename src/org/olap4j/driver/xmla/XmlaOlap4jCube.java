@@ -10,7 +10,7 @@ package org.olap4j.driver.xmla;
 
 import org.olap4j.OlapException;
 import org.olap4j.impl.*;
-import org.olap4j.mdx.IdentifierNode;
+import org.olap4j.mdx.*;
 import org.olap4j.metadata.*;
 
 import java.util.*;
@@ -154,27 +154,12 @@ class XmlaOlap4jCube implements Cube, Named
         return Collections.singletonList(Locale.getDefault());
     }
 
-    public Member lookupMember(String... nameParts) throws OlapException {
-        List<IdentifierNode.Segment> segmentList =
-            new ArrayList<IdentifierNode.Segment>();
-        for (String namePart : nameParts) {
-            segmentList.add(new IdentifierNode.NameSegment(namePart));
-        }
-        return lookupMember(segmentList);
-    }
-
-    /**
-     * Finds a member, given its fully qualfieid name.
-     *
-     * @param segmentList List of the segments of the name
-     * @return Member, or null if not found
-     * @throws OlapException on error
-     */
-    private Member lookupMember(
-        List<IdentifierNode.Segment> segmentList) throws OlapException
+    public Member lookupMember(
+        List<IdentifierSegment> segmentList)
+        throws OlapException
     {
         StringBuilder buf = new StringBuilder();
-        for (IdentifierNode.Segment segment : segmentList) {
+        for (IdentifierSegment segment : segmentList) {
             if (buf.length() > 0) {
                 buf.append('.');
             }
@@ -197,14 +182,14 @@ class XmlaOlap4jCube implements Cube, Named
 
     public List<Member> lookupMembers(
         Set<Member.TreeOp> treeOps,
-        String... nameParts) throws OlapException
+        List<IdentifierSegment> nameParts) throws OlapException
     {
         StringBuilder buf = new StringBuilder();
-        for (String namePart : nameParts) {
+        for (IdentifierSegment namePart : nameParts) {
             if (buf.length() > 0) {
                 buf.append('.');
             }
-            buf.append(new IdentifierNode.NameSegment(namePart));
+            buf.append(namePart);
         }
         final String uniqueName = buf.toString();
         final List<XmlaOlap4jMember> list =

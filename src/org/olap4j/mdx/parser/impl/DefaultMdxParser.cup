@@ -365,7 +365,7 @@ non terminal Axis.Standard
 non terminal String
     comp_op,
     keyword;
-non terminal IdentifierNode.Segment
+non terminal IdentifierSegment
     identifier,
     key_identifier,
     quoted_identifier,
@@ -425,34 +425,31 @@ start with statement;
 quoted_identifier ::=
         QUOTED_ID:i  {:
             ParseRegion region = createRegion(ileft, iright);
-            RESULT = new IdentifierNode.NameSegment(
-                region, i, IdentifierNode.Quoting.QUOTED);
+            RESULT = new NameSegment(region, i, Quoting.QUOTED);
         :}
     ;
 
 unquoted_identifier ::=
         ID:i {:
             ParseRegion region = createRegion(ileft, iright);
-            RESULT = new IdentifierNode.NameSegment(
-                region, i, IdentifierNode.Quoting.UNQUOTED);
+            RESULT = new NameSegment(region, i, Quoting.UNQUOTED);
         :}
     |   keyword:i {:
             ParseRegion region = createRegion(ileft, iright);
-            RESULT = new IdentifierNode.NameSegment(
-                region, i, IdentifierNode.Quoting.UNQUOTED);
+            RESULT = new NameSegment(region, i, Quoting.UNQUOTED);
         :}
     ;
 
 // for example '&foo&[1]&bar' in '[x].&foo&[1]&bar.[y]'
 key_identifier ::=
        amp_identifier_list:list {:
-            RESULT = new IdentifierNode.KeySegment(list);
+            RESULT = new KeySegment(list);
         :}
     ;
 
 amp_identifier_list ::=
         amp_identifier:i {:
-            RESULT = new ArrayList<IdentifierNode.NameSegment>();
+            RESULT = new ArrayList<NameSegment>();
             RESULT.add(i);
         :}
     |
@@ -471,16 +468,14 @@ amp_identifier ::=
 amp_quoted_identifier ::=
         AMP_QUOTED_ID:i {:
             ParseRegion region = createRegion(ileft, iright);
-            RESULT = new IdentifierNode.NameSegment(
-                region, i, IdentifierNode.Quoting.QUOTED);
+            RESULT = new NameSegment(region, i, Quoting.QUOTED);
         :}
     ;
 
 amp_unquoted_identifier ::=
         AMP_UNQUOTED_ID:i {:
             ParseRegion region = createRegion(ileft, iright);
-            RESULT = new IdentifierNode.NameSegment(
-                region, i, IdentifierNode.Quoting.UNQUOTED);
+            RESULT = new NameSegment(region, i, Quoting.UNQUOTED);
         :}
     ;
 

@@ -313,17 +313,6 @@ public class XmlaOlap4jDriver implements Driver {
             Olap4jUtil.discard(description);
         }
     }
-
-    /**
-     * This is a mock subclass to prevent retro-compatibility issues.
-     * If you're using this class, please change your code to
-     * use XmlaOlap4jProxy instead.
-     * @author Luc Boudreau
-     *
-     */
-    @Deprecated
-    public static interface Proxy extends XmlaOlap4jProxy {
-    }
 }
 
 // End XmlaOlap4jDriver.java

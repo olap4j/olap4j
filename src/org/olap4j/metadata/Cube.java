@@ -10,6 +10,7 @@
 package org.olap4j.metadata;
 
 import org.olap4j.OlapException;
+import org.olap4j.mdx.IdentifierSegment;
 
 import java.util.*;
 
@@ -114,12 +115,28 @@ public interface Cube extends MetadataElement {
      * each successive member on the path from the root member. If a member's
      * name is unique within its level, preceding member name can be omitted.
      *
-     * <p>For example,
-     * <code>lookupMember("Product", "Food")</code>
-     * and
-     * <code>lookupMember("Product", "All Products", "Food")</code>
+     * <p>For example, {@code "[Product].[Food]"} and
+     * {@code "[Product].[All Products].[Food]"}
      * are both valid ways to locate the "Food" member of the "Product"
      * dimension.
+     *
+     * <p>The name is represented as a list of {@link IdentifierSegment}
+     * objects. There are some common ways to create such a list. If you have an
+     * identifier, call
+     * {@link org.olap4j.mdx.IdentifierNode#parseIdentifier(String)}
+     * to parse the string into an identifier, then
+     * {@link org.olap4j.mdx.IdentifierNode#getSegmentList()}. For example,
+     *
+     * <blockquote><code>Member member = cube.lookupMember(<br/>
+     * &nbsp;&nbsp;IdentifierNode.parseIdentifier(
+     * "[Product].[Food]").getSegmentList())</code></blockquote>
+     *
+     * <p>If you have an array of names, call
+     * {@link org.olap4j.mdx.IdentifierNode#ofNames(String...)}. For example,
+     *
+     * <blockquote><code>Member member = cube.lookupMember(<br/>
+     * &nbsp;&nbsp;IdentifierNode.parseIdentifier(
+     * "[Product].[Food]").getSegmentList())</code></blockquote>
      *
      * @param nameParts Components of the fully-qualified member name
      *
@@ -127,15 +144,15 @@ public interface Cube extends MetadataElement {
      *
      * @throws OlapException if error occurs
      */
-    Member lookupMember(String... nameParts) throws OlapException;
+    Member lookupMember(List<IdentifierSegment> nameParts) throws OlapException;
 
     /**
      * Finds a collection of members in the current Cube related to a given
      * member.
      *
      * <p>The method first looks up a member with the given fully-qualified
-     * name as for {@link #lookupMember(String[])}, then applies the set of
-     * tree-operations to find related members.
+     * name as for {@link #lookupMember(java.util.List)}, then applies the set
+     * of tree-operations to find related members.
      *
      * <p>The returned collection is sorted by level number then by member
      * ordinal. If no member is found with the given name, the collection is
@@ -182,7 +199,7 @@ public interface Cube extends MetadataElement {
      */
     List<Member> lookupMembers(
         Set<Member.TreeOp> treeOps,
-        String... nameParts) throws OlapException;
+        List<IdentifierSegment> nameParts) throws OlapException;
 }
 
 // End Cube.java

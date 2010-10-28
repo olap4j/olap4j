@@ -8,8 +8,7 @@
 */
 package org.olap4j.impl;
 
-import org.olap4j.mdx.IdentifierNode;
-import org.olap4j.mdx.ParseRegion;
+import org.olap4j.mdx.*;
 
 import java.util.*;
 
@@ -211,7 +210,7 @@ public class IdentifierParser {
                     builder.segmentComplete(
                         null,
                         string.substring(start, i).trim(),
-                        IdentifierNode.Quoting.UNQUOTED,
+                        Quoting.UNQUOTED,
                         syntax);
                     state = AFTER_SEG;
                     break loop;
@@ -219,7 +218,7 @@ public class IdentifierParser {
                     builder.segmentComplete(
                         null,
                         string.substring(start, i).trim(),
-                        IdentifierNode.Quoting.UNQUOTED,
+                        Quoting.UNQUOTED,
                         syntax);
                     syntax = Builder.Syntax.NAME;
                     state = BEFORE_SEG;
@@ -229,7 +228,7 @@ public class IdentifierParser {
                     builder.segmentComplete(
                         null,
                         string.substring(start, i).trim(),
-                        IdentifierNode.Quoting.UNQUOTED,
+                        Quoting.UNQUOTED,
                         syntax);
                     syntax = Builder.Syntax.NEXT_KEY;
                     state = BEFORE_SEG;
@@ -254,7 +253,7 @@ public class IdentifierParser {
                             null,
                             Olap4jUtil.replace(
                                 string.substring(start, i), "]]", "]"),
-                            IdentifierNode.Quoting.QUOTED,
+                            Quoting.QUOTED,
                             syntax);
                         ++i;
                         state = AFTER_SEG;
@@ -332,7 +331,7 @@ public class IdentifierParser {
      * @param s MDX identifier
      * @return List of segments
      */
-    public static List<IdentifierNode.Segment> parseIdentifier(String s)  {
+    public static List<IdentifierSegment> parseIdentifier(String s)  {
         final MemberBuilder builder = new MemberBuilder();
         int i = parseMember(builder, s, 0);
         if (i < s.length()) {
@@ -357,7 +356,7 @@ public class IdentifierParser {
      * @param s MDX identifier list
      * @return List of lists of segments
      */
-    public static List<List<IdentifierNode.Segment>> parseIdentifierList(
+    public static List<List<IdentifierSegment>> parseIdentifierList(
         String s)
     {
         final MemberListBuilder builder = new MemberListBuilder();
@@ -400,7 +399,7 @@ public class IdentifierParser {
         void segmentComplete(
             ParseRegion region,
             String name,
-            IdentifierNode.Quoting quoting,
+            Quoting quoting,
             Syntax syntax);
 
         enum Syntax {
@@ -416,12 +415,12 @@ public class IdentifierParser {
      * It cannot handle tuples or lists of members.
      */
     public static class MemberBuilder implements Builder {
-        protected final List<IdentifierNode.NameSegment> subSegments;
-        protected final List<IdentifierNode.Segment> segmentList;
+        protected final List<NameSegment> subSegments;
+        protected final List<IdentifierSegment> segmentList;
 
         public MemberBuilder() {
-            segmentList = new ArrayList<IdentifierNode.Segment>();
-            subSegments = new ArrayList<IdentifierNode.NameSegment>();
+            segmentList = new ArrayList<IdentifierSegment>();
+            subSegments = new ArrayList<NameSegment>();
         }
 
         public void tupleComplete() {
@@ -434,7 +433,7 @@ public class IdentifierParser {
 
         private void flushSubSegments() {
             if (!subSegments.isEmpty()) {
-                segmentList.add(new IdentifierNode.KeySegment(subSegments));
+                segmentList.add(new KeySegment(subSegments));
                 subSegments.clear();
             }
         }
@@ -442,11 +441,11 @@ public class IdentifierParser {
         public void segmentComplete(
             ParseRegion region,
             String name,
-            IdentifierNode.Quoting quoting,
+            Quoting quoting,
             Syntax syntax)
         {
-            final IdentifierNode.NameSegment segment =
-                new IdentifierNode.NameSegment(
+            final NameSegment segment =
+                new NameSegment(
                     region, name, quoting);
             if (syntax != Syntax.NEXT_KEY) {
                 // If we were building a previous key, write it out.
@@ -467,13 +466,13 @@ public class IdentifierParser {
      * then collects members into lists.
      */
     public static class MemberListBuilder extends MemberBuilder {
-        final List<List<IdentifierNode.Segment>> list =
-            new ArrayList<List<IdentifierNode.Segment>>();
+        final List<List<IdentifierSegment>> list =
+            new ArrayList<List<IdentifierSegment>>();
 
         public void memberComplete() {
             super.memberComplete();
             list.add(
-                new ArrayList<IdentifierNode.Segment>(segmentList));
+                new ArrayList<IdentifierSegment>(segmentList));
             segmentList.clear();
         }
     }

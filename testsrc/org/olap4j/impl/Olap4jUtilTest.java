@@ -9,8 +9,7 @@
 package org.olap4j.impl;
 
 import junit.framework.TestCase;
-import org.olap4j.mdx.IdentifierNode;
-import org.olap4j.mdx.ParseRegion;
+import org.olap4j.mdx.*;
 
 import java.util.*;
 
@@ -347,7 +346,7 @@ public class Olap4jUtilTest extends TestCase {
      * Tests the {@link IdentifierNode#parseIdentifier} method.
      */
     public void testParseIdentifier() {
-        List<IdentifierNode.Segment> segments =
+        List<IdentifierSegment> segments =
             IdentifierParser.parseIdentifier(
                 "[string].[with].[a [bracket]] in it]");
         assertEquals(3, segments.size());
@@ -412,26 +411,26 @@ public class Olap4jUtilTest extends TestCase {
         segments = IdentifierParser.parseIdentifier(
             "[ProductFilterDim].[Product Main Group Name].&[Maingroup (xyz)]");
         assertEquals(3, segments.size());
-        final IdentifierNode.Segment s0 = segments.get(0);
+        final IdentifierSegment s0 = segments.get(0);
         assertEquals("ProductFilterDim", s0.getName());
-        assertEquals(IdentifierNode.Quoting.QUOTED, s0.getQuoting());
-        final IdentifierNode.Segment s1 = segments.get(1);
+        assertEquals(Quoting.QUOTED, s0.getQuoting());
+        final IdentifierSegment s1 = segments.get(1);
         assertEquals("Product Main Group Name", s1.getName());
-        assertEquals(IdentifierNode.Quoting.QUOTED, s1.getQuoting());
-        assertTrue(segments.get(2) instanceof IdentifierNode.KeySegment);
-        IdentifierNode.KeySegment s2 =
-            (IdentifierNode.KeySegment) segments.get(2);
+        assertEquals(Quoting.QUOTED, s1.getQuoting());
+        assertTrue(segments.get(2) instanceof KeySegment);
+        KeySegment s2 =
+            (KeySegment) segments.get(2);
         assertEquals(1, s2.getKeyParts().size());
-        final IdentifierNode.NameSegment s2k0 = s2.getKeyParts().get(0);
+        final NameSegment s2k0 = s2.getKeyParts().get(0);
         assertEquals("Maingroup (xyz)", s2k0.getName());
-        assertEquals(IdentifierNode.Quoting.QUOTED, s2k0.getQuoting());
+        assertEquals(Quoting.QUOTED, s2k0.getQuoting());
     }
 
     /**
      * Advanced test for the {@link IdentifierNode#parseIdentifier} method.
      */
     public void testParseIdentifierAdvanced() {
-        List<IdentifierNode.Segment> segments;
+        List<IdentifierSegment> segments;
 
         // detailed example, per javadoc
         //
@@ -450,39 +449,39 @@ public class Olap4jUtilTest extends TestCase {
         segments = IdentifierParser.parseIdentifier(
             "[Customers].[City].&[San Francisco]&CA&USA.&[cust1234]");
         assertEquals(4, segments.size());
-        final IdentifierNode.Segment s0 = segments.get(0);
+        final IdentifierSegment s0 = segments.get(0);
         assertEquals("Customers", s0.getName());
-        assertEquals(IdentifierNode.Quoting.QUOTED, s0.getQuoting());
-        final IdentifierNode.Segment s1 = segments.get(1);
+        assertEquals(Quoting.QUOTED, s0.getQuoting());
+        final IdentifierSegment s1 = segments.get(1);
         assertEquals("City", s1.getName());
-        assertEquals(IdentifierNode.Quoting.QUOTED, s1.getQuoting());
-        assertTrue(segments.get(2) instanceof IdentifierNode.KeySegment);
-        IdentifierNode.KeySegment s2 =
-            (IdentifierNode.KeySegment) segments.get(2);
+        assertEquals(Quoting.QUOTED, s1.getQuoting());
+        assertTrue(segments.get(2) instanceof KeySegment);
+        KeySegment s2 =
+            (KeySegment) segments.get(2);
         assertEquals(3, s2.getKeyParts().size());
-        final IdentifierNode.NameSegment s2k0 = s2.getKeyParts().get(0);
+        final NameSegment s2k0 = s2.getKeyParts().get(0);
         assertEquals("San Francisco", s2k0.getName());
-        assertEquals(IdentifierNode.Quoting.QUOTED, s2k0.getQuoting());
-        final IdentifierNode.NameSegment s2k1 = s2.getKeyParts().get(1);
+        assertEquals(Quoting.QUOTED, s2k0.getQuoting());
+        final NameSegment s2k1 = s2.getKeyParts().get(1);
         assertEquals("CA", s2k1.getName());
-        assertEquals(IdentifierNode.Quoting.QUOTED, s2k0.getQuoting());
-        final IdentifierNode.NameSegment s2k2 = s2.getKeyParts().get(0);
+        assertEquals(Quoting.QUOTED, s2k0.getQuoting());
+        final NameSegment s2k2 = s2.getKeyParts().get(0);
         assertEquals("San Francisco", s2k2.getName());
-        assertEquals(IdentifierNode.Quoting.QUOTED, s2k2.getQuoting());
-        IdentifierNode.KeySegment s3 =
-            (IdentifierNode.KeySegment) segments.get(3);
+        assertEquals(Quoting.QUOTED, s2k2.getQuoting());
+        KeySegment s3 =
+            (KeySegment) segments.get(3);
         assertNull(s3.getName());
         assertEquals(1, s3.getKeyParts().size());
-        final IdentifierNode.NameSegment s3k0 = s3.getKeyParts().get(0);
+        final NameSegment s3k0 = s3.getKeyParts().get(0);
         assertEquals("cust1234", s3k0.getName());
-        assertEquals(IdentifierNode.Quoting.QUOTED, s3k0.getQuoting());
+        assertEquals(Quoting.QUOTED, s3k0.getQuoting());
     }
 
     /**
      * Tests the {@link IdentifierParser#parseIdentifierList(String)} method.
      */
     public void testParseIdentifierList() {
-        List<List<IdentifierNode.Segment>> list;
+        List<List<IdentifierSegment>> list;
 
         list = IdentifierParser.parseIdentifierList("{foo, baz.baz}");
         assertEquals(2, list.size());
@@ -508,11 +507,11 @@ public class Olap4jUtilTest extends TestCase {
         assertEquals(1, list.get(0).size());
         assertEquals(4, list.get(1).size());
         assertEquals("baz", list.get(1).get(0).getName());
-        final IdentifierNode.Segment id1s1 = list.get(1).get(1);
+        final IdentifierSegment id1s1 = list.get(1).get(1);
         assertEquals(2, id1s1.getKeyParts().size());
         assertEquals("k0", id1s1.getKeyParts().get(0).getName());
         assertEquals("k1", id1s1.getKeyParts().get(1).getName());
-        final IdentifierNode.Segment id1s2 = list.get(1).get(2);
+        final IdentifierSegment id1s2 = list.get(1).get(2);
         assertEquals(1, id1s2.getKeyParts().size());
         assertEquals("m0", id1s2.getKeyParts().get(0).getName());
         assertEquals("boo", list.get(1).get(3).getName());
@@ -564,10 +563,10 @@ public class Olap4jUtilTest extends TestCase {
                 public void segmentComplete(
                     ParseRegion region,
                     String name,
-                    IdentifierNode.Quoting quoting,
+                    Quoting quoting,
                     Syntax syntax)
                 {
-                    if (quoting == IdentifierNode.Quoting.QUOTED) {
+                    if (quoting == Quoting.QUOTED) {
                         buf.append("[").append(name).append("]");
                     } else {
                         buf.append(name);

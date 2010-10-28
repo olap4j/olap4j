@@ -41,43 +41,43 @@ public class MdxTest extends TestCase {
             "[Store].[USA].[California]",
             IdentifierNode.unparseIdentifierList(
                 Arrays.asList(
-                    new IdentifierNode.NameSegment(
-                        null, "Store", IdentifierNode.Quoting.QUOTED),
-                    new IdentifierNode.NameSegment(
-                        null, "USA", IdentifierNode.Quoting.QUOTED),
-                    new IdentifierNode.NameSegment(
-                        null, "California", IdentifierNode.Quoting.QUOTED))));
+                    new NameSegment(
+                        null, "Store", Quoting.QUOTED),
+                    new NameSegment(
+                        null, "USA", Quoting.QUOTED),
+                    new NameSegment(
+                        null, "California", Quoting.QUOTED))));
     }
 
     public void testImplode() {
-        List<IdentifierNode.Segment> fooBar =
-            Arrays.<IdentifierNode.Segment>asList(
-                new IdentifierNode.NameSegment(
-                    null, "foo", IdentifierNode.Quoting.UNQUOTED),
-                new IdentifierNode.NameSegment(
-                    null, "bar", IdentifierNode.Quoting.QUOTED));
+        List<IdentifierSegment> fooBar =
+            Arrays.<IdentifierSegment>asList(
+                new NameSegment(
+                    null, "foo", Quoting.UNQUOTED),
+                new NameSegment(
+                    null, "bar", Quoting.QUOTED));
         assertEquals(
             "foo.[bar]",
             IdentifierNode.unparseIdentifierList(fooBar));
 
-        List<IdentifierNode.Segment> empty = Collections.emptyList();
+        List<IdentifierSegment> empty = Collections.emptyList();
         assertEquals("", IdentifierNode.unparseIdentifierList(empty));
 
-        List<IdentifierNode.Segment> nasty =
-            Arrays.<IdentifierNode.Segment>asList(
-                new IdentifierNode.NameSegment(
-                    null, "string", IdentifierNode.Quoting.QUOTED),
-                new IdentifierNode.NameSegment(
-                    null, "with", IdentifierNode.Quoting.QUOTED),
-                new IdentifierNode.NameSegment(
-                    null, "a [bracket] in it", IdentifierNode.Quoting.QUOTED));
+        List<IdentifierSegment> nasty =
+            Arrays.<IdentifierSegment>asList(
+                new NameSegment(
+                    null, "string", Quoting.QUOTED),
+                new NameSegment(
+                    null, "with", Quoting.QUOTED),
+                new NameSegment(
+                    null, "a [bracket] in it", Quoting.QUOTED));
         assertEquals(
             "[string].[with].[a [bracket]] in it]",
             IdentifierNode.unparseIdentifierList(nasty));
     }
 
     public void testParseIdentifier() {
-        List<IdentifierNode.Segment> segments =
+        List<IdentifierSegment> segments =
             IdentifierNode.parseIdentifier(
                 "[string].[with].[a [bracket]] in it]").getSegmentList();
         assertEquals(3, segments.size());
@@ -85,7 +85,7 @@ public class MdxTest extends TestCase {
             "a [bracket] in it",
             segments.get(2).getName());
         assertEquals(
-            IdentifierNode.Quoting.QUOTED,
+            Quoting.QUOTED,
             segments.get(2).getQuoting());
 
         segments = IdentifierNode.parseIdentifier(
@@ -98,10 +98,10 @@ public class MdxTest extends TestCase {
         segments = IdentifierNode.parseIdentifier("[foo].bar").getSegmentList();
         assertEquals(2, segments.size());
         assertEquals(
-            IdentifierNode.Quoting.QUOTED,
+            Quoting.QUOTED,
             segments.get(0).getQuoting());
         assertEquals(
-            IdentifierNode.Quoting.UNQUOTED,
+            Quoting.UNQUOTED,
             segments.get(1).getQuoting());
 
         try {
@@ -112,6 +112,43 @@ public class MdxTest extends TestCase {
             assertEquals(
                 "Expected ']', in member identifier '[foo].[bar'",
                 e.getMessage());
+        }
+    }
+
+    /**
+     * Unit test for {@link org.olap4j.mdx.IdentifierNode#ofNames(String...)}.
+     */
+    public void testIdentifierOfNames() {
+        IdentifierNode identifierNode =
+            IdentifierNode.ofNames(
+                "string", "with", "a [bracket] in it");
+        List<IdentifierSegment> segments =
+            identifierNode.getSegmentList();
+        assertEquals(3, segments.size());
+        assertEquals(
+            "a [bracket] in it",
+            segments.get(2).getName());
+        assertEquals(
+            Quoting.QUOTED,
+            segments.get(2).getQuoting());
+
+        assertEquals(
+            "xxx",
+            identifierNode.toString());
+
+        // Empty array is valid. (I don't feel strongly about this.)
+        identifierNode =
+            IdentifierNode.ofNames();
+        assertEquals(0, identifierNode.getSegmentList().size());
+        assertEquals("", identifierNode.toString());
+
+        // Array containing null is not valid.
+        try {
+            identifierNode =
+                IdentifierNode.ofNames("foo", null, "bar");
+            fail("expected error, got " + identifierNode);
+        } catch (NullPointerException e) {
+            // ok
         }
     }
 

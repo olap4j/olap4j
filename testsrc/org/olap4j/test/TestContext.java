@@ -16,8 +16,7 @@ import java.sql.*;
 
 import org.olap4j.*;
 import org.olap4j.impl.Olap4jUtil;
-import org.olap4j.mdx.ParseTreeNode;
-import org.olap4j.mdx.ParseTreeWriter;
+import org.olap4j.mdx.*;
 import org.olap4j.layout.TraditionalCellSetFormatter;
 
 import org.apache.commons.dbcp.*;
@@ -446,6 +445,16 @@ public class TestContext {
         e.printStackTrace(pw);
         pw.flush();
         return sw.toString();
+    }
+
+    /**
+     * Shorthand way to convert array of names into segment list.
+     *
+     * @param names Array of names
+     * @return Segment list
+     */
+    public static List<IdentifierSegment> nameList(String... names) {
+        return IdentifierNode.ofNames(names).getSegmentList();
     }
 
     /**

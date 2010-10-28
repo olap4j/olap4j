@@ -141,6 +141,15 @@ public class Query extends QueryNodeImpl {
         down.notifyAdd(acrossChildList);
     }
 
+    /**
+     * Returns the query axis for a given axis type.
+     *
+     * <p>If you pass axis=null, returns a special axis that is used to hold
+     * all unused hierarchies. (We may change this behavior in future.)
+     *
+     * @param axis Axis type
+     * @return Query axis
+     */
     public QueryAxis getAxis(Axis axis) {
         return this.axes.get(axis);
     }

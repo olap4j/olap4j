@@ -181,8 +181,8 @@ class DefaultMdxValidatorImpl
     // from IdentifierNode
     public ParseTreeNode accept(IdentifierNode identifier) {
         if (identifier.getSegmentList().size() == 1) {
-            final IdentifierNode.Segment s = identifier.getSegmentList().get(0);
-            if (s.getQuoting() == IdentifierNode.Quoting.UNQUOTED
+            final IdentifierSegment s = identifier.getSegmentList().get(0);
+            if (s.getQuoting() == Quoting.UNQUOTED
                 && isReserved(s.getName()))
             {
                 return LiteralNode.createSymbol(
@@ -209,7 +209,7 @@ class DefaultMdxValidatorImpl
 
     private ParseTreeNode lookup(
         SelectNode select,
-        List<IdentifierNode.Segment> segments,
+        List<IdentifierSegment> segments,
         boolean allowProp)
     {
         // todo: something like

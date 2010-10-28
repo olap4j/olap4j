@@ -11,6 +11,7 @@ package org.olap4j.query;
 
 import org.olap4j.Axis;
 import org.olap4j.OlapException;
+import org.olap4j.mdx.IdentifierSegment;
 import org.olap4j.metadata.Measure;
 import org.olap4j.metadata.Member;
 
@@ -261,30 +262,31 @@ public class QueryAxis extends QueryNodeImpl {
     }
 
     /**
-     * <p>Sorts the axis according to the supplied order
+     * Sorts the axis according to the supplied order
      * and member unique name.
+     *
      * <p>Using this method will try to resolve the supplied name
      * parts from the underlying cube and find the corresponding
      * member. This member will then be passed as a sort evaluation
      * expression.
+     *
      * @param order The {@link SortOrder} in which to
      * sort the axis.
      * @param nameParts The unique name parts of the sort
      * evaluation expression.
      * @throws OlapException If the supplied member cannot be resolved
-     * with {@link org.olap4j.metadata.Cube#lookupMember(String...)}
+     *     with {@link org.olap4j.metadata.Cube#lookupMember(java.util.List)}
      */
-    public void sort(SortOrder order, String... nameParts)
+    public void sort(SortOrder order, List<IdentifierSegment> nameParts)
         throws OlapException
     {
         assert order != null;
         assert nameParts != null;
         Member member = query.getCube().lookupMember(nameParts);
-        if (member != null) {
-            sort(order, member);
-        } else {
+        if (member == null) {
             throw new OlapException("Cannot find member.");
         }
+        sort(order, member);
     }
 
     /**

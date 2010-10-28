@@ -592,36 +592,36 @@ public class ParserTest extends TestCase {
         assertNotNull(id.getRegion());
         assertEquals(3, id.getSegmentList().size());
 
-        final IdentifierNode.Segment seg0 = id.getSegmentList().get(0);
+        final IdentifierSegment seg0 = id.getSegmentList().get(0);
         assertNotNull(seg0.getRegion());
         assertEquals("Foo", seg0.getName());
-        assertEquals(IdentifierNode.Quoting.QUOTED, seg0.getQuoting());
+        assertEquals(Quoting.QUOTED, seg0.getQuoting());
 
-        final IdentifierNode.Segment seg1 = id.getSegmentList().get(1);
-        assertEquals(IdentifierNode.Quoting.KEY, seg1.getQuoting());
+        final IdentifierSegment seg1 = id.getSegmentList().get(1);
+        assertEquals(Quoting.KEY, seg1.getQuoting());
         assertNull(seg1.getName());
-        List<IdentifierNode.NameSegment> keyParts = seg1.getKeyParts();
+        List<NameSegment> keyParts = seg1.getKeyParts();
         assertNotNull(keyParts);
         assertEquals(2, keyParts.size());
         assertEquals("Key1", keyParts.get(0).getName());
         assertEquals(
-            IdentifierNode.Quoting.UNQUOTED, keyParts.get(0).getQuoting());
+            Quoting.UNQUOTED, keyParts.get(0).getQuoting());
         assertEquals("Key2", keyParts.get(1).getName());
         assertEquals(
-            IdentifierNode.Quoting.UNQUOTED, keyParts.get(1).getQuoting());
+            Quoting.UNQUOTED, keyParts.get(1).getQuoting());
 
-        final IdentifierNode.Segment seg2 = id.getSegmentList().get(2);
+        final IdentifierSegment seg2 = id.getSegmentList().get(2);
         assertNotNull(seg2.getRegion());
-        assertEquals(IdentifierNode.Quoting.KEY, seg2.getQuoting());
-        List<IdentifierNode.NameSegment> keyParts2 = seg2.getKeyParts();
+        assertEquals(Quoting.KEY, seg2.getQuoting());
+        List<NameSegment> keyParts2 = seg2.getKeyParts();
         assertNotNull(keyParts2);
         assertEquals(3, keyParts2.size());
         assertEquals(
-            IdentifierNode.Quoting.QUOTED, keyParts2.get(0).getQuoting());
+            Quoting.QUOTED, keyParts2.get(0).getQuoting());
         assertEquals(
-            IdentifierNode.Quoting.UNQUOTED, keyParts2.get(1).getQuoting());
+            Quoting.UNQUOTED, keyParts2.get(1).getQuoting());
         assertEquals(
-            IdentifierNode.Quoting.QUOTED, keyParts2.get(2).getQuoting());
+            Quoting.QUOTED, keyParts2.get(2).getQuoting());
         assertEquals("5", keyParts2.get(2).getName());
         assertNotNull(keyParts2.get(2).getRegion());
 
@@ -759,20 +759,20 @@ public class ParserTest extends TestCase {
         }
 
         id = new IdentifierNode(
-            new IdentifierNode.NameSegment("foo"));
+            new NameSegment("foo"));
         assertEquals("[foo]", id.toString());
 
         // append does not mutate
         IdentifierNode id2 = id.append(
-            new IdentifierNode.KeySegment(
-                new IdentifierNode.NameSegment(
-                    null, "bar", IdentifierNode.Quoting.QUOTED)));
+            new KeySegment(
+                new NameSegment(
+                    null, "bar", Quoting.QUOTED)));
         assertTrue(id != id2);
         assertEquals("[foo]", id.toString());
         assertEquals("[foo].&[bar]", id2.toString());
 
         // cannot mutate segment list
-        final List<IdentifierNode.Segment> segments = id.getSegmentList();
+        final List<IdentifierSegment> segments = id.getSegmentList();
         try {
             segments.remove(0);
             fail("expected exception");
@@ -787,7 +787,7 @@ public class ParserTest extends TestCase {
         }
         try {
             segments.add(
-                new IdentifierNode.NameSegment("baz"));
+                new NameSegment("baz"));
             fail("expected exception");
         } catch (UnsupportedOperationException e) {
             // ok
@@ -848,16 +848,16 @@ public class ParserTest extends TestCase {
         SelectNode selectNode = new SelectNode();
         IdentifierNode startDate =
             new IdentifierNode(
-                new IdentifierNode.NameSegment("Date"),
-                new IdentifierNode.NameSegment("2010-01-03"));
+                new NameSegment("Date"),
+                new NameSegment("2010-01-03"));
         IdentifierNode endDate =
             new IdentifierNode(
-                new IdentifierNode.NameSegment("Date"),
-                new IdentifierNode.NameSegment("2010-10-03"));
+                new NameSegment("Date"),
+                new NameSegment("2010-10-03"));
         IdentifierNode name =
             new IdentifierNode(
-                new IdentifierNode.NameSegment("Date"),
-                new IdentifierNode.NameSegment("Date Range"));
+                new NameSegment("Date"),
+                new NameSegment("Date Range"));
         CallNode cn = new CallNode(null, ":", Syntax.Infix, startDate, endDate);
         ParseTreeNode exp =
             new CallNode(
