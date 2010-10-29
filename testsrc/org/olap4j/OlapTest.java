@@ -1084,7 +1084,8 @@ public class OlapTest extends TestCase {
 
             QueryDimension productDimension = query.getDimension("Product");
             productDimension.include(
-                Selection.Operator.INCLUDE_CHILDREN, nameList("Product", "Drink"));
+                Selection.Operator.INCLUDE_CHILDREN,
+                nameList("Product", "Drink"));
 
             QueryDimension measuresDimension = query.getDimension("Measures");
             measuresDimension.include(nameList("Measures", "Store Sales"));
