@@ -1,5 +1,5 @@
 /*
-// $Id:$
+// $Id$
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
@@ -51,7 +51,7 @@ import java.util.*;
  * specification and is subject to change without notice.</b></p>
  *
  * @author jhyde
- * @version $Id:$
+ * @version $Id$
  * @since Apr 15, 2009
 */
 public class RectangularCellSetFormatter implements CellSetFormatter {

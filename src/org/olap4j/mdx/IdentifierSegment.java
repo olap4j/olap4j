@@ -1,5 +1,5 @@
 /*
-// $Id: IdentifierNode.java 359 2010-10-14 21:24:51Z jhyde $
+// $Id$
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
@@ -33,7 +33,7 @@ import java.util.List;
  * {@link org.olap4j.mdx.IdentifierNode#getSegmentList()} on the resulting
  * node.</p>
  *
- * @version $Id: IdentifierNode.java 359 2010-10-14 21:24:51Z jhyde $
+ * @version $Id$
  * @author jhyde
  */
 public interface IdentifierSegment {

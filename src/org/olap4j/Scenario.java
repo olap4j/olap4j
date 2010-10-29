@@ -1,5 +1,5 @@
 /*
-// $Id: //open/mondrian/src/main/mondrian/olap/Scenario.java#4 $
+// $Id$
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
@@ -29,7 +29,7 @@ package org.olap4j;
  *
  * @author jhyde
  * @since 24 April, 2009
- * @version $Id: //open/mondrian/src/main/mondrian/olap/Scenario.java#4 $
+ * @version $Id$
  */
 public interface Scenario {
     /**

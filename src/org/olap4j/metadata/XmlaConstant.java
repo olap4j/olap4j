@@ -126,7 +126,7 @@ import java.util.*;
  * </table>
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  */
 public interface XmlaConstant {
     /**

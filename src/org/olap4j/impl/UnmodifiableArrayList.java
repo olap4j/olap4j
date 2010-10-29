@@ -1,5 +1,5 @@
 /*
-// $Id: AbstractNamedList.java 229 2009-05-08 19:11:29Z jhyde $
+// $Id$
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
@@ -20,7 +20,7 @@ import java.util.*;
  * class has one fewer wrapper object, saving space and indirection effort.
  *
  * @author jhyde
- * @version $Id: AbstractNamedList.java 229 2009-05-08 19:11:29Z jhyde $
+ * @version $Id$
  * @since May 7, 2009
  */
 public class UnmodifiableArrayList<T>

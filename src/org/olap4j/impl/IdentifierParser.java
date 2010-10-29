@@ -21,7 +21,7 @@ import java.util.*;
  * without notice. It is provided in the hope that it will be useful to
  * implementors of olap4j drivers.
  *
- * @version $Id: $
+ * @version $Id$
  * @author jhyde
  */
 public class IdentifierParser {

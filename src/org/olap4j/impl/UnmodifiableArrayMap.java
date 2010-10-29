@@ -1,5 +1,5 @@
 /*
-// $Id: AbstractNamedList.java 229 2009-05-08 19:11:29Z jhyde $
+// $Id$
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
@@ -24,7 +24,7 @@ import java.util.*;
  * these are even more space-efficient for maps of size 0 and 1.
  *
  * @author jhyde
- * @version $Id: AbstractNamedList.java 229 2009-05-08 19:11:29Z jhyde $
+ * @version $Id$
  * @since Jan 16, 2010
  */
 public class UnmodifiableArrayMap<K, V>

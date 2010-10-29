@@ -22,7 +22,7 @@ import org.olap4j.test.TestContext.Wrapper;
  * to remote XML/A servers.
  *
  * @author Luc Boudreau
- * @version $Id:$
+ * @version $Id$
  */
 public class RemoteXmlaTester implements Tester {
 

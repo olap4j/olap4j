@@ -1,5 +1,5 @@
 /*
-// $Id: IdentifierNode.java 359 2010-10-14 21:24:51Z jhyde $
+// $Id$
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
@@ -17,13 +17,13 @@ import java.util.List;
  * Segment that represents a key or compound key.
  *
  * <p>Such a segment appears in an identifier with each component prefixed
- * with '&amp;'. For example, in the identifier
- * '{@code [Customer].[State].&amp;[WA]&amp;[USA]}', the third segment is a
- * compound key whose parts are "@{code WA}" and "{@code USA}".
+ * with "&amp;". For example, in the identifier
+ * "<code>[Customer].[State].&amp;[WA]&amp;[USA]</code>", the third segment is
+ * a compound key whose parts are "{@code WA}" and "{@code USA}".
  *
  * @see org.olap4j.mdx.NameSegment
  *
- * @version $Id: IdentifierNode.java 359 2010-10-14 21:24:51Z jhyde $
+ * @version $Id$
  * @author jhyde
  */
 public class KeySegment implements IdentifierSegment {

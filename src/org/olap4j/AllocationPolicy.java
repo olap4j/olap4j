@@ -1,5 +1,5 @@
 /*
-// $Id: Cell.java 229 2009-05-08 19:11:29Z jhyde $
+// $Id$
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
@@ -16,7 +16,7 @@ package org.olap4j;
  * @see Cell#setValue
  *
  * @author jhyde
- * @version $Id: Cell.java 229 2009-05-08 19:11:29Z jhyde $
+ * @version $Id$
  * @since Aug 22, 2006
  */
 public enum AllocationPolicy {

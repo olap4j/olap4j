@@ -1,5 +1,5 @@
 /*
-// $Id: Datatype.java 253 2009-06-30 03:06:10Z jhyde $
+// $Id$
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
@@ -17,7 +17,7 @@ import java.util.*;
  * Implementation of {@link org.olap4j.metadata.XmlaConstant.Dictionary}.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  */
 class DictionaryImpl<E extends Enum<E> & XmlaConstant>
     implements XmlaConstant.Dictionary<E>
