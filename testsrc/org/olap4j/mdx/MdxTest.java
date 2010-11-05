@@ -133,14 +133,16 @@ public class MdxTest extends TestCase {
             segments.get(2).getQuoting());
 
         assertEquals(
-            "xxx",
+            "[string].[with].[a [bracket]] in it]",
             identifierNode.toString());
 
-        // Empty array is valid. (I don't feel strongly about this.)
-        identifierNode =
-            IdentifierNode.ofNames();
-        assertEquals(0, identifierNode.getSegmentList().size());
-        assertEquals("", identifierNode.toString());
+        // Empty array is invalid.
+        try {
+            identifierNode = IdentifierNode.ofNames();
+            fail("expected error, got " + identifierNode);
+        } catch (IllegalArgumentException e) {
+            // ok
+        }
 
         // Array containing null is not valid.
         try {

@@ -42,6 +42,9 @@ public class NameSegment implements IdentifierSegment {
         this.region = region;
         this.name = name;
         this.quoting = quoting;
+        if (name == null) {
+            throw new NullPointerException();
+        }
         if (!(quoting == Quoting.QUOTED || quoting == Quoting.UNQUOTED)) {
             throw new IllegalArgumentException();
         }
