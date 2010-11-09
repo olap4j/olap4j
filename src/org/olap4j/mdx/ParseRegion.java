@@ -9,6 +9,8 @@
 */
 package org.olap4j.mdx;
 
+import org.olap4j.impl.Olap4jUtil;
+
 /**
  * Region of parser source code.
  *
@@ -335,8 +337,11 @@ public class ParseRegion {
         --column;
         int i = 0;
         while (line-- > 0) {
-            i = code.indexOf(NL, i)
-                + NL.length();
+            // Works on linux where line ending is "\n";
+            // also works on windows where line ending is "\r\n".
+            // Even works if they supply linux strings on windows.
+            i = code.indexOf("\n", i)
+                + "\n".length();
         }
         return i + column;
     }

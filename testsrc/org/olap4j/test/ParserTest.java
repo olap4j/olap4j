@@ -178,19 +178,48 @@ public class ParserTest extends TestCase {
     }
 
     public void testScannerPunc() {
-        // '$' is OK inside brackets but not outside
+        assertParseQuery(
+            "with member [Measures].__Foo as 1 + 2\n"
+            + "select __Foo on 0\n"
+            + "from _Bar_Baz",
+            "WITH\n"
+            + "MEMBER [Measures].__Foo AS\n"
+            + "    (1.0 + 2.0)\n"
+            + "SELECT\n"
+            + "__Foo ON COLUMNS\n"
+            + "FROM _Bar_Baz");
+
+        // # is not allowed
+        assertParseQueryFails(
+            "with member [Measures].#^_Foo as 1 + 2\n"
+            + "select __Foo on 0\n"
+            + "from _Bar#Baz",
+            "Unexpected character '#'");
+        assertParseQueryFails(
+            "with member [Measures].Foo as 1 + 2\n"
+            + "select Foo on 0\n"
+            + "from Bar#B^az",
+            "Unexpected character '#'");
+
+        // The spec doesn't allow $ but SSAS allows it so we allow it too.
+        assertParseQuery(
+            "with member [Measures].$Foo as 1 + 2\n"
+            + "select $Foo on 0\n"
+            + "from Bar$Baz",
+            "WITH\n"
+            + "MEMBER [Measures].$Foo AS\n"
+            + "    (1.0 + 2.0)\n"
+            + "SELECT\n"
+            + "$Foo ON COLUMNS\n"
+            + "FROM Bar$Baz");
+        // '$' is OK inside brackets too
         assertParseQuery(
             "select [measures].[$foo] on columns from sales",
             "SELECT\n"
             + "[measures].[$foo] ON COLUMNS\n"
             + "FROM sales");
 
-        // todo: parser off by one
-        assertParseQueryFails(
-            "select [measures].$^f^oo on columns from sales",
-            "Unexpected character '\\$'");
-
-        // ']' unexcpected
+        // ']' unexpected
         assertParseQueryFails(
             "select { Customers]^.^Children } on columns from [Sales]",
             "Unexpected character ']'");
