@@ -8,6 +8,7 @@
 */
 package org.olap4j;
 
+import org.olap4j.impl.Bug;
 import org.olap4j.mdx.SelectNode;
 import org.olap4j.metadata.*;
 import org.olap4j.query.*;
@@ -790,63 +791,69 @@ public class OlapTest extends TestCase {
             Axis.ROWS,
             productDimension.getAxis().getLocation());
         assertEquals(
-                Axis.ROWS,
-                timeDimension.getAxis().getLocation());
+            Axis.ROWS,
+            timeDimension.getAxis().getLocation());
         assertEquals(
             Axis.COLUMNS,
             measuresDimension.getAxis().getLocation());
 
+        if (!Bug.BugOlap4j3106220Fixed) {
+            return;
+        }
+
         SelectNode mdx = query.getSelect();
         String mdxString = mdx.toString();
+
         TestContext.assertEqualsVerbose(
-                "SELECT\n"
-                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                + "Hierarchize(Union(CrossJoin({[Product].[All Products]}, [Time].[1997].Children), CrossJoin([Product].[All Products].Children, [Time].[1997].Children))) ON ROWS\n"
-                + "FROM [Sales]",
-                mdxString);
+            "SELECT\n"
+            + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+            + "Hierarchize(Union(CrossJoin({[Product].[All Products]}, [Time].[1997].Children), CrossJoin([Product].[All Products].Children, [Time].[1997].Children))) ON ROWS\n"
+            + "FROM [Sales]",
+            mdxString);
 
         CellSet results = query.execute();
         String s = TestContext.toString(results);
         TestContext.assertEqualsVerbose(
-                "Axis #0:\n"
-                + "{}\n"
-                + "Axis #1:\n"
-                + "{[Measures].[Store Sales]}\n"
-                + "Axis #2:\n"
-                + "{[Product].[All Products], [Time].[1997].[Q1]}\n"
-                + "{[Product].[All Products], [Time].[1997].[Q2]}\n"
-                + "{[Product].[All Products], [Time].[1997].[Q3]}\n"
-                + "{[Product].[All Products], [Time].[1997].[Q4]}\n"
-                + "{[Product].[Drink], [Time].[1997].[Q1]}\n"
-                + "{[Product].[Drink], [Time].[1997].[Q2]}\n"
-                + "{[Product].[Drink], [Time].[1997].[Q3]}\n"
-                + "{[Product].[Drink], [Time].[1997].[Q4]}\n"
-                + "{[Product].[Food], [Time].[1997].[Q1]}\n"
-                + "{[Product].[Food], [Time].[1997].[Q2]}\n"
-                + "{[Product].[Food], [Time].[1997].[Q3]}\n"
-                + "{[Product].[Food], [Time].[1997].[Q4]}\n"
-                + "{[Product].[Non-Consumable], [Time].[1997].[Q1]}\n"
-                + "{[Product].[Non-Consumable], [Time].[1997].[Q2]}\n"
-                + "{[Product].[Non-Consumable], [Time].[1997].[Q3]}\n"
-                + "{[Product].[Non-Consumable], [Time].[1997].[Q4]}\n"
-                + "Row #0: 139,628.35\n"
-                + "Row #1: 132,666.27\n"
-                + "Row #2: 140,271.89\n"
-                + "Row #3: 152,671.62\n"
-                + "Row #4: 11,585.80\n"
-                + "Row #5: 11,914.58\n"
-                + "Row #6: 11,994.00\n"
-                + "Row #7: 13,341.83\n"
-                + "Row #8: 101,261.32\n"
-                + "Row #9: 95,436.00\n"
-                + "Row #10: 101,807.60\n"
-                + "Row #11: 110,530.67\n"
-                + "Row #12: 26,781.23\n"
-                + "Row #13: 25,315.69\n"
-                + "Row #14: 26,470.29\n"
-                + "Row #15: 28,799.12\n",
-                s);
+            "Axis #0:\n"
+            + "{}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[Store Sales]}\n"
+            + "Axis #2:\n"
+            + "{[Product].[All Products], [Time].[1997].[Q1]}\n"
+            + "{[Product].[All Products], [Time].[1997].[Q2]}\n"
+            + "{[Product].[All Products], [Time].[1997].[Q3]}\n"
+            + "{[Product].[All Products], [Time].[1997].[Q4]}\n"
+            + "{[Product].[Drink], [Time].[1997].[Q1]}\n"
+            + "{[Product].[Drink], [Time].[1997].[Q2]}\n"
+            + "{[Product].[Drink], [Time].[1997].[Q3]}\n"
+            + "{[Product].[Drink], [Time].[1997].[Q4]}\n"
+            + "{[Product].[Food], [Time].[1997].[Q1]}\n"
+            + "{[Product].[Food], [Time].[1997].[Q2]}\n"
+            + "{[Product].[Food], [Time].[1997].[Q3]}\n"
+            + "{[Product].[Food], [Time].[1997].[Q4]}\n"
+            + "{[Product].[Non-Consumable], [Time].[1997].[Q1]}\n"
+            + "{[Product].[Non-Consumable], [Time].[1997].[Q2]}\n"
+            + "{[Product].[Non-Consumable], [Time].[1997].[Q3]}\n"
+            + "{[Product].[Non-Consumable], [Time].[1997].[Q4]}\n"
+            + "Row #0: 139,628.35\n"
+            + "Row #1: 132,666.27\n"
+            + "Row #2: 140,271.89\n"
+            + "Row #3: 152,671.62\n"
+            + "Row #4: 11,585.80\n"
+            + "Row #5: 11,914.58\n"
+            + "Row #6: 11,994.00\n"
+            + "Row #7: 13,341.83\n"
+            + "Row #8: 101,261.32\n"
+            + "Row #9: 95,436.00\n"
+            + "Row #10: 101,807.60\n"
+            + "Row #11: 110,530.67\n"
+            + "Row #12: 26,781.23\n"
+            + "Row #13: 25,315.69\n"
+            + "Row #14: 26,470.29\n"
+            + "Row #15: 28,799.12\n",
+            s);
     }
+
     public void testSortAxis() {
         try {
             Cube cube = getFoodmartCube("Sales");
