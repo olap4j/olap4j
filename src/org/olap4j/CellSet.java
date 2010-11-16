@@ -9,6 +9,7 @@
 */
 package org.olap4j;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.sql.ResultSet;
 
@@ -54,6 +55,23 @@ import java.sql.ResultSet;
  * @since Aug 22, 2006
  */
 public interface CellSet extends ResultSet, OlapWrapper {
+
+    /**
+     * Retrieves the <code>OlapStatement</code> object that produced this
+     * <code>CellSet</code> object.
+     * If the result set was generated some other way, such as by a
+     * {@link org.olap4j.OlapDatabaseMetaData} method, this method may return
+     * <code>null</code>.
+     *
+     * @return the <code>OlapStatment</code> object that produced
+     * this <code>CellSet</code> object or <code>null</code>
+     * if the cell set was produced some other way
+     *
+     * @exception SQLException if a database access error occurs
+     * or this method is called on a closed cell set
+     */
+    OlapStatement getStatement() throws SQLException;
+
     /**
      * Retrieves the description of this <code>CellSet</code>'s axes
      * and cells.

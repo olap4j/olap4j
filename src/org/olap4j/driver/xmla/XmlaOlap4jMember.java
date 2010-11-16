@@ -206,7 +206,7 @@ class XmlaOlap4jMember
                 (Property.StandardMemberProperty) property;
             switch (o) {
             case MEMBER_CAPTION:
-                return member.getCaption(member.getConnection().getLocale());
+                return member.getCaption();
             case MEMBER_NAME:
                 return member.getName();
             case MEMBER_UNIQUE_NAME:
@@ -220,8 +220,7 @@ class XmlaOlap4jMember
             case DEPTH:
                 return member.getDepth();
             case DESCRIPTION:
-                return member.getDescription(
-                    member.getConnection().getLocale());
+                return member.getDescription();
             case DIMENSION_UNIQUE_NAME:
                 return member.getDimension().getUniqueName();
             case DISPLAY_INFO:

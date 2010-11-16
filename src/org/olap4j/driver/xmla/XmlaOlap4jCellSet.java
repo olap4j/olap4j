@@ -1194,8 +1194,8 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         throw new UnsupportedOperationException();
     }
 
-    public Statement getStatement() throws SQLException {
-        throw new UnsupportedOperationException();
+    public OlapStatement getStatement() {
+        return olap4jStatement;
     }
 
     public Object getObject(
@@ -1475,11 +1475,11 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             return uname;
         }
 
-        public String getCaption(Locale locale) {
+        public String getCaption() {
             return caption;
         }
 
-        public String getDescription(Locale locale) {
+        public String getDescription() {
             return null;
         }
     }

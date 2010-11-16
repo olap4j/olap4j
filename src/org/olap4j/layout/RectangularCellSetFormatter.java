@@ -360,7 +360,7 @@ public class RectangularCellSetFormatter implements CellSetFormatter {
                 String value =
                     member == null
                         ? ""
-                        : member.getCaption(null);
+                        : member.getCaption();
                 if (isColumns) {
                     matrix.set(x, y, value, false, same);
                 } else {

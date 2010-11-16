@@ -11,8 +11,6 @@ package org.olap4j.driver.xmla;
 import org.olap4j.impl.Named;
 import org.olap4j.metadata.MetadataElement;
 
-import java.util.Locale;
-
 /**
  * Abstract implementation of {@link MetadataElement}
  * for XML/A providers.
@@ -52,11 +50,11 @@ abstract class XmlaOlap4jElement implements MetadataElement, Named {
         return uniqueName;
     }
 
-    public String getCaption(Locale locale) {
+    public String getCaption() {
         return caption;
     }
 
-    public String getDescription(Locale locale) {
+    public String getDescription() {
         return description;
     }
 

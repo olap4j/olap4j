@@ -488,12 +488,24 @@ public interface Property extends MetadataElement {
             return name();
         }
 
-        public String getDescription(Locale locale) {
-            return description;
+        public String getCaption() {
+            // NOTE: This caption will be the same in all locales, since
+            // StandardMemberProperty has no way of deducing the current
+            // connection. Providers that wish to localize the caption of
+            // built-in properties should create a wrapper around
+            // StandardMemberProperty that is aware of the current connection or
+            // locale.
+            return name();
         }
 
-        public String getCaption(Locale locale) {
-            return name();
+        public String getDescription() {
+            // NOTE: This description will be the same in all locales, since
+            // StandardMemberProperty has no way of deducing the current
+            // connection. Providers that wish to localize the description of
+            // built-in properties should create a wrapper around
+            // StandardCellProperty that is aware of the current connection or
+            // locale.
+            return description;
         }
 
         public Datatype getDatatype() {
@@ -726,11 +738,23 @@ public interface Property extends MetadataElement {
             return name();
         }
 
-        public String getCaption(Locale locale) {
+        public String getCaption() {
+            // NOTE: This caption will be the same in all locales, since
+            // StandardCellProperty has no way of deducing the current
+            // connection. Providers that wish to localize the caption of
+            // built-in properties should create a wrapper around
+            // StandardCellProperty that is aware of the current connection or
+            // locale.
             return name();
         }
 
-        public String getDescription(Locale locale) {
+        public String getDescription() {
+            // NOTE: This description will be the same in all locales, since
+            // StandardCellProperty has no way of deducing the current
+            // connection. Providers that wish to localize the description of
+            // built-in properties should create a wrapper around
+            // StandardCellProperty that is aware of the current connection or
+            // locale.
             return description;
         }
 

@@ -13,8 +13,6 @@ import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.NamedSet;
 
-import java.util.Locale;
-
 /**
  * Implementation of {@link org.olap4j.metadata.NamedSet}
  * for XML/A providers.
@@ -53,11 +51,11 @@ class XmlaOlap4jNamedSet
         return name;
     }
 
-    public String getCaption(Locale locale) {
+    public String getCaption() {
         return name;
     }
 
-    public String getDescription(Locale locale) {
+    public String getDescription() {
         return "";
     }
 }

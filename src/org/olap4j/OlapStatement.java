@@ -9,6 +9,7 @@
 */
 package org.olap4j;
 
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.olap4j.mdx.SelectNode;
@@ -27,6 +28,12 @@ import org.olap4j.mdx.SelectNode;
  * @since Aug 22, 2006
  */
 public interface OlapStatement extends Statement, OlapWrapper {
+
+    /**
+     * Retrieves the <code>OlapConnection</code> object
+     * that produced this <code>OlapStatement</code> object.
+     */
+    OlapConnection getConnection() throws SQLException;
 
     /**
      * Executes an OLAP statement.

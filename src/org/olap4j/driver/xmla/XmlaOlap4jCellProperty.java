@@ -12,7 +12,6 @@ import org.olap4j.impl.Named;
 import org.olap4j.metadata.Datatype;
 import org.olap4j.metadata.Property;
 
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -51,11 +50,11 @@ class XmlaOlap4jCellProperty implements Property, Named {
         return propertyName;
     }
 
-    public String getCaption(Locale locale) {
+    public String getCaption() {
         return propertyName;
     }
 
-    public String getDescription(Locale locale) {
+    public String getDescription() {
         return "";
     }
 

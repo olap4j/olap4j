@@ -9,8 +9,6 @@
 */
 package org.olap4j.metadata;
 
-import java.util.Locale;
-
 /**
  * An element which describes the structure of an OLAP schema.
  *
@@ -22,45 +20,61 @@ public interface MetadataElement {
     /**
      * Returns the name of this element.
      *
-     * @return name
+     * <p>Name is never null. Unlike {@link #getCaption() caption} and
+     * {@link #getDescription() description}, an element's name is the same in
+     * all locales.
+     *
+     * @return name of this element
      */
     String getName();
 
     /**
      * Returns the unique name of this element within its schema.
      *
+     * <p>The unique name is never null, and is unique among all elements in
+     * this {@link Schema}.
+     *
+     * <p>Unlike {@link #getCaption() caption} and
+     * {@link #getDescription() description}, an element's unique name is the
+     * same in all locales.
+     *
+     * <p>The structure of the unique name is provider-specific and subject to
+     * change between provider versions. Applications should not attempt to
+     * reverse-engineer the structure of the name.
+     *
      * @return unique name of this element
      */
     String getUniqueName();
 
     /**
-     * Returns the caption of this element in the given locale.
+     * Returns the caption of this element in the current connection's locale.
      *
-     * <p>If <code>locale</code> is null or if no caption has been defined for
-     * the element in that locale, returns the caption in base locale.</p>
+     * <p>This method may return the empty string, but never returns null.
+     * The rules for deriving an element's caption are provider-specific,
+     * but generally if no caption is defined for the element in a given locale,
+     * returns the name of the element.</p>
      *
-     * <p>This method may return the empty string, but never returns null.</p>
+     * @return caption of this element in the current locale; never null.
      *
-     * @param locale Locale
-     * @return Caption of this element in the given locale, or the base locale;
-     *         never null.
+     * @see org.olap4j.OlapConnection#getLocale()
      */
-    String getCaption(Locale locale);
+    String getCaption();
 
     /**
-     * Returns the description of this element in the given locale.
+     * Returns the description of this element in the current connection's
+     * {@link java.util.Locale}.
      *
-     * <p>If <code>locale</code> is null or if no description has been defined
-     * for the element in that locale, returns the description in base
+     * <p>This method may return the empty string, but never returns null.
+     * The rules for deriving an element's description are provider-specific,
+     * but generally if no description is defined
+     * for the element in a given locale, returns the description in base
      * locale.</p>
      *
-     * <p>This method may return the empty string, but never returns null.</p>
+     * @return description of this element in the current locale; never null.
      *
-     * @param locale Locale
-     * @return description of this element in the given locale, or the base
-     *         locale; never null.
+     * @see org.olap4j.OlapConnection#getLocale()
      */
-    String getDescription(Locale locale);
+    String getDescription();
 }
 
 // End MetadataElement.java

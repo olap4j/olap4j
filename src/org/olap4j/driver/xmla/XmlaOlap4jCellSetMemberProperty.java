@@ -11,7 +11,6 @@ package org.olap4j.driver.xmla;
 import org.olap4j.impl.Named;
 import org.olap4j.metadata.*;
 
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -54,11 +53,11 @@ class XmlaOlap4jCellSetMemberProperty implements Property, Named {
         return propertyUniqueName;
     }
 
-    public String getCaption(Locale locale) {
+    public String getCaption() {
         return propertyUniqueName;
     }
 
-    public String getDescription(Locale locale) {
+    public String getDescription() {
         return "";
     }
 

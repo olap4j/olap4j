@@ -117,11 +117,11 @@ class XmlaOlap4jCube implements Cube, Named
         return "[" + name + "]";
     }
 
-    public String getCaption(Locale locale) {
+    public String getCaption() {
         return name;
     }
 
-    public String getDescription(Locale locale) {
+    public String getDescription() {
         return description;
     }
 

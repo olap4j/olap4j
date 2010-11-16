@@ -88,6 +88,8 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * <p>Most drivers support a <code>Locale</code> connect-string property.
      *
      * @param locale Locale
+     *
+     * @see #getLocale()
      */
     void setLocale(Locale locale);
 
@@ -95,6 +97,10 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * Returns this connection's locale. The value is never null.
      *
      * @return locale of this connection
+     *
+     * @see #setLocale(java.util.Locale)
+     * @see org.olap4j.metadata.MetadataElement#getCaption()
+     * @see org.olap4j.metadata.MetadataElement#getDescription()
      */
     Locale getLocale();
 

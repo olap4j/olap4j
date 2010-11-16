@@ -356,9 +356,11 @@ public class ConnectionTest extends TestCase {
             Statement statement = connection.createStatement();
             OlapStatement olapStatement =
                 TestContext.Wrapper.NONE.unwrap(statement, OlapStatement.class);
+            assertSame(connection, olapStatement.getConnection());
             CellSet cellSet =
                 olapStatement.executeOlapQuery(
                     "SELECT FROM [Sales]");
+            assertSame(statement, cellSet.getStatement());
             List<CellSetAxis> axesList = cellSet.getAxes();
             assertNotNull(axesList);
             assertEquals(0, axesList.size());
@@ -1753,8 +1755,8 @@ public class ConnectionTest extends TestCase {
         int hierarchyCount = 0;
         for (Dimension dimension : cube.getDimensions()) {
             // Call every method of Dimension
-            assertNotNull(dimension.getCaption(Locale.getDefault()));
-            dimension.getDescription(Locale.getDefault());
+            assertNotNull(dimension.getCaption());
+            dimension.getDescription();
             assertNotNull(dimension.getDefaultHierarchy());
             assertEquals(
                 dimension.getName().equals("Time")
@@ -1784,8 +1786,8 @@ public class ConnectionTest extends TestCase {
                 assertNotNull(hierarchy.getDefaultMember());
                 assertNotNull(hierarchy.getName());
                 assertNotNull(hierarchy.getUniqueName());
-                hierarchy.getDescription(Locale.getDefault());
-                assertNotNull(hierarchy.getCaption(Locale.getDefault()));
+                hierarchy.getDescription();
+                assertNotNull(hierarchy.getCaption());
                 assertEquals(dimension, hierarchy.getDimension());
 
                 for (Level level : hierarchy.getLevels()) {
@@ -1851,8 +1853,8 @@ public class ConnectionTest extends TestCase {
             ++count;
             assertNotNull(namedSet.getName());
             assertNotNull(namedSet.getUniqueName());
-            assertNotNull(namedSet.getCaption(Locale.getDefault()));
-            namedSet.getDescription(Locale.getDefault());
+            assertNotNull(namedSet.getCaption());
+            namedSet.getDescription();
             switch (tester.getFlavor()) {
             case XMLA:
             case REMOTE_XMLA:
@@ -1900,19 +1902,19 @@ public class ConnectionTest extends TestCase {
         assertEquals("[Product].[Food]", list.get(1).getUniqueName());
         assertEquals("[Product].[All Products]", list.get(2).getUniqueName());
 
-        assertEquals("Food", member.getCaption(null));
+        assertEquals("Food", member.getCaption());
 
         if (tester.getFlavor() != Tester.Flavor.XMLA
                 && tester.getFlavor() != Tester.Flavor.REMOTE_XMLA)
         {
-            assertNull(member.getDescription(null));
+            assertNull(member.getDescription());
             assertEquals(1, member.getDepth());
             assertEquals(-1, member.getSolveOrder());
             assertFalse(member.isHidden());
             assertNull(member.getDataMember());
             assertFalse(member.isCalculatedInQuery());
         } else {
-            assertEquals("", member.getDescription(null));
+            assertEquals("", member.getDescription());
         }
 
         switch (tester.getFlavor()) {

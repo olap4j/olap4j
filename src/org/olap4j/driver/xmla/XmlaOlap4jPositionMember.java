@@ -22,7 +22,8 @@ import java.util.*;
  *
  * <p>This class is necessary because a member can have different properties
  * when it is retrieved as part of a cell set than if it is retrieved by
- * querying schema metadata (e.g. using {@link Cube#lookupMember(String[])}.
+ * querying schema metadata (e.g. using
+ * {@link Cube#lookupMember(java.util.List)}.
  * XmlaOlap4jPositionMember wraps the schema member (which might potentially
  * be cached between queries - even though today it is not) and adds extra
  * properties. All other methods are delegated to the underlying member.</p>
@@ -201,12 +202,12 @@ class XmlaOlap4jPositionMember
         return member.getUniqueName();
     }
 
-    public String getCaption(Locale locale) {
-        return member.getCaption(locale);
+    public String getCaption() {
+        return member.getCaption();
     }
 
-    public String getDescription(Locale locale) {
-        return member.getDescription(locale);
+    public String getDescription() {
+        return member.getDescription();
     }
 
     /**
