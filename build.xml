@@ -3,7 +3,7 @@
     == This software is subject to the terms of the Eclipse Public License v1.0
     == Agreement, available at the following URL:
     == http://www.eclipse.org/legal/epl-v10.html.
-    == Copyright (C) 2006-2009 Julian Hyde and others.
+    == Copyright (C) 2006-2010 Julian Hyde and others.
     == All Rights Reserved.
     == You must accept the terms of that agreement to use this software.
     -->
@@ -272,7 +272,7 @@ META-INF/**" />
             <tag name="pre" description="Pre-condition:" scope="constructors,methods" />
             <tag name="post" description="Post-condition:" scope="constructors,methods" />
             <tag name="testcase" description="Test-case:" scope="constructors,methods,types" />
-            <link href="http://java.sun.com/javase/6/docs/api/" />
+            <link href="http://download.oracle.com/javase/6/docs/api/" />
         </javadoc>
     </target>
 
@@ -291,7 +291,7 @@ META-INF/**" />
             <tag name="pre" description="Pre-condition:" scope="constructors,methods" />
             <tag name="post" description="Post-condition:" scope="constructors,methods" />
             <tag name="testcase" description="Test-case:" scope="constructors,methods,types" />
-            <link href="http://java.sun.com/javase/6/docs/api/" />
+            <link href="http://download.oracle.com/javase/6/docs/api/" />
         </javadoc>
     </target>
 
@@ -315,7 +315,7 @@ META-INF/**" />
             <tag name="pre" description="Pre-condition:" scope="constructors,methods" />
             <tag name="post" description="Post-condition:" scope="constructors,methods" />
             <tag name="testcase" description="Test-case:" scope="constructors,methods,types" />
-            <link href="http://java.sun.com/javase/6/docs/api/" />
+            <link href="http://download.oracle.com/javase/6/docs/api/" />
             <link href="http://www.junit.org/junit/javadoc/3.8/" />
             <doclet name="ydoc.doclets.YStandard"
                 path="${ydoc.home}/lib/ydoc.jar${ps}${ydoc.home}/lib/class2svg.jar${ps}${ydoc.home}/resources${ps}${ydoc.home}/doc">

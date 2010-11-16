@@ -577,7 +577,7 @@ public class ConnectionTest extends TestCase {
         assertEquals(0, filterAxis.getPositionCount());
         final List<Position> filterPositions = filterAxis.getPositions();
         assertEquals(0, filterPositions.size());
-        assertEquals(2, filterAxis.getAxisMetaData().getHierarchies().size());
+        assertEquals(0, filterAxis.getAxisMetaData().getHierarchies().size());
         final Cell cell = cellSet.getCell(Arrays.asList(0, 0));
         assertTrue(cell.isNull());
     }

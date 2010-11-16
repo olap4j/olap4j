@@ -97,13 +97,19 @@ public interface CellSet extends ResultSet, OlapWrapper {
     /**
      * Retrieves the CellSetAxis representing the filter axis.
      *
-     * <p>This axis always has one position, and members of
-     * dimensions not included in any other axis. Some of these dimensions may
-     * have been explicitly mentioned in the WHERE clause of the MDX statement;
-     * others dimensions are represented by their default member.
+     * <p>If the query has a WHERE clause, the contains the members returned
+     * by that expression. Most query authors write a WHERE clause so that it
+     * evaluates to just one member or tuple. The members in this tuple (or
+     * the sole member), are referred to as the 'slicer context' of the query.
+     * The tuple contains only members of hierarchies explicitly mentioned in
+     * the WHERE expression; the slicer context of every hierarchy in the
+     * query's cube is implicitly the default member of that hierarchy.
      *
-     * <p>In particular, if the query has no WHERE clause, the axis has a single
-     * position as usual, but the position has no members.
+     * <p>While not typical, note that a query's WHERE clause may also evaluate
+     * to zero or more than one tuples.
+     *
+     * <p>If the query has no WHERE clause, the filter axis has a single
+     * position, but the position has no members.
      *
      * <p>The filter axis is not included in the {@link #getAxes()} collection.
      *

@@ -278,17 +278,15 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             }
         }
 
-        // olap4j requires a filter axis even if XMLA does not return one. If
-        // XMLA does not return one, presumably there was no WHERE clause and
-        // therefore the filter axis has a single position containing 0 members
+        // If XMLA did not return a filter axis, it means that the WHERE clause
+        // evaluated to zero tuples. (If the query had no WHERE clause, it
+        // would have evaluated to a single tuple with zero positions.)
         if (filterAxis == null) {
             filterAxis =
                 new XmlaOlap4jCellSetAxis(
                     this,
                     Axis.FILTER,
-                    Collections.<Position>singletonList(
-                        new XmlaOlap4jPosition(
-                            Collections.<Member>emptyList(), 0)));
+                    Collections.<Position>emptyList());
         }
 
         final Element cellDataNode = findChild(root, MDDATASET_NS, "CellData");
