@@ -577,7 +577,7 @@ public class ConnectionTest extends TestCase {
         assertEquals(0, filterAxis.getPositionCount());
         final List<Position> filterPositions = filterAxis.getPositions();
         assertEquals(0, filterPositions.size());
-        assertEquals(0, filterAxis.getAxisMetaData().getHierarchies().size());
+        assertEquals(2, filterAxis.getAxisMetaData().getHierarchies().size());
         final Cell cell = cellSet.getCell(Arrays.asList(0, 0));
         assertTrue(cell.isNull());
     }
@@ -1550,7 +1550,7 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
-     * Tests the {@link Cube#lookupMember(java.util.List} method.
+     * Tests the {@link Cube#lookupMember(java.util.List)} method.
      */
     public void testCubeLookupMember() throws Exception {
         Class.forName(tester.getDriverClassName());
