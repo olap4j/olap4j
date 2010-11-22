@@ -59,6 +59,8 @@ public interface Level extends MetadataElement {
 
     /**
      * Returns whether the level is calculated.
+     *
+     * @return Whether this level is calculated
      */
     boolean isCalculated();
 
@@ -87,6 +89,8 @@ public interface Level extends MetadataElement {
      * is a {@link List} not a {@link NamedList}.
      *
      * @return List of members in this Level
+     *
+     * @throws OlapException if database error occurs
      */
     List<Member> getMembers() throws OlapException;
 

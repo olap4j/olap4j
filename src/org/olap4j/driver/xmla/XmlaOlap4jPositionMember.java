@@ -93,7 +93,7 @@ class XmlaOlap4jPositionMember
         return member.getChildMembers();
     }
 
-    public int getChildMemberCount() {
+    public int getChildMemberCount() throws OlapException {
         return member.getChildMemberCount();
     }
 
@@ -145,14 +145,16 @@ class XmlaOlap4jPositionMember
         return member.isCalculatedInQuery();
     }
 
-    public Object getPropertyValue(Property property) {
+    public Object getPropertyValue(Property property) throws OlapException {
         if (propertyValues.containsKey(property)) {
             return propertyValues.get(property);
         }
         return member.getPropertyValue(property);
     }
 
-    public String getPropertyFormattedValue(Property property) {
+    public String getPropertyFormattedValue(Property property)
+        throws OlapException
+    {
         // REVIEW: Formatted value is not available for properties which
         // come back as part of axis tuple. Unformatted property is best we
         // can do.
@@ -183,11 +185,18 @@ class XmlaOlap4jPositionMember
     }
 
     public int getDepth() {
-        return XmlaOlap4jMember.toInteger(
-            XmlaOlap4jMember.getPropertyValue(
-                Property.StandardMemberProperty.DEPTH,
-                member,
-                getPropertyValueMap()));
+        try {
+            final Object value =
+                XmlaOlap4jMember.getPropertyValue(
+                    Property.StandardMemberProperty.DEPTH,
+                    member,
+                    getPropertyValueMap());
+            return XmlaOlap4jMember.toInteger(value);
+        } catch (OlapException e) {
+            // should not happen; only CHILDREN_CARDINALITY can potentially
+            // give an error
+            throw new RuntimeException(e);
+        }
     }
 
     public Member getDataMember() {

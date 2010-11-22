@@ -175,7 +175,7 @@ class XmlaOlap4jMember
         throw new UnsupportedOperationException();
     }
 
-    public Object getPropertyValue(Property property) {
+    public Object getPropertyValue(Property property) throws OlapException {
         return getPropertyValue(
             property,
             this,
@@ -189,11 +189,15 @@ class XmlaOlap4jMember
      * @param member Member
      * @param propertyValueMap Map of property-value pairs
      * @return Property value
+     *
+     * @throws OlapException if database error occurs while evaluating
+     *   CHILDREN_CARDINALITY; no other property throws 
      */
     static Object getPropertyValue(
         Property property,
         XmlaOlap4jMemberBase member,
         Map<Property, Object> propertyValueMap)
+        throws OlapException
     {
         // If property map contains a value for this property (even if that
         // value is null), that overrides.
@@ -282,7 +286,9 @@ class XmlaOlap4jMember
         return propertyValueMap;
     }
 
-    public String getPropertyFormattedValue(Property property) {
+    public String getPropertyFormattedValue(Property property)
+        throws OlapException
+    {
         // FIXME: need to use a format string; but what format string; and how
         // to format the property on the client side?
         return String.valueOf(getPropertyValue(property));

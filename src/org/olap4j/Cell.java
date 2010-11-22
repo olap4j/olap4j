@@ -185,11 +185,14 @@ public interface Cell {
      * @param value Cell value
      * @param allocationPolicy Allocation policy
      * @param allocationArgs Allocation policy arguments
+     *
+     * @throws OlapException if a database error occurs
      */
     void setValue(
         Object value,
         AllocationPolicy allocationPolicy,
-        Object... allocationArgs);
+        Object... allocationArgs)
+        throws OlapException;
 }
 
 // End Cell.java

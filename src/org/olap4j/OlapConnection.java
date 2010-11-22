@@ -127,8 +127,10 @@ public interface OlapConnection extends Connection, OlapWrapper {
      *
      * @return a list of role names, or null if the available roles are not
      *    known
+     *
+     * @throws OlapException if database error occurs
      */
-    List<String> getAvailableRoleNames();
+    List<String> getAvailableRoleNames() throws OlapException;
 
     /**
      * Creates a Scenario.
@@ -139,8 +141,10 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * @see #setScenario
      *
      * @return a new Scenario
+     *
+     * @throws OlapException if database error occurs
      */
-    Scenario createScenario();
+    Scenario createScenario() throws OlapException;
 
     /**
      * Sets the active Scenario of this connection.
@@ -157,16 +161,20 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * <p>Scenarios are created using {@link #createScenario()}.
      *
      * @param scenario Scenario
+     *
+     * @throws OlapException if database error occurs
      */
-    void setScenario(Scenario scenario);
+    void setScenario(Scenario scenario) throws OlapException;
 
     /**
      * Returns this connection's active Scenario, or null if there is no
      * active Scenario.
      *
      * @return Active scenario, or null
+     *
+     * @throws OlapException if database error occurs
      */
-    Scenario getScenario();
+    Scenario getScenario() throws OlapException;
 }
 
 // End OlapConnection.java

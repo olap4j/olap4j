@@ -37,6 +37,8 @@ public interface Member extends MetadataElement {
      * @see org.olap4j.OlapDatabaseMetaData#getMembers
      *
      * @return children of this member
+     *
+     * @throws OlapException if database error occurs
      */
     NamedList<? extends Member> getChildMembers() throws OlapException;
 
@@ -47,8 +49,10 @@ public interface Member extends MetadataElement {
      * <code>getChildMembers().size()</code>, but is typically less expensive.
      *
      * @return number of children
+     *
+     * @throws OlapException if database error occurs
      */
-    int getChildMemberCount();
+    int getChildMemberCount() throws OlapException;
 
     /**
      * Returns the parent of this Member, or null if it has no parent.
@@ -212,8 +216,10 @@ public interface Member extends MetadataElement {
      * @return formatted value of the given property
      *
      * @see #getPropertyFormattedValue(Property)
+     *
+     * @throws OlapException if database error occurs
      */
-    Object getPropertyValue(Property property);
+    Object getPropertyValue(Property property) throws OlapException;
 
     /**
      * Returns the formatted value of a given property.
@@ -231,8 +237,10 @@ public interface Member extends MetadataElement {
      * @return formatted value of the given property
      *
      * @see #getPropertyValue(Property)
+     *
+     * @throws OlapException if database error occurs
      */
-    String getPropertyFormattedValue(Property property);
+    String getPropertyFormattedValue(Property property) throws OlapException;
 
     /**
      * Sets a property of this member to a given value.
