@@ -655,8 +655,9 @@ public class ConnectionTest extends TestCase {
             switch (tester.getFlavor()) {
             case XMLA:
             case REMOTE_XMLA:
-                assertTrue(e.getMessage().indexOf(
-                    "XMLA MDX parse failed") >= 0);
+                assertTrue(
+                    e.getMessage(),
+                    e.getMessage().indexOf("XMLA MDX parse failed") >= 0);
                 break;
             default:
                 assertTrue(
@@ -2580,17 +2581,7 @@ public class ConnectionTest extends TestCase {
         boolean useCubeObject)
         throws OlapException
     {
-        final String catalogName;
-        switch (tester.getFlavor()) {
-        case MONDRIAN:
-            catalogName = "LOCALDB";
-            break;
-        case XMLA:
-        default:
-            catalogName = "FoodMart";
-            break;
-        }
-        Catalog catalog = olapConnection.getCatalogs().get(catalogName);
+        Catalog catalog = olapConnection.getCatalogs().get("FoodMart");
         Schema schema = catalog.getSchemas().get("FoodMart");
         Cube cube = schema.getCubes().get("Sales");
         SelectNode query = new SelectNode();

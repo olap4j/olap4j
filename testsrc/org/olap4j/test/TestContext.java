@@ -14,14 +14,13 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.sql.*;
 
+import junit.framework.*;
 import org.olap4j.*;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.*;
 import org.olap4j.layout.TraditionalCellSetFormatter;
 
 import org.apache.commons.dbcp.*;
-import junit.framework.ComparisonFailure;
-import junit.framework.Assert;
 
 /**
  * Context for olap4j tests.
@@ -45,13 +44,62 @@ public class TestContext {
         Pattern.compile("\r\n|\r|\n");
     private static final Pattern TabPattern = Pattern.compile("\t");
     public static Properties testProperties;
+    private static final ThreadLocal<TestContext> THREAD_INSTANCE =
+        new ThreadLocal<TestContext>();
 
-    private final Tester tester = createTester();
+    /**
+     * The following classes are part of the TCK. Each driver should call them.
+     */
+    public static final Class[] TCK_CLASSES = {
+        org.olap4j.ConnectionTest.class,
+        org.olap4j.CellSetFormatterTest.class,
+        org.olap4j.MetadataTest.class,
+        org.olap4j.mdx.MdxTest.class,
+        org.olap4j.transform.TransformTest.class,
+        org.olap4j.XmlaConnectionTest.class,
+        org.olap4j.OlapTreeTest.class,
+        org.olap4j.OlapTest.class,
+    };
+
+    /**
+     * The following tests do not depend upon the driver implementation.
+     * They should be executed once, in olap4j's test suite, not for each
+     * provider's test suite.
+     */
+    public static final Class[] NON_TCK_CLASSES = {
+        org.olap4j.impl.ConnectStringParserTest.class,
+        org.olap4j.impl.Olap4jUtilTest.class,
+        org.olap4j.impl.Base64Test.class,
+        org.olap4j.test.ParserTest.class,
+        org.olap4j.test.ArrayMapTest.class,
+        org.olap4j.driver.xmla.cache.XmlaShaEncoderTest.class,
+        org.olap4j.driver.xmla.proxy.XmlaCookieManagerTest.class,
+        org.olap4j.driver.xmla.proxy.XmlaCachedProxyTest.class,
+    };
+
+    private final Tester tester;
 
     /**
      * Intentionally private: use {@link #instance()}.
      */
     private TestContext() {
+        tester = createTester(getTestProperties());
+    }
+
+    private TestContext(Tester tester) {
+        this.tester = tester;
+    }
+
+    /**
+     * Adds all of the test classes in the TCK (Test Compatibility Kit)
+     * to a given junit test suite.
+     *
+     * @param suite Suite to which to add tests
+     */
+    private static void addTck(TestSuite suite) {
+        for (Class tckClass : TCK_CLASSES) {
+            suite.addTestSuite(tckClass);
+        }
     }
 
     /**
@@ -124,6 +172,10 @@ public class TestContext {
      * @return default TestContext
      */
     public static TestContext instance() {
+        final TestContext i = THREAD_INSTANCE.get();
+        if (i != null) {
+            return i;
+        }
         return INSTANCE;
     }
 
@@ -264,10 +316,10 @@ public class TestContext {
      * Factory method for the {@link Tester}
      * object which determines which driver to test.
      *
+     * @param testProperties Properties that define the properties of the tester
      * @return a new Tester
      */
-    private static Tester createTester() {
-        Properties testProperties = getTestProperties();
+    private static Tester createTester(Properties testProperties) {
         String helperClassName =
             testProperties.getProperty(Property.HELPER_CLASS_NAME.path);
         if (helperClassName == null) {
@@ -323,6 +375,28 @@ public class TestContext {
             break;
         }
         return tester;
+    }
+
+    /**
+     * Creates a test suite that executes the olap4j TCK with the given
+     * set of properties. The properties are the same as those you can put in
+     * {@code "test.properties"}.
+     *
+     * @param properties Properties
+     * @param name Name of test suite
+     * @return Test suite that executes the TCK
+     */
+    public static TestSuite createTckSuite(Properties properties, String name) {
+        TestContext testContext = new TestContext(createTester(properties));
+        THREAD_INSTANCE.set(testContext);
+        try {
+            final TestSuite suite = new TestSuite();
+            suite.setName(name);
+            addTck(suite);
+            return suite;
+        } finally {
+            THREAD_INSTANCE.remove();
+        }
     }
 
     /**

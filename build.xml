@@ -47,7 +47,7 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
 
     <!-- Override to create a proper release. -->
     <target name="dist"
-        depends="clean,version-properties,jar,javadoc,javadoc-pdf,javadoc-with-ydoc,jar-jdk14,source.zip"
+        depends="clean,version-properties,jar,tck-jar,javadoc,javadoc-pdf,javadoc-with-ydoc,jar-jdk14,source.zip"
         description="Creates a distribution">
         <zip zipfile="${dist.dir}/${zip.filename}">
             <zipfileset dir="${basedir}/doc" prefix="${ivy.artifact.id}-${project.revision}/doc"
@@ -90,6 +90,19 @@ olap4j_api.pdf"
         description="Jars up the bin directory after a compile">
         <zip destfile="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">
             <zipfileset dir="${classes.dir}" prefix="" includes="**/*" />
+            <zipfileset dir="${basedir}" prefix=""
+                includes="
+LICENSE.html,
+README.txt,
+VERSION.txt" />
+        </zip>
+    </target>
+
+    <target name="tck-jar" depends="jar"
+        description="Jars up the Test Compatibility Kit (TCK) after a compile">
+        <zip destfile="${dist.dir}/olap4j-tck-${project.revision}.jar">
+            <zipfileset dir="${testclasses.dir}" prefix="" includes="**/*"
+                excludes="jndi.properties" />
             <zipfileset dir="${basedir}" prefix=""
                 includes="
 LICENSE.html,

@@ -54,18 +54,7 @@ public class OlapTest extends TestCase {
             connection = tester.createConnection();
             OlapConnection olapConnection =
                 tester.getWrapper().unwrap(connection, OlapConnection.class);
-            final String catalogName;
-            switch (tester.getFlavor()) {
-            case MONDRIAN:
-                catalogName = "LOCALDB";
-                break;
-            case XMLA:
-            case REMOTE_XMLA:
-            default:
-                catalogName = "FoodMart";
-                break;
-            }
-            Catalog catalog = olapConnection.getCatalogs().get(catalogName);
+            Catalog catalog = olapConnection.getCatalogs().get("FoodMart");
             NamedList<Schema> schemas = catalog.getSchemas();
             if (schemas.size() == 0) {
                 return null;
@@ -124,18 +113,7 @@ public class OlapTest extends TestCase {
 
             // Get a list of the schemas available from this connection and dump
             // their names.
-            final String catalogName;
-            switch (tester.getFlavor()) {
-            case MONDRIAN:
-                catalogName = "LOCALDB";
-                break;
-            case XMLA:
-            case REMOTE_XMLA:
-            default:
-                catalogName = "FoodMart";
-                break;
-            }
-            Catalog catalog = olapConnection.getCatalogs().get(catalogName);
+            Catalog catalog = olapConnection.getCatalogs().get("FoodMart");
             NamedList<Schema> schemas = catalog.getSchemas();
 
             if (schemas.size() == 0) {
