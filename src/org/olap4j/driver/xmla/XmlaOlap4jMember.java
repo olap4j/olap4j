@@ -191,7 +191,7 @@ class XmlaOlap4jMember
      * @return Property value
      *
      * @throws OlapException if database error occurs while evaluating
-     *   CHILDREN_CARDINALITY; no other property throws 
+     *   CHILDREN_CARDINALITY; no other property throws
      */
     static Object getPropertyValue(
         Property property,
