@@ -75,6 +75,13 @@ public interface MetadataElement {
      * @see org.olap4j.OlapConnection#getLocale()
      */
     String getDescription();
+
+    /*
+     * Returns whether this element is visible to end-users.
+     *
+     * @return Whether this element is visible
+     */
+    boolean isVisible();
 }
 
 // End MetadataElement.java

@@ -58,6 +58,10 @@ class XmlaOlap4jNamedSet
     public String getDescription() {
         return "";
     }
+
+    public boolean isVisible() {
+        return true;
+    }
 }
 
 // End XmlaOlap4jNamedSet.java

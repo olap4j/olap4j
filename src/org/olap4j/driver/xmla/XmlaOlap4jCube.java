@@ -125,6 +125,10 @@ class XmlaOlap4jCube implements Cube, Named
         return description;
     }
 
+    public boolean isVisible() {
+        return true;
+    }
+
     public NamedList<Dimension> getDimensions() {
         return Olap4jUtil.cast(dimensions);
     }
