@@ -1,6 +1,6 @@
 # $Id$
 
-olap4j, release 0.9.8 (beta)
+olap4j, release 0.9.9 (beta)
 
 Contents of this distribution
 -----------------------------
