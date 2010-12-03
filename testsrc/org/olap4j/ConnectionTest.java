@@ -11,6 +11,7 @@ package org.olap4j;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import org.olap4j.impl.Bug;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.driver.xmla.*;
 import org.olap4j.mdx.*;
@@ -2467,6 +2468,9 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testCellSetBug() throws SQLException {
+        if (!Bug.BugOlap4j3126553Fixed) {
+            return;
+        }
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);

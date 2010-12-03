@@ -52,6 +52,14 @@ public abstract class Bug {
      * is fixed.
      */
     public static final boolean BugOlap4j3106220Fixed = false;
+
+    /**
+     * Whether
+     * <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3126853&group_id=168953&atid=848534">bug 3126853,
+     * "ConnectionTest.testCellSetBug hangs"</a>
+     * is fixed.
+     */
+    public static final boolean BugOlap4j3126853Fixed = false;
 }
 
 // End Bug.java
