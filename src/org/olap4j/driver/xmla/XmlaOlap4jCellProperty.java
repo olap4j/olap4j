@@ -61,6 +61,10 @@ class XmlaOlap4jCellProperty implements Property, Named {
     public ContentType getContentType() {
         return ContentType.REGULAR;
     }
+
+    public boolean isVisible() {
+        return true;
+    }
 }
 
 // End XmlaOlap4jCellProperty.java

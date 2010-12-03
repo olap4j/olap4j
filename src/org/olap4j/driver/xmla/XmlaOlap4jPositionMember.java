@@ -219,6 +219,10 @@ class XmlaOlap4jPositionMember
         return member.getDescription();
     }
 
+    public boolean isVisible() {
+        return member.isVisible();
+    }
+
     /**
      * Read-only map that contains the union of two maps.
      */

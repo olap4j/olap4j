@@ -523,6 +523,10 @@ public interface Property extends MetadataElement {
         public boolean isInternal() {
             return internal;
         }
+
+        public boolean isVisible() {
+            return !internal;
+        }
     }
 
     /**
@@ -760,6 +764,10 @@ public interface Property extends MetadataElement {
 
         public boolean isInternal() {
             return internal;
+        }
+
+        public boolean isVisible() {
+            return !internal;
         }
 
         public ContentType getContentType() {

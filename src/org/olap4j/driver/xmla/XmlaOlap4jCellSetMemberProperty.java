@@ -64,6 +64,10 @@ class XmlaOlap4jCellSetMemberProperty implements Property, Named {
     public ContentType getContentType() {
         return ContentType.REGULAR;
     }
+
+    public boolean isVisible() {
+        return true;
+    }
 }
 
 // End XmlaOlap4jCellSetMemberProperty.java

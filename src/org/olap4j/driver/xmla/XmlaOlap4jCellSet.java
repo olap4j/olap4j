@@ -1480,6 +1480,10 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         public String getDescription() {
             return null;
         }
+
+        public boolean isVisible() {
+            return true;
+        }
     }
 }
 
