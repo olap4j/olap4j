@@ -10,6 +10,8 @@
 package org.olap4j.test;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.sql.*;
@@ -43,7 +45,7 @@ public class TestContext {
     private static final Pattern LineBreakPattern =
         Pattern.compile("\r\n|\r|\n");
     private static final Pattern TabPattern = Pattern.compile("\t");
-    public static Properties testProperties;
+    private static Properties testProperties;
     private static final ThreadLocal<TestContext> THREAD_INSTANCE =
         new ThreadLocal<TestContext>();
 
@@ -78,16 +80,19 @@ public class TestContext {
     };
 
     private final Tester tester;
+    private final Properties properties;
 
     /**
      * Intentionally private: use {@link #instance()}.
      */
     private TestContext() {
-        tester = createTester(getTestProperties());
+        this(getStaticTestProperties());
     }
 
-    private TestContext(Tester tester) {
-        this.tester = tester;
+    private TestContext(Properties properties) {
+        assert properties != null;
+        this.properties = properties;
+        this.tester = createTester(this, properties);
     }
 
     /**
@@ -316,24 +321,34 @@ public class TestContext {
      * Factory method for the {@link Tester}
      * object which determines which driver to test.
      *
+     * @param testContext Test context
      * @param testProperties Properties that define the properties of the tester
      * @return a new Tester
      */
-    private static Tester createTester(Properties testProperties) {
+    private static Tester createTester(
+        TestContext testContext,
+        Properties testProperties)
+    {
         String helperClassName =
             testProperties.getProperty(Property.HELPER_CLASS_NAME.path);
         if (helperClassName == null) {
-            helperClassName = "org.olap4j.MondrianTester";
+            helperClassName = "org.olap4j.XmlaTester";
         }
         Tester tester;
         try {
             Class<?> clazz = Class.forName(helperClassName);
-            tester = (Tester) clazz.newInstance();
+            final Constructor<?> constructor =
+                clazz.getConstructor(TestContext.class);
+            tester = (Tester) constructor.newInstance(testContext);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         }
 
@@ -387,7 +402,7 @@ public class TestContext {
      * @return Test suite that executes the TCK
      */
     public static TestSuite createTckSuite(Properties properties, String name) {
-        TestContext testContext = new TestContext(createTester(properties));
+        TestContext testContext = new TestContext(properties);
         THREAD_INSTANCE.set(testContext);
         try {
             final TestSuite suite = new TestSuite();
@@ -397,6 +412,10 @@ public class TestContext {
         } finally {
             THREAD_INSTANCE.remove();
         }
+    }
+
+    public Properties getProperties() {
+        return properties;
     }
 
     /**
@@ -450,7 +469,7 @@ public class TestContext {
          * @param statement Statement
          * @param clazz Desired result type
          * @return Unwrapped object
-         * @throws SQLException
+         * @throws SQLException on database error
          */
         public abstract <T extends Statement> T unwrap(
             Statement statement,
@@ -462,7 +481,7 @@ public class TestContext {
          * @param connection Connection
          * @param clazz Desired result type
          * @return Unwrapped object
-         * @throws SQLException
+         * @throws SQLException on database error
          */
         public abstract <T extends Connection> T unwrap(
             Connection connection,
@@ -480,7 +499,7 @@ public class TestContext {
      *
      * @return object containing properties needed by the test suite
      */
-    public static synchronized Properties getTestProperties() {
+    private static synchronized Properties getStaticTestProperties() {
         if (testProperties == null) {
             testProperties = new Properties(System.getProperties());
 
@@ -563,8 +582,18 @@ public class TestContext {
      * Abstracts the information about specific drivers and database instances
      * needed by this test. This allows the same test suite to be used for
      * multiple implementations of olap4j.
+     *
+     * <p>Must have a public constructor that takes a
+     * {@link org.olap4j.test.TestContext} as parameter.
      */
     public interface Tester {
+        /**
+         * Returns the test context.
+         *
+         * @return Test context
+         */
+        TestContext getTestContext();
+
         /**
          * Creates a connection
          *
@@ -643,6 +672,10 @@ public class TestContext {
             this.tester = tester;
         }
 
+        public TestContext getTestContext() {
+            return tester.getTestContext();
+        }
+
         public Connection createConnection() throws SQLException {
             return tester.createConnection();
         }
@@ -683,8 +716,8 @@ public class TestContext {
         /**
          * Name of the class used by the test infrastructure to make connections
          * to the olap4j data source and perform other housekeeping operations.
-         * Valid values include "org.olap4j.MondrianTester" (the default)
-         * and "org.olap4j.XmlaTester".
+         * Valid values include "mondrian.test.MondrianOlap4jTester" (the
+         * default, per test.properties) and "org.olap4j.XmlaTester".
          */
         HELPER_CLASS_NAME("org.olap4j.test.helperClassName"),
 

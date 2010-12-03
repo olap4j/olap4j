@@ -107,7 +107,8 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
     /**
      * Retrives a list of olap4j data sources that are available on the server.
      *
-     * <p>Specification as for XML/A DISCOVER_DATASOURCES schema rowset.
+     * <p>Specification as for XML/A DISCOVER_DATASOURCES schema rowset. The
+     * rows are ordered by <code>DATA_SOURCE_NAME</code>.
      *
      * <ol>
      * <li><b>DATA_SOURCE_NAME</b> String => The name of the data source, such

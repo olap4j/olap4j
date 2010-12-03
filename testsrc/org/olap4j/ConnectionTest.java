@@ -31,8 +31,8 @@ import static org.olap4j.test.TestContext.nameList;
  * Unit test for olap4j Driver and Connection classes.
  *
  * <p>The system property "org.olap4j.test.helperClassName" determines the
- * name of the helper class. By default, uses {@link MondrianTester}, which
- * runs against mondrian; {@link XmlaTester} is also available.
+ * name of the helper class. By default, uses {@link org.olap4j.XmlaTester},
+ * use the XMLA driver.
  *
  * @author jhyde
  * @version $Id$
@@ -1905,28 +1905,23 @@ public class ConnectionTest extends TestCase {
 
         assertEquals("Food", member.getCaption());
 
-        if (tester.getFlavor() != Tester.Flavor.XMLA
-                && tester.getFlavor() != Tester.Flavor.REMOTE_XMLA)
-        {
+        switch (tester.getFlavor()) {
+        case XMLA:
+        case REMOTE_XMLA:
+            assertEquals("", member.getDescription());
+            assertEquals(204, member.getOrdinal());
+            break;
+        default:
             assertNull(member.getDescription());
+            assertEquals(-1, member.getOrdinal());
             assertEquals(1, member.getDepth());
             assertEquals(-1, member.getSolveOrder());
             assertFalse(member.isHidden());
             assertNull(member.getDataMember());
             assertFalse(member.isCalculatedInQuery());
-        } else {
-            assertEquals("", member.getDescription());
+            break;
         }
 
-        switch (tester.getFlavor()) {
-        case MONDRIAN:
-            // mondrian does not set ordinals correctly
-            assertEquals(-1, member.getOrdinal());
-            break;
-        default:
-            assertEquals(204, member.getOrdinal());
-            break;
-        }
         final NamedList<Property> propertyList = member.getProperties();
         assertEquals(25, propertyList.size());
         final Property property = propertyList.get("MEMBER_CAPTION");

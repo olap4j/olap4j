@@ -29,12 +29,23 @@ public class RemoteXmlaTester implements Tester {
     public static final String DRIVER_URL_PREFIX = "jdbc:xmla:";
     public static final String DRIVER_CLASS_NAME =
         "org.olap4j.driver.xmla.XmlaOlap4jDriver";
+
     private String url = null;
     private String user = null;
     private String password = null;
+    private final TestContext testContext;
 
-    public RemoteXmlaTester() {
-        final Properties properties = TestContext.getTestProperties();
+    /**
+     * Creates a RemoteXmlaTester.
+     *
+     * <p>The {@link org.olap4j.test.TestContext.Tester} API requires a public
+     * constructor with a {@link org.olap4j.test.TestContext} parameter.
+     *
+     * @param testContext Test context
+     */
+    public RemoteXmlaTester(TestContext testContext) {
+        this.testContext = testContext;
+        final Properties properties = testContext.getProperties();
         this.url =
             properties.getProperty(
                 TestContext.Property.REMOTE_XMLA_URL.path);
@@ -49,6 +60,10 @@ public class RemoteXmlaTester implements Tester {
         this.password =
             properties.getProperty(
                 TestContext.Property.REMOTE_XMLA_PASSWORD.path);
+    }
+
+    public TestContext getTestContext() {
+        return testContext;
     }
 
     public Connection createConnection() throws SQLException {

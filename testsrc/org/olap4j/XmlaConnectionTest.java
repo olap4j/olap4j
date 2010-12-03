@@ -215,7 +215,7 @@ public class XmlaConnectionTest extends TestCase {
      * @throws Exception If the test fails.
      */
     public void testNoDoubleQuerySubmission() throws Exception {
-        if (!TestContext.getTestProperties()
+        if (!TestContext.instance().getProperties()
             .get(TestContext.Property.HELPER_CLASS_NAME.path)
             .equals("org.olap4j.XmlaTester"))
         {

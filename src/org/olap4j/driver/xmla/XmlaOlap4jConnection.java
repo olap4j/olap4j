@@ -840,14 +840,15 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         }
 
         // If the request requires catalog name, and one wasn't specified in the
-        // restrictions, use the connection's current catalog.
-        if (context.olap4jCatalog != null) {
-            requestCatalogName = context.olap4jCatalog.getName();
+        // restrictions, use the connection's current schema. (Note: What XMLA
+        // calls a catalog, JDBC calls a schema.)
+        if (context.olap4jSchema != null) {
+            requestCatalogName = context.olap4jSchema.getName();
         }
         if (requestCatalogName == null
             && metadataRequest.requiresCatalogName())
         {
-            requestCatalogName = context.olap4jConnection.getCatalog();
+            requestCatalogName = context.olap4jConnection.getSchema().getName();
         }
 
         // Add the catalog node only if this request has specified it as a

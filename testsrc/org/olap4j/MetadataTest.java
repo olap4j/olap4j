@@ -251,13 +251,13 @@ public class MetadataTest extends TestCase {
         switch (tester.getFlavor()) {
         case MONDRIAN:
             TestContext.assertEqualsVerbose(
-                "DATA_SOURCE_NAME=xxx,"
+                "DATA_SOURCE_NAME=FoodMart,"
                 + " DATA_SOURCE_DESCRIPTION=null,"
                 + " URL=null,"
-                + " DATA_SOURCE_INFO=xxx,"
-                + " PROVIDER_NAME=null,"
+                + " DATA_SOURCE_INFO=FoodMart,"
+                + " PROVIDER_NAME=Mondrian,"
                 + " PROVIDER_TYPE=MDP,"
-                + " AUTHENTICATION_MODE=null\n",
+                + " AUTHENTICATION_MODE=Unauthenticated\n",
                 s);
             break;
         case REMOTE_XMLA:
@@ -265,10 +265,17 @@ public class MetadataTest extends TestCase {
             break;
         case XMLA:
             TestContext.assertEqualsVerbose(
-                "DATA_SOURCE_NAME=MondrianFoodMart,"
+                "DATA_SOURCE_NAME=FoodMart,"
                 + " DATA_SOURCE_DESCRIPTION=Mondrian FoodMart data source,"
                 + " URL=http://localhost:8080/mondrian/xmla,"
-                + " DATA_SOURCE_INFO=MondrianFoodMart,"
+                + " DATA_SOURCE_INFO=FoodMart,"
+                + " PROVIDER_NAME=Mondrian,"
+                + " PROVIDER_TYPE=MDP,"
+                + " AUTHENTICATION_MODE=Unauthenticated\n"
+                + "DATA_SOURCE_NAME=FoodMart2,"
+                + " DATA_SOURCE_DESCRIPTION=Mondrian FoodMart data source,"
+                + " URL=http://localhost:8080/mondrian/xmla,"
+                + " DATA_SOURCE_INFO=FoodMart2,"
                 + " PROVIDER_NAME=Mondrian,"
                 + " PROVIDER_TYPE=MDP,"
                 + " AUTHENTICATION_MODE=Unauthenticated\n",
@@ -282,16 +289,18 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getCatalogs(),
             CATALOGS_COLUMN_NAMES);
         final String expected;
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
-                || tester.getFlavor() == Tester.Flavor.REMOTE_XMLA)
-        {
+        switch (tester.getFlavor()) {
+        case XMLA:
+        case REMOTE_XMLA:
             // XMLA test uses dummy duplicate catalog to make sure that we
             // get all catalogs
             expected =
                 "TABLE_CAT=" + catalogName + "\n"
                 + "TABLE_CAT=" + catalogName + "2\n";
-        } else {
+            break;
+        default:
             expected = "TABLE_CAT=" + catalogName + "\n";
+            break;
         }
         TestContext.assertEqualsVerbose(expected, s);
     }
@@ -301,16 +310,18 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getSchemas(),
             SCHEMAS_COLUMN_NAMES);
         final String expected;
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
-                || tester.getFlavor() == Tester.Flavor.REMOTE_XMLA)
-        {
-            // XMLA test uses dummy duplicate catalog to make sure that we
-            // get all catalogs
+        switch (tester.getFlavor()) {
+        case XMLA:
+        case REMOTE_XMLA:
+            // XMLA test uses dummy duplicate schema to make sure that we
+            // get all schemas
             expected =
                 "TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "\n"
                 + "TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "2\n";
-        } else {
+            break;
+        default:
             expected = "TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "\n";
+            break;
         }
         TestContext.assertEqualsVerbose(expected, s);
     }

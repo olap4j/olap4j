@@ -31,7 +31,9 @@ import java.io.PrintWriter;
  * @version $Id$
  */
 public class CellSetFormatterTest extends TestCase {
-    final String query1 =
+    final TestContext.Tester tester = TestContext.instance().getTester();
+
+    static final String query1 =
         "select\n"
         + "  crossjoin(\n"
         + "    {[Time].[1997].[Q1], [Time].[1997].[Q2].[4]},\n"
@@ -55,7 +57,6 @@ public class CellSetFormatterTest extends TestCase {
         Format format,
         String expected) throws SQLException
     {
-        final TestContext.Tester tester = TestContext.instance().getTester();
         Connection connection = null;
         try {
             connection = tester.createConnection();

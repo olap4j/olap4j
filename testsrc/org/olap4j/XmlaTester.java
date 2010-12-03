@@ -25,12 +25,18 @@ import java.lang.reflect.InvocationTargetException;
  * @version $Id$
  */
 public class XmlaTester implements TestContext.Tester {
+    private final TestContext testContext;
     final XmlaOlap4jProxy proxy;
     final String cookie;
     private Connection connection;
 
     /**
-     * Creates an XmlaTester
+     * Creates an XmlaTester.
+     *
+     * <p>The {@link org.olap4j.test.TestContext.Tester} API requires a public
+     * constructor with a {@link org.olap4j.test.TestContext} parameter.
+     *
+     * @param testContext Test context
      *
      * @throws ClassNotFoundException on error
      * @throws IllegalAccessException on error
@@ -38,20 +44,16 @@ public class XmlaTester implements TestContext.Tester {
      * @throws NoSuchMethodException on error
      * @throws InvocationTargetException on error
      */
-    public XmlaTester()
+    public XmlaTester(TestContext testContext)
         throws ClassNotFoundException, IllegalAccessException,
         InstantiationException, NoSuchMethodException,
         InvocationTargetException
     {
-        final Properties properties = TestContext.getTestProperties();
+        this.testContext = testContext;
+        final Properties properties = testContext.getProperties();
         final String catalogUrl =
             properties.getProperty(
-                TestContext.Property.XMLA_CATALOG_URL.path);
-        if (catalogUrl == null) {
-            throw new RuntimeException(
-                "Property " + TestContext.Property.XMLA_CATALOG_URL.path
-                + " must be specified");
-        }
+                TestContext.Property.XMLA_CATALOG_URL.path, "http://foo");
 
         // Include the same catalog URL twice with different catalog names. This
         // allows us to detect whether operations are restricting to the current
@@ -61,7 +63,8 @@ public class XmlaTester implements TestContext.Tester {
         catalogNameUrls.put("FoodMart", catalogUrl);
         catalogNameUrls.put("FoodMart2", catalogUrl);
         String urlString =
-            properties.getProperty(TestContext.Property.CONNECT_URL.path);
+            properties.getProperty(
+                TestContext.Property.CONNECT_URL.path, "jdbc:mondrian:");
 
         final Class<?> clazz = Class.forName(getProxyClassName());
         final Constructor<?> constructor =
@@ -71,6 +74,10 @@ public class XmlaTester implements TestContext.Tester {
                 catalogNameUrls, urlString);
         this.cookie = XmlaOlap4jDriver.nextCookie();
         XmlaOlap4jDriver.PROXY_MAP.put(cookie, proxy);
+    }
+
+    public TestContext getTestContext() {
+        return testContext;
     }
 
     public Connection createConnection() throws SQLException {
@@ -114,7 +121,8 @@ public class XmlaTester implements TestContext.Tester {
     }
 
     public String getURL() {
-        return "jdbc:xmla:Server=http://foo;Catalog=FoodMart;TestProxyCookie=" + cookie;
+        return "jdbc:xmla:Server=http://foo;Catalog=FoodMart;TestProxyCookie="
+            + cookie;
     }
 
     public Flavor getFlavor() {
