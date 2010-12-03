@@ -2468,7 +2468,7 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testCellSetBug() throws SQLException {
-        if (!Bug.BugOlap4j3126553Fixed) {
+        if (!Bug.BugOlap4j3126853Fixed) {
             return;
         }
         connection = tester.createConnection();
