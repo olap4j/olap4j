@@ -184,7 +184,7 @@ public class ParserTest extends TestCase {
             + "from _Bar_Baz",
             "WITH\n"
             + "MEMBER [Measures].__Foo AS\n"
-            + "    (1.0 + 2.0)\n"
+            + "    (1 + 2)\n"
             + "SELECT\n"
             + "__Foo ON COLUMNS\n"
             + "FROM _Bar_Baz");
@@ -208,7 +208,7 @@ public class ParserTest extends TestCase {
             + "from Bar$Baz",
             "WITH\n"
             + "MEMBER [Measures].$Foo AS\n"
-            + "    (1.0 + 2.0)\n"
+            + "    (1 + 2)\n"
             + "SELECT\n"
             + "$Foo ON COLUMNS\n"
             + "FROM Bar$Baz");
@@ -234,7 +234,7 @@ public class ParserTest extends TestCase {
             + "where [Marital Status].[S]",
             "WITH\n"
             + "MEMBER [Measures].[Foo] AS\n"
-            + "    123.0\n"
+            + "    123\n"
             + "SELECT\n"
             + "{[Measures].members} ON COLUMNS,\n"
             + "CrossJoin([Product].members, {[Gender].Children}) ON ROWS\n"
@@ -514,7 +514,7 @@ public class ParserTest extends TestCase {
             + "select {[foo]} on axis(0) from cube",
             "WITH\n"
             + "MEMBER [Measures].[Foo] AS\n"
-            + "    CASE x WHEN 1.0 THEN 2.0 WHEN 3.0 THEN 4.0 ELSE 5.0 END\n"
+            + "    CASE x WHEN 1 THEN 2 WHEN 3 THEN 4 ELSE 5 END\n"
             + "SELECT\n"
             + "{[foo]} ON COLUMNS\n"
             + "FROM cube");
@@ -544,12 +544,12 @@ public class ParserTest extends TestCase {
 
         assertParseExpr(
             "[Measures].[Unit Sales] IS EMPTY AND 1 IS NULL",
-            "(([Measures].[Unit Sales] IS EMPTY) AND (1.0 IS NULL))");
+            "(([Measures].[Unit Sales] IS EMPTY) AND (1 IS NULL))");
 
-        // FIXME: "NULL" should associate as "IS NULL" rather than "NULL + 56.0"
+        // FIXME: "NULL" should associate as "IS NULL" rather than "NULL + 56"
         assertParseExpr(
             "- x * 5 is empty is empty is null + 56",
-            "(((((- x) * 5.0) IS EMPTY) IS EMPTY) IS (NULL + 56.0))");
+            "(((((- x) * 5) IS EMPTY) IS EMPTY) IS (NULL + 56))");
     }
 
     public void testIs() {
@@ -565,27 +565,27 @@ public class ParserTest extends TestCase {
 
         assertParseExpr(
             "[Measures].[Unit Sales] IS NULL AND 1 <> 2",
-            "(([Measures].[Unit Sales] IS NULL) AND (1.0 <> 2.0))");
+            "(([Measures].[Unit Sales] IS NULL) AND (1 <> 2))");
 
         assertParseExpr(
             "x is null or y is null and z = 5",
-            "((x IS NULL) OR ((y IS NULL) AND (z = 5.0)))");
+            "((x IS NULL) OR ((y IS NULL) AND (z = 5)))");
 
         assertParseExpr(
             "(x is null) + 56 > 6",
-            "(((x IS NULL) + 56.0) > 6.0)");
+            "(((x IS NULL) + 56) > 6)");
 
         // FIXME: Should be:
-        //  "(((((x IS NULL) AND (a = b)) OR ((c = (d + 5.0))) IS NULL) + 5.0)"
+        //  "(((((x IS NULL) AND (a = b)) OR ((c = (d + 5))) IS NULL) + 5)"
         assertParseExpr(
             "x is null and a = b or c = d + 5 is null + 5",
-            "(((x IS NULL) AND (a = b)) OR ((c = (d + 5.0)) IS (NULL + 5.0)))");
+            "(((x IS NULL) AND (a = b)) OR ((c = (d + 5)) IS (NULL + 5)))");
     }
 
     public void testNull() {
         assertParseExpr(
             "Filter({[Measures].[Foo]}, Iif(1 = 2, NULL, 'X'))",
-            "Filter({[Measures].[Foo]}, Iif((1.0 = 2.0), NULL, \"X\"))");
+            "Filter({[Measures].[Foo]}, Iif((1 = 2), NULL, \"X\"))");
     }
 
     public void testCast() {
@@ -595,7 +595,7 @@ public class ParserTest extends TestCase {
 
         assertParseExpr(
             "Cast(1 + 2 AS String)",
-            "CAST((1.0 + 2.0) AS String)");
+            "CAST((1 + 2) AS String)");
     }
 
     public void testId() {
@@ -670,7 +670,7 @@ public class ParserTest extends TestCase {
         // compound key sans brackets
         assertParseExpr(
             "[Foo].&Key1&Key2 + 4",
-            "([Foo].&Key1&Key2 + 4.0)");
+            "([Foo].&Key1&Key2 + 4)");
         // brackets are requred for numbers
         assertParseExprFails(
             "[Foo].&[1]&[Key2]&^3.[Bar]",
@@ -713,36 +713,38 @@ public class ParserTest extends TestCase {
      */
     public void testNumbers() {
         // Number: [+-] <digits> [ . <digits> ] [e [+-] <digits> ]
-        assertParseExpr("2", "2.0");
+        assertParseExpr("2", "2");
 
         // leading '-' is treated as an operator -- that's ok
-        assertParseExpr("-3", "(- 3.0)");
+        assertParseExpr("-3", "(- 3)");
 
         // leading '+' is ignored -- that's ok
-        assertParseExpr("+45", "45.0");
+        assertParseExpr("+45", "45");
 
         // space bad
         assertParseExprFails(
             "4 ^5^",
-            "Syntax error at \\[1:35\\], token '5\\.0'");
+            "Syntax error at \\[1:35\\], token '5\\'");
 
         assertParseExpr("3.14", "3.14");
         assertParseExpr(".12345", "0.12345");
 
         // lots of digits left and right of point
-        assertParseExpr("31415926535.89793", "3.141592653589793E10");
+        assertParseExpr("31415926535.89793", "31415926535.89793");
         assertParseExpr(
-            "31415926535897.9314159265358979", "3.141592653589793E13");
+            "31415926535897.9314159265358979",
+            "31415926535897.9314159265358979");
         assertParseExpr("3.141592653589793", "3.141592653589793");
         assertParseExpr(
-            "-3141592653589793.14159265358979", "(- 3.141592653589793E15)");
+            "-3141592653589793.14159265358979",
+            "(- 3141592653589793.14159265358979)");
 
         // exponents akimbo
-        assertParseExpr("1e2", "100.0");
+        assertParseExpr("1e2", "100");
         assertParseExprFails(
             "1e2e^3^", // todo: fix parser; should be "1e2^e3^"
             "Syntax error at .* token 'e3'");
-        assertParseExpr("1.2e3", "1200.0");
+        assertParseExpr("1.2e3", "1200");
         assertParseExpr("-1.2345e3", "(- 1234.5)");
         assertParseExprFails(
             "1.2e3.^4^", // todo: fix parser; should be "1.2e3^.4^"
@@ -769,7 +771,7 @@ public class ParserTest extends TestCase {
             + "where ([Time].[1997].[Q2].[4])",
             "WITH\n"
             + "MEMBER [Measures].[Small Number] AS\n"
-            + "    ([Measures].[Store Sales] / 9000.0)\n"
+            + "    ([Measures].[Store Sales] / 9000)\n"
             + "SELECT\n"
             + "{[Measures].[Small Number]} ON COLUMNS,\n"
             + "{Filter([Product].[Product Department].members, (([Measures].[Small Number] >= 0.3) AND ([Measures].[Small Number] <= 0.5000001234)))} ON ROWS\n"
@@ -836,7 +838,7 @@ public class ParserTest extends TestCase {
             + "  ) ON COLUMNS\n"
             + "from [Sales]\n",
             "SELECT\n"
-            + "NON EMPTY HIERARCHIZE({DrillDownLevelTop({[Product].[All Products]}, 3.0, , [Measures].[Unit Sales])}) ON COLUMNS\n"
+            + "NON EMPTY HIERARCHIZE({DrillDownLevelTop({[Product].[All Products]}, 3, , [Measures].[Unit Sales])}) ON COLUMNS\n"
             + "FROM [Sales]");
 
         // more advanced; the actual test case in the bug
@@ -850,7 +852,7 @@ public class ParserTest extends TestCase {
             + "FROM [cube]",
             "SELECT\n"
             + "{[Measures].[NetSales]} DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON COLUMNS,\n"
-            + "NON EMPTY HIERARCHIZE(AddCalculatedMembers({DrillDownLevelTop({[ProductDim].[Name].[All]}, 10.0, , [Measures].[NetSales])})) DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON ROWS\n"
+            + "NON EMPTY HIERARCHIZE(AddCalculatedMembers({DrillDownLevelTop({[ProductDim].[Name].[All]}, 10, , [Measures].[NetSales])})) DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON ROWS\n"
             + "FROM [cube]");
     }
 

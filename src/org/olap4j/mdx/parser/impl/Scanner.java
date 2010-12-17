@@ -297,7 +297,7 @@ class Scanner {
      * @return number literal token
      */
     private Symbol makeNumber(BigDecimal mantissa, int exponent) {
-        double d = mantissa.movePointRight(exponent).doubleValue();
+        BigDecimal d = mantissa.movePointRight(exponent);
         return makeSymbol(DefaultMdxParserSym.NUMBER, d);
     }
 

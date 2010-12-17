@@ -190,7 +190,7 @@ public class MdxTest extends TestCase {
         TestContext.assertEqualsVerbose(
             "WITH\n"
             + "SET Foo AS\n"
-            + "    Filter(Bar.Members, (Instr(Name, \"'\") > 0.0))\n"
+            + "    Filter(Bar.Members, (Instr(Name, \"'\") > 0))\n"
             + "SELECT\n"
             + "FROM [Cube]",
             rootNode.toString());

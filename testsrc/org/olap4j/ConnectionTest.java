@@ -2425,14 +2425,19 @@ public class ConnectionTest extends TestCase {
         ).start();
         try {
             final CellSet cellSet = olapStatement.executeOlapQuery(
-                "SELECT [Customers].Members * \n"
-                + " [Time].Members on columns\n"
+                "SELECT Filter(\n"
+                + " [Product].Members *\n"
+                + " [Customers].Members *\n"
+                + " [Time].[Time].Members,\n"
+                + " 1 = 0) on columns\n"
                 + "from [Sales]");
             fail(
                 "expected exception indicating stmt had been canceled,"
                 + " got cellSet " + cellSet);
         } catch (OlapException e) {
-            assertTrue(e.getMessage().indexOf("Query canceled") >= 0);
+            assertTrue(
+                e.getMessage(),
+                e.getMessage().indexOf("Query canceled") >= 0);
         }
         if (exceptions[0] != null) {
             throw exceptions[0];
@@ -2455,15 +2460,18 @@ public class ConnectionTest extends TestCase {
         try {
             final CellSet cellSet =
                 olapStatement.executeOlapQuery(
-                    "SELECT [Store].Members * \n"
+                    "SELECT Filter(\n"
+                    + " [Store].Members * \n"
                     + " [Customers].Members * \n"
-                    + " [Time].Members on columns\n"
+                    + " [Time].[Time].Members, 1 = 0) on columns\n"
                     + "from [Sales]");
             fail(
                 "expected exception indicating timeout,"
                 + " got cellSet " + cellSet);
         } catch (OlapException e) {
-            assertTrue(e.getMessage().indexOf("Query timeout of ") >= 0);
+            assertTrue(
+                e.getMessage(),
+                e.getMessage().indexOf("Query timeout of ") >= 0);
         }
     }
 

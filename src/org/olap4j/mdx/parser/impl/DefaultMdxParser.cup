@@ -10,7 +10,10 @@
 */
 
 import java_cup.runtime.*;
+
+import java.math.BigDecimal;
 import java.util.*;
+
 import org.olap4j.Axis;
 import org.olap4j.mdx.*;
 import org.olap4j.mdx.parser.MdxParseException;
@@ -320,7 +323,7 @@ terminal
     SOLIDUS;                    // /
 
 // c. Typed terminals
-terminal Double NUMBER;
+terminal BigDecimal NUMBER;
 terminal String ID;
 terminal String QUOTED_ID;
 terminal String AMP_QUOTED_ID;
@@ -410,7 +413,7 @@ non terminal List
 non terminal ParseTreeNode[]
     when_clause;
 
-non terminal Double
+non terminal BigDecimal
     axis_number;
 
 // Start symbol
@@ -855,7 +858,7 @@ value_expression_primary ::=
         :}
     |   NUMBER:d {:
             ParseRegion region = createRegion(dleft, dright);
-            RESULT = LiteralNode.create(region, d);
+            RESULT = LiteralNode.createNumeric(region, d, false);
         :}
     |   identifier:i {:
             RESULT = new IdentifierNode(i);

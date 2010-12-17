@@ -9,9 +9,11 @@
 */
 package org.olap4j.mdx;
 
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.type.*;
 
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 
 /**
  * Represents a constant value, such as a string or number, in a parse tree.
@@ -50,6 +52,9 @@ public class LiteralNode implements ParseTreeNode {
     {
         assert type != null;
         assert (type instanceof NullType) == (value == null);
+        assert (type instanceof StringType || type instanceof SymbolType)
+               == (value instanceof String);
+        assert (type instanceof NumericType) == (value instanceof BigDecimal);
         this.region = region;
         this.type = type;
         this.value = value;
@@ -112,6 +117,8 @@ public class LiteralNode implements ParseTreeNode {
      * @param value Value of literal; must not be null
      *
      * @return literal representing the floating-point value
+     *
+     * @deprecated Use {@link #createNumeric}
      */
     public static LiteralNode create(
         ParseRegion region,
@@ -120,7 +127,7 @@ public class LiteralNode implements ParseTreeNode {
         if (value == null) {
             throw new IllegalArgumentException("value must not be null");
         }
-        return new LiteralNode(region, new NumericType(), value);
+        return createNumeric(region, new BigDecimal(value), true);
     }
 
     /**
@@ -130,6 +137,8 @@ public class LiteralNode implements ParseTreeNode {
      * @param value Value of literal; must not be null
      *
      * @return literal representing the integer value
+     *
+     * @deprecated Use {@link #createNumeric}
      */
     public static LiteralNode create(
         ParseRegion region,
@@ -138,6 +147,27 @@ public class LiteralNode implements ParseTreeNode {
         if (value == null) {
             throw new IllegalArgumentException("value must not be null");
         }
+        return createNumeric(region, new BigDecimal(value), false);
+    }
+
+    /**
+     * Creates a numeric literal.
+     *
+     * @param region Region of source code
+     * @param value Value of literal; must not be null
+     * @param approximate Whether the literal is approximate
+     *
+     * @return literal representing the integer value
+     */
+    public static LiteralNode createNumeric(
+        ParseRegion region,
+        BigDecimal value,
+        boolean approximate)
+    {
+        if (value == null) {
+            throw new IllegalArgumentException("value must not be null");
+        }
+        Olap4jUtil.discard(approximate); // reserved for future use
         return new LiteralNode(region, new NumericType(), value);
     }
 
@@ -155,6 +185,10 @@ public class LiteralNode implements ParseTreeNode {
 
     /**
      * Returns the value of this literal.
+     *
+     * <p>Value is always of type {@link String} (if the literal is a string or
+     * a symbol), of type {@link java.math.BigDecimal} (if the literal is
+     * numeric), or null (if the literal is of null type).
      *
      * @return value
      */
