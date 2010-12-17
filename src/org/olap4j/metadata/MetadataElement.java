@@ -22,7 +22,7 @@ public interface MetadataElement {
      *
      * <p>Name is never null. Unlike {@link #getCaption() caption} and
      * {@link #getDescription() description}, an element's name is the same in
-     * all locales.
+     * every {@link java.util.Locale}.
      *
      * @return name of this element
      */
@@ -36,7 +36,7 @@ public interface MetadataElement {
      *
      * <p>Unlike {@link #getCaption() caption} and
      * {@link #getDescription() description}, an element's unique name is the
-     * same in all locales.
+     * same in every {@link java.util.Locale}.
      *
      * <p>The structure of the unique name is provider-specific and subject to
      * change between provider versions. Applications should not attempt to
@@ -47,7 +47,8 @@ public interface MetadataElement {
     String getUniqueName();
 
     /**
-     * Returns the caption of this element in the current connection's locale.
+     * Returns the caption of this element in the current connection's
+     * {@link java.util.Locale}.
      *
      * <p>This method may return the empty string, but never returns null.
      * The rules for deriving an element's caption are provider-specific,
@@ -76,8 +77,20 @@ public interface MetadataElement {
      */
     String getDescription();
 
-    /*
+    /**
      * Returns whether this element is visible to end-users.
+     *
+     * <p>Visibility is a hint for client applications. An element's visibility
+     * does not affect how it is treated when MDX queries are evaluated.
+     *
+     * <p>If you wish to hide an MDX element at a deeper level, consider two
+     * OLAP concepts that sound similar to visibility but have different
+     * semantics:
+     *
+     * <ul>
+     * <li>{@link Member#isHidden Hidden members} in ragged hierarchies;</li>
+     * <li>{@link org.olap4j.OlapConnection#getRoleName Access control}</li>
+     * </ul>
      *
      * @return Whether this element is visible
      */
