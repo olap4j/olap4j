@@ -25,7 +25,8 @@ import java.util.*;
 public class MetadataTest extends TestCase {
     private static final String NL = System.getProperty("line.separator");
 
-    private final TestContext.Tester tester;
+    private final TestContext testContext = TestContext.instance();
+    private final TestContext.Tester tester = testContext.getTester();
     private Connection connection;
     private String catalogName;
     private OlapConnection olapConnection;
@@ -100,7 +101,6 @@ public class MetadataTest extends TestCase {
         "COORDINATE_TYPE");
 
     public MetadataTest() throws SQLException {
-        tester = TestContext.instance().getTester();
     }
 
     protected void setUp() throws SQLException {

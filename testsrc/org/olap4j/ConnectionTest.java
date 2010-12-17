@@ -39,8 +39,8 @@ import static org.olap4j.test.TestContext.nameList;
  * @version $Id$
  */
 public class ConnectionTest extends TestCase {
-    private final TestContext.Tester tester =
-        TestContext.instance().getTester();
+    private final TestContext testContext = TestContext.instance();
+    private final TestContext.Tester tester = testContext.getTester();
 
     private static final boolean IS_JDK_16 =
         System.getProperty("java.version").startsWith("1.6.");
@@ -1914,13 +1914,13 @@ public class ConnectionTest extends TestCase {
             break;
         default:
             assertNull(member.getDescription());
+            // mondrian does not set ordinals correctly
             assertEquals(-1, member.getOrdinal());
             assertEquals(1, member.getDepth());
             assertEquals(-1, member.getSolveOrder());
             assertFalse(member.isHidden());
             assertNull(member.getDataMember());
             assertFalse(member.isCalculatedInQuery());
-            break;
         }
 
         final NamedList<Property> propertyList = member.getProperties();

@@ -20,6 +20,7 @@ public class XmlaConnectionTest extends TestCase {
 
     public static final String DRIVER_CLASS_NAME =
         "org.olap4j.driver.xmla.XmlaOlap4jDriver";
+    private final TestContext testContext = TestContext.instance();
 
     static class XmlaOlap4jProxyMock implements XmlaOlap4jProxy {
         public byte[] get(URL url, String request) throws IOException {
@@ -215,7 +216,7 @@ public class XmlaConnectionTest extends TestCase {
      * @throws Exception If the test fails.
      */
     public void testNoDoubleQuerySubmission() throws Exception {
-        if (!TestContext.instance().getProperties()
+        if (!testContext.getProperties()
             .get(TestContext.Property.HELPER_CLASS_NAME.path)
             .equals("org.olap4j.XmlaTester"))
         {
@@ -227,7 +228,7 @@ public class XmlaConnectionTest extends TestCase {
         DoubleSubmissionTestProxy.setProxyClassName(oldValue);
         try {
             final TestContext.Tester tester =
-                TestContext.instance().getTester();
+                testContext.getTester();
             Connection connection = tester.createConnection();
             Statement statement = connection.createStatement();
             final OlapStatement olapStatement =

@@ -31,9 +31,10 @@ import java.io.PrintWriter;
  * @version $Id$
  */
 public class CellSetFormatterTest extends TestCase {
-    final TestContext.Tester tester = TestContext.instance().getTester();
+    private final TestContext testContext = TestContext.instance();
+    private final TestContext.Tester tester = testContext.getTester();
 
-    static final String query1 =
+    private static final String query1 =
         "select\n"
         + "  crossjoin(\n"
         + "    {[Time].[1997].[Q1], [Time].[1997].[Q2].[4]},\n"
@@ -42,7 +43,6 @@ public class CellSetFormatterTest extends TestCase {
         + "   [USA].[WA].[Seattle],\n"
         + "   [USA].[CA].[San Francisco]} on 1\n"
         + "FROM [Sales]";
-
 
     /**
      * Asserts that a query is formatted to an expected piece of text.

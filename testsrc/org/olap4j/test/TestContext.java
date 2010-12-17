@@ -39,7 +39,6 @@ import org.apache.commons.dbcp.*;
 public class TestContext {
     public static final String NL = System.getProperty("line.separator");
     private static final String indent = "                ";
-    private static final TestContext INSTANCE = new TestContext();
     private static final String lineBreak2 = "\\\\n\"" + NL + indent + "+ \"";
     private static final String lineBreak3 = "\\n\"" + NL + indent + "+ \"";
     private static final Pattern LineBreakPattern =
@@ -47,7 +46,11 @@ public class TestContext {
     private static final Pattern TabPattern = Pattern.compile("\t");
     private static Properties testProperties;
     private static final ThreadLocal<TestContext> THREAD_INSTANCE =
-        new ThreadLocal<TestContext>();
+        new ThreadLocal<TestContext>() {
+            protected TestContext initialValue() {
+                return new TestContext();
+            }
+        };
 
     /**
      * The following classes are part of the TCK. Each driver should call them.
@@ -177,11 +180,7 @@ public class TestContext {
      * @return default TestContext
      */
     public static TestContext instance() {
-        final TestContext i = THREAD_INSTANCE.get();
-        if (i != null) {
-            return i;
-        }
-        return INSTANCE;
+        return THREAD_INSTANCE.get();
     }
 
     /**
@@ -333,6 +332,13 @@ public class TestContext {
             testProperties.getProperty(Property.HELPER_CLASS_NAME.path);
         if (helperClassName == null) {
             helperClassName = "org.olap4j.XmlaTester";
+            if (!testProperties.containsKey(
+                TestContext.Property.XMLA_CATALOG_URL.path))
+            {
+                testProperties.setProperty(
+                    TestContext.Property.XMLA_CATALOG_URL.path,
+                    "dummy_xmla_catalog_url");
+            }
         }
         Tester tester;
         try {
