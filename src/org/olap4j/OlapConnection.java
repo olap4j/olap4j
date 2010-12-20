@@ -59,13 +59,23 @@ public interface OlapConnection extends Connection, OlapWrapper {
     OlapStatement createStatement() throws OlapException;
 
     /**
-     * Returns the current {@link org.olap4j.metadata.Schema} of this
-     * connection.
+     * Returns the database name that was selected for this connection,
+     * either through the JDBC URL or via
+     * {@link OlapConnection#setDatabase(String)}.
      *
-     * @return current Schema
-     * @throws OlapException if database error occurs
+     * @return The name of the database that was selected for this connection.
+     * @throws OlapException If a server error occurs.
      */
-    Schema getSchema() throws OlapException;
+    String getDatabase() throws OlapException;
+
+    /**
+     * Sets the name of the database that will be used for this connection.
+     * Overrides the value passed, if any, through the JDBC URL.
+     *
+     * @param databaseName The name of the database to use.
+     * @throws OlapException If a server error occurs.
+     */
+    void setDatabase(String databaseName) throws OlapException;
 
     /**
      * Returns a list of {@link org.olap4j.metadata.Catalog} objects which
@@ -76,8 +86,42 @@ public interface OlapConnection extends Connection, OlapWrapper {
      *
      * @see OlapDatabaseMetaData#getCatalogs()
      * @return List of Catalogs in this connection's OLAP server
+     * @deprecated Deprecated in favor of
+     * {@link OlapDatabaseMetaData#getOlapCatalogs()}. Will be removed as
+     * of version 1.0.
      */
+    @Deprecated
     NamedList<Catalog> getCatalogs();
+
+    /**
+     * Returns the {@link Catalog} name that was selected for this connection,
+     * either through the JDBC URL or via
+     * {@link OlapConnection#setCatalog(String)}.
+     *
+     * @return The name of the catalog that was selected for this connection.
+     * @throws OlapException If a server error occurs.
+     */
+    String getCatalog() throws OlapException;
+
+    /**
+     * Sets the name of the catalog that will be used for this connection.
+     * Overrides the value passed, if any, through the JDBC URL.
+     *
+     * @param catalogName The name of the catalog to use for this connection.
+     * @throws OlapException If a server error occurs.
+     */
+    void setCatalog(String catalogName) throws OlapException;
+
+    /**
+     * Returns the current active {@link org.olap4j.metadata.Schema}
+     * of this connection.
+     * @return The currently active schema, or null of none are
+     * currently selected.
+     * @throws OlapException if database error occurs
+     * @deprecated Will be removed as of version 1.0.
+     */
+    @Deprecated
+    Schema getSchema() throws OlapException;
 
     /**
      * Sets the current locale of this connection. The value must not be null.

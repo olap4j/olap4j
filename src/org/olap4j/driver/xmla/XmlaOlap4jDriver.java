@@ -61,7 +61,14 @@ import java.util.concurrent.*;
  *
  * <tr><td>Provider</td>     <td>Name of the XMLA provider.</td> </tr>
  *
- * <tr><td>DataSource</td>   <td>Name of the XMLA datasource. When using a
+ * <tr><td>Database</td>     <td>Name of the XMLA datasource. When using a
+ *                               Mondrian backed XMLA server, be sure to
+ *                               include the full datasource name between
+ *                               quotes.</td> </tr>
+ *
+ * <tr><td>DataSource</td>   <td><strong>Deprecated</strong> in favor of
+ *                               'Database'.<br/>
+ *                               Name of the XMLA datasource. When using a
  *                               Mondrian backed XMLA server, be sure to
  *                               include the full datasource name between
  *                               quotes.</td> </tr>
@@ -140,7 +147,7 @@ public class XmlaOlap4jDriver implements Driver {
             factoryClassName = "org.olap4j.driver.xmla.FactoryJdbc3Impl";
         }
         try {
-            final Class clazz = Class.forName(factoryClassName);
+            final Class<?> clazz = Class.forName(factoryClassName);
             factory = (Factory) clazz.newInstance();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -301,6 +308,8 @@ public class XmlaOlap4jDriver implements Driver {
         Server("URL of HTTP server"),
         Catalog("Catalog name"),
         Provider("Name of the datasource provider"),
+        Database("Name of the database"),
+        @Deprecated
         DataSource("Name of the datasource"),
         Cache("Class name of the SOAP cache implementation");
 

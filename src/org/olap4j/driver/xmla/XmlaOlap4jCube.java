@@ -90,8 +90,7 @@ class XmlaOlap4jCube implements Cube, Named
             measures,
             context,
             XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEASURES,
-            new XmlaOlap4jConnection.MeasureHandler(
-                this.dimensions.get("Measures")),
+            new XmlaOlap4jConnection.MeasureHandler(),
             restrictions);
         for (XmlaOlap4jMeasure measure : measures) {
             measuresMap.put(measure.getUniqueName(), measure);
@@ -432,7 +431,7 @@ class XmlaOlap4jCube implements Cube, Named
             Map<String, XmlaOlap4jMember> memberMap) throws OlapException
         {
             if (olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
-                .olap4jConnection.getDataSourceInfo()
+                .olap4jConnection.getDatabase()
                     .indexOf("Provider=Mondrian") != -1) //$NON-NLS-1$
             {
                 mondrianMembersLookup(memberUniqueNames, memberMap);

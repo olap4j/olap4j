@@ -21,7 +21,7 @@ import org.olap4j.OlapDatabaseMetaData;
  * OLAP server; its sole catalog is called "LOCALDB".
  *
  * <p>To obtain the collection of catalogs in the current server, call the
- * {@link org.olap4j.OlapConnection#getCatalogs()} method.
+ * {@link OlapDatabaseMetaData#getOlapCatalogs()} method.
  *
  * <p>The hierarchy of metadata objects, rooted at the connection from which
  * they are accessed, is as follows:

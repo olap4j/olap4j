@@ -70,8 +70,23 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     final URL serverUrl;
 
     private Locale locale;
+
+    /**
+     * Name of the current catalog to which this connection is bound to,
+     * as specified by the server.
+     */
+    private String nativeCatalogName;
+
+    /**
+     * Name of the catalog to which the user wishes to bind
+     * this connection. This value can be set through the JDBC URL
+     * or via {@link XmlaOlap4jConnection#setCatalog(String)}
+     */
     private String catalogName;
-    private final String driverCatalogName;
+
+    /**
+     * Name of the role that this connection impersonates.
+     */
     private String roleName;
 
     /**
@@ -80,22 +95,30 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     private String providerName;
 
     /**
-     * Datasource name.
+     * Name of the database to which the user wishes to bind
+     * this connection. This value can be set through the JDBC URL
+     * or via {@link XmlaOlap4jConnection#setCatalog(String)}
      */
-    private String datasourceName;
+    private String databaseName;
 
     /**
-     * Holds the datasource name as specified by the server. Necessary because
-     * some servers (such as mondrian) return both the provider
-     * name and the datasource name in their response.
+     * Holds the database name as specified by the server. Necessary because
+     * some servers (such as Mondrian) return both the provider
+     * name and the database name in their response.
      *
-     * <p>It's this value that we use inside queries, and not the jdbc
+     * <p>It's this value that we use inside queries, and not the JDBC
      * query value.
      */
-    private String nativeDatasourceName;
+    private String nativeDatabaseName;
+
     private boolean autoCommit;
     private boolean readOnly;
 
+    /**
+     * This is a private property used for development only.
+     * Enabling it makes the connection print out all queries
+     * to {@link System#out}
+     */
     private static final boolean DEBUG = false;
 
     /**
@@ -138,23 +161,27 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         Properties info)
         throws SQLException
     {
-        this.factory = factory;
-        this.driver = driver;
-        this.proxy = proxy;
         if (!acceptsURL(url)) {
             // This is not a URL we can handle.
             // DriverManager should not have invoked us.
             throw new AssertionError(
                 "does not start with '" + CONNECT_STRING_PREFIX + "'");
         }
+
+        this.factory = factory;
+        this.driver = driver;
+        this.proxy = proxy;
+
         Map<String, String> map = parseConnectString(url, info);
 
-        this.providerName = map.get(XmlaOlap4jDriver.Property.Provider.name());
-        this.datasourceName =
-            map.get(XmlaOlap4jDriver.Property.DataSource.name());
-        this.driverCatalogName =
+        this.providerName =
+            map.get(XmlaOlap4jDriver.Property.Provider.name());
+
+        this.databaseName =
+            map.get(XmlaOlap4jDriver.Property.Database.name());
+
+        this.catalogName =
             map.get(XmlaOlap4jDriver.Property.Catalog.name());
-        this.catalogName = driverCatalogName;
 
         // Set URL of HTTP server.
         String serverUrl = map.get(XmlaOlap4jDriver.Property.Server.name());
@@ -251,72 +278,68 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return url.startsWith(CONNECT_STRING_PREFIX);
     }
 
-    /**
-     * Returns the native datasource name, using the cached value if already
-     * computed.
-     *
-     * <p>Not part of public API.
-     *
-     * @return native datasource name
-     * @throws OlapException if cannot find a datasource that matches
-     */
-    String getDataSourceInfo() throws OlapException {
-        // If we already know it, return it.
-        if (this.nativeDatasourceName != null) {
-            return this.nativeDatasourceName;
+    public void setDatabase(String databaseName) throws OlapException {
+        this.databaseName = databaseName;
+        this.nativeCatalogName = null;
+    }
+    public String getDatabase() throws OlapException {
+     // If we already know it, return it.
+        if (this.nativeDatabaseName != null) {
+            return this.nativeDatabaseName;
         }
 
         ResultSet rSet = null;
         try {
             // We need to query for it
-            rSet = this.olap4jDatabaseMetaData.getDatasources();
+            rSet = this.olap4jDatabaseMetaData.getDatabases();
 
             // Check if the user requested a particular one.
-            if (this.datasourceName != null || this.providerName != null) {
-                // We iterate through the datasources
+            if (this.databaseName != null || this.providerName != null) {
+                // We iterate through the databases
                 while (rSet.next()) {
                     // Get current values
                     String currentDatasource = rSet.getString(DATA_SOURCE_NAME);
                     String currentProvider = rSet.getString(PROVIDER_NAME);
 
-                    // If datasource and provider match, we got it.
-                    // If datasource matches but no provider is specified, we
+                    // If database and provider match, we got it.
+                    // If database matches but no provider is specified, we
                     // got it.
-                    // If provider matches but no datasource specified, we
+                    // If provider matches but no database specified, we
                     // consider it good.
-                    if (currentDatasource.equals(this.datasourceName)
+                    if (currentDatasource.equals(this.databaseName)
                         && currentProvider.equals(this.providerName)
-                        || currentDatasource.equals(this.datasourceName)
+                        || currentDatasource.equals(this.databaseName)
                         && this.providerName == null
                         || currentProvider.equals(this.providerName)
-                        && this.datasourceName == null)
+                        && this.databaseName == null)
                     {
                         // Got it
-                        this.nativeDatasourceName = currentDatasource;
+                        this.nativeDatabaseName = currentDatasource;
                         break;
                     }
                 }
             } else {
                 // Use first
                 if (rSet.first()) {
-                    this.nativeDatasourceName =
+                    this.nativeDatabaseName =
                         rSet.getString(DATA_SOURCE_NAME);
                 }
             }
 
             // Throws exception to the client.  Tells that there are
-            // no datasource corresponding to the search criterias.
-            if (this.nativeDatasourceName == null) {
+            // no database corresponding to the search criteria.
+            if (this.nativeDatabaseName == null) {
                 throw getHelper().createException(
-                    "No datasource could be found.");
+                    "No database could be found on the server.");
             }
 
-            // If there is a provider
-            return this.nativeDatasourceName;
+            return this.nativeDatabaseName;
         } catch (OlapException e) {
             throw e;
         } catch (SQLException e) {
-            throw getHelper().createException("Datasource name not found.", e);
+            throw getHelper().createException(
+                "An exception occured while trying to resolve the database name.",
+                e);
         } finally {
             try {
                 if (rSet != null) {
@@ -384,40 +407,24 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return readOnly;
     }
 
-    public void setCatalog(String catalog) throws SQLException {
+    public void setCatalog(String catalog) throws OlapException {
         this.catalogName = catalog;
+        this.nativeCatalogName = null;
     }
 
     public String getCatalog() throws OlapException {
-        // REVIEW: All this logic to deduce and check catalog name should be
-        // done on initialization (construction, or setCatalog), not here. This
-        // method should be very quick.
-
-        if (this.catalogName == null) {
-            // This means that no particular catalog name
-            // was specified by the user.
-            List<Catalog> catalogs = this.getCatalogs();
-            if (catalogs.size() == 0) {
+        if (this.nativeCatalogName == null) {
+            if (catalogName != null) {
+                this.nativeCatalogName = catalogName;
+            } else if (olap4jDatabaseMetaData.getOlapCatalogs().size() == 0) {
                 throw new OlapException(
                     "There is no catalog available to query against.");
-            } else if (driverCatalogName != null) {
-                this.catalogName = driverCatalogName;
             } else {
-                this.catalogName = catalogs.get(0).getName();
-            }
-        } else {
-            // We must verify that the requested catalog name
-            // exists in the metadata.
-            Catalog buf = this.getCatalogs().get(this.catalogName);
-            if (buf != null) {
-                this.catalogName = buf.getName();
-            } else {
-                throw new OlapException(
-                    "There is no catalog named " + this.catalogName
-                    + " available to query against.");
+                this.nativeCatalogName =
+                    olap4jDatabaseMetaData.getOlapCatalogs().get(0).getName();
             }
         }
-        return catalogName;
+        return nativeCatalogName;
     }
 
     public void setTransactionIsolation(int level) throws SQLException {
@@ -568,6 +575,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         };
     }
 
+    @Deprecated
+    /*
+     * This function must either be removed and the tests adapted or
+     * be made package private.
+     */
     public synchronized org.olap4j.metadata.Schema getSchema()
         throws OlapException
     {
@@ -828,7 +840,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         // Add the datasource node only if this request requires it.
         if (metadataRequest.requiresDatasourceName()) {
             buf.append("        <DataSourceInfo>");
-            xmlEncode(buf, context.olap4jConnection.getDataSourceInfo());
+            xmlEncode(buf, context.olap4jConnection.getDatabase());
             buf.append("</DataSourceInfo>\n");
         }
 
@@ -865,6 +877,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         if (requestCatalogName != null
             && metadataRequest.allowsCatalogName())
         {
+            if (getMetaData().getOlapCatalogs()
+                .get(requestCatalogName) == null)
+            {
+                throw new OlapException(
+                    "No catalog named " + requestCatalogName
+                    + " exist on the server.");
+            }
             buf.append("        <Catalog>");
             xmlEncode(buf, requestCatalogName);
             buf.append("</Catalog>\n");
@@ -876,7 +895,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             "</Content>\n"
             + "      </PropertyList>\n"
             + "    </Properties>\n"
-            + "    </Discover>\n"
+            + "  </Discover>\n"
             + "</SOAP-ENV:Body>\n"
             + "</SOAP-ENV:Envelope>");
         return buf.toString();
@@ -1196,11 +1215,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class MeasureHandler extends HandlerImpl<XmlaOlap4jMeasure> {
-        private final XmlaOlap4jDimension measuresDimension;
-
-        public MeasureHandler(XmlaOlap4jDimension measuresDimension) {
-            this.measuresDimension = measuresDimension;
-        }
         public void handle(
             Element row,
             Context context,
@@ -1209,7 +1223,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         {
             /*
             Example:
-
             <row>
                 <CATALOG_NAME>FoodMart</CATALOG_NAME>
                 <SCHEMA_NAME>FoodMart</SCHEMA_NAME>

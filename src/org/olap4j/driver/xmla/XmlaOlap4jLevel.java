@@ -121,8 +121,7 @@ class XmlaOlap4jLevel
                             olap4jHierarchy.olap4jDimension,
                             olap4jHierarchy,
                             this),
-                        new XmlaOlap4jConnection.MeasureHandler(
-                            olap4jHierarchy.olap4jDimension),
+                        new XmlaOlap4jConnection.MeasureHandler(),
                             restrictions));
             } else {
                 this.memberList = new DeferredNamedListImpl<XmlaOlap4jMember>(

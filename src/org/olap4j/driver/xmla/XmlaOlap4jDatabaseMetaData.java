@@ -64,7 +64,10 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
      * <p>Package-local because not part of olap4j API.
      *
      * @return List of catalog objects
+     * @deprecated Deprecated in favor of
+     * {@link OlapDatabaseMetaData#getOlapCatalogs()}
      */
+    @Deprecated
     NamedList<XmlaOlap4jCatalog> getCatalogObjects() {
         return catalogs;
     }
@@ -694,14 +697,18 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         throw new UnsupportedOperationException();
     }
 
-    public ResultSet getSchemas() throws SQLException {
+    public ResultSet getSchemas() throws OlapException {
         return getMetadata(
             XmlaOlap4jConnection.MetadataRequest.DBSCHEMA_SCHEMATA);
     }
 
-    public ResultSet getCatalogs() throws SQLException {
+    public ResultSet getCatalogs() throws OlapException {
         return getMetadata(
             XmlaOlap4jConnection.MetadataRequest.DBSCHEMA_CATALOGS);
+    }
+
+    public NamedList<Catalog> getOlapCatalogs() throws OlapException {
+        return Olap4jUtil.cast(catalogs);
     }
 
     public ResultSet getTableTypes() throws SQLException {
@@ -989,6 +996,10 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public ResultSet getDatasources() throws OlapException {
+        return this.getDatabases();
+    }
+
+    public ResultSet getDatabases() throws OlapException {
         return getMetadata(
             XmlaOlap4jConnection.MetadataRequest.DISCOVER_DATASOURCES);
     }
