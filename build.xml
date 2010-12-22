@@ -272,6 +272,17 @@ META-INF/**" />
         </if>
     </target>
 
+    <!-- override from subfloor to publish tck as well -->
+    <target name="publish-nojar">
+        <antcall target="subfloor.publish-nojar"/>
+        <antcall target="maven-publish-sources">
+          <param name="publish.groupId" value="${ivy.artifact.group}" />
+          <param name="publish.artifactId" value="${ivy.artifact.id}" />
+          <param name="publish.version" value="${project.revision}" />
+          <param name="publish.file" value="${dist.dir}/${ivy.artifact.id}-${project.revision}-tck.jar" />
+        </antcall>
+    </target>
+
     <target name="javadoc" depends="clean-stray-package-html">
         <mkdir dir="${javadoc.dir}" />
         <delete quiet="true" file="${javadoc.dir}/index.html" />
