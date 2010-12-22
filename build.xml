@@ -277,7 +277,7 @@ META-INF/**" />
         <antcall target="subfloor.publish-nojar"/>
         <antcall target="maven-publish-sources">
           <param name="publish.groupId" value="${ivy.artifact.group}" />
-          <param name="publish.artifactId" value="${ivy.artifact.id}" />
+          <param name="publish.artifactId" value="${ivy.artifact.id}-tck" />
           <param name="publish.version" value="${project.revision}" />
           <param name="publish.file" value="${dist.dir}/${ivy.artifact.id}-tck-${project.revision}.jar" />
         </antcall>
