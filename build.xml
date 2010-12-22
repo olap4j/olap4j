@@ -42,7 +42,7 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
     <target name="setup" depends="version-properties,compile,create-dot-classpath"
         description="Setups the project for eclipse." />
 
-    <target name="hudson" depends="clean-all,clean-tests,version-properties,jar,source.jar,test,jar-jdk14"
+    <target name="hudson" depends="clean-all,clean-tests,version-properties,jar,source.jar,tck-jar,test,jar-jdk14"
         description="Sugar goal to build olap4j from hudson." />
 
     <!-- Override to create a proper release. -->
@@ -279,7 +279,7 @@ META-INF/**" />
           <param name="publish.groupId" value="${ivy.artifact.group}" />
           <param name="publish.artifactId" value="${ivy.artifact.id}" />
           <param name="publish.version" value="${project.revision}" />
-          <param name="publish.file" value="${dist.dir}/${ivy.artifact.id}-${project.revision}-tck.jar" />
+          <param name="publish.file" value="${dist.dir}/${ivy.artifact.id}-tck-${project.revision}.jar" />
         </antcall>
     </target>
 
