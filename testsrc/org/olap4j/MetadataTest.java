@@ -9,6 +9,8 @@
 package org.olap4j;
 
 import junit.framework.TestCase;
+import mondrian.olap.Util;
+
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
 import org.olap4j.test.TestContext;
@@ -246,7 +248,7 @@ public class MetadataTest extends TestCase {
 
     public void testDatabaseMetaDataGetDatasources() throws SQLException {
         String s = checkResultSet(
-            olapDatabaseMetaData.getDatasources(),
+            olapDatabaseMetaData.getDatabases(),
             DATASOURCES_COLUMN_NAMES);
         switch (tester.getFlavor()) {
         case MONDRIAN:
@@ -269,13 +271,6 @@ public class MetadataTest extends TestCase {
                 + " DATA_SOURCE_DESCRIPTION=Mondrian FoodMart data source,"
                 + " URL=http://localhost:8080/mondrian/xmla,"
                 + " DATA_SOURCE_INFO=FoodMart,"
-                + " PROVIDER_NAME=Mondrian,"
-                + " PROVIDER_TYPE=MDP,"
-                + " AUTHENTICATION_MODE=Unauthenticated\n"
-                + "DATA_SOURCE_NAME=FoodMart2,"
-                + " DATA_SOURCE_DESCRIPTION=Mondrian FoodMart data source,"
-                + " URL=http://localhost:8080/mondrian/xmla,"
-                + " DATA_SOURCE_INFO=FoodMart2,"
                 + " PROVIDER_NAME=Mondrian,"
                 + " PROVIDER_TYPE=MDP,"
                 + " AUTHENTICATION_MODE=Unauthenticated\n",
@@ -453,7 +448,7 @@ public class MetadataTest extends TestCase {
 
     public void testGetCatalogs() throws SQLException {
         int k = 0;
-        for (Catalog catalog : olapConnection.getCatalogs()) {
+        for (Catalog catalog : olapConnection.getMetaData().getOlapCatalogs()) {
             ++k;
             assertEquals(catalog.getMetaData(), olapDatabaseMetaData);
             for (Schema schema : catalog.getSchemas()) {
@@ -464,9 +459,11 @@ public class MetadataTest extends TestCase {
                     assertEquals(cube.getSchema(), schema);
                 }
                 for (Dimension dimension : schema.getSharedDimensions()) {
+                    Util.discard(dimension);
                     ++k;
                 }
                 for (Locale locale : schema.getSupportedLocales()) {
+                    Util.discard(locale);
                     ++k;
                 }
             }

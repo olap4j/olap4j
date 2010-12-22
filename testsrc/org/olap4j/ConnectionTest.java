@@ -383,15 +383,14 @@ public class ConnectionTest extends TestCase {
                 Statement statement2 = connection.createStatement();
                 OlapStatement olapStatement2 =
                     TestContext.Wrapper.NONE.unwrap(
-                        statement,
+                        statement2,
                         OlapStatement.class);
-                CellSet cellSet2 =
-                    olapStatement.executeOlapQuery(
-                        "SELECT FROM [Sales]");
+                olapStatement2.executeOlapQuery(
+                    "SELECT FROM [Sales]");
                 fail();
             } catch (OlapException e) {
-                if (e.getMessage().equals(
-                    "No catalog named FoodMartError exist on the server."))
+                if (e.getMessage().contains(
+                    "unknown schema 'FoodMartError'"))
                 {
                     return;
                 }

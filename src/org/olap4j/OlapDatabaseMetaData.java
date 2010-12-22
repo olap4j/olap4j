@@ -199,38 +199,6 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
     ResultSet getDatabases() throws OlapException;
 
     /**
-     * Retrieves a list of olap4j catalogs that are available on the server.
-     *
-     * <p>Specification as for XML/A DBSCHEMA_CATALOGS schema rowset.
-     *
-     * <p>
-     * The list of returned catalogs is dependent on the underlying connection
-     * Database parameter. To discover catalogs in another database, use
-     * {@link OlapDatabaseMetaData#getDatabases()} and
-     * {@link OlapConnection#setDatabase(String)}
-     *
-     * <ol>
-     * <li><b>CATALOG_NAME</b> String => The catalog name, such as
-     *         FoodMart.</li>
-     *
-     * <li><b>DESCRIPTION</b> String => A description of the
-     *         catalog, as entered by the publisher. (may be
-     *         <code>null</code>)</li></ol>
-     *
-     * <li><b>ROLES</b> String => A comma separated list of role names
-     *         that users can impersonate. (may be
-     *         <code>null</code>)</li></ol>
-     *
-     * <li><b>DATE_MODIFIED</b> String => The date of the latest modifications
-     *         to the catalog. (may be <code>null</code>)</li></ol>
-     *
-     * @return a <code>ResultSet</code> object in which each row is an
-     *         OLAP catalog description
-     * @throws OlapException if a database access error occurs
-     */
-    ResultSet getCatalogs() throws OlapException;
-
-    /**
      * Returns a list of {@link org.olap4j.metadata.Catalog} objects which
      * belong to this connection's OLAP server.
      *
@@ -247,33 +215,6 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @throws OlapException if a database access error occurs
      */
     NamedList<Catalog> getOlapCatalogs() throws OlapException;
-
-    /**
-     * Retrieves a list of olap4j schemas that are available on the server.
-     *
-     * <p>Specification as for XML/A DBSCHEMA_SCHEMATA schema rowset.
-     *
-     * <p>
-     * The list of returned catalogs is dependent on the underlying connection
-     * Database parameter. To discover schemas in another database, use
-     * {@link OlapDatabaseMetaData#getDatabases()} and
-     * {@link OlapConnection#setDatabase(String)}
-     *
-     * <ol>
-     * <li><b>CATALOG_NAME</b> String => The name of the parent catalog to which
-     *         the schema belongs to.</li>
-     *
-     * <li><b>SCHEMA_NAME</b> String => The name of the schema.</li>
-     *
-     * <li><b>SCHEMA_OWNER</b> String => The name of the user who is the owner
-     *         of the schema (may be <code>null</code>)</li>
-     * </ol>
-     *
-     * @return a <code>ResultSet</code> object in which each row is an OLAP
-     *         schema description
-     * @throws OlapException if a database access error occurs
-     */
-    ResultSet getSchemas() throws OlapException;
 
     /**
      * Retrieves a list of information on supported literals, including data
