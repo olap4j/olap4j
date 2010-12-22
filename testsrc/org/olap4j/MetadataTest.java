@@ -9,7 +9,6 @@
 package org.olap4j;
 
 import junit.framework.TestCase;
-import mondrian.olap.Util;
 
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
@@ -459,11 +458,9 @@ public class MetadataTest extends TestCase {
                     assertEquals(cube.getSchema(), schema);
                 }
                 for (Dimension dimension : schema.getSharedDimensions()) {
-                    Util.discard(dimension);
                     ++k;
                 }
                 for (Locale locale : schema.getSupportedLocales()) {
-                    Util.discard(locale);
                     ++k;
                 }
             }
