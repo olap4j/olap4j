@@ -301,7 +301,7 @@ META-INF/**" />
                 <arg value="-Durl=${ivy.repository.publish}" />
                 <arg value="-DgroupId=${ivy.artifact.group}" />
                 <arg value="-DartifactId=${ivy.artifact.id}-tck" />
-                <arg value="-Dpackaging=java" />
+                <arg value="-Dpackaging=jar" />
                 <arg value="-Dversion=${project.revision}" />
                 <arg value="-Dfile=${publish.file}" />
               </exec>
@@ -313,7 +313,7 @@ META-INF/**" />
                 <arg value="-Durl=${ivy.repository.publish}" />
                 <arg value="-DgroupId=${ivy.artifact.group}" />
                 <arg value="-DartifactId=${ivy.artifact.id}-tck" />
-                <arg value="-Dpackaging=java" />
+                <arg value="-Dpackaging=jar" />
                 <arg value="-Dversion=${project.revision}" />
                 <arg value="-Dfile=${publish.file}" />
               </exec>
