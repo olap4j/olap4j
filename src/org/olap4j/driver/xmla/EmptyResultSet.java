@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -101,11 +101,15 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
     }
 
     public String getString(int columnIndex) throws SQLException {
-        return String.valueOf(getColumn(columnIndex - 1));
+        Object o = getColumn(columnIndex - 1);
+        return o == null ? null : o.toString();
     }
 
     public boolean getBoolean(int columnIndex) throws SQLException {
         Object o = getColumn(columnIndex - 1);
+        if (o == null) {
+            return false;
+        }
         if (o instanceof Boolean) {
             return (Boolean) o;
         } else if (o instanceof String) {
@@ -115,40 +119,81 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
         }
     }
 
+    private Number convertToNumber(Object o) {
+        if (o instanceof Number) {
+            return (Number)o;
+        } else {
+            return new BigDecimal(o.toString());
+        }
+    }
+
     public byte getByte(int columnIndex) throws SQLException {
         Object o = getColumn(columnIndex - 1);
-        return ((Number) o).byteValue();
+        if (o == null) {
+            return 0;
+        }
+        return convertToNumber(o).byteValue();
     }
 
     public short getShort(int columnIndex) throws SQLException {
         Object o = getColumn(columnIndex - 1);
-        return ((Number) o).shortValue();
+        if (o == null) {
+            return 0;
+        }
+        return convertToNumber(o).shortValue();
     }
 
     public int getInt(int columnIndex) throws SQLException {
         Object o = getColumn(columnIndex - 1);
-        return ((Number) o).intValue();
+        if (o == null) {
+            return 0;
+        }
+        return convertToNumber(o).intValue();
     }
 
     public long getLong(int columnIndex) throws SQLException {
         Object o = getColumn(columnIndex - 1);
+        if (o == null) {
+            return 0;
+        }
         return ((Number) o).longValue();
     }
 
     public float getFloat(int columnIndex) throws SQLException {
         Object o = getColumn(columnIndex - 1);
-        return ((Number) o).floatValue();
+        if (o == null) {
+            return 0;
+        }
+        return convertToNumber(o).floatValue();
     }
 
     public double getDouble(int columnIndex) throws SQLException {
         Object o = getColumn(columnIndex - 1);
-        return ((Number) o).doubleValue();
+        if (o == null) {
+            return 0;
+        }
+        return convertToNumber(o).doubleValue();
     }
 
     public BigDecimal getBigDecimal(
-        int columnIndex, int scale) throws SQLException
+        int columnIndex,
+        int scale)
+        throws SQLException
     {
-        throw new UnsupportedOperationException();
+        Object o = getColumn(columnIndex - 1);
+        if (o == null) {
+            return null;
+        }
+        BigDecimal bd;
+        if (o instanceof BigDecimal) {
+            bd = (BigDecimal)o;
+        } else {
+            bd = new BigDecimal(o.toString());
+        }
+        if (bd.scale() != scale) {
+            bd = bd.setScale(scale);
+        }
+        return bd;
     }
 
     public byte[] getBytes(int columnIndex) throws SQLException {
@@ -185,7 +230,7 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
 
     public String getString(String columnLabel) throws SQLException {
         Object o = getColumn(columnLabel);
-        return String.valueOf(o);
+        return o == null ? null : o.toString();
     }
 
     public boolean getBoolean(String columnLabel) throws SQLException {
@@ -201,38 +246,71 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
 
     public byte getByte(String columnLabel) throws SQLException {
         Object o = getColumn(columnLabel);
-        return ((Number) o).byteValue();
+        if (o == null) {
+            return 0;
+        }
+        return convertToNumber(o).byteValue();
     }
 
     public short getShort(String columnLabel) throws SQLException {
         Object o = getColumn(columnLabel);
-        return ((Number) o).shortValue();
+        if (o == null) {
+            return 0;
+        }
+        return convertToNumber(o).shortValue();
     }
 
     public int getInt(String columnLabel) throws SQLException {
         Object o = getColumn(columnLabel);
-        return ((Number) o).intValue();
+        if (o == null) {
+            return 0;
+        }
+        return convertToNumber(o).intValue();
     }
 
     public long getLong(String columnLabel) throws SQLException {
         Object o = getColumn(columnLabel);
-        return ((Number) o).longValue();
+        if (o == null) {
+            return 0;
+        }
+        return convertToNumber(o).longValue();
     }
 
     public float getFloat(String columnLabel) throws SQLException {
         Object o = getColumn(columnLabel);
-        return ((Number) o).floatValue();
+        if (o == null) {
+            return 0;
+        }
+        return convertToNumber(o).floatValue();
     }
 
     public double getDouble(String columnLabel) throws SQLException {
         Object o = getColumn(columnLabel);
-        return ((Number) o).doubleValue();
+        if (o == null) {
+            return 0;
+        }
+        return convertToNumber(o).doubleValue();
     }
 
     public BigDecimal getBigDecimal(
-        String columnLabel, int scale) throws SQLException
+        String columnLabel,
+        int scale)
+        throws SQLException
     {
-        throw new UnsupportedOperationException();
+        Object o = getColumn(columnLabel);
+        if (o == null) {
+            return null;
+        }
+        BigDecimal bd;
+        if (o instanceof BigDecimal) {
+            bd = (BigDecimal)o;
+        } else {
+            bd = new BigDecimal(o.toString());
+        }
+        if (bd.scale() != scale) {
+           bd = bd.setScale(scale);
+        }
+        return bd;
     }
 
     public byte[] getBytes(String columnLabel) throws SQLException {
@@ -286,15 +364,19 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
     }
 
     public Object getObject(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException();
+        return getColumn(columnIndex - 1);
     }
 
     public Object getObject(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException();
+        return getColumn(columnLabel);
     }
 
     public int findColumn(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException();
+        int column = headerList.indexOf(columnLabel);
+        if (column < 0) {
+            throw new SQLException("Column not found: " + columnLabel);
+        }
+        return column;
     }
 
     public Reader getCharacterStream(int columnIndex) throws SQLException {
@@ -306,11 +388,31 @@ abstract class EmptyResultSet implements ResultSet, OlapWrapper {
     }
 
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException();
+        Object o = getColumn(columnIndex - 1);
+        if (o == null) {
+            return null;
+        }
+        BigDecimal bd;
+        if (o instanceof BigDecimal) {
+            bd = (BigDecimal)o;
+        } else {
+            bd = new BigDecimal(o.toString());
+        }
+        return bd;
     }
 
     public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException();
+        Object o = getColumn(columnLabel);
+        if (o == null) {
+            return null;
+        }
+        BigDecimal bd;
+        if (o instanceof BigDecimal) {
+            bd = (BigDecimal)o;
+        } else {
+            bd = new BigDecimal(o.toString());
+        }
+        return bd;
     }
 
     public boolean isBeforeFirst() throws SQLException {
