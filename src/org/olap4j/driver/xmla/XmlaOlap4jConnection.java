@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -249,7 +249,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 // Check if the current entry relates to cache config.
                 if (entry.getKey().startsWith(
                     XmlaOlap4jDriver.Property.Cache.name().toUpperCase()
-                    + ".")) //$NON-NLS-1$
+                    + "."))
                 {
                     props.put(entry.getKey().substring(
                         XmlaOlap4jDriver.Property.Cache.name()
@@ -1953,7 +1953,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             new MetadataColumn("IS_WRITE_ENABLED"),
             new MetadataColumn("IS_LINKABLE"),
             new MetadataColumn("IS_SQL_ENABLED"),
-            new MetadataColumn("DESCRIPTION")),
+            new MetadataColumn("DESCRIPTION"),
+            new MetadataColumn("CUBE_CAPTION"),
+            new MetadataColumn("BASE_CUBE_NAME")),
         MDSCHEMA_DIMENSIONS(
             new MetadataColumn("CATALOG_NAME"),
             new MetadataColumn("SCHEMA_NAME"),

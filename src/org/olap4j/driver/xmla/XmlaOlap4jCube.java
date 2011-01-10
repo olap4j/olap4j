@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -40,8 +40,6 @@ class XmlaOlap4jCube implements Cube, Named
         new HashMap<String, XmlaOlap4jLevel>();
     final List<XmlaOlap4jMeasure> measures =
         new ArrayList<XmlaOlap4jMeasure>();
-    private final HashMap<String, XmlaOlap4jMeasure> measuresMap =
-        new HashMap<String, XmlaOlap4jMeasure>();
     private final NamedList<XmlaOlap4jNamedSet> namedSets;
     private final MetadataReader metadataReader;
 
@@ -51,6 +49,7 @@ class XmlaOlap4jCube implements Cube, Named
      * @param olap4jSchema Schema
      * @param name Name
      * @param description Description
+     * @throws org.olap4j.OlapException on error
      */
     XmlaOlap4jCube(
         XmlaOlap4jSchema olap4jSchema,
@@ -63,6 +62,8 @@ class XmlaOlap4jCube implements Cube, Named
         this.olap4jSchema = olap4jSchema;
         this.name = name;
         this.description = description;
+        final Map<String, XmlaOlap4jMeasure> measuresMap =
+            new HashMap<String, XmlaOlap4jMeasure>();
         this.metadataReader =
             new CachingMetadataReader(
                 new RawMetadataReader(),
@@ -431,8 +432,8 @@ class XmlaOlap4jCube implements Cube, Named
             Map<String, XmlaOlap4jMember> memberMap) throws OlapException
         {
             if (olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
-                .olap4jConnection.getDatabase()
-                    .indexOf("Provider=Mondrian") != -1) //$NON-NLS-1$
+                    .olap4jConnection.getDatabase()
+                    .indexOf("Provider=Mondrian") != -1)
             {
                 mondrianMembersLookup(memberUniqueNames, memberMap);
             } else {

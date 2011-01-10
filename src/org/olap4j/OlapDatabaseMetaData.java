@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2010 Julian Hyde
+// Copyright (C) 2006-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -425,7 +425,12 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * <li><b>IS_SQL_ENABLED</b> boolean => Describes whether or not SQL can be
      *         used on the cube</li>
      * <li><b>DESCRIPTION</b> String (may be <code>null</code>) => A
-     *         user-friendly description of the dimension.</li>
+     *         user-friendly description of the cube.</li>
+     * <li><b>CUBE_CAPTION</b> String (may be <code>null</code>) =>
+     *         The caption of the cube.</li>
+     * <li><b>BASE_CUBE_NAME</b> String (may be <code>null</code>) =>
+     *         The name of the source cube if this cube is a perspective
+     *         cube.</li>
      * </ol>
      *
      * @param catalog a catalog name; must match the catalog name as it
