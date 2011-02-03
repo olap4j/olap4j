@@ -75,6 +75,10 @@ public interface Selection extends QueryNode {
          */
         MEMBER,
         /**
+         * All members of Level will be selected (LevelSelection only)
+         */
+        MEMBERS,
+        /**
          * Only the children of the root member will be selected.
          * This excludes the root member itself.
          * <p>Implemented via the MDX .Children member property.

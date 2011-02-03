@@ -19,11 +19,13 @@ import org.olap4j.mdx.CallNode;
 import org.olap4j.mdx.CubeNode;
 import org.olap4j.mdx.DimensionNode;
 import org.olap4j.mdx.IdentifierNode;
+import org.olap4j.mdx.LevelNode;
 import org.olap4j.mdx.LiteralNode;
 import org.olap4j.mdx.MemberNode;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.mdx.SelectNode;
 import org.olap4j.mdx.Syntax;
+import org.olap4j.metadata.Level;
 import org.olap4j.metadata.Member;
 
 /**
@@ -405,7 +407,14 @@ abstract class Olap4jNodeConverter {
 
     private static ParseTreeNode toOlap4j(Selection selection) {
         try {
-            return toOlap4j(selection.getMember(), selection.getOperator());
+            if (selection instanceof MemberSelectionImpl) {
+                return toOlap4j(selection.getMember(), selection.getOperator());
+            }
+            if (selection instanceof LevelSelectionImpl) {
+                return toOlap4j(
+                        ((LevelSelectionImpl) selection).getLevel(),
+                        selection.getOperator());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -468,6 +477,30 @@ abstract class Olap4jNodeConverter {
         }
         return node;
     }
+
+    private static ParseTreeNode toOlap4j(
+            Level level,
+            Selection.Operator oper)
+        {
+            ParseTreeNode node = null;
+            try {
+                switch (oper) {
+                case MEMBERS:
+                    node =
+                        new CallNode(
+                            null,
+                            "Members",
+                            Syntax.Property,
+                            new LevelNode(null, level));
+                    break;
+                default:
+                    System.out.println("NOT IMPLEMENTED: " + oper);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return node;
+        }
 
     private static List<AxisNode> toOlap4j(List<QueryAxis> axes) {
         final ArrayList<AxisNode> axisList = new ArrayList<AxisNode>();

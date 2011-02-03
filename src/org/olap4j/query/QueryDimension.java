@@ -146,6 +146,19 @@ public class QueryDimension extends QueryNodeImpl {
     }
 
     /**
+     * Selects a level and includes it in the query.
+     * <p>This method selects and includes a all members of the given
+     * query using the {@link Selection.Operator#MEMBERS} selection operator.
+     * @param member The member to select and include in the query.
+     */
+    public void include(Level level) {
+        if (level.getDimension().equals(this.dimension)) {
+            Selection selection =
+                    query.getSelectionFactory().createLevelSelection(level);
+            this.include(selection);
+        }
+    }
+    /**
      * Selects members and includes them in the query.
      * <p>This method selects and includes a member along with it's
      * relatives, depending on the supplied {@link Selection.Operator}
@@ -162,6 +175,22 @@ public class QueryDimension extends QueryNodeImpl {
             Selection selection =
                     query.getSelectionFactory().createMemberSelection(
                             member, operator);
+            return selection;
+        }
+        return null;
+    }
+
+    /**
+     * Selects level and includes all members in the query.
+     * <p>This method selects and includes all members of a
+     * given Level, using the MEMBERS operator {@link Selection.Operator}
+     * @param member Root member to select and include.
+     */
+    public Selection createSelection(Level level)
+    {
+        if (level.getDimension().equals(this.dimension)) {
+            Selection selection =
+                    query.getSelectionFactory().createLevelSelection(level);
             return selection;
         }
         return null;
@@ -258,6 +287,20 @@ public class QueryDimension extends QueryNodeImpl {
         this.exclude(
             operator,
             rootMember);
+    }
+
+    /**
+     * Selects level members and excludes them from the query.
+     * <p>This method selects and excludes members of a level with the
+     * {@link Selection.Operator#MEMBERS} selection operator.
+     * @param level The level to select and exclude from the query.
+     */
+    public void exclude(Level level) {
+        if (level.getDimension().equals(this.dimension)) {
+            Selection selection =
+                    query.getSelectionFactory().createLevelSelection(level);
+            this.exclude(selection);
+        }
     }
 
     /**

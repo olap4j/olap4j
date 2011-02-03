@@ -290,6 +290,23 @@ public class OlapTest extends TestCase {
                 + "{[Product].[Drink].Siblings} ON ROWS\n"
                 + "FROM [Sales]",
                 mdxString);
+
+            // TEST LEVEL MEMBERS SELECTION
+
+            NamedList<Level> productLevels =
+             productDimension.getDimension().getDefaultHierarchy().getLevels();
+
+            Level productDepartments = productLevels.get("Product Department");
+            productDimension.include(productDepartments);
+            query.validate();
+
+            mdx = query.getSelect();
+            mdxString = mdx.toString();
+            TestContext.assertEqualsVerbose(
+                    "SELECT\n"
+                    + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                    + "{[Product].[Drink].Siblings, [Product].[Product Department].Members} ON ROWS\n"
+                    + "FROM [Sales]", mdxString);
         } catch (Exception e) {
             e.printStackTrace();
             fail();

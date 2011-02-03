@@ -1,5 +1,5 @@
 /*
-// $Id$
+// $Id: LevelSelectionImpl.java 399 2011-02-03 20:53:50Z pstoellberger $
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
@@ -13,22 +13,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.olap4j.metadata.Dimension;
+import org.olap4j.metadata.Level;
 import org.olap4j.metadata.Member;
 
 /**
  * Abstract implementation of {@link Selection}.
  *
- * @author jhyde
- * @version $Id$
- * @since May 30, 2007
+ * @author pstoellberger
+ * @version $Id: LevelSelectionImpl.java 399 2011-02-03 20:53:50Z pstoellberger $
+ * @since Feb 3, 2011
  */
-class SelectionImpl extends QueryNodeImpl implements Selection {
+class LevelSelectionImpl extends QueryNodeImpl implements Selection {
 
-    protected Member member;
+    protected Level level;
     protected String dimensionName;
     protected String hierarchyName;
     protected String levelName;
-    protected String memberName;
     protected Dimension dimension;
     protected Operator operator = Operator.MEMBER;
     protected List<Selection> selectionContext;
@@ -38,20 +38,18 @@ class SelectionImpl extends QueryNodeImpl implements Selection {
      *
      * @pre operator != null
      */
-    public SelectionImpl(
-            Member member,
+    public LevelSelectionImpl(
+            Level level,
             Dimension dimension,
             String hierarchyName,
             String levelName,
-            String memberName,
             Operator operator)
     {
         super();
-        this.member = member;
+        this.level = level;
         this.dimension = dimension;
         this.hierarchyName = hierarchyName;
         this.levelName = levelName;
-        this.memberName = memberName;
         this.operator = operator;
     }
 
@@ -59,7 +57,7 @@ class SelectionImpl extends QueryNodeImpl implements Selection {
         final int prime = 31;
         int result = 1;
         result = prime * result
-            + ((member == null) ? 0 : member.getUniqueName().hashCode());
+            + ((level == null) ? 0 : level.getUniqueName().hashCode());
         result = prime * result
             + ((operator == null) ? 0 : operator.hashCode());
         result = prime * result
@@ -74,16 +72,16 @@ class SelectionImpl extends QueryNodeImpl implements Selection {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof SelectionImpl)) {
+        if (!(obj instanceof LevelSelectionImpl)) {
             return false;
         }
-        SelectionImpl other = (SelectionImpl) obj;
-        if (member == null) {
-            if (other.member != null) {
+        LevelSelectionImpl other = (LevelSelectionImpl) obj;
+        if (level == null) {
+            if (other.level != null) {
                 return false;
             }
-        } else if (!member.getUniqueName().equals(
-                        other.member.getUniqueName()))
+        } else if (!level.getUniqueName().equals(
+                        other.level.getUniqueName()))
         {
             return false;
         }
@@ -105,11 +103,11 @@ class SelectionImpl extends QueryNodeImpl implements Selection {
     }
 
     public String getName() {
-        return memberName;
+        return levelName;
     }
 
     public void setName(String name) {
-        memberName = name;
+        levelName = name;
     }
 
     public Dimension getDimension() {
@@ -120,8 +118,8 @@ class SelectionImpl extends QueryNodeImpl implements Selection {
         this.dimension = dimension;
     }
 
-    public Member getMember() {
-        return member;
+    public Level getLevel() {
+        return level;
     }
 
     public String getDimensionName() {
@@ -175,6 +173,11 @@ class SelectionImpl extends QueryNodeImpl implements Selection {
     public void removeContext(Selection selection) {
         selectionContext.remove(selection);
     }
+
+    public Member getMember() {
+        // there is no member in this type of Selections
+        return null;
+    }
 }
 
-// End SelectionImpl.java
+// End LevelSelectionImpl.java

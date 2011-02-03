@@ -9,6 +9,7 @@
 */
 package org.olap4j.query;
 
+import org.olap4j.metadata.Level;
 import org.olap4j.metadata.Member;
 
 /**
@@ -27,7 +28,7 @@ class SelectionFactory {
         Selection.Operator operator)
     {
         return
-            new SelectionImpl(
+            new MemberSelectionImpl(
                 member,
                 member.getDimension(),
                 member.getHierarchy().getUniqueName(),
@@ -35,6 +36,18 @@ class SelectionFactory {
                 member.getUniqueName(),
                 operator);
     }
+
+    Selection createLevelSelection(
+            Level level)
+        {
+            return
+                new LevelSelectionImpl(
+                    level,
+                    level.getDimension(),
+                    level.getHierarchy().getUniqueName(),
+                    level.getUniqueName(),
+                    Selection.Operator.MEMBERS);
+        }
 }
 
 // End SelectionFactory.java
