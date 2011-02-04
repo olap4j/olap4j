@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -407,21 +407,14 @@ abstract class Olap4jNodeConverter {
 
     private static ParseTreeNode toOlap4j(Selection selection) {
         try {
-            if (selection instanceof MemberSelectionImpl) {
-                return toOlap4j(selection.getMember(), selection.getOperator());
-            }
-            if (selection instanceof LevelSelectionImpl) {
-                return toOlap4j(
-                        ((LevelSelectionImpl) selection).getLevel(),
-                        selection.getOperator());
-            }
+            return selection.visit();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private static ParseTreeNode toOlap4j(
+    static ParseTreeNode toOlap4j(
         Member member,
         Selection.Operator oper)
     {
@@ -478,7 +471,7 @@ abstract class Olap4jNodeConverter {
         return node;
     }
 
-    private static ParseTreeNode toOlap4j(
+    static ParseTreeNode toOlap4j(
             Level level,
             Selection.Operator oper)
         {

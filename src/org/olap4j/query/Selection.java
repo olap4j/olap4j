@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -11,8 +11,9 @@ package org.olap4j.query;
 
 import java.util.List;
 
+import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Member;
+import org.olap4j.metadata.MetadataElement;
 
 /**
  * A selection of members from an OLAP dimension hierarchy. The selection
@@ -35,15 +36,32 @@ import org.olap4j.metadata.Member;
  */
 public interface Selection extends QueryNode {
 
-    String getName();
+    /**
+     * Unique name of the selection root.
+     * @return The unique OLAP name of the selection root.
+     */
+    String getUniqueName();
 
-    void setName(String name);
+    /**
+     * Visitor pattern-like function to convert
+     * the selection into a ParseTreeNode. Typical
+     * implementation should be:<br/>
+     * <code>Olap4jNodeConverter.toOlap4j(member, operator);</code>
+     * @return A parse tree node of the selection.
+     */
+    ParseTreeNode visit();
 
-    Member getMember();
-
+    /**
+     * Parent Dimension of the root selection element.
+     * @return A dimension object.
+     */
     Dimension getDimension();
 
-    String getHierarchyName();
+    /**
+     * Returns the root selection element of this selection.
+     * @return
+     */
+    MetadataElement getRootElement();
 
     /**
      * The selection context includes selections from other dimensions that
@@ -58,11 +76,14 @@ public interface Selection extends QueryNode {
 
     void removeContext(Selection selection);
 
-    String getLevelName();
-
     Operator getOperator();
 
-    // @pre operator != null
+    /**
+     * Set the selection operator to use.
+     * @throws IllegalArgumentException if the operator cannot
+     * be used on the root selection member.
+     * @param operator Operator to apply on the selection.
+     */
     void setOperator(Operator operator);
 
     /**

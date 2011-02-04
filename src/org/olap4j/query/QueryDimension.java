@@ -400,7 +400,8 @@ public class QueryDimension extends QueryNodeImpl {
             return
                 query.getCube().lookupMembers(
                     set,
-                    IdentifierParser.parseIdentifier(selection.getName()));
+                    IdentifierParser.parseIdentifier(
+                        selection.getUniqueName()));
         } catch (Exception e) {
             throw new OlapException(
                 "Error while resolving selection " + selection.toString(),

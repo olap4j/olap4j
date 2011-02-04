@@ -3,17 +3,16 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
  */
 package org.olap4j.query;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Member;
+import org.olap4j.metadata.MetadataElement;
 
 /**
  * Abstract implementation of {@link Selection}.
@@ -22,16 +21,9 @@ import org.olap4j.metadata.Member;
  * @version $Id$
  * @since May 30, 2007
  */
-class MemberSelectionImpl extends QueryNodeImpl implements Selection {
+class MemberSelectionImpl extends AbstractSelection {
 
-    protected Member member;
-    protected String dimensionName;
-    protected String hierarchyName;
-    protected String levelName;
-    protected String memberName;
-    protected Dimension dimension;
-    protected Operator operator = Operator.MEMBER;
-    protected List<Selection> selectionContext;
+    private Member member;
 
     /**
      * Creates a SelectionImpl.
@@ -41,18 +33,10 @@ class MemberSelectionImpl extends QueryNodeImpl implements Selection {
     public MemberSelectionImpl(
             Member member,
             Dimension dimension,
-            String hierarchyName,
-            String levelName,
-            String memberName,
             Operator operator)
     {
-        super();
+        super(dimension, operator);
         this.member = member;
-        this.dimension = dimension;
-        this.hierarchyName = hierarchyName;
-        this.levelName = levelName;
-        this.memberName = memberName;
-        this.operator = operator;
     }
 
     public int hashCode() {
@@ -104,76 +88,21 @@ class MemberSelectionImpl extends QueryNodeImpl implements Selection {
         return true;
     }
 
-    public String getName() {
-        return memberName;
-    }
-
-    public void setName(String name) {
-        memberName = name;
-    }
-
-    public Dimension getDimension() {
-        return dimension;
-    }
-
-    public void setDimension(Dimension dimension) {
-        this.dimension = dimension;
-    }
-
-    public Member getMember() {
+    public MetadataElement getRootElement() {
         return member;
     }
 
-    public String getDimensionName() {
-        return dimensionName;
+    public ParseTreeNode visit() {
+        return Olap4jNodeConverter.toOlap4j(member, operator);
     }
 
-    public void setDimensionName(String dimensionName) {
-        this.dimensionName = dimensionName;
-    }
-
-    public String getHierarchyName() {
-        return hierarchyName;
-    }
-
-    public void setHierarchyName(String hierarchyName) {
-        this.hierarchyName = hierarchyName;
-    }
-
-    public String getLevelName() {
-        return levelName;
-    }
-
-    public void setLevelName(String levelName) {
-        this.levelName = levelName;
-    }
-
-    public Operator getOperator() {
-        return operator;
-    }
-
+    @Override
     public void setOperator(Operator operator) {
-        assert operator != null;
-        this.operator = operator;
-        notifyChange(this,-1);
-    }
-
-    void tearDown() {
-    }
-
-    public List<Selection> getSelectionContext() {
-        return selectionContext;
-    }
-
-    public void addContext(Selection selection) {
-        if (selectionContext == null) {
-            selectionContext = new ArrayList<Selection>();
+        if (operator.equals(Operator.MEMBERS)) {
+            throw new IllegalArgumentException(
+            "Selections based on a Members cannot be of Operator MEMBERS.");
         }
-        selectionContext.add(selection);
-    }
-
-    public void removeContext(Selection selection) {
-        selectionContext.remove(selection);
+        super.setOperator(operator);
     }
 }
 

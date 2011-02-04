@@ -31,9 +31,6 @@ class SelectionFactory {
             new MemberSelectionImpl(
                 member,
                 member.getDimension(),
-                member.getHierarchy().getUniqueName(),
-                member.getLevel().getUniqueName(),
-                member.getUniqueName(),
                 operator);
     }
 
@@ -44,8 +41,6 @@ class SelectionFactory {
                 new LevelSelectionImpl(
                     level,
                     level.getDimension(),
-                    level.getHierarchy().getUniqueName(),
-                    level.getUniqueName(),
                     Selection.Operator.MEMBERS);
         }
 }
