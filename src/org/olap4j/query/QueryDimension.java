@@ -151,12 +151,14 @@ public class QueryDimension extends QueryNodeImpl {
      * query using the {@link Selection.Operator#MEMBERS} selection operator.
      * @param member The member to select and include in the query.
      */
-    public void include(Level level) {
+    public Selection include(Level level) {
         if (level.getDimension().equals(this.dimension)) {
             Selection selection =
                     query.getSelectionFactory().createLevelSelection(level);
             this.include(selection);
+            return selection;
         }
+        return null;
     }
     /**
      * Selects members and includes them in the query.
