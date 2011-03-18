@@ -9,9 +9,6 @@
 */
 package org.olap4j.type;
 
-import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Hierarchy;
-
 /**
  * The type of a string expression.
  *

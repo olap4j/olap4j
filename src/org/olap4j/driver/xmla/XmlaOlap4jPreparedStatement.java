@@ -351,8 +351,8 @@ abstract class XmlaOlap4jPreparedStatement
     public String getParameterClassName(int param) throws SQLException {
         final Type type = getParameterOlapType(param);
         return foo(
-            new XmlaOlap4jPreparedStatement.TypeHelper<Class>() {
-                public Class booleanType(BooleanType type) {
+            new XmlaOlap4jPreparedStatement.TypeHelper<Class<?>>() {
+                public Class<?> booleanType(BooleanType type) {
                     return Boolean.class;
                 }
 
@@ -404,7 +404,7 @@ abstract class XmlaOlap4jPreparedStatement
                     return Member[].class;
                 }
 
-                public Class symbolType(SymbolType symbolType) {
+                public Class<?> symbolType(SymbolType symbolType) {
                     // parameters cannot be of this type
                     throw new UnsupportedOperationException();
                 }

@@ -13,11 +13,31 @@ import org.olap4j.mdx.parser.MdxParserFactory;
 import org.olap4j.metadata.*;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
 import java.util.List;
 import java.util.Locale;
 
 /**
  * Connection to an OLAP server.
+ *
+ * <p>OlapConnection is a subclass of {@link Connection}. It can be pooled
+ * by a connection pooling framework or obtained directly via the Java
+ * standard {@link DriverManager}. The JDBC URL prefix of olap connections
+ * is dependent of the driver implementation. Such implementations are,
+ * among others possible:
+ *
+ * <ul><li>Olap4j's XML/A driver</li><li>Mondrian</li></ul>
+ *
+ * <p>Olap connections have a different metadata hierarchy than regular
+ * JDBC. The connection's metadata is available using
+ * {@link OlapConnection#getMetaData()}, and returns a specialized subclass
+ * of {@link DatabaseMetaData}. The objects at the root of the hierarchy
+ * are {@link Database} class objects.
+ *
+ * <p>A connection needs be bound to a database, a catalog and a schema.
+ * Implementations are expected to automatically discover these if no
+ * driver specific parameters indicated which ones to use.
  *
  * @author jhyde
  * @version $Id$
@@ -59,12 +79,21 @@ public interface OlapConnection extends Connection, OlapWrapper {
     OlapStatement createStatement() throws OlapException;
 
     /**
-     * Returns the database name that was selected for this connection,
-     * either through the JDBC URL or via
-     * {@link OlapConnection#setDatabase(String)}.
+     * Returns the database name currently active for this connection. If no
+     * database name was specified either through the JDBC URL or through
+     * {@link OlapConnection#setDatabase(String)}, the driver will select the
+     * first one available.
      *
-     * @return The name of the database that was selected for this connection.
-     * @throws OlapException If a server error occurs.
+     * @return The name of the database currently active for this connection.
+     * @throws OlapException
+     *             An exception will be thrown, if any of these conditions
+     *             are true:
+     *             <ul>
+     *             <li>A server error occurs.</li>
+     *             <li>No databases exist on the server.</li>
+     *             <li>The user specified a database name which does not
+     *             exist on the server.</li>
+     *             </ul>
      */
     String getDatabase() throws OlapException;
 
@@ -72,34 +101,79 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * Sets the name of the database that will be used for this connection.
      * Overrides the value passed, if any, through the JDBC URL.
      *
-     * @param databaseName The name of the database to use.
-     * @throws OlapException If a server error occurs.
+     * @param databaseName
+     *            The name of the database to use.
+     * @throws OlapException
+     *             An exception will be thrown, if any of these conditions
+     *             are true:
+     *             <ul>
+     *             <li>A server error occurs.</li>
+     *             <li>The user specified a database name which does not
+     *             exist on the server.</li>
+     *             </ul>
      */
     void setDatabase(String databaseName) throws OlapException;
 
     /**
-     * Returns a list of {@link org.olap4j.metadata.Catalog} objects which
+     * Returns the current active {@link org.olap4j.metadata.Database} of this
+     * connection.
+     *
+     * <p>If the user has not specified a database name to use for this
+     * connection, the driver will auto-select the first Database available.
+     *
+     * @see #setDatabase(String)
+     * @see #getOlapDatabases()
+     * @return The currently active Database, or null of none are currently
+     *         selected.
+     * @throws OlapException
+     *             An exception will be thrown, if any of these conditions
+     *             are true:
+     *             <ul>
+     *             <li>A server error occurs.</li>
+     *             <li>No databases exist on the server.</li>
+     *             <li>The user specified a database name which does not
+     *             exist on the server.</li>
+     *             </ul>
+     */
+    Database getOlapDatabase() throws OlapException;
+
+    /**
+     * Returns a list of {@link org.olap4j.metadata.Database} objects which
      * belong to this connection's OLAP server.
      *
      * <p>The caller should assume that the list is immutable;
      * if the caller modifies the list, behavior is undefined.</p>
      *
-     * @see OlapDatabaseMetaData#getCatalogs()
-     * @return List of Catalogs in this connection's OLAP server
-     * @deprecated Deprecated in favor of
-     * {@link OlapDatabaseMetaData#getOlapCatalogs()}. Will be removed as
-     * of version 1.0.
+     * @return List of Database objects in this connection's OLAP server
+     * @throws OlapException if a database access error occurs
      */
-    @Deprecated
-    NamedList<Catalog> getCatalogs();
+    NamedList<Database> getOlapDatabases() throws OlapException;
 
     /**
-     * Returns the {@link Catalog} name that was selected for this connection,
-     * either through the JDBC URL or via
-     * {@link OlapConnection#setCatalog(String)}.
+     * Returns the {@link Catalog} name which is currently active for this
+     * connection.
      *
-     * @return The name of the catalog that was selected for this connection.
-     * @throws OlapException If a server error occurs.
+     * <p>
+     * If the user has not specified a database name to use for this
+     * connection, the driver will automatically select the first one
+     * available. If the user has not specified a catalog name to use,
+     * the driver will also use the first one available on the server.
+     *
+     * @return The name of the catalog which is active for this connection.
+     * @throws OlapException
+     *             An exception will be thrown, if any of these conditions
+     *             are true:
+     *             <ul>
+     *             <li>A server error occurs.</li>
+     *             <li>No database name was specified and no databases exist
+     *             on the server.</li>
+     *             <li>The user specified a database name which does not
+     *             exist on the server.</li>
+     *             <li>No catalog names were specified and no catalogs
+     *             exist on the server.</li>
+     *             <li>The user specified a catalog name which does not exist
+     *             on the server.</li>
+     *             </ul>
      */
     String getCatalog() throws OlapException;
 
@@ -107,21 +181,208 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * Sets the name of the catalog that will be used for this connection.
      * Overrides the value passed, if any, through the JDBC URL.
      *
-     * @param catalogName The name of the catalog to use for this connection.
-     * @throws OlapException If a server error occurs.
+     * @param catalogName
+     *            The name of the catalog to use for this connection.
+     * @throws OlapException
+     *             An exception will be thrown, if any of these conditions
+     *             are true:
+     *             <ul>
+     *             <li>A server error occurs.</li>
+     *             <li>No database name was specified and no databases
+     *             exist on the server.</li>
+     *             <li>The user specified a database name which does not
+     *             exist on the server.</li>
+     *             <li>The user specified a catalog name which does not exist
+     *             on the server.</li>
+     *             </ul>
      */
     void setCatalog(String catalogName) throws OlapException;
 
     /**
+     * Returns the current active {@link org.olap4j.metadata.Catalog}
+     * of this connection.
+     *
+     * <p>If the user has not selected a Database and Catalog to use for
+     * this connection, the driver will auto-select the first
+     * Database and Catalog available on the server.
+     *
+     * <p>Any auto-discovery performed by implementations must take into
+     * account the specified database name and catalog name, if any.
+     *
+     * @return The currently active catalog, or null of none are
+     * currently selected.
+     * @throws OlapException
+     *             An exception will be thrown, if any of these conditions
+     *             are true:
+     *             <ul>
+     *             <li>A server error occurs.</li>
+     *             <li>No database name was specified and no databases
+     *             exist on the server.</li>
+     *             <li>The user specified a database name which does not
+     *             exist on the server.</li>
+     *             <li>No catalog name was specified and no catalogs
+     *             exist on the server.</li>
+     *             <li>The user specified a catalog name which does not exist
+     *             on the server.</li>
+     *             </ul>
+     */
+    Catalog getOlapCatalog() throws OlapException;
+
+    /**
+     * Returns a list of {@link org.olap4j.metadata.Catalog} objects which
+     * belong to this connection's OLAP server.
+     *
+     * <p>If the user has not selected a Database to use for
+     * this connection, the implementation auto-selects
+     * the first Database available. Any auto-discovery performed
+     * by implementations must take into account the connection
+     * Database parameter.
+     *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.
+     *
+     * @return List of Catalogs in this connection's OLAP server
+     * @throws OlapException
+     *             An exception will be thrown, if any of these conditions
+     *             are true:
+     *             <ul>
+     *             <li>A server error occurs.</li>
+     *             <li>No database name was specified and no databases
+     *             exist on the server.</li>
+     *             <li>The user specified a database name which does not
+     *             exist on the server.</li>
+     *             </ul>
+     */
+    NamedList<Catalog> getOlapCatalogs() throws OlapException;
+
+    /**
+     * Returns the {@link Schema} name that was selected for this connection,
+     * either through the JDBC URL or via
+     * {@link #setSchema(String)}.
+     *
+     * <p>If the user has not selected a Database, Catalog and Schema to use
+     * for this connection, the driver will auto-select the first Database,
+     * Catalog and Schema available.
+     *
+     * <p>Any auto-discovery performed by implementations must take into
+     * account the specified Database, Catalog and Schema names, if any.
+     *
+     * @return The name of the schema currently selected for this connection.
+     * @throws OlapException
+     *             An exception will be thrown, if any of these conditions
+     *             are true:
+     *             <ul>
+     *             <li>A server error occurs.</li>
+     *             <li>No database name was specified and no databases
+     *             exist on the server.</li>
+     *             <li>The user specified a database name which does not
+     *             exist on the server.</li>
+     *             <li>No catalog name was specified and no catalogs
+     *             exist on the server.</li>
+     *             <li>The user specified a catalog name which does not exist
+     *             on the server.</li>
+     *             <li>No schema name was specified and no schema
+     *             exist on the server.</li>
+     *             <li>The user specified a schema name which does not exist
+     *             on the server.</li>
+     *             </ul>
+     */
+    String getSchema() throws OlapException;
+
+    /**
+     * Sets the name of the active schema for this connection.
+     * Overrides the value passed, if any, through the JDBC URL.
+     *
+     * @param catalogName The name of the schema to use for this connection.
+     * @throws OlapException
+     *             An exception will be thrown, if any of these conditions
+     *             are true:
+     *             <ul>
+     *             <li>A server error occurs.</li>
+     *             <li>No database name was specified and no databases
+     *             exist on the server.</li>
+     *             <li>The user specified a database name which does not
+     *             exist on the server.</li>
+     *             <li>No catalog name was specified and no catalogs
+     *             exist on the server.</li>
+     *             <li>The user specified a catalog name which does not exist
+     *             on the server.</li>
+     *             <li>No schema name was specified and no schema
+     *             exist on the server.</li>
+     *             <li>The user specified a schema name which does not exist
+     *             on the server.</li>
+     *             </ul>
+     */
+    void setSchema(String schemaName) throws OlapException;
+
+    /**
      * Returns the current active {@link org.olap4j.metadata.Schema}
      * of this connection.
-     * @return The currently active schema, or null of none are
-     * currently selected.
-     * @throws OlapException if database error occurs
-     * @deprecated Will be removed as of version 1.0.
+     *
+     * <p>If the user has not selected a Database, Catalog and Schema to use
+     * for this connection, the driver will auto-select the first Database,
+     * Catalog and Schema available.
+     *
+     * <p>Any auto-discovery performed by implementations must take into
+     * account the specified Database, Catalog and Schema names, if any.
+     *
+     * @return The currently active schema
+     * @throws OlapException
+     *             An exception will be thrown, if any of these conditions
+     *             are true:
+     *             <ul>
+     *             <li>A server error occurs.</li>
+     *             <li>No database name was specified and no databases
+     *             exist on the server.</li>
+     *             <li>The user specified a database name which does not
+     *             exist on the server.</li>
+     *             <li>No catalog name was specified and no catalogs
+     *             exist on the server.</li>
+     *             <li>The user specified a catalog name which does not exist
+     *             on the server.</li>
+     *             <li>No schema name was specified and no schema
+     *             exist on the server.</li>
+     *             <li>The user specified a schema name which does not exist
+     *             on the server.</li>
+     *             </ul>
      */
-    @Deprecated
-    Schema getSchema() throws OlapException;
+    Schema getOlapSchema() throws OlapException;
+
+    /**
+     * Returns a list of {@link org.olap4j.metadata.Schemas} objects which
+     * belong to this connection's OLAP server.
+     *
+     * <p>If the user has not selected a Database, Catalog and Schema to use
+     * for this connection, the driver will auto-select the first Database and
+     * Catalog available.
+     *
+     * <p>Any auto-discovery performed by implementations must take into
+     * account the specified Database, Catalog and Schema names, if any.
+     *
+     * <p>The caller should assume that the list is immutable;
+     * if the caller modifies the list, behavior is undefined.
+     *
+     * @return List of Catalogs in this connection's OLAP server
+     * @throws OlapException
+     *             An exception will be thrown, if any of these conditions
+     *             are true:
+     *             <ul>
+     *             <li>A server error occurs.</li>
+     *             <li>No database name was specified and no databases
+     *             exist on the server.</li>
+     *             <li>The user specified a database name which does not
+     *             exist on the server.</li>
+     *             <li>No catalog name was specified and no catalogs
+     *             exist on the server.</li>
+     *             <li>The user specified a catalog name which does not exist
+     *             on the server.</li>
+     *             <li>No schema name was specified and no schema
+     *             exist on the server.</li>
+     *             <li>The user specified a schema name which does not exist
+     *             on the server.</li>
+     *             </ul>
+     */
+    NamedList<Schema> getOlapSchemas() throws OlapException;
 
     /**
      * Sets the current locale of this connection. The value must not be null.

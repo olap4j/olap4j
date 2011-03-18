@@ -111,46 +111,6 @@ public class LiteralNode implements ParseTreeNode {
     }
 
     /**
-     * Creates a floating-point numeric literal.
-     *
-     * @param region Region of source code
-     * @param value Value of literal; must not be null
-     *
-     * @return literal representing the floating-point value
-     *
-     * @deprecated Use {@link #createNumeric}
-     */
-    public static LiteralNode create(
-        ParseRegion region,
-        Double value)
-    {
-        if (value == null) {
-            throw new IllegalArgumentException("value must not be null");
-        }
-        return createNumeric(region, new BigDecimal(value), true);
-    }
-
-    /**
-     * Creates an integer literal.
-     *
-     * @param region Region of source code
-     * @param value Value of literal; must not be null
-     *
-     * @return literal representing the integer value
-     *
-     * @deprecated Use {@link #createNumeric}
-     */
-    public static LiteralNode create(
-        ParseRegion region,
-        Integer value)
-    {
-        if (value == null) {
-            throw new IllegalArgumentException("value must not be null");
-        }
-        return createNumeric(region, new BigDecimal(value), false);
-    }
-
-    /**
      * Creates a numeric literal.
      *
      * @param region Region of source code

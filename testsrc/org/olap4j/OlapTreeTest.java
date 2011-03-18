@@ -55,7 +55,7 @@ public class OlapTreeTest extends TestCase {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        Schema schema = olapConnection.getSchema();
+        Schema schema = olapConnection.getOlapSchema();
         Cube cube = schema.getCubes().get("Sales");
 
         Map<Dimension, String> dimensionMap =

@@ -13,7 +13,6 @@ import junit.framework.TestCase;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
 import org.olap4j.test.TestContext;
-import org.olap4j.test.TestContext.Tester;
 
 import java.sql.*;
 import java.util.*;
@@ -231,10 +230,145 @@ public class MetadataTest extends TestCase {
         }
     }
 
-    public void testSchema() throws OlapException {
-        // check schema
-        final Schema schema1 = olapConnection.getSchema();
-        assertEquals(schema1.getName(), "FoodMart");
+    public void testSchemas() throws OlapException {
+        // check schema auto detection
+        final Schema schema1 = olapConnection.getOlapSchema();
+        assertEquals(
+            "Failed to auto detect the schema.",
+            schema1.getName(),
+            "FoodMart");
+        switch (tester.getFlavor()) {
+        case MONDRIAN:
+            // Setting a correct schema should work.
+            olapConnection.setSchema("FoodMart");
+            // setting a null schema should be ignored
+            olapConnection.setSchema(null);
+            // setting a non existent schema should be ignored
+            olapConnection.setSchema("Chunky Bacon");
+            break;
+        case XMLA:
+        case REMOTE_XMLA:
+            // Setting a correct schema should work.
+            olapConnection.setSchema(catalogName);
+            // setting a null schema should fail
+            try {
+                olapConnection.setSchema(null);
+                fail();
+            } catch (OlapException e) {
+                // no op.
+            }
+            // setting a non existent schema should fail
+            try {
+                olapConnection.setSchema("Chunky Bacon");
+                fail();
+            } catch (OlapException e) {
+                // no op.
+            }
+            break;
+        default:
+            fail("Unknown tester flavor.");
+        }
+    }
+
+    public void testCatalogs() throws SQLException {
+        final Catalog catalog = olapConnection.getOlapCatalog();
+        assertEquals(
+            "Failed to auto detect the catalog.",
+            catalog.getName(),
+            "FoodMart");
+
+        switch (tester.getFlavor()) {
+        case MONDRIAN:
+            // Setting a correct catalog should work.
+            olapConnection.setCatalog("FoodMart");
+            // setting a null catalog should be ignored
+            olapConnection.setCatalog(null);
+            // setting a non existent catalog should be ignored
+            olapConnection.setCatalog("Chunky Bacon");
+            break;
+        case XMLA:
+        case REMOTE_XMLA:
+            // Setting a correct catalog should work.
+            olapConnection.setCatalog(catalogName);
+            // setting a null catalog should fail
+            try {
+                olapConnection.setCatalog(null);
+                fail();
+            } catch (OlapException e) {
+                // no op.
+            }
+            // setting a non existent catalog should fail
+            try {
+                olapConnection.setCatalog("Chunky Bacon");
+                fail();
+            } catch (OlapException e) {
+                // no op.
+            }
+            break;
+        default:
+            fail("Unknown tester flavor.");
+        }
+    }
+
+    public void testDatabases() throws SQLException {
+        final Database database = olapConnection.getOlapDatabase();
+        assertTrue(
+            "Failed to auto detect the database.",
+            database.getName()
+                .equals("Provider=Mondrian;DataSource=MondrianFoodMart;")
+            || database.getName()
+                .equals("FoodMart"));
+
+        switch (tester.getFlavor()) {
+        case MONDRIAN:
+            // Setting a correct database should work.
+            olapConnection.setDatabase("FoodMart");
+            // setting a null database should be ignored
+            olapConnection.setDatabase(null);
+            // setting a non existent database should be ignored
+            olapConnection.setDatabase("Chunky Bacon");
+            break;
+        case XMLA:
+            // Setting a correct database should work.
+            olapConnection.setDatabase(
+                "FoodMart");
+            // setting a null database should fail
+            try {
+                olapConnection.setDatabase(null);
+                fail();
+            } catch (OlapException e) {
+                // no op.
+            }
+            // setting a non existent database should fail
+            try {
+                olapConnection.setDatabase("Chunky Bacon");
+                fail();
+            } catch (OlapException e) {
+                // no op.
+            }
+            break;
+        case REMOTE_XMLA:
+            // Setting a correct database should work.
+            olapConnection.setDatabase(
+                "Provider=Mondrian;DataSource=MondrianFoodMart;");
+            // setting a null database should fail
+            try {
+                olapConnection.setDatabase(null);
+                fail();
+            } catch (OlapException e) {
+                // no op.
+            }
+            // setting a non existent database should fail
+            try {
+                olapConnection.setDatabase("Chunky Bacon");
+                fail();
+            } catch (OlapException e) {
+                // no op.
+            }
+            break;
+        default:
+            fail("Unknown tester flavor.");
+        }
     }
 
     public void testDatabaseMetaDataGetActions() throws SQLException {
@@ -285,13 +419,13 @@ public class MetadataTest extends TestCase {
         final String expected;
         switch (tester.getFlavor()) {
         case XMLA:
-        case REMOTE_XMLA:
             // XMLA test uses dummy duplicate catalog to make sure that we
             // get all catalogs
             expected =
                 "TABLE_CAT=" + catalogName + "\n"
                 + "TABLE_CAT=" + catalogName + "2\n";
             break;
+        case REMOTE_XMLA:
         default:
             expected = "TABLE_CAT=" + catalogName + "\n";
             break;
@@ -306,13 +440,13 @@ public class MetadataTest extends TestCase {
         final String expected;
         switch (tester.getFlavor()) {
         case XMLA:
-        case REMOTE_XMLA:
             // XMLA test uses dummy duplicate schema to make sure that we
             // get all schemas
             expected =
                 "TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "\n"
                 + "TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "2\n";
             break;
+        case REMOTE_XMLA:
         default:
             expected = "TABLE_SCHEM=FoodMart, TABLE_CAT=" + catalogName + "\n";
             break;
@@ -384,26 +518,6 @@ public class MetadataTest extends TestCase {
             s);
         final int lineCount = linecount(s);
 
-        // again, but with null catalog name. should yield twice as many
-        // cubes on xmla, where we have two identical catalogs
-        olapDatabaseMetaData.getConnection().setCatalog(null);
-        s = checkResultSet(
-            olapDatabaseMetaData.getCubes(
-                null,
-                null,
-                null),
-            CUBE_COLUMN_NAMES);
-        assertContains(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, ",
-            s);
-        final int lineCount2 = linecount(s);
-        if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA
-                || tester.getFlavor() == Tester.Flavor.REMOTE_XMLA)
-        {
-            assertEquals(lineCount * 2, lineCount2);
-        }
-
         // Null catalog specified in metadata request, but connection has a
         // catalog. Should return all cubes, ignoring the connection's catalog.
         olapDatabaseMetaData.getConnection().setCatalog(catalogName);
@@ -443,29 +557,6 @@ public class MetadataTest extends TestCase {
         assertTrue(s.contains(", CUBE_NAME=Warehouse and Sales"));
         assertTrue(s.contains(", CUBE_NAME=Warehouse"));
         assertFalse(s.contains(", CUBE_NAME=Sales"));
-    }
-
-    public void testGetCatalogs() throws SQLException {
-        int k = 0;
-        for (Catalog catalog : olapConnection.getMetaData().getOlapCatalogs()) {
-            ++k;
-            assertEquals(catalog.getMetaData(), olapDatabaseMetaData);
-            for (Schema schema : catalog.getSchemas()) {
-                ++k;
-                assertEquals(schema.getCatalog(), catalog);
-                for (Cube cube : schema.getCubes()) {
-                    ++k;
-                    assertEquals(cube.getSchema(), schema);
-                }
-                for (Dimension dimension : schema.getSharedDimensions()) {
-                    ++k;
-                }
-                for (Locale locale : schema.getSupportedLocales()) {
-                    ++k;
-                }
-            }
-        }
-        assertTrue(k > 0);
     }
 
     public void testDatabaseMetaDataGetDimensions() throws SQLException {

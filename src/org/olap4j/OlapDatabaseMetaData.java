@@ -103,56 +103,6 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
         String actionNamePattern) throws OlapException;
 
     /**
-     * Retrieves a list of olap4j data sources that are available on the server.
-     *
-     * <p>Specification as for XML/A DISCOVER_DATASOURCES schema rowset. The
-     * rows are ordered by <code>DATA_SOURCE_NAME</code>.
-     *
-     * <ol>
-     * <li><b>DATA_SOURCE_NAME</b> String => The name of the data source, such
-     *         as FoodMart 2000.</li>
-     * <li><b>DATA_SOURCE_DESCRIPTION</b> String => A description of the data
-     *         source, as entered by the publisher. (may be
-     *         <code>null</code>)</li>
-     * <li><b>URL</b> String => The unique path that shows where to invoke the
-     *         XML for Analysis methods for that data source. (may be
-     *         <code>null</code>)</li>
-     * <li><b>DATA_SOURCE_INFO</b> String => A string containing any additional
-     *         information required to connect to the data source. This can
-     *         include the Initial Catalog property or other information for
-     *         the provider.<br/>Example: "Provider=MSOLAP;Data
-     *         Source=Local;" (may be <code>null</code>)</li>
-     * <li><b>PROVIDER_NAME</b> String => The name of the provider behind the
-     *         data source. <br/>Example: "MSDASQL" (may be
-     *         <code>null</code>)</li>
-     * <li><b>PROVIDER_TYPE</b> EnumerationArray => The types of data supported
-     *         by the provider. May include one or more of the following
-     *         types. Example follows this table.<br/>TDP: tabular data
-     *         provider.<br/>MDP: multidimensional data provider.<br/>DMP:
-     *         data mining provider. A DMP provider implements the OLE DB for
-     *         Data Mining specification.</li>
-     * <li><b>AUTHENTICATION_MODE</b> EnumString => Specification of what type
-     *         of security mode the data source uses. Values can be one of
-     *         the following:<br/>Unauthenticated: no user ID or password
-     *         needs to be sent.<br/>Authenticated: User ID and Password must
-     *         be included in the information required for the
-     *         connection.<br/>Integrated: the data source uses the
-     *         underlying security to determine authorization, such as
-     *         Integrated Security provided by Microsoft Internet Information
-     *         Services (IIS).</li>
-     * </ol>
-     *
-     * @return a <code>ResultSet</code> object in which each row is a
-     *         datasource description
-     * @exception OlapException if a database access error occurs
-     * @deprecated Deprecated in favor of
-     * {@link OlapDatabaseMetaData#getDatabases()}. Will be removed
-     * in version 1.0.
-     */
-    @Deprecated
-    ResultSet getDatasources() throws OlapException;
-
-    /**
      * Retrieves a row set describing the databases that are available on the
      * server.
      *
@@ -197,24 +147,6 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * @throws OlapException if a database access error occurs
      */
     ResultSet getDatabases() throws OlapException;
-
-    /**
-     * Returns a list of {@link org.olap4j.metadata.Catalog} objects which
-     * belong to this connection's OLAP server.
-     *
-     * <p>
-     * The list of returned catalogs is dependent on the underlying connection
-     * Database parameter. To discover catalogs in another database, use
-     * {@link OlapDatabaseMetaData#getDatabases()} and
-     * {@link OlapConnection#setDatabase(String)}
-     *
-     * <p>The caller should assume that the list is immutable;
-     * if the caller modifies the list, behavior is undefined.</p>
-     *
-     * @return List of Catalogs in this connection's OLAP server
-     * @throws OlapException if a database access error occurs
-     */
-    NamedList<Catalog> getOlapCatalogs() throws OlapException;
 
     /**
      * Retrieves a list of information on supported literals, including data

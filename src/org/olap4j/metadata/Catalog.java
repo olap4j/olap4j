@@ -9,39 +9,42 @@
 */
 package org.olap4j.metadata;
 
+import org.olap4j.OlapConnection;
 import org.olap4j.OlapException;
 import org.olap4j.OlapDatabaseMetaData;
 
 /**
- * Highest level element in the hierarchy of metadata objects.
- *
- * <p>A Catalog contains one or more {@link Schema}s.</p>
+ * <p>Catalogs are the second element of the hierarchy of metadata objects.
+ * A Catalog contains one or more {@link Schema}s and has a parent
+ * {@link Database}.</p>
  *
  * <p>Some OLAP servers may only have one Catalog. Mondrian is one such
  * OLAP server; its sole catalog is called "LOCALDB".
  *
  * <p>To obtain the collection of catalogs in the current server, call the
- * {@link OlapDatabaseMetaData#getOlapCatalogs()} method.
+ * {@link OlapConnection#getOlapCatalogs()} method.
  *
  * <p>The hierarchy of metadata objects, rooted at the connection from which
  * they are accessed, is as follows:
  * <blockquote>
  * <ul>
  * <li type="circle">{@link org.olap4j.OlapConnection}<ul>
- *     <li type="circle">{@link Catalog}<ul>
- *         <li type="circle">{@link Schema}<ul>
- *             <li type="circle">{@link Cube}<ul>
- *                 <li type="circle">{@link Dimension}<ul>
- *                     <li type="circle">{@link Hierarchy}<ul>
- *                         <li type="circle">{@link Level}<ul>
- *                             <li type="circle">{@link Member}</li>
- *                             <li type="circle">{@link Property}</li>
+ *     <li type="circle">{@link Database}<ul>
+ *         <li type="circle">{@link Catalog}<ul>
+ *             <li type="circle">{@link Schema}<ul>
+ *                 <li type="circle">{@link Cube}<ul>
+ *                     <li type="circle">{@link Dimension}<ul>
+ *                         <li type="circle">{@link Hierarchy}<ul>
+ *                             <li type="circle">{@link Level}<ul>
+ *                                 <li type="circle">{@link Member}</li>
+ *                                 <li type="circle">{@link Property}</li>
+ *                             </ul></li>
  *                         </ul></li>
  *                     </ul></li>
+ *                 <li type="circle">{@link NamedSet}</li>
  *                 </ul></li>
- *             <li type="circle">{@link NamedSet}</li>
+ *             <li type="circle">{@link Dimension} (shared)</li>
  *             </ul></li>
- *         <li type="circle">Dimension (shared)</li>
  *         </ul></li>
  *     </ul></li>
  *  </ul>
@@ -80,6 +83,12 @@ public interface Catalog {
      * @return metadata describing the OLAP server
      */
     OlapDatabaseMetaData getMetaData();
+
+    /**
+     * Returns the parent database of this catalog.
+     * @return A Database object to which this catalog belongs.
+     */
+    Database getDatabase();
 }
 
 // End Catalog.java

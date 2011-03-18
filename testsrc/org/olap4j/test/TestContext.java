@@ -55,7 +55,7 @@ public class TestContext {
     /**
      * The following classes are part of the TCK. Each driver should call them.
      */
-    public static final Class[] TCK_CLASSES = {
+    public static final Class<?>[] TCK_CLASSES = {
         org.olap4j.ConnectionTest.class,
         org.olap4j.CellSetFormatterTest.class,
         org.olap4j.MetadataTest.class,
@@ -71,7 +71,7 @@ public class TestContext {
      * They should be executed once, in olap4j's test suite, not for each
      * provider's test suite.
      */
-    public static final Class[] NON_TCK_CLASSES = {
+    public static final Class<?>[] NON_TCK_CLASSES = {
         org.olap4j.impl.ConnectStringParserTest.class,
         org.olap4j.impl.Olap4jUtilTest.class,
         org.olap4j.impl.Base64Test.class,
@@ -105,7 +105,7 @@ public class TestContext {
      * @param suite Suite to which to add tests
      */
     private static void addTck(TestSuite suite) {
-        for (Class tckClass : TCK_CLASSES) {
+        for (Class<?> tckClass : TCK_CLASSES) {
             suite.addTestSuite(tckClass);
         }
     }

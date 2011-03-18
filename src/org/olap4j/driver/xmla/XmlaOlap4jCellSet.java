@@ -524,8 +524,8 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         XmlaOlap4jDatabaseMetaData databaseMetaData,
         String cubeName) throws OlapException
     {
-        for (XmlaOlap4jCatalog catalog
-            : databaseMetaData.getCatalogObjects())
+        for (Catalog catalog
+            : databaseMetaData.olap4jConnection.getOlapCatalogs())
         {
             for (Schema schema : catalog.getSchemas()) {
                 for (Cube cube : schema.getCubes()) {

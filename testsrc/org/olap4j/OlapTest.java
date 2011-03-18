@@ -54,7 +54,7 @@ public class OlapTest extends TestCase {
             connection = tester.createConnection();
             OlapConnection olapConnection =
                 tester.getWrapper().unwrap(connection, OlapConnection.class);
-            Catalog catalog = olapConnection.getCatalogs().get("FoodMart");
+            Catalog catalog = olapConnection.getOlapCatalogs().get("FoodMart");
             NamedList<Schema> schemas = catalog.getSchemas();
             if (schemas.size() == 0) {
                 return null;
@@ -113,7 +113,7 @@ public class OlapTest extends TestCase {
 
             // Get a list of the schemas available from this connection and dump
             // their names.
-            Catalog catalog = olapConnection.getCatalogs().get("FoodMart");
+            Catalog catalog = olapConnection.getOlapCatalogs().get("FoodMart");
             NamedList<Schema> schemas = catalog.getSchemas();
 
             if (schemas.size() == 0) {

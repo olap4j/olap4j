@@ -352,7 +352,7 @@ public class ConnectionTest extends TestCase {
                     info);
             assertEquals("FoodMart", connection.getCatalog());
             final NamedList<Catalog> catalogs =
-                ((OlapConnection) connection).getMetaData().getOlapCatalogs();
+                ((OlapConnection) connection).getOlapCatalogs();
             assertNotNull(catalogs);
             Statement statement = connection.createStatement();
             OlapStatement olapStatement =
@@ -389,15 +389,8 @@ public class ConnectionTest extends TestCase {
                     "SELECT FROM [Sales]");
                 fail();
             } catch (OlapException e) {
-                if (e.getMessage().contains(
-                    "unknown schema 'FoodMartError'"))
-                {
-                    return;
-                }
+                // no op.
             }
-            fail(
-                "XmlaOlap4jConnection did not detect an inexistant "
-                + "catalog name.");
         }
     }
 
@@ -1568,13 +1561,12 @@ public class ConnectionTest extends TestCase {
 
         Cube cube =
             olapConnection
-                .getMetaData()
-                    .getOlapCatalogs()
-                        .get("FoodMart")
-                            .getSchemas()
-                                .get("FoodMart")
-                                    .getCubes()
-                                        .get("Sales Ragged");
+                .getOlapCatalogs()
+                    .get("FoodMart")
+                        .getSchemas()
+                            .get("FoodMart")
+                                .getCubes()
+                                    .get("Sales Ragged");
 
         Member member =
             cube.lookupMember(nameList("Time", "1997", "Q2"));
@@ -1621,13 +1613,12 @@ public class ConnectionTest extends TestCase {
 
         Cube cube =
             olapConnection
-                .getMetaData()
-                    .getOlapCatalogs()
-                        .get("FoodMart")
-                            .getSchemas()
-                                .get("FoodMart")
-                                    .getCubes()
-                                        .get("Sales");
+                .getOlapCatalogs()
+                    .get("FoodMart")
+                        .getSchemas()
+                            .get("FoodMart")
+                                .getCubes()
+                                    .get("Sales");
 
         List<Member> memberList =
             cube.lookupMembers(
@@ -1751,25 +1742,24 @@ public class ConnectionTest extends TestCase {
         // We engineered the XMLA test environment to have two catalogs.
         switch (tester.getFlavor()) {
         case REMOTE_XMLA:
-            assertEquals(1, metadata.getOlapCatalogs().size());
+            assertEquals(1, olapConnection.getOlapCatalogs().size());
             break;
         case XMLA:
-            assertEquals(2, metadata.getOlapCatalogs().size());
+            assertEquals(2, olapConnection.getOlapCatalogs().size());
             break;
         case MONDRIAN:
-            assertEquals(1, metadata.getOlapCatalogs().size());
+            assertEquals(1, olapConnection.getOlapCatalogs().size());
             break;
         }
 
         Cube cube =
             olapConnection
-                .getMetaData()
-                    .getOlapCatalogs()
-                        .get("FoodMart")
-                            .getSchemas()
-                                .get("FoodMart")
-                                    .getCubes()
-                                        .get("Sales");
+                .getOlapCatalogs()
+                    .get("FoodMart")
+                        .getSchemas()
+                            .get("FoodMart")
+                                .getCubes()
+                                    .get("Sales");
 
         int z = 0;
         int hierarchyCount = 0;
@@ -1867,13 +1857,12 @@ public class ConnectionTest extends TestCase {
 
         Cube warehouseCube =
             olapConnection
-                .getMetaData()
-                    .getOlapCatalogs()
-                        .get("FoodMart")
-                            .getSchemas()
-                                .get("FoodMart")
-                                    .getCubes()
-                                        .get("Warehouse");
+                .getOlapCatalogs()
+                    .get("FoodMart")
+                        .getSchemas()
+                            .get("FoodMart")
+                                .getCubes()
+                                    .get("Warehouse");
 
         int count = 0;
         for (NamedSet namedSet : warehouseCube.getSets()) {
@@ -2614,7 +2603,7 @@ public class ConnectionTest extends TestCase {
         throws OlapException
     {
         Catalog catalog =
-            olapConnection.getMetaData().getOlapCatalogs()
+            olapConnection.getOlapCatalogs()
                 .get("FoodMart");
         Schema schema = catalog.getSchemas().get("FoodMart");
         Cube cube = schema.getCubes().get("Sales");
@@ -2672,11 +2661,10 @@ public class ConnectionTest extends TestCase {
 
         Schema schema =
             olapConnection
-                .getMetaData()
-                    .getOlapCatalogs()
-                        .get("FoodMart")
-                            .getSchemas()
-                                .get("FoodMart");
+                .getOlapCatalogs()
+                    .get("FoodMart")
+                        .getSchemas()
+                            .get("FoodMart");
         Cube cube = schema.getCubes().get("Sales");
         Measure measure = cube.getMeasures().get(0);
         assertEquals("Unit Sales", measure.getName());
@@ -2769,13 +2757,12 @@ public class ConnectionTest extends TestCase {
             tester.getWrapper().unwrap(connection, OlapConnection.class);
         Cube cube =
             olapConnection
-                .getMetaData()
-                    .getOlapCatalogs()
-                        .get("FoodMart")
-                            .getSchemas()
-                                .get("FoodMart")
-                                    .getCubes()
-                                        .get("Sales");
+                .getOlapCatalogs()
+                    .get("FoodMart")
+                        .getSchemas()
+                            .get("FoodMart")
+                                .getCubes()
+                                    .get("Sales");
         StringBuilder sb = new StringBuilder();
         for (Dimension dimension : cube.getDimensions()) {
             sb.append(dimension.getUniqueName())

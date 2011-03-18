@@ -9,7 +9,6 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
-import org.olap4j.impl.ArrayMap;
 import org.olap4j.impl.UnmodifiableArrayMap;
 import org.olap4j.metadata.Property;
 

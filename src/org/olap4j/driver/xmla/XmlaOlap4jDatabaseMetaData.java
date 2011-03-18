@@ -33,8 +33,6 @@ import java.util.regex.Pattern;
 abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     final XmlaOlap4jConnection olap4jConnection;
 
-    private final NamedList<XmlaOlap4jCatalog> catalogs;
-
     /**
      * Creates an XmlaOlap4jDatabaseMetaData.
      *
@@ -48,28 +46,6 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         XmlaOlap4jConnection olap4jConnection)
     {
         this.olap4jConnection = olap4jConnection;
-        this.catalogs =
-            new DeferredNamedListImpl<XmlaOlap4jCatalog>(
-                XmlaOlap4jConnection.MetadataRequest.DBSCHEMA_CATALOGS,
-                new XmlaOlap4jConnection.Context(
-                    olap4jConnection, this, null, null, null, null, null,
-                    null),
-                new XmlaOlap4jConnection.CatalogHandler(),
-                null);
-    }
-
-    /**
-     * Returns a list of catalogs in this database.
-     *
-     * <p>Package-local because not part of olap4j API.
-     *
-     * @return List of catalog objects
-     * @deprecated Deprecated in favor of
-     * {@link OlapDatabaseMetaData#getOlapCatalogs()}
-     */
-    @Deprecated
-    NamedList<XmlaOlap4jCatalog> getCatalogObjects() {
-        return catalogs;
     }
 
     /**
@@ -705,10 +681,6 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     public ResultSet getCatalogs() throws OlapException {
         return getMetadata(
             XmlaOlap4jConnection.MetadataRequest.DBSCHEMA_CATALOGS);
-    }
-
-    public NamedList<Catalog> getOlapCatalogs() throws OlapException {
-        return Olap4jUtil.cast(catalogs);
     }
 
     public ResultSet getTableTypes() throws SQLException {

@@ -27,11 +27,14 @@ class XmlaOlap4jCatalog implements Catalog, Named {
     final XmlaOlap4jDatabaseMetaData olap4jDatabaseMetaData;
     private final String name;
     final DeferredNamedListImpl<XmlaOlap4jSchema> schemas;
+    private final XmlaOlap4jDatabase database;
 
     XmlaOlap4jCatalog(
         XmlaOlap4jDatabaseMetaData olap4jDatabaseMetaData,
+        XmlaOlap4jDatabase database,
         String name)
     {
+        this.database = database;
         assert olap4jDatabaseMetaData != null;
         assert name != null;
         this.olap4jDatabaseMetaData = olap4jDatabaseMetaData;
@@ -78,6 +81,10 @@ class XmlaOlap4jCatalog implements Catalog, Named {
 
     public OlapDatabaseMetaData getMetaData() {
         return olap4jDatabaseMetaData;
+    }
+
+    public XmlaOlap4jDatabase getDatabase() {
+        return database;
     }
 }
 
