@@ -42,15 +42,15 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
     <target name="setup" depends="version-properties,compile,create-dot-classpath"
         description="Setups the project for eclipse." />
 
-    <target name="hudson" depends="clean-all,clean-tests,version-properties,jar,source.jar,tck-jar,test,jar-jdk14"
+    <target name="hudson" depends="clean-all,clean-tests,version-properties,jar,source.jar,tck-jar,xmla-jar,test,jar-jdk14"
         description="Sugar goal to build olap4j from hudson." />
 
-    <target name="hudson-notest" depends="clean-all,clean-tests,version-properties,jar,source.jar,tck-jar,jar-jdk14"
+    <target name="hudson-notest" depends="clean-all,clean-tests,version-properties,jar,source.jar,tck-jar,xmla-jar,jar-jdk14"
             description="Sugar goal to build olap4j from hudson." />
 
     <!-- Override to create a proper release. -->
     <target name="dist"
-        depends="clean,version-properties,jar,tck-jar,javadoc,javadoc-pdf,javadoc-with-ydoc,jar-jdk14,source.zip"
+        depends="clean,version-properties,jar,tck-jar,xmla-jar,javadoc,javadoc-pdf,javadoc-with-ydoc,jar-jdk14,source.zip"
         description="Creates a distribution">
         <zip zipfile="${dist.dir}/${zip.filename}">
             <zipfileset dir="${basedir}/doc" prefix="${ivy.artifact.id}-${project.revision}/doc"
@@ -92,7 +92,26 @@ olap4j_api.pdf"
     <target name="jar" depends="checkIsNotJdk16,compile,compile-tests,compileJdk16,set-build.id,generate.manifest"
         description="Jars up the bin directory after a compile">
         <zip destfile="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">
-            <zipfileset dir="${classes.dir}" prefix="" includes="**/*" />
+            <zipfileset dir="${classes.dir}" prefix=""
+                includes="**/*"
+                excludes="
+org/olap4j/driver/**,
+META-INF/**"/>
+            <zipfileset dir="${basedir}" prefix=""
+                includes="
+LICENSE.html,
+README.txt,
+VERSION.txt" />
+        </zip>
+    </target>
+
+    <target name="xmla-jar" depends="jar"
+        description="Jars up the bin directory after a compile">
+        <zip destfile="${dist.dir}/${ivy.artifact.id}-xmla-${project.revision}.jar">
+            <zipfileset dir="${classes.dir}" prefix=""
+                includes="
+org/olap4j/driver/**,
+META-INF/**"/>
             <zipfileset dir="${basedir}" prefix=""
                 includes="
 LICENSE.html,
@@ -103,7 +122,7 @@ VERSION.txt" />
 
     <target name="tck-jar" depends="jar"
         description="Jars up the Test Compatibility Kit (TCK) after a compile">
-        <zip destfile="${dist.dir}/olap4j-tck-${project.revision}.jar">
+        <zip destfile="${dist.dir}/${ivy.artifact.id}-tck-${project.revision}.jar">
             <zipfileset dir="${testclasses.dir}" prefix="" includes="**/*"
                 excludes="jndi.properties" />
             <zipfileset dir="${basedir}" prefix=""
@@ -232,7 +251,9 @@ class XmlaOlap4jDriverVersion {
     <!-- create a retrowoven jar file which will work under jdk1.4 -->
     <target name="jar-jdk14">
         <copy todir="${classes-jdk14.dir}">
-            <fileset dir="${classes.dir}" includes="**/*"/>
+            <fileset dir="${classes.dir}"
+                includes="**/*"
+                excludes="org/olap4j/driver/**"/>
         </copy>
         <antcall target="retroweave"/>
         <zip zipfile="${jar-jdk14.file}" update="true">
@@ -240,8 +261,7 @@ class XmlaOlap4jDriverVersion {
                 includes="
 **/*.class,
 **/*.properties,
-**/*.xml,
-META-INF/**" />
+**/*.xml"/>
         </zip>
         <delete includeemptydirs="true">
             <fileset dir="${classes-jdk14.dir}" includes="**/*"/>
@@ -275,7 +295,7 @@ META-INF/**" />
         </if>
     </target>
 
-    <!-- override from subfloor to publish tck as well -->
+    <!-- override from subfloor to publish tck and xmla artifacts as well -->
     <target name="publish-nojar">
         <antcall target="subfloor.publish-nojar"/>
         <property
@@ -313,6 +333,48 @@ META-INF/**" />
                 <arg value="-Durl=${ivy.repository.publish}" />
                 <arg value="-DgroupId=${ivy.artifact.group}" />
                 <arg value="-DartifactId=${ivy.artifact.id}-tck" />
+                <arg value="-Dpackaging=jar" />
+                <arg value="-Dversion=${project.revision}" />
+                <arg value="-Dfile=${publish.file}" />
+              </exec>
+            </else>
+          </if>
+        </sequential>
+        <property
+            name="publish.file"
+            value="${dist.dir}/${ivy.artifact.id}-xmla-${project.revision}.jar"/>
+        <sequential>
+          <fail message="No file found at: ${publish.file}">
+            <condition>
+              <not>
+                <available file="${publish.file}" />
+              </not>
+            </condition>
+          </fail>
+          <echo message="Publishing ${publish.file} to ${ivy.repository.publish}..." />
+          <if>
+            <isset property="isWindows" />
+            <then>
+              <exec executable="cmd" failonerror="true">
+                <arg value="/c" />
+                <arg value="mvn.bat" />
+                <arg value="deploy:deploy-file" />
+                <arg value="-DrepositoryId=${ivy.repository.id}" />
+                <arg value="-Durl=${ivy.repository.publish}" />
+                <arg value="-DgroupId=${ivy.artifact.group}" />
+                <arg value="-DartifactId=${ivy.artifact.id}-xmla" />
+                <arg value="-Dpackaging=jar" />
+                <arg value="-Dversion=${project.revision}" />
+                <arg value="-Dfile=${publish.file}" />
+              </exec>
+            </then>
+            <else>
+              <exec executable="mvn" failonerror="true">
+                <arg value="deploy:deploy-file" />
+                <arg value="-DrepositoryId=${ivy.repository.id}" />
+                <arg value="-Durl=${ivy.repository.publish}" />
+                <arg value="-DgroupId=${ivy.artifact.group}" />
+                <arg value="-DartifactId=${ivy.artifact.id}-xmla" />
                 <arg value="-Dpackaging=jar" />
                 <arg value="-Dversion=${project.revision}" />
                 <arg value="-Dfile=${publish.file}" />
