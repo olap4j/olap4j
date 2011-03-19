@@ -341,17 +341,17 @@ class XmlaOlap4jDriverVersion {
           </if>
         </sequential>
         <property
-            name="publish.file"
+            name="publish.file.xmla"
             value="${dist.dir}/${ivy.artifact.id}-xmla-${project.revision}.jar"/>
         <sequential>
-          <fail message="No file found at: ${publish.file}">
+          <fail message="No file found at: ${publish.file.xmla}">
             <condition>
               <not>
-                <available file="${publish.file}" />
+                <available file="${publish.file.xmla}" />
               </not>
             </condition>
           </fail>
-          <echo message="Publishing ${publish.file} to ${ivy.repository.publish}..." />
+          <echo message="Publishing ${publish.file.xmla} to ${ivy.repository.publish}..." />
           <if>
             <isset property="isWindows" />
             <then>
@@ -365,7 +365,7 @@ class XmlaOlap4jDriverVersion {
                 <arg value="-DartifactId=${ivy.artifact.id}-xmla" />
                 <arg value="-Dpackaging=jar" />
                 <arg value="-Dversion=${project.revision}" />
-                <arg value="-Dfile=${publish.file}" />
+                <arg value="-Dfile=${publish.file.xmla}" />
               </exec>
             </then>
             <else>
@@ -377,7 +377,7 @@ class XmlaOlap4jDriverVersion {
                 <arg value="-DartifactId=${ivy.artifact.id}-xmla" />
                 <arg value="-Dpackaging=jar" />
                 <arg value="-Dversion=${project.revision}" />
-                <arg value="-Dfile=${publish.file}" />
+                <arg value="-Dfile=${publish.file.xmla}" />
               </exec>
             </else>
           </if>
