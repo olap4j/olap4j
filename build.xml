@@ -243,7 +243,7 @@ class XmlaOlap4jDriverVersion {
         <ivy:retrieve conf="test" pattern="${testlib.dir}/[module](-[classifier]).[ext]" />
 
         <ivy:resolve file="ivy.xml" conf="default" />
-        <ivy:deliver conf="default" deliverpattern="${bin.dir}/ivy.xml" />
+        <ivy:deliver conf="default" deliverpattern="${dist.dir}/ivy.xml" />
 
     </target>
 
