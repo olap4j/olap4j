@@ -351,6 +351,15 @@ class XmlaOlap4jDriverVersion {
               </not>
             </condition>
           </fail>
+          <echo message="Generating pom file for XMLA module"/>
+            <ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${bin.dir}/olap4j-xmla.pom">
+                <mapping conf="default" scope="compile"/>
+                <mapping conf="xmla" scope="compile"/>
+            </ivy:makepom>
+            <replace
+                file="${bin.dir}/olap4j-xmla.pom"
+                token="artifactId>olap4j"
+                value="artifactId>olap4j-xmla"/>
           <echo message="Publishing ${publish.file.xmla} to ${ivy.repository.publish}..." />
           <if>
             <isset property="isWindows" />
@@ -366,6 +375,8 @@ class XmlaOlap4jDriverVersion {
                 <arg value="-Dpackaging=jar" />
                 <arg value="-Dversion=${project.revision}" />
                 <arg value="-Dfile=${publish.file.xmla}" />
+                <arg value="-DpomFile=${bin.dir}/olap4j-xmla.pom" />
+                <arg value="-DupdateReleaseInfo=true" />
               </exec>
             </then>
             <else>
@@ -378,6 +389,8 @@ class XmlaOlap4jDriverVersion {
                 <arg value="-Dpackaging=jar" />
                 <arg value="-Dversion=${project.revision}" />
                 <arg value="-Dfile=${publish.file.xmla}" />
+                <arg value="-DpomFile=${bin.dir}/olap4j-xmla.pom" />
+                <arg value="-DupdateReleaseInfo=true" />
               </exec>
             </else>
           </if>
