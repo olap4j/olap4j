@@ -1,4 +1,49 @@
 # $Id$
+
+###############################################################################
+# Olap4j 1.0.0
+
+Although this file was not kept up to date since a while, we intend to change
+this starting with version 1.0.0. :)
+
+Olap4j 1.0.0 brings changes to the top of the metadata hierarchy,
+changes in the driver specification, along with the removal of
+all APIs which were marked for deprecation prior to 1.0.0.
+
+* Metadata changes
+    Version 1.0.0 introduces a new object at the top of the OlapDatabaseMetaData,
+    namely the Database object. The database was an implicit member; we
+    have decided to turn it into a first class object of the hierarchy. Catalogs
+    have been modified to reflect this new parent. OlapConnections now have
+    methods to explore the Databases, Catalogs and Schemas on a server.
+
+* Driver specification changes
+    OlapConnections must now be bound unto a database, a catalog and a schema
+    before being able to resolve cubes and execute queries. Reference
+    implementations have been modified to reflect the correct behavior, as was
+    the TCK. New methods were added to OlapConnection in order to change the
+    connection binding and obtain lists of available Databases, Catalogs
+    and Schemas.
+
+Olap4j is now split into five Java libraries.
+
+* olap4j.jar
+    The core API
+
+* olap4j-xmla.jar
+    The XML/A driver for olap4j.
+
+* olap4j-tck.jar
+    TCK classes.
+
+* olap4j-jdk14.jar
+    Java 1.4 compatible release. Contains the core API and XML/A driver.
+
+* olap4j-sources.jar
+    Java source files.
+
+===============================================================================
+
 # Changes to olap4j since olap4j-0.9.3.
 
 Summary of changes between olap4j-0.9.3 and olap4j-0.9.4-svn072:
