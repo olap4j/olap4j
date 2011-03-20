@@ -14,40 +14,28 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:m="http://ant.apache.org/ivy/maven"
     xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
-  <info organisation="${ivy.artifact.group}" module="${ivy.artifact.id}" revision="${project.revision}">
+  <info organisation="${ivy.artifact.group}" module="${ivy.artifact.id}-xmla" revision="${project.revision}">
       <license name="EPL" url="http://www.eclipse.org/legal/epl-v10.html"/>
       <ivyauthor name="Julian Hyde" />
       <repository name="pentaho-repository" url="http://repo.pentaho.org/artifactory"/>
       <description homepage="http://olap4j.org">
-          olap4j is an open Java API for OLAP.
-          Think of it like JDBC, but for accessing multi-dimensional data.
-          Olap4j is designed to be a common API for any OLAP server,
-          so you can write an application on one OLAP server and easily
-          switch it to another. And built on that API, there will be a
-          growing collection of tools and components.
+          XML/A driver for olap4j.
       </description>
   </info>
   <configurations>
-    <conf name="default"/>
-    <conf name="codegen"/>
-    <conf name="test"/>
+    <conf name="xmla.default"/>
+    <conf name="xmla.default.transitive"/>
   </configurations>
 
   <publications>
-    <artifact name="${ivy.artifact.id}" type="jar" conf="default" />
+    <artifact name="${ivy.artifact.id}-xmla" type="jar" conf="xmla.default" />
   </publications>
 
-  <dependencies defaultconf="default->default">
-
-    <!--  Runtime deps here  -->
-    <dependency org="javacup" name="javacup" rev="10k"
-        conf="default->default"/>
-
-    <!-- Javadoc -->
-    <dependency org="net.sf" name="pdfdoclet" rev="1.0.2"
-      conf="codegen->default" />
-
+  <dependencies defaultconf="xmla.default->default">
+    <dependency org="org.olap4j" name="olap4j" rev="${project.revision}"
+        conf="xmla.default.transitive"/>
+    <dependency org="xerces" name="xercesImpl" rev="2.6.0"/>
   </dependencies>
 </ivy-module>
 
-<!-- End ivy.xml -->
+<!-- End ivy-xmla.xml -->

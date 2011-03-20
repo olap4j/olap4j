@@ -221,14 +221,16 @@ class XmlaOlap4jDriverVersion {
     </target>
 
     <!-- Override of subfloor to resolve artifacts of custom configurations -->
-    <target name="resolve" depends="resolve-xmla,resolve-jdk14,subfloor.resolve"/>
-    <target name="resolve-jdk14" depends="resolve-init">
-        <ivy:resolve file="ivy.xml" conf="default-jdk1.4" />
-        <ivy:retrieve conf="default-jdk1.4" pattern="${lib.dir}/[module](-[classifier]).[ext]" />
-    </target>
-    <target name="resolve-xmla" depends="resolve-init">
-        <ivy:resolve file="ivy.xml" conf="xmla" />
-        <ivy:retrieve conf="xmla" pattern="${lib.dir}/[module](-[classifier]).[ext]" />
+    <target name="resolve" depends="install-ivy,install-antcontrib">
+        <antcall target="subfloor.resolve"/>
+        <ivy:resolve file="ivy-jdk14.xml" conf="jdk14.default" />
+        <ivy:retrieve conf="jdk14.default" pattern="${lib.dir}/[module](-[classifier]).[ext]" />
+        <ivy:resolve file="ivy-xmla.xml" conf="xmla.default" />
+        <ivy:retrieve conf="xmla.default" pattern="${lib.dir}/[module](-[classifier]).[ext]" />
+        <ivy:resolve file="ivy-tck.xml" conf="tck.test" />
+        <ivy:retrieve conf="tck.test" pattern="${testlib.dir}/[module](-[classifier]).[ext]" />
+        <ivy:resolve file="ivy.xml" conf="codegen" />
+        <ivy:retrieve conf="codegen" pattern="${testlib.dir}/[module](-[classifier]).[ext]" />
     </target>
 
     <!-- override compile task to account for special jdk handling -->
@@ -305,105 +307,72 @@ class XmlaOlap4jDriverVersion {
         </if>
     </target>
 
+    <!-- Override from subfloor to allow filtering of core dependencies -->
+    <target name="create-pom" depends="install-ivy,ivy.deliver">
+        <ivy:makepom ivyfile="${dist.dir}/ivy.xml" pomfile="${dist.dir}/pom.xml">
+          <mapping conf="default" scope="compile" />
+          <mapping conf="test" scope="test" />
+          <mapping conf="codegen" scope="test" />
+        </ivy:makepom>
+    </target>
+    <target name="ivy.deliver">
+        <ivy:deliver conf="default,test,codegen" deliverpattern="${dist.dir}/ivy.xml" />
+    </target>
+
     <!-- override from subfloor to publish tck and xmla artifacts as well -->
     <target name="publish-nojar">
-        <antcall target="subfloor.publish-nojar"/>
-        <property
-            name="publish.file"
-            value="${dist.dir}/${ivy.artifact.id}-tck-${project.revision}.jar"/>
         <sequential>
-          <fail message="No file found at: ${publish.file}">
-            <condition>
-              <not>
-                <available file="${publish.file}" />
-              </not>
-            </condition>
-          </fail>
-          <echo message="Publishing ${publish.file} to ${ivy.repository.publish}..." />
-          <if>
-            <isset property="isWindows" />
-            <then>
-              <exec executable="cmd" failonerror="true">
-                <arg value="/c" />
-                <arg value="mvn.bat" />
-                <arg value="deploy:deploy-file" />
-                <arg value="-DrepositoryId=${ivy.repository.id}" />
-                <arg value="-Durl=${ivy.repository.publish}" />
-                <arg value="-DgroupId=${ivy.artifact.group}" />
-                <arg value="-DartifactId=${ivy.artifact.id}-tck" />
-                <arg value="-Dpackaging=jar" />
-                <arg value="-Dversion=${project.revision}" />
-                <arg value="-Dfile=${publish.file}" />
-              </exec>
-            </then>
-            <else>
-              <exec executable="mvn" failonerror="true">
-                <arg value="deploy:deploy-file" />
-                <arg value="-DrepositoryId=${ivy.repository.id}" />
-                <arg value="-Durl=${ivy.repository.publish}" />
-                <arg value="-DgroupId=${ivy.artifact.group}" />
-                <arg value="-DartifactId=${ivy.artifact.id}-tck" />
-                <arg value="-Dpackaging=jar" />
-                <arg value="-Dversion=${project.revision}" />
-                <arg value="-Dfile=${publish.file}" />
-              </exec>
-            </else>
-          </if>
-        </sequential>
-        <property
-            name="publish.file.xmla"
-            value="${dist.dir}/${ivy.artifact.id}-xmla-${project.revision}.jar"/>
-        <sequential>
-          <fail message="No file found at: ${publish.file.xmla}">
-            <condition>
-              <not>
-                <available file="${publish.file.xmla}" />
-              </not>
-            </condition>
-          </fail>
-          <echo message="Generating pom file for XMLA module"/>
-            <ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${bin.dir}/olap4j-xmla.pom">
-                <mapping conf="default" scope="compile"/>
-                <mapping conf="xmla" scope="compile"/>
+            <antcall target="subfloor.publish-nojar"/>
+
+            <!-- Generate pom files -->
+            <ivy:makepom ivyfile="${basedir}/ivy-tck.xml" pomfile="${bin.dir}/${ivy.artifact.id}-tck.pom">
+                <mapping conf="tck.default" scope="test"/>
+                <mapping conf="tck.test" scope="test"/>
+                <mapping conf="tck.test.transitive" scope="test"/>
             </ivy:makepom>
-            <replace
-                file="${bin.dir}/olap4j-xmla.pom"
-                token="artifactId>olap4j"
-                value="artifactId>olap4j-xmla"/>
-          <echo message="Publishing ${publish.file.xmla} to ${ivy.repository.publish}..." />
-          <if>
-            <isset property="isWindows" />
-            <then>
-              <exec executable="cmd" failonerror="true">
-                <arg value="/c" />
-                <arg value="mvn.bat" />
-                <arg value="deploy:deploy-file" />
-                <arg value="-DrepositoryId=${ivy.repository.id}" />
-                <arg value="-Durl=${ivy.repository.publish}" />
-                <arg value="-DgroupId=${ivy.artifact.group}" />
-                <arg value="-DartifactId=${ivy.artifact.id}-xmla" />
-                <arg value="-Dpackaging=jar" />
-                <arg value="-Dversion=${project.revision}" />
-                <arg value="-Dfile=${publish.file.xmla}" />
-                <arg value="-DpomFile=${bin.dir}/olap4j-xmla.pom" />
-                <arg value="-DupdateReleaseInfo=true" />
-              </exec>
-            </then>
-            <else>
-              <exec executable="mvn" failonerror="true">
-                <arg value="deploy:deploy-file" />
-                <arg value="-DrepositoryId=${ivy.repository.id}" />
-                <arg value="-Durl=${ivy.repository.publish}" />
-                <arg value="-DgroupId=${ivy.artifact.group}" />
-                <arg value="-DartifactId=${ivy.artifact.id}-xmla" />
-                <arg value="-Dpackaging=jar" />
-                <arg value="-Dversion=${project.revision}" />
-                <arg value="-Dfile=${publish.file.xmla}" />
-                <arg value="-DpomFile=${bin.dir}/olap4j-xmla.pom" />
-                <arg value="-DupdateReleaseInfo=true" />
-              </exec>
-            </else>
-          </if>
+
+            <ivy:makepom ivyfile="${basedir}/ivy-jdk14.xml" pomfile="${bin.dir}/${ivy.artifact.id}-jdk14.pom">
+                <mapping conf="jdk14.default" scope="compile"/>
+            </ivy:makepom>
+
+            <ivy:makepom ivyfile="${basedir}/ivy-xmla.xml" pomfile="${bin.dir}/${ivy.artifact.id}-xmla.pom">
+                <mapping conf="xmla.default" scope="compile"/>
+                <mapping conf="xmla.default.transitive" scope="compile"/>
+            </ivy:makepom>
+
+            <!-- Publish -->
+            <antcall target="maven-publish-dependencies">
+                <param name="publish.groupId" value="${ivy.artifact.group}" />
+                <param name="publish.artifactId" value="${ivy.artifact.id}-tck" />
+                <param name="publish.version" value="${project.revision}" />
+                <param name="publish.file" value="${basedir}/ivy-tck.xml" />
+            </antcall>
+            <antcall target="maven-publish-artifact">
+              <param name="publish.pomFile" value="${bin.dir}/${ivy.artifact.id}-tck.pom" />
+              <param name="publish.file" value="${dist.dir}/${ivy.artifact.id}-tck-${project.revision}.jar" />
+            </antcall>
+
+            <antcall target="maven-publish-dependencies">
+                <param name="publish.groupId" value="${ivy.artifact.group}" />
+                <param name="publish.artifactId" value="${ivy.artifact.id}-xmla" />
+                <param name="publish.version" value="${project.revision}" />
+                <param name="publish.file" value="${basedir}/ivy-xmla.xml" />
+            </antcall>
+            <antcall target="maven-publish-artifact">
+              <param name="publish.pomFile" value="${bin.dir}/${ivy.artifact.id}-xmla.pom" />
+              <param name="publish.file" value="${dist.dir}/${ivy.artifact.id}-xmla-${project.revision}.jar" />
+            </antcall>
+
+            <antcall target="maven-publish-dependencies">
+                <param name="publish.groupId" value="${ivy.artifact.group}" />
+                <param name="publish.artifactId" value="${ivy.artifact.id}-jdk14" />
+                <param name="publish.version" value="${project.revision}" />
+                <param name="publish.file" value="${basedir}/ivy-jdk14.xml" />
+            </antcall>
+            <antcall target="maven-publish-artifact">
+              <param name="publish.pomFile" value="${bin.dir}/${ivy.artifact.id}-jdk14.pom" />
+              <param name="publish.file" value="${dist.dir}/${ivy.artifact.id}-jdk14-${project.revision}.jar" />
+            </antcall>
         </sequential>
     </target>
 
