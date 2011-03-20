@@ -220,8 +220,18 @@ class XmlaOlap4jDriverVersion {
         <antcall target="init-hsql"/>
     </target>
 
+    <!-- Override of subfloor to resolve artifacts of custom configurations -->
+    <target name="resolve" depends="resolve-xmla,resolve-jdk14,subfloor.resolve"/>
+    <target name="resolve-jdk14" depends="resolve-init">
+        <ivy:resolve file="ivy.xml" conf="default-jdk1.4" />
+        <ivy:retrieve conf="default-jdk1.4" pattern="${lib.dir}/[module](-[classifier]).[ext]" />
+    </target>
+    <target name="resolve-xmla" depends="resolve-init">
+        <ivy:resolve file="ivy.xml" conf="xmla" />
+        <ivy:retrieve conf="xmla" pattern="${lib.dir}/[module](-[classifier]).[ext]" />
+    </target>
+
     <!-- override compile task to account for special jdk handling -->
-    <!-- <target name="compile.compile" depends="init,parser"> -->
     <target name="compile.compile">
         <javac destdir="${classes.dir}" debug="${javac.debug}"
             deprecation="${javac.deprecation}" fork="true" source="${javac.source}"
