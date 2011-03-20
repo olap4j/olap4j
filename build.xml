@@ -12,7 +12,7 @@
     <import file="subfloor.xml" />
 
     <property name="jar-jdk14.file"
-        value="${dist.dir}/${ivy.artifact.id}-${project.revision}-jdk14.jar" />
+        value="${dist.dir}/${ivy.artifact.id}-jdk14-${project.revision}.jar" />
 
     <property name="classes-jdk14.dir"
                 value="${bin.dir}/classes-jdk14" />
@@ -264,8 +264,7 @@ class XmlaOlap4jDriverVersion {
     <target name="jar-jdk14">
         <copy todir="${classes-jdk14.dir}">
             <fileset dir="${classes.dir}"
-                includes="**/*"
-                excludes="org/olap4j/driver/**"/>
+                includes="**/*"/>
         </copy>
         <antcall target="retroweave"/>
         <zip zipfile="${jar-jdk14.file}" update="true">
@@ -371,7 +370,7 @@ class XmlaOlap4jDriverVersion {
             </antcall>
             <antcall target="maven-publish-artifact">
               <param name="publish.pomFile" value="${bin.dir}/${ivy.artifact.id}-jdk14.pom" />
-              <param name="publish.file" value="${dist.dir}/${ivy.artifact.id}-jdk14-${project.revision}.jar" />
+              <param name="publish.file" value="${jar-jdk14.file}" />
             </antcall>
         </sequential>
     </target>
