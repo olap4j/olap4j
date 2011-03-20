@@ -249,7 +249,7 @@ class XmlaOlap4jDriverVersion {
 
     <!-- Override from subfloor so we generate a pom per module. -->
     <target name="create-pom" depends="install-ivy,ivy.deliver">
-        <ivy:makepom ivyfile="${bin.dir}/ivy.xml" pomfile="${dist.dir}/pom.xml">
+        <ivy:makepom ivyfile="${dist.dir}/ivy.xml" pomfile="${dist.dir}/pom.xml">
           <mapping conf="default" scope="compile" />
           <mapping conf="test" scope="test" />
           <mapping conf="codegen" scope="test" />
