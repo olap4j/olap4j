@@ -28,26 +28,19 @@
       </description>
   </info>
   <configurations>
-    <conf name="jdk14.default"/>
+    <conf name="default"/>
   </configurations>
 
   <publications>
-    <artifact name="${ivy.artifact.id}-jdk14" type="jar" conf="jdk14.default" />
+    <artifact name="${ivy.artifact.id}-jdk14" type="jar" conf="default" />
   </publications>
 
-  <dependencies defaultconf="jdk14.default->default">
+  <dependencies defaultconf="default->default">
 
-    <!--  Runtime deps here  -->
     <dependency org="javacup" name="javacup" rev="10k"/>
-
-    <!-- JDK 1.4 dependencies -->
     <dependency org="asm" name="asm" rev="2.2.3"/>
-
     <dependency org="asm" name="asm-commons" rev="2.2.3"/>
-
-    <!-- get retroweaver from Pentaho repo since ibilio one is corrupted -->
     <dependency org="retroweaver" name="retroweaver" rev="1.2.4"/>
-
     <dependency org="retroweaver" name="retroweaver-rt" rev="1.2.4"/>
 
   </dependencies>

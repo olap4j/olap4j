@@ -39,11 +39,9 @@
 
   <dependencies defaultconf="default->default">
 
-    <!--  Runtime deps here  -->
     <dependency org="javacup" name="javacup" rev="10k"
         conf="default->default"/>
 
-    <!-- Javadoc -->
     <dependency org="net.sf" name="pdfdoclet" rev="1.0.2"
       conf="codegen->default" />
 

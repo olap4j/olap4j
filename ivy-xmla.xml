@@ -23,17 +23,17 @@
       </description>
   </info>
   <configurations>
-    <conf name="xmla.default"/>
-    <conf name="xmla.default.transitive"/>
+    <conf name="default"/>
+    <conf name="default.transitive"/>
   </configurations>
 
   <publications>
-    <artifact name="${ivy.artifact.id}-xmla" type="jar" conf="xmla.default" />
+    <artifact name="${ivy.artifact.id}-xmla" type="jar" conf="default" />
   </publications>
 
-  <dependencies defaultconf="xmla.default->default">
+  <dependencies defaultconf="default->default">
     <dependency org="org.olap4j" name="olap4j" rev="${project.revision}"
-        conf="xmla.default.transitive"/>
+        conf="default.transitive"/>
     <dependency org="xerces" name="xercesImpl" rev="2.6.0"/>
   </dependencies>
 </ivy-module>

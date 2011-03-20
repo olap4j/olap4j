@@ -220,17 +220,55 @@ class XmlaOlap4jDriverVersion {
         <antcall target="init-hsql"/>
     </target>
 
-    <!-- Override of subfloor to resolve artifacts of custom configurations -->
+    <!-- Override of subfloor to resolve modules artifacts -->
     <target name="resolve" depends="install-ivy,install-antcontrib">
+
         <antcall target="subfloor.resolve"/>
-        <ivy:resolve file="ivy-jdk14.xml" conf="jdk14.default" />
-        <ivy:retrieve conf="jdk14.default" pattern="${lib.dir}/[module](-[classifier]).[ext]" />
-        <ivy:resolve file="ivy-xmla.xml" conf="xmla.default" />
-        <ivy:retrieve conf="xmla.default" pattern="${lib.dir}/[module](-[classifier]).[ext]" />
-        <ivy:resolve file="ivy-tck.xml" conf="tck.test" />
-        <ivy:retrieve conf="tck.test" pattern="${testlib.dir}/[module](-[classifier]).[ext]" />
+
         <ivy:resolve file="ivy.xml" conf="codegen" />
         <ivy:retrieve conf="codegen" pattern="${testlib.dir}/[module](-[classifier]).[ext]" />
+
+        <ivy:resolve file="ivy-jdk14.xml" conf="default" />
+        <ivy:deliver conf="default" deliverpattern="${bin.dir}/ivy-jdk14.xml" />
+        <ivy:retrieve conf="default" pattern="${lib.dir}/[module](-[classifier]).[ext]" />
+
+        <ivy:resolve file="ivy-xmla.xml" conf="default" />
+        <ivy:deliver conf="default,default.transitive" deliverpattern="${bin.dir}/ivy-xmla.xml" />
+        <replace token="default.transitive" value="default" file="${bin.dir}/ivy-xmla.xml"/>
+        <ivy:retrieve conf="default" pattern="${lib.dir}/[module](-[classifier]).[ext]" />
+
+        <ivy:resolve file="ivy-tck.xml" conf="test" />
+        <ivy:deliver conf="test,test.transitive" deliverpattern="${bin.dir}/ivy-tck.xml" />
+    	<replace token="test.transitive" value="test" file="${bin.dir}/ivy-tck.xml"/>
+        <ivy:retrieve conf="test" pattern="${testlib.dir}/[module](-[classifier]).[ext]" />
+
+        <ivy:resolve file="ivy.xml" conf="default" />
+        <ivy:deliver conf="default" deliverpattern="${bin.dir}/ivy.xml" />
+
+    </target>
+
+    <!-- Override from subfloor so we generate a pom per module. -->
+    <target name="create-pom" depends="install-ivy,ivy.deliver">
+        <ivy:makepom ivyfile="${bin.dir}/ivy.xml" pomfile="${dist.dir}/pom.xml">
+          <mapping conf="default" scope="compile" />
+          <mapping conf="test" scope="test" />
+          <mapping conf="codegen" scope="test" />
+        </ivy:makepom>
+        <ivy:makepom ivyfile="${bin.dir}/ivy-tck.xml" pomfile="${bin.dir}/${ivy.artifact.id}-tck.pom">
+            <mapping conf="default" scope="test"/>
+            <mapping conf="test" scope="test"/>
+            <mapping conf="test.transitive" scope="test"/>
+        </ivy:makepom>
+        <ivy:makepom ivyfile="${bin.dir}/ivy-jdk14.xml" pomfile="${bin.dir}/${ivy.artifact.id}-jdk14.pom">
+            <mapping conf="default" scope="compile"/>
+        </ivy:makepom>
+        <ivy:makepom ivyfile="${bin.dir}/ivy-xmla.xml" pomfile="${bin.dir}/${ivy.artifact.id}-xmla.pom">
+            <mapping conf="default" scope="compile"/>
+            <mapping conf="default.transitive" scope="compile"/>
+        </ivy:makepom>
+    </target>
+    <target name="ivy.deliver">
+        <!-- Purposely left empty. Exportable Ivy files are generated when resolving. -->
     </target>
 
     <!-- override compile task to account for special jdk handling -->
@@ -306,38 +344,10 @@ class XmlaOlap4jDriverVersion {
         </if>
     </target>
 
-    <!-- Override from subfloor to allow filtering of core dependencies -->
-    <target name="create-pom" depends="install-ivy,ivy.deliver">
-        <ivy:makepom ivyfile="${dist.dir}/ivy.xml" pomfile="${dist.dir}/pom.xml">
-          <mapping conf="default" scope="compile" />
-          <mapping conf="test" scope="test" />
-          <mapping conf="codegen" scope="test" />
-        </ivy:makepom>
-    </target>
-    <target name="ivy.deliver">
-        <ivy:deliver conf="default,test,codegen" deliverpattern="${dist.dir}/ivy.xml" />
-    </target>
-
     <!-- override from subfloor to publish tck and xmla artifacts as well -->
     <target name="publish-nojar">
         <sequential>
             <antcall target="subfloor.publish-nojar"/>
-
-            <!-- Generate pom files -->
-            <ivy:makepom ivyfile="${basedir}/ivy-tck.xml" pomfile="${bin.dir}/${ivy.artifact.id}-tck.pom">
-                <mapping conf="tck.default" scope="test"/>
-                <mapping conf="tck.test" scope="test"/>
-                <mapping conf="tck.test.transitive" scope="test"/>
-            </ivy:makepom>
-
-            <ivy:makepom ivyfile="${basedir}/ivy-jdk14.xml" pomfile="${bin.dir}/${ivy.artifact.id}-jdk14.pom">
-                <mapping conf="jdk14.default" scope="compile"/>
-            </ivy:makepom>
-
-            <ivy:makepom ivyfile="${basedir}/ivy-xmla.xml" pomfile="${bin.dir}/${ivy.artifact.id}-xmla.pom">
-                <mapping conf="xmla.default" scope="compile"/>
-                <mapping conf="xmla.default.transitive" scope="compile"/>
-            </ivy:makepom>
 
             <!-- Publish -->
             <antcall target="maven-publish-dependencies">
