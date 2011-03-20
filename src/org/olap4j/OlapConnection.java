@@ -293,7 +293,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * Sets the name of the active schema for this connection.
      * Overrides the value passed, if any, through the JDBC URL.
      *
-     * @param catalogName The name of the schema to use for this connection.
+     * @param schemaName The name of the schema to use for this connection.
      * @throws OlapException
      *             An exception will be thrown, if any of these conditions
      *             are true:
@@ -349,7 +349,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
     Schema getOlapSchema() throws OlapException;
 
     /**
-     * Returns a list of {@link org.olap4j.metadata.Schemas} objects which
+     * Returns a list of {@link org.olap4j.metadata.Schema} objects which
      * belong to this connection's OLAP server.
      *
      * <p>If the user has not selected a Database, Catalog and Schema to use

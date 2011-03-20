@@ -1,6 +1,6 @@
 # $Id$
 
-olap4j, release 0.9.9 (beta)
+olap4j, release 1.0.0
 
 Contents of this distribution
 -----------------------------
@@ -13,21 +13,39 @@ This release of olap4j contains a driver implementation based on the XML for
 Analysis (XML/A) protocol. There is also an olap4j driver for mondrian; this
 is part of the mondrian distribution from mondrian-3.0 onwards.
 
-olap4j requires the following files at run time:
+Olap4j is divided in four different jar files.
+
+* olap4j-[version].jar
+    This is the core olap4j API.
+
+* olap4j-xmla-[version].jar
+    This is the XMLA implementation of the olap4j core API.
+
+* olap4j-tck-[version].jar
+    This is the technology compatibility kit for olap4j.
+
+* olap4j-jdk14-[version].jar
+    This is a Java 1.4 compatible retrowoven olap4j distribution. It contains both the core API and the XMLA driver.
+
+olap4j requires the following libraries at run time:
 
 * lib/olap4j.jar (or lib/olap4j-jdk14.jar if you are running JDK 1.4)
 * lib/javacup.jar
-* lib/asm.jar
-* lib/asm-commons.jar
 
 If you use the JDK 1.4 compatible jar, you will also need:
 
 * lib/retroweaver.jar
 * lib/retroweaver-rt.jar
+* lib/asm.jar
+* lib/asm-commons.jar
 
 If you are using the XML/A driver, you will also need:
 
 * lib/xercesImpl.jar
+
+The TCK requires:
+
+* lib/commons-dbcp.jar
 
 Building olap4j from source
 ---------------------------
@@ -37,7 +55,7 @@ Building olap4j from source
    (%JAVA_HOME%\bin for Windows) on your path.
 3. Edit buildJdk16.bat and buildJdk16.sh and set the JAVA_HOME variable
    to a valid home directory of a Java 6 installation.
-4. In the root of the source tree, run 'ant'.
+4. In the root of the source tree, run 'ant'. You must use Apache Ant 1.7+.
 
 Writing a simple program
 ------------------------
@@ -52,8 +70,7 @@ You can now write and run a simple program against olap4j. For example, under Ja
         Connection connection =
             DriverManager.getConnection(
                 "jdbc:xmla:"
-                    + "Server=http://deedub:8080/mondrian/xmla;"
-                    + "Catalog=FoodMart");
+                    + "Server=http://example.com:8080/mondrian/xmla");
         OlapConnection olapConnection = connection.unwrap(OlapConnection.class);
         OlapStatement statement = olapConnection.createStatement();
         CellSet cellSet =

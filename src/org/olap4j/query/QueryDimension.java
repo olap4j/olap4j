@@ -149,7 +149,7 @@ public class QueryDimension extends QueryNodeImpl {
      * Selects a level and includes it in the query.
      * <p>This method selects and includes a all members of the given
      * query using the {@link Selection.Operator#MEMBERS} selection operator.
-     * @param member The member to select and include in the query.
+     * @param level The level to select and include in the query.
      */
     public Selection include(Level level) {
         if (level.getDimension().equals(this.dimension)) {
@@ -186,7 +186,7 @@ public class QueryDimension extends QueryNodeImpl {
      * Selects level and includes all members in the query.
      * <p>This method selects and includes all members of a
      * given Level, using the MEMBERS operator {@link Selection.Operator}
-     * @param member Root member to select and include.
+     * @param level Root level to select and include.
      */
     public Selection createSelection(Level level)
     {

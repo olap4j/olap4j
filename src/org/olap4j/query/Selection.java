@@ -59,7 +59,7 @@ public interface Selection extends QueryNode {
 
     /**
      * Returns the root selection element of this selection.
-     * @return
+     * @return The root metadata object.
      */
     MetadataElement getRootElement();
 
