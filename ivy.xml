@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-  <info organisation="${ivy.artifact.group}" module="${ivy.artifact.id}"
-    revision="${project.revision}" />
-
+<?xml-stylesheet type="text/xsl" href="http://ivyrep.jayasoft.org/ivy-doc.xsl"?>
+<!--
+  == $Id:$
+  == This software is subject to the terms of the Eclipse Public License v1.0
+  == Agreement, available at the following URL:
+  == http://www.eclipse.org/legal/epl-v10.html.
+  == Copyright (C) 2009-2011 Julian Hyde
+  == All Rights Reserved.
+  == You must accept the terms of that agreement to use this software.
+  -->
+<ivy-module
+    version="2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:m="http://ant.apache.org/ivy/maven"
+    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+  <info organisation="${ivy.artifact.group}" module="${ivy.artifact.id}" revision="${project.revision}">
+      <license name="EPL" url="http://www.eclipse.org/legal/epl-v10.html"/>
+      <ivyauthor name="Julian Hyde" />
+      <repository name="pentaho-repository" url="http://repo.pentaho.org/artifactory"/>
+      <description homepage="http://olap4j.org">
+          olap4j is an open Java API for OLAP.
+          Think of it like JDBC, but for accessing multi-dimensional data.
+          Olap4j is designed to be a common API for any OLAP server,
+          so you can write an application on one OLAP server and easily
+          switch it to another. And built on that API, there will be a
+          growing collection of tools and components.
+      </description>
+  </info>
   <configurations>
-    <conf name="default" />
-    <conf name="test" visibility="private" />
+    <conf name="default"/>
+    <conf name="default-jdk1.4"/>
+    <conf name="xmla"/>
+    <conf name="test" visibility="private"/>
   </configurations>
 
   <publications>
@@ -14,70 +40,72 @@
 
   <dependencies defaultconf="default->default">
 
-    <!--  Compile deps here  -->
+    <!--  Runtime deps here  -->
+    <dependency org="javacup" name="javacup" rev="10k"/>
 
+    <!-- XMLA -->
+    <dependency org="xerces" name="xercesImpl" rev="2.6.0"
+      conf="xmla->default" />
+
+    <!-- Javadoc -->
+    <dependency org="net.sf" name="pdfdoclet" rev="1.0.2"
+      conf="test->default" />
+
+    <!-- JDK 1.4 dependencies -->
     <dependency org="asm" name="asm" rev="2.2.3"
-      transitive="false" />
+      conf="default-jdk1.4->default"/>
 
     <dependency org="asm" name="asm-commons" rev="2.2.3"
-      transitive="false" />
-
-    <dependency org="javacup" name="javacup" rev="10k"
-      transitive="false" />
+      conf="default-jdk1.4->default" />
 
     <!-- get retroweaver from Pentaho repo since ibilio one is corrupted -->
     <dependency org="retroweaver" name="retroweaver" rev="1.2.4"
-      transitive="false" />
+      conf="default-jdk1.4->default" />
 
     <dependency org="retroweaver" name="retroweaver-rt" rev="1.2.4"
-      transitive="false" />
-
-    <dependency org="xerces" name="xercesImpl" rev="2.6.0"
-      transitive="false" />
+      conf="default-jdk1.4->default" />
 
     <!--  test deps here  -->
 
     <dependency org="log4j" name="log4j" rev="1.2.9"
-      transitive="false" conf="test->default" />
+      conf="test->default" />
 
     <dependency org="commons-dbcp" name="commons-dbcp" rev="1.1"
-      transitive="false" conf="test->default" />
-
-    <dependency org="net.sf" name="pdfdoclet" rev="1.0.2"
-      transitive="false" conf="test->default" />
+      conf="test->default" />
 
     <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7"
-      transitive="false" conf="test->default" />
+      conf="test->default" />
 
     <dependency org="simple-jndi" name="simple-jndi" rev="0.11.4.1"
-      transitive="false" conf="test->default" />
+      conf="test->default" />
 
     <dependency org="commons-pool" name="commons-pool" rev="1.1"
-      transitive="false" conf="test->default" />
+      conf="test->default" />
 
     <dependency org="commons-collections" name="commons-collections" rev="3.2"
-      transitive="false" conf="test->default" />
+      conf="test->default" />
 
     <dependency org="commons-vfs" name="commons-vfs" rev="1.0"
-      transitive="false" conf="test->default" />
+      conf="test->default" />
 
     <dependency org="commons-logging" name="commons-logging" rev="1.1"
-      transitive="false" conf="test->default" />
+      conf="test->default" />
 
     <dependency org="commons-math" name="commons-math" rev="1.1"
-      transitive="false" conf="test->default" />
+      conf="test->default" />
 
     <dependency org="javax.servlet" name="servlet-api" rev="2.4"
-      transitive="false" conf="test->default" />
+      conf="test->default" />
 
     <dependency org="junit" name="junit" rev="3.8.1"
-      transitive="false" conf="test->default" />
+      conf="test->default" />
 
-    <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7"
-      transitive="false" conf="test->default" />
+
+
+    <!-- OLAP tests dependencies - uses Mondrian -->
 
     <dependency org="pentaho" name="mondrian" rev="3.3-SNAPSHOT"
-      transitive="false" changing="true" conf="test->default" />
+      changing="true" conf="test->default" />
 
     <dependency org="eigenbase" name="eigenbase-xom" rev="1.3.0.11999"
       conf="test->default"/>
