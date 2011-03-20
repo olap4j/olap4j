@@ -173,25 +173,42 @@ a:hover, a:active {
         
         <tr>
           <td width="100%" valign="top" style="padding-bottom: 10px;"><h4>Status</h4>
-          <p><b>olap4j is headed for 1.0!</b><br/>olap4j-0.9.8 (beta) was released in August 2010.</p><br/>
-          <p>The olap4j release includes the specification, a reference implementation of the API in the form of a olap4j driver for mondrian, 
-          a generic XML/A driver compatible with Mondrian, SQL Server Analysis Services, Palo and SAP BW, and a Test Compatibility Kit (TCK)
-          consisting of a suite of JUnit tests.</p><br/>
+          <p><b>olap4j 1.0.0 was released in March 2011.</b></p><br/>
+          <p>This olap4j release includes the specification, a technology compatibility kit (TCK)
+          and a generic XML/A driver compatible with Mondrian, SQL Server Analysis Services, Palo and SAP BW</p><br/>
           
           <h4>Resources</h4>
             <ul>
               <li><a href="http://sourceforge.net/projects/olap4j">olap4j project at SourceForge</a></font></li>
-              <li>Download 0.9.8 <a href="http://sourceforge.net/project/showfiles.php?group_id=168953">release</a>
+              <li>Download 1.0.0 <a href="http://sourceforge.net/project/showfiles.php?group_id=168953">release</a>
               and specification (<a href="http://sourceforge.net/project/showfiles.php?group_id=168953">PDF</a> or <a href="olap4j_fs.html">HTML</a>)</li>
               <li><a href="api/index.html">API javadoc</a></li>
               <li>For project committers: latest <a href="head/api/index.html">API</a>
                   and <a href="http://olap4j.svn.sourceforge.net/viewvc/*checkout*/olap4j/trunk/doc/olap4j_fs.html">specification (HTML)</a>.</li>
             </ul>
 
+          <h4>Modules</h4>
+          <p>Olap4j is distributed as four Java JAR libraries.</p><br/>
+          <p>
+            <ul>
+              <li><strong>olap4j</strong><br/>
+              Core API, Query Model, Transformation and other auxiliary packages,
+              along with the driver specification.</li><br/><br/>
+              <li><strong>olap4j-xmla</strong><br/>
+              Driver implementation of olap4j for XML/A data sources. It is compatible with Mondrian, Palo,
+              SAP BW and SQL Server 2005+.</li><br/><br/>
+              <li><strong>olap4j-tck</strong><br/>
+              Technology compatibility kit. Consists mostly of JUnit tests.</li><br/><br/>
+              <li><strong>olap4j-jdk14</strong><br/>
+              Olap4j distribution compatible with Java 1.4. Includes the core API and
+              the XML/A driver.</li>
+            </ul>
+          </p>
+
           <h4>Roadmap</h4><br/>
 
-          <p>The olap4j team is in the final sprint towards a 1.0 specification. The core API will be considered a
-          Long Term Support (LTS) release, but some parts of the olap4j project will remain considered as experimental,
+          <p>The core API will be considered a Long Term Support (LTS) release,
+          but some parts of the olap4j project will remain considered as experimental,
           thus subject to change. The LTS packages are:</p><br/>
           <p>
             <ul>
@@ -206,57 +223,33 @@ a:hover, a:active {
               <li><strong>org.olap4j.type</strong><br/>
               System for the core MDX object model and the metadata package.</li>
             </ul>
-          </p><br/>
-          <p>The following parts will still be considered experimental after the 1.0
-          release and are subject to change.</p><br/>
+          </p>
+          <p>The following parts will still be considered experimental
+          and are subject to change.</p><br/>
           <p>
             <ul>
               <li><strong>org.olap4j.query</strong><br/>
               Programmatic Query Model.</li><br/><br/>
+              <li><strong>org.olap4j.transform</strong><br/>
+              Core MDX object model transformation utilities.</li><br/><br/>
               <li><strong>org.olap4j.layout</strong><br/>
               Utility classes to display CellSets.</li><br/><br/>
               <li><strong>org.olap4j.CellSetListener and all associated classes</strong><br/>
               Event-based system for real time updates of CellSet objects.</li><br/><br/>
               <li><strong>org.olap4j.Scenario and all associated classes</strong><br/>
-              Statistical simulations module.</li><br/><br/>
-              <li><strong>org.olap4j.transform</strong><br/>
-              Core MDX object model transformation utilities.</li>
-            </ul>
-          </p><br/>
-          <p>The push for 1.0 will be done according to the following schedule.</p><br/>
-          <p>
-            <ul>
-              <li><strong>Release of olap4j 0.9.8</strong><br/>
-              This release is mostly a wrap-up of the unofficial releases we have put in the Maven repository.
-              Notable changes include compatibility with SAP BW, contextual drill-through for the Query Model,
-              CellSetListener implementation for real time updates, along with  various other compatibility fixes.</li><br/><br/>
-              <li><strong>Month of August</strong><br/>
-              During the month of August, the olap4j community will have a chance to comment the proposed changes
-              to the 1.0 final draft. We will provide an updated functional specification document as well as a
-              complete list of the changes that will be  required. Should you judge that some items are still missing,
-              or that  some should be modified or removed altogether, you are encouraged to let us know. The
-              <a href="http://sourceforge.net/mailarchive/forum.php?forum_name=olap4j-devel">mailing list</a> 
-              is the best place to hold those discussions, or you can also use our
-              <a href="http://sourceforge.net/projects/olap4j/forums/forum/577988">forums</a>.</li><br/><br/>
-              <li><strong>September 1st - Release of 0.9.9</strong><br/>
-              September 1st is  the date that marks the end of our discussions. After that, all the  changes 
-              that we agreed upon will be implemented in the API, as well as the Mondrian and XML/A implementations
-              of the driver. The 0.9.9 release  will include those changes, but <u>will still maintain retro-compatibility</u>.
-              Some API calls will be marked for deprecation, new ones will be present as well.
-              The 0.9.9 release will be the last available before 1.0. Everything that is marked for deprecation
-              will be removed as of 1.0, so users will have a chance to convert their code  base progressively.</li><br/><br/>
-              <li><strong>October 31st - Release of 1.0</strong>
-              We are planning to release olap4j 1.0 on October 31st. <u>All methods that have been marked as deprecated,
-              whether by the 0.9.9 release or any other previous 0.X release will be removed.</u></li>
+              Statistical simulations module.</li>
             </ul>
           </p>
+
             <h4>Get involved!</h4> 
             <p>Join the <a href="http://sourceforge.net/forum/forum.php?forum_id=577988">forum</a>, download the specification, and give us your feedback. If you are developing an OLAP server, component or 
     application, let's work together to make your project olap4j-compliant.</p><br/>
             <p>Drivers for mondrian and XML/A are under development; we're looking for committers to work on these drivers and drivers for other servers.</p>
           </td>
           <td rowspan="5" class="col_spacer" style="padding-bottom: 10px;"><img src="images/spacer.png" class="col_spacer"/></td>
-          <td rowspan="4" valign="top" style="padding-bottom: 10px;"><div class="participation_bg"><h4 style="margin: 0px;">Participation</h4>
+          <td rowspan="4" valign="top" style="padding-bottom: 10px;">
+          <div class="participation_bg">
+          <h4 style="margin: 0px;">Participation</h4>
             olap4j is an open specification, being developed by a consortium of companies and open source projects, including:
           <h5 style="margin-top: 5px;">Projects</h5>
             <ul style="white-space:nowrap">
@@ -265,7 +258,7 @@ a:hover, a:active {
                 <li><a href="http://mondrian.pentaho.org">Mondrian</a></li>
                 <li><a href="http://openi.sourceforge.net">OpenI</a></li>
                 <li><a href="http://www.palo.net">PALO</a></li>
-                <li><a href="http://www.analytical-labs.com">PAT Analysis Tool</a></li>
+                <li><a href="http://www.analytical-labs.com">Saiku</a></li>
                 <li><a href="http://www.sqlpower.ca">SQL Power Wabit</a></li>
             </ul>
             <h5>Companies</h5>
@@ -278,7 +271,15 @@ a:hover, a:active {
                 <li><a href="http://www.sqlpower.ca">SQL Power</a></li>
                 <li><a href="http://www.tensegrity-software.de">Tensegrity</a></li>
                 <li><a href="http://www.tonbeller.com/">Tonbeller AG</a></li>
-            </ul></div></td>
+            </ul>
+            <h4 style="margin: 0px;">Developer's resources</h4>
+            <ul style="white-space:nowrap">
+                <li><a href="http://ci.pentaho.com/view/Analysis/job/olap4j/">Continuous Integration</a></li>
+                <li><a href="head/api/index.html">API</a></li>
+                <li><a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/">Source Server</a></li>
+                <li><a href="https://lists.sourceforge.net/lists/listinfo/olap4j-devel">Developer's mailing list</a></li>
+            </ul>
+        </div></td>
         </tr>
       </table></td>
     </tr>
