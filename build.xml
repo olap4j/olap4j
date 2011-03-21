@@ -354,7 +354,7 @@ class XmlaOlap4jDriverVersion {
                 <param name="publish.groupId" value="${ivy.artifact.group}" />
                 <param name="publish.artifactId" value="${ivy.artifact.id}-tck" />
                 <param name="publish.version" value="${project.revision}" />
-                <param name="publish.file" value="${basedir}/ivy-tck.xml" />
+                <param name="publish.file" value="${bin.dir}/ivy-tck.xml" />
             </antcall>
             <antcall target="maven-publish-artifact">
               <param name="publish.pomFile" value="${bin.dir}/${ivy.artifact.id}-tck.pom" />
@@ -365,7 +365,7 @@ class XmlaOlap4jDriverVersion {
                 <param name="publish.groupId" value="${ivy.artifact.group}" />
                 <param name="publish.artifactId" value="${ivy.artifact.id}-xmla" />
                 <param name="publish.version" value="${project.revision}" />
-                <param name="publish.file" value="${basedir}/ivy-xmla.xml" />
+                <param name="publish.file" value="${bin.dir}/ivy-xmla.xml" />
             </antcall>
             <antcall target="maven-publish-artifact">
               <param name="publish.pomFile" value="${bin.dir}/${ivy.artifact.id}-xmla.pom" />
@@ -376,7 +376,7 @@ class XmlaOlap4jDriverVersion {
                 <param name="publish.groupId" value="${ivy.artifact.group}" />
                 <param name="publish.artifactId" value="${ivy.artifact.id}-jdk14" />
                 <param name="publish.version" value="${project.revision}" />
-                <param name="publish.file" value="${basedir}/ivy-jdk14.xml" />
+                <param name="publish.file" value="${bin.dir}/ivy-jdk14.xml" />
             </antcall>
             <antcall target="maven-publish-artifact">
               <param name="publish.pomFile" value="${bin.dir}/${ivy.artifact.id}-jdk14.pom" />
