@@ -120,13 +120,11 @@ public class XmlaDatabaseCache implements XmlaOlap4jCache {
                 connection.prepareStatement(
                     Properties.QUERY_SELECT.getValueOrDefault(props));
             try {
-                stm.setString(
-                    1,
-                    XmlaOlap4jShaEncoder.encodeSha1(new String(request)));
+                stm.setString(1, new String(request));
                 stm.execute();
                 ResultSet rs = stm.getResultSet();
                 if (rs.next()) {
-                    return Base64.decode(rs.getString(2));
+                    return rs.getString(2).getBytes();
                 } else {
                     return null;
                 }
@@ -149,10 +147,8 @@ public class XmlaDatabaseCache implements XmlaOlap4jCache {
                 connection.prepareStatement(
                     Properties.QUERY_INSERT.getValueOrDefault(props));
             try {
-                stm.setString(
-                    1,
-                    XmlaOlap4jShaEncoder.encodeSha1(new String(request)));
-                stm.setString(2, Base64.encodeBytes(response));
+                stm.setString(1,new String(request));
+                stm.setString(2, new String(response));
                 stm.execute();
             } finally {
                 stm.close();
