@@ -40,23 +40,52 @@ class XmlaOlap4jCatalog implements Catalog, Named {
         this.olap4jDatabaseMetaData = olap4jDatabaseMetaData;
         this.name = name;
 
-        // Fetching the schemas is a tricky part. There are no XMLA requests to
-        // obtain the available schemas for a given catalog. We therefore need
-        // to ask for the cubes, restricting results on the catalog, and while
+        // Some servers don't support MDSCHEMA_MDSCHEMATA, so we will
+        // override the list class so it tries it first, and falls
+        // back to the MDSCHEMA_CUBES trick, where ask for the cubes,
+        // restricting results on the catalog, and while
         // iterating on the cubes, take the schema name from this recordset.
         //
         // Many servers (SSAS for example) won't support the schema name column
-        // in the returned rowset. This has to be taken into account.
+        // in the returned rowset. This has to be taken into account as well.
         this.schemas =
             new DeferredNamedListImpl<XmlaOlap4jSchema>(
-                XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_CUBES,
+                XmlaOlap4jConnection.MetadataRequest.DBSCHEMA_SCHEMATA,
                 new XmlaOlap4jConnection.Context(
                     olap4jDatabaseMetaData.olap4jConnection,
                     olap4jDatabaseMetaData,
                     this,
                     null, null, null, null, null),
-                new XmlaOlap4jConnection.CatalogSchemaHandler(this.name),
-                null);
+                new XmlaOlap4jConnection.SchemaHandler(),
+                null)
+            {
+                @Override
+                protected void populateList(NamedList<XmlaOlap4jSchema> list)
+                        throws OlapException
+                {
+                    // First try DBSCHEMA_SCHEMATA
+                    try {
+                        super.populateList(list);
+                    } catch (OlapException e) {
+                        // Fallback to MDSCHEMA_CUBES trick
+                        XmlaOlap4jConnection conn =
+                            XmlaOlap4jCatalog.this
+                            .olap4jDatabaseMetaData.olap4jConnection;
+                        conn.populateList(
+                            list,
+                            new XmlaOlap4jConnection.Context(
+                                conn,
+                                conn.olap4jDatabaseMetaData,
+                                XmlaOlap4jCatalog.this,
+                                null, null, null, null, null),
+                                XmlaOlap4jConnection.MetadataRequest
+                                    .MDSCHEMA_CUBES,
+                                new XmlaOlap4jConnection.CatalogSchemaHandler(
+                                    XmlaOlap4jCatalog.this.name),
+                                new Object[0]);
+                    }
+                }
+            };
     }
 
     public int hashCode() {
