@@ -9,14 +9,14 @@
 */
 package org.olap4j.driver.xmla.proxy;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.concurrent.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Map;
+import java.util.concurrent.Future;
 
 import org.olap4j.OlapException;
-import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.driver.xmla.XmlaHelper;
+import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.driver.xmla.cache.XmlaOlap4jCache;
 
 /**
@@ -159,7 +159,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
             if (response != null) {
                 return response;
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new XmlaOlap4jProxyException(
                 "An exception was encountered while browsing the proxy cache.",
                 e);
@@ -176,7 +176,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
                 response);
             // Returns result
             return response;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new XmlaOlap4jProxyException(
                 "An exception was encountered while saving a response in the proxy cache.",
                 e);
@@ -194,7 +194,9 @@ abstract class XmlaOlap4jAbstractHttpProxy
      * @return either a response in a byte array or null
      * if the response is not in cache
      */
-    private byte[] getFromCache(final URL url, final byte[] request) {
+    private byte[] getFromCache(final URL url, final byte[] request)
+            throws OlapException
+    {
         return (this.cache != null)
             ? this.cache.get(this.cacheId, url, request)
             : null;
@@ -207,7 +209,9 @@ abstract class XmlaOlap4jAbstractHttpProxy
      * @param request The SOAP request to cache
      * @param response The SOAP response to cache
      */
-    private void addToCache(URL url, byte[] request, byte[] response) {
+    private void addToCache(URL url, byte[] request, byte[] response)
+            throws OlapException
+    {
         if (this.cache != null) {
             this.cache.put(this.cacheId, url, request, response);
         }

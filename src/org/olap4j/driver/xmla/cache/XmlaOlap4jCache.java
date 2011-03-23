@@ -12,6 +12,8 @@ package org.olap4j.driver.xmla.cache;
 import java.net.URL;
 import java.util.Map;
 
+import org.olap4j.OlapException;
+
 /**
  * XMLA driver cache. Implementations will have to declare those methods.
  *
@@ -37,9 +39,9 @@ public interface XmlaOlap4jCache {
      * @param url The URL where the SOAP message was sent.
      * @param request The SOAP complete message.
      *
-     * @throws XmlaOlap4jInvalidStateException when
-     * operations to the cache are performed but it hasn't been initialized.
-     * Make sure you call the setParameters method.
+     * @throws OlapException when operations to the cache are
+     * performed but it hasn't been initialized. Make sure you
+     * call the setParameters(Map, Map) method.
      *
      * @return The SOAP response, null if there are no corresponding
      * response in the cache.
@@ -48,7 +50,7 @@ public interface XmlaOlap4jCache {
         String id,
         URL url,
         byte[] request)
-        throws XmlaOlap4jInvalidStateException;
+        throws OlapException;
 
     /**
      * Adds a SOAP response to the cache. It has to be relative to the
@@ -60,16 +62,16 @@ public interface XmlaOlap4jCache {
      * response.
      * @param response The response to cache.
      *
-     * @throws XmlaOlap4jInvalidStateException when
-     * operations to the cache are performed but it hasn't been initialized.
-     * Make sure you call the setParameters method.
+     * @throws OlapException when operations to the cache are
+     * performed but it hasn't been initialized. Make sure you
+     * call the setParameters(Map, Map) method.
      */
     public void put(
         String id,
         URL url,
         byte[] request,
         byte[] response)
-        throws XmlaOlap4jInvalidStateException;
+        throws OlapException;
 
     /**
      * Tells the cache to flush all cached entries.
@@ -82,9 +84,9 @@ public interface XmlaOlap4jCache {
      * <p>The XMLA driver takes cache properties as
      * "<code>Cache.[property name]=[value]</code>" in its JDBC url. All those
      * properties should be striped of their "<code>Cache.</code>" prefix and
-     * sent to this method as the properties parameter.
+     * sent to this method as the props parameter.
      *
-     * <p>Also, the complete config map of the current connection
+     * <p>Also, the complete  map of the current connection
      * should be passed as the config parameter.
      *
      * @param config The complete configuration parameters which were used to

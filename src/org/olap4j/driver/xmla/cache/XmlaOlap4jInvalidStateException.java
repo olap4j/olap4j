@@ -9,18 +9,16 @@
 */
 package org.olap4j.driver.xmla.cache;
 
+import org.olap4j.OlapException;
+
 /**
  * <p>Internal exception which gets thrown when operations to the cache
  * are performed but it hasn't been initialized.
  *
- * <p>It extends RuntimeException so it cannot be catched by the
- * regular catch(Exception) mechanism. Those exceptions should get right
- * to the system level since it's a programming error.
- *
  * @author Luc Boudreau
  * @version $Id$
  */
-class XmlaOlap4jInvalidStateException extends RuntimeException {
+public class XmlaOlap4jInvalidStateException extends OlapException {
     private static final long serialVersionUID = 7265273715459263740L;
 }
 
