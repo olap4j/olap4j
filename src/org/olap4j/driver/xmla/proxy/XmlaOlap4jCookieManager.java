@@ -131,25 +131,30 @@ class XmlaOlap4jCookieManager {
 
                 while (st.hasMoreTokens()) {
                     String token = st.nextToken();
-                    cookie.put(
-                        token.substring(
-                            0,
-                            token.indexOf(NAME_VALUE_SEPARATOR)).toLowerCase(),
-                            token.substring(
-                                token.indexOf(NAME_VALUE_SEPARATOR) + 1,
-                                token.length()));
 
-                    if (this.debug) {
-                        System.out.println(
-                            "Saving cookie : "
-                            + token.substring(
+                    // Check if the separator does exist
+                    // The other attributes are not stored (Ex: HttpOnly)
+                    int separatorIndex = token.indexOf(NAME_VALUE_SEPARATOR);
+
+                    if (separatorIndex > 0) {
+                        String tokenName =
+                            token.substring(
                                 0,
-                                token.indexOf(
-                                    NAME_VALUE_SEPARATOR)).toLowerCase()
-                            + "="
-                            + token.substring(
-                                token.indexOf(NAME_VALUE_SEPARATOR) + 1,
-                                token.length()));
+                                separatorIndex)
+                            .toLowerCase();
+                        String tokenValue =
+                            token.substring(
+                                separatorIndex + 1,
+                                token.length());
+
+                        cookie.put(tokenName, tokenValue);
+
+                        if (this.debug) {
+                            System.out.println(
+                                "Saving cookie : "
+                                + tokenName
+                                + "=" + tokenValue);
+                        }
                     }
                 }
             }
