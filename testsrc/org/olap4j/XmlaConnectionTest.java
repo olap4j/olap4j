@@ -195,7 +195,7 @@ public class XmlaConnectionTest extends TestCase {
             }
             Properties info = new Properties();
             info.setProperty(
-                XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
+                XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMart");
             DriverManager.getConnection(
                 "jdbc:xmla:Server=http://foo;Catalog=FoodMart;TestProxyCookie="
                 + cookie,

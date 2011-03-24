@@ -91,7 +91,7 @@ public class XmlaTester implements TestContext.Tester {
         }
         Properties info = new Properties();
         info.setProperty(
-            XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
+            XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMart");
         connection =
             DriverManager.getConnection(
                 getURL(),
@@ -107,7 +107,7 @@ public class XmlaTester implements TestContext.Tester {
         }
         Properties info = new Properties();
         info.setProperty(
-            XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
+            XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMart");
         return DriverManager.getConnection(
             getURL(), USER, PASSWORD);
     }

@@ -195,8 +195,7 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
             if (caches.containsKey(id)) {
                 return caches.get(id).get(url, request);
             } else {
-                throw new RuntimeException(
-                    "There are no configured caches of this name yet configured.");
+                throw new XmlaOlap4jInvalidStateException();
             }
         }
     }
@@ -217,9 +216,7 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
             if (caches.containsKey(id)) {
                 caches.get(id).put(url, request, response);
             } else {
-                throw new RuntimeException(
-                    "There are no configured caches of this name yet "
-                    + "configured.");
+                throw new XmlaOlap4jInvalidStateException();
             }
         }
     }

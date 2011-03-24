@@ -1,5 +1,5 @@
 /*
-// $Id:$
+// $Id$
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
@@ -62,7 +62,7 @@ import java.util.concurrent.*;
  * <tr><td>Schema</td>      <td>Schema name to use.
  *                               By default, the first one returned by the
  *                               XMLA server will be used.</td></tr>
- **
+ *
  * <tr><td>Database</td>     <td>Name of the XMLA database.
  *                               By default, the first one returned by the
  *                               XMLA server will be used.</td></tr>
@@ -240,7 +240,7 @@ public class XmlaOlap4jDriver implements Driver {
      * @return A Proxy with which to submit XML requests
      */
     protected XmlaOlap4jProxy createProxy(Map<String, String> map) {
-        String cookie = map.get(Property.TestProxyCookie.name());
+        String cookie = map.get(Property.TESTPROXYCOOKIE.name());
         if (cookie != null) {
             XmlaOlap4jProxy proxy = PROXY_MAP.get(cookie);
             if (proxy != null) {
@@ -296,14 +296,14 @@ public class XmlaOlap4jDriver implements Driver {
      * Properties supported by this driver.
      */
     public enum Property {
-        TestProxyCookie(
+        TESTPROXYCOOKIE(
             "String that uniquely identifies a proxy object via which to send "
             + "XMLA requests for testing purposes."),
-        Server("URL of HTTP server"),
-        Catalog("Catalog name"),
-        Database("Name of the database"),
-        Schema("Name of the schema"),
-        Cache("Class name of the SOAP cache implementation");
+        SERVER("URL of HTTP server"),
+        DATABASE("Name of the database"),
+        CATALOG("Catalog name"),
+        SCHEMA("Name of the schema"),
+        CACHE("Class name of the SOAP cache implementation");
 
         /**
          * Creates a property.

@@ -9,8 +9,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
-import org.olap4j.impl.Base64;
-
 /**
  * This mock server cache is only used to save and load
  * runs of the XMLA driver as a database table.
@@ -147,7 +145,7 @@ public class XmlaDatabaseCache implements XmlaOlap4jCache {
                 connection.prepareStatement(
                     Properties.QUERY_INSERT.getValueOrDefault(props));
             try {
-                stm.setString(1,new String(request));
+                stm.setString(1, new String(request));
                 stm.setString(2, new String(response));
                 stm.execute();
             } finally {

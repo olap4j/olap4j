@@ -167,21 +167,21 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         final Map<String, String> map = parseConnectString(url, info);
 
         this.databaseName =
-            map.get(XmlaOlap4jDriver.Property.Database.name());
+            map.get(XmlaOlap4jDriver.Property.DATABASE.name());
 
         this.catalogName =
-            map.get(XmlaOlap4jDriver.Property.Catalog.name());
+            map.get(XmlaOlap4jDriver.Property.CATALOG.name());
 
         this.schemaName =
-            map.get(XmlaOlap4jDriver.Property.Schema.name());
+            map.get(XmlaOlap4jDriver.Property.SCHEMA.name());
 
         // Set URL of HTTP server.
         final String serverUrl =
-            map.get(XmlaOlap4jDriver.Property.Server.name());
+            map.get(XmlaOlap4jDriver.Property.SERVER.name());
         if (serverUrl == null) {
             throw getHelper().createException(
                 "Connection property '"
-                + XmlaOlap4jDriver.Property.Server.name()
+                + XmlaOlap4jDriver.Property.SERVER.name()
                 + "' must be specified");
         }
         try {
@@ -245,7 +245,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      */
     private void initSoapCache(Map<String, String> map) throws OlapException {
         //  Test if a SOAP cache class was defined
-        if (map.containsKey(XmlaOlap4jDriver.Property.Cache.name()
+        if (map.containsKey(XmlaOlap4jDriver.Property.CACHE.name()
             .toUpperCase()))
         {
             // Create a properties object to pass to the proxy
@@ -256,11 +256,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             for (Entry<String, String> entry : map.entrySet()) {
                 // Check if the current entry relates to cache config.
                 if (entry.getKey().startsWith(
-                    XmlaOlap4jDriver.Property.Cache.name().toUpperCase()
-                    + "."))
+                    XmlaOlap4jDriver.Property.CACHE.name() + "."))
                 {
                     props.put(entry.getKey().substring(
-                        XmlaOlap4jDriver.Property.Cache.name()
+                        XmlaOlap4jDriver.Property.CACHE.name()
                         .length() + 1), entry.getValue());
                 }
             }

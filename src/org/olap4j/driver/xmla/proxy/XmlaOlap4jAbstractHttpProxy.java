@@ -119,7 +119,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
         try {
             // Loads the cache class
             Class clazz = Class.forName(config.get(
-                    XmlaOlap4jDriver.Property.Cache.name()));
+                    XmlaOlap4jDriver.Property.CACHE.name()));
 
             // Instantiates it
             this.cache = (XmlaOlap4jCache) clazz.newInstance();
@@ -129,23 +129,23 @@ abstract class XmlaOlap4jAbstractHttpProxy
         } catch (ClassNotFoundException e) {
             throw helper.createException(
                 "The specified cache class name could not be found : "
-                + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
+                + config.get(XmlaOlap4jDriver.Property.CACHE.name()), e);
         } catch (InstantiationException e) {
             throw helper.createException(
                 "The specified cache class name could not be instanciated : "
-                + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
+                + config.get(XmlaOlap4jDriver.Property.CACHE.name()), e);
         } catch (IllegalAccessException e) {
             throw helper.createException(
                 "An error was encountered while instanciating the cache : "
-                + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
+                + config.get(XmlaOlap4jDriver.Property.CACHE.name()), e);
         } catch (IllegalArgumentException e) {
             throw helper.createException(
                 "An error was encountered while instanciating the cache : "
-                + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
+                + config.get(XmlaOlap4jDriver.Property.CACHE.name()), e);
         } catch (SecurityException e) {
             throw helper.createException(
                 "An error was encountered while instanciating the cache : "
-                + config.get(XmlaOlap4jDriver.Property.Cache.name()), e);
+                + config.get(XmlaOlap4jDriver.Property.CACHE.name()), e);
         }
     }
 

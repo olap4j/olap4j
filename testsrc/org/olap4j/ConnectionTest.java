@@ -367,7 +367,7 @@ public class ConnectionTest extends TestCase {
             assertEquals(0, axesList.size());
 
             info.setProperty(
-                    XmlaOlap4jDriver.Property.Catalog.name(), "FoodMart");
+                    XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMart");
             connection =
                 DriverManager.getConnection(
                     tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
@@ -375,7 +375,7 @@ public class ConnectionTest extends TestCase {
             assertEquals("FoodMart", connection.getCatalog());
 
             info.setProperty(
-                    XmlaOlap4jDriver.Property.Catalog.name(), "FoodMartError");
+                    XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMartError");
             try {
                 connection = DriverManager.getConnection(
                         tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
