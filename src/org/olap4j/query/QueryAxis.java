@@ -308,8 +308,8 @@ public class QueryAxis extends QueryNodeImpl {
     /**
      * <p>Sorts the axis according to the supplied order
      * and evaluation expression.
-     * <p>The string value passed as the sortIdentifierNodeName
-     * parameter willb e used literally as a sort evaluator.
+     * <p>The string value passed as the sortEvaluationLitteral
+     * parameter will be used literally as a sort evaluator.
      * @param order The {@link SortOrder} in which to
      * sort the axis.
      * @param sortEvaluationLiteral The literal expression that
