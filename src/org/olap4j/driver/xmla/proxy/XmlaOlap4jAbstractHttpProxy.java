@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 import org.olap4j.OlapException;
 import org.olap4j.driver.xmla.XmlaHelper;
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
+import org.olap4j.driver.xmla.XmlaOlap4jServerInfos;
 import org.olap4j.driver.xmla.cache.XmlaOlap4jCache;
 
 /**
@@ -68,8 +69,10 @@ abstract class XmlaOlap4jAbstractHttpProxy
      * @param request Request string
      * @return Response
      */
-    abstract public byte[] getResponse(URL url, String request)
-        throws XmlaOlap4jProxyException;
+    abstract public byte[] getResponse(
+        XmlaOlap4jServerInfos serverInfos,
+        String request)
+            throws XmlaOlap4jProxyException;
 
 
     /**
@@ -80,7 +83,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
      * @return Future object representing the submitted job
      */
     abstract public Future<byte[]> getResponseViaSubmit(
-        URL url,
+        XmlaOlap4jServerInfos serverInfos,
         String request);
 
     /**
@@ -147,13 +150,17 @@ abstract class XmlaOlap4jAbstractHttpProxy
     }
 
     // implement XmlaOlap4jProxy
-    public byte[] get(URL url, String request) throws XmlaOlap4jProxyException {
+    public byte[] get(
+            XmlaOlap4jServerInfos serverInfos,
+            String request)
+        throws XmlaOlap4jProxyException
+    {
         byte[] response = null;
         // Tries to fetch from cache
         try {
             response =
                 getFromCache(
-                    url,
+                    serverInfos.getUrl(),
                     request.getBytes(getEncodingCharsetName()));
             // Returns the cached value if found
             if (response != null) {
@@ -166,12 +173,12 @@ abstract class XmlaOlap4jAbstractHttpProxy
         }
 
         // Executes the query
-        response = getResponse(url, request);
+        response = getResponse(serverInfos, request);
 
         try {
             // Adds to cache
             addToCache(
-                url,
+                serverInfos.getUrl(),
                 request.getBytes(getEncodingCharsetName()),
                 response);
             // Returns result
@@ -218,14 +225,17 @@ abstract class XmlaOlap4jAbstractHttpProxy
     }
 
     // implement XmlaOlap4jProxy
-    public Future<byte[]> submit(final URL url, final String request) {
+    public Future<byte[]> submit(
+            final XmlaOlap4jServerInfos serverInfos,
+            final String request)
+    {
         // The submit operation doesn't need to be cached yet, since it will
         // call the get operation to fetch the data later on. It will get cached
         // then.
         //
         // I still overridden the submit method in case we need some caching
         // done in the end. - Luc
-        return getResponseViaSubmit(url, request);
+        return getResponseViaSubmit(serverInfos, request);
     }
 
     /**

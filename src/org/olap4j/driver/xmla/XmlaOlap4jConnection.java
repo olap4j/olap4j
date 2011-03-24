@@ -25,8 +25,7 @@ import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 import java.sql.*;
 import java.util.*;
 import java.util.Map.*;
@@ -79,7 +78,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     /**
      * URL of the HTTP server to which to send XML requests.
      */
-    final URL serverUrl;
+    final XmlaOlap4jServerInfos serverInfos;
 
     private Locale locale;
 
@@ -116,6 +115,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * Root of the metadata hierarchy of this connection.
      */
     private NamedList<XmlaOlap4jDatabase> olapDatabases;
+
+    private final URL serverUrlObject;
 
     /**
      * This is a private property used for development only.
@@ -163,7 +164,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         this.driver = driver;
         this.proxy = proxy;
 
-        Map<String, String> map = parseConnectString(url, info);
+        final Map<String, String> map = parseConnectString(url, info);
 
         this.databaseName =
             map.get(XmlaOlap4jDriver.Property.Database.name());
@@ -175,36 +176,42 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             map.get(XmlaOlap4jDriver.Property.Schema.name());
 
         // Set URL of HTTP server.
-        String serverUrl = map.get(XmlaOlap4jDriver.Property.Server.name());
+        final String serverUrl =
+            map.get(XmlaOlap4jDriver.Property.Server.name());
         if (serverUrl == null) {
             throw getHelper().createException(
                 "Connection property '"
                 + XmlaOlap4jDriver.Property.Server.name()
                 + "' must be specified");
         }
-
-        // Basic authentication. Make sure the credentials passed as standard
-        // JDBC parameters override any credentials already included in the URL
-        // as part of the standard URL scheme.
-        if (map.containsKey("user") && map.containsKey("password")) {
-            serverUrl = serverUrl.replaceFirst(
-                ":\\/\\/([^@]*@){0,1}",
-                "://"
-                + map.get("user")
-                + ":"
-                + map.get("password")
-                + "@");
+        try {
+            this.serverUrlObject = new URL(serverUrl);
+        } catch (MalformedURLException e) {
+            throw getHelper().createException(e);
         }
 
         // Initialize the SOAP cache if needed
         initSoapCache(map);
 
-        try {
-            this.serverUrl = new URL(serverUrl);
-        } catch (MalformedURLException e) {
-            throw getHelper().createException(
-                "Error while creating connection", e);
-        }
+        this.serverInfos =
+            new XmlaOlap4jServerInfos() {
+                private String sessionId = null;
+                public String getUsername() {
+                    return map.get("user");
+                }
+                public String getPassword() {
+                    return map.get("password");
+                }
+                public URL getUrl() {
+                    return serverUrlObject;
+                }
+                public String getSessionId() {
+                    return sessionId;
+                }
+                public void setSessionId(String sessionId) {
+                    this.sessionId = sessionId;
+                }
+            };
 
         this.olap4jDatabaseMetaData =
             factory.newDatabaseMetaData(this);
@@ -724,16 +731,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             System.out.println(request);
         }
         try {
-            bytes = proxy.get(serverUrl, request);
-        } catch (IOException e) {
-            /*
-             * FIXME This type of exception should not reach this point.
-             * It was maintained because some other proxy implementations
-             * exists out there that still throw an IOException arround.
-             * This was a bad design which we will fix at some point but not
-             * before the 1.0 release.
-             */
-            throw getHelper().createException(e);
+            bytes = proxy.get(serverInfos, request);
         } catch (XmlaOlap4jProxyException e) {
             throw getHelper().createException(
                 "This connection encountered an exception while executing a query.",
@@ -836,6 +834,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 + "    <Discover xmlns=\"urn:schemas-microsoft-com:xml-analysis\"\n"
                 + "        SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
                 + "    <RequestType>");
+
         buf.append(metadataRequest.name());
         buf.append(
             "</RequestType>\n"

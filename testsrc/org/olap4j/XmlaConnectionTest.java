@@ -1,18 +1,15 @@
 package org.olap4j;
 
-import java.io.IOException;
-import java.net.URL;
-import java.security.*;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.olap4j.driver.xmla.XmlaOlap4jDriver;
-import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxy;
-import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxyException;
-import org.olap4j.test.TestContext;
+import org.olap4j.driver.xmla.*;
+import org.olap4j.driver.xmla.proxy.*;
+import org.olap4j.test.*;
+import org.olap4j.test.TestContext.Tester;
 
 import junit.framework.TestCase;
 
@@ -23,7 +20,10 @@ public class XmlaConnectionTest extends TestCase {
     private final TestContext testContext = TestContext.instance();
 
     static class XmlaOlap4jProxyMock implements XmlaOlap4jProxy {
-        public byte[] get(URL url, String request) throws IOException {
+        public byte[] get(
+                XmlaOlap4jServerInfos serverInfos,
+                String request)
+        {
             throw new RuntimeException("Non-Trivial Call!");
         }
 
@@ -31,7 +31,10 @@ public class XmlaConnectionTest extends TestCase {
             return "UTF-8";
         }
 
-        public Future<byte[]> submit(URL url, String request) {
+        public Future<byte[]> submit(
+                XmlaOlap4jServerInfos serverInfos,
+                String request)
+        {
             throw new RuntimeException("Non-Trivial Call!");
         }
     }
@@ -52,17 +55,17 @@ public class XmlaConnectionTest extends TestCase {
             this.proxy = proxy;
         }
 
-        public byte[] get(URL url, String request)
-            throws XmlaOlap4jProxyException, IOException
+        public byte[] get(XmlaOlap4jServerInfos serverInfos, String request)
+            throws XmlaOlap4jProxyException
         {
-            return proxy.get(url, request);
+            return proxy.get(serverInfos, request);
         }
 
         public Future<byte[]> submit(
-            URL url,
+            XmlaOlap4jServerInfos serverInfos,
             String request)
         {
-            return proxy.submit(url, request);
+            return proxy.submit(serverInfos, request);
         }
 
         public String getEncodingCharsetName() {
@@ -125,7 +128,7 @@ public class XmlaConnectionTest extends TestCase {
          * @param urlString URL
          * @return Proxy
          */
-        private static XmlaOlap4jProxy createProxy(
+        static XmlaOlap4jProxy createProxy(
             Map<String, String> catalogNameUrls,
             String urlString)
         {
@@ -149,11 +152,11 @@ public class XmlaConnectionTest extends TestCase {
             }
         }
 
-        public byte[] get(URL url, String request)
-            throws IOException, XmlaOlap4jProxyException
+        public byte[] get(XmlaOlap4jServerInfos serverInfos, String request)
+            throws XmlaOlap4jProxyException
         {
             this.checkup(request);
-            return super.get(url, request);
+            return super.get(serverInfos, request);
         }
 
         /**
@@ -205,6 +208,55 @@ public class XmlaConnectionTest extends TestCase {
         }
     }
 
+    public void testDbSchemaSchemata() throws Exception {
+        if (!testContext.getTester().getFlavor()
+                .equals(Tester.Flavor.XMLA))
+        {
+            return;
+        }
+        class Proxy extends DoubleSubmissionTestProxy {
+            boolean schemata = false;
+            boolean cubes = false;
+            public Proxy(
+                    Map<String, String> catalogNameUrls,
+                    String urlString)
+            {
+                super(catalogNameUrls, urlString);
+            }
+            @Override
+            public byte[] get(
+                    XmlaOlap4jServerInfos serverInfos, String request)
+                throws XmlaOlap4jProxyException
+            {
+                if (request.contains("DBSCHEMA_SCHEMATA")) {
+                    if (schemata || cubes) {
+                        fail();
+                    }
+                    schemata = true;
+                } else if (request.contains("MDSCHEMA_CUBES")) {
+                    if (!schemata || cubes) {
+                        fail();
+                    }
+                }
+                return super.get(serverInfos, request);
+            }
+        }
+        String oldValue = XmlaTester.getProxyClassName();
+        XmlaTester.setProxyClassName(
+            Proxy.class.getName());
+        DoubleSubmissionTestProxy.setProxyClassName(oldValue);
+        try {
+            final TestContext.Tester tester =
+                testContext.getTester();
+            Connection connection = tester.createConnection();
+            OlapConnection oConn =
+                tester.getWrapper().unwrap(connection, OlapConnection.class);
+            oConn.getOlapSchema().getCubes().size();
+        } finally {
+            XmlaTester.setProxyClassName(oldValue);
+        }
+    }
+
     /**
      * Tests that no request is sent to XMLA more than once.
      * If the same request is sent twice, throws an exception. The only
@@ -216,9 +268,10 @@ public class XmlaConnectionTest extends TestCase {
      * @throws Exception If the test fails.
      */
     public void testNoDoubleQuerySubmission() throws Exception {
-        if (!testContext.getProperties()
-            .get(TestContext.Property.HELPER_CLASS_NAME.path)
-            .equals("org.olap4j.XmlaTester"))
+        if (!testContext.getTester().getFlavor()
+                .equals(Tester.Flavor.XMLA)
+            && !testContext.getTester().getFlavor()
+                .equals(Tester.Flavor.REMOTE_XMLA))
         {
             return;
         }
@@ -280,28 +333,6 @@ public class XmlaConnectionTest extends TestCase {
                 } while (two_halfs++ < 1);
             }
             return buf.toString();
-        }
-
-        /**
-         * Computes the SHA-1 digest of a string, encoded as a hex string.
-         * @param text String
-         * @return Digest
-         */
-        public static String SHA1(String text) {
-            MessageDigest md;
-            try {
-                md = MessageDigest.getInstance("SHA-1");
-            } catch (NoSuchAlgorithmException e) {
-                try {
-                    md = MessageDigest.getInstance("MD5");
-                } catch (NoSuchAlgorithmException e1) {
-                    throw new RuntimeException(e1);
-                }
-            }
-            byte[] sha1hash = new byte[40];
-            md.update(text.getBytes(), 0, text.length());
-            sha1hash = md.digest();
-            return convertToHex(sha1hash);
         }
     }
 }

@@ -14,6 +14,7 @@ import java.net.*;
 import java.util.concurrent.*;
 
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
+import org.olap4j.driver.xmla.XmlaOlap4jServerInfos;
 import org.olap4j.impl.Base64;
 
 /**
@@ -39,16 +40,19 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
      *
      * @param driver Driver
      */
-    public XmlaOlap4jHttpProxy(XmlaOlap4jDriver driver) {
+    public XmlaOlap4jHttpProxy(
+            XmlaOlap4jDriver driver)
+    {
         this.driver = driver;
     }
 
     @Override
-    public byte[] getResponse(URL url, String request)
+    public byte[] getResponse(XmlaOlap4jServerInfos serverInfos, String request)
         throws XmlaOlap4jProxyException
     {
         URLConnection urlConnection = null;
         try {
+            URL url = serverInfos.getUrl();
             // Open connection to manipulate the properties
             urlConnection = url.openConnection();
             urlConnection.setDoOutput(true);
@@ -87,9 +91,20 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
             }
 
             // Encode credentials for basic authentication
-            if (url.getUserInfo() != null) {
+            StringBuilder sb = new StringBuilder();
+            if (serverInfos.getUsername() != null
+                && serverInfos.getPassword() != null)
+            {
+                sb.append(serverInfos.getUsername());
+                sb.append(":");
+                sb.append(serverInfos.getPassword());
+            } else if (url.getUserInfo() != null) {
+                sb.append(url.getUserInfo());
+            }
+            if (!sb.toString().equals("")) {
                 String encoding =
-                    Base64.encodeBytes(url.getUserInfo().getBytes(), 0);
+                    Base64.encodeBytes(
+                        sb.toString().getBytes(), 0);
                 urlConnection.setRequestProperty(
                     "Authorization", "Basic " + encoding);
             }
@@ -149,10 +164,10 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
 
     @Override
     public Future<byte[]> getResponseViaSubmit(
-        final URL url,
+        final XmlaOlap4jServerInfos serverInfos,
         final String request)
     {
-        return XmlaOlap4jDriver.getFuture(this, url, request);
+        return XmlaOlap4jDriver.getFuture(this, serverInfos, request);
     }
 
     // implement XmlaOlap4jProxy

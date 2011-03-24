@@ -2,16 +2,14 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
-import org.olap4j.mdx.SelectNode;
-import org.olap4j.mdx.ParseTreeNode;
-import org.olap4j.mdx.ParseTreeWriter;
+import org.olap4j.mdx.*;
 
 import java.sql.*;
 import java.io.*;
@@ -326,7 +324,7 @@ class XmlaOlap4jStatement implements OlapStatement {
 
             this.future =
                 olap4jConnection.proxy.submit(
-                    olap4jConnection.serverUrl, request);
+                    olap4jConnection.serverInfos, request);
             openCellSet = olap4jConnection.factory.newCellSet(this);
         }
         // Release the monitor before calling populate, so that cancel can
