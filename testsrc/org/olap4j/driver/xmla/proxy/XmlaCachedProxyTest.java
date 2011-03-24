@@ -47,16 +47,16 @@ public class XmlaCachedProxyTest extends TestCase {
             XmlaOlap4jDriver.Property.Cache.name(),
             "org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Name.name(),
+            XmlaOlap4jNamedMemoryCache.Property.NAME.name(),
             "testCacheConfig");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Mode.name(),
+            XmlaOlap4jNamedMemoryCache.Property.MODE.name(),
             "LFU");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Timeout.name(),
+            XmlaOlap4jNamedMemoryCache.Property.TIMEOUT.name(),
             "30");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Size.name(),
+            XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
             "50");
 
         proxy.setCache(driverParameters, cacheProperties);
@@ -82,16 +82,16 @@ public class XmlaCachedProxyTest extends TestCase {
             XmlaOlap4jDriver.Property.Cache.name(),
             "org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Name.name(),
+            XmlaOlap4jNamedMemoryCache.Property.NAME.name(),
             "testCacheModeError");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Mode.name(),
+            XmlaOlap4jNamedMemoryCache.Property.MODE.name(),
             "ERRONOUS VALUE MWAHAHAHAHA");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Timeout.name(),
+            XmlaOlap4jNamedMemoryCache.Property.TIMEOUT.name(),
             "30");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Size.name(),
+            XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
             "50");
 
         try {
@@ -125,16 +125,16 @@ public class XmlaCachedProxyTest extends TestCase {
             XmlaOlap4jDriver.Property.Cache.name(),
             "org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Name.name(),
+            XmlaOlap4jNamedMemoryCache.Property.NAME.name(),
             "testCacheTimeoutError");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Mode.name(),
+            XmlaOlap4jNamedMemoryCache.Property.MODE.name(),
             "LFU");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Timeout.name(),
+            XmlaOlap4jNamedMemoryCache.Property.TIMEOUT.name(),
             "EEE");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Size.name(),
+            XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
             "50");
 
         try {
@@ -142,7 +142,7 @@ public class XmlaCachedProxyTest extends TestCase {
         } catch (OlapException t) {
             try {
                 cacheProperties.put(
-                    XmlaOlap4jNamedMemoryCache.Property.Timeout.name(),
+                    XmlaOlap4jNamedMemoryCache.Property.TIMEOUT.name(),
                     "-30");
                 proxy.setCache(driverParameters, cacheProperties);
             } catch (OlapException t2) {
@@ -175,16 +175,16 @@ public class XmlaCachedProxyTest extends TestCase {
             XmlaOlap4jDriver.Property.Cache.name(),
             "org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Name.name(),
+            XmlaOlap4jNamedMemoryCache.Property.NAME.name(),
             "testCacheSizeError");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Mode.name(),
+            XmlaOlap4jNamedMemoryCache.Property.MODE.name(),
             "LFU");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Timeout.name(),
+            XmlaOlap4jNamedMemoryCache.Property.TIMEOUT.name(),
             "600");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Size.name(),
+            XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
             "EEE");
 
         try {
@@ -192,7 +192,7 @@ public class XmlaCachedProxyTest extends TestCase {
         } catch (OlapException t) {
             try {
                 cacheProperties.put(
-                        XmlaOlap4jNamedMemoryCache.Property.Size.name(),
+                        XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
                         "-30");
                 proxy.setCache(driverParameters, cacheProperties);
             } catch (OlapException t2) {
@@ -224,16 +224,16 @@ public class XmlaCachedProxyTest extends TestCase {
             XmlaOlap4jDriver.Property.Cache.name(),
             "Class which doesn't exist");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Name.name(),
+            XmlaOlap4jNamedMemoryCache.Property.NAME.name(),
             "testCacheNameError");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Mode.name(),
+            XmlaOlap4jNamedMemoryCache.Property.MODE.name(),
             "LFU");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Timeout.name(),
+            XmlaOlap4jNamedMemoryCache.Property.TIMEOUT.name(),
             "600");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Size.name(),
+            XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
             "50");
 
         try {
@@ -271,16 +271,16 @@ public class XmlaCachedProxyTest extends TestCase {
             XmlaOlap4jDriver.Property.Cache.name(),
             "org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Name.name(),
+            XmlaOlap4jNamedMemoryCache.Property.NAME.name(),
             "testCacheSharing");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Mode.name(),
+            XmlaOlap4jNamedMemoryCache.Property.MODE.name(),
             "LFU");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Timeout.name(),
+            XmlaOlap4jNamedMemoryCache.Property.TIMEOUT.name(),
             "600");
         cacheProperties.put(
-            XmlaOlap4jNamedMemoryCache.Property.Size.name(),
+            XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
             "50");
 
         try {
@@ -299,16 +299,16 @@ public class XmlaCachedProxyTest extends TestCase {
                 XmlaOlap4jDriver.Property.Cache.name(),
                 "org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache");
         cacheProperties.put(
-                XmlaOlap4jNamedMemoryCache.Property.Name.name(),
+                XmlaOlap4jNamedMemoryCache.Property.NAME.name(),
                 "testCacheSharing");
         cacheProperties.put(
-                XmlaOlap4jNamedMemoryCache.Property.Mode.name(),
+                XmlaOlap4jNamedMemoryCache.Property.MODE.name(),
                 "Erronous value which won't trigger an exception since a shared cache should be used.");
         cacheProperties.put(
-                XmlaOlap4jNamedMemoryCache.Property.Timeout.name(),
+                XmlaOlap4jNamedMemoryCache.Property.TIMEOUT.name(),
                 "Erronous value which won't trigger an exception since a shared cache should be used.");
         cacheProperties.put(
-                XmlaOlap4jNamedMemoryCache.Property.Size.name(),
+                XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
                 "Erronous value which won't trigger an exception since a shared cache should be used.");
 
         try {

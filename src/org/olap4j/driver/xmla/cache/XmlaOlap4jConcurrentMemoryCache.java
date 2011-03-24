@@ -84,17 +84,17 @@ class XmlaOlap4jConcurrentMemoryCache {
         throws IllegalArgumentException
     {
         for (Entry<String, String> entry : props.entrySet()) {
-            if (Property.Size.name().equalsIgnoreCase(
+            if (Property.SIZE.name().equalsIgnoreCase(
                 entry.getKey().toString()))
             {
                 this.setCacheSize(
                         Integer.parseInt(entry.getValue().toString()));
-            } else if (Property.Timeout.name().equalsIgnoreCase(
+            } else if (Property.TIMEOUT.name().equalsIgnoreCase(
                 entry.getKey().toString()))
             {
                 this.setCacheTimeout(
                         Integer.parseInt(entry.getValue().toString()));
-            } else if (Property.Mode.name().equalsIgnoreCase(
+            } else if (Property.MODE.name().equalsIgnoreCase(
                 entry.getKey().toString()))
             {
                 this.setCacheMode(

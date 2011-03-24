@@ -24,16 +24,16 @@ import org.olap4j.impl.Olap4jUtil;
  * <p>All parameters are optional.
  *
  * <ul>
- * <li><b>Name</b><br />A unique identifier which allows two connections
+ * <li><b>NAME</b><br />A unique identifier which allows two connections
  * to share a same cache space. Setting this to an already existing cache
  * space will cause the cache manager to ignore other configuration properties,
  * such as eviction mode and so on. Not setting this property will
  * assign a random name to the cache space, thus creating a unique space.</li>
- * <li><b>Size</b><br />The number of entries to maintain in cache under
+ * <li><b>SIZE</b><br />The number of entries to maintain in cache under
  * the given cache name.</li>
- * <li><b>Timeout</b><br />The number of seconds to maintain entries in
+ * <li><b>TIMEOUT</b><br />The number of seconds to maintain entries in
  * cache before expiration.</li>
- * <li><b>Mode</b><br />Supported eviction modes are LIFO (last in first out),
+ * <li><b>MODE</b><br />Supported eviction modes are LIFO (last in first out),
  * FIFO (first in first out), LFU (least frequently used) and MFU
  * (most frequently used)</li>
  * </ul>
@@ -63,13 +63,13 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
          * property will assign a random name to the cache space, thus creating
          * a unique space.
          */
-        Name("Name of a cache to create or to share."),
+        NAME("Name of a cache to create or to share."),
 
         /**
          * The number of entries to maintain in cache under
          * the given cache name.
          */
-        Size(
+        SIZE(
             "Maximum number of SOAP requests which will be cached under the "
             + "given cache name."),
 
@@ -77,7 +77,7 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
          * The number of seconds to maintain
          * entries in cache before expiration.
          */
-        Timeout(
+        TIMEOUT(
             "Maximum TTL of SOAP requests which will be cached under the given "
             + "cache name."),
 
@@ -86,7 +86,7 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
          * LIFO (last in first out), FIFO (first in first out),
          * LFU (least frequently used) and MFU (most frequently used).
          */
-        Mode("Eviction mode to set to the given cache name.");
+        MODE("Eviction mode to set to the given cache name.");
 
         /**
          * Creates a property.
@@ -149,13 +149,13 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
         // Make sure there's a name for the cache. Generate a
         // random one if needed.
         if (props.containsKey(
-                XmlaOlap4jNamedMemoryCache.Property.Name.name()))
+                XmlaOlap4jNamedMemoryCache.Property.NAME.name()))
         {
             refId = (String)props.get(
-                    XmlaOlap4jNamedMemoryCache.Property.Name.name());
+                    XmlaOlap4jNamedMemoryCache.Property.NAME.name());
         } else {
             refId = String.valueOf(UUID.randomUUID());
-            props.put(XmlaOlap4jNamedMemoryCache.Property.Name.name(), refId);
+            props.put(XmlaOlap4jNamedMemoryCache.Property.NAME.name(), refId);
         }
 
 
@@ -164,11 +164,11 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
             // Create a cache for this URL if it is not created yet
             if (!caches.containsKey(
                 props.get(
-                    XmlaOlap4jNamedMemoryCache.Property.Name.name())))
+                    XmlaOlap4jNamedMemoryCache.Property.NAME.name())))
             {
                 caches.put(
                     (String) props.get(
-                        XmlaOlap4jNamedMemoryCache.Property.Name.name()),
+                        XmlaOlap4jNamedMemoryCache.Property.NAME.name()),
                     new XmlaOlap4jConcurrentMemoryCache(props));
             }
         }
