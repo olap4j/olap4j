@@ -146,6 +146,11 @@ class XmlaOlap4jCube implements Cube, Named
         return Olap4jUtil.cast(hierarchies);
     }
 
+    public boolean isDrillThroughEnabled() {
+        // XMLA does not implement drillthrough yet.
+        return false;
+    }
+
     public List<Measure> getMeasures() {
         return Olap4jUtil.cast(measures);
     }

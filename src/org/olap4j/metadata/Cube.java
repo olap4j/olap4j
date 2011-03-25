@@ -200,6 +200,13 @@ public interface Cube extends MetadataElement {
     List<Member> lookupMembers(
         Set<Member.TreeOp> treeOps,
         List<IdentifierSegment> nameParts) throws OlapException;
+
+    /**
+     * Tells whether or not drill through operations are
+     * possible in this cube.
+     * @return True if drillthrough is enabled, false otherwise.
+     */
+    boolean isDrillThroughEnabled();
 }
 
 // End Cube.java

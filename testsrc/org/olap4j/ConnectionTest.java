@@ -2773,6 +2773,33 @@ public class ConnectionTest extends TestCase {
             sb.toString());
     }
 
+    public void testCubesDrillthrough() throws Exception {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        Cube cube =
+            olapConnection
+                .getOlapCatalogs()
+                    .get("FoodMart")
+                        .getSchemas()
+                            .get("FoodMart")
+                                .getCubes()
+                                    .get("Sales");
+        switch (tester.getFlavor()) {
+        case MONDRIAN:
+            assertTrue(cube.isDrillThroughEnabled());
+            break;
+        case REMOTE_XMLA :
+        case XMLA:
+            assertFalse(cube.isDrillThroughEnabled());
+            break;
+        default:
+            fail();
+            break;
+        }
+    }
+
     /**
      * Query with dimension properties.
      *

@@ -535,6 +535,24 @@ public class MetadataTest extends TestCase {
         if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
             assertEquals(lineCount * 2, lineCount3);
         }
+        s = checkResultSet(
+            olapDatabaseMetaData.getCubes(
+                "FoodMart",
+                "FoodMart",
+                "Sales"),
+            CUBE_COLUMN_NAMES);
+        switch (testContext.getTester().getFlavor()) {
+        case MONDRIAN:
+            assertTrue(s.contains(", IS_DRILLTHROUGH_ENABLED=true"));
+            break;
+        case XMLA:
+        case REMOTE_XMLA:
+            assertTrue(s.contains(", IS_DRILLTHROUGH_ENABLED=false"));
+            assertFalse(s.contains(", IS_DRILLTHROUGH_ENABLED=true"));
+            break;
+        default:
+            throw new RuntimeException("Unknown tester type.");
+        }
 
         // If we ask for 'Warehouse and Sales' cube we should get it, but
         // nothing else.

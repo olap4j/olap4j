@@ -48,12 +48,26 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         this.olap4jConnection = olap4jConnection;
     }
 
+    private ResultSet getMetadata(
+        XmlaOlap4jConnection.MetadataRequest metadataRequest,
+        Object... patternValues) throws OlapException
+    {
+        return getMetadata(
+            metadataRequest,
+            Collections.emptyMap(),
+            patternValues);
+    }
+
     /**
      * Executes a metadata query and returns the result as a JDBC
      * {@link ResultSet}.
      *
      * @param metadataRequest Name of the metadata request. Corresponds to the
      * XMLA method name, e.g. "MDSCHEMA_CUBES"
+     *
+     * @param overrides Map of metadata columns to forced values. Used
+     * to override the value returned by the server for a list of
+     * columns.
      *
      * @param patternValues Array of alternating parameter name and value
      * pairs. If the parameter value is null, it is ignored.
@@ -64,6 +78,7 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
      */
     private ResultSet getMetadata(
         XmlaOlap4jConnection.MetadataRequest metadataRequest,
+        Map<XmlaOlap4jConnection.MetadataColumn, String> overrides,
         Object... patternValues) throws OlapException
     {
         assert patternValues.length % 2 == 0;
@@ -132,9 +147,13 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
             for (XmlaOlap4jConnection.MetadataColumn column
                 : metadataRequest.columns)
             {
-                final String value =
-                    XmlaOlap4jUtil.stringElement(row, column.xmlaName);
-                valueList.add(value);
+                if (overrides.containsKey(column)) {
+                    valueList.add(overrides.get(column));
+                } else {
+                    final String value =
+                        XmlaOlap4jUtil.stringElement(row, column.xmlaName);
+                    valueList.add(value);
+                }
             }
             rowList.add(valueList);
         }
@@ -1039,8 +1058,17 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         String cubeNamePattern)
         throws OlapException
     {
+        // XMLA doesn't support drillthrough so override
+        // whatever the server returns.
+        final Map<XmlaOlap4jConnection.MetadataColumn, String> overrides =
+            new HashMap<XmlaOlap4jConnection.MetadataColumn, String>();
+        overrides.put(
+            XmlaOlap4jConnection.MetadataRequest
+                .MDSCHEMA_CUBES.getColumn("IS_DRILLTHROUGH_ENABLED"),
+                "false");
         return getMetadata(
             XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_CUBES,
+            overrides,
             "CATALOG_NAME", catalog,
             "SCHEMA_NAME", wildcard(schemaPattern),
             "CUBE_NAME", wildcard(cubeNamePattern));
