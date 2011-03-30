@@ -106,4 +106,4 @@ class XmlaOlap4jDatabase implements Database, Named {
         return this.dataSourceInfo;
     }
 }
-// End XmlaOlap4jDatabase
+// End XmlaOlap4jDatabase.java

@@ -192,3 +192,5 @@ public class XmlaDatabaseCache implements XmlaOlap4jCache {
         return CACHE_IDENT;
     }
 }
+
+// End XmlaDatabaseCache.java
