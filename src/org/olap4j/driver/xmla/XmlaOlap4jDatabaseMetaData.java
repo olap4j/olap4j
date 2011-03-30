@@ -52,9 +52,11 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         XmlaOlap4jConnection.MetadataRequest metadataRequest,
         Object... patternValues) throws OlapException
     {
+        final Map<XmlaOlap4jConnection.MetadataColumn, String> overrides =
+            Collections.emptyMap();
         return getMetadata(
             metadataRequest,
-            Collections.emptyMap(),
+            overrides,
             patternValues);
     }
 
