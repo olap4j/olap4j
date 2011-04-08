@@ -151,6 +151,7 @@ testsrc/**,
 foodmart/*.zip,
 foodmart/*.xml,
 simple-jndi/**,
+xmla-cache/**,
 .settings/**
 .classpath,
 .project,
