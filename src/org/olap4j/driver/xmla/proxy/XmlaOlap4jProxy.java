@@ -36,7 +36,7 @@ public interface XmlaOlap4jProxy {
     /**
      * Submits a request for background execution.
      *
-     * @param url URL
+     * @param serverInfos Server infos.
      * @param request Request
      * @return Future object representing the submitted job
      */
