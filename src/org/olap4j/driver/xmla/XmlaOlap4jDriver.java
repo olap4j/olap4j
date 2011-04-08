@@ -255,7 +255,7 @@ public class XmlaOlap4jDriver implements Driver {
      * XMLA request to a URL.
      *
      * @param proxy Proxy via which to send the request
-     * @param url URL of XMLA server
+     * @param serverInfos Server infos.
      * @param request Request
      * @return Future object from which the byte array containing the result
      * of the XMLA call can be obtained
