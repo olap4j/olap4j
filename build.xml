@@ -50,7 +50,7 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
 
     <!-- Override to create a proper release. -->
     <target name="dist"
-        depends="clean,version-properties,jar,tck-jar,xmla-jar,javadoc,javadoc-pdf,javadoc-with-ydoc,jar-jdk14,source.zip"
+        depends="clean,version-properties,jar,tck-jar,xmla-jar,javadoc,javadoc-pdf,jar-jdk14,source.zip"
         description="Creates a distribution">
         <zip zipfile="${dist.dir}/${zip.filename}">
             <zipfileset dir="${basedir}/doc" prefix="${ivy.artifact.id}-${project.revision}/doc"
@@ -68,7 +68,7 @@ VERSION.txt" />
         </zip>
     </target>
 
-    <target name="doczip" depends="clean-all,clean-tests,compile,compile-tests,version-properties,javadoc,javadoc-pdf,javadoc-with-ydoc"
+    <target name="doczip" depends="clean-all,clean-tests,compile,compile-tests,version-properties,javadoc,javadoc-pdf"
         description="Creates an archive of all docs to deploy on www.olap4j.org.
                      See also doc/deployDoc.sh.">
         <mkdir dir="${dist.dir}" />
@@ -418,44 +418,6 @@ class XmlaOlap4jDriverVersion {
             <tag name="post" description="Post-condition:" scope="constructors,methods" />
             <tag name="testcase" description="Test-case:" scope="constructors,methods,types" />
             <link href="http://download.oracle.com/javase/6/docs/api/" />
-        </javadoc>
-    </target>
-
-    <!--
-        Generate javadoc with embedded UML diagrams using the yDoc doclet from
-        yWorks.com. Set ydoc.home in build.properties, then replace
-        ${ydoc.home}/resources/ydoc.license with a full license (free for open
-        source use).
-    -->
-    <target name="javadoc-with-ydoc" depends="clean-stray-package-html">
-        <mkdir dir="${javadoc.dir}" />
-        <delete quiet="true" file="${javadoc.dir}/index.html" />
-        <property name="ps" value="${path.separator}" />
-        <javadoc sourcepath="${src.dir}" classpathref="javadoc.classpath"
-            destdir="${javadoc.dir}" packagenames="org.olap4j.*"
-            excludepackagenames="org.olap4j.impl.*,org.olap4j.mdx.parser.impl.*,org.olap4j.sample.*"
-            overview="${src.dir}/overview.html"
-            footer="&lt;a href=&quot;http://sourceforge.net/projects/olap4j&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=168953&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
-            author="true" source="1.5" access="public"
-            Windowtitle="olap4j, version ${project.revision}" additionalparam="-linksource">
-            <tag name="pre" description="Pre-condition:" scope="constructors,methods" />
-            <tag name="post" description="Post-condition:" scope="constructors,methods" />
-            <tag name="testcase" description="Test-case:" scope="constructors,methods,types" />
-            <link href="http://download.oracle.com/javase/6/docs/api/" />
-            <link href="http://www.junit.org/junit/javadoc/3.8/" />
-            <doclet name="ydoc.doclets.YStandard"
-                path="${ydoc.home}/lib/ydoc.jar${ps}${ydoc.home}/lib/class2svg.jar${ps}${ydoc.home}/resources${ps}${ydoc.home}/doc">
-                <param name="-author" />
-                <param name="-generic" />
-                <param name="-umlautogen" />
-                <param name="-tag" value="y.precondition" />
-                <param name="-tag" value="y.postcondition" />
-                <param name="-tag" value="y.complexity" />
-                <param name="-tag" value="param" />
-                <param name="-tag" value="return" />
-                <param name="-tag" value="see" />
-                <param name="-tag" value="y.uml" />
-            </doclet>
         </javadoc>
     </target>
 

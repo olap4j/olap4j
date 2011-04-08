@@ -41,7 +41,7 @@ import java.util.concurrent.*;
  * &nbsp;&nbsp;&nbsp;connection.unwrap(OlapConnection.class);</code>
  * </blockquote>
  *
- * <p>Note how we use the {@link java.sql.Connection#unwrap(Class)} method to down-cast
+ * <p>Note how we use the java.sql.Connection#unwrap(Class) method to down-cast
  * the JDBC connection object to the extension {@link org.olap4j.OlapConnection}
  * object. This method is only available in JDBC 4.0 (JDK 1.6 onwards).
  *
