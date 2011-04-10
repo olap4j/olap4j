@@ -732,22 +732,26 @@ connection to an OLAP data source.</p>
 Methods:</p>
 
 <ul>
-  <li><code>String getCatalog()</code> // returns the name of the current catalog (inherited from Connection)</li>
-  <li><code>Catalog getOlapCatalog()</code> // returns the current catalog object</li>
-  <li><code>NamedList&lt;Catalog&gt; getOlapCatalogs()</code> // returns a list of all catalogs</li>
+  <li><code>String getDatabase()</code> // returns the name of the current database</li>
+  <li><code>void setDatabase(String databaseName)</code> // sets this connection's current database</li>
   <li><code>Database getOlapDatabase()</code> // returns the current database</li>
   <li><code>NamedList&lt;Database&gt; getOlapDatabases()</code> // returns a list of all databases</li>
+  <li><code>String getCatalog()</code> // returns the name of the current catalog (inherited from Connection)</li>
+  <li><code>void setCatalog(String catalogName)</code> // sets this connection's current catalog</li>
+  <li><code>Catalog getOlapCatalog()</code> // returns the current catalog object</li>
+  <li><code>NamedList&lt;Catalog&gt; getOlapCatalogs()</code> // returns a list of all catalogs</li>
   <li><code>String getSchema()</code> // returns the name of the current schema</li>
+  <li><code>void setSchema(String schemaName)</code> // sets this connection's current schema</li>
   <li><code>Schema getOlapSchema()</code> // returns the current schema object</li>
-  <li><code>NamedList&lt;Schema&gt; getOlapSchema()</code> // returns a list of all schemas</li>
+  <li><code>NamedList&lt;Schema&gt; getOlapSchemas()</code> // returns a list of all schemas</li>
   <li><code>OlapDatabaseMetaData getMetaData()</code> // returns an object that contains metadata about the database</li>
-  <li><code>void setLocale(Locale locale)</code> // sets this connection's locale</li>
   <li><code>Locale getLocale()</code> // returns this connection's locale</li>
+  <li><code>void setLocale(Locale locale)</code> // sets this connection's locale</li>
   <li><code>void setRoleName(String roleName)</code> // sets the name of the role in which access-control context this connection will execute queries</li>
   <li><code>String getRoleName()</code> // returns the name of the role in which access-control context this connection will execute queries</li>
+  <li><code>List&lt;String&gt; getAvailableRoleNames()</code> // returns a list of role names available in this connection</li>
   <li><code>PreparedOlapStatement prepareOlapStatement(String mdx)</code> // prepares a statement</li>
   <li><code>createStatement createStatement(String mdx)</code> // creates a statement (overrides Connection method)</li>
-  <li><code>List&lt;String&gt; getAvailableRoleNames()</code> // returns a list of role names available in this connection</li>
   <li><code>Scenario createScenario()</code> // creates a scenario</li>
   <li><code>void setScenario(Scenario scenario)</code> // sets the current scenario for this connection</li>
   <li><code>Scenario getScenario()</code> // returns the current scenario for this connection</li>
@@ -1124,9 +1128,9 @@ specific instance is chosen based upon the types of its arguments.</p>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new
   IdentifierNode(<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  new IdentifierNode.NameSegment(&quot;Measures&quot;),<br/>
+  new IdentifierNode(IdentifierNode.ofNames(&quot;Measures&quot;).getSegmentList()),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  new IdentifierNode.NameSegment(&quot;Unit Sales&quot;)))));<br/>
+  new IdentifierNode(IdentifierNode.ofNames(&quot;Unit Sales&quot;).getSegmentList()))));<br/>
   <br/>
   // Create a statement based upon the query model.<br/>
   OlapStatement stmt;<br/>
@@ -1457,13 +1461,15 @@ OLAP server.</p>
 <p>Methods:</p>
 
 <ul>
-  <li><code>OlapConnection()</code> // returns the current connection</li>
+  <li><code>OlapConnection getOlapConnection()</code> // returns the current connection</li>
   <li><code>String getName()</code> // returns the name of this database</li>
-  <li><code>NamedList&lt;Catalog&gt; getCatalogs()</code> // returns a list of catalogs in this database</li>
+  <li><code>String getDescription()</code> // returns the description of this database</li>
   <li><code>String getURL()</code> // returns the redirection URL, if this database is a proxy to another server</li>
   <li><code>String getDataSourceInfo()</code> // returns provider-specific information</li>
   <li><code>String getProviderName()</code> // returns the name of the underlying OLAP provider</li>
   <li><code>List&lt;ProviderType&gt; getProviderTypes()</code> // returns the types of data that are supported by this provider</li>
+  <li><code>List&lt;AuthenticationMode&gt; getAuthenticationModes()</code> // returns the modes of authentication that are supported by this provider</li>
+  <li><code>NamedList&lt;Catalog&gt; getCatalogs()</code> // returns a list of catalogs in this database</li>
 </ul>
 
 <h5>2.7.2.3. <a name="Catalog">The Catalog interface</a></h5>
