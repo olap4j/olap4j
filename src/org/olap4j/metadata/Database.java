@@ -22,7 +22,7 @@ import org.olap4j.OlapException;
  * <p>To obtain the collection of databases in the current server, call the
  * {@link OlapConnection#getOlapDatabases()} method. To obtain the current
  * active catalog object, to which a connection is bound, use
- * {@link OlapConnection#getOlapDatabase()()}.
+ * {@link OlapConnection#getOlapDatabase()}.
  *
  * <p>The hierarchy of metadata objects, rooted at the connection from which
  * they are accessed, is as follows:
@@ -72,7 +72,8 @@ public interface Database {
     String getName() throws OlapException;
 
     /**
-     * Returns a human readable description of this Database.
+     * Returns a human-readable description of this Database.
+     *
      * @return The database description. Can be <code>null</code>.
      * @throws OlapException if error occurs.
      */
@@ -95,23 +96,27 @@ public interface Database {
     String getURL() throws OlapException;
 
     /**
-     * Returns provider specific informations.
-     * @return A string containing provider specific informations.
+     * Returns provider-specific information.
+     *
+     * @return A string containing provider-specific information.
      * @throws OlapException if error cccurs
      */
     String getDataSourceInfo() throws OlapException;
 
     /**
      * Returns the name of the underlying OLAP provider.
-     * This usually is the server vendor name, like Mondrian or
-     * MSOLAP for example.
+     *
+     * <p>This usually is the server vendor name, for example "Mondrian" or
+     * "MSOLAP".
+     *
      * @return The provider name.
      * @throws OlapException if error occurs.
      */
     String getProviderName() throws OlapException;
 
     /**
-     * Returns the types of data which are supported by this provider.
+     * Returns the types of data that are supported by this provider.
+     *
      * @return The provider types.
      * @throws OlapException if error occurs.
      */

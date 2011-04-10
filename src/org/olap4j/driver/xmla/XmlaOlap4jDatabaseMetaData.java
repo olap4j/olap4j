@@ -988,10 +988,6 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
             "ACTION_NAME", wildcard(actionNamePattern));
     }
 
-    public ResultSet getDatasources() throws OlapException {
-        return this.getDatabases();
-    }
-
     public ResultSet getDatabases() throws OlapException {
         return getMetadata(
             XmlaOlap4jConnection.MetadataRequest.DISCOVER_DATASOURCES);
