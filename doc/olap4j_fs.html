@@ -574,7 +574,7 @@ is an object representing the textual region in the MDX statement.</p>
 
 <ul>
     <li><code>Region getRegion()</code></li>
-    <li><code>setRegion(Region region)</code></li>
+    <li><code>void setRegion(Region region)</code></li>
     <li><code>Object getContext()</code></li>
     <li><code>void setContext(Object context)</code></li>
 </ul>
@@ -732,7 +732,6 @@ connection to an OLAP data source.</p>
 Methods:</p>
 
 <ul>
-
   <li><code>String getCatalog()</code> // returns the name of the current catalog (inherited from Connection)</li>
   <li><code>Catalog getOlapCatalog()</code> // returns the current catalog object</li>
   <li><code>NamedList&lt;Catalog&gt; getOlapCatalogs()</code> // returns a list of all catalogs</li>
@@ -752,8 +751,7 @@ Methods:</p>
   <li><code>Scenario createScenario()</code> // creates a scenario</li>
   <li><code>void setScenario(Scenario scenario)</code> // sets the current scenario for this connection</li>
   <li><code>Scenario getScenario()</code> // returns the current scenario for this connection</li>
-  <li><code>MdxParserFactory getParserFactory()</code> // returns a
-factory to create MDX parsers</li>
+  <li><code>MdxParserFactory getParserFactory()</code> // returns a factory to create MDX parsers</li>
 </ul>
 
 <h4>2.2.3. <a name="The_OlapWrapper_interface">The OlapWrapper interface</a></h4>
@@ -770,11 +768,9 @@ to olap4j clients running in a JDBC 3.0 environment. For code which
 will run only on JDBC 4.0 and later, <code>Wrapper</code> can be used,
 and <code>OlapWrapper</code> can be ignored.</p>
 
-<p>
-Methods:</p>
+<p>Methods:</p>
 
 <ul>
-
   <li><code>boolean isWrapperFor(Class&lt;?&gt; iface)</code> //
 returns true if this either implements the interface argument or is
 directly or indirectly a wrapper for an object that does</li>
@@ -811,18 +807,21 @@ schema rowsets</a>".</p>
 is an object used to execute a static MDX statement and return the
 result it
 produces.</p>
+
 <p>It has methods to execute an MDX query represented both as a string and as a
 parse tree.</p>
+
 <p>Methods:</p>
 
 <ul>
-
   <li><code>CellSet executeOlapQuery(String mdx)</code> // executes an MDX statement</li>
   <li><code>CellSet executeOlapQuery(SelectNode selectNode)</code> // executes an MDX statement expressed as a parse tree</li>
   <li><code>OlapConnection getConnection()</code> // returns the current connection (overrides Statement method)</li>
   <li><code>addListener(Granularity, CellSetListener)</code> // adds a listener to be notified of events to CellSets created by this statement</li>
 </ul>
+
 <h4>2.3.2. <a name="PreparedOlapStatement">The PreparedOlapStatement interface</a></h4>
+
 <p><a class="javadoc" href="api/org/olap4j/PreparedOlapStatement.html">PreparedOlapStatement</a>
 (extends
 <a class="javadoc" href="http://download.oracle.com/javase/6/docs/api/java/sql/PreparedStatement.html">java.sql.PreparedStatement</a>)
@@ -859,18 +858,22 @@ relates to.</p>
     <li><code>CellSetMetaData getMetaData()</code></li>
     <li><code>OlapParameterMetaData getParameterMetaData()</code></li>
 </ul>
+
 <h4>2.3.3. <a name="OlapParameterMetaData">The OlapParameterMetaData interface</a></h4>
+
 <p><a class="javadoc" href="api/org/olap4j/OlapParameterMetaData.html">OlapParameterMetaData</a>
 (extends
-<a class="javadoc" href="http://download.oracle.com/javase/6/docs/api/java/sql/ParameterMetaData.html">java.sql.ParameterMetaData</a>)
-describes parameters of a <code>
-PreparedOlapStatement</code>.</p>
+<a class="javadoc"
+href="http://download.oracle.com/javase/6/docs/api/java/sql/ParameterMetaData.html">java.sql.ParameterMetaData</a>)
+describes parameters of a <code> PreparedOlapStatement</code>. Note that regular
+JDBC parameters (bind variables) have ordinals but not names; olap4j parameters
+have both ordinals and names.</p>
 
 <p>Additional methods:</p>
 
 <ul>
-    <li><code>getName()</code></li>
-    <li><code>getOlapType(int param)</code></li>
+    <li><code>String getParameterName(int param)</code> // returns the designated parameter's name</li>
+    <li><code>getParameterOlapType(int param)</code> // returns the designated parameter's OLAP type</li>
 </ul>
 
 <h4>2.3.4. <a name="CellSet">The CellSet interface</a></h4>
@@ -885,7 +888,6 @@ and columns, only a few of the base class's methods are applicable. The followin
 are applicable:</p>
 
 <ul>
-
   <li><a class="javadoc" href="http://download.oracle.com/javase/6/docs/api/java/sql/ResultSet.html#clearWarnings%28%29">clearWarnings()</a></li>
   <li><a class="javadoc" href="http://download.oracle.com/javase/6/docs/api/java/sql/ResultSet.html#close%28%29">close()</a></li>
   <li><a class="javadoc" href="http://download.oracle.com/javase/6/docs/api/java/sql/ResultSet.html#getConcurrency%28%29">getConcurrency()</a></li>
@@ -898,7 +900,6 @@ are applicable:</p>
 result:</p>
 
 <ul>
-
   <li><code>List&lt;CellSetAxis&gt; getAxes()</code></li>
   <li><code>CellSetAxis getFilterAxis()</code></li>
   <li><code>Cell getCell(List&lt;Integer&gt; coordinates)</code></li>
@@ -1043,7 +1044,6 @@ CellSet</a>.</p>
 <p>Methods:</p>
 
 <ul>
-
   <li><code>CellSet getCellSet()</code></li>
   <li><code>int getOrdinal()</code></li>
   <li><code>List&lt;Integer&gt; getCoordinateList()</code></li>
@@ -1434,6 +1434,7 @@ MetadataElement provides
 name and unique-name properties (not localized), and localized caption and
 description (see <a href="#Internationalization">Internationalization</a>).</p>
 
+<p>Methods:</p>
 <ul>
   <li><code>String getName()</code> // name of this metadata element</li>
   <li><code>String getUniqueName()</code> // unique name of this metadata element</li>
@@ -1451,7 +1452,7 @@ database contains one or more catalogs.</p>
 OLAP server.</p>
 
 <p>To obtain the collection of databases in the current server, call the
-<code>OlapConnection.getDatabases()</code> method.</p>
+<code>OlapConnection.getOlapDatabases()</code> method.</p>
 
 <p>Methods:</p>
 
@@ -1468,14 +1469,14 @@ OLAP server.</p>
 <h5>2.7.2.3. <a name="Catalog">The Catalog interface</a></h5>
 
 <p>A <a class="javadoc" href="api/org/olap4j/metadata/Catalog.html">Catalog</a>
-is the highest level element in the hierarchy of metadata objects. A
-catalog contains one or more schemas.</p>
+is the second highest level element in the hierarchy of metadata objects. A
+catalog belongs to a database and contains one or more schemas.</p>
 
 <p>Some OLAP servers may only have one catalog. Mondrian is one such OLAP
 server; its sole catalog is always called "LOCALDB".</p>
 
 <p>To obtain the collection of catalogs in the current server, call the
-<code>OlapConnection.getCatalogs()</code> method.</p>
+<code>OlapConnection.getOlapCatalogs()</code> method.</p>
 
 <p>Methods:</p>
 <ul>
@@ -1493,14 +1494,18 @@ metadata, about a database.</p>
 
 <p>It belongs to a catalog and contains a number of cubes and shared dimensions.</p>
 
+<p>Methods:</p>
 <ul>
-    <li><code>Catalog geCatalog()</code> // returns this schema's parent catalog</li>
+    <li><code>Catalog getCatalog()</code> // returns this schema's parent catalog</li>
     <li><code>String getName()</code> // returns the name of this catalog</li>
     <li><code>NamedList&lt;Dimension&gt; getSharedDimensions()</code></li>
     <li><code>NamedList&lt;Cube&gt; getCubes()</code></li>
     <li><code>Collection&lt;Locale&gt; getSupportedLocales()</code> (see <a href="#Internationalization">
     Internationalization</a>)</li>
 </ul>
+
+<p>To obtain the collection of schemas in the current server, call the
+<code>OlapConnection.getOlapSchemas()</code> method.</p>
 
 <h5>2.7.2.5. <a name="Cube">The Cube interface</a></h5>
 
@@ -1511,6 +1516,7 @@ central metadata object for representing multidimensional data.</p>
 of measures. It may also have a collection of named sets, each defined by a
 formula.</p>
 
+<p>Methods:</p>
 <ul>
     <li><code>NamedList&lt;Dimension&gt; getDimensions()</code></li>
     <li><code>NamedList&lt;Hierarchy&gt; getHierarchies()</code></li>
@@ -1547,8 +1553,11 @@ but most have exactly one hierarchy.</p>
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>) is an organization of the set of members in a dimension and
 their positions relative to one another.</p>
+
 <p>A hierarchy is a collection of levels, each of which is a category of similar
 members.</p>
+
+<p>Methods:</p>
 <ul>
     <li><code>Dimension getDimension()</code></li>
     <li><code>String getName()</code></li>
@@ -1564,6 +1573,8 @@ members.</p>
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>) is a group of members in a hierarchy, all with the same
 attributes and at the same depth in the hierarchy.</p>
+
+<p>Methods:</p>
 <ul>
     <li><code>int getDepth()</code></li>
     <li><code>Hierarchy getHierarchy()</code></li>
@@ -1579,6 +1590,7 @@ attributes and at the same depth in the hierarchy.</p>
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>) is a data value in an OLAP dimension.</p>
 
+<p>Methods:</p>
 <ul>
     <li><code>String getName()</code></li>
     <li><code>NamedList&lt;Member&gt; getChildMembers()</code></li>
@@ -1610,6 +1622,7 @@ value of each cell, and is usually numeric.</p>
 
 <p>Every measure is a member of a special dimension called "Measures".</p>
 
+<p>Methods:</p>
 <ul>
     <li><code>boolean isVisible()</code></li>
     <li><code>Aggregator getAggregator()</code></li>
@@ -1654,6 +1667,8 @@ properties; for example:</p>
 (extends <a class="javadoc" href="api/org/olap4j/metadata/MetadataElement.html">
 MetadataElement</a>) describes a set whose value is determined by an MDX
 expression. It belongs to a cube.</p>
+
+<p>Methods:</p>
 <ul>
     <li><code>Cube getCube()</code></li>
     <li><code>Expression getExpression()</code></li>
@@ -3743,6 +3758,7 @@ read-write to role C.)</p>
 <ul>
   <li><code>String getId()</code> // returns the unique identifier of this scenario</li>
 </ul>
+
 <p>Other methods relating to scenarios:</p>
 <ul>
   <li><code>Scenario OlapConnection.createScenario()</code> // creates a scenario</li>
