@@ -155,15 +155,23 @@ xmla-cache/**,
 .settings/**
 .classpath,
 .project,
-CHANGES.txt,
-LICENSE.html,
-README.txt,
 build.properties,
 build.xml,
+buildJdk16.bat,
+buildJdk16.sh,
+CHANGES.txt,
+checkFile.sh,
+checkFile.awk,
 ivy.xml,
+ivy-xmla.xml,
+ivy-tck.xml,
+ivy-jdk14.xml,
 ivysettings.xml,
+LICENSE.html,
+README.txt,
 subfloor.xml,
-test.properties.example" />
+test.properties,
+VERSION.txt" />
         </zip>
     </target>
 
