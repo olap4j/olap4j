@@ -7,7 +7,7 @@
   == This software is subject to the terms of the Eclipse Public License v1.0
   == Agreement, available at the following URL:
   == http://www.eclipse.org/legal/epl-v10.html.
-  == Copyright (C) 2006-2009 Julian Hyde and others.
+  == Copyright (C) 2006-2011 Julian Hyde and others.
   == All Rights Reserved.
   == You must accept the terms of that agreement to use this software.
   -->
@@ -130,8 +130,8 @@ a:hover, a:active {
 <body>
 <table width="700" border="0" align="center" cellpadding="0" cellspacing="0">
   <tr>
-    <td valign="top" width="159"><img src="images/olap4j_logo.png" alt="OLAP 4 J" width="159" height="81" class="logo" /></td>
-    <td valign="top" width="541"><img src="images/banner_title.png" width="247" height="25" alt="open java api for OLAP" class="banner_title" /></td>
+    <td valign="top" width="159"><img src="images/olap4j_logo.png" alt="olap4j" width="159" height="81" class="logo" /></td>
+    <td valign="top" width="541"><img src="images/banner_title.png" width="247" height="25" alt="Open Java API for OLAP" class="banner_title" /></td>
   </tr>
   <tr>
     <td colspan="2" valign="top"><table width="700" border="0" cellspacing="0" cellpadding="0">
@@ -148,15 +148,15 @@ a:hover, a:active {
                         <span style="font-variant: small-caps">OLAP</span>.</p>
                         
                         <p class="box_header">
-                        Think of it  like 
+                        Think of it like 
                         <span style="font-variant: small-caps">JDBC</span>, 
                         but for accessing multi-dimensional data.</p>
                         <br />
                         <p class="box_subheader">
-                        olap4j is designed to be 
-                        a common API for any OLAP server, so you can write an 
-                        application on one OLAP server and easily switch it to 
-                        another. And built on that API, there will be a growing 
+                        olap4j is a common API for any OLAP server,
+                        so you can write an 
+                        analytic application on one server and easily switch it to 
+                        another. Built on that API, there is a growing 
                         collection of tools and components.</p></div></td>
           <td class="home_box"><img src="images/spacer.png" class="home_box_spacer"/></td>
         </tr>
@@ -172,19 +172,22 @@ a:hover, a:active {
         
         
         <tr>
-          <td width="100%" valign="top" style="padding-bottom: 10px;"><h4>Status</h4>
-          <p><b>olap4j 1.0.0 was released in March 2011.</b></p><br/>
+          <td width="100%" valign="top" style="padding-bottom: 10px;">
+          <h4>Status</h4>
+          <p><b>olap4j 1.0.0 was released on April 12, 2011.</b></p><br/>
           <p>This olap4j release includes the specification, a technology compatibility kit (TCK)
-          and a generic XML/A driver compatible with Mondrian, SQL Server Analysis Services, Palo and SAP BW</p><br/>
+          and a generic XML/A driver compatible with Mondrian, SQL Server Analysis Services, Palo and SAP BW.</p><br/>
+          <p><a href="http://www.pentaho.com/news/releases/pentaho-announces-a-new-era-in-open-standards-for-analytics/">Read the press release</a>.</p>
           
           <h4>Resources</h4>
             <ul>
-              <li><a href="http://sourceforge.net/projects/olap4j">olap4j project at SourceForge</a></font></li>
+              <li><a href="http://sourceforge.net/projects/olap4j">olap4j project at SourceForge</a>.</li>
               <li>Download 1.0.0 <a href="http://sourceforge.net/project/showfiles.php?group_id=168953">release</a>
-              and specification (<a href="http://sourceforge.net/project/showfiles.php?group_id=168953">PDF</a> or <a href="olap4j_fs.html">HTML</a>)</li>
-              <li><a href="api/index.html">API javadoc</a></li>
+              and specification (<a href="olap4j_fs.pdf">PDF</a> or <a href="olap4j_fs.html">HTML</a>).</li>
+              <li><a href="api/index.html">API javadoc</a>.</li>
+              <li><a href="http://olap4j-demo.googlecode.com/svn/trunk/doc/Olap4j_Introduction_An_end_user_perspective.pdf">Primer</a> and <a href="http://code.google.com/p/olap4j-demo/">code examples</a>.</li>
               <li>For project committers: latest <a href="head/api/index.html">API</a>
-                  and <a href="http://olap4j.svn.sourceforge.net/viewvc/*checkout*/olap4j/trunk/doc/olap4j_fs.html">specification (HTML)</a>.</li>
+                  and specification (<a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html">HTML</a> only).</li>
             </ul>
 
           <h4>Modules</h4>
@@ -193,58 +196,69 @@ a:hover, a:active {
             <ul>
               <li><strong>olap4j</strong><br/>
               Core API, Query Model, Transformation and other auxiliary packages,
-              along with the driver specification.</li><br/><br/>
+              along with the driver specification.</li><br/>
               <li><strong>olap4j-xmla</strong><br/>
               Driver implementation of olap4j for XML/A data sources. It is compatible with Mondrian, Palo,
-              SAP BW and SQL Server 2005+.</li><br/><br/>
+              SAP BW and SQL Server 2005+.</li><br/>
               <li><strong>olap4j-tck</strong><br/>
-              Technology compatibility kit. Consists mostly of JUnit tests.</li><br/><br/>
+              Technology compatibility kit. Consists mostly of JUnit tests.</li><br/>
               <li><strong>olap4j-jdk14</strong><br/>
               Olap4j distribution compatible with Java 1.4. Includes the core API and
               the XML/A driver.</li>
             </ul>
           </p>
 
-          <h4>Roadmap</h4><br/>
+          <h4>Packages and Roadmap</h4>
 
-          <p>The core API will be considered a Long Term Support (LTS) release,
+          <p>The core API of olap4j version 1.0 is a Long Term Support (LTS) release,
           but some parts of the olap4j project will remain considered as experimental,
-          thus subject to change. The LTS packages are:</p><br/>
+          thus subject to change in future releases.
+
+          <h5>Core packages</h5>
+          <p>The core packages in olap4j-1.0 are as follows.</p><br/>
           <p>
             <ul>
               <li><strong>org.olap4j.driver.xmla</strong><br/>
-              Generic XML/A driver.</li><br/><br/>
+              Generic XML/A driver.</li><br/>
               <li><strong>org.olap4j.mdx</strong><br/>
-              Core objects of the MDX model.</li><br/><br/>
+              Core objects of the MDX model.</li><br/>
               <li><strong>org.olap4j.mdx.parser</strong><br/>
-              Parser for the MDX query language.</li><br/><br/>
+              Parser for the MDX query language.</li><br/>
               <li><strong>org.olap4j.metadata</strong><br/>
-              Discovery of OLAP servers metadata.</li><br/><br/>
+              Discovery of OLAP servers metadata.</li><br/>
               <li><strong>org.olap4j.type</strong><br/>
               System for the core MDX object model and the metadata package.</li>
             </ul>
           </p>
-          <p>The following parts will still be considered experimental
+          <h5>Experimental packages</h5>
+          <p>The following packages are considered experimental
           and are subject to change.</p><br/>
           <p>
             <ul>
               <li><strong>org.olap4j.query</strong><br/>
-              Programmatic Query Model.</li><br/><br/>
+              Programmatic Query Model.</li><br/>
               <li><strong>org.olap4j.transform</strong><br/>
-              Core MDX object model transformation utilities.</li><br/><br/>
+              Core MDX object model transformation utilities.</li><br/>
               <li><strong>org.olap4j.layout</strong><br/>
-              Utility classes to display CellSets.</li><br/><br/>
+              Utility classes to display CellSets.</li><br/>
               <li><strong>org.olap4j.CellSetListener and all associated classes</strong><br/>
-              Event-based system for real time updates of CellSet objects.</li><br/><br/>
+              Event-based system for real time updates of CellSet objects.</li><br/>
               <li><strong>org.olap4j.Scenario and all associated classes</strong><br/>
               Statistical simulations module.</li>
             </ul>
           </p>
 
             <h4>Get involved!</h4> 
-            <p>Join the <a href="http://sourceforge.net/forum/forum.php?forum_id=577988">forum</a>, download the specification, and give us your feedback. If you are developing an OLAP server, component or 
-    application, let's work together to make your project olap4j-compliant.</p><br/>
-            <p>Drivers for mondrian and XML/A are under development; we're looking for committers to work on these drivers and drivers for other servers.</p>
+
+            <p>Join the
+            <a href="http://sourceforge.net/forum/forum.php?forum_id=577988">forum</a>,
+            download the specification, and give us your feedback. If you are
+            developing an OLAP server, component or application, let's work
+            together to make your project olap4j-compliant.</p><br/>
+
+            <p>There are olap4j drivers for mondrian and XML/A; we are looking
+            for committers to port the XML/A driver to new servers, and to write
+            native drivers for other OLAP engines.</p>
           </td>
           <td rowspan="5" class="col_spacer" style="padding-bottom: 10px;"><img src="images/spacer.png" class="col_spacer"/></td>
           <td rowspan="4" valign="top" style="padding-bottom: 10px;">
@@ -263,30 +277,29 @@ a:hover, a:active {
             </ul>
             <h5>Companies</h5>
             <ul style="white-space:nowrap">
+                <li><a href="http://www.aschauer-edv.at">Aschauer EDV GmbH</a></li>
                 <li><a href="http://www.jaspersoft.com">JasperSoft</a></li>
                 <li><a href="http://www.jedox.com">Jedox</a></li>
-                <li><a href="http://www.loyaltymatrix.com">Loyalty Matrix</a></li>
-                <li><a href="http://www.lucidera.com">LucidEra</a></li>
                 <li><a href="http://www.pentaho.org">Pentaho</a></li>
                 <li><a href="http://www.sqlpower.ca">SQL Power</a></li>
                 <li><a href="http://www.tensegrity-software.de">Tensegrity</a></li>
                 <li><a href="http://www.tonbeller.com/">Tonbeller AG</a></li>
             </ul>
-            <h4 style="margin: 0px;">Developer's resources</h4>
-            <ul style="white-space:nowrap">
+            <h4 style="margin: 0px;">Developer resources</h4>
+            <ul>
                 <li><a href="http://ci.pentaho.com/view/Analysis/job/olap4j/">Continuous Integration</a></li>
                 <li><a href="head/api/index.html">API</a></li>
-                <li><a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/">Source Server</a></li>
+                <li><a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/">Source server</a></li>
                 <li><a href="https://lists.sourceforge.net/lists/listinfo/olap4j-devel">Developer's mailing list</a></li>
                 <li><a href="http://repository.pentaho.org/artifactory/pentaho">Maven repository</a>
-                <br/><i>group id 'org.olap4j'<br/>artifact 'olap4j'</i></li>
+                (<i>group id 'org.olap4j', artifact 'olap4j'</i>)</li>
             </ul>
         </div></td>
         </tr>
       </table></td>
     </tr>
     <tr>
-      <td colspan="2" class="copyright">&copy; 2007-2008</td>
+      <td colspan="2" class="copyright">&copy; 2007-2011</td>
     </tr>
     <tr>
       <td colspan="2" align="right">
