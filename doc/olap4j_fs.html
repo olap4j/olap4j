@@ -148,7 +148,7 @@ CellSetAxisMetaData interface</a></li>
 CellSetMetaData interface</a></li>
         </ol>
       </li>
-      <li><a href="#MDX_query_model">MDX parse tree model</a>
+      <li><a href="#MDX_object_model">MDX parse tree model</a>
         <ol>
           <li><a href="#The_ParseTreeWriter_class">The ParseTreeWriter
 class</a></li>
@@ -623,8 +623,7 @@ string, the code is identical.</p>
     Class.forName(&quot;org.olap4j.driver.xmla.XmlaOlap4jDriver&quot;);<br/>
     Connection connection =<br/>
     &nbsp;&nbsp;&nbsp; DriverManager.getConnection(<br/>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:xmla:Server=http://localhost/xmla/msxisapi.dll;&quot;<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    + &quot;Catalog=FoodMart&quot;);<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;jdbc:xmla:Server=http://localhost/xmla/msxisapi.dll&quot;<br/>
     OlapWrapper wrapper = (OlapWrapper) connection;<br/>
       OlapConnection olapConnection = wrapper.unwrap(OlapConnection.class);<br/>
     OlapStatement statement = connection.createStatement();<br/>
@@ -1078,30 +1077,30 @@ java.sql.ResultSetMetaData</a>) describes a
     <li><code>CellSetAxisMetaData getSlicerAxisMetaData()</code></li>
 </ul>
 
-<h3>2.4. <a name="MDX_query_model">MDX query model</a></h3>
+<h3>2.4. <a name="MDX_object_model">MDX object model</a></h3>
 
-<p>The MDX query model represents a parsed MDX statement.</p>
+<p>The MDX object model represents a parsed MDX statement.</p>
 
-<p>An MDX query model can be created in three ways:</p>
+<p>An MDX object model can be created in three ways:</p>
 
 <ul>
 
-  <li>The MDX parser parses an MDX string to create an MDX query model;</li>
-  <li>Client code programmatically builds a query model by calling API methods;</li>
-  <li>Code in the transform package manipulates query model in response to
+  <li>The MDX parser parses an MDX string to create an MDX object model;</li>
+  <li>Client code programmatically builds a model by calling API methods;</li>
+  <li>Code in the transform package manipulates the model in response to
   graphical operations.</li>
 </ul>
 
-<p>An MDX query model can exist in an <i>un-validated</i> and <i>validated</i>
+<p>An MDX object model can exist in an <i>un-validated</i> and <i>validated</i>
 state. In the un-validated state, identifiers and function calls exist as raw
 strings, and no type information has been assigned. During validation,
 identifiers are resolved to specific MDX objects (members, etc.), type
 information is assigned, and if a function exists in several overloaded forms, a
 specific instance is chosen based upon the types of its arguments.</p>
 
-<p>Any MDX query model can be serialized to a string containing MDX text.</p>
+<p>Any MDX object model can be serialized to a string containing MDX text.</p>
 
-<p>An MDX query model can be converted into a statement. For example,</p>
+<p>An MDX object model can be converted into a statement. For example,</p>
 
 <div class="code">
   import org.olap.*;<br/>
@@ -1132,7 +1131,7 @@ specific instance is chosen based upon the types of its arguments.</p>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   new IdentifierNode(IdentifierNode.ofNames(&quot;Unit Sales&quot;).getSegmentList()))));<br/>
   <br/>
-  // Create a statement based upon the query model.<br/>
+  // Create a statement based upon the object model.<br/>
   OlapStatement stmt;<br/>
   try {<br/>
 &nbsp;&nbsp;&nbsp; stmt = connection.createStatement();<br/>
