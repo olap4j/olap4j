@@ -1079,10 +1079,14 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             //   IS_DRILLTHROUGH_ENABLED, IS_WRITE_ENABLED, IS_LINKABLE,
             //   IS_SQL_ENABLED
             String cubeName = stringElement(row, "CUBE_NAME");
+            String caption = stringElement(row, "CUBE_CAPTION");
+            if (caption == null) {
+                caption = cubeName;
+            }
             String description = stringElement(row, "DESCRIPTION");
             list.add(
                 new XmlaOlap4jCube(
-                    context.olap4jSchema, cubeName, description));
+                    context.olap4jSchema, cubeName, caption, description));
         }
     }
 

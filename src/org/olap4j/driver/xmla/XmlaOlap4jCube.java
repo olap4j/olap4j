@@ -28,6 +28,7 @@ class XmlaOlap4jCube implements Cube, Named
 {
     final XmlaOlap4jSchema olap4jSchema;
     private final String name;
+    private final String caption;
     private final String description;
 
     final NamedList<XmlaOlap4jDimension> dimensions;
@@ -48,12 +49,14 @@ class XmlaOlap4jCube implements Cube, Named
      *
      * @param olap4jSchema Schema
      * @param name Name
+     * @param caption Caption
      * @param description Description
      * @throws org.olap4j.OlapException on error
      */
     XmlaOlap4jCube(
         XmlaOlap4jSchema olap4jSchema,
         String name,
+        String caption,
         String description) throws OlapException
     {
         assert olap4jSchema != null;
@@ -61,6 +64,7 @@ class XmlaOlap4jCube implements Cube, Named
         assert name != null;
         this.olap4jSchema = olap4jSchema;
         this.name = name;
+        this.caption = caption;
         this.description = description;
         final Map<String, XmlaOlap4jMeasure> measuresMap =
             new HashMap<String, XmlaOlap4jMeasure>();
@@ -118,7 +122,7 @@ class XmlaOlap4jCube implements Cube, Named
     }
 
     public String getCaption() {
-        return name;
+        return caption;
     }
 
     public String getDescription() {
