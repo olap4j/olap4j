@@ -56,7 +56,7 @@ class XmlaOlap4jCatalog implements Catalog, Named {
                     olap4jDatabaseMetaData,
                     this,
                     null, null, null, null, null),
-                new XmlaOlap4jConnection.SchemaHandler(),
+                new XmlaOlap4jConnection.CatalogSchemaHandler(this.name),
                 null)
             {
                 @Override
