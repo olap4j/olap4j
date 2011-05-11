@@ -221,11 +221,40 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
     }
 
     public String getDatabaseProductName() throws SQLException {
-        throw Olap4jUtil.needToImplement(this);
+        final ResultSet rs =
+            this.getDatabaseProperties(null, null);
+        try {
+            while (rs.next()) {
+                if (rs.getString(
+                        XmlaConstants.Literal.PROPERTY_NAME.name())
+                            .equals("ProviderName"))
+                {
+                    return
+                        rs.getString("PROPERTY_VALUE");
+                }
+            }
+            return "";
+        } finally {
+            rs.close();
+        }
     }
 
     public String getDatabaseProductVersion() throws SQLException {
-        throw Olap4jUtil.needToImplement(this);
+        final ResultSet rs =
+            this.getDatabaseProperties(null, null);
+        try {
+            while (rs.next()) {
+                if (rs.getString(
+                    XmlaConstants.Literal.PROPERTY_NAME.name())
+                        .equals("ProviderVersion"))
+                {
+                    return rs.getString("PROPERTY_VALUE");
+                }
+            }
+            return "";
+        } finally {
+            rs.close();
+        }
     }
 
     public String getDriverName() throws SQLException {

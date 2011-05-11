@@ -9,6 +9,8 @@
 */
 package org.olap4j.driver.xmla;
 
+import java.sql.SQLException;
+
 import org.olap4j.OlapDatabaseMetaData;
 import org.olap4j.OlapException;
 import org.olap4j.impl.Named;
@@ -59,31 +61,59 @@ class XmlaOlap4jCatalog implements Catalog, Named {
                 new XmlaOlap4jConnection.CatalogSchemaHandler(this.name),
                 null)
             {
+                private boolean useSchemata = false;
                 @Override
-                protected void populateList(NamedList<XmlaOlap4jSchema> list)
-                        throws OlapException
+                protected void populateList(
+                        NamedList<XmlaOlap4jSchema> list)
+                    throws OlapException
                 {
-                    // First try DBSCHEMA_SCHEMATA
                     try {
-                        super.populateList(list);
-                    } catch (OlapException e) {
-                        // Fallback to MDSCHEMA_CUBES trick
-                        XmlaOlap4jConnection conn =
-                            XmlaOlap4jCatalog.this
-                            .olap4jDatabaseMetaData.olap4jConnection;
-                        conn.populateList(
-                            list,
-                            new XmlaOlap4jConnection.Context(
-                                conn,
-                                conn.olap4jDatabaseMetaData,
-                                XmlaOlap4jCatalog.this,
-                                null, null, null, null, null),
-                                XmlaOlap4jConnection.MetadataRequest
-                                    .MDSCHEMA_CUBES,
-                                new XmlaOlap4jConnection.CatalogSchemaHandler(
-                                    XmlaOlap4jCatalog.this.name),
-                                new Object[0]);
+                        /*
+                         * Some OLAP servers don't support DBSCHEMA_SCHEMATA
+                         * so we fork the behavior here according to the
+                         * database product name.
+                         */
+                        if (XmlaOlap4jCatalog.this.olap4jDatabaseMetaData
+                            .getDatabaseProductName().contains("Mondrian"))
+                        {
+                            this.useSchemata = true;
+                        }
+                    } catch (SQLException e1) {
+                        throw new OlapException(
+                            "Failed to obtain the database product name.",
+                            e1);
                     }
+                    try {
+                        if (this.useSchemata) {
+                            super.populateList(list);
+                            return;
+                        }
+                    } catch (OlapException e) {
+                        // no op. we know how to fallback.
+                        useSchemata = false;
+                    }
+                    // Fallback to MDSCHEMA_CUBES trick
+                    populateInternal(list);
+                }
+                private void populateInternal(
+                        NamedList<XmlaOlap4jSchema> list)
+                    throws OlapException
+                {
+                    XmlaOlap4jConnection conn =
+                        XmlaOlap4jCatalog.this
+                        .olap4jDatabaseMetaData.olap4jConnection;
+                    conn.populateList(
+                        list,
+                        new XmlaOlap4jConnection.Context(
+                            conn,
+                            conn.olap4jDatabaseMetaData,
+                            XmlaOlap4jCatalog.this,
+                            null, null, null, null, null),
+                            XmlaOlap4jConnection.MetadataRequest
+                                .MDSCHEMA_CUBES,
+                            new XmlaOlap4jConnection.CatalogSchemaHandler(
+                                XmlaOlap4jCatalog.this.name),
+                            new Object[0]);
                 }
             };
     }
