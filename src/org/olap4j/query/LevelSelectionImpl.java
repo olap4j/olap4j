@@ -9,16 +9,18 @@
  */
 package org.olap4j.query;
 
+import org.olap4j.OlapException;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.Level;
+import org.olap4j.metadata.Level.Type;
 import org.olap4j.metadata.MetadataElement;
 
 /**
  * Abstract implementation of {@link Selection}.
  *
  * @author pstoellberger
- * @version $Id: LevelSelectionImpl.java 399 2011-02-03 20:53:50Z pstoellberger $
+ * @version $Id: LevelSelectionImpl.java 454 2011-05-15 20:53:50Z pstoellberger $
  * @since Feb 3, 2011
  */
 class LevelSelectionImpl extends AbstractSelection {
@@ -88,6 +90,19 @@ class LevelSelectionImpl extends AbstractSelection {
     }
 
     public ParseTreeNode visit() {
+        // TODO this is a hack for MONDRIAN-929 and needs to be removed again
+        if (level.getLevelType().equals(Type.ALL)
+            && operator.equals(Operator.MEMBERS))
+        {
+            try {
+                return
+                    Olap4jNodeConverter.toOlap4j(
+                        level.getHierarchy().getDefaultMember(),
+                            Operator.MEMBER);
+            } catch (OlapException e) {
+                e.printStackTrace();
+            }
+        }
         return Olap4jNodeConverter.toOlap4j(level, operator);
     }
 
