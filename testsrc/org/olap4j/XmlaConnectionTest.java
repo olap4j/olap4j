@@ -21,8 +21,8 @@ public class XmlaConnectionTest extends TestCase {
 
     static class XmlaOlap4jProxyMock implements XmlaOlap4jProxy {
         public byte[] get(
-                XmlaOlap4jServerInfos serverInfos,
-                String request)
+            XmlaOlap4jServerInfos serverInfos,
+            String request)
         {
             throw new RuntimeException("Non-Trivial Call!");
         }
@@ -32,8 +32,8 @@ public class XmlaConnectionTest extends TestCase {
         }
 
         public Future<byte[]> submit(
-                XmlaOlap4jServerInfos serverInfos,
-                String request)
+            XmlaOlap4jServerInfos serverInfos,
+            String request)
         {
             throw new RuntimeException("Non-Trivial Call!");
         }
@@ -138,7 +138,7 @@ public class XmlaConnectionTest extends TestCase {
                     clazz.getConstructor(Map.class, String.class);
                 return
                 (XmlaOlap4jProxy) constructor.newInstance(
-                        catalogNameUrls, urlString);
+                    catalogNameUrls, urlString);
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchMethodException e) {
@@ -218,14 +218,15 @@ public class XmlaConnectionTest extends TestCase {
             boolean schemata = false;
             boolean cubes = false;
             public Proxy(
-                    Map<String, String> catalogNameUrls,
-                    String urlString)
+                Map<String, String> catalogNameUrls,
+                String urlString)
             {
                 super(catalogNameUrls, urlString);
             }
             @Override
             public byte[] get(
-                    XmlaOlap4jServerInfos serverInfos, String request)
+                XmlaOlap4jServerInfos serverInfos,
+                String request)
                 throws XmlaOlap4jProxyException
             {
                 if (request.contains("DBSCHEMA_SCHEMATA")) {
@@ -338,3 +339,8 @@ public class XmlaConnectionTest extends TestCase {
 }
 
 // End XmlaConnectionTest.java
+
+
+
+
+

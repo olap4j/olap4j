@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -367,7 +367,7 @@ public class ConnectionTest extends TestCase {
             assertEquals(0, axesList.size());
 
             info.setProperty(
-                    XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMart");
+                XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMart");
             connection =
                 DriverManager.getConnection(
                     tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
@@ -375,11 +375,11 @@ public class ConnectionTest extends TestCase {
             assertEquals("FoodMart", connection.getCatalog());
 
             info.setProperty(
-                    XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMartError");
+                XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMartError");
             try {
                 connection = DriverManager.getConnection(
-                        tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
-                        info);
+                    tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
+                    info);
                 Statement statement2 = connection.createStatement();
                 OlapStatement olapStatement2 =
                     TestContext.Wrapper.NONE.unwrap(
@@ -2840,3 +2840,6 @@ public class ConnectionTest extends TestCase {
 }
 
 // End ConnectionTest.java
+
+
+

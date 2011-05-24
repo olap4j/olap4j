@@ -256,7 +256,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             for (Entry<String, String> entry : map.entrySet()) {
                 // Check if the current entry relates to cache config.
                 if (entry.getKey().startsWith(
-                    XmlaOlap4jDriver.Property.CACHE.name() + "."))
+                        XmlaOlap4jDriver.Property.CACHE.name() + "."))
                 {
                     props.put(entry.getKey().substring(
                         XmlaOlap4jDriver.Property.CACHE.name()
@@ -454,9 +454,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             (XmlaOlap4jSchema) catalog.getSchemas().get(schemaName);
         if (this.olap4jSchema == null) {
             throw new OlapException(
-                    "No schema named " + schemaName
-                    + " could be found in catalog "
-                    + catalog.getName());
+                "No schema named " + schemaName
+                + " could be found in catalog "
+                + catalog.getName());
         }
         this.schemaName = schemaName;
     }
@@ -1139,9 +1139,14 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 stringElement(row, "DEFAULT_HIERARCHY");
             final Integer dimensionOrdinal =
                 integerElement(row, "DIMENSION_ORDINAL");
-            XmlaOlap4jDimension dimension = new XmlaOlap4jDimension(
-                    context.olap4jCube, dimensionUniqueName, dimensionName,
-                    dimensionCaption, description, type,
+            XmlaOlap4jDimension dimension =
+                new XmlaOlap4jDimension(
+                    context.olap4jCube,
+                    dimensionUniqueName,
+                    dimensionName,
+                    dimensionCaption,
+                    description,
+                    type,
                     defaultHierarchyUniqueName,
                     dimensionOrdinal == null ? 0 : dimensionOrdinal);
             list.add(dimension);
@@ -1150,8 +1155,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     list,
                     new Comparator<XmlaOlap4jDimension> () {
                         public int compare(
-                                XmlaOlap4jDimension d1,
-                                XmlaOlap4jDimension d2)
+                            XmlaOlap4jDimension d1,
+                            XmlaOlap4jDimension d2)
                         {
                             if (d1.getOrdinal() == d2.getOrdinal()) {
                                 return 0;
@@ -1549,7 +1554,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 for (Property property : level.getProperties()) {
                     if (property instanceof XmlaOlap4jProperty
                         && property.getName().equalsIgnoreCase(
-                        node.getLocalName()))
+                            node.getLocalName()))
                     {
                         map.put(property, node.getTextContent());
                     }
@@ -2303,3 +2308,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 }
 
 // End XmlaOlap4jConnection.java
+
+
+
+
+

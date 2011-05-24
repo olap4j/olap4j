@@ -28,9 +28,9 @@ class LevelSelectionImpl extends AbstractSelection {
     protected Level level;
 
     public LevelSelectionImpl(
-            Level level,
-            Dimension dimension,
-            Operator operator)
+        Level level,
+        Dimension dimension,
+        Operator operator)
     {
         super(dimension, operator);
         this.level = level;
@@ -64,7 +64,7 @@ class LevelSelectionImpl extends AbstractSelection {
                 return false;
             }
         } else if (!level.getUniqueName().equals(
-                        other.level.getUniqueName()))
+                other.level.getUniqueName()))
         {
             return false;
         }
@@ -117,3 +117,5 @@ class LevelSelectionImpl extends AbstractSelection {
 }
 
 // End LevelSelectionImpl.java
+
+

@@ -31,9 +31,9 @@ class MemberSelectionImpl extends AbstractSelection {
      * @pre operator != null
      */
     public MemberSelectionImpl(
-            Member member,
-            Dimension dimension,
-            Operator operator)
+        Member member,
+        Dimension dimension,
+        Operator operator)
     {
         super(dimension, operator);
         this.member = member;
@@ -67,7 +67,7 @@ class MemberSelectionImpl extends AbstractSelection {
                 return false;
             }
         } else if (!member.getUniqueName().equals(
-                        other.member.getUniqueName()))
+                other.member.getUniqueName()))
         {
             return false;
         }
@@ -100,10 +100,13 @@ class MemberSelectionImpl extends AbstractSelection {
     public void setOperator(Operator operator) {
         if (operator.equals(Operator.MEMBERS)) {
             throw new IllegalArgumentException(
-            "Selections based on a Members cannot be of Operator MEMBERS.");
+                "Selections based on a Members cannot be of Operator MEMBERS.");
         }
         super.setOperator(operator);
     }
 }
 
 // End MemberSelectionImpl.java
+
+
+

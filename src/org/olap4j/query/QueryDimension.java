@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -170,13 +170,13 @@ public class QueryDimension extends QueryNodeImpl {
      * @param member Root member to select and include.
      */
     public Selection createSelection(
-            Selection.Operator operator,
-            Member member)
+        Selection.Operator operator,
+        Member member)
     {
         if (member.getDimension().equals(this.dimension)) {
             Selection selection =
-                    query.getSelectionFactory().createMemberSelection(
-                            member, operator);
+                query.getSelectionFactory().createMemberSelection(
+                    member, operator);
             return selection;
         }
         return null;
@@ -208,13 +208,13 @@ public class QueryDimension extends QueryNodeImpl {
      * @param member Root member to select and include.
      */
     public Selection include(
-            Selection.Operator operator,
-            Member member)
+        Selection.Operator operator,
+        Member member)
     {
         if (member.getDimension().equals(this.dimension)) {
             Selection selection =
-                    query.getSelectionFactory().createMemberSelection(
-                            member, operator);
+                query.getSelectionFactory().createMemberSelection(
+                    member, operator);
             this.include(selection);
             return selection;
         }
@@ -228,7 +228,7 @@ public class QueryDimension extends QueryNodeImpl {
     private void include(Selection selection) {
         this.getInclusions().add(selection);
         Integer index = Integer.valueOf(
-                this.getInclusions().indexOf(selection));
+            this.getInclusions().indexOf(selection));
         this.notifyAdd(selection, index);
     }
 
@@ -325,13 +325,13 @@ public class QueryDimension extends QueryNodeImpl {
      * @param member Root member to select and exclude.
      */
     public void exclude(
-            Selection.Operator operator,
-            Member member)
+        Selection.Operator operator,
+        Member member)
     {
         if (member.getDimension().equals(this.dimension)) {
             Selection selection =
-                    query.getSelectionFactory().createMemberSelection(
-                            member, operator);
+                query.getSelectionFactory().createMemberSelection(
+                    member, operator);
             this.exclude(selection);
         }
     }
@@ -343,7 +343,7 @@ public class QueryDimension extends QueryNodeImpl {
     private void exclude(Selection selection) {
         this.getExclusions().add(selection);
         Integer index = Integer.valueOf(
-                this.getExclusions().indexOf(selection));
+            this.getExclusions().indexOf(selection));
         this.notifyAdd(selection, index);
     }
 
@@ -583,3 +583,11 @@ public class QueryDimension extends QueryNodeImpl {
 }
 
 // End QueryDimension.java
+
+
+
+
+
+
+
+

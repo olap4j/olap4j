@@ -100,8 +100,8 @@ abstract class Olap4jNodeConverter {
                 null, "CrossJoin", Syntax.Function, sel1, sel2);
         } else {
             return new CallNode(
-               null, "CrossJoin", Syntax.Function, sel1,
-               generateCrossJoin(selections));
+                null, "CrossJoin", Syntax.Function, sel1,
+                generateCrossJoin(selections));
         }
     }
 
@@ -114,9 +114,9 @@ abstract class Olap4jNodeConverter {
                 generateUnion(unions));
         } else {
             return new CallNode(
-               null, "Union", Syntax.Function,
-               generateCrossJoin(unions.get(0)),
-               generateCrossJoin(unions.get(1)));
+                null, "Union", Syntax.Function,
+                generateCrossJoin(unions.get(0)),
+                generateCrossJoin(unions.get(1)));
         }
     }
 
@@ -164,36 +164,39 @@ abstract class Olap4jNodeConverter {
             // If a sort Order was specified for this dimension
             // apply it for this inclusion
             if (qDim.getSortOrder() != null) {
-                CallNode currentMemberNode = new CallNode(
+                CallNode currentMemberNode =
+                    new CallNode(
                         null,
                         "CurrentMember",
                         Syntax.Property,
                         new DimensionNode(null, sel.getDimension()));
-                    CallNode currentMemberNameNode = new CallNode(
+                CallNode currentMemberNameNode =
+                    new CallNode(
                         null,
                         "Name",
                         Syntax.Property,
                         currentMemberNode);
-                    selectionNode =
-                        new CallNode(
+                selectionNode =
+                    new CallNode(
+                        null,
+                        "Order",
+                        Syntax.Function,
+                        generateSetCall(selectionNode),
+                        currentMemberNameNode,
+                        LiteralNode.createSymbol(
                             null,
-                            "Order",
-                            Syntax.Function,
-                            generateSetCall(selectionNode),
-                            currentMemberNameNode,
-                            LiteralNode.createSymbol(
-                                null,
-                                qDim.getSortOrder().name()));
+                            qDim.getSortOrder().name()));
             }
             // If there are exlclusions wrap the ordered selection
             // in an Except() function
             if (exceptSet != null) {
-                selectionNode = new CallNode(
-                                    null,
-                                    "Except",
-                                    Syntax.Function,
-                                    generateSetCall(selectionNode),
-                                    exceptSet);
+                selectionNode =
+                    new CallNode(
+                        null,
+                        "Except",
+                        Syntax.Function,
+                        generateSetCall(selectionNode),
+                        exceptSet);
             }
             if (sel.getSelectionContext() != null
                 && sel.getSelectionContext().size() > 0)
@@ -217,7 +220,7 @@ abstract class Olap4jNodeConverter {
                                 : sel.getSelectionContext())
                             {
                                 if (selection.getDimension().equals(
-                                    dimension.getDimension()))
+                                        dimension.getDimension()))
                                 {
                                     sels.add(toOlap4j(selection));
                                     found = true;
@@ -227,7 +230,7 @@ abstract class Olap4jNodeConverter {
                                 // add the first selection of the dimension
                                 if (dimension.getInclusions().size() > 0) {
                                     sels.add(toOlap4j(
-                                            dimension.getInclusions().get(0)));
+                                        dimension.getInclusions().get(0)));
                                 }
                             }
                         }
@@ -376,7 +379,7 @@ abstract class Olap4jNodeConverter {
             CallNode hierarchyNode;
             // There are two modes available, PRE and POST.
             if (dimension.getHierarchizeMode().equals(
-                QueryDimension.HierarchizeMode.PRE))
+                    QueryDimension.HierarchizeMode.PRE))
             {
                 // In pre mode, we don't add the "POST" literal.
                 hierarchyNode = new CallNode(
@@ -393,7 +396,7 @@ abstract class Olap4jNodeConverter {
                     Syntax.Function,
                     generateListSetCall(listWithExclusions),
                     LiteralNode.createSymbol(
-                            null, dimension.getHierarchizeMode().name()));
+                        null, dimension.getHierarchizeMode().name()));
             } else {
                 throw new RuntimeException("Missing value handler.");
             }
@@ -472,28 +475,28 @@ abstract class Olap4jNodeConverter {
     }
 
     static ParseTreeNode toOlap4j(
-            Level level,
-            Selection.Operator oper)
-        {
-            ParseTreeNode node = null;
-            try {
-                switch (oper) {
-                case MEMBERS:
-                    node =
-                        new CallNode(
-                            null,
-                            "Members",
-                            Syntax.Property,
-                            new LevelNode(null, level));
-                    break;
-                default:
-                    System.out.println("NOT IMPLEMENTED: " + oper);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        Level level,
+        Selection.Operator oper)
+    {
+        ParseTreeNode node = null;
+        try {
+            switch (oper) {
+            case MEMBERS:
+                node =
+                    new CallNode(
+                        null,
+                        "Members",
+                        Syntax.Property,
+                        new LevelNode(null, level));
+                break;
+            default:
+                System.out.println("NOT IMPLEMENTED: " + oper);
             }
-            return node;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return node;
+    }
 
     private static List<AxisNode> toOlap4j(List<QueryAxis> axes) {
         final ArrayList<AxisNode> axisList = new ArrayList<AxisNode>();
@@ -508,3 +511,13 @@ abstract class Olap4jNodeConverter {
 }
 
 // End Olap4jNodeConverter.java
+
+
+
+
+
+
+
+
+
+

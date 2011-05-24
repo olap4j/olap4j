@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2008-2010 Julian Hyde
+// Copyright (C) 2008-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -85,17 +85,17 @@ class XmlaOlap4jConcurrentMemoryCache {
     {
         for (Entry<String, String> entry : props.entrySet()) {
             if (Property.SIZE.name().equalsIgnoreCase(
-                entry.getKey().toString()))
+                    entry.getKey().toString()))
             {
                 this.setCacheSize(
-                        Integer.parseInt(entry.getValue().toString()));
+                    Integer.parseInt(entry.getValue().toString()));
             } else if (Property.TIMEOUT.name().equalsIgnoreCase(
-                entry.getKey().toString()))
+                    entry.getKey().toString()))
             {
                 this.setCacheTimeout(
-                        Integer.parseInt(entry.getValue().toString()));
+                    Integer.parseInt(entry.getValue().toString()));
             } else if (Property.MODE.name().equalsIgnoreCase(
-                entry.getKey().toString()))
+                    entry.getKey().toString()))
             {
                 this.setCacheMode(
                     entry.getValue().toString());
@@ -328,3 +328,6 @@ class XmlaOlap4jConcurrentMemoryCache {
 }
 
 // End XmlaOlap4jConcurrentMemoryCache.java
+
+
+

@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2008-2010 Julian Hyde
+// Copyright (C) 2008-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -87,10 +87,12 @@ public class DrillReplaceTransform extends AxisTransform {
         // FIXME: for now only 1 dimension on an axis is supported,
         // (naive implementation only used for proof of concept)
         return MdxHelper.makeSetCallNode(
-                MdxHelper.makeChildrenCallNode(
-                        MdxHelper.makeMemberNode(memberToDrill)));
+            MdxHelper.makeChildrenCallNode(
+                MdxHelper.makeMemberNode(memberToDrill)));
     }
 
 }
 
 // End DrillReplaceTransform.java
+
+

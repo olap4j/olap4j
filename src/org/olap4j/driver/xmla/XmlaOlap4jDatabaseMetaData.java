@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -129,8 +129,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         rowLoop:
         for (Element row : XmlaOlap4jUtil.childElements(root)) {
             if (row.getNamespaceURI() != null
-                    && !row.getNamespaceURI().equals(
-                            "urn:schemas-microsoft-com:xml-analysis:rowset"))
+                && !row.getNamespaceURI().equals(
+                    "urn:schemas-microsoft-com:xml-analysis:rowset"))
             {
                 // Ignore any vendor specific namespaced elements that
                 // are not part of the rowset namespace
@@ -245,8 +245,8 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
         try {
             while (rs.next()) {
                 if (rs.getString(
-                    XmlaConstants.Literal.PROPERTY_NAME.name())
-                        .equals("ProviderVersion"))
+                        XmlaConstants.Literal.PROPERTY_NAME.name())
+                    .equals("ProviderVersion"))
                 {
                     return rs.getString("PROPERTY_VALUE");
                 }
@@ -1241,3 +1241,5 @@ abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {
 }
 
 // End XmlaOlap4jDatabaseMetaData.java
+
+

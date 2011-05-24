@@ -157,8 +157,8 @@ public class XmlaDatabaseCache implements XmlaOlap4jCache {
     }
 
     public String setParameters(
-            Map<String, String> config,
-            Map<String, String> props)
+        Map<String, String> config,
+        Map<String, String> props)
     {
         this.props = props;
         if (connection == null) {
@@ -166,9 +166,9 @@ public class XmlaDatabaseCache implements XmlaOlap4jCache {
                 Class.forName(Properties.JDBC_DRIVER.getValueOrDefault(props));
                 connection =
                     DriverManager.getConnection(
-                            Properties.JDBC_URL.getValueOrDefault(props),
-                            Properties.JDBC_USER.getValueOrDefault(props),
-                            Properties.JDBC_PASS.getValueOrDefault(props));
+                        Properties.JDBC_URL.getValueOrDefault(props),
+                        Properties.JDBC_USER.getValueOrDefault(props),
+                        Properties.JDBC_PASS.getValueOrDefault(props));
                 if (Boolean.valueOf(
                         Properties.INIT.getValueOrDefault(props)))
                 {
@@ -194,3 +194,5 @@ public class XmlaDatabaseCache implements XmlaOlap4jCache {
 }
 
 // End XmlaDatabaseCache.java
+
+

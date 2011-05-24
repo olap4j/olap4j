@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2008-2010 Julian Hyde
+// Copyright (C) 2008-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -151,8 +151,8 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
         if (props.containsKey(
                 XmlaOlap4jNamedMemoryCache.Property.NAME.name()))
         {
-            refId = (String)props.get(
-                    XmlaOlap4jNamedMemoryCache.Property.NAME.name());
+            refId = (String) props.get(
+                XmlaOlap4jNamedMemoryCache.Property.NAME.name());
         } else {
             refId = String.valueOf(UUID.randomUUID());
             props.put(XmlaOlap4jNamedMemoryCache.Property.NAME.name(), refId);
@@ -163,8 +163,8 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
         synchronized (caches) {
             // Create a cache for this URL if it is not created yet
             if (!caches.containsKey(
-                props.get(
-                    XmlaOlap4jNamedMemoryCache.Property.NAME.name())))
+                    props.get(
+                        XmlaOlap4jNamedMemoryCache.Property.NAME.name())))
             {
                 caches.put(
                     (String) props.get(
@@ -242,3 +242,5 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
 }
 
 // End XmlaOlap4jNamedMemoryCache.java
+
+

@@ -37,14 +37,14 @@ class XmlaOlap4jDatabase implements Database, Named {
     private final List<AuthenticationMode> authenticationMode;
 
     public XmlaOlap4jDatabase(
-            XmlaOlap4jConnection olap4jConnection,
-            String name,
-            String description,
-            String providerName,
-            String url,
-            String dataSourceInfo,
-            List<ProviderType> providerType,
-            List<AuthenticationMode> authenticationMode)
+        XmlaOlap4jConnection olap4jConnection,
+        String name,
+        String description,
+        String providerName,
+        String url,
+        String dataSourceInfo,
+        List<ProviderType> providerType,
+        List<AuthenticationMode> authenticationMode)
     {
         this.olap4jConnection = olap4jConnection;
         this.name = name;
@@ -107,3 +107,4 @@ class XmlaOlap4jDatabase implements Database, Named {
     }
 }
 // End XmlaOlap4jDatabase.java
+

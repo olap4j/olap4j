@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -133,7 +133,7 @@ public class QueryAxis extends QueryNodeImpl {
     public void addDimension(QueryDimension dimension) {
         this.getDimensions().add(dimension);
         Integer index = Integer.valueOf(
-                this.getDimensions().indexOf(dimension));
+            this.getDimensions().indexOf(dimension));
         this.notifyAdd(dimension, index);
     }
 
@@ -157,7 +157,7 @@ public class QueryAxis extends QueryNodeImpl {
      */
     public void removeDimension(QueryDimension dimension) {
         Integer index = Integer.valueOf(
-                this.getDimensions().indexOf(dimension));
+            this.getDimensions().indexOf(dimension));
         this.getDimensions().remove(dimension);
         this.notifyRemove(dimension, index);
     }
@@ -352,3 +352,5 @@ public class QueryAxis extends QueryNodeImpl {
 }
 
 // End QueryAxis.java
+
+

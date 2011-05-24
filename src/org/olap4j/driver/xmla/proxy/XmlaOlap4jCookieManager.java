@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -105,7 +105,7 @@ class XmlaOlap4jCookieManager {
             if (headerName.equalsIgnoreCase(SET_COOKIE)) {
                 Map cookie = new ConcurrentHashMap();
                 StringTokenizer st = new StringTokenizer(
-                        conn.getHeaderField(i), COOKIE_VALUE_DELIMITER);
+                    conn.getHeaderField(i), COOKIE_VALUE_DELIMITER);
 
                 // the specification dictates that the first name/value pair
                 // in the string is the cookie name and value, so let's handle
@@ -208,12 +208,12 @@ class XmlaOlap4jCookieManager {
                 && !(cookieStringBuffer.toString().equals("")))
             {
                 System.out.println(
-                  "Using cookie : " + cookieStringBuffer.toString());
+                    "Using cookie : " + cookieStringBuffer.toString());
             }
             conn.setRequestProperty(COOKIE, cookieStringBuffer.toString());
         } catch (java.lang.IllegalStateException ise) {
             throw new RuntimeException(
-                    "Illegal State! Cookies cannot be set on a URLConnection that is already connected. Only call setCookies(java.net.URLConnection) AFTER calling java.net.URLConnection.connect().");
+                "Illegal State! Cookies cannot be set on a URLConnection that is already connected. Only call setCookies(java.net.URLConnection) AFTER calling java.net.URLConnection.connect().");
         }
     }
 
@@ -244,7 +244,7 @@ class XmlaOlap4jCookieManager {
         } else if (cookiePath.equals("/")) {
             return true;
         } else if (targetPath.regionMatches(
-            0, cookiePath, 0, cookiePath.length()))
+                0, cookiePath, 0, cookiePath.length()))
         {
             return true;
         } else {
@@ -262,3 +262,6 @@ class XmlaOlap4jCookieManager {
 }
 
 // End XmlaOlap4jCookieManager.java
+
+
+

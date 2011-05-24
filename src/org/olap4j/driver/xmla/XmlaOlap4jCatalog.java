@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -62,9 +62,10 @@ class XmlaOlap4jCatalog implements Catalog, Named {
                 null)
             {
                 private boolean useSchemata = false;
+
                 @Override
                 protected void populateList(
-                        NamedList<XmlaOlap4jSchema> list)
+                    NamedList<XmlaOlap4jSchema> list)
                     throws OlapException
                 {
                     try {
@@ -95,8 +96,9 @@ class XmlaOlap4jCatalog implements Catalog, Named {
                     // Fallback to MDSCHEMA_CUBES trick
                     populateInternal(list);
                 }
+
                 private void populateInternal(
-                        NamedList<XmlaOlap4jSchema> list)
+                    NamedList<XmlaOlap4jSchema> list)
                     throws OlapException
                 {
                     XmlaOlap4jConnection conn =
@@ -148,3 +150,5 @@ class XmlaOlap4jCatalog implements Catalog, Named {
 }
 
 // End XmlaOlap4jCatalog.java
+
+

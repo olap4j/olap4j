@@ -41,10 +41,16 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
      * @param driver Driver
      */
     public XmlaOlap4jHttpProxy(
-            XmlaOlap4jDriver driver)
+        XmlaOlap4jDriver driver)
     {
         this.driver = driver;
     }
+
+    private static final String DISCOVER =
+        "<Discover xmlns=\"urn:schemas-microsoft-com:xml-analysis\"";
+
+    private static final String EXECUTE =
+        "<Execute xmlns=\"urn:schemas-microsoft-com:xml-analysis\"";
 
     @Override
     public byte[] getResponse(XmlaOlap4jServerInfos serverInfos, String request)
@@ -76,18 +82,14 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
 
             // Some servers expect a SOAPAction header.
             // TODO There is bound to be a better way to do this.
-            if (request.contains(
-                "<Discover xmlns=\"urn:schemas-microsoft-com:xml-analysis\""))
-            {
+            if (request.contains(DISCOVER)) {
                 urlConnection.setRequestProperty(
                     "SOAPAction",
                     "\"urn:schemas-microsoft-com:xml-analysis:Discover\"");
-            } else if (request.contains(
-                "<Execute xmlns=\"urn:schemas-microsoft-com:xml-analysis\""))
-            {
+            } else if (request.contains(EXECUTE)) {
                 urlConnection.setRequestProperty(
-                        "SOAPAction",
-                        "\"urn:schemas-microsoft-com:xml-analysis:Execute\"");
+                    "SOAPAction",
+                    "\"urn:schemas-microsoft-com:xml-analysis:Execute\"");
             }
 
             // Encode credentials for basic authentication
@@ -177,3 +179,6 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
 }
 
 // End XmlaOlap4jHttpProxy.java
+
+
+

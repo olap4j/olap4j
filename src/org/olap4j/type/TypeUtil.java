@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2005-2010 Julian Hyde
+// Copyright (C) 2005-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -87,7 +87,7 @@ public class TypeUtil {
         if (type1 instanceof TupleType) {
             return type2 instanceof TupleType
                 && ((TupleType) type1).isUnionCompatibleWith(
-                (TupleType) type2);
+                    (TupleType) type2);
         } else {
             final MemberType memberType1 = toMemberType(type1);
             if (memberType1 == null) {
@@ -165,3 +165,4 @@ public class TypeUtil {
 }
 
 // End TypeUtil.java
+

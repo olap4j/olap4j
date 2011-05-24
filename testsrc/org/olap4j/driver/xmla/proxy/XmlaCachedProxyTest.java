@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2008-2010 Julian Hyde
+// Copyright (C) 2008-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -192,8 +192,8 @@ public class XmlaCachedProxyTest extends TestCase {
         } catch (OlapException t) {
             try {
                 cacheProperties.put(
-                        XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
-                        "-30");
+                    XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
+                    "-30");
                 proxy.setCache(driverParameters, cacheProperties);
             } catch (OlapException t2) {
                 return;
@@ -290,26 +290,26 @@ public class XmlaCachedProxyTest extends TestCase {
         }
 
         driverParameters.put(
-                XmlaOlap4jDriver.Property.SERVER.name(),
-                "http://example2.com");
+            XmlaOlap4jDriver.Property.SERVER.name(),
+            "http://example2.com");
         driverParameters.put(
-                XmlaOlap4jDriver.Property.CATALOG.name(),
-                "CatalogName2");
+            XmlaOlap4jDriver.Property.CATALOG.name(),
+            "CatalogName2");
         driverParameters.put(
-                XmlaOlap4jDriver.Property.CACHE.name(),
-                "org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache");
+            XmlaOlap4jDriver.Property.CACHE.name(),
+            "org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache");
         cacheProperties.put(
-                XmlaOlap4jNamedMemoryCache.Property.NAME.name(),
-                "testCacheSharing");
+            XmlaOlap4jNamedMemoryCache.Property.NAME.name(),
+            "testCacheSharing");
         cacheProperties.put(
-                XmlaOlap4jNamedMemoryCache.Property.MODE.name(),
-                "Erronous value which won't trigger an exception since a shared cache should be used.");
+            XmlaOlap4jNamedMemoryCache.Property.MODE.name(),
+            "Erronous value which won't trigger an exception since a shared cache should be used.");
         cacheProperties.put(
-                XmlaOlap4jNamedMemoryCache.Property.TIMEOUT.name(),
-                "Erronous value which won't trigger an exception since a shared cache should be used.");
+            XmlaOlap4jNamedMemoryCache.Property.TIMEOUT.name(),
+            "Erronous value which won't trigger an exception since a shared cache should be used.");
         cacheProperties.put(
-                XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
-                "Erronous value which won't trigger an exception since a shared cache should be used.");
+            XmlaOlap4jNamedMemoryCache.Property.SIZE.name(),
+            "Erronous value which won't trigger an exception since a shared cache should be used.");
 
         try {
             // Create a new object and try with a faulty cache parameters,
@@ -330,3 +330,11 @@ public class XmlaCachedProxyTest extends TestCase {
 }
 
 // End XmlaCachedProxyTest.java
+
+
+
+
+
+
+
+

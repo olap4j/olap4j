@@ -119,7 +119,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
         try {
             // Loads the cache class
             Class clazz = Class.forName(config.get(
-                    XmlaOlap4jDriver.Property.CACHE.name()));
+                XmlaOlap4jDriver.Property.CACHE.name()));
 
             // Instantiates it
             this.cache = (XmlaOlap4jCache) clazz.newInstance();
@@ -151,8 +151,8 @@ abstract class XmlaOlap4jAbstractHttpProxy
 
     // implement XmlaOlap4jProxy
     public byte[] get(
-            XmlaOlap4jServerInfos serverInfos,
-            String request)
+        XmlaOlap4jServerInfos serverInfos,
+        String request)
         throws XmlaOlap4jProxyException
     {
         byte[] response = null;
@@ -226,8 +226,8 @@ abstract class XmlaOlap4jAbstractHttpProxy
 
     // implement XmlaOlap4jProxy
     public Future<byte[]> submit(
-            final XmlaOlap4jServerInfos serverInfos,
-            final String request)
+        final XmlaOlap4jServerInfos serverInfos,
+        final String request)
     {
         // The submit operation doesn't need to be cached yet, since it will
         // call the get operation to fetch the data later on. It will get cached
@@ -251,3 +251,6 @@ abstract class XmlaOlap4jAbstractHttpProxy
 }
 
 // End XmlaOlap4jAbstractHttpProxy.java
+
+
+

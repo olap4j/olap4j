@@ -155,7 +155,7 @@ public class OlapTest extends TestCase {
             // create some selections for Product
             productQuery.clearInclusions();
             productQuery.include(
-                    Selection.Operator.CHILDREN, productMember);
+                Selection.Operator.CHILDREN, productMember);
             productQuery.include(
                 Selection.Operator.CHILDREN, nameList("Product", "Food"));
 
@@ -303,10 +303,10 @@ public class OlapTest extends TestCase {
             mdx = query.getSelect();
             mdxString = mdx.toString();
             TestContext.assertEqualsVerbose(
-                    "SELECT\n"
-                    + "{[Measures].[Store Sales]} ON COLUMNS,\n"
-                    + "{[Product].[Drink].Siblings, [Product].[Product Department].Members} ON ROWS\n"
-                    + "FROM [Sales]", mdxString);
+                "SELECT\n"
+                + "{[Measures].[Store Sales]} ON COLUMNS,\n"
+                + "{[Product].[Drink].Siblings, [Product].[Product Department].Members} ON ROWS\n"
+                + "FROM [Sales]", mdxString);
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -1415,26 +1415,26 @@ public class OlapTest extends TestCase {
             // Validate the generated MDX
             String mdxString = query.getSelect().toString();
             TestContext.assertEqualsVerbose(
-                    "SELECT\n"
-                    + "{[Measures].[Sales Count]} ON COLUMNS,\n"
-                    + "{[Store].[USA]} ON ROWS\n"
-                    + "FROM [Sales]\n"
-                    + "WHERE Hierarchize(Union(CrossJoin({[Product].[Drink].[Beverages]}, {[Time].[1997].[Q3].[7]}), CrossJoin({[Product].[Food].[Frozen Foods]}, {[Time].[1997].[Q3].[7]})))",
+                "SELECT\n"
+                + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+                + "{[Store].[USA]} ON ROWS\n"
+                + "FROM [Sales]\n"
+                + "WHERE Hierarchize(Union(CrossJoin({[Product].[Drink].[Beverages]}, {[Time].[1997].[Q3].[7]}), CrossJoin({[Product].[Food].[Frozen Foods]}, {[Time].[1997].[Q3].[7]})))",
                 mdxString);
 
             // Validate the returned results
             CellSet results = query.execute();
             String resultsString = TestContext.toString(results);
             TestContext.assertEqualsVerbose(
-                    "Axis #0:\n"
-                    + "{[Product].[Drink].[Beverages], [Time].[1997].[Q3].[7]}\n"
-                    + "{[Product].[Food].[Frozen Foods], [Time].[1997].[Q3].[7]}\n"
-                    + "Axis #1:\n"
-                    + "{[Measures].[Sales Count]}\n"
-                    + "Axis #2:\n"
-                    + "{[Store].[USA]}\n"
-                    + "Row #0: 1,187\n",
-                    resultsString);
+                "Axis #0:\n"
+                + "{[Product].[Drink].[Beverages], [Time].[1997].[Q3].[7]}\n"
+                + "{[Product].[Food].[Frozen Foods], [Time].[1997].[Q3].[7]}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Sales Count]}\n"
+                + "Axis #2:\n"
+                + "{[Store].[USA]}\n"
+                + "Row #0: 1,187\n",
+                resultsString);
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -1505,3 +1505,7 @@ public class OlapTest extends TestCase {
 }
 
 // End OlapTest.java
+
+
+
+

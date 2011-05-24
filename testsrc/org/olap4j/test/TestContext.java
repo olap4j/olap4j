@@ -3,7 +3,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -333,7 +333,7 @@ public class TestContext {
         if (helperClassName == null) {
             helperClassName = "org.olap4j.XmlaTester";
             if (!testProperties.containsKey(
-                TestContext.Property.XMLA_CATALOG_URL.path))
+                    TestContext.Property.XMLA_CATALOG_URL.path))
             {
                 testProperties.setProperty(
                     TestContext.Property.XMLA_CATALOG_URL.path,
@@ -799,3 +799,4 @@ public class TestContext {
 }
 
 // End TestContext.java
+
