@@ -10,8 +10,11 @@
 package org.olap4j.query;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.olap4j.Axis;
 import org.olap4j.mdx.AxisNode;
@@ -161,6 +164,21 @@ abstract class Olap4jNodeConverter {
 
         for (Selection sel : qDim.getInclusions()) {
             ParseTreeNode selectionNode = toOlap4j(sel);
+            // If a the querydimension should return only hierarchy
+            // consistent results, generate a filter that checks
+            // inclusions for ancestors in higher levels
+            if (qDim.isHierarchyConsistent()
+                    && qDim.getInclusions().size() > 1)
+            {
+                Integer currentDepth = null;
+                if (sel.getRootElement() instanceof Member) {
+                    currentDepth = ((Member)sel.getRootElement()).getDepth();
+                } else if (sel.getRootElement() instanceof Level) {
+                    currentDepth = ((Level)sel.getRootElement()).getDepth();
+                }
+                selectionNode =
+                   toHierarchyConsistentNode(selectionNode, currentDepth, qDim);
+            }
             // If a sort Order was specified for this dimension
             // apply it for this inclusion
             if (qDim.getSortOrder() != null) {
@@ -319,10 +337,52 @@ abstract class Olap4jNodeConverter {
     private static List<ParseTreeNode> toOlap4j(QueryDimension dimension) {
         // Let's build a first list of included members.
         List<ParseTreeNode> includeList = new ArrayList<ParseTreeNode>();
+        Map<Integer, List<ParseTreeNode>> levelNodes =
+            new HashMap<Integer, List<ParseTreeNode>>();
         for (Selection selection : dimension.getInclusions()) {
-            includeList.add(toOlap4j(selection));
-        }
+            ParseTreeNode selectionNode = toOlap4j(selection);
+            // If a the querydimension should return only hierarchy
+            // consistent results, generate a filter that checks
+            // inclusions for ancestors in higher levels
+            if (dimension.isHierarchyConsistent()
+                && dimension.getInclusions().size() > 1)
+            {
+                Integer curdepth = 0;
+                if (selection.getRootElement() instanceof Member) {
+                    curdepth = ((Member)selection.getRootElement()).getDepth();
+                } else if (selection.getRootElement() instanceof Level) {
+                    curdepth = ((Level)selection.getRootElement()).getDepth();
+                }
 
+                if (levelNodes.get(curdepth) != null) {
+                    levelNodes.get(curdepth).add(selectionNode);
+                } else {
+                    List<ParseTreeNode> nodes = new ArrayList<ParseTreeNode>();
+                    nodes.add(selectionNode);
+                    levelNodes.put(curdepth, nodes);
+                }
+            } else {
+                includeList.add(selectionNode);
+            }
+        }
+        if (dimension.isHierarchyConsistent()
+            && dimension.getInclusions().size() > 1)
+        {
+            Integer levelDepths[] =
+                levelNodes.keySet()
+                    .toArray(new Integer[levelNodes.keySet().size()]);
+
+            Arrays.sort(levelDepths);
+
+            for (Integer depth : levelDepths) {
+                ParseTreeNode levelNode =
+                    generateListSetCall(levelNodes.get(depth));
+
+                levelNode =
+                    toHierarchyConsistentNode(levelNode, depth, dimension);
+                includeList.add(levelNode);
+            }
+        }
         // If a sort order was specified, we need to wrap the inclusions in an
         // Order() mdx function.
         List<ParseTreeNode> orderedList = new ArrayList<ParseTreeNode>();
@@ -507,6 +567,108 @@ abstract class Olap4jNodeConverter {
             }
         }
         return axisList;
+    }
+
+    private static ParseTreeNode toHierarchyConsistentNode(
+        ParseTreeNode selectionNode,
+        Integer maxDepth,
+        QueryDimension qDim)
+    {
+        // If a the querydimension should return only hierarchy
+        // consistent results, generate a filter that checks
+        // inclusions for ancestors in higher levels
+        if (qDim.getInclusions().size() > 1) {
+            CallNode currentMemberNode =
+                new CallNode(
+                    null,
+                    "CurrentMember",
+                    Syntax.Property,
+                    new DimensionNode(null, qDim.getDimension()));
+
+            Map<Integer, Level> levels = new HashMap<Integer, Level>();
+            for (Selection s : qDim.getInclusions()) {
+                if (s.getRootElement() instanceof Member) {
+                    Integer d = ((Member)s.getRootElement()).getDepth();
+                    if (!levels.containsKey(d)) {
+                        Level lvl = ((Member)s.getRootElement()).getLevel();
+                        levels.put(d, lvl);
+                    }
+                } else if (s.getRootElement() instanceof Level) {
+                    Integer d = ((Level)s.getRootElement()).getDepth();
+                    if (!levels.containsKey(d)) {
+                        Level lvl = ((Level)s.getRootElement());
+                        levels.put(d, lvl);
+                    }
+                }
+            }
+            Integer levelDepths[] =
+                levels.keySet()
+                    .toArray(new Integer[levels.keySet().size()]);
+
+            Arrays.sort(levelDepths);
+
+            List<CallNode> inConditions = new ArrayList<CallNode>();
+            for (Integer i = 0; i < levelDepths.length - 1; i++) {
+                Level currentLevel = levels.get(levelDepths[i]);
+                if (levelDepths[i] < maxDepth
+                    && currentLevel.getLevelType() != Level.Type.ALL)
+                {
+                CallNode ancestorNode =
+                    new CallNode(
+                            null,
+                            "Ancestor",
+                            Syntax.Function,
+                            currentMemberNode,
+                            new LevelNode(null, currentLevel));
+
+                List <ParseTreeNode> ancestorList =
+                    new ArrayList<ParseTreeNode>();
+
+                for (Selection anc : qDim.getInclusions()) {
+                    if (anc.getRootElement() instanceof Member) {
+                        Level l = ((Member)anc.getRootElement()).getLevel();
+                        if (l.equals(levels.get(levelDepths[i]))) {
+                            ancestorList.add(anc.visit());
+                        }
+                    } else if (anc.getRootElement() instanceof Level) {
+                        Level l = ((Level)anc.getRootElement());
+                        if (l.equals(levels.get(levelDepths[i]))) {
+                            ancestorList.add(anc.visit());
+                        }
+                    }
+                }
+                CallNode ancestorSet = generateListSetCall(ancestorList);
+                CallNode inClause = new CallNode(
+                        null,
+                        "IN",
+                        Syntax.Infix,
+                        ancestorNode,
+                        ancestorSet);
+                inConditions.add(inClause);
+                }
+            }
+            if (inConditions.size() > 0) {
+                CallNode chainedIn = inConditions.get(0);
+                if (inConditions.size() > 1) {
+                    for (int c = 1;c < inConditions.size();c++) {
+                        chainedIn = new CallNode(
+                                null,
+                                "AND",
+                                Syntax.Infix,
+                                chainedIn,
+                                inConditions.get(c));
+                    }
+                }
+
+                return new CallNode(
+                    null,
+                    "Filter",
+                    Syntax.Function,
+                    generateSetCall(selectionNode),
+                    chainedIn);
+            }
+        }
+        return selectionNode;
     }
 }
 

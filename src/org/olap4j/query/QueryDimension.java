@@ -43,6 +43,7 @@ public class QueryDimension extends QueryNodeImpl {
     protected Dimension dimension;
     private SortOrder sortOrder = null;
     private HierarchizeMode hierarchizeMode = null;
+    private boolean hierarchyConsistent = false;
 
     public QueryDimension(Query query, Dimension dimension) {
         super();
@@ -525,6 +526,28 @@ public class QueryDimension extends QueryNodeImpl {
      */
     public void clearHierarchizeMode() {
         this.hierarchizeMode = null;
+    }
+
+    /**
+     * Tells the QueryDimension not to keep a consistent hierarchy
+     * within the inclusions when the mdx is generated.
+     * Only members whose Ancestors are included will be included.
+     *
+     * <p>It uses the MDX function FILTER() in combination with
+     * ANCESTOR() to produce a set like:<br /><br />
+     * {[Time].[1997]}, <br />
+     * Filter({{[Time].[Quarter].Members}},
+     * (Ancestor([Time].CurrentMember, [Time].[Year]) IN {[Time].[1997]}))
+     */
+    public void setHierarchyConsistent(boolean consistent) {
+        this.hierarchyConsistent = consistent;
+    }
+
+    /**
+     * Tells the QueryDimension not to keep a consistent hierarchy
+     */
+    public boolean isHierarchyConsistent() {
+        return this.hierarchyConsistent;
     }
 
     private class SelectionList extends AbstractList<Selection> {

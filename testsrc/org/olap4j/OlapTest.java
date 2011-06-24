@@ -15,7 +15,6 @@ import org.olap4j.query.*;
 import org.olap4j.query.QueryDimension.HierarchizeMode;
 import org.olap4j.query.Selection.Operator;
 import org.olap4j.test.TestContext;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -1440,6 +1439,138 @@ public class OlapTest extends TestCase {
             fail();
         }
     }
+    public void testHierarchyConsistency() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+            // Setup a base query.
+            Query query = new Query("my query", cube);
+            QueryDimension productDimension = query.getDimension("Product");
+            productDimension.setHierarchyConsistent(true);
+            NamedList<Level> productLevels =
+                productDimension.getDimension()
+                    .getDefaultHierarchy().getLevels();
+
+            Level productLevel = productLevels.get("Product Category");
+            productDimension.include(productLevel);
+
+            productDimension.include(
+                    Selection.Operator.MEMBER,
+                    nameList("Product", "Food", "Deli"));
+            productDimension.include(
+                    Selection.Operator.MEMBER,
+                    nameList("Product", "Food", "Dairy"));
+            productDimension.include(
+                Selection.Operator.MEMBER,
+                nameList("Product", "Product Family", "Food"));
+            productDimension.include(
+                    Selection.Operator.MEMBER,
+                    nameList("Product", "All Products"));
+            QueryDimension timeDimension = query.getDimension("Time");
+            timeDimension.setHierarchyConsistent(true);
+
+            timeDimension.include(nameList("Time", "Year", "1997", "Q3", "7"));
+            timeDimension.include(nameList("Time", "Year", "1997", "Q4", "11"));
+
+            timeDimension.include(nameList("Time", "Year", "1997"));
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            measuresDimension.include(nameList("Measures", "Sales Count"));
+
+            query.getAxis(Axis.COLUMNS).addDimension(productDimension);
+            query.getAxis(Axis.ROWS).addDimension(timeDimension);
+
+            query.validate();
+
+            // Validate the generated MDX
+            String mdxString = query.getSelect().toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{{[Product].[All Products]}, {[Product].[Food]}, Filter({{[Product].[Food].[Deli], [Product].[Food].[Dairy]}}, (Ancestor([Product].CurrentMember, [Product].[Product Family]) IN {[Product].[Food]})), Filter({{[Product].[Product Category].Members}}, ((Ancestor([Product].CurrentMember, [Product].[Product Family]) IN {[Product].[Food]}) AND (Ancestor([Product].CurrentMember, [Product].[Product Department]) IN {[Product].[Food].[Deli], [Product].[Food].[Dairy]})))} ON COLUMNS,\n"
+                + "{{[Time].[1997]}, Filter({{[Time].[1997].[Q3].[7], [Time].[1997].[Q4].[11]}}, (Ancestor([Time].CurrentMember, [Time].[Year]) IN {[Time].[1997]}))} ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
+
+            // Validate the returned results
+            CellSet results = query.execute();
+            String resultsString = TestContext.toString(results);
+            TestContext.assertEqualsVerbose(
+                    "Axis #0:\n"
+                    + "{}\n"
+                    + "Axis #1:\n"
+                    + "{[Product].[All Products]}\n"
+                    + "{[Product].[Food]}\n"
+                    + "{[Product].[Food].[Deli]}\n"
+                    + "{[Product].[Food].[Dairy]}\n"
+                    + "{[Product].[Food].[Dairy].[Dairy]}\n"
+                    + "{[Product].[Food].[Deli].[Meat]}\n"
+                    + "{[Product].[Food].[Deli].[Side Dishes]}\n"
+                    + "Axis #2:\n"
+                    + "{[Time].[1997]}\n"
+                    + "{[Time].[1997].[Q3].[7]}\n"
+                    + "{[Time].[1997].[Q4].[11]}\n"
+                    + "Row #0: 266,773\n"
+                    + "Row #0: 191,940\n"
+                    + "Row #0: 12,037\n"
+                    + "Row #0: 12,885\n"
+                    + "Row #0: 12,885\n"
+                    + "Row #0: 9,433\n"
+                    + "Row #0: 2,604\n"
+                    + "Row #1: 23,763\n"
+                    + "Row #1: 17,036\n"
+                    + "Row #1: 1,050\n"
+                    + "Row #1: 1,229\n"
+                    + "Row #1: 1,229\n"
+                    + "Row #1: 847\n"
+                    + "Row #1: 203\n"
+                    + "Row #2: 25,270\n"
+                    + "Row #2: 18,278\n"
+                    + "Row #2: 1,312\n"
+                    + "Row #2: 1,232\n"
+                    + "Row #2: 1,232\n"
+                    + "Row #2: 1,033\n"
+                    + "Row #2: 279\n",
+                    resultsString);
+            query.validate();
+
+            query.getAxis(Axis.ROWS).addDimension(measuresDimension);
+            productDimension.clearInclusions();
+            productDimension.include(
+                    Selection.Operator.MEMBER,
+                    nameList("Product", "Product Family", "Food"));
+
+            // Validate the generated MDX
+            String mdxString2 = query.getSelect().toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Product].[Food]} ON COLUMNS,\n"
+                + "Hierarchize(Union(CrossJoin(Filter({[Time].[1997].[Q3].[7]}, (Ancestor([Time].CurrentMember, [Time].[Year]) IN {[Time].[1997]})), {[Measures].[Sales Count]}), Union(CrossJoin(Filter({[Time].[1997].[Q4].[11]}, (Ancestor([Time].CurrentMember, [Time].[Year]) IN {[Time].[1997]})), {[Measures].[Sales Count]}), CrossJoin({[Time].[1997]}, {[Measures].[Sales Count]})))) ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString2);
+
+            // Validate the returned results
+            CellSet results2 = query.execute();
+            String resultsString2 = TestContext.toString(results2);
+            TestContext.assertEqualsVerbose(
+                "Axis #0:\n"
+                + "{}\n"
+                + "Axis #1:\n"
+                + "{[Product].[Food]}\n"
+                + "Axis #2:\n"
+                + "{[Time].[1997], [Measures].[Sales Count]}\n"
+                + "{[Time].[1997].[Q3].[7], [Measures].[Sales Count]}\n"
+                + "{[Time].[1997].[Q4].[11], [Measures].[Sales Count]}\n"
+                + "Row #0: 62,445\n"
+                + "Row #1: 5,552\n"
+                + "Row #2: 5,944\n",
+                resultsString2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
     public void testNonMandatoryQueryAxis() {
         try {
             Cube cube = getFoodmartCube("Sales");
