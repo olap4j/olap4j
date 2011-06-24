@@ -60,6 +60,14 @@ public abstract class Bug {
      * is fixed.
      */
     public static final boolean BugOlap4j3126853Fixed = false;
+
+    /**
+     * Whether
+     * <a href="http://sourceforge.net/tracker/?func=detail&aid=3312701&group_id=168953&atid=848534">bug 3312701,
+     * "ConnectionTest.testVirtualCubeCmBug hangs"</a>
+     * is fixed.
+     */
+    public static final boolean BugOlap4j3312701Fixed = false;
 }
 
 // End Bug.java

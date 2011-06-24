@@ -2032,6 +2032,50 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
+     * Testcase for bug 3312701, "VirtualCube doesn't show
+     * Calculated Members"
+     */
+    public void testVirtualCubeCmBug() throws Exception {
+        if (!Bug.BugOlap4j3312701Fixed) {
+            return;
+        }
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        Cube warehouseSalesCube =
+            olapConnection
+                .getOlapCatalogs()
+                    .get("FoodMart")
+                        .getSchemas()
+                            .get("FoodMart")
+                                .getCubes()
+                                    .get("Warehouse and Sales");
+        Set<String> measureVcNameSet = new HashSet<String>();
+        for (Measure measure : warehouseSalesCube.getMeasures()) {
+            measureVcNameSet.add(measure.getName());
+        }
+        assertEquals(
+                new HashSet<String>(
+                    Arrays.asList(
+                            "Sales Count",
+                            "Store Cost",
+                            "Store Sales",
+                            "Unit Sales",
+                            "Profit",
+                            "Profit Growth",
+                            "Store Invoice",
+                            "Supply Time",
+                            "Units Ordered",
+                            "Units Shipped",
+                            "Warehouse Cost",
+                            "Warehouse Profit",
+                            "Warehouse Sales",
+                            "Average Warehouse Sale")),
+                            measureVcNameSet);
+    }
+
+    /**
      * Testcase for bug 1868075, "Query on ragged hierarchy gives only empty
      * cells".
      */
