@@ -1457,16 +1457,16 @@ public class OlapTest extends TestCase {
             productDimension.include(productLevel);
 
             productDimension.include(
-                    Selection.Operator.MEMBER,
+                Selection.Operator.MEMBER,
                     nameList("Product", "Food", "Deli"));
             productDimension.include(
-                    Selection.Operator.MEMBER,
+                Selection.Operator.MEMBER,
                     nameList("Product", "Food", "Dairy"));
             productDimension.include(
                 Selection.Operator.MEMBER,
-                nameList("Product", "Product Family", "Food"));
+                    nameList("Product", "Product Family", "Food"));
             productDimension.include(
-                    Selection.Operator.MEMBER,
+                Selection.Operator.MEMBER,
                     nameList("Product", "All Products"));
             QueryDimension timeDimension = query.getDimension("Time");
             timeDimension.setHierarchyConsistent(true);
@@ -1496,48 +1496,48 @@ public class OlapTest extends TestCase {
             CellSet results = query.execute();
             String resultsString = TestContext.toString(results);
             TestContext.assertEqualsVerbose(
-                    "Axis #0:\n"
-                    + "{}\n"
-                    + "Axis #1:\n"
-                    + "{[Product].[All Products]}\n"
-                    + "{[Product].[Food]}\n"
-                    + "{[Product].[Food].[Deli]}\n"
-                    + "{[Product].[Food].[Dairy]}\n"
-                    + "{[Product].[Food].[Dairy].[Dairy]}\n"
-                    + "{[Product].[Food].[Deli].[Meat]}\n"
-                    + "{[Product].[Food].[Deli].[Side Dishes]}\n"
-                    + "Axis #2:\n"
-                    + "{[Time].[1997]}\n"
-                    + "{[Time].[1997].[Q3].[7]}\n"
-                    + "{[Time].[1997].[Q4].[11]}\n"
-                    + "Row #0: 266,773\n"
-                    + "Row #0: 191,940\n"
-                    + "Row #0: 12,037\n"
-                    + "Row #0: 12,885\n"
-                    + "Row #0: 12,885\n"
-                    + "Row #0: 9,433\n"
-                    + "Row #0: 2,604\n"
-                    + "Row #1: 23,763\n"
-                    + "Row #1: 17,036\n"
-                    + "Row #1: 1,050\n"
-                    + "Row #1: 1,229\n"
-                    + "Row #1: 1,229\n"
-                    + "Row #1: 847\n"
-                    + "Row #1: 203\n"
-                    + "Row #2: 25,270\n"
-                    + "Row #2: 18,278\n"
-                    + "Row #2: 1,312\n"
-                    + "Row #2: 1,232\n"
-                    + "Row #2: 1,232\n"
-                    + "Row #2: 1,033\n"
-                    + "Row #2: 279\n",
-                    resultsString);
+                "Axis #0:\n"
+                + "{}\n"
+                + "Axis #1:\n"
+                + "{[Product].[All Products]}\n"
+                + "{[Product].[Food]}\n"
+                + "{[Product].[Food].[Deli]}\n"
+                + "{[Product].[Food].[Dairy]}\n"
+                + "{[Product].[Food].[Dairy].[Dairy]}\n"
+                + "{[Product].[Food].[Deli].[Meat]}\n"
+                + "{[Product].[Food].[Deli].[Side Dishes]}\n"
+                + "Axis #2:\n"
+                + "{[Time].[1997]}\n"
+                + "{[Time].[1997].[Q3].[7]}\n"
+                + "{[Time].[1997].[Q4].[11]}\n"
+                + "Row #0: 266,773\n"
+                + "Row #0: 191,940\n"
+                + "Row #0: 12,037\n"
+                + "Row #0: 12,885\n"
+                + "Row #0: 12,885\n"
+                + "Row #0: 9,433\n"
+                + "Row #0: 2,604\n"
+                + "Row #1: 23,763\n"
+                + "Row #1: 17,036\n"
+                + "Row #1: 1,050\n"
+                + "Row #1: 1,229\n"
+                + "Row #1: 1,229\n"
+                + "Row #1: 847\n"
+                + "Row #1: 203\n"
+                + "Row #2: 25,270\n"
+                + "Row #2: 18,278\n"
+                + "Row #2: 1,312\n"
+                + "Row #2: 1,232\n"
+                + "Row #2: 1,232\n"
+                + "Row #2: 1,033\n"
+                + "Row #2: 279\n",
+                resultsString);
             query.validate();
 
             query.getAxis(Axis.ROWS).addDimension(measuresDimension);
             productDimension.clearInclusions();
             productDimension.include(
-                    Selection.Operator.MEMBER,
+                Selection.Operator.MEMBER,
                     nameList("Product", "Product Family", "Food"));
 
             // Validate the generated MDX

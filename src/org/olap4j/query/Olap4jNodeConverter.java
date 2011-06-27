@@ -615,11 +615,11 @@ abstract class Olap4jNodeConverter {
                 {
                 CallNode ancestorNode =
                     new CallNode(
-                            null,
-                            "Ancestor",
-                            Syntax.Function,
-                            currentMemberNode,
-                            new LevelNode(null, currentLevel));
+                        null,
+                        "Ancestor",
+                        Syntax.Function,
+                        currentMemberNode,
+                        new LevelNode(null, currentLevel));
 
                 List <ParseTreeNode> ancestorList =
                     new ArrayList<ParseTreeNode>();
@@ -639,11 +639,11 @@ abstract class Olap4jNodeConverter {
                 }
                 CallNode ancestorSet = generateListSetCall(ancestorList);
                 CallNode inClause = new CallNode(
-                        null,
-                        "IN",
-                        Syntax.Infix,
-                        ancestorNode,
-                        ancestorSet);
+                    null,
+                    "IN",
+                    Syntax.Infix,
+                    ancestorNode,
+                    ancestorSet);
                 inConditions.add(inClause);
                 }
             }
@@ -652,11 +652,11 @@ abstract class Olap4jNodeConverter {
                 if (inConditions.size() > 1) {
                     for (int c = 1;c < inConditions.size();c++) {
                         chainedIn = new CallNode(
-                                null,
-                                "AND",
-                                Syntax.Infix,
-                                chainedIn,
-                                inConditions.get(c));
+                            null,
+                            "AND",
+                            Syntax.Infix,
+                            chainedIn,
+                            inConditions.get(c));
                     }
                 }
 
