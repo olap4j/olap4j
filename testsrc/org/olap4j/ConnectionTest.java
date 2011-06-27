@@ -2058,21 +2058,21 @@ public class ConnectionTest extends TestCase {
         assertEquals(
             new HashSet<String>(
                 Arrays.asList(
-                        "Sales Count",
-                        "Store Cost",
-                        "Store Sales",
-                        "Unit Sales",
-                        "Profit",
-                        "Profit Growth",
-                        "Store Invoice",
-                        "Supply Time",
-                        "Units Ordered",
-                        "Units Shipped",
-                        "Warehouse Cost",
-                        "Warehouse Profit",
-                        "Warehouse Sales",
-                        "Average Warehouse Sale")),
-                        measureVcNameSet);
+                    "Sales Count",
+                    "Store Cost",
+                    "Store Sales",
+                    "Unit Sales",
+                    "Profit",
+                    "Profit Growth",
+                    "Store Invoice",
+                    "Supply Time",
+                    "Units Ordered",
+                    "Units Shipped",
+                    "Warehouse Cost",
+                    "Warehouse Profit",
+                    "Warehouse Sales",
+                    "Average Warehouse Sale")),
+            measureVcNameSet);
     }
 
     /**

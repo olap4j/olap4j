@@ -3,7 +3,7 @@
 # Checks that a file is valid.
 
 function error(fname, linum, msg) {
-    printf "%s: %d: %s\n", fname, linum, msg;
+    printf "%s:%d: %s\n", fname, linum, msg;
     if (0) print; # for debug
 }
 function _matchFile(fname) {
@@ -12,6 +12,7 @@ function _matchFile(fname) {
        || fname ~ "/aspen/" \
        || fname ~ "/farrago/" \
        || fname ~ "/fennel/" \
+       || fname ~ "/extensions/" \
        || fname ~ "/com/sqlstream/" \
        || !lenient;
 }
@@ -20,6 +21,9 @@ function _isCpp(fname) {
 }
 function _isJava(fname) {
     return fname ~ /\.(java|jj)$/;
+}
+function _isMondrian(fname) {
+    return fname ~ /mondrian/;
 }
 function push(val) {
     switchStack[switchStackLen++] = val;
@@ -30,6 +34,51 @@ function pop() {
     delete switchStack[switchStackLen];
     return val;
 }
+function afterFile() {
+    # Compute basename. If fname="/foo/bar/baz.txt" then basename="baz.txt".
+    basename = fname;
+    gsub(".*/", "", basename);
+    gsub(lf, "", lastNonEmptyLine);
+    terminator = "// End " basename;
+    if (matchFile && (lastNonEmptyLine != terminator)) {
+        error(fname, FNR, sprintf("Last line should be %c%s%c", 39, terminator, 39));
+    }
+}
+# Returns whether there are unmatched open parentheses.
+# unmatchedOpenParens("if ()") returns false.
+# unmatchedOpenParens("if (") returns true.
+# unmatchedOpenParens("if (foo) bar(") returns false
+function unmatchedOpenParens(s) {
+    i = index(s, "(");
+    if (i == 0) {
+    if (0)         print FNR, "unmatchedOpenParens=0";
+        return 0;
+    }
+    openCount = 1;
+    while (++i <= length(s)) {
+        c = substr(s, i, 1);
+        if (c == "(") {
+            ++openCount;
+        }
+        if (c == ")") {
+            if (--openCount == 0) {
+    if (0)         print FNR, "unmatchedOpenParens=0 (b)";
+                return 0;
+            }
+        }
+    }
+    if (0) print FNR, "unmatchedOpenParens=1";
+    return 1;
+}
+
+function countLeadingSpaces(str) {
+    i = 0;
+    while (i < length(str) && substr(str, i + 1, 1) == " ") {
+        ++i;
+    }
+    return i;
+}
+
 BEGIN {
     # pre-compute regexp for quotes, linefeed
     apos = sprintf("%c", 39);
@@ -39,10 +88,14 @@ BEGIN {
     if (0) printf "maxLineLength=%s lenient=%s\n", maxLineLength, lenient;
 }
 FNR == 1 {
+    if (fname) {
+        afterFile();
+    }
     fname = FILENAME;
     matchFile = _matchFile(fname);
     isCpp = _isCpp(fname);
     isJava = _isJava(fname);
+    mondrian = _isMondrian(fname);
 }
 {
     if (previousLineEndedInCloseBrace > 0) {
@@ -81,6 +134,9 @@ FNR == 1 {
         # mask out /* */ comments
         gsub(/\/\*.*\*\//, "/* comment */", s);
     }
+    if (mondrian && s ~ /\/\/\$NON-NLS/) {
+        error(fname, FNR, "NON-NLS not allowed");
+    }
     # mask out // comments
     gsub(/\/\/.*$/, "// comment", s);
     # line starts with string or plus?
@@ -97,6 +153,15 @@ FNR == 1 {
     } else {
         stringCol = 0;
     }
+
+    # Is the line indented as expected?
+    if (nextIndent > 0) {
+        indent = countLeadingSpaces(s);
+        if (indent != nextIndent) {
+            error(fname, FNR, "Incorrect indent for first line of arg list");
+        }
+    }
+    nextIndent = -1;
 }
 / $/ {
     error(fname, FNR, "Line ends in space");
@@ -110,6 +175,9 @@ FNR == 1 {
     if (matchFile) {
         error(fname, FNR, "Carriage return character (file is in DOS format?)");
     }
+}
+/./ {
+    lastNonEmptyLine = $0;
 }
 {
     # Rules beyond this point only apply to Java and C++.
@@ -162,7 +230,7 @@ s ~ /\<(for|switch|synchronized|} catch) *\(/ {
         error(fname, FNR, "for/switch/synchronized/catch must be followed by space");
     }
 }
-s ~ /\<(if|while|for|switch)\>/ {
+s ~ /\<(if|while|for|switch|catch)\>/ {
     # Check single-line if statements, such as
     #   if (condition) return;
     # We recognize such statements because there are equal numbers of open and
@@ -183,11 +251,11 @@ s ~ /\<(if|while|for|switch)\>/ {
     } else if (s ~ /if \(true|false\)/) {
         # allow "if (true)" and "if (false)" because they are
         # used for commenting
-    } else if (length(opens) == length(closes)  \
-               && length($0) != 79              \
+    } else if (!unmatchedOpenParens(s)  \
+               && length($0) != 79      \
                && length($0) != 80)
     {
-        error(fname, FNR, "single-line if/while/for/switch must end in {");
+        error(fname, FNR, "single-line if/while/for/switch/catch must end in {");
     }
 }
 s ~ /[[:alnum:]]\(/ &&
@@ -317,6 +385,12 @@ s ~ /\<finally\>/ {
     if (!matchFile) {}
     else if (s !~ /^(    )+} finally {/) {
         error(fname, FNR, "finally must be preceded by }, followed by space {, and correctly indented");
+    }
+}
+s ~ /\($/ {
+    nextIndent = countLeadingSpaces(s) + 4;
+    if (s ~ / (if|while) .*\(.*\(/) {
+        nextIndent += 4;
     }
 }
 match(s, /([]A-Za-z0-9()])(+|-|\*|\^|\/|%|=|==|+=|-=|\*=|\/=|>=|<=|!=|&|&&|\||\|\||^|\?|:) *[A-Za-z0-9(]/, a) {
@@ -515,9 +589,6 @@ length($0) > maxLineLength                      \
         FNR, \
         "Line length (" length($0) ") exceeds " maxLineLength " chars");
 }
-/./ {
-    lastNonEmptyLine = $0;
-}
 /}$/ {
     previousLineEndedInCloseBrace = 2;
 }
@@ -553,14 +624,7 @@ length($0) > maxLineLength                      \
     next;
 }
 END {
-    # Compute basename. If fname="/foo/bar/baz.txt" then basename="baz.txt".
-    basename = fname;
-    gsub(".*/", "", basename);
-    gsub(lf, "", lastNonEmptyLine);
-    terminator = "// End " basename;
-    if (matchFile && (lastNonEmptyLine != terminator)) {
-        error(fname, FNR, sprintf("Last line should be %c%s%c", 39, terminator, 39));
-    }
+    afterFile();
 }
 
 # End checkFile.awk
