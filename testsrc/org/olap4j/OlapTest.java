@@ -1439,6 +1439,60 @@ public class OlapTest extends TestCase {
             fail();
         }
     }
+    public void testMultipleHierarchyConsistency() {
+        try {
+            Cube cube = getFoodmartCube("Sales");
+            if (cube == null) {
+                fail("Could not find Sales cube");
+            }
+            // Setup a base query.
+            Query query = new Query("my query", cube);
+            QueryDimension timeDimension = query.getDimension("Time");
+            timeDimension.setHierarchyConsistent(true);
+
+            timeDimension.include(nameList("Time.Weekly", "1997", "10", "23"));
+            timeDimension.include(nameList("Time.Weekly", "1997", "10", "28"));
+            timeDimension.include(nameList("Time.Weekly", "Year", "1997"));
+
+            QueryDimension measuresDimension = query.getDimension("Measures");
+            measuresDimension.include(nameList("Measures", "Sales Count"));
+
+            query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+            query.getAxis(Axis.ROWS).addDimension(timeDimension);
+
+            query.validate();
+
+            // Validate the generated MDX
+            String mdxString = query.getSelect().toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+                + "{{[Time.Weekly].[1997]}, Filter({{[Time.Weekly].[1997].[10].[23], [Time.Weekly].[1997].[10].[28]}}, (Ancestor([Time.Weekly].CurrentMember, [Time.Weekly].[Year]) IN {[Time.Weekly].[1997]}))} ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString);
+
+            // Validate the returned results
+            CellSet results = query.execute();
+            String resultsString = TestContext.toString(results);
+            TestContext.assertEqualsVerbose(
+                "Axis #0:\n"
+                + "{}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Sales Count]}\n"
+                + "Axis #2:\n"
+                + "{[Time.Weekly].[1997]}\n"
+                + "{[Time.Weekly].[1997].[10].[23]}\n"
+                + "{[Time.Weekly].[1997].[10].[28]}\n"
+                + "Row #0: 86,837\n"
+                + "Row #1: 123\n"
+                + "Row #2: \n",
+                resultsString);
+            query.validate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
     public void testHierarchyConsistency() {
         try {
             Cube cube = getFoodmartCube("Sales");

@@ -21,6 +21,7 @@ import org.olap4j.mdx.AxisNode;
 import org.olap4j.mdx.CallNode;
 import org.olap4j.mdx.CubeNode;
 import org.olap4j.mdx.DimensionNode;
+import org.olap4j.mdx.HierarchyNode;
 import org.olap4j.mdx.IdentifierNode;
 import org.olap4j.mdx.LevelNode;
 import org.olap4j.mdx.LiteralNode;
@@ -578,13 +579,6 @@ abstract class Olap4jNodeConverter {
         // consistent results, generate a filter that checks
         // inclusions for ancestors in higher levels
         if (qDim.getInclusions().size() > 1) {
-            CallNode currentMemberNode =
-                new CallNode(
-                    null,
-                    "CurrentMember",
-                    Syntax.Property,
-                    new DimensionNode(null, qDim.getDimension()));
-
             Map<Integer, Level> levels = new HashMap<Integer, Level>();
             for (Selection s : qDim.getInclusions()) {
                 if (s.getRootElement() instanceof Member) {
@@ -613,6 +607,13 @@ abstract class Olap4jNodeConverter {
                 if (levelDepths[i] < maxDepth
                     && currentLevel.getLevelType() != Level.Type.ALL)
                 {
+                CallNode currentMemberNode =
+                    new CallNode(
+                        null,
+                        "CurrentMember",
+                        Syntax.Property,
+                        new HierarchyNode(null, currentLevel.getHierarchy()));
+
                 CallNode ancestorNode =
                     new CallNode(
                         null,
