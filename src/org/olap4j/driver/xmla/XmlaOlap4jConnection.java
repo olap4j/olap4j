@@ -1093,9 +1093,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     static class DimensionHandler extends HandlerImpl<XmlaOlap4jDimension> {
         private final XmlaOlap4jCube cubeForCallback;
 
-        public DimensionHandler(XmlaOlap4jCube dimensionsByUname) {
-            this.cubeForCallback = dimensionsByUname;
+        public DimensionHandler(XmlaOlap4jCube cube) {
+            this.cubeForCallback = cube;
         }
+
         public void handle(
             Element row,
             Context context,
@@ -1168,9 +1169,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                         }
                 });
             }
-            this.cubeForCallback.dimensionsByUname.put(
-                dimension.getUniqueName(),
-                dimension);
+            if (this.cubeForCallback != null) {
+                this.cubeForCallback.dimensionsByUname.put(
+                    dimension.getUniqueName(),
+                    dimension);
+            }
         }
     }
 

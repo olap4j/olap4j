@@ -2032,6 +2032,34 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
+     * Test case for {@link org.olap4j.metadata.Schema#getSharedDimensions()}.
+     * Bug 3375355, "getSharedDimensions returns empty result".
+     */
+    public void testSchemaGetSharedDimensions() throws Exception {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        final List<String> list = new ArrayList<String>();
+        final NamedList<Dimension> sharedDimensions =
+            olapConnection.getOlapSchema().getSharedDimensions();
+        for (Dimension dimension : sharedDimensions) {
+            list.add(dimension.getName());
+        }
+
+        // note that, per specification, list is sorted
+        assertEquals(
+            Arrays.asList(
+                "Product",
+                "Store",
+                "Store Size in SQFT",
+                "Store Type",
+                "Time",
+                "Warehouse"),
+            list);
+    }
+
+    /**
      * Testcase for bug 3312701, "VirtualCube doesn't show
      * Calculated Members"
      */

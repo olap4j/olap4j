@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -26,10 +26,12 @@ class XmlaOlap4jSchema implements Schema, Named {
     final XmlaOlap4jCatalog olap4jCatalog;
     private final String name;
     final NamedList<XmlaOlap4jCube> cubes;
+    private final NamedList<XmlaOlap4jDimension> sharedDimensions;
 
     XmlaOlap4jSchema(
         XmlaOlap4jCatalog olap4jCatalog,
         String name)
+        throws OlapException
     {
         if (olap4jCatalog == null) {
             throw new NullPointerException("Catalog cannot be null.");
@@ -40,16 +42,36 @@ class XmlaOlap4jSchema implements Schema, Named {
 
         this.olap4jCatalog = olap4jCatalog;
         this.name = name;
-        this.cubes = new DeferredNamedListImpl<XmlaOlap4jCube>(
-            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_CUBES,
+
+        // Dummy cube to own shared dimensions.
+        final XmlaOlap4jCube sharedCube =
+            new XmlaOlap4jCube(this, "", "", "");
+
+        final XmlaOlap4jConnection.Context context =
             new XmlaOlap4jConnection.Context(
                 olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection,
                 olap4jCatalog.olap4jDatabaseMetaData,
                 olap4jCatalog,
                 this,
-                null, null, null, null),
+                sharedCube, null, null, null);
+
+        this.cubes = new DeferredNamedListImpl<XmlaOlap4jCube>(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_CUBES,
+            context,
             new XmlaOlap4jConnection.CubeHandler(),
             null);
+
+        String[] restrictions = {
+            "CATALOG_NAME", olap4jCatalog.getName(),
+            "SCHEMA_NAME", getName(),
+            "CUBE_NAME", ""
+        };
+
+        this.sharedDimensions = new DeferredNamedListImpl<XmlaOlap4jDimension>(
+            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_DIMENSIONS,
+            context,
+            new XmlaOlap4jConnection.DimensionHandler(null),
+            restrictions);
     }
 
     public int hashCode() {
@@ -78,8 +100,7 @@ class XmlaOlap4jSchema implements Schema, Named {
     }
 
     public NamedList<Dimension> getSharedDimensions() throws OlapException {
-        // No shared dimensions
-        return Olap4jUtil.cast(new NamedListImpl<XmlaOlap4jDimension>());
+        return Olap4jUtil.cast(sharedDimensions);
     }
 
     public Collection<Locale> getSupportedLocales() throws OlapException {
