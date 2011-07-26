@@ -1169,11 +1169,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                         }
                 });
             }
-            if (this.cubeForCallback != null) {
-                this.cubeForCallback.dimensionsByUname.put(
-                    dimension.getUniqueName(),
-                    dimension);
-            }
+            this.cubeForCallback.dimensionsByUname.put(
+                dimension.getUniqueName(),
+                dimension);
         }
     }
 

@@ -70,7 +70,7 @@ class XmlaOlap4jSchema implements Schema, Named {
         this.sharedDimensions = new DeferredNamedListImpl<XmlaOlap4jDimension>(
             XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_DIMENSIONS,
             context,
-            new XmlaOlap4jConnection.DimensionHandler(null),
+            new XmlaOlap4jConnection.DimensionHandler(sharedCube),
             restrictions);
     }
 

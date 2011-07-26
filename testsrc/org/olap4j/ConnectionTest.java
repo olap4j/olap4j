@@ -2057,6 +2057,18 @@ public class ConnectionTest extends TestCase {
                 "Time",
                 "Warehouse"),
             list);
+
+        int hierarchyCount = 0, levelCount = 0;
+        for (Dimension sharedDimension : sharedDimensions) {
+            for (Hierarchy hierarchy : sharedDimension.getHierarchies()) {
+                ++hierarchyCount;
+                for (Level level : hierarchy.getLevels()) {
+                    ++levelCount;
+                }
+            }
+        }
+        assertTrue(hierarchyCount > 0);
+        assertTrue(levelCount > 0);
     }
 
     /**
