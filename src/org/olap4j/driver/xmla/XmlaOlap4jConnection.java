@@ -2105,6 +2105,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             new MetadataColumn("IS_READWRITE"),
             new MetadataColumn("DIMENSION_UNIQUE_SETTINGS"),
             new MetadataColumn("DIMENSION_IS_VISIBLE"),
+            new MetadataColumn("HIERARCHY_IS_VISIBLE"),
             new MetadataColumn("HIERARCHY_ORDINAL"),
             new MetadataColumn("DIMENSION_IS_SHARED"),
             new MetadataColumn("PARENT_CHILD")),

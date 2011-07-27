@@ -480,7 +480,7 @@ public class MetadataTest extends TestCase {
             "CATALOG_NAME=" + catalogName
             + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse and Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store], LEVEL_UNIQUE_NAME=[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Frozen Sqft, PROPERTY_CAPTION=Frozen Sqft, PROPERTY_TYPE=1, DATA_TYPE=5, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Warehouse and Sales Cube - Store Hierarchy - Store Name Level - Frozen Sqft Property",
             s);
-        assertEquals(s, 66, linecount(s));
+        assertEquals(s, 74, linecount(s));
 
         s = checkResultSet(
             olapDatabaseMetaData.getProperties(
@@ -586,7 +586,7 @@ public class MetadataTest extends TestCase {
             "CATALOG_NAME=" + catalogName
             + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_NAME=Education Level, DIMENSION_UNIQUE_NAME=[Education Level], DIMENSION_GUID=null, DIMENSION_CAPTION=Education Level, DIMENSION_ORDINAL=9, DIMENSION_TYPE=3, DIMENSION_CARDINALITY=6, DEFAULT_HIERARCHY=[Education Level], DESCRIPTION=Sales Cube - Education Level Dimension, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_MASTER_UNIQUE_NAME=null, DIMENSION_IS_VISIBLE=true",
             s);
-        assertEquals(62, linecount(s));
+        assertEquals(68, linecount(s));
     }
 
     public void testDatabaseMetaDataGetFunctions() throws SQLException {
@@ -642,10 +642,8 @@ public class MetadataTest extends TestCase {
             olapDatabaseMetaData.getLevels(
                 catalogName, null, null, null, null, null),
             LEVELS_COLUMN_NAMES);
-        assertContainsLine(
-            "LEVEL_NAME=Product Category,",
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Product], HIERARCHY_UNIQUE_NAME=[Product], LEVEL_NAME=Product Category, LEVEL_UNIQUE_NAME=[Product].[Product Category], LEVEL_GUID=null, LEVEL_CAPTION=Product Category, LEVEL_NUMBER=3, LEVEL_CARDINALITY=55, LEVEL_TYPE=0, CUSTOM_ROLLUP_SETTINGS=0, LEVEL_UNIQUE_SETTINGS=0, LEVEL_IS_VISIBLE=true, DESCRIPTION=Sales Cube - Product Hierarchy - Product Category Level",
+        assertContains(
+            "CATALOG_NAME=FoodMart, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Measures], HIERARCHY_UNIQUE_NAME=[Measures], LEVEL_NAME=MeasuresLevel, LEVEL_UNIQUE_NAME=[Measures].[MeasuresLevel], LEVEL_GUID=null, LEVEL_CAPTION=MeasuresLevel, LEVEL_NUMBER=0, LEVEL_CARDINALITY=9, LEVEL_TYPE=0, CUSTOM_ROLLUP_SETTINGS=0, LEVEL_UNIQUE_SETTINGS=0, LEVEL_IS_VISIBLE=true, DESCRIPTION=Sales Cube - Measures Hierarchy - MeasuresLevel Level",
             s);
 
         s = checkResultSet(
