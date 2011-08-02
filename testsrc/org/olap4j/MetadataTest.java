@@ -480,7 +480,7 @@ public class MetadataTest extends TestCase {
             "CATALOG_NAME=" + catalogName
             + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse and Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store], LEVEL_UNIQUE_NAME=[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Frozen Sqft, PROPERTY_CAPTION=Frozen Sqft, PROPERTY_TYPE=1, DATA_TYPE=5, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Warehouse and Sales Cube - Store Hierarchy - Store Name Level - Frozen Sqft Property",
             s);
-        assertEquals(s, 74, linecount(s));
+        assertEquals(s, 66, linecount(s));
 
         s = checkResultSet(
             olapDatabaseMetaData.getProperties(
