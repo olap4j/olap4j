@@ -296,6 +296,43 @@ public class ConnectionTest extends TestCase {
         olapConnection.setLocale(Locale.CANADA_FRENCH);
         assertEquals(olapConnection.getLocale(), Locale.CANADA_FRENCH);
 
+        // Against mondrian, Sales cube is localized.
+        final OlapDatabaseMetaData metaData = olapConnection.getMetaData();
+        final String databaseName = metaData.getDatabaseProductName();
+        final String databaseVersion = metaData.getDatabaseProductVersion();
+        if (databaseName.equals("Mondrian XML for Analysis Provider")
+            && databaseVersion.compareTo("3.3") > 0)
+        {
+            olapConnection.setLocale(Locale.US);
+            final Cube salesCubeUs =
+                olapConnection.getOlapSchema().getCubes().get("Sales");
+            assertEquals("Sales", salesCubeUs.getCaption());
+
+            // Switch locales. Note that we have to re-read metadata from the
+            // root (getOlapSchema()).
+            olapConnection.setLocale(Locale.GERMANY);
+            final Cube salesCubeGerman =
+                olapConnection.getOlapSchema().getCubes().get("Sales");
+            assertEquals("Verkaufen", salesCubeGerman.getCaption());
+            assertEquals("Cube Verkaufen", salesCubeGerman.getDescription());
+
+            olapConnection.setLocale(Locale.FRANCE);
+            final Cube salesCubeFrance =
+                olapConnection.getOlapSchema().getCubes().get("Sales");
+            assertEquals("Ventes", salesCubeFrance.getCaption());
+            assertEquals("Cube des ventes", salesCubeFrance.getDescription());
+
+            // The sales cube queried when the connection had a different
+            // locale has not been updated. According to the olap4j spec,
+            // behavior is undefined (e.g. the US sales cube might be invalid).
+            // In the xmla-olap4j driver, it stays valid but still shows the
+            // caption under the US locale.
+            assertEquals("Sales", salesCubeUs.getCaption());
+
+            // Reset locale.
+            olapConnection.setLocale(Locale.US);
+        }
+
         // Try to set locale to null, should get error.
         try {
             olapConnection.setLocale(null);

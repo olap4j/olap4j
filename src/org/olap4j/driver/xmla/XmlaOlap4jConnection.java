@@ -54,7 +54,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     private XmlaOlap4jDatabase olap4jDatabase;
 
     /**
-     * <p>Current schema.
+     * <p>Current catalog.
      */
     private XmlaOlap4jCatalog olap4jCatalog;
 
@@ -114,7 +114,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     /**
      * Root of the metadata hierarchy of this connection.
      */
-    private NamedList<XmlaOlap4jDatabase> olapDatabases;
+    private final NamedList<XmlaOlap4jDatabase> olapDatabases;
 
     private final URL serverUrlObject;
 
@@ -660,7 +660,27 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         if (locale == null) {
             throw new IllegalArgumentException("locale must not be null");
         }
+        final Locale previousLocale = this.locale;
         this.locale = locale;
+
+        // If locale has changed, clear the cache. This is necessary because
+        // metadata elements (e.g. Cubes) only store the caption & description
+        // of the current locale. The SOAP cache, if enabled, will speed things
+        // up a little if a client JVM uses connections to the same server with
+        // different locales.
+        if (!Olap4jUtil.equal(previousLocale, locale)) {
+            clearCache();
+        }
+    }
+
+    /**
+     * Clears the cache.
+     */
+    private void clearCache() {
+        ((DeferredNamedListImpl) this.olapDatabases).reset();
+        this.olap4jCatalog = null;
+        this.olap4jDatabase = null;
+        this.olap4jSchema = null;
     }
 
     public Locale getLocale() {
@@ -928,6 +948,15 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             buf.append("        <Catalog>");
             xmlEncode(buf, requestCatalogName);
             buf.append("</Catalog>\n");
+        }
+
+        if (metadataRequest.allowsLocale()) {
+            final Locale locale1 = context.olap4jConnection.getLocale();
+            if (locale1 != null) {
+                buf.append("<LocaleIdentifier>");
+                xmlEncode(buf, locale1.toString());
+                buf.append("</LocaleIdentifier>");
+            }
         }
 
         buf.append("        <Content>");
@@ -2260,6 +2289,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         public MetadataColumn getColumn(String name) {
             return columnsByName.get(name);
         }
+
+        public boolean allowsLocale() {
+            return name().startsWith("MDSCHEMA");
+        }
     }
 
     private static final Pattern LOWERCASE_PATTERN =
@@ -2310,8 +2343,3 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 }
 
 // End XmlaOlap4jConnection.java
-
-
-
-
-
