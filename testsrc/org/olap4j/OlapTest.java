@@ -1619,6 +1619,28 @@ public class OlapTest extends TestCase {
                 + "Row #1: 5,552\n"
                 + "Row #2: 5,944\n",
                 resultsString2);
+
+            QueryDimension customerDimension = query.getDimension("Customers");
+            customerDimension.setHierarchyConsistent(true);
+            NamedList<Level> customerLevels =
+                customerDimension.getDimension()
+                    .getDefaultHierarchy().getLevels();
+
+            Level country = customerLevels.get("Country");
+            Level state = customerLevels.get("State Province");
+            customerDimension.include(country);
+            customerDimension.include(state);
+
+            query.getAxis(Axis.ROWS).removeDimension(timeDimension);
+            query.getAxis(Axis.ROWS).addDimension(customerDimension);
+
+            String mdxString3 = query.getSelect().toString();
+            TestContext.assertEqualsVerbose(
+                "SELECT\n"
+                + "{[Product].[Food]} ON COLUMNS,\n"
+                + "Hierarchize(Union(CrossJoin({[Measures].[Sales Count]}, [Customers].[Country].Members), CrossJoin({[Measures].[Sales Count]}, [Customers].[State Province].Members))) ON ROWS\n"
+                + "FROM [Sales]",
+                mdxString3);
         } catch (Exception e) {
             e.printStackTrace();
             fail();

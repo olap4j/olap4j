@@ -607,45 +607,45 @@ abstract class Olap4jNodeConverter {
                 if (levelDepths[i] < maxDepth
                     && currentLevel.getLevelType() != Level.Type.ALL)
                 {
-                CallNode currentMemberNode =
-                    new CallNode(
-                        null,
-                        "CurrentMember",
-                        Syntax.Property,
-                        new HierarchyNode(null, currentLevel.getHierarchy()));
+                    CallNode currentMemberNode =
+                        new CallNode(
+                            null,
+                            "CurrentMember",
+                            Syntax.Property,
+                            new HierarchyNode(
+                                null,
+                                currentLevel.getHierarchy()));
 
-                CallNode ancestorNode =
-                    new CallNode(
-                        null,
-                        "Ancestor",
-                        Syntax.Function,
-                        currentMemberNode,
-                        new LevelNode(null, currentLevel));
+                    CallNode ancestorNode =
+                        new CallNode(
+                            null,
+                            "Ancestor",
+                            Syntax.Function,
+                            currentMemberNode,
+                            new LevelNode(null, currentLevel));
 
-                List <ParseTreeNode> ancestorList =
-                    new ArrayList<ParseTreeNode>();
+                    List <ParseTreeNode> ancestorList =
+                        new ArrayList<ParseTreeNode>();
 
-                for (Selection anc : qDim.getInclusions()) {
-                    if (anc.getRootElement() instanceof Member) {
-                        Level l = ((Member)anc.getRootElement()).getLevel();
-                        if (l.equals(levels.get(levelDepths[i]))) {
-                            ancestorList.add(anc.visit());
-                        }
-                    } else if (anc.getRootElement() instanceof Level) {
-                        Level l = ((Level)anc.getRootElement());
-                        if (l.equals(levels.get(levelDepths[i]))) {
-                            ancestorList.add(anc.visit());
+                    for (Selection anc : qDim.getInclusions()) {
+                        if (anc.getRootElement() instanceof Member) {
+                            Level l = ((Member)anc.getRootElement()).getLevel();
+                            if (l.equals(levels.get(levelDepths[i]))) {
+                                ancestorList.add(anc.visit());
+                            }
                         }
                     }
-                }
-                CallNode ancestorSet = generateListSetCall(ancestorList);
-                CallNode inClause = new CallNode(
-                    null,
-                    "IN",
-                    Syntax.Infix,
-                    ancestorNode,
-                    ancestorSet);
-                inConditions.add(inClause);
+                    if (ancestorList.size() > 0) {
+                        CallNode ancestorSet =
+                            generateListSetCall(ancestorList);
+                        CallNode inClause = new CallNode(
+                            null,
+                            "IN",
+                            Syntax.Infix,
+                            ancestorNode,
+                            ancestorSet);
+                        inConditions.add(inClause);
+                    }
                 }
             }
             if (inConditions.size() > 0) {
