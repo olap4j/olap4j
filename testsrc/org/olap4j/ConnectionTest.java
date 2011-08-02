@@ -2076,9 +2076,6 @@ public class ConnectionTest extends TestCase {
      * Calculated Members"
      */
     public void testVirtualCubeCmBug() throws Exception {
-        if (!Bug.BugOlap4j3312701Fixed) {
-            return;
-        }
         Class.forName(tester.getDriverClassName());
         connection = tester.createConnection();
         OlapConnection olapConnection =
@@ -2104,6 +2101,7 @@ public class ConnectionTest extends TestCase {
                     "Unit Sales",
                     "Profit",
                     "Profit Growth",
+                    "Profit Per Unit Shipped",
                     "Store Invoice",
                     "Supply Time",
                     "Units Ordered",
