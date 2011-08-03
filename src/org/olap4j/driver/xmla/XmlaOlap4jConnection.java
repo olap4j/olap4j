@@ -953,9 +953,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         if (metadataRequest.allowsLocale()) {
             final Locale locale1 = context.olap4jConnection.getLocale();
             if (locale1 != null) {
-                buf.append("<LocaleIdentifier>");
-                xmlEncode(buf, locale1.toString());
-                buf.append("</LocaleIdentifier>");
+                final short lcid = LcidLocale.localeToLcid(locale1);
+                buf.append("<LocaleIdentifier>")
+                    .append(lcid)
+                    .append("</LocaleIdentifier>");
             }
         }
 

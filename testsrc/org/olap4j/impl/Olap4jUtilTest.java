@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -645,6 +645,56 @@ public class Olap4jUtilTest extends TestCase {
                 e.getMessage());
         }
     }
+
+    /**
+     * Unit test for {@link LcidLocale#lcidToLocale(short)}.
+     */
+    public void testLcidToLocale() {
+        assertEquals(
+            "en_US", LcidLocale.lcidToLocale((short) 0x0409).toString());
+        assertEquals("en_US", LcidLocale.lcidToLocale((short) 1033).toString());
+        assertEquals("fr", LcidLocale.lcidToLocale((short) 0x040c).toString());
+        assertEquals("en_GB", LcidLocale.lcidToLocale((short) 2057).toString());
+    }
+
+    /**
+     * Unit test for {@link LcidLocale#localeToLcid(java.util.Locale)}.
+     */
+    public void testLocaleToLcid() {
+        assertEquals(0x0409, LcidLocale.localeToLcid(Locale.US));
+        assertEquals(1033, LcidLocale.localeToLcid(Locale.US));
+        assertEquals(0x040c, LcidLocale.localeToLcid(Locale.FRENCH));
+        assertEquals(0x040c, LcidLocale.localeToLcid(Locale.FRANCE));
+        assertEquals(2060, LcidLocale.localeToLcid(new Locale("fr", "BE")));
+        assertEquals(2057, LcidLocale.localeToLcid(Locale.UK));
+        assertEquals(1031, LcidLocale.localeToLcid(Locale.GERMAN));
+        assertEquals(1031, LcidLocale.localeToLcid(Locale.GERMANY));
+    }
+
+    /**
+     * Unit test for {@link LcidLocale#parseLocale(String)} method.
+     */
+    public void testParseLocale() {
+        Locale[] locales = {
+            Locale.CANADA,
+            Locale.CANADA_FRENCH,
+            Locale.getDefault(),
+            Locale.US,
+            Locale.TRADITIONAL_CHINESE,
+        };
+        for (Locale locale : locales) {
+            assertEquals(locale, LcidLocale.parseLocale(locale.toString()));
+        }
+        // Example locale names in Locale.toString() javadoc.
+        String[] localeNames = {
+            "en", "de_DE", "_GB", "en_US_WIN", "de__POSIX", "fr__MAC"
+        };
+        for (String localeName : localeNames) {
+            assertEquals(
+                localeName, LcidLocale.parseLocale(localeName).toString());
+        }
+    }
+
 }
 
 // End Olap4jUtilTest.java
