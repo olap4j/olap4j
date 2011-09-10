@@ -2956,6 +2956,183 @@ public class ConnectionTest extends TestCase {
             Connection.TRANSACTION_NONE,
             connection.getTransactionIsolation());
     }
+
+    public void testSchemaAccessControl() throws Exception {
+        connection = tester.createConnection();
+        final OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        olapConnection.setRoleName("California manager");
+        final List<String> list = new ArrayList<String>();
+        for (Schema schema
+            : olapConnection.getOlapSchemas())
+        {
+            list.add(schema.getName());
+        }
+        assertEquals(
+            Arrays.asList(
+                "FoodMart"),
+            list);
+    }
+
+    public void testCubeAccessControl() throws Exception {
+        connection = tester.createConnection();
+        final OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        olapConnection.setRoleName("California manager");
+        final List<String> list = new ArrayList<String>();
+        for (Cube cube : olapConnection.getOlapSchema().getCubes()) {
+            list.add(cube.getName());
+        }
+        assertEquals(
+            Arrays.asList(
+                "Sales"),
+            list);
+        olapConnection.setRoleName("No HR Cube");
+        list.clear();
+        for (Cube cube : olapConnection.getOlapSchema().getCubes()) {
+            list.add(cube.getName());
+        }
+        assertEquals(
+            Arrays.asList(
+                "Sales Ragged",
+                "Warehouse",
+                "Warehouse and Sales",
+                "Sales 2",
+                "Store",
+                "Sales"),
+            list);
+    }
+
+    public void testDimensionAccessControl() throws Exception {
+        connection = tester.createConnection();
+        final OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        olapConnection.setRoleName("California manager");
+        final List<String> list = new ArrayList<String>();
+        for (Dimension dimension
+            : olapConnection.getOlapSchema()
+                .getCubes().get("Sales").getDimensions())
+        {
+            list.add(dimension.getName());
+        }
+        assertEquals(
+            Arrays.asList(
+                "Measures",
+                "Store",
+                "Store Size in SQFT",
+                "Store Type",
+                "Time",
+                "Product",
+                "Promotion Media",
+                "Promotions",
+                "Customers",
+                "Education Level",
+                "Marital Status",
+                "Yearly Income"),
+            list);
+    }
+
+    public void testLevelAccessControl() throws Exception {
+        connection = tester.createConnection();
+        final OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        olapConnection.setRoleName("California manager");
+        final List<String> list = new ArrayList<String>();
+        for (Level level
+            : olapConnection.getOlapSchema()
+                .getCubes().get("Sales")
+                .getDimensions().get("Customers")
+                .getHierarchies().get(0)
+                .getLevels())
+        {
+            list.add(level.getName());
+        }
+        assertEquals(
+            Arrays.asList(
+                "State Province",
+                "City"),
+            list);
+    }
+
+    public void testLevelMembersAccessControl() throws Exception {
+        connection = tester.createConnection();
+        final OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        olapConnection.setRoleName("California manager");
+        final List<String> list = new ArrayList<String>();
+        for (Member member
+            : olapConnection.getOlapSchema()
+                .getCubes().get("Sales")
+                .getDimensions().get("Store")
+                .getHierarchies().get(0)
+                .getLevels().get(0)
+                .getMembers())
+        {
+            list.add(member.getName());
+        }
+        assertEquals(
+            Arrays.asList(
+                "USA"),
+            list);
+        list.clear();
+        for (Member member
+            : olapConnection.getOlapSchema()
+                .getCubes().get("Sales")
+                .getDimensions().get("Store")
+                .getHierarchies().get(0)
+                .getLevels().get(1)
+                .getMembers())
+        {
+            list.add(member.getName());
+        }
+        assertEquals(
+            Arrays.asList(
+                "CA"),
+            list);
+        list.clear();
+        for (Member member
+            : olapConnection.getOlapSchema()
+                .getCubes().get("Sales")
+                .getDimensions().get("Store")
+                .getHierarchies().get(0)
+                .getLevels().get(2)
+                .getMembers())
+        {
+            list.add(member.getName());
+        }
+        assertEquals(
+            Arrays.asList(
+                "Alameda",
+                "Beverly Hills",
+                "San Diego",
+                "San Francisco"),
+            list);
+    }
+
+    public void testParentChildAccessControl() throws Exception {
+        connection = tester.createConnection();
+        final OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        olapConnection.setRoleName("California manager");
+        final Member city =
+            olapConnection.getOlapSchema()
+            .getCubes().get("Sales")
+            .getDimensions().get("Customers")
+            .getHierarchies().get(0)
+            .getLevels().get("City")
+            .getMembers().get(0);
+        assertEquals(
+            0,
+            city.getChildMembers().size());
+        final Member state =
+            olapConnection.getOlapSchema()
+            .getCubes().get("Sales")
+            .getDimensions().get("Customers")
+            .getHierarchies().get(0)
+            .getLevels().get("State Province")
+            .getMembers().get(0);
+        assertNull(state.getParentMember());
+    }
 }
 
 // End ConnectionTest.java
