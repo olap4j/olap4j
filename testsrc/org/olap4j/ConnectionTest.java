@@ -2979,7 +2979,7 @@ public class ConnectionTest extends TestCase {
             {
                 list.add(schema.getName());
             }
-            assertEquals(
+            assertListsEquals(
                 Arrays.asList(
                     "FoodMart"),
                 list);
@@ -3007,7 +3007,7 @@ public class ConnectionTest extends TestCase {
             for (Cube cube : olapConnection.getOlapSchema().getCubes()) {
                 list.add(cube.getName());
             }
-            assertEquals(
+            assertListsEquals(
                 Arrays.asList(
                     "Sales"),
                 list);
@@ -3016,7 +3016,7 @@ public class ConnectionTest extends TestCase {
             for (Cube cube : olapConnection.getOlapSchema().getCubes()) {
                 list.add(cube.getName());
             }
-            assertEquals(
+            assertListsEquals(
                 Arrays.asList(
                     "Sales Ragged",
                     "Warehouse",
@@ -3052,7 +3052,7 @@ public class ConnectionTest extends TestCase {
             {
                 list.add(dimension.getName());
             }
-            assertEquals(
+            assertListsEquals(
                 Arrays.asList(
                     "Measures",
                     "Store",
@@ -3097,7 +3097,7 @@ public class ConnectionTest extends TestCase {
             {
                 list.add(level.getName());
             }
-            assertEquals(
+            assertListsEquals(
                 Arrays.asList(
                     "State Province",
                     "City"),
@@ -3148,7 +3148,7 @@ public class ConnectionTest extends TestCase {
             {
                 list.add(member.getName());
             }
-            assertEquals(
+            assertListsEquals(
                 Arrays.asList(
                     "CA"),
                 list);
@@ -3163,7 +3163,7 @@ public class ConnectionTest extends TestCase {
             {
                 list.add(member.getName());
             }
-            assertEquals(
+            assertListsEquals(
                 Arrays.asList(
                     "Alameda",
                     "Beverly Hills",
@@ -3211,6 +3211,12 @@ public class ConnectionTest extends TestCase {
         } finally {
             olapConnection.setRoleName(null);
         }
+    }
+
+    protected void assertListsEquals(List<String> list1, List<String> list2) {
+        Collections.sort(list1);
+        Collections.sort(list2);
+        assertEquals(list1, list2);
     }
 }
 
