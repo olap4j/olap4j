@@ -19,6 +19,7 @@ import org.olap4j.mdx.parser.*;
 import org.olap4j.metadata.*;
 import org.olap4j.test.TestContext;
 import org.olap4j.test.TestContext.Tester;
+import org.olap4j.test.TestContext.Tester.Flavor;
 import org.olap4j.type.*;
 
 import java.io.*;
@@ -2958,180 +2959,258 @@ public class ConnectionTest extends TestCase {
     }
 
     public void testSchemaAccessControl() throws Exception {
+        if (tester.getFlavor() == Flavor.XMLA
+            || tester.getFlavor() == Flavor.REMOTE_XMLA)
+        {
+            /*
+             * TODO Implement a way to pass an XmlaRequestCallback to
+             * the tested servlet so we can pass the roles down.
+             */
+            return;
+        }
         connection = tester.createConnection();
         final OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        olapConnection.setRoleName("California manager");
-        final List<String> list = new ArrayList<String>();
-        for (Schema schema
-            : olapConnection.getOlapSchemas())
-        {
-            list.add(schema.getName());
+        try {
+            olapConnection.setRoleName("California manager");
+            final List<String> list = new ArrayList<String>();
+            for (Schema schema
+                : olapConnection.getOlapSchemas())
+            {
+                list.add(schema.getName());
+            }
+            assertEquals(
+                Arrays.asList(
+                    "FoodMart"),
+                list);
+        } finally {
+            olapConnection.setRoleName(null);
         }
-        assertEquals(
-            Arrays.asList(
-                "FoodMart"),
-            list);
     }
 
     public void testCubeAccessControl() throws Exception {
+        if (tester.getFlavor() == Flavor.XMLA
+            || tester.getFlavor() == Flavor.REMOTE_XMLA)
+        {
+            /*
+             * TODO Implement a way to pass an XmlaRequestCallback to
+             * the tested servlet so we can pass the roles down.
+             */
+            return;
+        }
         connection = tester.createConnection();
         final OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        olapConnection.setRoleName("California manager");
-        final List<String> list = new ArrayList<String>();
-        for (Cube cube : olapConnection.getOlapSchema().getCubes()) {
-            list.add(cube.getName());
+        try {
+            olapConnection.setRoleName("California manager");
+            final List<String> list = new ArrayList<String>();
+            for (Cube cube : olapConnection.getOlapSchema().getCubes()) {
+                list.add(cube.getName());
+            }
+            assertEquals(
+                Arrays.asList(
+                    "Sales"),
+                list);
+            olapConnection.setRoleName("No HR Cube");
+            list.clear();
+            for (Cube cube : olapConnection.getOlapSchema().getCubes()) {
+                list.add(cube.getName());
+            }
+            assertEquals(
+                Arrays.asList(
+                    "Sales Ragged",
+                    "Warehouse",
+                    "Warehouse and Sales",
+                    "Sales 2",
+                    "Store",
+                    "Sales"),
+                list);
+        } finally {
+            olapConnection.setRoleName(null);
         }
-        assertEquals(
-            Arrays.asList(
-                "Sales"),
-            list);
-        olapConnection.setRoleName("No HR Cube");
-        list.clear();
-        for (Cube cube : olapConnection.getOlapSchema().getCubes()) {
-            list.add(cube.getName());
-        }
-        assertEquals(
-            Arrays.asList(
-                "Sales Ragged",
-                "Warehouse",
-                "Warehouse and Sales",
-                "Sales 2",
-                "Store",
-                "Sales"),
-            list);
     }
 
     public void testDimensionAccessControl() throws Exception {
+        if (tester.getFlavor() == Flavor.XMLA
+            || tester.getFlavor() == Flavor.REMOTE_XMLA)
+        {
+            /*
+             * TODO Implement a way to pass an XmlaRequestCallback to
+             * the tested servlet so we can pass the roles down.
+             */
+            return;
+        }
         connection = tester.createConnection();
         final OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        olapConnection.setRoleName("California manager");
-        final List<String> list = new ArrayList<String>();
-        for (Dimension dimension
-            : olapConnection.getOlapSchema()
-                .getCubes().get("Sales").getDimensions())
-        {
-            list.add(dimension.getName());
+        try {
+            olapConnection.setRoleName("California manager");
+            final List<String> list = new ArrayList<String>();
+            for (Dimension dimension
+                : olapConnection.getOlapSchema()
+                    .getCubes().get("Sales").getDimensions())
+            {
+                list.add(dimension.getName());
+            }
+            assertEquals(
+                Arrays.asList(
+                    "Measures",
+                    "Store",
+                    "Store Size in SQFT",
+                    "Store Type",
+                    "Time",
+                    "Product",
+                    "Promotion Media",
+                    "Promotions",
+                    "Customers",
+                    "Education Level",
+                    "Marital Status",
+                    "Yearly Income"),
+                list);
+        } finally {
+            olapConnection.setRoleName(null);
         }
-        assertEquals(
-            Arrays.asList(
-                "Measures",
-                "Store",
-                "Store Size in SQFT",
-                "Store Type",
-                "Time",
-                "Product",
-                "Promotion Media",
-                "Promotions",
-                "Customers",
-                "Education Level",
-                "Marital Status",
-                "Yearly Income"),
-            list);
     }
 
     public void testLevelAccessControl() throws Exception {
+        if (tester.getFlavor() == Flavor.XMLA
+            || tester.getFlavor() == Flavor.REMOTE_XMLA)
+        {
+            /*
+             * TODO Implement a way to pass an XmlaRequestCallback to
+             * the tested servlet so we can pass the roles down.
+             */
+            return;
+        }
         connection = tester.createConnection();
         final OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        olapConnection.setRoleName("California manager");
-        final List<String> list = new ArrayList<String>();
-        for (Level level
-            : olapConnection.getOlapSchema()
-                .getCubes().get("Sales")
-                .getDimensions().get("Customers")
-                .getHierarchies().get(0)
-                .getLevels())
-        {
-            list.add(level.getName());
+        try {
+            olapConnection.setRoleName("California manager");
+            final List<String> list = new ArrayList<String>();
+            for (Level level
+                : olapConnection.getOlapSchema()
+                    .getCubes().get("Sales")
+                    .getDimensions().get("Customers")
+                    .getHierarchies().get(0)
+                    .getLevels())
+            {
+                list.add(level.getName());
+            }
+            assertEquals(
+                Arrays.asList(
+                    "State Province",
+                    "City"),
+                list);
+        } finally {
+            olapConnection.setRoleName(null);
         }
-        assertEquals(
-            Arrays.asList(
-                "State Province",
-                "City"),
-            list);
     }
 
     public void testLevelMembersAccessControl() throws Exception {
+        if (tester.getFlavor() == Flavor.XMLA
+            || tester.getFlavor() == Flavor.REMOTE_XMLA)
+        {
+            /*
+             * TODO Implement a way to pass an XmlaRequestCallback to
+             * the tested servlet so we can pass the roles down.
+             */
+            return;
+        }
         connection = tester.createConnection();
         final OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        olapConnection.setRoleName("California manager");
-        final List<String> list = new ArrayList<String>();
-        for (Member member
-            : olapConnection.getOlapSchema()
-                .getCubes().get("Sales")
-                .getDimensions().get("Store")
-                .getHierarchies().get(0)
-                .getLevels().get(0)
-                .getMembers())
-        {
-            list.add(member.getName());
+        try {
+            olapConnection.setRoleName("California manager");
+            final List<String> list = new ArrayList<String>();
+            for (Member member
+                : olapConnection.getOlapSchema()
+                    .getCubes().get("Sales")
+                    .getDimensions().get("Store")
+                    .getHierarchies().get(0)
+                    .getLevels().get(0)
+                    .getMembers())
+            {
+                list.add(member.getName());
+            }
+            assertEquals(
+                Arrays.asList(
+                    "USA"),
+                list);
+            list.clear();
+            for (Member member
+                : olapConnection.getOlapSchema()
+                    .getCubes().get("Sales")
+                    .getDimensions().get("Store")
+                    .getHierarchies().get(0)
+                    .getLevels().get(1)
+                    .getMembers())
+            {
+                list.add(member.getName());
+            }
+            assertEquals(
+                Arrays.asList(
+                    "CA"),
+                list);
+            list.clear();
+            for (Member member
+                : olapConnection.getOlapSchema()
+                    .getCubes().get("Sales")
+                    .getDimensions().get("Store")
+                    .getHierarchies().get(0)
+                    .getLevels().get(2)
+                    .getMembers())
+            {
+                list.add(member.getName());
+            }
+            assertEquals(
+                Arrays.asList(
+                    "Alameda",
+                    "Beverly Hills",
+                    "San Diego",
+                    "San Francisco"),
+                list);
+        } finally {
+            olapConnection.setRoleName(null);
         }
-        assertEquals(
-            Arrays.asList(
-                "USA"),
-            list);
-        list.clear();
-        for (Member member
-            : olapConnection.getOlapSchema()
-                .getCubes().get("Sales")
-                .getDimensions().get("Store")
-                .getHierarchies().get(0)
-                .getLevels().get(1)
-                .getMembers())
-        {
-            list.add(member.getName());
-        }
-        assertEquals(
-            Arrays.asList(
-                "CA"),
-            list);
-        list.clear();
-        for (Member member
-            : olapConnection.getOlapSchema()
-                .getCubes().get("Sales")
-                .getDimensions().get("Store")
-                .getHierarchies().get(0)
-                .getLevels().get(2)
-                .getMembers())
-        {
-            list.add(member.getName());
-        }
-        assertEquals(
-            Arrays.asList(
-                "Alameda",
-                "Beverly Hills",
-                "San Diego",
-                "San Francisco"),
-            list);
     }
 
     public void testParentChildAccessControl() throws Exception {
+        if (tester.getFlavor() == Flavor.XMLA
+            || tester.getFlavor() == Flavor.REMOTE_XMLA)
+        {
+            /*
+             * TODO Implement a way to pass an XmlaRequestCallback to
+             * the tested servlet so we can pass the roles down.
+             */
+            return;
+        }
         connection = tester.createConnection();
         final OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        olapConnection.setRoleName("California manager");
-        final Member city =
-            olapConnection.getOlapSchema()
-            .getCubes().get("Sales")
-            .getDimensions().get("Customers")
-            .getHierarchies().get(0)
-            .getLevels().get("City")
-            .getMembers().get(0);
-        assertEquals(
-            0,
-            city.getChildMembers().size());
-        final Member state =
-            olapConnection.getOlapSchema()
-            .getCubes().get("Sales")
-            .getDimensions().get("Customers")
-            .getHierarchies().get(0)
-            .getLevels().get("State Province")
-            .getMembers().get(0);
-        assertNull(state.getParentMember());
+        try {
+            olapConnection.setRoleName("California manager");
+            final Member city =
+                olapConnection.getOlapSchema()
+                .getCubes().get("Sales")
+                .getDimensions().get("Customers")
+                .getHierarchies().get(0)
+                .getLevels().get("City")
+                .getMembers().get(0);
+            assertEquals(
+                    0,
+                    city.getChildMembers().size());
+            final Member state =
+                olapConnection.getOlapSchema()
+                .getCubes().get("Sales")
+                .getDimensions().get("Customers")
+                .getHierarchies().get(0)
+                .getLevels().get("State Province")
+                .getMembers().get(0);
+            assertNull(state.getParentMember());
+        } finally {
+            olapConnection.setRoleName(null);
+        }
     }
 }
 
