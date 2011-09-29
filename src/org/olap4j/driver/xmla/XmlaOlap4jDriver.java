@@ -130,7 +130,7 @@ public class XmlaOlap4jDriver implements Driver {
     /**
      * Creates an XmlaOlap4jDriver.
      */
-    protected XmlaOlap4jDriver() {
+    public XmlaOlap4jDriver() {
         String factoryClassName;
         try {
             Class.forName("java.sql.Wrapper");
