@@ -11,8 +11,8 @@ package org.olap4j.driver.xmla;
 import org.olap4j.*;
 import org.olap4j.mdx.*;
 
+import java.io.StringWriter;
 import java.sql.*;
-import java.io.*;
 import java.util.concurrent.*;
 
 /**

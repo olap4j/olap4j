@@ -15,12 +15,7 @@ import org.olap4j.mdx.IdentifierSegment;
 import org.olap4j.metadata.Measure;
 import org.olap4j.metadata.Member;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.AbstractList;
-import java.util.Map;
+import java.util.*;
 
 /**
  * An axis within an OLAP {@link Query}.

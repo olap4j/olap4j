@@ -1,13 +1,26 @@
+/*
+// $Id$
+// This software is subject to the terms of the Eclipse Public License v1.0
+// Agreement, available at the following URL:
+// http://www.eclipse.org/legal/epl-v10.html.
+// Copyright (C) 2008-2011 Julian Hyde and others
+// All Rights Reserved.
+// You must accept the terms of that agreement to use this software.
+*/
 package org.olap4j.driver.xmla.proxy;
+
+import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import junit.framework.TestCase;
-
-import org.olap4j.driver.xmla.proxy.XmlaOlap4jCookieManager;
-
+/**
+ * Unit test for cookie manager.
+ *
+ * @version $Id$
+ * @author Luc Boudreau
+ */
 public class XmlaCookieManagerTest extends TestCase {
 
     private static final String receivedCookieKey = "Set-Cookie";

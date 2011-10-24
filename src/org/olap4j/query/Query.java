@@ -9,13 +9,13 @@
 */
 package org.olap4j.query;
 
-import org.olap4j.metadata.*;
 import org.olap4j.*;
 import org.olap4j.mdx.SelectNode;
+import org.olap4j.metadata.*;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.Map.Entry;
-import java.sql.SQLException;
 
 /**
  * Base query model object.

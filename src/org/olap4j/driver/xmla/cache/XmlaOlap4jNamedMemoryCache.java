@@ -9,11 +9,12 @@
 */
 package org.olap4j.driver.xmla.cache;
 
-import java.net.*;
-import java.util.*;
-import java.util.concurrent.*;
-
 import org.olap4j.impl.Olap4jUtil;
+
+import java.net.URL;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>Implementation of the XMLA SOAP cache that places its cache entries

@@ -9,28 +9,12 @@
 */
 package org.olap4j.query;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.olap4j.Axis;
-import org.olap4j.mdx.AxisNode;
-import org.olap4j.mdx.CallNode;
-import org.olap4j.mdx.CubeNode;
-import org.olap4j.mdx.DimensionNode;
-import org.olap4j.mdx.HierarchyNode;
-import org.olap4j.mdx.IdentifierNode;
-import org.olap4j.mdx.LevelNode;
-import org.olap4j.mdx.LiteralNode;
-import org.olap4j.mdx.MemberNode;
-import org.olap4j.mdx.ParseTreeNode;
-import org.olap4j.mdx.SelectNode;
-import org.olap4j.mdx.Syntax;
+import org.olap4j.mdx.*;
 import org.olap4j.metadata.Level;
 import org.olap4j.metadata.Member;
+
+import java.util.*;
 
 /**
  * Utility class to convert a Query object to a SelectNode.

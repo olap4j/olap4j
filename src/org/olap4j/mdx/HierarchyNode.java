@@ -3,15 +3,15 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.mdx;
 
 import org.olap4j.metadata.Hierarchy;
-import org.olap4j.type.Type;
 import org.olap4j.type.HierarchyType;
+import org.olap4j.type.Type;
 
 /**
  * Usage of a {@link org.olap4j.metadata.Hierarchy} as an expression in an MDX

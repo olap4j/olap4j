@@ -15,10 +15,11 @@ import org.olap4j.query.*;
 import org.olap4j.query.QueryDimension.HierarchizeMode;
 import org.olap4j.query.Selection.Operator;
 import org.olap4j.test.TestContext;
-import java.sql.Connection;
-import java.sql.DriverManager;
 
 import junit.framework.TestCase;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 import static org.olap4j.test.TestContext.nameList;
 

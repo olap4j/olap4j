@@ -9,12 +9,12 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
-import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.impl.Olap4jUtil;
-import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
+import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.metadata.*;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import java.io.*;
@@ -23,6 +23,8 @@ import java.net.URL;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
+
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
 
 /**
  * Implementation of {@link org.olap4j.CellSet}

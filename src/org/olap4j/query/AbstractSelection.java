@@ -9,10 +9,10 @@
 */
 package org.olap4j.query;
 
+import org.olap4j.metadata.Dimension;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.olap4j.metadata.Dimension;
 
 /**
  * Abstract implementation of a selection.

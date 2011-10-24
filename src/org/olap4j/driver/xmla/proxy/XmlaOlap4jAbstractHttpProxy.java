@@ -9,16 +9,14 @@
 */
 package org.olap4j.driver.xmla.proxy;
 
+import org.olap4j.OlapException;
+import org.olap4j.driver.xmla.*;
+import org.olap4j.driver.xmla.cache.XmlaOlap4jCache;
+
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.concurrent.Future;
-
-import org.olap4j.OlapException;
-import org.olap4j.driver.xmla.XmlaHelper;
-import org.olap4j.driver.xmla.XmlaOlap4jDriver;
-import org.olap4j.driver.xmla.XmlaOlap4jServerInfos;
-import org.olap4j.driver.xmla.cache.XmlaOlap4jCache;
 
 /**
  * <p>Abstract implementation of Proxy which adds a SOAP

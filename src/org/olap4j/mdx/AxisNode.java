@@ -3,18 +3,18 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.mdx;
 
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Collections;
-
 import org.olap4j.Axis;
 import org.olap4j.type.Type;
+
+import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * An axis in an MDX query. For example, the typical MDX query has two axes,

@@ -9,8 +9,10 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
-import org.olap4j.impl.*;
-import org.olap4j.metadata.*;
+import org.olap4j.impl.Olap4jUtil;
+import org.olap4j.metadata.Member;
+import org.olap4j.metadata.XmlaConstants;
+
 import org.w3c.dom.Element;
 
 import java.sql.ResultSet;

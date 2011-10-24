@@ -8,14 +8,12 @@
 */
 package org.olap4j;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Properties;
-
 import org.olap4j.test.TestContext;
 import org.olap4j.test.TestContext.Tester;
 import org.olap4j.test.TestContext.Wrapper;
+
+import java.sql.*;
+import java.util.Properties;
 
 /**
  * Implementation of {@link org.olap4j.test.TestContext.Tester} which speaks

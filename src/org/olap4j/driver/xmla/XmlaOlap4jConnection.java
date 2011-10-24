@@ -9,9 +9,6 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
-
-import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
-
 import org.olap4j.driver.xmla.proxy.*;
 import org.olap4j.impl.*;
 import org.olap4j.mdx.ParseTreeWriter;
@@ -21,15 +18,20 @@ import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
 import org.olap4j.metadata.*;
 import org.olap4j.metadata.Database.AuthenticationMode;
 import org.olap4j.metadata.Database.ProviderType;
+
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.*;
 import java.util.*;
-import java.util.Map.*;
-import java.util.regex.*;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
+
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
 
 /**
  * Implementation of {@link org.olap4j.OlapConnection}

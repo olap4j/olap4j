@@ -9,11 +9,9 @@
 */
 package org.olap4j;
 
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
+import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.impl.Bug;
 import org.olap4j.impl.Olap4jUtil;
-import org.olap4j.driver.xmla.*;
 import org.olap4j.mdx.*;
 import org.olap4j.mdx.parser.*;
 import org.olap4j.metadata.*;
@@ -21,6 +19,9 @@ import org.olap4j.test.TestContext;
 import org.olap4j.test.TestContext.Tester;
 import org.olap4j.test.TestContext.Tester.Flavor;
 import org.olap4j.type.*;
+
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -3198,8 +3199,8 @@ public class ConnectionTest extends TestCase {
                 .getLevels().get("City")
                 .getMembers().get(0);
             assertEquals(
-                    0,
-                    city.getChildMembers().size());
+                0,
+                city.getChildMembers().size());
             final Member state =
                 olapConnection.getOlapSchema()
                 .getCubes().get("Sales")

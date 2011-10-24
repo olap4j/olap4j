@@ -1,17 +1,19 @@
 package org.olap4j;
 
-import java.sql.*;
-import java.util.*;
-import java.util.concurrent.Future;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
-import org.olap4j.driver.xmla.*;
-import org.olap4j.driver.xmla.proxy.*;
-import org.olap4j.test.*;
+import org.olap4j.driver.xmla.XmlaOlap4jDriver;
+import org.olap4j.driver.xmla.XmlaOlap4jServerInfos;
+import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxy;
+import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxyException;
+import org.olap4j.test.TestContext;
 import org.olap4j.test.TestContext.Tester;
 
 import junit.framework.TestCase;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.*;
+import java.util.*;
+import java.util.concurrent.Future;
 
 public class XmlaConnectionTest extends TestCase {
 

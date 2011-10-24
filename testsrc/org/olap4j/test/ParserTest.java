@@ -3,22 +3,23 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.test;
 
-import junit.framework.TestCase;
-import junit.framework.AssertionFailedError;
-import org.olap4j.mdx.parser.MdxParser;
-import org.olap4j.mdx.parser.MdxParseException;
-import org.olap4j.mdx.*;
-import org.olap4j.OlapConnection;
 import org.olap4j.Axis;
+import org.olap4j.OlapConnection;
+import org.olap4j.mdx.*;
+import org.olap4j.mdx.parser.MdxParseException;
+import org.olap4j.mdx.parser.MdxParser;
 
-import java.sql.SQLException;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
+
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;

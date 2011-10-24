@@ -14,13 +14,7 @@ import org.olap4j.impl.IdentifierParser;
 import org.olap4j.mdx.IdentifierSegment;
 import org.olap4j.metadata.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.AbstractList;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Usage of a dimension for an OLAP query.

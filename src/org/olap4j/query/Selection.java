@@ -9,11 +9,11 @@
 */
 package org.olap4j.query;
 
-import java.util.List;
-
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.MetadataElement;
+
+import java.util.List;
 
 /**
  * A selection of members from an OLAP dimension hierarchy. The selection

@@ -9,18 +9,15 @@
  */
 package org.olap4j.transform;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import org.olap4j.Axis;
-import org.olap4j.CellSet;
-import org.olap4j.OlapConnection;
-import org.olap4j.OlapStatement;
+import org.olap4j.*;
 import org.olap4j.mdx.SelectNode;
 import org.olap4j.mdx.parser.MdxParser;
 import org.olap4j.test.TestContext;
 
 import junit.framework.TestCase;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Testcase for org.olap4j.transform package.

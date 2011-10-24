@@ -10,11 +10,11 @@ package org.olap4j.driver.xmla;
 
 import org.olap4j.OlapException;
 import org.olap4j.impl.*;
-import org.olap4j.mdx.*;
+import org.olap4j.mdx.IdentifierSegment;
 import org.olap4j.metadata.*;
 
-import java.util.*;
 import java.lang.ref.SoftReference;
+import java.util.*;
 
 /**
  * Implementation of {@link Cube}

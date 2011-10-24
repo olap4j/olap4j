@@ -11,10 +11,8 @@ package org.olap4j.query;
 
 import org.olap4j.OlapException;
 import org.olap4j.mdx.ParseTreeNode;
-import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Level;
+import org.olap4j.metadata.*;
 import org.olap4j.metadata.Level.Type;
-import org.olap4j.metadata.MetadataElement;
 
 /**
  * Abstract implementation of {@link Selection}.

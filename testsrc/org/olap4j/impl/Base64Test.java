@@ -3,20 +3,17 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2006-2010 Julian Hyde and others
+// Copyright (C) 2006-2011 Julian Hyde and others
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
-
 package org.olap4j.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import junit.framework.TestCase;
+
+import java.io.*;
 import java.util.Arrays;
 import java.util.Random;
-
-import junit.framework.TestCase;
 
 /**
  * Test case for {@link Base64}.

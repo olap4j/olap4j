@@ -9,7 +9,7 @@
 */
 package org.olap4j;
 
-import org.olap4j.metadata.*;
+import org.olap4j.metadata.Member;
 
 import java.sql.*;
 import java.util.Set;

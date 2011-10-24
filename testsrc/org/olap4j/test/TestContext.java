@@ -9,20 +9,23 @@
 */
 package org.olap4j.test;
 
+import org.olap4j.CellSet;
+import org.olap4j.OlapWrapper;
+import org.olap4j.impl.Olap4jUtil;
+import org.olap4j.layout.TraditionalCellSetFormatter;
+import org.olap4j.mdx.*;
+
+import junit.framework.*;
+
+import org.apache.commons.dbcp.*;
+
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.regex.Pattern;
 import java.sql.*;
-
-import junit.framework.*;
-import org.olap4j.*;
-import org.olap4j.impl.Olap4jUtil;
-import org.olap4j.mdx.*;
-import org.olap4j.layout.TraditionalCellSetFormatter;
-
-import org.apache.commons.dbcp.*;
+import java.util.List;
+import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Context for olap4j tests.

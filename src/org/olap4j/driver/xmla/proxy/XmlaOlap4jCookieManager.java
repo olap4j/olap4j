@@ -9,10 +9,12 @@
 */
 package org.olap4j.driver.xmla.proxy;
 
-import java.net.*;
-import java.text.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>CookieManager is a simple utility for handling cookies when working

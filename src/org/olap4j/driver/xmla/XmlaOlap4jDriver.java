@@ -9,7 +9,8 @@
 */
 package org.olap4j.driver.xmla;
 
-import org.olap4j.driver.xmla.proxy.*;
+import org.olap4j.driver.xmla.proxy.XmlaOlap4jHttpProxy;
+import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxy;
 import org.olap4j.impl.Olap4jUtil;
 
 import java.sql.*;

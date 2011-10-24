@@ -9,7 +9,8 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.OlapException;
-import org.olap4j.impl.*;
+import org.olap4j.impl.Named;
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
 
 import java.util.*;

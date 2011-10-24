@@ -9,9 +9,9 @@
 */
 package org.olap4j.driver.xmla.proxy;
 
-import java.util.concurrent.Future;
-
 import org.olap4j.driver.xmla.XmlaOlap4jServerInfos;
+
+import java.util.concurrent.Future;
 
 /**
  * Defines a common set of methods for proxy objects.

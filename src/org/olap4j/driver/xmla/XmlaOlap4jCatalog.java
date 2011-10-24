@@ -9,13 +9,13 @@
 */
 package org.olap4j.driver.xmla;
 
-import java.sql.SQLException;
-
 import org.olap4j.OlapDatabaseMetaData;
 import org.olap4j.OlapException;
 import org.olap4j.impl.Named;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
+
+import java.sql.SQLException;
 
 /**
  * Implementation of {@link org.olap4j.metadata.Catalog}

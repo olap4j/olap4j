@@ -9,8 +9,8 @@
 */
 package org.olap4j.type;
 
-import org.olap4j.metadata.Hierarchy;
 import org.olap4j.OlapException;
+import org.olap4j.metadata.Hierarchy;
 
 /**
  * Utility methods relating to types.

@@ -9,13 +9,13 @@
 */
 package org.olap4j.driver.xmla.proxy;
 
-import java.io.*;
-import java.net.*;
-import java.util.concurrent.*;
-
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.driver.xmla.XmlaOlap4jServerInfos;
 import org.olap4j.impl.Base64;
+
+import java.io.*;
+import java.net.*;
+import java.util.concurrent.Future;
 
 /**
  * Extends the AbstractCachedProxy and serves as

@@ -8,8 +8,9 @@
 */
 package org.olap4j.impl;
 
-import junit.framework.TestCase;
 import org.olap4j.mdx.*;
+
+import junit.framework.TestCase;
 
 import java.util.*;
 

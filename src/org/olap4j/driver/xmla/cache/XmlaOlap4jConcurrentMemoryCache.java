@@ -9,14 +9,15 @@
 */
 package org.olap4j.driver.xmla.cache;
 
-import java.net.*;
-import java.util.*;
-import java.util.Map.*;
-import java.util.concurrent.*;
-
 import org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache.Mode;
 import org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache.Property;
 import org.olap4j.impl.Olap4jUtil;
+
+import java.net.URL;
+import java.util.Calendar;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Thread-safe cache object which supports concurrent access.

@@ -9,11 +9,8 @@
 */
 package org.olap4j.type;
 
-import org.olap4j.metadata.Member;
-import org.olap4j.metadata.Level;
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.Dimension;
 import org.olap4j.OlapException;
+import org.olap4j.metadata.*;
 
 /**
  * The type of an expression which represents a member.

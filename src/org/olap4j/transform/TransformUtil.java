@@ -3,20 +3,17 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2008-2010 Julian Hyde
+// Copyright (C) 2008-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
 package org.olap4j.transform;
 
+import org.olap4j.*;
+import org.olap4j.metadata.Member;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.olap4j.Axis;
-import org.olap4j.CellSet;
-import org.olap4j.CellSetAxis;
-import org.olap4j.Position;
-import org.olap4j.metadata.Member;
 
 /**
  * Various helper functions for MDX query transforms.
