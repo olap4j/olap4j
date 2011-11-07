@@ -389,8 +389,6 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             findChild(cubeNode, MDDATASET_NS, "CubeName");
         final String cubeName = gatherText(cubeNameNode);
 
-        // REVIEW: If there are multiple cubes with the same name, we should
-        // qualify by catalog and schema. Currently we just take the first.
         XmlaOlap4jCube cube =
             lookupCube(
                 olap4jStatement.olap4jConnection.olap4jDatabaseMetaData,
@@ -398,23 +396,6 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         if (cube == null) {
             throw getHelper().createException(
                 "Internal error: cube '" + cubeName + "' not found");
-        }
-        // REVIEW: We should not modify the connection. It is not safe, because
-        // connection might be shared between multiple statements with different
-        // cubes. Caller should call
-        //
-        // connection.setCatalog(
-        //   cellSet.getMetaData().getCube().getSchema().getCatalog().getName())
-        //
-        // before doing metadata queries.
-        try {
-            this.olap4jStatement.olap4jConnection.setCatalog(
-                cube.getSchema().getCatalog().getName());
-        } catch (SQLException e) {
-            throw getHelper().createException(
-                "Internal error: setting catalog '"
-                + cube.getSchema().getCatalog().getName()
-                + "' caused error");
         }
         final Element axesInfo =
             findChild(olapInfo, MDDATASET_NS, "AxesInfo");
@@ -512,8 +493,8 @@ abstract class XmlaOlap4jCellSet implements CellSet {
     }
 
     /**
-     * Looks up a cube among all of the schemas in all of the catalogs
-     * in this connection.
+     * Looks up a cube with a given name within the current database,
+     * catalog and schema bound to the source connection.
      *
      * <p>If there are several with the same name, returns the first.
      *
@@ -526,18 +507,14 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         XmlaOlap4jDatabaseMetaData databaseMetaData,
         String cubeName) throws OlapException
     {
-        for (Catalog catalog
-            : databaseMetaData.olap4jConnection.getOlapCatalogs())
+        for (Cube cube
+            : databaseMetaData.olap4jConnection.getOlapSchema().getCubes())
         {
-            for (Schema schema : catalog.getSchemas()) {
-                for (Cube cube : schema.getCubes()) {
-                    if (cubeName.equals(cube.getName())) {
-                        return (XmlaOlap4jCube) cube;
-                    }
-                    if (cubeName.equals("[" + cube.getName() + "]")) {
-                        return (XmlaOlap4jCube) cube;
-                    }
-                }
+            if (cubeName.equals(cube.getName())) {
+                return (XmlaOlap4jCube) cube;
+            }
+            if (cubeName.equals("[" + cube.getName() + "]")) {
+                return (XmlaOlap4jCube) cube;
             }
         }
         return null;
