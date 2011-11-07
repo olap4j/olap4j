@@ -288,7 +288,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     public OlapStatement createStatement() {
-        return new XmlaOlap4jStatement(this);
+        return factory.newStatement(this);
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {

@@ -9,6 +9,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.OlapException;
+import org.olap4j.OlapStatement;
 import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxy;
 
 import java.sql.*;
@@ -74,6 +75,15 @@ interface Factory {
      */
     XmlaOlap4jCellSet newCellSet(
         XmlaOlap4jStatement olap4jStatement) throws OlapException;
+
+    /**
+     * Creates a statement.
+     *
+     * @param olap4jConnection Connection
+     * @return Statement
+     */
+    XmlaOlap4jStatement newStatement(
+        XmlaOlap4jConnection olap4jConnection);
 
     /**
      * Creates a prepared statement.

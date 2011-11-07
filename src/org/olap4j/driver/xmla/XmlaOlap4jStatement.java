@@ -23,7 +23,7 @@ import java.util.concurrent.*;
  * @version $Id$
  * @since May 24, 2007
  */
-class XmlaOlap4jStatement implements OlapStatement {
+abstract class XmlaOlap4jStatement implements OlapStatement {
     final XmlaOlap4jConnection olap4jConnection;
     private boolean closed;
 

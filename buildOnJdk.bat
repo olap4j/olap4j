@@ -1,5 +1,5 @@
 @echo off
-rem $Id$
+rem $Id: buildJdk16.bat 207 2009-05-05 14:58:00Z lucboudreau $
 rem Called recursively from 'ant release' to build the files which can only be
 rem built under JDK 1.6.
 

@@ -16,6 +16,7 @@ import org.olap4j.impl.Olap4jUtil;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.Logger;
 
 /**
  * Olap4j driver for generic XML for Analysis (XMLA) providers.
@@ -132,6 +133,25 @@ public class XmlaOlap4jDriver implements Driver {
      * Creates an XmlaOlap4jDriver.
      */
     public XmlaOlap4jDriver() {
+        factory = createFactory();
+    }
+
+    private static Factory createFactory() {
+        final String factoryClassName = getFactoryClassName();
+        try {
+            final Class<?> clazz = Class.forName(factoryClassName);
+            return (Factory) clazz.newInstance();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /*
+
         String factoryClassName;
         try {
             Class.forName("java.sql.Wrapper");
@@ -150,6 +170,27 @@ public class XmlaOlap4jDriver implements Driver {
             throw new RuntimeException(e);
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
+        }
+     */
+
+    private static String getFactoryClassName() {
+        try {
+            // If java.sql.PseudoColumnUsage is present, we are running JDBC 4.1
+            // or later.
+            Class.forName("java.sql.PseudoColumnUsage");
+            return "org.olap4j.driver.xmla.FactoryJdbc41Impl";
+        } catch (ClassNotFoundException e) {
+            // java.sql.PseudoColumnUsage is not present. This means we are
+            // running JDBC 4.0 or earlier.
+            try {
+                Class.forName("java.sql.Wrapper");
+                return "org.olap4j.driver.xmla.FactoryJdbc4Impl";
+            } catch (ClassNotFoundException e2) {
+                // java.sql.Wrapper is not present. This means we are running
+                // JDBC 3.0 or earlier (probably JDK 1.5). Load the JDBC 3.0
+                // factory.
+                return "org.olap4j.driver.xmla.FactoryJdbc3Impl";
+            }
         }
     }
 
@@ -229,6 +270,11 @@ public class XmlaOlap4jDriver implements Driver {
 
     public boolean jdbcCompliant() {
         return false;
+    }
+
+    // for JDBC 4.1
+    public Logger getParentLogger() {
+        return Logger.getLogger("");
     }
 
     /**

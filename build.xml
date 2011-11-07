@@ -3,7 +3,7 @@
     == This software is subject to the terms of the Eclipse Public License v1.0
     == Agreement, available at the following URL:
     == http://www.eclipse.org/legal/epl-v10.html.
-    == Copyright (C) 2006-2010 Julian Hyde and others.
+    == Copyright (C) 2006-2011 Julian Hyde and others.
     == All Rights Reserved.
     == You must accept the terms of that agreement to use this software.
     -->
@@ -24,10 +24,19 @@
 ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParser.java,
 ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
 
-    <target name="checkIsNotJdk16" if="jdk16.present">
+    <target name="checkIsJdk15" if="jdk15.not.present">
         <fail message="The 'jar' target (and dependent targets 'release', 'binzip') must be run under JDK 1.5." />
     </target>
 
+    <condition property="jdk15.present">
+        <equals arg1="${ant.java.version}" arg2="1.5" />
+    </condition>
+
+    <condition property="jdk15.not.present">
+        <not>
+            <equals arg1="${ant.java.version}" arg2="1.5" />
+        </not>
+    </condition>
 
     <condition property="jdk16.present">
         <equals arg1="${ant.java.version}" arg2="1.6" />
@@ -36,6 +45,16 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
     <condition property="jdk16.not.present">
         <not>
             <equals arg1="${ant.java.version}" arg2="1.6" />
+        </not>
+    </condition>
+
+    <condition property="jdk17.present">
+        <equals arg1="${ant.java.version}" arg2="1.7" />
+    </condition>
+
+    <condition property="jdk17.not.present">
+        <not>
+            <equals arg1="${ant.java.version}" arg2="1.7" />
         </not>
     </condition>
 
@@ -89,7 +108,7 @@ olap4j_api.pdf"
         </tar>
     </target>
 
-    <target name="jar" depends="checkIsNotJdk16,compile,compile-tests,compileJdk16,set-build.id,generate.manifest"
+    <target name="jar" depends="init, compile.pre, checkIsJdk15, compileJdk15, compileJdk16, compileJdk17, compile, compile-tests, set-build.id, generate.manifest"
         description="Jars up the bin directory after a compile">
         <zip destfile="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">
             <zipfileset dir="${classes.dir}" prefix=""
@@ -133,12 +152,30 @@ VERSION.txt" />
         </zip>
     </target>
 
-    <target name="compileJdk16">
-        <exec osfamily="unix" executable="${basedir}/buildJdk16.sh">
-            <arg line="compile"/>
+    <target name="compileJdk15">
+        <exec osfamily="unix" executable="${basedir}/buildOnJdk.sh">
+            <arg line="jdk1.5 compile.compile"/>
         </exec>
-        <exec osfamily="windows" executable="${basedir}/buildJdk16.bat">
-            <arg line="compile"/>
+        <exec osfamily="windows" dir="." executable="cmd">
+            <arg line="/c .\buildOnJdk.bat jdk1.5 compile.compile"/>
+        </exec>
+    </target>
+    
+    <target name="compileJdk16">
+        <exec osfamily="unix" executable="${basedir}/buildOnJdk.sh">
+            <arg line="jdk1.6 compile.compile"/>
+        </exec>
+        <exec osfamily="windows" dir="." executable="cmd">
+            <arg line="/c .\buildOnJdk.bat jdk1.6 compile.compile"/>
+        </exec>
+    </target>
+    
+    <target name="compileJdk17">
+        <exec osfamily="unix" executable="${basedir}/buildOnJdk.sh">
+            <arg line="jdk1.7 compile.compile"/>
+        </exec>
+        <exec osfamily="windows" dir="." executable="cmd">
+            <arg line="/c .\buildOnJdk.bat jdk1.7 compile.compile"/>
         </exec>
     </target>
 
@@ -157,8 +194,8 @@ xmla-cache/**,
 .project,
 build.properties,
 build.xml,
-buildJdk16.bat,
-buildJdk16.sh,
+buildOnJdk16.bat,
+buildOnJdk16.sh,
 CHANGES.txt,
 checkFile.sh,
 checkFile.awk,
@@ -290,9 +327,13 @@ class XmlaOlap4jDriverVersion {
             </classpath>
             <src path="${src.dir}" />
             <exclude name="org/olap4j/driver/xmla/FactoryJdbc3Impl.java"
-                if="jdk16.present" />
+                if="jdk15.not.present" />
             <exclude name="org/olap4j/driver/xmla/FactoryJdbc4Impl.java"
                 if="jdk16.not.present" />
+            <exclude name="org/olap4j/driver/xmla/FactoryJdbc4Plus.java"
+                if="jdk16.not.present" />
+            <exclude name="org/olap4j/driver/xmla/FactoryJdbc41Impl.java"
+                if="jdk17.not.present" />
         </javac>
     </target>
 
@@ -407,7 +448,7 @@ class XmlaOlap4jDriverVersion {
             <tag name="pre" description="Pre-condition:" scope="constructors,methods" />
             <tag name="post" description="Post-condition:" scope="constructors,methods" />
             <tag name="testcase" description="Test-case:" scope="constructors,methods,types" />
-            <link href="http://download.oracle.com/javase/6/docs/api/" />
+            <link href="http://download.oracle.com/javase/7/docs/api/" />
         </javadoc>
     </target>
 
@@ -426,7 +467,7 @@ class XmlaOlap4jDriverVersion {
             <tag name="pre" description="Pre-condition:" scope="constructors,methods" />
             <tag name="post" description="Post-condition:" scope="constructors,methods" />
             <tag name="testcase" description="Test-case:" scope="constructors,methods,types" />
-            <link href="http://download.oracle.com/javase/6/docs/api/" />
+            <link href="http://download.oracle.com/javase/7/docs/api/" />
         </javadoc>
     </target>
 
@@ -450,7 +491,7 @@ class XmlaOlap4jDriverVersion {
             <tag name="pre" description="Pre-condition:" scope="constructors,methods" />
             <tag name="post" description="Post-condition:" scope="constructors,methods" />
             <tag name="testcase" description="Test-case:" scope="constructors,methods,types" />
-            <link href="http://download.oracle.com/javase/6/docs/api/" />
+            <link href="http://download.oracle.com/javase/7/docs/api/" />
             <link href="http://junit.sourceforge.net/javadoc/" />
             <doclet name="ydoc.doclets.YStandard"
                 path="${ydoc.home}/lib/ydoc.jar${ps}${ydoc.home}/lib/class2svg.jar${ps}${ydoc.home}/resources${ps}${ydoc.home}/doc">
