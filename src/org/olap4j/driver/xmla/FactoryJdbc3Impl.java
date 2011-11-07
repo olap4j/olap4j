@@ -2,7 +2,7 @@
 // This software is subject to the terms of the Eclipse Public License v1.0
 // Agreement, available at the following URL:
 // http://www.eclipse.org/legal/epl-v10.html.
-// Copyright (C) 2007-2010 Julian Hyde
+// Copyright (C) 2007-2011 Julian Hyde
 // All Rights Reserved.
 // You must accept the terms of that agreement to use this software.
 */
@@ -59,26 +59,41 @@ class FactoryJdbc3Impl implements Factory {
     public XmlaOlap4jCellSet newCellSet(
         XmlaOlap4jStatement olap4jStatement) throws OlapException
     {
-        return new FactoryJdbc3Impl.XmlaOlap4jCellSetJdbc3(
-            olap4jStatement);
+        return new XmlaOlap4jCellSetJdbc3(olap4jStatement);
+    }
+
+    public XmlaOlap4jStatement newStatement(
+        XmlaOlap4jConnection olap4jConnection)
+    {
+        return new XmlaOlap4jStatementJdbc3(olap4jConnection);
     }
 
     public XmlaOlap4jPreparedStatement newPreparedStatement(
         String mdx,
         XmlaOlap4jConnection olap4jConnection) throws OlapException
     {
-        return new FactoryJdbc3Impl.XmlaOlap4jPreparedStatementJdbc3(
+        return new XmlaOlap4jPreparedStatementJdbc3(
             olap4jConnection, mdx);
     }
 
     public XmlaOlap4jDatabaseMetaData newDatabaseMetaData(
         XmlaOlap4jConnection olap4jConnection)
     {
-        return new FactoryJdbc3Impl.XmlaOlap4jDatabaseMetaDataJdbc3(
+        return new XmlaOlap4jDatabaseMetaDataJdbc3(
             olap4jConnection);
     }
 
     // Inner classes
+
+    private static class XmlaOlap4jStatementJdbc3
+        extends XmlaOlap4jStatement
+    {
+        public XmlaOlap4jStatementJdbc3(
+            XmlaOlap4jConnection olap4jConnection)
+        {
+            super(olap4jConnection);
+        }
+    }
 
     private static class XmlaOlap4jPreparedStatementJdbc3
         extends XmlaOlap4jPreparedStatement
