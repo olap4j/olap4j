@@ -27,7 +27,7 @@ import java.util.*;
 public class XmlaTester implements TestContext.Tester {
     private final TestContext testContext;
     final XmlaOlap4jProxy proxy;
-    final String cookie;
+    final static String cookie = XmlaOlap4jDriver.nextCookie();
     private Connection connection;
 
     /**
@@ -72,7 +72,6 @@ public class XmlaTester implements TestContext.Tester {
         this.proxy =
             (XmlaOlap4jProxy) constructor.newInstance(
                 catalogNameUrls, urlString);
-        this.cookie = XmlaOlap4jDriver.nextCookie();
         XmlaOlap4jDriver.PROXY_MAP.put(cookie, proxy);
     }
 
