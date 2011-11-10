@@ -9,6 +9,7 @@
     -->
 <project name="olap4j" basedir="." default="dist" xmlns:ivy="antlib:org.apache.ivy.ant">
     <property file="${basedir}/test.properties"/>
+    <property name="unix.script" value="${basedir}/buildOnJdk.sh"/>
     <import file="subfloor.xml" />
 
     <property name="jar-jdk14.file"
@@ -29,32 +30,32 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
     </target>
 
     <condition property="jdk15.present">
-        <equals arg1="${ant.java.version}" arg2="1.5" />
+        <contains string="${java.version}" substring="1.5." />
     </condition>
 
     <condition property="jdk15.not.present">
         <not>
-            <equals arg1="${ant.java.version}" arg2="1.5" />
+          <contains string="${java.version}" substring="1.5." />
         </not>
     </condition>
 
     <condition property="jdk16.present">
-        <equals arg1="${ant.java.version}" arg2="1.6" />
+        <contains string="${java.version}" substring="1.6." />
     </condition>
 
     <condition property="jdk16.not.present">
         <not>
-            <equals arg1="${ant.java.version}" arg2="1.6" />
+          <contains string="${java.version}" substring="1.6." />
         </not>
     </condition>
 
     <condition property="jdk17.present">
-        <equals arg1="${ant.java.version}" arg2="1.7" />
+        <contains string="${java.version}" substring="1.7." />
     </condition>
 
     <condition property="jdk17.not.present">
         <not>
-            <equals arg1="${ant.java.version}" arg2="1.7" />
+           <contains string="${java.version}" substring="1.7." />
         </not>
     </condition>
 
@@ -108,6 +109,10 @@ olap4j_api.pdf"
         </tar>
     </target>
 
+    <target name="compile"
+        depends="init, compile.pre, compileJdk15, compileJdk16, compileJdk17, compile.src_copy, compile.res_copy, compile.lic_copy, compile.post"
+        description="Performs all the steps to prepare the bin directory with a complete compilation" />
+
     <target name="jar" depends="init, compile.pre, checkIsJdk15, compileJdk15, compileJdk16, compileJdk17, compile, compile-tests, set-build.id, generate.manifest"
         description="Jars up the bin directory after a compile">
         <zip destfile="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">
@@ -153,29 +158,29 @@ VERSION.txt" />
     </target>
 
     <target name="compileJdk15">
-        <exec osfamily="unix" executable="${basedir}/buildOnJdk.sh">
-            <arg line="jdk1.5 compile.compile"/>
+        <exec osfamily="unix" executable="${unix.script}">
+            <arg line="jdk1.5 -Dskip.download=true compile.compile"/>
         </exec>
         <exec osfamily="windows" dir="." executable="cmd">
-            <arg line="/c .\buildOnJdk.bat jdk1.5 compile.compile"/>
+            <arg line="/c .\buildOnJdk.bat jdk1.5 -Dskip.download=true compile.compile"/>
         </exec>
     </target>
     
     <target name="compileJdk16">
-        <exec osfamily="unix" executable="${basedir}/buildOnJdk.sh">
-            <arg line="jdk1.6 compile.compile"/>
+        <exec osfamily="unix" executable="${unix.script}">
+            <arg line="jdk1.6 -Dskip.download=true compile.compile"/>
         </exec>
         <exec osfamily="windows" dir="." executable="cmd">
-            <arg line="/c .\buildOnJdk.bat jdk1.6 compile.compile"/>
+            <arg line="/c .\buildOnJdk.bat jdk1.6 -Dskip.download=true compile.compile"/>
         </exec>
     </target>
     
     <target name="compileJdk17">
-        <exec osfamily="unix" executable="${basedir}/buildOnJdk.sh">
-            <arg line="jdk1.7 compile.compile"/>
+        <exec osfamily="unix" executable="${unix.script}">
+            <arg line="jdk1.7 -Dskip.download=true compile.compile"/>
         </exec>
         <exec osfamily="windows" dir="." executable="cmd">
-            <arg line="/c .\buildOnJdk.bat jdk1.7 compile.compile"/>
+            <arg line="/c .\buildOnJdk.bat jdk1.7 -Dskip.download=true compile.compile"/>
         </exec>
     </target>
 
@@ -320,8 +325,7 @@ class XmlaOlap4jDriverVersion {
     <!-- override compile task to account for special jdk handling -->
     <target name="compile.compile">
         <javac destdir="${classes.dir}" debug="${javac.debug}"
-            deprecation="${javac.deprecation}" fork="true" source="${javac.source}"
-            target="${javac.target}">
+            deprecation="${javac.deprecation}" fork="true">
             <classpath>
                 <path refid="classpath" />
             </classpath>

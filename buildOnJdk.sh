@@ -1,4 +1,4 @@
-# $Id: //open/mondrian/buildJdk16.sh#3 $
+# $Id: //open/mondrian/buildOnJdk.sh#2 $
 # Called recursively from 'ant release' to build the files which can only be
 # built under a particular JDK version.
 #
@@ -22,6 +22,10 @@ if [ ! -d "$JAVA_HOME" ]; then
 fi
 
 export PATH=$JAVA_HOME/bin:$PATH
-ant -Dskip.download=true "$@"
+
+echo Using JAVA_HOME: $JAVA_HOME
+echo Using Ant arguments: $@
+
+ant "$@"
 
 # End buildOnJdk.sh
