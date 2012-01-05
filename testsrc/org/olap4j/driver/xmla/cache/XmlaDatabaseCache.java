@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 //
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * @see Properties
  * @author LBoudreau
- * @version $Id: $
+ * @version $Id$
  */
 public class XmlaDatabaseCache implements XmlaOlap4jCache {
 

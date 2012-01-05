@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 //
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
@@ -24,7 +24,7 @@ import java.util.*;
 /**
  * Mapping between {@link Locale} and Locale identifier (LCID).
  *
- * @version $Id: //open/mondrian/src/main/mondrian/util/LcidLocale.java#1 $
+ * @version $Id$
  * @author jhyde
  */
 public class LcidLocale {

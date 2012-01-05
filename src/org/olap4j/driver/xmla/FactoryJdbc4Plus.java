@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 //
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
@@ -31,7 +31,7 @@ import java.util.*;
  * Abstract JDBC classes, for JDBC 4.0 and 4.1.
  *
  * @author jhyde
- * @version $Id: FactoryJdbc4Impl.java 476 2011-10-24 17:54:40Z jhyde $
+ * @version $Id$
  */
 class FactoryJdbc4Plus {
     private FactoryJdbc4Plus() {

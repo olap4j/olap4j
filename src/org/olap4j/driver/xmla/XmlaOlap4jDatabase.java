@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 //
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * XMLA implementation of a database metadata object.
- * @version $Id:$
+ * @version $Id$
  * @author LBoudreau
  */
 class XmlaOlap4jDatabase implements Database, Named {

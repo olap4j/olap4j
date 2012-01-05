@@ -1,5 +1,5 @@
 /*
-// $Id:$
+// $Id$
 //
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
@@ -62,7 +62,7 @@ import java.util.List;
  * </p>
  *
  * @author Luc Boudreau
- * @version $Id:$
+ * @version $Id$
  * @since Jan 15 2011
  */
 public interface Database {

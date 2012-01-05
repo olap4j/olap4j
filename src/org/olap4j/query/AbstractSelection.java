@@ -1,5 +1,5 @@
 /*
-// $Id:$
+// $Id$
 //
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Abstract implementation of a selection.
  * @author LBoudreau
- * @version $Id:$
+ * @version $Id$
  */
 abstract class AbstractSelection extends QueryNodeImpl implements Selection {
 
