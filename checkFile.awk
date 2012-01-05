@@ -33,7 +33,7 @@ function _matchFile(fname) {
        || fname ~ "/fennel/" \
        || fname ~ "/extensions/" \
        || fname ~ "/com/sqlstream/" \
-       || !lenient;
+       || strict > 0;
 }
 function _isCpp(fname) {
     return fname ~ /\.(cpp|h)$/;
@@ -109,7 +109,7 @@ BEGIN {
     quot = sprintf("%c", 34);
     lf = sprintf("%c", 13);
     pattern = apos "(\\" apos "|[^" apos "])" apos;
-    if (0) printf "maxLineLength=%s lenient=%s\n", maxLineLength, lenient;
+    if (0) printf "maxLineLength=%s strict=%s\n", maxLineLength, strict;
 }
 FNR == 1 {
     if (fname) {
@@ -229,7 +229,6 @@ FNR == 1 {
     thisImport = $2;
     gsub(/;/, "", thisImport);
     gsub(/\*/, "", thisImport);
-    importGroup = "zzzzzzzzzzzzzzzzz";
     if (thisPackage ~ /^mondrian.*/ && thisImport ~ /^mondrian.*/ \
         || thisPackage ~ /^org.olap4j.*/ && thisImport ~ /^org.olap4j.*/)
     {
@@ -257,7 +256,7 @@ FNR == 1 {
         if (!previousLineWasEmpty) {
             error(fname, FNR, "Expected blank line between import groups");
         } else if (prevImportGroup > importGroup) {
-            error(fname, FNR, "Import group out of sequence" importGroup prevImportGroup);
+            error(fname, FNR, "Import group out of sequence (should precede " prevImportGroup ")");
         }
     } else if (prevImport \
         && prevImport > thisImport \
@@ -268,6 +267,34 @@ FNR == 1 {
     }
     prevImport = thisImport;
     prevImportGroup = importGroup;
+}
+/^\/\/ Copyright .* Julian/ && strict {
+    if ($0 !~ /-2012/) {
+        error(fname, FNR, "copyright is not current");
+    }
+}
+/(static|public|private|protected|final|abstract)/ && !/import/ && strict > 1 {
+    # Order of qualifiers: "public/private/protected static final abstract class ..."
+    s2 = s;
+    gsub(/\(.*$/, "", s2);
+    if (s2 ~ /abstract .*final/) {
+        error(fname, FNR, "'final' must come before 'abstract'");
+    }
+    if (s2 ~ /final .*static/) {
+        error(fname, FNR, "'static' must come before 'final'");
+    }
+    if (s2 ~ /abstract .*static/) {
+        error(fname, FNR, "'static' must come before 'abstract'");
+    }
+    if (s2 ~ /static .*(public|protected|private)/) {
+        error(fname, FNR, "'public/private/protected' must come before 'static'");
+    }
+    if (s2 ~ /final .*(public|protected|private)/) {
+        error(fname, FNR, "'public/private/protected' must come before 'final'");
+    }
+    if (s2 ~ /abstract .*(public|protected|private)/) {
+        error(fname, FNR, "'public/private/protected' must come before 'abstract'");
+    }
 }
 /^$/ {
     if (matchFile && previousLineEndedInOpenBrace) {
@@ -504,7 +531,7 @@ match(s, /([]A-Za-z0-9() ] *)(+|-|\*|\^|\/|%|=|==|+=|-=|\*=|\/=|>=|<=|!=|&|&&|\|
     else if (a[2] == "&" && isCpp && s ~ /&[^ ]/) {} # ignore case "foo(&x)" in c++
     else if (isCpp && s ~ /\<operator[^ ]+\(/) {} # ignore e.g. "operator++()" in c++
     else if (isCpp && a[2] == "/" && s ~ /#include/) {} # ignore e.g. "#include <x/y.hpp>" in c++
-    else if (lenient && fname ~ /(fennel)/ && a[1] = ",") {} # not enabled yet
+    else if (strict < 2 && fname ~ /(fennel)/ && a[1] = ",") {} # not enabled yet
     else {
         error(fname, FNR, "operator '" a[2] "' must be followed by space");
     }
@@ -518,8 +545,8 @@ match(s, /( )(,)/, a) {
 }
 match(s, / (+|-|\*|\/|==|>=|<=|!=|<<|<<<|>>|&|&&|\|\||\?|:)$/, a) || \
 match(s, /(\.|->)$/, a) {
-    if (lenient && fname ~ /(aspen)/ && a[1] != ":") {} # not enabled yet
-    else if (lenient && fname ~ /(fennel|farrago|aspen)/ && a[1] = "+") {} # not enabled yet
+    if (strict < 2 && fname ~ /(aspen)/ && a[1] != ":") {} # not enabled yet
+    else if (strict < 2 && fname ~ /(fennel|farrago|aspen)/ && a[1] = "+") {} # not enabled yet
     else if (a[1] == ":" && s ~ /(case.*|default):$/) {
         # ignore e.g. "case 5:"
     } else if ((a[1] == "*" || a[1] == "&") && isCpp && s ~ /^[[:alnum:]:_ ]* [*&]$/) {
@@ -623,7 +650,7 @@ s ~ /{/ {
         gsub(/[^(]/, "", opens);
         closes = s;
         gsub(/[^)]/, "", closes);
-        if (0 && lenient && fname ~ /aspen/) {} # not enabled
+        if (0 && strict < 2 && fname ~ /aspen/) {} # not enabled
         else if (length(closes) > length(opens)) {
             error(fname, FNR, "Open brace should be on new line (function call/decl spans several lines)");
         }
@@ -694,7 +721,7 @@ length($0) > maxLineLength                      \
         if (funDeclStartLine < FNR \
             && $0 !~ /^ *{$/)
         {
-            if (lenient && fname ~ /aspen/) {} # not enabled
+            if (strict < 2 && fname ~ /aspen/) {} # not enabled
             else error(fname, FNR, "Open brace should be on new line (function decl spans several lines)");
         }
         funDeclStartLine = 0;

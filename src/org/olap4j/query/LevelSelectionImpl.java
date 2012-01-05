@@ -1,5 +1,5 @@
 /*
-// $Id: LevelSelectionImpl.java 399 2011-02-03 20:53:50Z pstoellberger $
+// $Id$
 //
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
@@ -28,7 +28,7 @@ import org.olap4j.metadata.Level.Type;
  * Abstract implementation of {@link Selection}.
  *
  * @author pstoellberger
- * @version $Id: LevelSelectionImpl.java 454 2011-05-15 20:53:50Z pstoellberger $
+ * @version $Id$
  * @since Feb 3, 2011
  */
 class LevelSelectionImpl extends AbstractSelection {

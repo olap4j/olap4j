@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: //open/mondrian-release/3.2/bin/checkFile.sh#2 $
+# $Id$
 #
 # Licensed to Julian Hyde under one or more contributor license
 # agreements. See the NOTICE file distributed with this work for
@@ -44,6 +44,8 @@ usage() {
     echo "--lenient"
     echo "    Does not apply rules to components which are not known to"
     echo "    be in compliance. The perforce trigger uses this option."
+    echo "--strict"
+    echo "    Stricter than usual; the opposite of lenient."
 }
 
 doCheck() {

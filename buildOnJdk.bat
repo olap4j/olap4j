@@ -1,5 +1,5 @@
 @echo off
-rem $Id: //open/mondrian/buildOnJdk.bat#2 $
+rem $Id$
 rem
 rem Licensed to Julian Hyde under one or more contributor license
 rem agreements. See the NOTICE file distributed with this work for
