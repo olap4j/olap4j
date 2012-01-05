@@ -1,3 +1,22 @@
+/*
+// $Id: $
+//
+// Licensed to Julian Hyde under one or more contributor license
+// agreements. See the NOTICE file distributed with this work for
+// additional information regarding copyright ownership.
+//
+// Julian Hyde licenses this file to you under the Apache License,
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at:
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+*/
 package org.olap4j.driver.xmla.cache;
 
 import java.net.URL;
@@ -7,13 +26,15 @@ import java.util.Map;
 /**
  * This mock server cache is only used to save and load
  * runs of the XMLA driver as a database table.
+ *
  * @see Properties
  * @author LBoudreau
+ * @version $Id: $
  */
 public class XmlaDatabaseCache implements XmlaOlap4jCache {
 
     private static Connection connection = null;
-    private final static String CACHE_IDENT = "Panda steak!";
+    private static final String CACHE_IDENT = "Panda steak!";
     private Map<String, String> props;
 
     public static enum Properties {
@@ -189,5 +210,3 @@ public class XmlaDatabaseCache implements XmlaOlap4jCache {
 }
 
 // End XmlaDatabaseCache.java
-
-

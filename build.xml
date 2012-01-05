@@ -1,11 +1,21 @@
 <!--
     == $Id$
-    == This software is subject to the terms of the Eclipse Public License v1.0
-    == Agreement, available at the following URL:
-    == http://www.eclipse.org/legal/epl-v10.html.
-    == Copyright (C) 2006-2011 Julian Hyde and others.
-    == All Rights Reserved.
-    == You must accept the terms of that agreement to use this software.
+    ==
+    == Licensed to Julian Hyde under one or more contributor license
+    == agreements. See the NOTICE file distributed with this work for
+    == additional information regarding copyright ownership.
+    ==
+    == Julian Hyde licenses this file to you under the Apache License,
+    == Version 2.0 (the "License"); you may not use this file except in
+    == compliance with the License. You may obtain a copy of the License at:
+    ==
+    == http://www.apache.org/licenses/LICENSE-2.0
+    ==
+    == Unless required by applicable law or agreed to in writing, software
+    == distributed under the License is distributed on an "AS IS" BASIS,
+    == WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    == See the License for the specific language governing permissions and
+    == limitations under the License.
     -->
 <project name="olap4j" basedir="." default="dist" xmlns:ivy="antlib:org.apache.ivy.ant">
     <property file="${basedir}/test.properties"/>
@@ -73,13 +83,14 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
         depends="clean,version-properties,jar,tck-jar,xmla-jar,javadoc,javadoc-pdf,jar-jdk14,source.zip"
         description="Creates a distribution">
         <zip zipfile="${dist.dir}/${zip.filename}">
-            <zipfileset dir="${basedir}/doc" prefix="${ivy.artifact.id}-${project.revision}/doc"
-                includes="**/*" />
             <zipfileset dir="${basedir}" prefix="${ivy.artifact.id}-${project.revision}"
                 includes="
-LICENSE.html,
+LICENSE,
+NOTICE,
 README.txt,
 VERSION.txt" />
+            <zipfileset dir="${basedir}/doc" prefix="${ivy.artifact.id}-${project.revision}/doc"
+                includes="**/*" />
             <zipfileset dir="${javadoc.dir}" prefix="${ivy.artifact.id}-${project.revision}/doc/api"
                 includes="**/*" />
             <zipfileset dir="${dist.dir}" prefix="${ivy.artifact.id}-${project.revision}/lib" includes="olap4j-*.jar" />
@@ -116,44 +127,47 @@ olap4j_api.pdf"
     <target name="jar" depends="init, compile.pre, checkIsJdk15, compileJdk15, compileJdk16, compileJdk17, compile, compile-tests, set-build.id, generate.manifest"
         description="Jars up the bin directory after a compile">
         <zip destfile="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">
+            <zipfileset dir="${basedir}" prefix=""
+                includes="
+LICENSE,
+NOTICE,
+README.txt,
+VERSION.txt" />
             <zipfileset dir="${classes.dir}" prefix=""
                 includes="**/*"
                 excludes="
 org/olap4j/driver/**,
 META-INF/**"/>
-            <zipfileset dir="${basedir}" prefix=""
-                includes="
-LICENSE.html,
-README.txt,
-VERSION.txt" />
         </zip>
     </target>
 
     <target name="xmla-jar" depends="jar"
         description="Jars up the bin directory after a compile">
         <zip destfile="${dist.dir}/${ivy.artifact.id}-xmla-${project.revision}.jar">
+            <zipfileset dir="${basedir}" prefix=""
+                includes="
+LICENSE,
+NOTICE,
+README.txt,
+VERSION.txt" />
             <zipfileset dir="${classes.dir}" prefix=""
                 includes="
 org/olap4j/driver/**,
 META-INF/**"/>
-            <zipfileset dir="${basedir}" prefix=""
-                includes="
-LICENSE.html,
-README.txt,
-VERSION.txt" />
         </zip>
     </target>
 
     <target name="tck-jar" depends="jar"
         description="Jars up the Test Compatibility Kit (TCK) after a compile">
         <zip destfile="${dist.dir}/${ivy.artifact.id}-tck-${project.revision}.jar">
-            <zipfileset dir="${testclasses.dir}" prefix="" includes="**/*"
-                excludes="jndi.properties" />
             <zipfileset dir="${basedir}" prefix=""
                 includes="
-LICENSE.html,
+LICENSE,
+NOTICE,
 README.txt,
 VERSION.txt" />
+            <zipfileset dir="${testclasses.dir}" prefix="" includes="**/*"
+                excludes="jndi.properties" />
         </zip>
     </target>
 
@@ -165,7 +179,7 @@ VERSION.txt" />
             <arg line="/c .\buildOnJdk.bat jdk1.5 -Dskip.download=true compile.compile"/>
         </exec>
     </target>
-    
+
     <target name="compileJdk16">
         <exec osfamily="unix" executable="${unix.script}">
             <arg line="jdk1.6 -Dskip.download=true compile.compile"/>
@@ -174,7 +188,7 @@ VERSION.txt" />
             <arg line="/c .\buildOnJdk.bat jdk1.6 -Dskip.download=true compile.compile"/>
         </exec>
     </target>
-    
+
     <target name="compileJdk17">
         <exec osfamily="unix" executable="${unix.script}">
             <arg line="jdk1.7 -Dskip.download=true compile.compile"/>
@@ -186,6 +200,12 @@ VERSION.txt" />
 
     <target name="source.zip">
         <zip zipfile="${dist.dir}/${source.zip.filename}">
+            <zipfileset dir="${basedir}" prefix="${ivy.artifact.id}-${project.revision}"
+                    includes="
+LICENSE,
+NOTICE,
+README.txt,
+VERSION.txt" />
             <zipfileset dir="${basedir}" prefix="${ivy.artifact.id}-${project.revision}"
                     includes="
 src/**,
@@ -209,11 +229,8 @@ ivy-xmla.xml,
 ivy-tck.xml,
 ivy-jdk14.xml,
 ivysettings.xml,
-LICENSE.html,
-README.txt,
 subfloor.xml,
-test.properties,
-VERSION.txt" />
+test.properties" />
         </zip>
     </target>
 
@@ -251,7 +268,7 @@ class XmlaOlap4jDriverVersion {
 
     <target name="clean-hsql">
         <delete includeemptydirs="false">
-            <fileset 
+            <fileset
                 dir="${basedir}/foodmart"
                 defaultexcludes="true">
                 <exclude name="foodmart.zip"/>

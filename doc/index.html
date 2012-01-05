@@ -4,21 +4,31 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <!--
   == $Id$
-  == This software is subject to the terms of the Eclipse Public License v1.0
-  == Agreement, available at the following URL:
-  == http://www.eclipse.org/legal/epl-v10.html.
-  == Copyright (C) 2006-2011 Julian Hyde and others.
-  == All Rights Reserved.
-  == You must accept the terms of that agreement to use this software.
+  ==
+  == Licensed to Julian Hyde under one or more contributor license
+  == agreements. See the NOTICE file distributed with this work for
+  == additional information regarding copyright ownership.
+  ==
+  == Julian Hyde licenses this file to you under the Apache License,
+  == Version 2.0 (the "License"); you may not use this file except in
+  == compliance with the License. You may obtain a copy of the License at:
+  ==
+  == http://www.apache.org/licenses/LICENSE-2.0
+  ==
+  == Unless required by applicable law or agreed to in writing, software
+  == distributed under the License is distributed on an "AS IS" BASIS,
+  == WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  == See the License for the specific language governing permissions and
+  == limitations under the License.
   -->
 <title>olap4j: Open Java API for OLAP</title>
 <style type="text/css">
-  body { 
-  color: #000000; 
-  font-family: Arial, sans-serif; 
+  body {
+  color: #000000;
+  font-family: Arial, sans-serif;
   font-size: .85em;
   }
-  
+
   a {
     font-family: Tahoma, Helvetica, sans-serif;
     color: #949e3e;
@@ -37,7 +47,7 @@ a:hover, a:active {
     font-family: Tahoma, Helvetica, sans-serif;
     color: #907c6c;
 }
-  
+
   ul {
     margin-left: 0px;
     margin-top: 0px;
@@ -47,83 +57,83 @@ a:hover, a:active {
     list-style-image: url(images/bullet_gray.png);
     list-style-position: inside;
     }
-  
+
   p { margin: 0px; }
-  
-  .logo { 
-  padding: 0px 0px 10px 0px; 
+
+  .logo {
+  padding: 0px 0px 10px 0px;
   }
-  
+
   .banner_title {
   padding: 42px 0px 0px 10px;
   }
-  
-  .col_spacer { 
+
+  .col_spacer {
   width: 15px;
   height: 15px;
   }
-  
+
   h4 {
   font-size: 1.2em;
   color:#004263;
   font-weight:bold;
   margin: 20px 0px 0px 0px;
   }
-  
+
   h5 {
   font-size: .85em;
   color:#000000;
   font-weight:bold;
   margin: 20px 0px 0px 0px;
   }
-    
-  .home_box { 
-  background-color:#004263; 
-  background-image:url(images/curve_bg.png); 
+
+  .home_box {
+  background-color:#004263;
+  background-image:url(images/curve_bg.png);
   }
-  
-  .home_box_center { 
-  background-image:url(images/home_box_bg.png); 
+
+  .home_box_center {
+  background-image:url(images/home_box_bg.png);
   background-repeat: no-repeat;
   background-position: top right;
   padding: 0px 0px 10px 0px;
   }
-  
-  .home_box_spacer { 
-  background-color:#004263; 
+
+  .home_box_spacer {
+  background-color:#004263;
   width: 11px;
   height: 11px;
-  background-image:url(images/curve_bg.png); 
+  background-image:url(images/curve_bg.png);
   }
-  
-  p.box_header { 
-  color: #ffffff; 
-  font-size: 1.45em; 
+
+  p.box_header {
+  color: #ffffff;
+  font-size: 1.45em;
   margin-top: 10px;
   width: 385px;
   font-weight:bold;
   }
-  
-  p.box_subheader { 
+
+  p.box_subheader {
   color: #ffffff;
-  font-size: 1.35em; 
+  font-size: 1.35em;
   }
-  
+
   .participation_bg {
   background-color: #c0c0c0;
   padding: 10px 15px 1px 15px;
   margin: 15px 0px 10px 0px;
   width: 170px;
   }
-  
+
   .copyright {
-  border-top: 1px solid #004263; 
-  font: normal .75em Arial, Helvetica, sans-serif; 
-  color:#000000; 
-  text-align:center; 
+  border-top: 1px solid #004263;
+  font: normal .75em Arial, Helvetica, sans-serif;
+  color:#000000;
+  text-align:center;
   padding: 5px 0px 5px 0px;
   }
-  
+
 </style>
 </head>
 
@@ -143,20 +153,20 @@ a:hover, a:active {
         <tr>
           <td class="home_box"><img src="images/spacer.png" class="home_box_spacer"/></td>
           <td class="home_box"><div class="home_box_center"><p class="box_header">
-                        olap4j is an open Java 
+                        olap4j is an open Java
                         <span style="font-variant: small-caps">API</span> for
                         <span style="font-variant: small-caps">OLAP</span>.</p>
-                        
+
                         <p class="box_header">
-                        Think of it like 
-                        <span style="font-variant: small-caps">JDBC</span>, 
+                        Think of it like
+                        <span style="font-variant: small-caps">JDBC</span>,
                         but for accessing multi-dimensional data.</p>
                         <br />
                         <p class="box_subheader">
                         olap4j is a common API for any OLAP server,
-                        so you can write an 
-                        analytic application on one server and easily switch it to 
-                        another. Built on that API, there is a growing 
+                        so you can write an
+                        analytic application on one server and easily switch it to
+                        another. Built on that API, there is a growing
                         collection of tools and components.</p></div></td>
           <td class="home_box"><img src="images/spacer.png" class="home_box_spacer"/></td>
         </tr>
@@ -169,8 +179,8 @@ a:hover, a:active {
   </tr>
   <tr>
     <td colspan="2" valign="top"><table width="700" border="0" cellspacing="0" cellpadding="0">
-        
-        
+
+
         <tr>
           <td width="100%" valign="top" style="padding-bottom: 10px;">
           <h4>Status</h4>
@@ -178,7 +188,7 @@ a:hover, a:active {
           <p>This olap4j release includes the specification, a technology compatibility kit (TCK)
           and a generic XML/A driver compatible with Pentaho Analysis (Mondrian), Microsoft SQL Server Analysis Services, Palo and SAP BW.</p><br/>
           <p><a href="http://www.pentaho.com/news/releases/pentaho-announces-a-new-era-in-open-standards-for-analytics/">Read the press release</a>.</p>
-          
+
           <h4>Resources</h4>
             <ul>
               <li><a href="http://sourceforge.net/projects/olap4j">olap4j project at SourceForge</a>.</li>
@@ -248,7 +258,7 @@ a:hover, a:active {
             </ul>
           </p>
 
-            <h4>Get involved!</h4> 
+            <h4>Get involved!</h4>
 
             <p>Join the
             <a href="http://sourceforge.net/forum/forum.php?forum_id=577988">forum</a>,

@@ -1,18 +1,28 @@
 #!/bin/bash
 # $Id: //open/mondrian-release/3.2/bin/checkFile.sh#2 $
+#
+# Licensed to Julian Hyde under one or more contributor license
+# agreements. See the NOTICE file distributed with this work for
+# additional information regarding copyright ownership.
+#
+# Julian Hyde licenses this file to you under the Apache License,
+# Version 2.0 (the "License"); you may not use this file except in
+# compliance with the License. You may obtain a copy of the License at:
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ==============================================================================
 # Checks that a file is valid.
-# Used by perforce submit trigger, via runTrigger.
 # The file is deemed to be valid if this command produces no output.
 #
 # Usage:
-#   checkFile [ --depotPath <depotPath> ] <file> 
-#
-# runTrigger uses first form, with a temporary file, e.g.
-#   checkFile --depotPath //depot/src/foo/Bar.java /tmp/foo.txt
-#
-# The second form is useful for checking files in the client before you
-# try to submit them:
-#   checkFile src/foo/Bar.java
+#   checkFile [ --depotPath <depotPath> ] <file>
 #
 
 usage() {
@@ -273,4 +283,5 @@ fi
 
 exit $status
 
-# End checkFile
+# End checkFile.sh
+
