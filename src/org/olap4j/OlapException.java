@@ -19,7 +19,7 @@
 */
 package org.olap4j;
 
-import java.sql.SQLException;
+import java.sql.*;
 
 /**
  * <p>An exception describing an error accessing an OLAP database.</p>
@@ -41,7 +41,9 @@ public class OlapException extends SQLException {
     private Object context;
 
     /**
-     * Constructs a fully-specified <code>SQLException</code> object.
+     * Constructs an <code>OlapException</code> object with a given
+     * <code>reason</code>, <code>SQLState</code>  and
+     * <code>vendorCode</code>.
      *
      * @param reason a description of the exception
      * @param sqlState an XOPEN or SQL 99 code identifying the exception
@@ -52,7 +54,7 @@ public class OlapException extends SQLException {
     }
 
     /**
-     * Constructs an <code>SQLException</code> object with the given reason and
+     * Constructs an <code>OlapException</code> object with the given reason and
      * SQLState; the <code>vendorCode</code> field defaults to 0.
      *
      * @param reason a description of the exception
@@ -63,7 +65,7 @@ public class OlapException extends SQLException {
     }
 
     /**
-     * Constructs an <code>SQLException</code> object with a reason;
+     * Constructs an <code>OlapException</code> object with a reason;
      * the <code>sqlState</code> field defaults to <code>null</code>, and
      * the <code>vendorCode</code> field defaults to 0.
      *
@@ -74,13 +76,31 @@ public class OlapException extends SQLException {
     }
 
     /**
-     * Constructs an <code>SQLException</code> object;
+     * Constructs an <code>OlapException</code> object;
      * the <code>reason</code> field defaults to null,
      * the <code>sqlState</code> field defaults to <code>null</code>, and
      * the <code>vendorCode</code> field defaults to 0.
      */
     public OlapException() {
         super();
+    }
+
+    /**
+     * Constructs an <code>OlapException</code> object with a given
+     * <code>cause</code>.
+     * The <code>SQLState</code> is initialized
+     * to <code>null</code> and the vendor code is initialized to 0.
+     * The <code>reason</code>  is initialized to <code>null</code> if
+     * <code>cause==null</code> or to <code>cause.toString()</code> if
+     * <code>cause!=null</code>.
+     * <p>
+     * @param cause the underlying reason for this <code>OlapException</code>
+     * (which is saved for later retrieval by the <code>getCause()</code>
+     * method); may be null indicating the cause is non-existent or unknown.
+     */
+    public OlapException(Throwable cause) {
+        super();
+        initCause(cause);
     }
 
     /**
@@ -98,6 +118,50 @@ public class OlapException extends SQLException {
         // Cannot call super(reason, cause) because
         // SQLException(String, Throwable) only exists from JDK 1.6.
         super(reason);
+        initCause(cause);
+    }
+
+    /**
+     * Constructs an <code>OlapException</code> object with a given
+     * <code>reason</code>, <code>SQLState</code> and  <code>cause</code>.
+     * The vendor code is initialized to 0.
+     *
+     * @param reason a description of the exception.
+     * @param sqlState an XOPEN or SQL:2003 code identifying the exception
+     * @param cause the underlying reason for this <code>OlapException</code>
+     * (which is saved for later retrieval by the
+     * <code>getCause()</code> method); may be null indicating
+     *     the cause is non-existent or unknown.
+     */
+    public OlapException(String reason, String sqlState, Throwable cause) {
+        // Cannot call SQLException(String, String, Throwable); it only
+        // exists from JDK 1.6
+        super(reason, sqlState);
+        initCause(cause);
+    }
+
+    /**
+     * Constructs an <code>OlapException</code> object with a given
+     * <code>reason</code>, <code>SQLState</code>, <code>vendorCode</code>
+     * and  <code>cause</code>.
+     *
+     * @param reason a description of the exception
+     * @param sqlState an XOPEN or SQL:2003 code identifying the exception
+     * @param vendorCode a database vendor-specific exception code
+     * @param cause the underlying reason for this <code>OlapException</code>
+     * (which is saved for later retrieval by the <code>getCause()</code>
+     * method);
+     * may be null indicating the cause is non-existent or unknown.
+     */
+    public OlapException(
+        String reason,
+        String sqlState,
+        int vendorCode,
+        Throwable cause)
+    {
+        // Cannot call SQLException(String, String, int, Throwable); it only
+        // exists from JDK 1.6
+        super(reason, sqlState, vendorCode);
         initCause(cause);
     }
 

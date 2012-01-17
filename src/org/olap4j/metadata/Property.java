@@ -704,10 +704,10 @@ public interface Property extends MetadataElement {
             + "usually used for currency conversion."),
 
         ACTION_TYPE(
-            Datatype.UNSIGNED_INTEGER,
+            Datatype.INT4,
             0,
             false,
-            null,
+            XmlaConstants.ActionType.class,
             "A bitmask that indicates which types of actions exist on the "
             + "cell."),
 

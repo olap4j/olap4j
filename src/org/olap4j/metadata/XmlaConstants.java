@@ -358,16 +358,29 @@ public class XmlaConstants
         }
     }
 
+    /**
+     * Action type.
+     *
+     * <p>Fields correspond to XMLA constants MDACTION_TYPE_URL (0x01),
+     * MDACTION_TYPE_HTML (0x02),
+     * MDACTION_TYPE_STATEMENT (0x04),
+     * MDACTION_TYPE_DATASET (0x08),
+     * MDACTION_TYPE_ROWSET (0x10),
+     * MDACTION_TYPE_COMMANDLINE (0x20),
+     * MDACTION_TYPE_PROPRIETARY (0x40),
+     * MDACTION_TYPE_REPORT (0x80),
+     * MDACTION_TYPE_DRILLTHROUGH (0x100)</p>
+     */
     public static enum ActionType implements XmlaConstant {
-        URL(-1),
-        HTML(-1),
-        STATEMENT(-1),
-        DATASET(-1),
-        ROWSET(-1),
-        COMMANDLINE(-1),
-        PROPRIETARY(-1),
-        REPORT(-1),
-        DRILLTHROUGH(-1);
+        URL(0x01),
+        HTML(0x02),
+        STATEMENT(0x04),
+        DATASET(0x08),
+        ROWSET(0x10),
+        COMMANDLINE(0x20),
+        PROPRIETARY(0x40),
+        REPORT(0x80),
+        DRILLTHROUGH(0x100);
 
         private final int xmlaOrdinal;
 
@@ -390,6 +403,57 @@ public class XmlaConstants
 
         public String xmlaName() {
             return "MDACTION_TYPE_" + name();
+        }
+
+        public String getDescription() {
+            return name();
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
+        }
+    }
+
+    /**
+     * How the COORDINATE restriction column is interpreted.
+     *
+     * <p>Fields correspond to the XMLA values
+     * MDACTION_COORDINATE_CUBE (1),
+     * MDACTION_COORDINATE_DIMENSION (2)
+     * MDACTION_COORDINATE_LEVEL (3),
+     * MDACTION_COORDINATE_MEMBER (4),
+     * MDACTION_COORDINATE_SET (5),
+     * MDACTION_COORDINATE_CELL (6)</p>
+     */
+    public static enum CoordinateType implements XmlaConstant {
+        CUBE(1),
+        DIMENSION(2),
+        LEVEL(3),
+        MEMBER(4),
+        SET(5),
+        CELL(6);
+
+        private final int xmlaOrdinal;
+
+        private static final Dictionary<ActionType> DICTIONARY =
+            DictionaryImpl.forClass(ActionType.class);
+
+        /**
+         * Per {@link XmlaConstant}, returns a dictionary
+         * of all values of this enumeration.
+         *
+         * @return Dictionary of all values
+         */
+        public static Dictionary<ActionType> getDictionary() {
+            return DICTIONARY;
+        }
+
+        CoordinateType(int xmlaOrdinal) {
+            this.xmlaOrdinal = xmlaOrdinal;
+        }
+
+        public String xmlaName() {
+            return "MDACTION_COORDINATE_" + name();
         }
 
         public String getDescription() {

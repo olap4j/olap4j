@@ -88,10 +88,27 @@ public interface Level extends MetadataElement {
     NamedList<Property> getProperties();
 
     /**
-     * Returns a list of Member objects which belong to this Level.
+     * Returns a list of {@link Member} objects that belong to this Level.
+     *
+     * <p>The list does not include calculated members.</p>
      *
      * <p>Some levels have a very many members. In this case, calling this
-     * method may be expensive in space and/or time and is not recommended.
+     * method may be expensive in space and/or time and is not recommended.</p>
+     *
+     * <p>If you need to include calculated members, or if you need to query
+     * specific members or subsets of members in a level, consider instead
+     * generating and executing an MDX query with a single axis. MDX functions
+     * {@code AddCalculatedMembers}, {@code Filter} and {@code Order} are
+     * especially useful. For example,
+     *
+     * <pre>with member [Measures].[Zero] as 0
+     * select AddCalculatedMembers([Time].[Month].Members) on 0
+     * from [Sales]
+     * where [Measures].[Zero]</pre>
+     *
+     * returns the {@code [Month]} level including calculated members. The
+     * {@code [Measures].[Zero]} calculated member saves the OLAP server the
+     * effort of retrieving cell values.</p>
      *
      * <p>The members of a level do not have unique names, so unlike
      * {@link Hierarchy#getRootMembers()} and
