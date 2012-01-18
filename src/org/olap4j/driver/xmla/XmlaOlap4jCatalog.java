@@ -26,6 +26,7 @@ import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Implementation of {@link org.olap4j.metadata.Catalog}
@@ -40,17 +41,20 @@ class XmlaOlap4jCatalog implements Catalog, Named {
     private final String name;
     final DeferredNamedListImpl<XmlaOlap4jSchema> schemas;
     private final XmlaOlap4jDatabase database;
+	private List<String> roles;
 
     XmlaOlap4jCatalog(
         XmlaOlap4jDatabaseMetaData olap4jDatabaseMetaData,
         XmlaOlap4jDatabase database,
-        String name)
+        String name,
+        List<String> roles)
     {
         this.database = database;
         assert olap4jDatabaseMetaData != null;
         assert name != null;
         this.olap4jDatabaseMetaData = olap4jDatabaseMetaData;
         this.name = name;
+        this.roles = roles;
 
         // Some servers don't support MDSCHEMA_MDSCHEMATA, so we will
         // override the list class so it tries it first, and falls
@@ -148,6 +152,10 @@ class XmlaOlap4jCatalog implements Catalog, Named {
 
     public String getName() {
         return name;
+    }
+    
+    public List<String> getAvailableRoles() {
+    	return roles;
     }
 
     public OlapDatabaseMetaData getMetaData() {

@@ -121,6 +121,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      */
     private String databaseName;
 
+    /**
+     * List of additional properties being used as part of the XML/A
+     * calls as part of &lt;PropertyList/&gt;.<br />
+     * Can be passed to connection via connection string properties.
+     */
+    private Properties databaseProperties;
+
     private boolean autoCommit;
     private boolean readOnly;
 
@@ -179,6 +186,24 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
         final Map<String, String> map = parseConnectString(url, info);
 
+        this.databaseProperties = new Properties();
+        for (String infoKey : map.keySet()) {
+            boolean addProperty = true;
+            for (XmlaOlap4jDriver.Property p
+                : XmlaOlap4jDriver.Property.values())
+            {
+                if (infoKey.equals(p.name())
+                        || "USER".equals(infoKey)
+                        || "PASSWORD".equals(infoKey))
+                {
+                    addProperty = false;
+                }
+            }
+            if (addProperty) {
+                databaseProperties.put(infoKey, map.get(infoKey));
+            }
+        }
+
         this.databaseName =
             map.get(XmlaOlap4jDriver.Property.DATABASE.name());
 
@@ -187,6 +212,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
         this.schemaName =
             map.get(XmlaOlap4jDriver.Property.SCHEMA.name());
+
+        this.roleName =
+            map.get(XmlaOlap4jDriver.Property.ROLE.name());
 
         // Set URL of HTTP server.
         final String serverUrl =
@@ -712,9 +740,17 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     public List<String> getAvailableRoleNames() {
-        // List of available roles is not known. Could potentially add an XMLA
-        // call to populate this list if useful to a client.
-        return null;
+        Set<String> roleNames = new HashSet<String>();
+        try {
+            for (Catalog catalog : getOlapCatalogs()) {
+                List<String> catalogRoles =
+                    ((XmlaOlap4jCatalog) catalog).getAvailableRoles();
+                roleNames.addAll(catalogRoles);
+            }
+        } catch (OlapException e) {
+        }
+
+        return new ArrayList<String>(roleNames);
     }
 
     public Scenario createScenario() {
@@ -908,11 +944,23 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             + "    <Properties>\n"
             + "      <PropertyList>\n");
 
+        for (Object prop : databaseProperties.keySet()) {
+            buf.append("        <" + prop + ">");
+            xmlEncode(buf, databaseProperties.getProperty(prop.toString()));
+            buf.append("</" + prop + ">\n");
+        }
+
         // Add the datasource node only if this request requires it.
         if (metadataRequest.requiresDatasourceName()) {
             buf.append("        <DataSourceInfo>");
             xmlEncode(buf, context.olap4jConnection.getDatabase());
             buf.append("</DataSourceInfo>\n");
+        }
+
+        if (roleName != null && !("".equals(roleName))) {
+            buf.append("        <Roles>");
+            xmlEncode(buf, roleName);
+            buf.append("</Roles>\n");
         }
 
         String requestCatalogName = null;
@@ -1087,12 +1135,21 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
              */
             String catalogName =
                 XmlaOlap4jUtil.stringElement(row, "CATALOG_NAME");
-            // Unused: DESCRIPTION, ROLES
+            String roles =
+                XmlaOlap4jUtil.stringElement(row, "ROLES");
+            List<String> roleList = new ArrayList<String>();
+            if (roles !=  null && !"".equals(roles)) {
+                for (String role : roles.split(",")) {
+                    roleList.add(role);
+                }
+            }
+            // Unused: DESCRIPTION
             list.add(
                 new XmlaOlap4jCatalog(
                     context.olap4jDatabaseMetaData,
                     database,
-                    catalogName));
+                    catalogName,
+                    roleList));
         }
     }
 

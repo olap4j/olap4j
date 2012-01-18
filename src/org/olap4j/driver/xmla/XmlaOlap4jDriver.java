@@ -98,6 +98,11 @@ import java.util.logging.Logger;
  *                               object in {@link #PROXY_MAP} via which to
  *                               send XMLA requests for testing
  *                               purposes.</td></tr>
+ * <tr><td>Role</td>           <td>Comma separated list of role names used for
+ *                                this connection (Optional). <br />
+ *                                Available role names can be retrieved via
+ *    {@link org.olap4j.driver.xmla.XmlaOlap4jConnection#getAvailableRoleNames}
+ *                             </td></tr>
  *
  * </table>
  *
@@ -360,7 +365,8 @@ public class XmlaOlap4jDriver implements Driver {
         DATABASE("Name of the database"),
         CATALOG("Catalog name"),
         SCHEMA("Name of the schema"),
-        CACHE("Class name of the SOAP cache implementation");
+        CACHE("Class name of the SOAP cache implementation"),
+        ROLE("Comma separated list of roles this connection impersonates");
 
         /**
          * Creates a property.
