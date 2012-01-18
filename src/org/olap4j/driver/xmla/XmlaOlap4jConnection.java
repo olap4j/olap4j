@@ -126,7 +126,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * calls as part of &lt;PropertyList/&gt;.<br />
      * Can be passed to connection via connection string properties.
      */
-    private Properties databaseProperties;
+    private final Properties databaseProperties;
 
     private boolean autoCommit;
     private boolean readOnly;
@@ -740,7 +740,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     public List<String> getAvailableRoleNames() {
-        Set<String> roleNames = new HashSet<String>();
+        Set<String> roleNames = new LinkedHashSet<String>();
         try {
             for (Catalog catalog : getOlapCatalogs()) {
                 List<String> catalogRoles =

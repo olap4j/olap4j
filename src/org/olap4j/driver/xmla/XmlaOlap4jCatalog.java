@@ -154,7 +154,7 @@ class XmlaOlap4jCatalog implements Catalog, Named {
         return name;
     }
     
-    public List<String> getAvailableRoles() {
+    protected List<String> getAvailableRoles() {
     	return roles;
     }
 
