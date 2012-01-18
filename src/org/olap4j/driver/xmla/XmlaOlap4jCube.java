@@ -83,6 +83,14 @@ class XmlaOlap4jCube implements Cube, Named
             new CachingMetadataReader(
                 new RawMetadataReader(),
                 measuresMap);
+        // In case this is the dummy cube for shared dimensions stop here
+        // to avoid unnecessary calls and errors with unique members
+        if ("".equals(name)) {
+            namedSets = null;
+            dimensions = null;
+            return;
+        }
+
         final XmlaOlap4jConnection olap4jConnection =
             olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData.olap4jConnection;
 
@@ -440,6 +448,12 @@ class XmlaOlap4jCube implements Cube, Named
             case 1:
                 return list.get(0);
             default:
+                String providerName =
+                    olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
+                        .olap4jConnection.getOlapDatabase().getProviderName();
+                if ("Microsoft Analysis Services".equals(providerName)) {
+                    return list.get(0);
+                }
                 throw new IllegalArgumentException(
                     "more than one member with unique name '"
                         + memberUniqueName
