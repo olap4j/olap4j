@@ -62,6 +62,13 @@ import java.util.logging.Logger;
  * <p>Unless otherwise stated, properties are optional. If a property occurs
  * multiple times in the connect string, the first occurrence is used.
  *
+ * <p>It is also possible to pass properties to the server end-point using
+ * JDBC connection properties as part of the XMLA driver connection properties.
+ * If the JDBC URL contains properties that are not enumerated in
+ * {@link Property}, they will be included as part of the SOAP PropertyList
+ * element.
+ *
+ *
  * <table border="1">
  * <tr><th>Property</th>     <th>Description</th> </tr>
  *
@@ -75,35 +82,47 @@ import java.util.logging.Logger;
  *                               By default, the first one returned by the
  *                               XMLA server will be used.</td></tr>
  *
- * <tr><td>Database</td>     <td>Name of the XMLA database.
+ * <tr><td>Database</td>    <td>Name of the XMLA database.
  *                               By default, the first one returned by the
  *                               XMLA server will be used.</td></tr>
  *
- * <tr><td>Cache</td>        <td><p>Class name of the SOAP cache to use.
- *                               Must implement interface
+ * <tr><td>Cache</td>      <td><p>Class name of the SOAP cache to use.
+ *                             Must implement interface
  *              {@link org.olap4j.driver.xmla.proxy.XmlaOlap4jCachedProxy}.
- *                               A built-in memory cache is available with
+ *                             A built-in memory cache is available with
  *              {@link org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache}.
  *
- *                               <p>By default, no SOAP query cache will be
- *                               used.</td></tr>
- *
- * <tr> <td>Cache.*</td>     <td>Properties to transfer to the selected cache
- *                               implementation. See
+ *                         <p>By default, no SOAP query cache will be
+ *                             used.
+ *                             </td></tr>
+ * <tr><td>Cache.*</td>    <td>Properties to transfer to the selected cache
+ *                             implementation. See
  *                          {@link org.olap4j.driver.xmla.cache.XmlaOlap4jCache}
- *                               or your selected implementation for properties
- *                               details.</td></tr>
- *
+ *                             or your selected implementation for properties
+ *                             details.
+ *                             </td></tr>
  * <tr><td>TestProxyCookie</td><td>String that uniquely identifies a proxy
- *                               object in {@link #PROXY_MAP} via which to
- *                               send XMLA requests for testing
- *                               purposes.</td></tr>
- * <tr><td>Role</td>           <td>Comma separated list of role names used for
- *                                this connection (Optional). <br />
- *                                Available role names can be retrieved via
+ *                             object in {@link #PROXY_MAP} via which to
+ *                             send XMLA requests for testing
+ *                             purposes.
+ *                             </td></tr>
+ * <tr><td>Role</td>       <td>Comma separated list of role names used for
+ *                             this connection (Optional). <br />
+ *                             Available role names can be retrieved via
  *    {@link org.olap4j.driver.xmla.XmlaOlap4jConnection#getAvailableRoleNames}
  *                             </td></tr>
- *
+ * <tr><td>User</td>       <td>User name to use when establishing a
+ *                             connection to the server. The credentials are passed
+ *                             using the HTTP Basic authentication protocol,
+ *                             but are also sent as part of the SOAP Security
+ *                             headers.
+ *                             </td></tr>
+ * <tr><td>Password</td>   <td>Password to use when establishing a
+ *                             connection to the server. The credentials are passed
+ *                             using the HTTP Basic authentication protocol,
+ *                             but are also sent as part of the SOAP Security
+ *                             headers.
+ *                             </td></tr>
  * </table>
  *
  * @author jhyde, Luc Boudreau
@@ -366,7 +385,9 @@ public class XmlaOlap4jDriver implements Driver {
         CATALOG("Catalog name"),
         SCHEMA("Name of the schema"),
         CACHE("Class name of the SOAP cache implementation"),
-        ROLE("Comma separated list of roles this connection impersonates");
+        ROLE("Comma separated list of roles this connection impersonates"),
+        USER("Username to use when creating connections to the server."),
+        PASSWORD("Password to use when creating connections to the server.");
 
         /**
          * Creates a property.

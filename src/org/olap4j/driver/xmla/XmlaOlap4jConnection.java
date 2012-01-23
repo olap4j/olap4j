@@ -188,20 +188,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
         this.databaseProperties = new HashMap<String,String>();
         for (String infoKey : map.keySet()) {
-            boolean addProperty = true;
-            for (XmlaOlap4jDriver.Property p
-                : XmlaOlap4jDriver.Property.values())
-            {
-                if (infoKey.equals(p.name())
-                        || "USER".equals(infoKey)
-                        || "PASSWORD".equals(infoKey))
-                {
-                    addProperty = false;
-                }
-            }
-            if (addProperty) {
-                databaseProperties.put(infoKey, map.get(infoKey));
-            }
+            databaseProperties.put(infoKey, map.get(infoKey));
         }
 
         this.databaseName =
@@ -238,10 +225,12 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             new XmlaOlap4jServerInfos() {
                 private String sessionId = null;
                 public String getUsername() {
-                    return map.get("user");
+                    return map.get(
+                        XmlaOlap4jDriver.Property.USER.name());
                 }
                 public String getPassword() {
-                    return map.get("password");
+                    return map.get(
+                        XmlaOlap4jDriver.Property.PASSWORD.name());
                 }
                 public URL getUrl() {
                     return serverUrlObject;
@@ -286,9 +275,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      */
     private void initSoapCache(Map<String, String> map) throws OlapException {
         //  Test if a SOAP cache class was defined
-        if (map.containsKey(XmlaOlap4jDriver.Property.CACHE.name()
-            .toUpperCase()))
-        {
+        if (map.containsKey(XmlaOlap4jDriver.Property.CACHE.name())) {
             // Create a properties object to pass to the proxy
             // so it can configure it's cache
             Map<String, String> props = new HashMap<String, String>();
@@ -941,13 +928,18 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             + "      <PropertyList>\n");
 
         for (String prop : databaseProperties.keySet()) {
-            buf.append("        <");
-            xmlEncode(buf,prop);
-            buf.append(">");
-            xmlEncode(buf, databaseProperties.get(prop));
-            buf.append("</");
-            xmlEncode(buf, prop);
-            buf.append(">");
+            try {
+                XmlaOlap4jDriver.Property.valueOf(prop);
+                continue;
+            } catch (IllegalArgumentException e) {
+                buf.append("        <");
+                xmlEncode(buf,prop);
+                buf.append(">");
+                xmlEncode(buf, databaseProperties.get(prop));
+                buf.append("</");
+                xmlEncode(buf, prop);
+                buf.append(">");
+            }
         }
 
         // Add the datasource node only if this request requires it.

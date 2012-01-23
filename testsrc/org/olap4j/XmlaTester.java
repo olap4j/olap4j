@@ -110,16 +110,28 @@ public class XmlaTester implements TestContext.Tester {
     }
 
     public Connection createConnectionWithUserPassword() throws SQLException {
+        final Properties props = new Properties();
+        return createConnectionWithUserPassword(props);
+    }
+
+    public Connection createConnectionWithUserPassword(
+        Properties props)
+        throws SQLException
+    {
         try {
             Class.forName(DRIVER_CLASS_NAME);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("oops", e);
         }
-        Properties info = new Properties();
-        info.setProperty(
+        props.setProperty(
             XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMart");
-        return DriverManager.getConnection(
-            getURL(), USER, PASSWORD);
+        if (USER != null) {
+            props.put("user", USER);
+        }
+        if (PASSWORD != null) {
+            props.put("password", PASSWORD);
+        }
+        return DriverManager.getConnection(getURL(), props);
     }
 
     public String getDriverUrlPrefix() {

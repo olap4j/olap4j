@@ -335,6 +335,106 @@ public class XmlaConnectionTest extends TestCase {
         }
     }
 
+    /**
+     * This is a test to verify that server specific properties
+     * can be sent to the server in the PropertyList element
+     * of SOAP messages. A property that is not part of those enumerated
+     * in {@link org.olap4j.driver.xmla.XmlaOlap4jDriver.Property} must
+     * not be sent to the server.
+     */
+    public void testPropertyList() throws Exception {
+        if (!testContext.getTester().getFlavor()
+                .equals(Tester.Flavor.XMLA)
+            && !testContext.getTester().getFlavor()
+                .equals(Tester.Flavor.REMOTE_XMLA))
+        {
+            return;
+        }
+        final String oldValue = XmlaTester.getProxyClassName();
+        try {
+            XmlaTester.setProxyClassName(
+                    PropertyListTestProxy.class.getName());
+            final TestContext.Tester tester =
+                testContext.getTester();
+
+            Connection connection = tester.createConnection();
+            Statement statement = connection.createStatement();
+            OlapStatement olapStatement =
+                tester.getWrapper().unwrap(statement, OlapStatement.class);
+            olapStatement.executeOlapQuery(
+                "SELECT\n"
+                + " {[Measures].[Unit Sales],\n"
+                + "    [Measures].[Store Sales]} ON COLUMNS\n,"
+                + " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n"
+                + "FROM [Sales]\n"
+                + "WHERE [Time].[1997].[Q2]");
+            assertEquals(0, PropertyListTestProxy.count);
+            connection.close();
+
+            connection = tester.createConnectionWithUserPassword();
+            statement = connection.createStatement();
+            olapStatement =
+                tester.getWrapper().unwrap(statement, OlapStatement.class);
+            olapStatement.executeOlapQuery(
+                "SELECT\n"
+                + " {[Measures].[Unit Sales],\n"
+                + "    [Measures].[Store Sales]} ON COLUMNS\n,"
+                + " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n"
+                + "FROM [Sales]\n"
+                + "WHERE [Time].[1997].[Q2]");
+            assertEquals(0, PropertyListTestProxy.count);
+            connection.close();
+
+            final Properties props = new Properties();
+            props.put("FOOBAR", "Bacon");
+            connection =
+                ((XmlaTester)tester).createConnectionWithUserPassword(props);
+            statement = connection.createStatement();
+            olapStatement =
+                tester.getWrapper().unwrap(statement, OlapStatement.class);
+            try {
+                olapStatement.executeOlapQuery(
+                    "SELECT\n"
+                    + " {[Measures].[Unit Sales],\n"
+                    + "    [Measures].[Store Sales]} ON COLUMNS\n,"
+                    + " Crossjoin({[Gender].[M]}, [Product].Children) ON ROWS\n"
+                    + "FROM [Sales]\n"
+                    + "WHERE [Time].[1997].[Q2]");
+            } catch (Throwable e) {
+                assertTrue(e.getCause().getMessage().contains("FOOBAR"));
+            }
+            connection.close();
+        } finally {
+            XmlaTester.setProxyClassName(oldValue);
+        }
+    }
+
+    /**
+     * This is a class for the test
+     * {@link XmlaConnectionTest#testPropertyList()}.
+     */
+    public static class PropertyListTestProxy extends DelegatingTestProxy {
+        public PropertyListTestProxy(XmlaOlap4jProxy proxy) {
+            super(proxy);
+        }
+        private final static String[] lookup =
+            new String[] {
+                "<PASSWORD>"
+            };
+        private static int count = 0;
+        public byte[] get(
+            XmlaOlap4jServerInfos serverInfos, String request)
+            throws XmlaOlap4jProxyException
+        {
+            for (String token : lookup) {
+                if (request.contains(token)) {
+                    count++;
+                }
+            }
+            return super.get(serverInfos, request);
+        }
+    }
+
     private static class Encoder {
         /**
          * Converts an array of bytes to a hex string.
