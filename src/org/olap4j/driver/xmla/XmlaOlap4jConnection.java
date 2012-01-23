@@ -126,7 +126,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * calls as part of &lt;PropertyList/&gt;.<br />
      * Can be passed to connection via connection string properties.
      */
-    private final Properties databaseProperties;
+    private final Map<String,String> databaseProperties;
 
     private boolean autoCommit;
     private boolean readOnly;
@@ -186,7 +186,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
         final Map<String, String> map = parseConnectString(url, info);
 
-        this.databaseProperties = new Properties();
+        this.databaseProperties = new HashMap<String,String>();
         for (String infoKey : map.keySet()) {
             boolean addProperty = true;
             for (XmlaOlap4jDriver.Property p
@@ -739,17 +739,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return roleName;
     }
 
-    public List<String> getAvailableRoleNames() {
+    public List<String> getAvailableRoleNames() throws OlapException {
         Set<String> roleNames = new LinkedHashSet<String>();
-        try {
-            for (Catalog catalog : getOlapCatalogs()) {
-                List<String> catalogRoles =
-                    ((XmlaOlap4jCatalog) catalog).getAvailableRoles();
-                roleNames.addAll(catalogRoles);
-            }
-        } catch (OlapException e) {
+        for (Catalog catalog : getOlapCatalogs()) {
+            List<String> catalogRoles =
+                ((XmlaOlap4jCatalog) catalog).getAvailableRoles();
+            roleNames.addAll(catalogRoles);
         }
-
         return new ArrayList<String>(roleNames);
     }
 
@@ -944,10 +940,14 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             + "    <Properties>\n"
             + "      <PropertyList>\n");
 
-        for (Object prop : databaseProperties.keySet()) {
-            buf.append("        <" + prop + ">");
-            xmlEncode(buf, databaseProperties.getProperty(prop.toString()));
-            buf.append("</" + prop + ">\n");
+        for (String prop : databaseProperties.keySet()) {
+            buf.append("        <");
+            xmlEncode(buf,prop);
+            buf.append(">");
+            xmlEncode(buf, databaseProperties.get(prop));
+            buf.append("</");
+            xmlEncode(buf, prop);
+            buf.append(">");
         }
 
         // Add the datasource node only if this request requires it.
