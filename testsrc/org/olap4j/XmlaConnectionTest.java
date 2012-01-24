@@ -350,6 +350,10 @@ public class XmlaConnectionTest extends TestCase {
         {
             return;
         }
+        switch (testContext.getTester().getWrapper()) {
+        case DBCP:
+            return;
+        }
         final String oldValue = XmlaTester.getProxyClassName();
         try {
             XmlaTester.setProxyClassName(
@@ -357,10 +361,10 @@ public class XmlaConnectionTest extends TestCase {
             final TestContext.Tester tester =
                 testContext.getTester();
 
-            Connection connection = tester.createConnection();
-            Statement statement = connection.createStatement();
-            OlapStatement olapStatement =
-                tester.getWrapper().unwrap(statement, OlapStatement.class);
+            OlapConnection connection =
+                tester.getWrapper().unwrap(
+                    tester.createConnection(), OlapConnection.class);
+            OlapStatement olapStatement = connection.createStatement();
             olapStatement.executeOlapQuery(
                 "SELECT\n"
                 + " {[Measures].[Unit Sales],\n"
@@ -371,10 +375,11 @@ public class XmlaConnectionTest extends TestCase {
             assertEquals(0, PropertyListTestProxy.count);
             connection.close();
 
-            connection = tester.createConnectionWithUserPassword();
-            statement = connection.createStatement();
-            olapStatement =
-                tester.getWrapper().unwrap(statement, OlapStatement.class);
+            connection =
+                tester.getWrapper().unwrap(
+                    tester.createConnectionWithUserPassword(),
+                    OlapConnection.class);
+            olapStatement = connection.createStatement();
             olapStatement.executeOlapQuery(
                 "SELECT\n"
                 + " {[Measures].[Unit Sales],\n"
@@ -388,10 +393,11 @@ public class XmlaConnectionTest extends TestCase {
             final Properties props = new Properties();
             props.put("FOOBAR", "Bacon");
             connection =
-                ((XmlaTester)tester).createConnectionWithUserPassword(props);
-            statement = connection.createStatement();
-            olapStatement =
-                tester.getWrapper().unwrap(statement, OlapStatement.class);
+                tester.getWrapper().unwrap(
+                    ((XmlaTester)tester)
+                        .createConnectionWithUserPassword(props),
+                    OlapConnection.class);
+            olapStatement = connection.createStatement();
             try {
                 olapStatement.executeOlapQuery(
                     "SELECT\n"

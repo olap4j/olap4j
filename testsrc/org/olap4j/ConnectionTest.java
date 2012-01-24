@@ -1987,7 +1987,6 @@ public class ConnectionTest extends TestCase {
         }
 
         final NamedList<Property> propertyList = member.getProperties();
-        assertEquals(25, propertyList.size());
         final Property property = propertyList.get("MEMBER_CAPTION");
         assertEquals("Food", member.getPropertyFormattedValue(property));
         assertEquals("Food", member.getPropertyValue(property));

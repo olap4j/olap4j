@@ -92,7 +92,8 @@ public class XmlaTester implements TestContext.Tester {
 
     public Connection createConnection() throws SQLException {
         if (connection != null) {
-            return connection;
+            connection.close();
+            connection = null;
         }
         try {
             Class.forName(DRIVER_CLASS_NAME);
