@@ -69,7 +69,7 @@
     <dependency org="junit" name="junit" rev="3.8.1"/>
 
     <!-- OLAP tests dependencies - uses Mondrian -->
-    <dependency org="pentaho" name="mondrian" rev="3.3-SNAPSHOT" changing="true">
+    <dependency org="pentaho" name="mondrian" rev="3.3.0.14703" changing="true">
       <exclude org="${ivy.artifact.group}" module="${ivy.artifact.id}"/>
     </dependency>
   </dependencies>

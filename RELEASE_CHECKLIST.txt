@@ -1,0 +1,42 @@
+
+ - Update README.txt, CHANGES.txt, index.html.
+
+ - Update build.properties
+
+ - Edit test.properties and run the test suite. Make sure everything is green.
+   Also make sure to run both the Mondrian and the XMLA TCKs.
+
+ - Make sure that you have all of the following Java JVM's installed
+   separately:
+
+    * Java 5
+    * Java 6
+    * Java 7
+
+  - Update buildOnJdk.[sh|bat].
+
+    If you are building on a Linux/Unix/Whatever machine, you only need to create
+    symlinks to /usr/lib/jvm/${jdkVersion} where jdkVersion is one of 1.5, 1.6 or 1.7.
+
+    If you are building on a Windows system, including Cygwin users, edit the Batch
+    file and set the properties JAVA_HOME_1* to the paths of the corresponding JVM
+    installation paths. You can also set these variables in your system environment.
+
+  - Make sure that the JVM 5 is the default JVM on the system path.
+
+  - Run a test build: $ ant clean-all dist
+  
+    Pay close attention to the Ant targets named compileJdk1* and ensure that each
+    JVM compilation phase has compiled the files it needed to. The JDK 1.5 should compile
+    about 800+ files. The JDK 1.6 must compile the JDBC 4.0 classes (2 files)
+    and Java 7 should compile the JDBC 4.1 driver (1 file).
+
+    Check the Javadoc warnings, and make sure that the only warnings are related to
+    the JDBC 4 and 4.1 classes. Any other error/warning must be fixed.
+
+  - Check the zip file.
+  
+      * Make sure that it contains all the required files.
+      * Make sure that the Javadoc links work correctly.
+      * Make sure that all JAR files are present.
+      

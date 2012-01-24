@@ -88,6 +88,7 @@ ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
 LICENSE,
 NOTICE,
 README.txt,
+CHANGES.txt,
 VERSION.txt" />
             <zipfileset dir="${basedir}/doc" prefix="${ivy.artifact.id}-${project.revision}/doc"
                 includes="**/*" />
@@ -205,6 +206,7 @@ VERSION.txt" />
 LICENSE,
 NOTICE,
 README.txt,
+CHANGES.txt,
 VERSION.txt" />
             <zipfileset dir="${basedir}" prefix="${ivy.artifact.id}-${project.revision}"
                     includes="
@@ -246,8 +248,8 @@ package org.olap4j.driver.xmla;
 class XmlaOlap4jDriverVersion {
     static final String NAME = "olap4j driver for XML/A";
     static final String VERSION = "${project.revision}";
-    static final int MAJOR_VERSION = ${project.revision.major};
-    static final int MINOR_VERSION = ${project.revision.minor};
+    static final int MAJOR_VERSION = Integer.valueOf("${project.revision.major}");
+    static final int MINOR_VERSION = Integer.valueOf("${project.revision.minor}");
 }
 
 // End XmlaOlap4jDriverVersion.java</echo>
