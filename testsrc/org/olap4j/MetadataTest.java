@@ -22,7 +22,6 @@ package org.olap4j;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
 import org.olap4j.test.TestContext;
-import org.olap4j.test.TestContext.Tester;
 
 import junit.framework.TestCase;
 
@@ -35,6 +34,8 @@ import java.util.*;
  * @version $Id$
  */
 public class MetadataTest extends TestCase {
+    private TestContext testContext = TestContext.instance();
+    private TestContext.Tester tester = testContext.getTester();
     private static final String NL = System.getProperty("line.separator");
 
     private Connection connection;
@@ -114,8 +115,6 @@ public class MetadataTest extends TestCase {
     }
 
     protected void setUp() throws SQLException {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         connection = tester.createConnection();
         catalogName = connection.getCatalog();
         olapConnection =
@@ -131,6 +130,8 @@ public class MetadataTest extends TestCase {
         connection = null;
         olapConnection = null;
         olapDatabaseMetaData = null;
+        testContext = null;
+        tester = null;
     }
 
     // ~ Helper methods ----------
@@ -190,8 +191,6 @@ public class MetadataTest extends TestCase {
     // ~ Tests follow -------------
 
     public void testDatabaseMetaData() throws SQLException {
-        final TestContext context = TestContext.instance();
-        final Tester tester = context.getTester();
         assertEquals("" + catalogName + "", catalogName);
 
         DatabaseMetaData databaseMetaData = connection.getMetaData();
@@ -248,8 +247,6 @@ public class MetadataTest extends TestCase {
     }
 
     public void testSchemas() throws OlapException {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         // check schema auto detection
         final Schema schema1 = olapConnection.getOlapSchema();
         assertEquals(
@@ -290,8 +287,6 @@ public class MetadataTest extends TestCase {
     }
 
     public void testCatalogs() throws SQLException {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         final Catalog catalog = olapConnection.getOlapCatalog();
         assertEquals(
             "Failed to auto detect the catalog.",
@@ -333,8 +328,6 @@ public class MetadataTest extends TestCase {
 
     public void testDatabases() throws SQLException {
         final Database database = olapConnection.getOlapDatabase();
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         assertTrue(
             "Failed to auto detect the database.",
             database.getName()
@@ -403,8 +396,6 @@ public class MetadataTest extends TestCase {
     }
 
     public void testDatabaseMetaDataGetDatasources() throws SQLException {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         String s = checkResultSet(
             olapDatabaseMetaData.getDatabases(),
             DATASOURCES_COLUMN_NAMES);
@@ -438,8 +429,6 @@ public class MetadataTest extends TestCase {
     }
 
     public void testDatabaseMetaDataGetCatalogs() throws SQLException {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         String s = checkResultSet(
             olapDatabaseMetaData.getCatalogs(),
             CATALOGS_COLUMN_NAMES);
@@ -461,8 +450,6 @@ public class MetadataTest extends TestCase {
     }
 
     public void testDatabaseMetaDataGetSchemas() throws SQLException {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         String s = checkResultSet(
             olapDatabaseMetaData.getSchemas(),
             SCHEMAS_COLUMN_NAMES);
@@ -535,8 +522,6 @@ public class MetadataTest extends TestCase {
     }
 
     public void testDatabaseMetaDataGetCubes() throws SQLException {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         String s = checkResultSet(
             olapDatabaseMetaData.getCubes(
                 catalogName,
@@ -720,8 +705,6 @@ public class MetadataTest extends TestCase {
     }
 
     public void testDatabaseMetaDataGetMembers() throws SQLException {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         String s = checkResultSet(
             olapDatabaseMetaData.getMembers(
                 catalogName, "FoodMart", "Sales", null, "[Gender]", null, null,

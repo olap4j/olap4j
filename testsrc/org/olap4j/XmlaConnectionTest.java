@@ -40,7 +40,8 @@ import java.util.concurrent.Future;
  * @version $Id$
  */
 public class XmlaConnectionTest extends TestCase {
-
+    private TestContext testContext = TestContext.instance();
+    private TestContext.Tester tester = testContext.getTester();
     public static final String DRIVER_CLASS_NAME =
         "org.olap4j.driver.xmla.XmlaOlap4jDriver";
 
@@ -204,6 +205,12 @@ public class XmlaConnectionTest extends TestCase {
         }
     }
 
+    protected void tearDown() throws Exception {
+        testContext = null;
+        tester = null;
+        super.tearDown();
+    }
+
     /**
      * Verifies that the construction of the necessary
      * XMLA objects during DriverManager.getConnection() do not make
@@ -234,8 +241,6 @@ public class XmlaConnectionTest extends TestCase {
     }
 
     public void testDbSchemaSchemata() throws Exception {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         if (!testContext.getTester().getFlavor()
                 .equals(Tester.Flavor.XMLA))
         {
@@ -294,8 +299,6 @@ public class XmlaConnectionTest extends TestCase {
      * @throws Exception If the test fails.
      */
     public void testNoDoubleQuerySubmission() throws Exception {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         if (!testContext.getTester().getFlavor()
                 .equals(Tester.Flavor.XMLA)
             && !testContext.getTester().getFlavor()
@@ -342,8 +345,6 @@ public class XmlaConnectionTest extends TestCase {
      * not be sent to the server.
      */
     public void testPropertyList() throws Exception {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         if (!testContext.getTester().getFlavor()
                 .equals(Tester.Flavor.XMLA)
             && !testContext.getTester().getFlavor()

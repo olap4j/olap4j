@@ -38,6 +38,8 @@ import java.sql.SQLException;
  * @since Jul 28, 2008
  */
 public class TransformTest extends TestCase {
+    private TestContext testContext = TestContext.instance();
+    private TestContext.Tester tester = testContext.getTester();
     private Connection connection = null;
 
     public TransformTest() {
@@ -57,11 +59,11 @@ public class TransformTest extends TestCase {
             connection.close();
             connection = null;
         }
+        testContext = null;
+        tester = null;
     }
 
     protected OlapConnection getConnection() throws SQLException {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         if (connection == null) {
             connection = tester.createConnection();
         }

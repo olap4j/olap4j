@@ -42,6 +42,16 @@ import java.sql.SQLException;
  */
 public class CellSetFormatterTest extends TestCase {
 
+    private TestContext testContext = TestContext.instance();
+    private TestContext.Tester tester = testContext.getTester();
+
+    @Override
+    protected void tearDown() throws Exception {
+        testContext = null;
+        tester = null;
+        super.tearDown();
+    }
+
     private static final String query1 =
         "select\n"
         + "  crossjoin(\n"
@@ -65,8 +75,6 @@ public class CellSetFormatterTest extends TestCase {
         Format format,
         String expected) throws SQLException
     {
-        final TestContext testContext = TestContext.instance();
-        final TestContext.Tester tester = testContext.getTester();
         Connection connection = null;
         try {
             connection = tester.createConnection();
