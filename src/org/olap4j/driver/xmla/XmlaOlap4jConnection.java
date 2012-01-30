@@ -126,7 +126,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * calls as part of &lt;PropertyList/&gt;.<br />
      * Can be passed to connection via connection string properties.
      */
-    private final Map<String,String> databaseProperties;
+    private final Map<String, String> databaseProperties;
 
     private boolean autoCommit;
     private boolean readOnly;
@@ -186,7 +186,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
         final Map<String, String> map = parseConnectString(url, info);
 
-        this.databaseProperties = new HashMap<String,String>();
+        this.databaseProperties = new HashMap<String, String>();
         for (String infoKey : map.keySet()) {
             databaseProperties.put(infoKey, map.get(infoKey));
         }
@@ -311,6 +311,25 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     static boolean acceptsURL(String url) {
         return url.startsWith(CONNECT_STRING_PREFIX);
+    }
+
+    String makeConnectionPropertyList() {
+        StringBuilder buf = new StringBuilder();
+        for (String prop : databaseProperties.keySet()) {
+            try {
+                XmlaOlap4jDriver.Property.valueOf(prop);
+                continue;
+            } catch (IllegalArgumentException e) {
+                buf.append("        <");
+                xmlEncode(buf, prop);
+                buf.append(">");
+                xmlEncode(buf, databaseProperties.get(prop));
+                buf.append("</");
+                xmlEncode(buf, prop);
+                buf.append(">\n");
+            }
+        }
+        return buf.toString();
     }
 
     public OlapStatement createStatement() {
@@ -927,19 +946,15 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             + "    <Properties>\n"
             + "      <PropertyList>\n");
 
-        for (String prop : databaseProperties.keySet()) {
-            try {
-                XmlaOlap4jDriver.Property.valueOf(prop);
-                continue;
-            } catch (IllegalArgumentException e) {
-                buf.append("        <");
-                xmlEncode(buf,prop);
-                buf.append(">");
-                xmlEncode(buf, databaseProperties.get(prop));
-                buf.append("</");
-                xmlEncode(buf, prop);
-                buf.append(">");
-            }
+        String conProperties = makeConnectionPropertyList();
+        if (conProperties != null && !("".equals(conProperties))) {
+            buf.append(conProperties);
+        }
+
+        if (roleName != null && !("".equals(roleName))) {
+            buf.append("        <Roles>");
+            xmlEncode(buf, roleName);
+            buf.append("</Roles>\n");
         }
 
         // Add the datasource node only if this request requires it.
@@ -947,12 +962,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             buf.append("        <DataSourceInfo>");
             xmlEncode(buf, context.olap4jConnection.getDatabase());
             buf.append("</DataSourceInfo>\n");
-        }
-
-        if (roleName != null && !("".equals(roleName))) {
-            buf.append("        <Roles>");
-            xmlEncode(buf, roleName);
-            buf.append("</Roles>\n");
         }
 
         String requestCatalogName = null;

@@ -285,6 +285,8 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
     public CellSet executeOlapQuery(String mdx) throws OlapException {
         final String catalog = olap4jConnection.getCatalog();
         final String dataSourceInfo = olap4jConnection.getDatabase();
+        final String roleName = olap4jConnection.getRoleName();
+        final String propList = olap4jConnection.makeConnectionPropertyList();
         StringBuilder buf = new StringBuilder(
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<soapenv:Envelope\n"
@@ -304,6 +306,14 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
             buf.append("            <Catalog>");
             buf.append(catalog);
             buf.append("</Catalog>\n");
+        }
+        if (propList != null) {
+            buf.append(propList);
+        }
+        if (roleName != null && !("".equals(roleName))) {
+            buf.append("        <Roles>");
+            buf.append(roleName);
+            buf.append("</Roles>\n");
         }
         if (dataSourceInfo != null) {
             buf.append("            <DataSourceInfo>");
