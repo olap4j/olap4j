@@ -43,7 +43,6 @@ public class XmlaConnectionTest extends TestCase {
 
     public static final String DRIVER_CLASS_NAME =
         "org.olap4j.driver.xmla.XmlaOlap4jDriver";
-    private final TestContext testContext = TestContext.instance();
 
     static class XmlaOlap4jProxyMock implements XmlaOlap4jProxy {
         public byte[] get(
@@ -235,6 +234,8 @@ public class XmlaConnectionTest extends TestCase {
     }
 
     public void testDbSchemaSchemata() throws Exception {
+        final TestContext testContext = TestContext.instance();
+        final TestContext.Tester tester = testContext.getTester();
         if (!testContext.getTester().getFlavor()
                 .equals(Tester.Flavor.XMLA))
         {
@@ -273,8 +274,6 @@ public class XmlaConnectionTest extends TestCase {
             Proxy.class.getName());
         DoubleSubmissionTestProxy.setProxyClassName(oldValue);
         try {
-            final TestContext.Tester tester =
-                testContext.getTester();
             Connection connection = tester.createConnection();
             OlapConnection oConn =
                 tester.getWrapper().unwrap(connection, OlapConnection.class);
@@ -295,6 +294,8 @@ public class XmlaConnectionTest extends TestCase {
      * @throws Exception If the test fails.
      */
     public void testNoDoubleQuerySubmission() throws Exception {
+        final TestContext testContext = TestContext.instance();
+        final TestContext.Tester tester = testContext.getTester();
         if (!testContext.getTester().getFlavor()
                 .equals(Tester.Flavor.XMLA)
             && !testContext.getTester().getFlavor()
@@ -307,8 +308,6 @@ public class XmlaConnectionTest extends TestCase {
             DoubleSubmissionTestProxy.class.getName());
         DoubleSubmissionTestProxy.setProxyClassName(oldValue);
         try {
-            final TestContext.Tester tester =
-                testContext.getTester();
             Connection connection = tester.createConnection();
             Statement statement = connection.createStatement();
             final OlapStatement olapStatement =
@@ -343,6 +342,8 @@ public class XmlaConnectionTest extends TestCase {
      * not be sent to the server.
      */
     public void testPropertyList() throws Exception {
+        final TestContext testContext = TestContext.instance();
+        final TestContext.Tester tester = testContext.getTester();
         if (!testContext.getTester().getFlavor()
                 .equals(Tester.Flavor.XMLA)
             && !testContext.getTester().getFlavor()
@@ -358,8 +359,6 @@ public class XmlaConnectionTest extends TestCase {
         try {
             XmlaTester.setProxyClassName(
                     PropertyListTestProxy.class.getName());
-            final TestContext.Tester tester =
-                testContext.getTester();
 
             OlapConnection connection =
                 tester.getWrapper().unwrap(

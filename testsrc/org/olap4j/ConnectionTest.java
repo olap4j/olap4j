@@ -51,8 +51,8 @@ import static org.olap4j.test.TestContext.nameList;
  * @version $Id$
  */
 public class ConnectionTest extends TestCase {
-    private final TestContext testContext = TestContext.instance();
-    private final TestContext.Tester tester = testContext.getTester();
+    private TestContext testContext = TestContext.instance();
+    private TestContext.Tester tester = testContext.getTester();
 
     private static final boolean IS_JDK_16 =
         System.getProperty("java.version").startsWith("1.6.");
@@ -72,6 +72,8 @@ public class ConnectionTest extends TestCase {
             connection.close();
             connection = null;
         }
+        testContext = null;
+        tester = null;
     }
 
     /**

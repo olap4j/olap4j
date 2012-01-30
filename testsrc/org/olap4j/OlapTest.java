@@ -43,7 +43,6 @@ import static org.olap4j.test.TestContext.nameList;
  * @version $Id$
  */
 public class OlapTest extends TestCase {
-    final TestContext.Tester tester = TestContext.instance().getTester();
     private Connection connection;
 
     public OlapTest() {
@@ -61,6 +60,8 @@ public class OlapTest extends TestCase {
     }
 
     public Cube getFoodmartCube(String cubeName) throws Exception {
+        final TestContext testContext = TestContext.instance();
+        final TestContext.Tester tester = testContext.getTester();
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
@@ -86,6 +87,8 @@ public class OlapTest extends TestCase {
     }
 
     public void testModel() throws Exception {
+        final TestContext testContext = TestContext.instance();
+        final TestContext.Tester tester = testContext.getTester();
         if (false) {
         // define the connection information
         String schemaUri = "file:/open/mondrian/demo/FoodMart.xml";

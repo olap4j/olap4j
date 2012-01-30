@@ -41,8 +41,6 @@ import java.sql.SQLException;
  * @version $Id$
  */
 public class CellSetFormatterTest extends TestCase {
-    private final TestContext testContext = TestContext.instance();
-    private final TestContext.Tester tester = testContext.getTester();
 
     private static final String query1 =
         "select\n"
@@ -67,6 +65,8 @@ public class CellSetFormatterTest extends TestCase {
         Format format,
         String expected) throws SQLException
     {
+        final TestContext testContext = TestContext.instance();
+        final TestContext.Tester tester = testContext.getTester();
         Connection connection = null;
         try {
             connection = tester.createConnection();
