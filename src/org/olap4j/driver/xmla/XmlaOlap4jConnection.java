@@ -316,6 +316,12 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     String makeConnectionPropertyList() {
         StringBuilder buf = new StringBuilder();
         for (String prop : databaseProperties.keySet()) {
+            if (prop.startsWith(
+                XmlaOlap4jDriver.Property.CACHE.name()))
+            {
+                // Skip over the pass-through properties for the cache.
+                continue;
+            }
             try {
                 XmlaOlap4jDriver.Property.valueOf(prop);
                 continue;
