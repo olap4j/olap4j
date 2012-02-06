@@ -28,7 +28,7 @@
   
     Pay close attention to the Ant targets named compileJdk1* and ensure that each
     JVM compilation phase has compiled the files it needed to. The JDK 1.5 should compile
-    about 800+ files. The JDK 1.6 must compile the JDBC 4.0 classes (2 files)
+    about 700+ files. The JDK 1.6 must compile the JDBC 4.0 classes (2 files)
     and Java 7 should compile the JDBC 4.1 driver (1 file).
 
     Check the Javadoc warnings, and make sure that the only warnings are related to

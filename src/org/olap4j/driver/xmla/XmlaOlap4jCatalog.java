@@ -41,7 +41,7 @@ class XmlaOlap4jCatalog implements Catalog, Named {
     private final String name;
     final DeferredNamedListImpl<XmlaOlap4jSchema> schemas;
     private final XmlaOlap4jDatabase database;
-	private List<String> roles;
+    private List<String> roles;
 
     XmlaOlap4jCatalog(
         XmlaOlap4jDatabaseMetaData olap4jDatabaseMetaData,
@@ -153,9 +153,9 @@ class XmlaOlap4jCatalog implements Catalog, Named {
     public String getName() {
         return name;
     }
-    
+
     protected List<String> getAvailableRoles() {
-    	return roles;
+        return roles;
     }
 
     public OlapDatabaseMetaData getMetaData() {

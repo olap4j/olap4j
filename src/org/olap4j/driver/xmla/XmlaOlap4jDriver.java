@@ -112,16 +112,16 @@ import java.util.logging.Logger;
  *    {@link org.olap4j.driver.xmla.XmlaOlap4jConnection#getAvailableRoleNames}
  *                             </td></tr>
  * <tr><td>User</td>       <td>User name to use when establishing a
- *                             connection to the server. The credentials are passed
- *                             using the HTTP Basic authentication protocol,
- *                             but are also sent as part of the SOAP Security
- *                             headers.
+ *                             connection to the server. The credentials are
+ *                             passed using the HTTP Basic authentication
+ *                             protocol, but are also sent as part of the SOAP
+ *                             Security headers.
  *                             </td></tr>
  * <tr><td>Password</td>   <td>Password to use when establishing a
- *                             connection to the server. The credentials are passed
- *                             using the HTTP Basic authentication protocol,
- *                             but are also sent as part of the SOAP Security
- *                             headers.
+ *                             connection to the server. The credentials are
+ *                             passed using the HTTP Basic authentication
+ *                             protocol, but are also sent as part of the SOAP
+ *                             Security headers.
  *                             </td></tr>
  * </table>
  *

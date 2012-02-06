@@ -359,7 +359,7 @@ public class XmlaConnectionTest extends TestCase {
         final String oldValue = XmlaTester.getProxyClassName();
         try {
             XmlaTester.setProxyClassName(
-                    PropertyListTestProxy.class.getName());
+                PropertyListTestProxy.class.getName());
 
             OlapConnection connection =
                 tester.getWrapper().unwrap(

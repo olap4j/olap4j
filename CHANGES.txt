@@ -23,6 +23,10 @@ Among other notable changes, this version introduces support for JDBC 4.1.
     - Fixes an issue with SAP BW where the XMLA driver would scan
       through all the available databases/catalogs/schemas, causing
       access control exceptions.
+    - Added the ability to pass server specific properties as part
+      of the XMLA's PropertyList payload.
+    - The XmlaDriver now exposes a public constructor to prevent
+      errors in Sun's JDBC implementation.
 
 # Olap4j 1.0.0
 
