@@ -101,11 +101,17 @@ Building olap4j from source
 ---------------------------
 
 1. Unzip olap4j-<version>-src.zip.
-2. Set JAVA_HOME to a JDK version 1.5 home, and put $JAVA_HOME/bin
-   (%JAVA_HOME%\bin for Windows) on your path.
-3. Edit buildJdk16.bat and buildJdk16.sh and set the JAVA_HOME variable
-   to a valid home directory of a Java 6 installation.
-4. In the root of the source tree, run 'ant'. You must use Apache Ant 1.7+.
+
+2. Update buildOnJdk.[sh|bat].
+
+   If you are building on a Linux/Unix/Whatever machine, you only need to create
+   symlinks to /usr/lib/jvm/${jdkVersion} where jdkVersion is one of 1.5, 1.6 or 1.7.
+
+   If you are building on a Windows system, including Cygwin users, edit the Batch
+   file and set the properties JAVA_HOME_1* to the paths of the corresponding JVM
+   installation paths. You can also set these variables in your system environment.
+
+3. Run a test build: $ ant clean-all dist
 
 Writing a simple program
 ------------------------
