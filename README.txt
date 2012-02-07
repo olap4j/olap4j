@@ -6,26 +6,76 @@ Contents of this distribution
 -----------------------------
 
 This is a distribution of olap4j, the open Java API for accessing OLAP data.
-For version information, see VERSION.txt.
-For licensing, see LICENSE.html.
+For version information, see VERSION.txt. For licensing, see LICENSE/NOTICE.
+For details regarding this release and the changes it introduces, see
+CHANGES.txt.
 
-This release of olap4j contains a driver implementation based on the XML for
-Analysis (XML/A) protocol. There is also an olap4j driver for mondrian; this
-is part of the mondrian distribution from mondrian-3.0 onwards.
+Olap4j is distributed as four Java JAR libraries.
 
-Olap4j is divided in four different jar files.
+    * olap4j-[version].jar
+        Core API, Query Model, Transformation and other auxiliary packages,
+        along with the driver specification.
 
-* olap4j-[version].jar
-    This is the core olap4j API.
+    * olap4j-xmla-[version].jar
+        Driver implementation of olap4j for XML/A data sources. It is
+        compatible with Mondrian, Palo, SAP BW and SQL Server 2005+.
 
-* olap4j-xmla-[version].jar
-    This is the XMLA implementation of the olap4j core API.
+    * olap4j-tck-[version].jar
+        Technology compatibility kit. Consists mostly of JUnit tests.
 
-* olap4j-tck-[version].jar
-    This is the technology compatibility kit for olap4j.
+    * olap4j-jdk14-[version].jar
+        Olap4j distribution compatible with Java 1.4. Includes the core
+        API and the XML/A driver.
 
-* olap4j-jdk14-[version].jar
-    This is a Java 1.4 compatible retrowoven olap4j distribution. It contains both the core API and the XMLA driver.
+Packages and Roadmap
+-----------------------------
+
+The core API of olap4j version 1.0 is a Long Term Support (LTS) release,
+but some parts of the olap4j project will remain considered as experimental,
+thus subject to change in future releases. 
+
+Core packages
+-----------------------------
+
+The core packages in olap4j-1.0 are as follows.
+
+    * org.olap4j.driver.xmla
+        Generic XML/A driver.
+
+    * org.olap4j.mdx
+        Core objects of the MDX model.
+
+    * org.olap4j.mdx.parser
+        Parser for the MDX query language.
+
+    * org.olap4j.metadata
+        Discovery of OLAP servers metadata.
+
+    * org.olap4j.type
+        System for the core MDX object model and the metadata package.
+
+Experimental packages
+-----------------------------
+
+The following packages are considered experimental and are subject to change.
+
+    * org.olap4j.query
+        Programmatic Query Model.
+
+    * org.olap4j.transform
+        Core MDX object model transformation utilities.
+
+    * org.olap4j.layout
+        Utility classes to display CellSets.
+
+    * org.olap4j.CellSetListener and all associated classes
+        Event-based system for real time updates of CellSet objects.
+
+    * org.olap4j.Scenario and all associated classes
+        Statistical simulations module.
+
+Dependencies
+-----------------------------
 
 olap4j requires the following libraries at run time:
 
@@ -92,8 +142,7 @@ You can now write and run a simple program against olap4j. For example, under Ja
             }
         }
 
-
-Or if you are using the in-process mondrian driver, include mondrian.jar
+Or, if you are using the in-process mondrian driver, include mondrian.jar
 and its dependencies in your classpath, and change the
 appropriate lines in the above code to the following:
 
