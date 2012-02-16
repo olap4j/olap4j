@@ -138,6 +138,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     private final URL serverUrlObject;
 
+    private HashSet<String> olap4jDatabaseProperties;
+
     /**
      * This is a private property used for development only.
      * Enabling it makes the connection print out all queries
@@ -255,6 +257,22 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     null, null, null, null, null, null),
                 new XmlaOlap4jConnection.DatabaseHandler(),
                 null);
+
+        this.olap4jDatabaseProperties = new HashSet<String>();
+        final ResultSet rs =
+            this.olap4jDatabaseMetaData.getDatabaseProperties(null, null);
+        try {
+            while (rs.next()) {
+                String property =
+                    rs.getString(XmlaConstants.Literal.PROPERTY_NAME.name());
+                if (property != null) {
+                    property = property.toUpperCase();
+                    olap4jDatabaseProperties.add(property);
+                }
+            }
+        } finally {
+            rs.close();
+        }
     }
 
     /**
@@ -326,13 +344,15 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 XmlaOlap4jDriver.Property.valueOf(prop);
                 continue;
             } catch (IllegalArgumentException e) {
-                buf.append("        <");
-                xmlEncode(buf, prop);
-                buf.append(">");
-                xmlEncode(buf, databaseProperties.get(prop));
-                buf.append("</");
-                xmlEncode(buf, prop);
-                buf.append(">\n");
+                if (olap4jDatabaseProperties.contains(prop)) {
+                    buf.append("        <");
+                    xmlEncode(buf, prop);
+                    buf.append(">");
+                    xmlEncode(buf, databaseProperties.get(prop));
+                    buf.append("</");
+                    xmlEncode(buf, prop);
+                    buf.append(">\n");
+                }
             }
         }
         return buf.toString();
