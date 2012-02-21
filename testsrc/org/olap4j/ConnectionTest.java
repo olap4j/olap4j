@@ -2933,6 +2933,289 @@ public class ConnectionTest extends TestCase {
     }
 
     /**
+     * This is a test case for
+     * <a href="http://jira.pentaho.com/browse/MONDRIAN-893">
+     * MONDRIAN-893</a>.
+     *
+     * <p>Test two arguments as part of the return clause,
+     * on a constrained cell. One argument is a level
+     * which returns a numeric key, the other is a level
+     * as a numeric key. 
+     */
+    public void testCubesDrillthroughReturnClause() throws Exception {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        ResultSet rs = olapConnection.createStatement().executeQuery(
+            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name], [Gender].[Gender]");
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        while (rs.next()) {
+            pw.print("ROW:");
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                pw.print(rs.getString(i + 1));
+                pw.print(",");
+            }
+            pw.println();
+        }
+        pw.flush();
+        TestContext.assertEqualsVerbose(
+            "ROW:5956,M,\n"
+            + "ROW:6013,M,\n"
+            + "ROW:7293,M,\n"
+            + "ROW:7683,F,\n"
+            + "ROW:7683,F,\n",
+            sw.toString());
+    }
+
+    /**
+     * Same test as {@link #testCubesDrillthroughReturnClause()}
+     * but with a single column returned.
+     */
+    public void testCubesDrillthroughReturnClause2() throws Exception {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        ResultSet rs = olapConnection.createStatement().executeQuery(
+            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name]");
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        while (rs.next()) {
+            pw.print("ROW:");
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                pw.print(rs.getString(i + 1));
+                pw.print(",");
+            }
+            pw.println();
+        }
+        pw.flush();
+        TestContext.assertEqualsVerbose(
+            "ROW:5956,\n"
+            + "ROW:6013,\n"
+            + "ROW:7293,\n"
+            + "ROW:7683,\n"
+            + "ROW:7683,\n",
+            sw.toString());
+    }
+
+    /**
+     * Same test as {@link #testCubesDrillthroughReturnClause()}
+     * but without selecting anything except the slicer axis.
+     */
+    public void testCubesDrillthroughReturnClause3() throws Exception {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        ResultSet rs = olapConnection.createStatement().executeQuery(
+            "DRILLTHROUGH SELECT from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name]");
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        while (rs.next()) {
+            pw.print("ROW:");
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                pw.print(rs.getString(i + 1));
+                pw.print(",");
+            }
+            pw.println();
+        }
+        pw.flush();
+        TestContext.assertEqualsVerbose(
+            "ROW:5956,\n"
+            + "ROW:6013,\n"
+            + "ROW:7293,\n"
+            + "ROW:7683,\n"
+            + "ROW:7683,\n",
+            sw.toString());
+    }
+
+    /**
+     * A drillthrough on a cell which is part of a query which doesn't
+     * include any measure on its axis, but has 2 in the RETURN clause.
+     */
+    public void testCubesDrillthroughReturnClause4() throws Exception {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        ResultSet rs = olapConnection.createStatement().executeQuery(
+            "DRILLTHROUGH SELECT {[Promotions].[One Day Sale]} on columns, "
+            + "{[Store].[Store City].[Walla Walla]} on rows "
+            + "from [Sales] where ([Product].[Product Category].[Pizza]) "
+            + "RETURN [Measures].[Unit Sales], [Measures].[Store Sales]");
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        while (rs.next()) {
+            pw.print("ROW:");
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                pw.print(rs.getString(i + 1));
+                pw.print(",");
+            }
+            pw.println();
+        }
+        pw.flush();
+        TestContext.assertEqualsVerbose(
+            "ROW:1.0000,0.8000,\n",
+            sw.toString());
+    }
+
+    /**
+     * A drillthrough on a cell which is part of a query which doesn't
+     * include any measure on its axis, but has 1 in the RETURN clause.
+     */
+    public void testCubesDrillthroughReturnClause5() throws Exception {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        ResultSet rs = olapConnection.createStatement().executeQuery(
+            "DRILLTHROUGH SELECT {[Promotions].[One Day Sale]} on columns, "
+            + "{[Store].[Store City].[Walla Walla]} on rows "
+            + "from [Sales] where ([Product].[Product Category].[Pizza]) "
+            + "RETURN [Measures].[Store Sales]");
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        while (rs.next()) {
+            pw.print("ROW:");
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                pw.print(rs.getString(i + 1));
+                pw.print(",");
+            }
+            pw.println();
+        }
+        pw.flush();
+        TestContext.assertEqualsVerbose(
+            "ROW:0.8000,\n",
+            sw.toString());
+    }
+
+    /**
+     * Drillthrough with a measure on the axis, but returning
+     * a different measure as part of the RETURN clause.
+     */
+    public void testCubesDrillthroughReturnClause6() throws Exception {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        ResultSet rs = olapConnection.createStatement().executeQuery(
+            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Measures].[Store Sales]");
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        while (rs.next()) {
+            pw.print("ROW:");
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                pw.print(rs.getString(i + 1));
+                pw.print(",");
+            }
+            pw.println();
+        }
+        pw.flush();
+        TestContext.assertEqualsVerbose(
+            "ROW:2.8200,\n"
+            + "ROW:3.4600,\n"
+            + "ROW:1.2700,\n"
+            + "ROW:2.8400,\n"
+            + "ROW:1.9500,\n",
+            sw.toString());
+    }
+
+    /**
+     * Drillthrough with a measure on the axis and returning
+     * a dimension and a SQL generated measure as part of the RETURN clause.
+     */
+    public void testCubesDrillthroughReturnClause7() throws Exception {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        ResultSet rs = olapConnection.createStatement().executeQuery(
+            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers], [Measures].[Promotion Sales]");
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        while (rs.next()) {
+            pw.print("ROW:");
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                pw.print(rs.getString(i + 1));
+                pw.print(",");
+            }
+            pw.println();
+        }
+        pw.flush();
+        TestContext.assertEqualsVerbose(
+            "ROW:USA,2.8200,\n"
+            + "ROW:USA,2.8400,\n"
+            + "ROW:USA,3.4600,\n"
+            + "ROW:USA,1.9500,\n"
+            + "ROW:USA,1.2700,\n",
+            sw.toString());
+    }
+
+    /**
+     * Drillthrough with a measure on the axis and returning
+     * a level and a SQL generated measure as part of the RETURN clause.
+     */
+    public void testCubesDrillthroughReturnClause8() throws Exception {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        ResultSet rs = olapConnection.createStatement().executeQuery(
+            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[City], [Measures].[Promotion Sales]");
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        while (rs.next()) {
+            pw.print("ROW:");
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                pw.print(rs.getString(i + 1));
+                pw.print(",");
+            }
+            pw.println();
+        }
+        pw.flush();
+        TestContext.assertEqualsVerbose(
+            "ROW:Walla Walla,2.8200,\n"
+            + "ROW:Walla Walla,2.8400,\n"
+            + "ROW:Walla Walla,3.4600,\n"
+            + "ROW:Walla Walla,1.9500,\n"
+            + "ROW:Walla Walla,1.2700,\n",
+            sw.toString());
+    }
+
+    /**
+     * Drillthrough with a measure on the axis and no RETURN
+     * clause specified.
+     */
+    public void testCubesDrillthroughReturnClause9() throws Exception {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        ResultSet rs = olapConnection.createStatement().executeQuery(
+            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread])");
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        while (rs.next()) {
+            pw.print("ROW:");
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                pw.print(rs.getString(i + 1));
+                pw.print(",");
+            }
+            pw.println();
+        }
+        pw.flush();
+        TestContext.assertEqualsVerbose(
+            "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,8,34,14,Food,Baked Goods,Bread,Muffins,Great,Great Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Joe. Burnett,7293,Partial High School,M,S,$30K - $50K,1.0000,\n"
+            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,8,34,14,Food,Baked Goods,Bread,Muffins,Modell,Modell Cranberry Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Geraldine Aubrecht,5956,Partial High School,M,S,$30K - $50K,1.0000,\n"
+            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,8,34,14,Food,Baked Goods,Bread,Sliced Bread,Colony,Colony White Bread,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Rena Shaw,6013,Partial High School,M,M,$10K - $30K,2.0000,\n"
+            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,9,38,10,Food,Baked Goods,Bread,Muffins,Modell,Modell Blueberry Muffins,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683,High School Degree,F,M,$50K - $70K,1.0000,\n"
+            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,9,38,10,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683,High School Degree,F,M,$50K - $70K,1.0000,\n",
+            sw.toString());
+    }
+
+    /**
      * Query with dimension properties.
      *
      * <p>Test case for
