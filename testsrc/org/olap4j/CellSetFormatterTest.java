@@ -42,13 +42,11 @@ import java.sql.SQLException;
  */
 public class CellSetFormatterTest extends TestCase {
 
-    private TestContext testContext = null;
-    private TestContext.Tester tester = null;
+    private TestContext testContext = TestContext.instance();
+    private TestContext.Tester tester = testContext.getTester();
 
     protected void setUp() throws Exception {
         super.setUp();
-        testContext = TestContext.instance();
-        tester = testContext.getTester();
     }
 
     protected void tearDown() throws Exception {
