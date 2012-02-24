@@ -862,6 +862,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         }
         assert envelope.getLocalName().equals("Envelope");
         assert envelope.getNamespaceURI().equals(SOAP_NS);
+        Element header =
+            findChild(envelope, SOAP_NS, "Header");
         Element body =
             findChild(envelope, SOAP_NS, "Body");
         Element fault =
@@ -888,6 +890,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 + "\n"
                 + "Request was:\n"
                 + request);
+        }
+        Element session =
+            findChild(header, XMLA_NS, "Session");
+        if (session != null) {
+            String sessionId =
+                session.getAttribute("SessionId");
+            if ("".equals(sessionId)) {
+                sessionId = null;
+            }
+            serverInfos.setSessionId(sessionId);
         }
         Element discoverResponse =
             findChild(body, XMLA_NS, "DiscoverResponse");
