@@ -19,6 +19,8 @@
 */
 package org.olap4j;
 
+import mondrian.olap.MondrianProperties;
+
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.impl.Bug;
 import org.olap4j.impl.Olap4jUtil;
@@ -51,8 +53,8 @@ import static org.olap4j.test.TestContext.nameList;
  * @version $Id$
  */
 public class ConnectionTest extends TestCase {
-    private TestContext testContext = TestContext.instance();
-    private TestContext.Tester tester = testContext.getTester();
+    private TestContext testContext = null;
+    private TestContext.Tester tester = null;
 
     private static final boolean IS_JDK_16 =
         System.getProperty("java.version").startsWith("1.6.");
@@ -63,6 +65,12 @@ public class ConnectionTest extends TestCase {
      * if it is not already closed.
      */
     private Connection connection;
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        testContext = TestContext.instance();
+        tester = testContext.getTester();
+    }
 
     protected void tearDown() throws Exception {
         // Simple strategy to prevent connection leaks
@@ -2603,6 +2611,11 @@ public class ConnectionTest extends TestCase {
             assertTrue(e.getMessage().indexOf("illegal timeout value ") >= 0);
         }
         olapStatement.setQueryTimeout(1);
+        if (tester.getFlavor().equals(Flavor.XMLA)
+            || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+        {
+            MondrianProperties.instance().QueryTimeout.set(1);
+        }
         try {
             final CellSet cellSet =
                 olapStatement.executeOlapQuery(
@@ -2615,6 +2628,11 @@ public class ConnectionTest extends TestCase {
                 "expected exception indicating timeout,"
                 + " got cellSet " + cellSet);
         } catch (OlapException e) {
+            if (tester.getFlavor().equals(Flavor.XMLA)
+                || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+            {
+                MondrianProperties.instance().QueryTimeout.set(0);
+            }
             assertTrue(
                 e.getMessage(),
                 e.getMessage().indexOf("Query timeout of ") >= 0);
@@ -2705,20 +2723,26 @@ public class ConnectionTest extends TestCase {
                 "WITH MEMBER [Measures].[Average Profit] AS"
                 + "'[Measures].[Profit] / [Measures].[Sales Count]'"
                 + "SELECT {[Measures].[Average Profit]} ON 0,\n"
-                + "{[Product].Children} ON 1\n"
-                + "FROM [Sales]");
+                + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].Children} ON 1\n"
+                + "FROM [Sales] "
+                + "WHERE ([Time.Weekly].[Week].[5])");
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{}\n"
+            + "{[Time.Weekly].[1997].[5]}\n"
             + "Axis #1:\n"
             + "{[Measures].[Average Profit]}\n"
             + "Axis #2:\n"
-            + "{[Product].[Drink]}\n"
-            + "{[Product].[Food]}\n"
-            + "{[Product].[Non-Consumable]}\n"
-            + "Row #0: $3.68\n"
-            + "Row #1: $3.94\n"
-            + "Row #2: $3.93\n", TestContext.toString(cellSet));
+            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Good]}\n"
+            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Pearl]}\n"
+            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Portsmouth]}\n"
+            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Top Measure]}\n"
+            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Walrus]}\n"
+            + "Row #0: $2.17\n"
+            + "Row #1: $2.60\n"
+            + "Row #2: $6.03\n"
+            + "Row #3: $1.54\n"
+            + "Row #4: $5.11\n",
+            TestContext.toString(cellSet));
     }
 
     public void testBuildQuery() throws SQLException {
@@ -2949,24 +2973,13 @@ public class ConnectionTest extends TestCase {
             tester.getWrapper().unwrap(connection, OlapConnection.class);
         ResultSet rs = olapConnection.createStatement().executeQuery(
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name], [Gender].[Gender]");
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
-        while (rs.next()) {
-            pw.print("ROW:");
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                pw.print(rs.getString(i + 1));
-                pw.print(",");
-            }
-            pw.println();
-        }
-        pw.flush();
-        TestContext.assertEqualsVerbose(
+        assertDrillRowsEquals(
+            rs,
             "ROW:5956,M,\n"
             + "ROW:6013,M,\n"
             + "ROW:7293,M,\n"
             + "ROW:7683,F,\n"
-            + "ROW:7683,F,\n",
-            sw.toString());
+            + "ROW:7683,F,\n");
     }
 
     /**
@@ -2980,24 +2993,13 @@ public class ConnectionTest extends TestCase {
             tester.getWrapper().unwrap(connection, OlapConnection.class);
         ResultSet rs = olapConnection.createStatement().executeQuery(
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name]");
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
-        while (rs.next()) {
-            pw.print("ROW:");
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                pw.print(rs.getString(i + 1));
-                pw.print(",");
-            }
-            pw.println();
-        }
-        pw.flush();
-        TestContext.assertEqualsVerbose(
+        assertDrillRowsEquals(
+            rs,
             "ROW:5956,\n"
             + "ROW:6013,\n"
             + "ROW:7293,\n"
             + "ROW:7683,\n"
-            + "ROW:7683,\n",
-            sw.toString());
+            + "ROW:7683,\n");
     }
 
     /**
@@ -3011,24 +3013,13 @@ public class ConnectionTest extends TestCase {
             tester.getWrapper().unwrap(connection, OlapConnection.class);
         ResultSet rs = olapConnection.createStatement().executeQuery(
             "DRILLTHROUGH SELECT from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name]");
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
-        while (rs.next()) {
-            pw.print("ROW:");
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                pw.print(rs.getString(i + 1));
-                pw.print(",");
-            }
-            pw.println();
-        }
-        pw.flush();
-        TestContext.assertEqualsVerbose(
+        assertDrillRowsEquals(
+            rs,
             "ROW:5956,\n"
             + "ROW:6013,\n"
             + "ROW:7293,\n"
             + "ROW:7683,\n"
-            + "ROW:7683,\n",
-            sw.toString());
+            + "ROW:7683,\n");
     }
 
     /**
@@ -3045,20 +3036,9 @@ public class ConnectionTest extends TestCase {
             + "{[Store].[Store City].[Walla Walla]} on rows "
             + "from [Sales] where ([Product].[Product Category].[Pizza]) "
             + "RETURN [Measures].[Unit Sales], [Measures].[Store Sales]");
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
-        while (rs.next()) {
-            pw.print("ROW:");
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                pw.print(rs.getString(i + 1));
-                pw.print(",");
-            }
-            pw.println();
-        }
-        pw.flush();
-        TestContext.assertEqualsVerbose(
-            "ROW:1.0000,0.8000,\n",
-            sw.toString());
+        assertDrillRowsEquals(
+            rs,
+            "ROW:1.0000,0.8000,\n");
     }
 
     /**
@@ -3075,20 +3055,9 @@ public class ConnectionTest extends TestCase {
             + "{[Store].[Store City].[Walla Walla]} on rows "
             + "from [Sales] where ([Product].[Product Category].[Pizza]) "
             + "RETURN [Measures].[Store Sales]");
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
-        while (rs.next()) {
-            pw.print("ROW:");
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                pw.print(rs.getString(i + 1));
-                pw.print(",");
-            }
-            pw.println();
-        }
-        pw.flush();
-        TestContext.assertEqualsVerbose(
-            "ROW:0.8000,\n",
-            sw.toString());
+        assertDrillRowsEquals(
+            rs,
+            "ROW:0.8000,\n");
     }
 
     /**
@@ -3102,24 +3071,13 @@ public class ConnectionTest extends TestCase {
             tester.getWrapper().unwrap(connection, OlapConnection.class);
         ResultSet rs = olapConnection.createStatement().executeQuery(
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Measures].[Store Sales]");
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
-        while (rs.next()) {
-            pw.print("ROW:");
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                pw.print(rs.getString(i + 1));
-                pw.print(",");
-            }
-            pw.println();
-        }
-        pw.flush();
-        TestContext.assertEqualsVerbose(
-            "ROW:2.8200,\n"
-            + "ROW:3.4600,\n"
-            + "ROW:1.2700,\n"
+        assertDrillRowsEquals(
+            rs,
+            "ROW:1.2700,\n"
+            + "ROW:1.9500,\n"
+            +"ROW:2.8200,\n"
             + "ROW:2.8400,\n"
-            + "ROW:1.9500,\n",
-            sw.toString());
+            + "ROW:3.4600,\n");
     }
 
     /**
@@ -3133,24 +3091,13 @@ public class ConnectionTest extends TestCase {
             tester.getWrapper().unwrap(connection, OlapConnection.class);
         ResultSet rs = olapConnection.createStatement().executeQuery(
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers], [Measures].[Promotion Sales]");
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
-        while (rs.next()) {
-            pw.print("ROW:");
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                pw.print(rs.getString(i + 1));
-                pw.print(",");
-            }
-            pw.println();
-        }
-        pw.flush();
-        TestContext.assertEqualsVerbose(
-            "ROW:USA,2.8200,\n"
-            + "ROW:USA,2.8400,\n"
-            + "ROW:USA,3.4600,\n"
+        assertDrillRowsEquals(
+            rs,
+            "ROW:USA,1.2700,\n"
             + "ROW:USA,1.9500,\n"
-            + "ROW:USA,1.2700,\n",
-            sw.toString());
+            + "ROW:USA,2.8200,\n"
+            + "ROW:USA,2.8400,\n"
+            + "ROW:USA,3.4600,\n");
     }
 
     /**
@@ -3164,24 +3111,13 @@ public class ConnectionTest extends TestCase {
             tester.getWrapper().unwrap(connection, OlapConnection.class);
         ResultSet rs = olapConnection.createStatement().executeQuery(
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[City], [Measures].[Promotion Sales]");
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
-        while (rs.next()) {
-            pw.print("ROW:");
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                pw.print(rs.getString(i + 1));
-                pw.print(",");
-            }
-            pw.println();
-        }
-        pw.flush();
-        TestContext.assertEqualsVerbose(
-            "ROW:Walla Walla,2.8200,\n"
-            + "ROW:Walla Walla,2.8400,\n"
-            + "ROW:Walla Walla,3.4600,\n"
+        assertDrillRowsEquals(
+            rs,
+            "ROW:Walla Walla,1.2700,\n"
             + "ROW:Walla Walla,1.9500,\n"
-            + "ROW:Walla Walla,1.2700,\n",
-            sw.toString());
+            + "ROW:Walla Walla,2.8200,\n"
+            + "ROW:Walla Walla,2.8400,\n"
+            + "ROW:Walla Walla,3.4600,\n");
     }
 
     /**
@@ -3195,26 +3131,39 @@ public class ConnectionTest extends TestCase {
             tester.getWrapper().unwrap(connection, OlapConnection.class);
         ResultSet rs = olapConnection.createStatement().executeQuery(
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread])");
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
-        while (rs.next()) {
-            pw.print("ROW:");
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                pw.print(rs.getString(i + 1));
-                pw.print(",");
-            }
-            pw.println();
-        }
-        pw.flush();
-        TestContext.assertEqualsVerbose(
+        assertDrillRowsEquals(
+            rs,
             "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,8,34,14,Food,Baked Goods,Bread,Muffins,Great,Great Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Joe. Burnett,7293,Partial High School,M,S,$30K - $50K,1.0000,\n"
             + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,8,34,14,Food,Baked Goods,Bread,Muffins,Modell,Modell Cranberry Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Geraldine Aubrecht,5956,Partial High School,M,S,$30K - $50K,1.0000,\n"
             + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,8,34,14,Food,Baked Goods,Bread,Sliced Bread,Colony,Colony White Bread,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Rena Shaw,6013,Partial High School,M,M,$10K - $30K,2.0000,\n"
             + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,9,38,10,Food,Baked Goods,Bread,Muffins,Modell,Modell Blueberry Muffins,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683,High School Degree,F,M,$50K - $70K,1.0000,\n"
-            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,9,38,10,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683,High School Degree,F,M,$50K - $70K,1.0000,\n",
-            sw.toString());
+            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,9,38,10,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683,High School Degree,F,M,$50K - $70K,1.0000,\n");
     }
 
+    private void assertDrillRowsEquals(
+        ResultSet rs, String expected)
+        throws Exception
+    {
+        final List<String> rows = new ArrayList<String>();
+        while (rs.next()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("ROW:");
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                sb.append(rs.getString(i + 1));
+                sb.append(",");
+            }
+            rows.add(sb.toString());
+        }
+        Collections.sort(rows);
+        StringBuilder sb = new StringBuilder();
+        for (String str : rows) {
+            sb.append(str);
+            sb.append("\n");
+        }
+        assertEquals(
+            expected,
+            sb.toString());
+    }
     /**
      * Query with dimension properties.
      *

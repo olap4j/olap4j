@@ -40,10 +40,16 @@ import java.util.concurrent.Future;
  * @version $Id$
  */
 public class XmlaConnectionTest extends TestCase {
-    private TestContext testContext = TestContext.instance();
-    private TestContext.Tester tester = testContext.getTester();
+    private TestContext testContext = null;
+    private TestContext.Tester tester = null;
     public static final String DRIVER_CLASS_NAME =
         "org.olap4j.driver.xmla.XmlaOlap4jDriver";
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        testContext = TestContext.instance();
+        tester = testContext.getTester();
+    }
 
     static class XmlaOlap4jProxyMock implements XmlaOlap4jProxy {
         public byte[] get(
