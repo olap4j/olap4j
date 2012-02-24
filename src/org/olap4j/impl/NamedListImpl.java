@@ -63,8 +63,8 @@ public class NamedListImpl<T extends Named>
         super(c);
     }
 
-    protected final String getName(T t) {
-        return t.getName();
+    public final String elementName(Object t) {
+        return ((T) t).getName();
     }
 }
 

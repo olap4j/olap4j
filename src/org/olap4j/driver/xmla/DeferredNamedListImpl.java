@@ -25,6 +25,7 @@ import org.olap4j.impl.NamedListImpl;
 import org.olap4j.metadata.NamedList;
 
 import java.util.AbstractList;
+import java.util.Map;
 
 /**
  * Named list which instantiates itself on first use.
@@ -114,6 +115,14 @@ class DeferredNamedListImpl<T extends Named>
 
     public int indexOfName(String name) {
         return getList().indexOfName(name);
+    }
+
+    public String elementName(Object element) {
+        return getList().elementName(element);
+    }
+
+    public Map<String, T> asMap() {
+        return getList().asMap();
     }
 
     protected void populateList(NamedList<T> list) throws OlapException {

@@ -20,6 +20,7 @@
 package org.olap4j.metadata;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Extension to {@link java.util.List} which allows access to members of the
@@ -54,6 +55,22 @@ public interface NamedList<E> extends List<E> {
      * @see #indexOf(Object)
      */
     int indexOfName(String name);
+
+    /**
+     * Returns the name of a given element.
+     *
+     * @param element Element
+     * @return Name of element
+     */
+    String elementName(Object element);
+
+    /**
+     * Returns a view of this named list as a {@link Map} whose key is the name
+     * of each element.
+     *
+     * @return A view of this named list as a map
+     */
+    Map<String, E> asMap();
 }
 
 // End NamedList.java

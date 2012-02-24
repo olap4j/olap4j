@@ -181,8 +181,8 @@ class XmlaOlap4jLevel
 
     public NamedList<Property> getProperties() {
         final NamedList<Property> list = new ArrayNamedListImpl<Property>() {
-            protected String getName(Property property) {
-                return property.getName();
+            public String elementName(Object property) {
+                return ((Property) property).getName();
             }
         };
         // standard properties first

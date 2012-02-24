@@ -484,8 +484,8 @@ public class Olap4jUtil {
         final NamedList<? extends T> list)
     {
         return list instanceof RandomAccess
-        ? new UnmodifiableNamedRandomAccessList<T>(list)
-        : new UnmodifiableNamedList<T>(list);
+            ? new UnmodifiableNamedRandomAccessList<T>(list)
+            : new UnmodifiableNamedList<T>(list);
     }
 
     /**
@@ -615,10 +615,10 @@ public class Olap4jUtil {
     }
 
     /**
-     * Implementation of {@link NamedList} whih is immutable and empty.
+     * Implementation of {@link NamedList} that is immutable and empty.
      */
     private static class EmptyNamedList<T> extends AbstractNamedList<T> {
-        protected String getName(Object o) {
+        public String elementName(Object element) {
             throw new UnsupportedOperationException();
         }
 
@@ -650,6 +650,14 @@ public class Olap4jUtil {
 
         public int indexOfName(String s) {
             return list.indexOfName(s);
+        }
+
+        public String elementName(Object element) {
+            return list.elementName(element);
+        }
+
+        public Map<String, T> asMap() {
+            return Collections.unmodifiableMap(list.asMap());
         }
 
         public int size() {

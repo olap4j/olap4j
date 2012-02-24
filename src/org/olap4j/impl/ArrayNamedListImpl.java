@@ -21,14 +21,13 @@ package org.olap4j.impl;
 
 import org.olap4j.metadata.NamedList;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Implementation of {@link org.olap4j.metadata.NamedList} which uses
  * {@link java.util.ArrayList} for storage.
  *
- * <p>Derived class must implement {@link #getName(Object)}, to indicate how
+ * <p>Derived class must implement {@link #elementName(Object)}, to indicate how
  * elements are named.
  *
  * @see NamedListImpl
@@ -71,11 +70,9 @@ public abstract class ArrayNamedListImpl<T>
         super(c);
     }
 
-    protected abstract String getName(T t);
-
     public T get(String name) {
         for (T t : this) {
-            if (getName(t).equals(name)) {
+            if (elementName(t).equals(name)) {
                 return t;
             }
         }
@@ -85,11 +82,15 @@ public abstract class ArrayNamedListImpl<T>
     public int indexOfName(String name) {
         for (int i = 0; i < size(); ++i) {
             T t = get(i);
-            if (getName(t).equals(name)) {
+            if (elementName(t).equals(name)) {
                 return i;
             }
         }
         return -1;
+    }
+
+    public Map<String, T> asMap() {
+        return new NamedListMap<T>(this);
     }
 }
 
