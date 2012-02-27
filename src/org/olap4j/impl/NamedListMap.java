@@ -52,7 +52,7 @@ class NamedListMap<T> extends AbstractMap<String, T> {
 
                     public Entry<String, T> next() {
                         T x = iterator.next();
-                        String name = namedList.elementName(x);
+                        String name = namedList.getName(x);
                         return new Pair<String, T>(name, x);
                     }
 

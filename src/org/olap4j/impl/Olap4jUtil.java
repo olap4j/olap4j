@@ -618,7 +618,7 @@ public class Olap4jUtil {
      * Implementation of {@link NamedList} that is immutable and empty.
      */
     private static class EmptyNamedList<T> extends AbstractNamedList<T> {
-        public String elementName(Object element) {
+        public String getName(Object element) {
             throw new UnsupportedOperationException();
         }
 
@@ -652,8 +652,8 @@ public class Olap4jUtil {
             return list.indexOfName(s);
         }
 
-        public String elementName(Object element) {
-            return list.elementName(element);
+        public String getName(Object element) {
+            return list.getName(element);
         }
 
         public Map<String, T> asMap() {

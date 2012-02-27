@@ -28,7 +28,7 @@ import java.util.*;
  *
  * <p>Derived class must implement {@link #get(int)} and {@link #size()}, as
  * per {@link java.util.AbstractList}; and must implement
- * {@link #elementName(Object)}, to indicate how elements are named.
+ * {@link #getName(Object)}, to indicate how elements are named.
  *
  * @see org.olap4j.impl.ArrayNamedListImpl
  *
@@ -42,7 +42,7 @@ public abstract class AbstractNamedList<T>
 {
     public T get(String name) {
         for (T t : this) {
-            if (elementName(t).equals(name)) {
+            if (getName(t).equals(name)) {
                 return t;
             }
         }
@@ -52,7 +52,7 @@ public abstract class AbstractNamedList<T>
     public int indexOfName(String name) {
         for (int i = 0; i < size(); ++i) {
             T t = get(i);
-            if (elementName(t).equals(name)) {
+            if (getName(t).equals(name)) {
                 return i;
             }
         }
