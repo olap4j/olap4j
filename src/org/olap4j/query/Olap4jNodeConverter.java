@@ -634,11 +634,23 @@ abstract class Olap4jNodeConverter {
                             generateListSetCall(ancestorList);
                         CallNode inClause = new CallNode(
                             null,
-                            "IN",
-                            Syntax.Infix,
+                            "Exists",
+                            Syntax.Function,
                             ancestorNode,
                             ancestorSet);
-                        inConditions.add(inClause);
+                        CallNode count =
+                            new CallNode(
+                                null,
+                                "Count",
+                                Syntax.Property,
+                                inClause);
+                        CallNode greaterZero =
+                            new CallNode(
+                                null,
+                                " > 0",
+                                Syntax.Postfix,
+                                count);
+                        inConditions.add(greaterZero);
                     }
                 }
             }

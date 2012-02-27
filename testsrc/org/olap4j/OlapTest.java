@@ -1480,8 +1480,8 @@ public class OlapTest extends TestCase {
         String mdxString = query.getSelect().toString();
         TestContext.assertEqualsVerbose(
             "SELECT\n"
-            + "{{[Product].[All Products]}, {[Product].[Food]}, Filter({{[Product].[Food].[Deli], [Product].[Food].[Dairy]}}, (Ancestor([Product].CurrentMember, [Product].[Product Family]) IN {[Product].[Food]})), Filter({{[Product].[Product Category].Members}}, ((Ancestor([Product].CurrentMember, [Product].[Product Family]) IN {[Product].[Food]}) AND (Ancestor([Product].CurrentMember, [Product].[Product Department]) IN {[Product].[Food].[Deli], [Product].[Food].[Dairy]})))} ON COLUMNS,\n"
-            + "{{[Time].[1997]}, Filter({{[Time].[1997].[Q3].[7], [Time].[1997].[Q4].[11]}}, (Ancestor([Time].CurrentMember, [Time].[Year]) IN {[Time].[1997]}))} ON ROWS\n"
+            + "{{[Product].[All Products]}, {[Product].[Food]}, Filter({{[Product].[Food].[Deli], [Product].[Food].[Dairy]}}, (Exists(Ancestor([Product].CurrentMember, [Product].[Product Family]), {[Product].[Food]}).Count  > 0)), Filter({{[Product].[Product Category].Members}}, ((Exists(Ancestor([Product].CurrentMember, [Product].[Product Family]), {[Product].[Food]}).Count  > 0) AND (Exists(Ancestor([Product].CurrentMember, [Product].[Product Department]), {[Product].[Food].[Deli], [Product].[Food].[Dairy]}).Count  > 0)))} ON COLUMNS,\n"
+            + "{{[Time].[1997]}, Filter({{[Time].[1997].[Q3].[7], [Time].[1997].[Q4].[11]}}, (Exists(Ancestor([Time].CurrentMember, [Time].[Year]), {[Time].[1997]}).Count  > 0))} ON ROWS\n"
             + "FROM [Sales]",
             mdxString);
 
@@ -1538,7 +1538,7 @@ public class OlapTest extends TestCase {
         TestContext.assertEqualsVerbose(
             "SELECT\n"
             + "{[Product].[Food]} ON COLUMNS,\n"
-            + "Hierarchize(Union(CrossJoin(Filter({[Time].[1997].[Q3].[7]}, (Ancestor([Time].CurrentMember, [Time].[Year]) IN {[Time].[1997]})), {[Measures].[Sales Count]}), Union(CrossJoin(Filter({[Time].[1997].[Q4].[11]}, (Ancestor([Time].CurrentMember, [Time].[Year]) IN {[Time].[1997]})), {[Measures].[Sales Count]}), CrossJoin({[Time].[1997]}, {[Measures].[Sales Count]})))) ON ROWS\n"
+            + "Hierarchize(Union(CrossJoin(Filter({[Time].[1997].[Q3].[7]}, (Exists(Ancestor([Time].CurrentMember, [Time].[Year]), {[Time].[1997]}).Count  > 0)), {[Measures].[Sales Count]}), Union(CrossJoin(Filter({[Time].[1997].[Q4].[11]}, (Exists(Ancestor([Time].CurrentMember, [Time].[Year]), {[Time].[1997]}).Count  > 0)), {[Measures].[Sales Count]}), CrossJoin({[Time].[1997]}, {[Measures].[Sales Count]})))) ON ROWS\n"
             + "FROM [Sales]",
             mdxString2);
 
