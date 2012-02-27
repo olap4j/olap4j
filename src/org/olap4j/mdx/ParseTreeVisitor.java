@@ -191,6 +191,17 @@ public interface ParseTreeVisitor<T> {
      * @see PropertyValueNode#accept(ParseTreeVisitor)
      */
     T visit(PropertyValueNode propertyValueNode);
+
+    /**
+     * Visits a property-value pair.
+     *
+     * @param drillThroughNode Node representing a drill-through statement
+     *
+     * @return value yielded by visiting the node
+     *
+     * @see DrillThroughNode#accept(ParseTreeVisitor)
+     */
+    T visit(DrillThroughNode drillThroughNode);
 }
 
 // End ParseTreeVisitor.java

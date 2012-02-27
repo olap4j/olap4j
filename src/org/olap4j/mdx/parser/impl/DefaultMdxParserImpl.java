@@ -19,9 +19,15 @@
 */
 package org.olap4j.mdx.parser.impl;
 
+import org.olap4j.impl.Olap4jUtil;
+import org.olap4j.mdx.ParseRegion;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.mdx.SelectNode;
+import org.olap4j.mdx.parser.MdxParseException;
 import org.olap4j.mdx.parser.MdxParser;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Default implementation of {@link org.olap4j.mdx.parser.MdxParser MDX Parser}.
@@ -46,17 +52,81 @@ public class DefaultMdxParserImpl implements MdxParser {
     }
 
     public SelectNode parseSelect(String mdx) {
-        return new DefaultMdxParser().parseSelect(
-            mdx,
-            debug,
-            funTable);
+        try {
+            return new MdxParserImpl(mdx, false, false).selectStatement();
+        } catch (TokenMgrError e) {
+            throw convertException(mdx, e);
+        } catch (ParseException e) {
+            throw convertException(mdx, e);
+        }
     }
 
     public ParseTreeNode parseExpression(String mdx) {
-        return new DefaultMdxParser().parseExpression(
-            mdx,
-            debug,
-            funTable);
+        try {
+            return new MdxParserImpl(mdx, false, false).expression();
+        } catch (TokenMgrError e) {
+            throw convertException(mdx, e);
+        } catch (ParseException e) {
+            throw convertException(mdx, e);
+        }
+    }
+
+    /**
+     * Converts the exception so that it looks like the exception produced by   
+     * JavaCUP. (Not that that format is ideal, but it minimizes test output    
+     * changes during the transition from JavaCUP to JavaCC.)                   
+     *
+     * @param queryString MDX query string                                      
+     * @param pe JavaCC parse exception                                         
+     * @return Wrapped exception                                                
+     */
+    private RuntimeException convertException(
+        String queryString,
+        Throwable pe)
+    {
+        ParseRegion parseRegion = null;
+        String message = null;
+        if (pe instanceof TokenMgrError) {
+            Pattern pattern =
+                Pattern.compile(
+                    "Lexical error at line ([0-9]+), column ([0-9]+)\\. .*");
+            final Matcher matcher = pattern.matcher(pe.getMessage());
+            if (matcher.matches()) {
+                Olap4jUtil.discard(matcher);
+                int line = Integer.parseInt(matcher.group(1));
+                int column = Integer.parseInt(matcher.group(2));
+                parseRegion = new ParseRegion(line, column);
+                message = pe.getMessage();
+            }
+        } else if (pe instanceof ParseException
+            && pe.getMessage().startsWith("Encountered "))
+        {
+            Token errorToken = ((ParseException) pe).currentToken.next;
+            parseRegion =
+                new ParseRegion(
+                    errorToken.beginLine,
+                    errorToken.beginColumn,
+                    errorToken.endLine,
+                    errorToken.endColumn);
+            message = "Syntax error at line "
+                + parseRegion.getStartLine()
+                + ", column "
+                + parseRegion.getStartColumn()
+                + ", token '"
+                + errorToken.image
+                + "'";
+        }
+        Throwable e;
+        if (parseRegion != null) {
+            e = new MdxParseException(
+                parseRegion,
+                message);
+        } else {
+            e = pe;
+        }
+        throw new RuntimeException(
+            "Error while parsing MDX statement '" + queryString + "'",
+            e);
     }
 
     interface FunTable {

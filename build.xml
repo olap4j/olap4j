@@ -33,7 +33,13 @@
     <property name="generated.java.files"
         value="
 ${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParser.java,
-${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
+${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java,
+${src.dir}/org/olap4j/mdx/parser/impl/MdxParserImpl.java,
+${src.dir}/org/olap4j/mdx/parser/impl/MdxParserImplTokenManager.java,
+${src.dir}/org/olap4j/mdx/parser/impl/ParseException.java,
+${src.dir}/org/olap4j/mdx/parser/impl/SimpleCharStream.java,
+${src.dir}/org/olap4j/mdx/parser/impl/Token.java,
+${src.dir}/org/olap4j/mdx/parser/impl/TokenMgrError.java" />
 
     <target name="checkIsJdk15" if="jdk15.not.present">
         <fail message="The 'jar' target (and dependent targets 'release', 'binzip') must be run under JDK 1.5." />
@@ -254,13 +260,21 @@ class XmlaOlap4jDriverVersion {
 // End XmlaOlap4jDriverVersion.java</echo>
     </target>
 
-    <target name="parser" depends="resolve">
+    <target name="define-tasks">
         <taskdef name="javacup" classname="java_cup.JavaCUPTask">
-            <classpath refid="classpath" />
+            <classpath refid="classpath"/>
         </taskdef>
+    </target>
+
+    <target name="parser" depends="resolve,define-tasks">
+        <!-- Old parser. -->
         <javacup srcdir="${src.dir}"
             input="${src.dir}/org/olap4j/mdx/parser/impl/DefaultMdxParser.cup"
             expect="61" interface="true" />
+        <!-- New parser. -->
+        <javacc
+            target="${src.dir}/org/olap4j/mdx/parser/impl/MdxParser.jj"
+            javacchome="${lib.dir}"/>
     </target>
 
     <target name="clean-tests" depends="subfloor.clean-tests">

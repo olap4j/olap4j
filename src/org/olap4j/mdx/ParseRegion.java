@@ -19,6 +19,10 @@
 */
 package org.olap4j.mdx;
 
+import java.util.AbstractList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Region of parser source code.
  *
@@ -47,8 +51,6 @@ public class ParseRegion {
     private final int startColumn;
     private final int endLine;
     private final int endColumn;
-
-    private static final String NL = System.getProperty("line.separator");
 
     /**
      * Creates a ParseRegion.
@@ -169,6 +171,61 @@ public class ParseRegion {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Combines this region with other regions.
+     *
+     * @param nodes Source code regions
+     * @return region which represents the span of the given regions
+     */
+    public ParseRegion plus(final ParseTreeNode... nodes)
+    {
+        return plusAll(
+            new AbstractList<ParseRegion>() {
+                public ParseRegion get(int index) {
+                    final ParseTreeNode node = nodes[index];
+                    if (node == null) {
+                        return null;
+                    }
+                    return node.getRegion();
+                }
+
+                public int size() {
+                    return nodes.length;
+                }
+            });
+    }
+
+    public ParseRegion plus(final List<? extends ParseTreeNode> nodes) {
+        if (nodes == null) {
+            return this;
+        }
+        return plusAll(
+            new AbstractList<ParseRegion>() {
+                public ParseRegion get(int index) {
+                    final ParseTreeNode node = nodes.get(index);
+                    if (node == null) {
+                        return null;
+                    }
+                    return node.getRegion();
+                }
+
+                public int size() {
+                    return nodes.size();
+                }
+            });
+    }
+
+    /**
+     * Combines this region with other regions.
+     *
+     * @param regions Source code regions
+     * @return region which represents the span of the given regions
+     */
+    public ParseRegion plus(ParseRegion... regions)
+    {
+        return plusAll(Arrays.asList(regions));
     }
 
     /**

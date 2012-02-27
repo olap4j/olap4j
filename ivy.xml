@@ -55,6 +55,8 @@
     <dependency org="net.sf" name="pdfdoclet" rev="1.0.2"
       conf="codegen->default" />
 
+    <dependency org="net.java.dev.javacc" name="javacc" rev="5.0"/>
+
   </dependencies>
 </ivy-module>
 

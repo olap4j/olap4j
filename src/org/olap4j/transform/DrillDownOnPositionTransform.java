@@ -179,8 +179,12 @@ public class DrillDownOnPositionTransform extends AxisTransform {
             // TODO Auto-generated method stub
             return null;
         }
-    }
 
+        public ParseTreeNode visit(DrillThroughNode drillThroughNode) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+    }
 }
 
 // End DrillDownOnPositionTransform.java

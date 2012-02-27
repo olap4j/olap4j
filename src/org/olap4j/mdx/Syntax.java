@@ -22,6 +22,8 @@ package org.olap4j.mdx;
 import java.io.PrintWriter;
 import java.util.List;
 
+import static org.olap4j.mdx.MdxUtil.unparseList;
+
 /**
  * Enumerated values describing the syntax of an expression.
  *
@@ -297,13 +299,39 @@ public enum Syntax {
      * Defines syntax for expression invoked <code>object&#46;&PROPERTY</code>
      * (a variant of {@link #Property}).
      */
-    QuotedProperty,
+    QuotedProperty {
+        public void unparse(
+            String operatorName,
+            List<ParseTreeNode> argList,
+            ParseTreeWriter writer)
+        {
+            assert argList.size() == 1;
+            argList.get(0).unparse(writer); // 'this'
+            final PrintWriter pw = writer.getPrintWriter();
+            pw.print(".[");
+            pw.print(operatorName);
+            pw.print("]");
+        }
+    },
 
     /**
      * Defines syntax for expression invoked <code>object&#46;[&PROPERTY]</code>
      * (a variant of {@link #Property}).
      */
-    AmpersandQuotedProperty,
+    AmpersandQuotedProperty {
+        public void unparse(
+            String operatorName,
+            List<ParseTreeNode> argList,
+            ParseTreeWriter writer)
+        {
+            assert argList.size() == 1;
+            argList.get(0).unparse(writer); // 'this'
+            final PrintWriter pw = writer.getPrintWriter();
+            pw.print(".&[");
+            pw.print(operatorName);
+            pw.print("]");
+        }
+    },
 
     /**
      * Defines the syntax for an empty expression. Empty expressions can occur
@@ -351,24 +379,6 @@ public enum Syntax {
         return !(args.size() == 1
                  && args.get(0) instanceof CallNode
                  && ((CallNode) args.get(0)).getSyntax() == Parentheses);
-    }
-
-    private static void unparseList(
-        ParseTreeWriter writer,
-        List<ParseTreeNode> argList,
-        String start,
-        String mid,
-        String end)
-    {
-        final PrintWriter pw = writer.getPrintWriter();
-        pw.print(start);
-        for (int i = 0; i < argList.size(); i++) {
-            if (i > 0) {
-                pw.print(mid);
-            }
-            argList.get(i).unparse(writer);
-        }
-        pw.print(end);
     }
 }
 

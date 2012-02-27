@@ -2962,7 +2962,7 @@ public class ConnectionTest extends TestCase {
      * <p>Test two arguments as part of the return clause,
      * on a constrained cell. One argument is a level
      * which returns a numeric key, the other is a level
-     * as a numeric key. 
+     * as a numeric key.
      */
     public void testCubesDrillthroughReturnClause() throws Exception {
         Class.forName(tester.getDriverClassName());

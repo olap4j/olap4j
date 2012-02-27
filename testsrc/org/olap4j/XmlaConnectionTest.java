@@ -427,13 +427,16 @@ public class XmlaConnectionTest extends TestCase {
         public PropertyListTestProxy(XmlaOlap4jProxy proxy) {
             super(proxy);
         }
-        private final static String[] lookup =
-            new String[] {
-                "<PASSWORD>"
-            };
+
+        private static final String[] lookup = {
+            "<PASSWORD>"
+        };
+
         private static int count = 0;
+
         public byte[] get(
-            XmlaOlap4jServerInfos serverInfos, String request)
+            XmlaOlap4jServerInfos serverInfos,
+            String request)
             throws XmlaOlap4jProxyException
         {
             for (String token : lookup) {

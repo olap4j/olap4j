@@ -19,6 +19,7 @@
 */
 package org.olap4j.mdx;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -95,6 +96,24 @@ class MdxUtil {
             listCopy.add((E) e.deepCopy());
         }
         return listCopy;
+    }
+
+    static void unparseList(
+        ParseTreeWriter writer,
+        List<ParseTreeNode> argList,
+        String start,
+        String mid,
+        String end)
+    {
+        final PrintWriter pw = writer.getPrintWriter();
+        pw.print(start);
+        for (int i = 0; i < argList.size(); i++) {
+            if (i > 0) {
+                pw.print(mid);
+            }
+            argList.get(i).unparse(writer);
+        }
+        pw.print(end);
     }
 }
 

@@ -170,6 +170,13 @@ class DefaultMdxValidatorImpl
         throw new UnsupportedOperationException();
     }
 
+    public ParseTreeNode visit(DrillThroughNode drillThroughNode) {
+        if (false) {
+            return null;
+        }
+        throw new UnsupportedOperationException();
+    }
+
     public void accept(AxisNode axis) {
         ParseTreeNode exp = axis.getExpression().accept(this);
         final Type type = exp.getType();

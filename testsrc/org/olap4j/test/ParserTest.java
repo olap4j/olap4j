@@ -21,6 +21,7 @@ package org.olap4j.test;
 
 import org.olap4j.Axis;
 import org.olap4j.OlapConnection;
+import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.*;
 import org.olap4j.mdx.parser.MdxParseException;
 import org.olap4j.mdx.parser.MdxParser;
@@ -79,6 +80,14 @@ public class ParserTest extends TestCase {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void assertParseExpr(String expr, String expected, boolean old) {
+        // See mondrian.olap.ParserTest.assertParseExpr(String, String, boolean)
+        if (old) {
+            return;
+        }
+        assertParseExpr(expr, expected);
     }
 
     public void testAddCarets()
@@ -140,15 +149,15 @@ public class ParserTest extends TestCase {
     public void testNegativeCases() throws Exception {
         assertParseQueryFails(
             "^s^ from sales",
-            "Syntax error at \\[1:1\\], token 's'");
+            "Syntax error at line 1, column 1, token 's'");
 
         assertParseQueryFails(
             "^seleg^ from sales",
-            "Syntax error at \\[1:1, 1:5\\], token 'seleg'");
+            "Syntax error at line 1, column 1, token 'seleg'");
 
         assertParseQueryFails(
             "^seleg^   from sales",
-            "Syntax error at \\[1:1, 1:5\\], token 'seleg'");
+            "Syntax error at line 1, column 1, token 'seleg'");
 
         assertParseQueryFails(
             "select [member] on ^axis(1.7)^ from sales",
@@ -156,15 +165,15 @@ public class ParserTest extends TestCase {
 
         assertParseQueryFails(
             "select [member] on ^foobar^ from sales",
-            "Syntax error at \\[1:20, 1:25\\], token 'foobar'");
+            "Syntax error at line 1, column 20, token 'foobar'");
 
         assertParseQueryFails(
-            "select [member] on axis(-^ ^1) from sales",
-            "Syntax error at \\[1:26\\], token '-'");
+            "select [member] on axis(^-^ 1) from sales",
+            "Syntax error at line 1, column 25, token '-'");
 
         assertParseQueryFails(
-            "select [member] on axis(-^1^) from sales",
-            "Syntax error at \\[1:26\\], token '-'");
+            "select [member] on axis(^-^1) from sales",
+            "Syntax error at line 1, column 25, token '-'");
 
         // used to be an error, but no longer
         assertParseQuery(
@@ -175,7 +184,7 @@ public class ParserTest extends TestCase {
 
         assertParseQueryFails(
             "select [member] on ^axes^(0) from sales",
-            "Syntax error at \\[1:20, 1:23\\], token 'axes'");
+            "Syntax error at line 1, column 20, token 'axes'");
 
         assertParseQueryFails(
             "select [member] on ^0.5^ from sales",
@@ -188,6 +197,17 @@ public class ParserTest extends TestCase {
             + "FROM sales");
     }
 
+    /**
+     * Test case for bug <a href="http://jira.pentaho.com/browse/MONDRIAN-831">
+     * MONDRIAN-831, "Failure parsing queries with member identifiers beginning
+     * with '_' and not expressed between brackets"</a>.
+     *
+     * <p>According to the spec
+     * <a href="http://msdn.microsoft.com/en-us/library/ms145572.aspx">
+     * Identifiers (MDX)</a>, the first character of a regular identifier
+     * must be a letter (per the unicode standard 2.0) or underscore. Subsequent
+     * characters must be a letter, and underscore, or a digit.
+     */
     public void testScannerPunc() {
         assertParseQuery(
             "with member [Measures].__Foo as 1 + 2\n"
@@ -202,15 +222,15 @@ public class ParserTest extends TestCase {
 
         // # is not allowed
         assertParseQueryFails(
-            "with member [Measures].#^_Foo as 1 + 2\n"
+            "with member [Measures].^#_Foo as 1 + 2\n"
             + "select __Foo on 0\n"
             + "from _Bar#Baz",
-            "Unexpected character '#'");
+            "Lexical error at line 1, column 24.  Encountered: \"#\" \\(35\\), after : \"\"");
         assertParseQueryFails(
             "with member [Measures].Foo as 1 + 2\n"
             + "select Foo on 0\n"
-            + "from Bar#B^az",
-            "Unexpected character '#'");
+            + "from Bar^#Baz",
+            "Lexical error at line 3, column 9\\.  Encountered: \"#\" \\(35\\), after : \"\"");
 
         // The spec doesn't allow $ but SSAS allows it so we allow it too.
         assertParseQuery(
@@ -232,8 +252,8 @@ public class ParserTest extends TestCase {
 
         // ']' unexpected
         assertParseQueryFails(
-            "select { Customers]^.^Children } on columns from [Sales]",
-            "Unexpected character ']'");
+            "select { Customers^]^.Children } on columns from [Sales]",
+            "Lexical error at line 1, column 19\\.  Encountered: \"\\]\" \\(93\\), after : \"\"");
     }
 
     public void testUnparse() {
@@ -505,6 +525,18 @@ public class ParserTest extends TestCase {
             identifier.getSegmentList().get(0).getName());
     }
 
+    /**
+     * If an axis expression is a member, implicitly convert it to a set.
+     */
+    public void testMemberOnAxis() {
+        assertParseQuery(
+            "select [Measures].[Sales Count] on 0, non empty [Store].[Store State].members on 1 from [Sales]",
+            "SELECT\n"
+            + "[Measures].[Sales Count] ON COLUMNS,\n"
+            + "NON EMPTY [Store].[Store State].members ON ROWS\n"
+            + "FROM [Sales]");
+    }
+
     public void testCaseTest() {
         assertParseQuery(
             "with member [Measures].[Foo] as "
@@ -531,6 +563,35 @@ public class ParserTest extends TestCase {
             + "FROM cube");
     }
 
+    /**
+     * Test case for bug <a href="http://jira.pentaho.com/browse/MONDRIAN-306">
+     * MONDRIAN-306, "Parser should not require braces around range op in WITH
+     * SET"</a>.
+     */
+    public void testSetExpr() {
+        assertParseQuery(
+            "with set [Set1] as '[Product].[Drink]:[Product].[Food]' \n"
+            + "select [Set1] on columns, {[Measures].defaultMember} on rows \n"
+            + "from Sales",
+            "WITH\n"
+            + "SET [Set1] AS\n"
+            + "    ([Product].[Drink] : [Product].[Food])\n"
+            + "SELECT\n"
+            + "[Set1] ON COLUMNS,\n"
+            + "{[Measures].defaultMember} ON ROWS\n"
+            + "FROM Sales");
+
+        // set expr in axes
+        assertParseQuery(
+            "select [Product].[Drink]:[Product].[Food] on columns,\n"
+            + " {[Measures].defaultMember} on rows \n"
+            + "from Sales",
+            "SELECT\n"
+            + "([Product].[Drink] : [Product].[Food]) ON COLUMNS,\n"
+            + "{[Measures].defaultMember} ON ROWS\n"
+            + "FROM Sales");
+    }
+
     public void testDimensionProperties() {
         assertParseQuery(
             "select {[foo]} properties p1,   p2 on columns from [cube]",
@@ -541,7 +602,8 @@ public class ParserTest extends TestCase {
 
     public void testCellProperties() {
         assertParseQuery(
-            "select {[foo]} on columns from [cube] CELL PROPERTIES FORMATTED_VALUE",
+            "select {[foo]} on columns "
+            + "from [cube] CELL PROPERTIES FORMATTED_VALUE",
             "SELECT\n"
             + "{[foo]} ON COLUMNS\n"
             + "FROM [cube]\n"
@@ -558,15 +620,19 @@ public class ParserTest extends TestCase {
             "(([Measures].[Unit Sales] IS EMPTY) AND (1 IS NULL))");
 
         // FIXME: "NULL" should associate as "IS NULL" rather than "NULL + 56"
+        // FIXME: Gives error at token '+' with new parser.
         assertParseExpr(
             "- x * 5 is empty is empty is null + 56",
-            "(((((- x) * 5) IS EMPTY) IS EMPTY) IS (NULL + 56))");
+            "(((((- x) * 5) IS EMPTY) IS EMPTY) IS (NULL + 56))",
+            true);
     }
 
     public void testIs() {
         assertParseExpr(
-            "[Measures].[Unit Sales] IS [Measures].[Unit Sales] AND [Measures].[Unit Sales] IS NULL",
-            "(([Measures].[Unit Sales] IS [Measures].[Unit Sales]) AND ([Measures].[Unit Sales] IS NULL))");
+            "[Measures].[Unit Sales] IS [Measures].[Unit Sales] "
+            + "AND [Measures].[Unit Sales] IS NULL",
+            "(([Measures].[Unit Sales] IS [Measures].[Unit Sales]) "
+            + "AND ([Measures].[Unit Sales] IS NULL))");
     }
 
     public void testIsNull() {
@@ -588,9 +654,11 @@ public class ParserTest extends TestCase {
 
         // FIXME: Should be:
         //  "(((((x IS NULL) AND (a = b)) OR ((c = (d + 5))) IS NULL) + 5)"
+        // FIXME: Gives error at token '+' with new parser.
         assertParseExpr(
             "x is null and a = b or c = d + 5 is null + 5",
-            "(((x IS NULL) AND (a = b)) OR ((c = (d + 5)) IS (NULL + 5)))");
+            "(((x IS NULL) AND (a = b)) OR ((c = (d + 5)) IS (NULL + 5)))",
+            true);
     }
 
     public void testNull() {
@@ -607,6 +675,34 @@ public class ParserTest extends TestCase {
         assertParseExpr(
             "Cast(1 + 2 AS String)",
             "CAST((1 + 2) AS String)");
+    }
+
+    /**
+     * Verifies that calculated measures made of several '*' operators
+     * can resolve them correctly.
+     */
+    public void testMultiplication() {
+        MdxParser p = createParser();
+        final String mdx =
+            wrapExpr(
+                "([Measures].[Unit Sales]"
+                + " * [Measures].[Store Cost]"
+                + " * [Measures].[Store Sales])");
+
+        assertParseQuery(
+            mdx,
+            "WITH\n"
+            + "MEMBER [Measures].[Foo] AS\n"
+            + "    (([Measures].[Unit Sales] * [Measures].[Store Cost]) * [Measures].[Store Sales])\n"
+            + "SELECT\n"
+            + "FROM [Sales]");
+    }
+
+    public void testBangFunction() {
+        // Parser accepts '<id> [! <id>] *' as a function name, but ignores
+        // all but last name.
+        assertParseExpr("foo!bar!Exp(2.0)", "Exp(2.0)");
+        assertParseExpr("1 + VBA!Exp(2.0 + 3)", "(1 + Exp((2.0 + 3)))");
     }
 
     public void testId() {
@@ -682,18 +778,18 @@ public class ParserTest extends TestCase {
         assertParseExpr(
             "[Foo].&Key1&Key2 + 4",
             "([Foo].&Key1&Key2 + 4)");
-        // brackets are requred for numbers
+        // brackets are required for numbers
         assertParseExprFails(
             "[Foo].&[1]&[Key2]&^3.[Bar]",
-            "Syntax error at \\[1:51\\], token '&'");
+            "Lexical error at line 1, column 51\\.  Encountered: \"3\" \\(51\\), after : \"&\"");
         // space between ampersand and key is unacceptable
         assertParseExprFails(
             "[Foo].&^ [Key2].[Bar]",
-            "Syntax error at \\[1:40\\], token '&'");
+            "Lexical error at line 1, column 40\\.  Encountered: \" \" \\(32\\), after : \"&\"");
         // underscore after ampersand is unacceptable
         assertParseExprFails(
             "[Foo].&^_Key2.[Bar]",
-            "Syntax error at \\[1:40\\], token '&'");
+            "Lexical error at line 1, column 40\\.  Encountered: \"_\" \\(95\\), after : \"&\"");
         // but underscore is OK within brackets
         assertParseExpr(
             "[Foo].&[_Key2].[Bar]",
@@ -735,7 +831,7 @@ public class ParserTest extends TestCase {
         // space bad
         assertParseExprFails(
             "4 ^5^",
-            "Syntax error at \\[1:35\\], token '5\\'");
+            "Syntax error at line 1, column 35, token '5'");
 
         assertParseExpr("3.14", "3.14");
         assertParseExpr(".12345", "0.12345");
@@ -751,21 +847,34 @@ public class ParserTest extends TestCase {
             "(- 3141592653589793.14159265358979)");
 
         // exponents akimbo
-        assertParseExpr("1e2", "100");
+        assertParseExpr("1e2", "100", true);
+        assertParseExpr("1e2", Olap4jUtil.PreJdk15 ? "100" : "1E+2", false);
+
         assertParseExprFails(
-            "1e2e^3^", // todo: fix parser; should be "1e2^e3^"
+            "1e2^e3^",
             "Syntax error at .* token 'e3'");
-        assertParseExpr("1.2e3", "1200");
+
+        assertParseExpr("1.2e3", "1200", true);
+        assertParseExpr(
+            "1.2e3",
+            Olap4jUtil.PreJdk15 ? "1200" : "1.2E+3", false);
+
         assertParseExpr("-1.2345e3", "(- 1234.5)");
         assertParseExprFails(
-            "1.2e3.^4^", // todo: fix parser; should be "1.2e3^.4^"
-            "Syntax error at .* token '0.4'");
+            "1.2e3^.4^",
+            "Syntax error at .* token '\\.4'");
         assertParseExpr(".00234e0003", "2.34");
-        assertParseExpr(".00234e-0067", "2.34E-70");
+        assertParseExpr(
+            ".00234e-0067",
+            Olap4jUtil.PreJdk15
+                ? "0.00000000000000000000000000000000000000000000000000000000"
+                     + "0000000000000234"
+                : "2.34E-70");
     }
 
     /**
-     * Testcase for bug 1688645, "High precision number in MDX causes overflow".
+     * Testcase for bug <a href="http://jira.pentaho.com/browse/MONDRIAN-272">
+     * MONDRIAN-272, "High precision number in MDX causes overflow"</a>.
      * The problem was that "5000001234" exceeded the precision of the int being
      * used to gather the mantissa.
      */
@@ -795,7 +904,7 @@ public class ParserTest extends TestCase {
         IdentifierNode id;
         try {
             id = new IdentifierNode();
-            fail("expected exception");
+            fail("expected exception, got " + id);
         } catch (IllegalArgumentException e) {
             // ok
         }
@@ -962,7 +1071,8 @@ public class ParserTest extends TestCase {
     }
 
     private String wrapExpr(String expr) {
-        return "with member [Measures].[Foo] as "
+        return
+            "with member [Measures].[Foo] as "
             + expr
             + "\n select from [Sales]";
     }
