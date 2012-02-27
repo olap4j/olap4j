@@ -135,8 +135,8 @@ doCheck() {
         fi
         ;;
 
-    # Only validate .java and .cup files at present.
-    *.java|*.cup|*.h|*.cpp)
+    # Only validate .java and .jj files at present.
+    *.java|*.jj|*.h|*.cpp)
         ;;
 
     *)

@@ -49,9 +49,6 @@
 
   <dependencies defaultconf="default->default">
 
-    <dependency org="javacup" name="javacup" rev="10k"
-        conf="default->default"/>
-
     <dependency org="net.sf" name="pdfdoclet" rev="1.0.2"
       conf="codegen->default" />
 

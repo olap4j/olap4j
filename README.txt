@@ -80,7 +80,6 @@ Dependencies
 olap4j requires the following libraries at run time:
 
 * lib/olap4j.jar (or lib/olap4j-jdk14.jar if you are running JDK 1.4)
-* lib/javacup.jar
 
 If you use the JDK 1.4 compatible jar, you will also need:
 
