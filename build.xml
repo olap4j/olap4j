@@ -48,7 +48,7 @@ src/org/olap4j/mdx/parser/impl/TokenMgrError.java,
 src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
 
     <target name="checkIsJdk15" if="jdk15.not.present">
-        <fail message="The 'jar' target (and dependent targets 'release', 'binzip') must be run under JDK 1.5." />
+        <fail message="The 'dist' target (used to make an official release) must be run under JDK 1.5." />
     </target>
 
     <condition property="jdk15.present">
@@ -108,7 +108,9 @@ src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
     </target>
 
     <!-- Override to create a proper release. -->
-    <target name="dist"
+    <target name="dist" depends="checkIsJdk15, all"/>
+
+    <target name="all"
         depends="clean,version-properties,jar,tck-jar,xmla-jar,javadoc,javadoc-pdf,jar-jdk14,source.zip"
         description="Creates a distribution">
         <zip zipfile="${dist.dir}/${zip.filename}">
@@ -154,7 +156,7 @@ olap4j_api.pdf"
         depends="init, compile.pre, compileJdk15, compileJdk16, compileJdk17, compile.src_copy, compile.res_copy, compile.lic_copy, compile.post"
         description="Performs all the steps to prepare the bin directory with a complete compilation" />
 
-    <target name="jar" depends="init, compile.pre, checkIsJdk15, compileJdk15, compileJdk16, compileJdk17, compile, compile-tests, set-build.id, generate.manifest"
+    <target name="jar" depends="init, compile.pre, compileJdk15, compileJdk16, compileJdk17, compile, compile-tests, set-build.id, generate.manifest"
         description="Jars up the bin directory after a compile">
         <zip destfile="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">
             <zipfileset dir="${basedir}" prefix=""
