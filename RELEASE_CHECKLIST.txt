@@ -1,42 +1,57 @@
+# $Id$
 
- - Update README.txt, CHANGES.txt, index.html.
+olap4j release check-list
+=========================
 
- - Update build.properties
+  - Update README.txt, CHANGES.txt, index.html.
 
- - Edit test.properties and run the test suite. Make sure everything is green.
-   Also make sure to run both the Mondrian and the XMLA TCKs.
+  - Update build.properties
 
- - Make sure that you have all of the following Java JVM's installed
-   separately:
+  - Edit test.properties and run the test suite. Make sure everything is green.
+    Also make sure to run both the Mondrian and the XMLA TCKs.
 
-    * Java 5
-    * Java 6
-    * Java 7
+  - Make sure that you have all of the following Java JVMs installed
+    separately:
 
-  - Update buildOnJdk.[sh|bat].
+     * Java 1.5
+     * Java 1.6
+     * Java 1.7
 
-    If you are building on a Linux/Unix/Whatever machine, you only need to create
-    symlinks to /usr/lib/jvm/${jdkVersion} where jdkVersion is one of 1.5, 1.6 or 1.7.
+    If you are building on a Linux/Unix/Whatever machine, you should create
+    symlinks /usr/lib/jvm/${jdkVersion} where jdkVersion is one of 1.5, 1.6 or
+    1.7.
 
-    If you are building on a Windows system, including Cygwin users, edit the Batch
-    file and set the properties JAVA_HOME_1* to the paths of the corresponding JVM
-    installation paths. You can also set these variables in your system environment.
+  - Update buildOnJdk.sh (or buildOnJdk.bat if you are building on Windows).
 
-  - Make sure that the JVM 5 is the default JVM on the system path.
+    Important: Uncomment the "case" expression that sets JAVA_HOME. (These days
+    buildOnJdk is configured to work out-of-the-box for developers building for
+    just one JDK, whereas for a release you need it to build for 3 JDKs.)
 
-  - Run a test build: $ ant clean-all dist
-  
-    Pay close attention to the Ant targets named compileJdk1* and ensure that each
-    JVM compilation phase has compiled the files it needed to. The JDK 1.5 should compile
-    about 700+ files. The JDK 1.6 must compile the JDBC 4.0 classes (2 files)
-    and Java 7 should compile the JDBC 4.1 driver (1 file).
+    If you are building on a Windows system, including Cygwin users, edit the
+    Batch file and set the properties JAVA_HOME_1* to the paths of the
+    corresponding JVM installation paths. You can also set these variables in
+    your system environment.
 
-    Check the Javadoc warnings, and make sure that the only warnings are related to
-    the JDBC 4 and 4.1 classes. Any other error/warning must be fixed.
+  - Make sure that the Java 1.5 is the default JDK on the system path.
+
+  - Run a test build:
+
+      $ ant clean-all dist
+
+    Pay close attention to the Ant targets named compileJdk1.5, compileJdk1.6
+    and compileJdk1.7, and ensure that each JVM compilation phase has compiled
+    the files it needed to. The JDK 1.5 should compile about 700+ files. The JDK
+    1.6 must compile the JDBC 4.0 classes (2 files) and JDK 1.7 should compile
+    the JDBC 4.1 driver (1 file). In each compileJdk1.x target, the first target
+    is called "apologise:", and must produce no output.
+
+    Check the Javadoc warnings, and make sure that the only warnings are related
+    to the JDBC 4 and 4.1 classes. Any other error/warning must be fixed.
 
   - Check the zip file.
-  
+
       * Make sure that it contains all the required files.
       * Make sure that the Javadoc links work correctly.
       * Make sure that all JAR files are present.
-      
+
+# End RELEASE_CHECKLIST.txt

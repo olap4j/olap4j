@@ -81,6 +81,15 @@ src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
         </not>
     </condition>
 
+    <condition property="java.version.matches.requested">
+      <or>
+        <not>
+          <isset property="requested.java.version"/>
+        </not>
+        <matches pattern="^${requested.java.version}.*" string="jdk${java.runtime.version}" />
+      </or>
+    </condition>
+
     <target name="setup" depends="version-properties,compile,create-dot-classpath"
         description="Setups the project for eclipse." />
 
@@ -359,8 +368,15 @@ class XmlaOlap4jDriverVersion {
         <!-- Purposely left empty. Exportable Ivy files are generated when resolving. -->
     </target>
 
+    <target name="apologise" unless="java.version.matches.requested">
+      <echo>Actual JVM Version (${java.runtime.version}) does not match
+requested (${requested.java.version}); skipping compile for this JDK.
+If you wish to build for this JDK, modify ${unix.script}.
+      </echo>
+    </target>
+
     <!-- override compile task to account for special jdk handling -->
-    <target name="compile.compile">
+    <target name="compile.compile" depends="apologise" if="java.version.matches.requested">
         <javac destdir="${classes.dir}" debug="${javac.debug}"
             deprecation="${javac.deprecation}" fork="true">
             <classpath>
