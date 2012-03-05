@@ -2986,11 +2986,11 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name], [Gender].[Gender]");
         assertDrillRowsEquals(
             rs,
-            "ROW:5956,M,\n"
-            + "ROW:6013,M,\n"
-            + "ROW:7293,M,\n"
-            + "ROW:7683,F,\n"
-            + "ROW:7683,F,\n");
+            "ROW:5956.0,M,\n"
+            + "ROW:6013.0,M,\n"
+            + "ROW:7293.0,M,\n"
+            + "ROW:7683.0,F,\n"
+            + "ROW:7683.0,F,\n");
     }
 
     /**
@@ -3006,11 +3006,11 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name]");
         assertDrillRowsEquals(
             rs,
-            "ROW:5956,\n"
-            + "ROW:6013,\n"
-            + "ROW:7293,\n"
-            + "ROW:7683,\n"
-            + "ROW:7683,\n");
+            "ROW:5956.0,\n"
+            + "ROW:6013.0,\n"
+            + "ROW:7293.0,\n"
+            + "ROW:7683.0,\n"
+            + "ROW:7683.0,\n");
     }
 
     /**
@@ -3026,11 +3026,11 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name]");
         assertDrillRowsEquals(
             rs,
-            "ROW:5956,\n"
-            + "ROW:6013,\n"
-            + "ROW:7293,\n"
-            + "ROW:7683,\n"
-            + "ROW:7683,\n");
+            "ROW:5956.0,\n"
+            + "ROW:6013.0,\n"
+            + "ROW:7293.0,\n"
+            + "ROW:7683.0,\n"
+            + "ROW:7683.0,\n");
     }
 
     /**
@@ -3049,7 +3049,7 @@ public class ConnectionTest extends TestCase {
             + "RETURN [Measures].[Unit Sales], [Measures].[Store Sales]");
         assertDrillRowsEquals(
             rs,
-            "ROW:1.0000,0.8000,\n");
+            "ROW:1.0,0.8,\n");
     }
 
     /**
@@ -3068,7 +3068,7 @@ public class ConnectionTest extends TestCase {
             + "RETURN [Measures].[Store Sales]");
         assertDrillRowsEquals(
             rs,
-            "ROW:0.8000,\n");
+            "ROW:0.8,\n");
     }
 
     /**
@@ -3084,11 +3084,11 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Measures].[Store Sales]");
         assertDrillRowsEquals(
             rs,
-            "ROW:1.2700,\n"
-            + "ROW:1.9500,\n"
-            +"ROW:2.8200,\n"
-            + "ROW:2.8400,\n"
-            + "ROW:3.4600,\n");
+            "ROW:1.27,\n"
+            + "ROW:1.95,\n"
+            +"ROW:2.82,\n"
+            + "ROW:2.84,\n"
+            + "ROW:3.46,\n");
     }
 
     /**
@@ -3104,11 +3104,11 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers], [Measures].[Promotion Sales]");
         assertDrillRowsEquals(
             rs,
-            "ROW:USA,1.2700,\n"
-            + "ROW:USA,1.9500,\n"
-            + "ROW:USA,2.8200,\n"
-            + "ROW:USA,2.8400,\n"
-            + "ROW:USA,3.4600,\n");
+            "ROW:USA,1.27,\n"
+            + "ROW:USA,1.95,\n"
+            + "ROW:USA,2.82,\n"
+            + "ROW:USA,2.84,\n"
+            + "ROW:USA,3.46,\n");
     }
 
     /**
@@ -3124,11 +3124,11 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[City], [Measures].[Promotion Sales]");
         assertDrillRowsEquals(
             rs,
-            "ROW:Walla Walla,1.2700,\n"
-            + "ROW:Walla Walla,1.9500,\n"
-            + "ROW:Walla Walla,2.8200,\n"
-            + "ROW:Walla Walla,2.8400,\n"
-            + "ROW:Walla Walla,3.4600,\n");
+            "ROW:Walla Walla,1.27,\n"
+            + "ROW:Walla Walla,1.95,\n"
+            + "ROW:Walla Walla,2.82,\n"
+            + "ROW:Walla Walla,2.84,\n"
+            + "ROW:Walla Walla,3.46,\n");
     }
 
     /**
@@ -3144,11 +3144,11 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread])");
         assertDrillRowsEquals(
             rs,
-            "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,8,34,14,Food,Baked Goods,Bread,Muffins,Great,Great Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Joe. Burnett,7293,Partial High School,M,S,$30K - $50K,1.0000,\n"
-            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,8,34,14,Food,Baked Goods,Bread,Muffins,Modell,Modell Cranberry Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Geraldine Aubrecht,5956,Partial High School,M,S,$30K - $50K,1.0000,\n"
-            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,8,34,14,Food,Baked Goods,Bread,Sliced Bread,Colony,Colony White Bread,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Rena Shaw,6013,Partial High School,M,M,$10K - $30K,2.0000,\n"
-            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,9,38,10,Food,Baked Goods,Bread,Muffins,Modell,Modell Blueberry Muffins,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683,High School Degree,F,M,$50K - $70K,1.0000,\n"
-            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997,Q3,9,38,10,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683,High School Degree,F,M,$50K - $70K,1.0000,\n");
+            "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Great,Great Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Joe. Burnett,7293.0,Partial High School,M,S,$30K - $50K,1.0,\n"
+            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Cranberry Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Geraldine Aubrecht,5956.0,Partial High School,M,S,$30K - $50K,1.0,\n"
+            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Sliced Bread,Colony,Colony White Bread,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Rena Shaw,6013.0,Partial High School,M,M,$10K - $30K,2.0,\n"
+            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Blueberry Muffins,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683.0,High School Degree,F,M,$50K - $70K,1.0,\n"
+            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683.0,High School Degree,F,M,$50K - $70K,1.0,\n");
     }
 
     private void assertDrillRowsEquals(
@@ -3160,7 +3160,9 @@ public class ConnectionTest extends TestCase {
             StringBuilder sb = new StringBuilder();
             sb.append("ROW:");
             for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                sb.append(rs.getString(i + 1));
+                sb.append(
+                    normalizeTrailingZeros(
+                        rs.getObject(i + 1)));
                 sb.append(",");
             }
             rows.add(sb.toString());
@@ -3175,6 +3177,25 @@ public class ConnectionTest extends TestCase {
             expected,
             sb.toString());
     }
+
+    /**
+     * This method normalizes the number of trailing zeros across
+     * the different FoodMart databases / test environments. All numbers
+     * are returned with format: '#0.0#'
+     */
+    private String normalizeTrailingZeros(Object str) {
+        if (str == null) {
+            return null;
+        }
+        final Double number;
+        try {
+            number = Double.parseDouble(String.valueOf(str));
+        } catch (NumberFormatException e) {
+            return String.valueOf(str);
+        }
+        return String.valueOf(number);
+    }
+
     /**
      * Query with dimension properties.
      *
