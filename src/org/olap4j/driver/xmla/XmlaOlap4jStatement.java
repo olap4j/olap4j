@@ -48,6 +48,9 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
     int timeoutSeconds;
     Future<byte []> future;
 
+    // Tells this statement to cancel as soon as it starts.
+    private boolean cancelEarly = false;
+
     /**
      * Creates an XmlaOlap4jStatement.
      *
@@ -130,10 +133,14 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
     }
 
     public synchronized void cancel() {
-        if (!canceled) {
-            canceled = true;
-            if (future != null) {
-                future.cancel(true);
+        synchronized (this) {
+            if (!canceled) {
+                if (future != null) {
+                    canceled = true;
+                    future.cancel(true);
+                } else {
+                    this.cancelEarly = true;
+                }
             }
         }
     }
@@ -347,6 +354,9 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
                 olap4jConnection.proxy.submit(
                     olap4jConnection.serverInfos, request);
             openCellSet = olap4jConnection.factory.newCellSet(this);
+        }
+        if (cancelEarly) {
+            cancel();
         }
         // Release the monitor before calling populate, so that cancel can
         // grab the monitor if it needs to.

@@ -40,6 +40,7 @@ import java.net.URL;
 import java.sql.*;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
@@ -138,7 +139,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     private final URL serverUrlObject;
 
-    private HashSet<String> olap4jDatabaseProperties;
+    private HashSet<String> olap4jDatabaseProperties = null;
 
     /**
      * This is a private property used for development only.
@@ -257,22 +258,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     null, null, null, null, null, null),
                 new XmlaOlap4jConnection.DatabaseHandler(),
                 null);
-
-        this.olap4jDatabaseProperties = new HashSet<String>();
-        final ResultSet rs =
-            this.olap4jDatabaseMetaData.getDatabaseProperties(null, null);
-        try {
-            while (rs.next()) {
-                String property =
-                    rs.getString(XmlaConstants.Literal.PROPERTY_NAME.name());
-                if (property != null) {
-                    property = property.toUpperCase();
-                    olap4jDatabaseProperties.add(property);
-                }
-            }
-        } finally {
-            rs.close();
-        }
     }
 
     /**
@@ -331,7 +316,37 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return url.startsWith(CONNECT_STRING_PREFIX);
     }
 
-    String makeConnectionPropertyList() {
+    String makeConnectionPropertyList() throws OlapException {
+        synchronized (propPopulation) {
+            if (propPopulation.get()) {
+                return "";
+            }
+            if (this.olap4jDatabaseProperties == null) {
+                propPopulation.set(true);
+                this.olap4jDatabaseProperties = new HashSet<String>();
+                final ResultSet rs =
+                    this.olap4jDatabaseMetaData.getDatabaseProperties(null, null);
+                try {
+                    while (rs.next()) {
+                        String property =
+                            rs.getString(XmlaConstants.Literal.PROPERTY_NAME.name());
+                        if (property != null) {
+                            property = property.toUpperCase();
+                            olap4jDatabaseProperties.add(property);
+                        }
+                    }
+                } catch (SQLException e) {
+                    throw new OlapException(e);
+                } finally {
+                    propPopulation.set(false);
+                    try {
+                        rs.close();
+                    } catch (SQLException e) {
+                        throw new OlapException();
+                    }
+                }
+            }
+        }
         StringBuilder buf = new StringBuilder();
         for (String prop : databaseProperties.keySet()) {
             if (prop.startsWith(
@@ -907,6 +922,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             findChild(discoverResponse, XMLA_NS, "return");
         return findChild(returnElement, ROWSET_NS, "root");
     }
+
+    final AtomicBoolean propPopulation = new AtomicBoolean(false);
 
     /**
      * Generates a metadata request.
@@ -2358,7 +2375,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
          * @return whether this request requires a DatasourceName element
          */
         public boolean requiresDatasourceName() {
-            return this != DISCOVER_DATASOURCES;
+            return this != DISCOVER_DATASOURCES && this != DISCOVER_PROPERTIES;
         }
 
         /**

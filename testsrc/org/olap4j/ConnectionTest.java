@@ -2576,6 +2576,13 @@ public class ConnectionTest extends TestCase {
             }
         ).start();
         try {
+            // Because XMLA doesn't pass cancel statements,
+            // we set a query timeout to cleanup in the background
+            if (tester.getFlavor().equals(Flavor.XMLA)
+                || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+            {
+                MondrianProperties.instance().QueryTimeout.set(5);
+            }
             final CellSet cellSet = olapStatement.executeOlapQuery(
                 "SELECT Filter(\n"
                 + " [Product].Members *\n"
@@ -2590,6 +2597,12 @@ public class ConnectionTest extends TestCase {
             assertTrue(
                 e.getMessage(),
                 e.getMessage().indexOf("Query canceled") >= 0);
+        } finally {
+            if (tester.getFlavor().equals(Flavor.XMLA)
+                || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+            {
+                MondrianProperties.instance().QueryTimeout.set(0);
+            }
         }
         if (exceptions[0] != null) {
             throw exceptions[0];
