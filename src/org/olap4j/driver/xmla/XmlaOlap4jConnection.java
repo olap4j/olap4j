@@ -906,15 +906,17 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 + "Request was:\n"
                 + request);
         }
-        Element session =
-            findChild(header, XMLA_NS, "Session");
-        if (session != null) {
-            String sessionId =
-                session.getAttribute("SessionId");
-            if ("".equals(sessionId)) {
-                sessionId = null;
+        if (header != null) {
+            Element session =
+                findChild(header, XMLA_NS, "Session");
+            if (session != null) {
+                String sessionId =
+                    session.getAttribute("SessionId");
+                if ("".equals(sessionId)) {
+                    sessionId = null;
+                }
+                serverInfos.setSessionId(sessionId);
             }
-            serverInfos.setSessionId(sessionId);
         }
         Element discoverResponse =
             findChild(body, XMLA_NS, "DiscoverResponse");
