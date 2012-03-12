@@ -1411,7 +1411,7 @@ public class OlapTest extends TestCase {
         TestContext.assertEqualsVerbose(
             "SELECT\n"
             + "{[Measures].[Sales Count]} ON COLUMNS,\n"
-            + "{{[Time.Weekly].[1997]}, Filter({{[Time.Weekly].[1997].[10].[23], [Time.Weekly].[1997].[10].[28]}}, (Ancestor([Time.Weekly].CurrentMember, [Time.Weekly].[Year]) IN {[Time.Weekly].[1997]}))} ON ROWS\n"
+            + "{{[Time.Weekly].[1997]}, Filter({{[Time.Weekly].[1997].[10].[23], [Time.Weekly].[1997].[10].[28]}}, (Exists(Ancestor([Time.Weekly].CurrentMember, [Time.Weekly].[Year]), {[Time.Weekly].[1997]}).Count  > 0))} ON ROWS\n"
             + "FROM [Sales]",
             mdxString);
 
