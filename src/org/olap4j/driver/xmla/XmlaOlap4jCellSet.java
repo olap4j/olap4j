@@ -291,15 +291,20 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             }
         }
 
-        // If XMLA did not return a filter axis, it means that the WHERE clause
-        // evaluated to zero tuples. (If the query had no WHERE clause, it
-        // would have evaluated to a single tuple with zero positions.)
+        // If XMLA did not return a filter axis, it means that there was no
+        // WHERE. This is equivalent to a slicer axis with one tuple that has
+        // zero positions. (Versions of Mondrian before 3.4 do, in fact, return
+        // a slicer axis with one empty position. This CellSet should behave the
+        // same.)
         if (filterAxis == null) {
             filterAxis =
                 new XmlaOlap4jCellSetAxis(
                     this,
                     Axis.FILTER,
-                    Collections.<Position>emptyList());
+                    Collections.<Position>singletonList(
+                        new XmlaOlap4jPosition(
+                            Collections.<Member>emptyList(),
+                            0)));
         }
 
         final Element cellDataNode = findChild(root, MDDATASET_NS, "CellData");

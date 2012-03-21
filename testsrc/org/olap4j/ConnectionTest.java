@@ -19,8 +19,6 @@
 */
 package org.olap4j;
 
-import mondrian.olap.MondrianProperties;
-
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.impl.Bug;
 import org.olap4j.impl.Olap4jUtil;
@@ -34,6 +32,8 @@ import org.olap4j.type.*;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+
+import mondrian.olap.MondrianProperties;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -3086,7 +3086,7 @@ public class ConnectionTest extends TestCase {
             rs,
             "ROW:1.27,\n"
             + "ROW:1.95,\n"
-            +"ROW:2.82,\n"
+            + "ROW:2.82,\n"
             + "ROW:2.84,\n"
             + "ROW:3.46,\n");
     }
