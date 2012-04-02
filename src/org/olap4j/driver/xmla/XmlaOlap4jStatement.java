@@ -20,6 +20,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
+import org.olap4j.driver.xmla.XmlaOlap4jConnection.BackendFlavor;
 import org.olap4j.mdx.*;
 
 import java.io.StringWriter;
@@ -291,9 +292,21 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
 
     public CellSet executeOlapQuery(String mdx) throws OlapException {
         final String catalog = olap4jConnection.getCatalog();
-        final String dataSourceInfo = olap4jConnection.getDatabase();
         final String roleName = olap4jConnection.getRoleName();
         final String propList = olap4jConnection.makeConnectionPropertyList();
+
+        final String dataSourceInfo;
+        switch (BackendFlavor.getFlavor(olap4jConnection)) {
+            case ESSBASE:
+                dataSourceInfo =
+                    olap4jConnection.getOlapDatabase()
+                        .getDataSourceInfo();
+                break;
+            default:
+                dataSourceInfo =
+                    olap4jConnection.getDatabase();
+        }
+
         StringBuilder buf = new StringBuilder(
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<soapenv:Envelope\n"

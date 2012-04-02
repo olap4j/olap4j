@@ -809,6 +809,39 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Enumeration of server backends. Use
+     * {@link BackendFlavor#getFlavor(XmlaOlap4jConnection)}
+     * to get the vendor for a given connection.
+     */
+    static enum BackendFlavor {
+        MONDRIAN("Mondrian"),
+        SSAS("Microsoft"),
+        PALO("Palo"),
+        SAP("SAP"),
+        ESSBASE("Essbase"),
+        UNKNOWN("");
+
+        private final String token;
+
+        private BackendFlavor(String token) {
+            this.token = token;
+        }
+
+        static BackendFlavor getFlavor(XmlaOlap4jConnection conn)
+            throws OlapException
+        {
+            final String dataSourceInfo =
+                conn.getOlapDatabase().getDataSourceInfo();
+            for (BackendFlavor flavor : BackendFlavor.values()) {
+                if (dataSourceInfo.contains(flavor.token)) {
+                    return flavor;
+                }
+            }
+            throw new AssertionError("Can't determine the backend vendor.");
+        }
+    }
+
     <T extends Named> void populateList(
         List<T> list,
         Context context,
@@ -1017,8 +1050,19 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
         // Add the datasource node only if this request requires it.
         if (metadataRequest.requiresDatasourceName()) {
+            final String dataSourceInfo;
+            switch (BackendFlavor.getFlavor(context.olap4jConnection)) {
+                case ESSBASE:
+                    dataSourceInfo =
+                        context.olap4jConnection.getOlapDatabase()
+                            .getDataSourceInfo();
+                    break;
+                default:
+                    dataSourceInfo =
+                        context.olap4jConnection.getDatabase();
+            }
             buf.append("        <DataSourceInfo>");
-            xmlEncode(buf, context.olap4jConnection.getDatabase());
+            xmlEncode(buf, dataSourceInfo);
             buf.append("</DataSourceInfo>\n");
         }
 
