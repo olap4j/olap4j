@@ -40,7 +40,7 @@ public class DefaultMdxParserImpl implements MdxParser {
     private boolean debug = false;
     private final FunTable funTable = new FunTable() {
         public boolean isProperty(String s) {
-            return s.equals("CHILDREN");
+            return s.equalsIgnoreCase("CHILDREN");
         }
     };
 
@@ -53,7 +53,8 @@ public class DefaultMdxParserImpl implements MdxParser {
 
     public SelectNode parseSelect(String mdx) {
         try {
-            return new MdxParserImpl(mdx, false, false).selectStatement();
+            return new MdxParserImpl(mdx, debug, funTable, false)
+                .selectStatement();
         } catch (TokenMgrError e) {
             throw convertException(mdx, e);
         } catch (ParseException e) {
@@ -63,7 +64,7 @@ public class DefaultMdxParserImpl implements MdxParser {
 
     public ParseTreeNode parseExpression(String mdx) {
         try {
-            return new MdxParserImpl(mdx, false, false).expression();
+            return new MdxParserImpl(mdx, debug, funTable, false).expression();
         } catch (TokenMgrError e) {
             throw convertException(mdx, e);
         } catch (ParseException e) {

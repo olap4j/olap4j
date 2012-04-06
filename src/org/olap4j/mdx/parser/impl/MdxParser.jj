@@ -39,7 +39,7 @@ import java.math.BigDecimal;
 /**
  * MDX parser, generated from MdxParser.jj.
  *
- * <p>The public wrapper for this parser is {@link DefaultMdxParser}.
+ * <p>The public wrapper for this parser is {@link DefaultMdxParserImpl}.
  *
  * @author jhyde
  * @version $Id$
@@ -52,19 +52,11 @@ import java.math.BigDecimal;
 })
 public class MdxParserImpl
 {
-    interface FunctionTable {
-        boolean isProperty(String name);
-    }
-
 /*
     private MdxParserValidator.QueryPartFactory factory;
     private Statement statement;
     */
-    private final FunctionTable funTable = new FunctionTable() {
-        public boolean isProperty(String name) {
-            return name.equals("CHILDREN");
-        }
-    };
+    private DefaultMdxParserImpl.FunTable funTable;
     private boolean strictValidation;
 
     private static final Comparator<AxisNode> AXIS_NODE_COMPARATOR =
@@ -75,21 +67,13 @@ public class MdxParserImpl
         };
 
     public MdxParserImpl(
-    /*
-        MdxParserValidator.QueryPartFactory factory,
-        Statement statement,
-        */
         String queryString,
         boolean debug,
-        /*
-        FunTable funTable,
-        */
+        DefaultMdxParserImpl.FunTable funTable,
         boolean strictValidation)
     {
         this(new StringReader(term(queryString)));
-//        this.factory = factory;
-//        this.statement = statement;
-//        this.funTable = funTable;
+        this.funTable = funTable;
         this.strictValidation = strictValidation;
     }
 
@@ -104,11 +88,9 @@ public class MdxParserImpl
     ParseTreeNode recursivelyParseExp(String s) throws ParseException {
         MdxParserImpl parser =
             new MdxParserImpl(
-//                factory,
-//                statement,
                 s,
                 false,
-//                funTable,
+                funTable,
                 strictValidation);
         return parser.expression();
     }
@@ -127,12 +109,10 @@ public class MdxParserImpl
 
     private List<ParseRegion> regionList(final List<ParseTreeNode> nodes) {
         return new AbstractList<ParseRegion>() {
-            @Override
             public ParseRegion get(int index) {
                 return nodes.get(index).getRegion();
             }
 
-            @Override
             public int size() {
                 return nodes.size();
             }
@@ -142,76 +122,16 @@ public class MdxParserImpl
     ParseRegion region(final ParseTreeNode... nodes) {
         return ParseRegion.sum(
             new AbstractList<ParseRegion>() {
-                @Override
                 public ParseRegion get(int index) {
                     return nodes[index].getRegion();
                 }
 
-                @Override
                 public int size() {
                     return nodes.length;
                 }
             }
         );
     }
-
-/*
-    static IdentifierNode[] toIdArray(List<IdentifierNode> idList) {
-        if (idList == null || idList.size() == 0) {
-            return EmptyIdArray;
-        } else {
-            return idList.toArray(new IdentifierNode[idList.size()]);
-        }
-    }
-
-    static ParseTreeNode[] toExpArray(List<ParseTreeNode> expList) {
-        if (expList == null || expList.size() == 0) {
-            return EmptyExpArray;
-        } else {
-            return expList.toArray(new ParseTreeNode[expList.size()]);
-        }
-    }
-
-    static WithMemberNode[] toFormulaArray(List<WithMemberNode> formulaList) {
-        if (formulaList == null || formulaList.size() == 0) {
-            return EmptyFormulaArray;
-        } else {
-            return formulaList.toArray(new WithMemberNode[formulaList.size()]);
-        }
-    }
-
-    static PropertyValueNode[] toMemberPropertyArray(List<PropertyValueNode> mpList) {
-        if (mpList == null || mpList.size() == 0) {
-            return EmptyMemberPropertyArray;
-        } else {
-            return mpList.toArray(new PropertyValueNode[mpList.size()]);
-        }
-    }
-
-    static ParseTreeNode[] toQueryPartArray(List<ParseTreeNode> qpList) {
-        if (qpList == null || qpList.size() == 0) {
-            return EmptyQueryPartArray;
-        } else {
-            return qpList.toArray(new ParseTreeNode[qpList.size()]);
-        }
-    }
-
-    static AxisNode[] toQueryAxisArray(List<AxisNode> qpList) {
-        if (qpList == null || qpList.size() == 0) {
-            return EmptyQueryAxisArray;
-        } else {
-            return qpList.toArray(new AxisNode[qpList.size()]);
-        }
-    }
-
-    private static final PropertyValueNode[] EmptyMemberPropertyArray =
-        new PropertyValueNode[0];
-    private static final ParseTreeNode[] EmptyExpArray = new ParseTreeNode[0];
-    private static final WithMemberNode[] EmptyFormulaArray = new WithMemberNode[0];
-    private static final IdentifierNode[] EmptyIdArray = new IdentifierNode[0];
-    private static final ParseTreeNode[] EmptyQueryPartArray = new ParseTreeNode[0];
-    private static final AxisNode[] EmptyQueryAxisArray = new AxisNode[0];
-*/
 
     private static final String DQ = '"' + "";
     private static final String DQDQ = DQ + DQ;

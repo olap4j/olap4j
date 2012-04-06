@@ -288,20 +288,20 @@ public class ParserTest extends TestCase {
     }
 
     private void assertParseQueryFails(String query, String expected) {
-        checkFails(createParser(), query, expected);
+        checkFails(createParser(), query, regexpChecker(expected));
     }
 
     private void assertParseExprFails(String expr, String expected) {
-        checkFails(createParser(), wrapExpr(expr), expected);
+        checkFails(createParser(), wrapExpr(expr), regexpChecker(expected));
     }
 
-    private void checkFails(MdxParser p, String query, String expected) {
+    private void checkFails(MdxParser p, String query, Checker checker) {
         final ParseRegion.RegionAndSource ras = ParseRegion.findPos(query);
         try {
             SelectNode selectNode = p.parseSelect(ras.source);
             fail("Must return an error, got " + selectNode);
         } catch (Exception e) {
-            checkEx(e, expected, ras);
+            checkEx(e, checker, ras);
         }
     }
 
@@ -315,7 +315,7 @@ public class ParserTest extends TestCase {
      */
     public static void checkEx(
         Throwable ex,
-        String expectedMsgPattern,
+        Checker expectedMsgPattern,
         ParseRegion.RegionAndSource ras)
     {
         String NL = TestContext.NL;
@@ -422,9 +422,7 @@ public class ParserTest extends TestCase {
                     throw new AssertionFailedError(
                         "todo: add carets to sql: " + sqlWithCarets);
                 }
-                if ((actualMessage == null)
-                    || !actualMessage.matches(expectedMsgPattern))
-                {
+                if (!expectedMsgPattern.apply(actualException)) {
                     actualException.printStackTrace();
                     final String actualJavaRegexp =
                         (actualMessage == null) ? "null"
@@ -1039,6 +1037,32 @@ public class ParserTest extends TestCase {
     }
 
     /**
+     * Test case for bug
+     * <a href="http://sourceforge.net/tracker/?func=detail&aid=3515404&group_id=168953&atid=848534">3515404</a>,
+     * "Inconsistent parsing behavior('.CHILDREN' and '.Children')".
+     */
+    public void testChildren() {
+        MdxParser p = createParser();
+        ParseTreeNode node = p.parseExpression("[Store].[USA].CHILDREN");
+        checkChildren(node, "CHILDREN");
+
+        ParseTreeNode node2 = p.parseExpression("[Store].[USA].Children");
+        checkChildren(node2, "Children");
+
+        ParseTreeNode node3 = p.parseExpression("[Store].[USA].children");
+        checkChildren(node3, "children");
+    }
+
+    private void checkChildren(ParseTreeNode node, String name) {
+        assertTrue(node instanceof CallNode);
+        CallNode call = (CallNode) node;
+        assertEquals(name, call.getOperatorName());
+        assertTrue(call.getArgList().get(0) instanceof IdentifierNode);
+        assertEquals("[Store].[USA]", call.getArgList().get(0).toString());
+        assertEquals(1, call.getArgList().size());
+    }
+
+    /**
      * Parses an MDX query and asserts that the result is as expected when
      * unparsed.
      *
@@ -1075,6 +1099,31 @@ public class ParserTest extends TestCase {
             "with member [Measures].[Foo] as "
             + expr
             + "\n select from [Sales]";
+    }
+
+    static Checker regexpChecker(String pattern) {
+        return new RegexpChecker(pattern);
+    }
+
+    interface Checker {
+        boolean apply(Throwable e);
+    }
+
+    static class RegexpChecker implements Checker {
+        private final String pattern;
+
+        public RegexpChecker(String pattern) {
+            this.pattern = pattern;
+        }
+
+        public String toString() {
+            return "regex(" + pattern + ")";
+        }
+
+        public boolean apply(Throwable e) {
+            return e.getMessage() != null
+                   && e.getMessage().matches(pattern);
+        }
     }
 }
 
