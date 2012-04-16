@@ -481,7 +481,7 @@ public class Olap4jUtil {
      * @return an unmodifiable view of the specified list.
      */
     public static <T> NamedList<T> unmodifiableNamedList(
-        final NamedList<? extends T> list)
+        final NamedList<T> list)
     {
         return list instanceof RandomAccess
             ? new UnmodifiableNamedRandomAccessList<T>(list)
@@ -638,9 +638,9 @@ public class Olap4jUtil {
     }
 
     private static class UnmodifiableNamedList<T> implements NamedList<T> {
-        private final NamedList<? extends T> list;
+        private final NamedList<T> list;
 
-        UnmodifiableNamedList(NamedList<? extends T> list) {
+        UnmodifiableNamedList(NamedList<T> list) {
             this.list = list;
         }
 
@@ -652,7 +652,7 @@ public class Olap4jUtil {
             return list.indexOfName(s);
         }
 
-        public String getName(Object element) {
+        public String getName(T element) {
             return list.getName(element);
         }
 
@@ -760,7 +760,7 @@ public class Olap4jUtil {
         extends UnmodifiableNamedList<T>
         implements RandomAccess
     {
-        UnmodifiableNamedRandomAccessList(NamedList<? extends T> list) {
+        UnmodifiableNamedRandomAccessList(NamedList<T> list) {
             super(list);
         }
     }

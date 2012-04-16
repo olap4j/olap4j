@@ -40,16 +40,15 @@ class XmlaOlap4jCellSetMetaData implements CellSetMetaData {
     final XmlaOlap4jCube cube;
     private final NamedList<CellSetAxisMetaData> axisMetaDataList =
         new ArrayNamedListImpl<CellSetAxisMetaData>() {
-            public String getName(Object axisMetaData) {
-                return ((CellSetAxisMetaData) axisMetaData).getAxisOrdinal()
-                    .name();
+            public String getName(CellSetAxisMetaData axisMetaData) {
+                return axisMetaData.getAxisOrdinal().name();
             }
         };
     private final XmlaOlap4jCellSetAxisMetaData filterAxisMetaData;
     private final NamedList<Property> cellProperties =
         new ArrayNamedListImpl<Property>() {
-            public String getName(Object property) {
-                return ((Property) property).getName();
+            public String getName(Property property) {
+                return property.getName();
             }
         };
     final Map<String, Property> propertiesByTag;
