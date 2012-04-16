@@ -117,7 +117,7 @@ class DeferredNamedListImpl<T extends Named>
         return getList().indexOfName(name);
     }
 
-    public String getName(T element) {
+    public String getName(Object element) {
         return getList().getName(element);
     }
 

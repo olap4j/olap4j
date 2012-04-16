@@ -652,7 +652,7 @@ public class Olap4jUtil {
             return list.indexOfName(s);
         }
 
-        public String getName(T element) {
+        public String getName(Object element) {
             return list.getName(element);
         }
 
