@@ -62,7 +62,7 @@ public interface NamedList<E> extends List<E> {
      * @param element Element
      * @return Name of element
      */
-    String getName(Object element);
+    String getName(E element);
 
     /**
      * Returns a view of this named list as a {@link Map} whose key is the name
