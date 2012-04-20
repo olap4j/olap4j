@@ -2978,6 +2978,12 @@ public class ConnectionTest extends TestCase {
      * as a numeric key.
      */
     public void testCubesDrillthroughReturnClause() throws Exception {
+        if (tester.getFlavor().equals(Flavor.XMLA)
+            || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+        {
+            // TODO: Drillthrough is not implemented in XMLA yet.
+            return;
+        }
         Class.forName(tester.getDriverClassName());
         connection = tester.createConnection();
         OlapConnection olapConnection =
@@ -2998,6 +3004,12 @@ public class ConnectionTest extends TestCase {
      * but with a single column returned.
      */
     public void testCubesDrillthroughReturnClause2() throws Exception {
+        if (tester.getFlavor().equals(Flavor.XMLA)
+            || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+        {
+            // TODO: Drillthrough is not implemented in XMLA yet.
+            return;
+        }
         Class.forName(tester.getDriverClassName());
         connection = tester.createConnection();
         OlapConnection olapConnection =
@@ -3018,6 +3030,12 @@ public class ConnectionTest extends TestCase {
      * but without selecting anything except the slicer axis.
      */
     public void testCubesDrillthroughReturnClause3() throws Exception {
+        if (tester.getFlavor().equals(Flavor.XMLA)
+            || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+        {
+            // TODO: Drillthrough is not implemented in XMLA yet.
+            return;
+        }
         Class.forName(tester.getDriverClassName());
         connection = tester.createConnection();
         OlapConnection olapConnection =
@@ -3038,6 +3056,12 @@ public class ConnectionTest extends TestCase {
      * include any measure on its axis, but has 2 in the RETURN clause.
      */
     public void testCubesDrillthroughReturnClause4() throws Exception {
+        if (tester.getFlavor().equals(Flavor.XMLA)
+            || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+        {
+            // TODO: Drillthrough is not implemented in XMLA yet.
+            return;
+        }
         Class.forName(tester.getDriverClassName());
         connection = tester.createConnection();
         OlapConnection olapConnection =
@@ -3057,6 +3081,12 @@ public class ConnectionTest extends TestCase {
      * include any measure on its axis, but has 1 in the RETURN clause.
      */
     public void testCubesDrillthroughReturnClause5() throws Exception {
+        if (tester.getFlavor().equals(Flavor.XMLA)
+            || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+        {
+            // TODO: Drillthrough is not implemented in XMLA yet.
+            return;
+        }
         Class.forName(tester.getDriverClassName());
         connection = tester.createConnection();
         OlapConnection olapConnection =
@@ -3076,6 +3106,12 @@ public class ConnectionTest extends TestCase {
      * a different measure as part of the RETURN clause.
      */
     public void testCubesDrillthroughReturnClause6() throws Exception {
+        if (tester.getFlavor().equals(Flavor.XMLA)
+            || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+        {
+            // TODO: Drillthrough is not implemented in XMLA yet.
+            return;
+        }
         Class.forName(tester.getDriverClassName());
         connection = tester.createConnection();
         OlapConnection olapConnection =
@@ -3096,6 +3132,12 @@ public class ConnectionTest extends TestCase {
      * a dimension and a SQL generated measure as part of the RETURN clause.
      */
     public void testCubesDrillthroughReturnClause7() throws Exception {
+        if (tester.getFlavor().equals(Flavor.XMLA)
+            || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+        {
+            // TODO: Drillthrough is not implemented in XMLA yet.
+            return;
+        }
         Class.forName(tester.getDriverClassName());
         connection = tester.createConnection();
         OlapConnection olapConnection =
@@ -3116,6 +3158,12 @@ public class ConnectionTest extends TestCase {
      * a level and a SQL generated measure as part of the RETURN clause.
      */
     public void testCubesDrillthroughReturnClause8() throws Exception {
+        if (tester.getFlavor().equals(Flavor.XMLA)
+            || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+        {
+            // TODO: Drillthrough is not implemented in XMLA yet.
+            return;
+        }
         Class.forName(tester.getDriverClassName());
         connection = tester.createConnection();
         OlapConnection olapConnection =
@@ -3136,6 +3184,12 @@ public class ConnectionTest extends TestCase {
      * clause specified.
      */
     public void testCubesDrillthroughReturnClause9() throws Exception {
+        if (tester.getFlavor().equals(Flavor.XMLA)
+            || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+        {
+            // TODO: Drillthrough is not implemented in XMLA yet.
+            return;
+        }
         Class.forName(tester.getDriverClassName());
         connection = tester.createConnection();
         OlapConnection olapConnection =
