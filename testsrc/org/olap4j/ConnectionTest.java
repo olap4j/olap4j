@@ -76,8 +76,8 @@ public class ConnectionTest extends TestCase {
             && !connection.isClosed())
         {
             connection.close();
-            connection = null;
         }
+        connection = null;
         testContext = null;
         tester = null;
     }
