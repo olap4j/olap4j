@@ -1052,14 +1052,14 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         if (metadataRequest.requiresDatasourceName()) {
             final String dataSourceInfo;
             switch (BackendFlavor.getFlavor(context.olap4jConnection)) {
-                case ESSBASE:
-                    dataSourceInfo =
-                        context.olap4jConnection.getOlapDatabase()
-                            .getDataSourceInfo();
-                    break;
-                default:
-                    dataSourceInfo =
-                        context.olap4jConnection.getDatabase();
+            case ESSBASE:
+                dataSourceInfo =
+                    context.olap4jConnection.getOlapDatabase()
+                        .getDataSourceInfo();
+                break;
+            default:
+                dataSourceInfo =
+                    context.olap4jConnection.getDatabase();
             }
             buf.append("        <DataSourceInfo>");
             xmlEncode(buf, dataSourceInfo);

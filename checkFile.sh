@@ -136,7 +136,7 @@ doCheck() {
         ;;
 
     # Only validate .java and .jj files at present.
-    *.java|*.jj|*.h|*.cpp)
+    *.java|*.h|*.cpp)
         ;;
 
     *)
@@ -282,6 +282,8 @@ status=0
 if [ -s /tmp/checkFile_output_$$.txt ]; then
     status=1
 fi
+
+rm -f /tmp/checkFile_output_$$.txt
 
 exit $status
 

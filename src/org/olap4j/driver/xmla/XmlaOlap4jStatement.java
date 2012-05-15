@@ -297,14 +297,13 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
 
         final String dataSourceInfo;
         switch (BackendFlavor.getFlavor(olap4jConnection)) {
-            case ESSBASE:
-                dataSourceInfo =
-                    olap4jConnection.getOlapDatabase()
-                        .getDataSourceInfo();
-                break;
-            default:
-                dataSourceInfo =
-                    olap4jConnection.getDatabase();
+        case ESSBASE:
+            dataSourceInfo =
+                olap4jConnection.getOlapDatabase().getDataSourceInfo();
+            break;
+        default:
+            dataSourceInfo =
+                olap4jConnection.getDatabase();
         }
 
         StringBuilder buf = new StringBuilder(
