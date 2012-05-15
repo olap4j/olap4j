@@ -665,7 +665,8 @@ public class Olap4jUtilTest extends TestCase {
         assertEquals(
             "en_US", LcidLocale.lcidToLocale((short) 0x0409).toString());
         assertEquals("en_US", LcidLocale.lcidToLocale((short) 1033).toString());
-        assertEquals("fr", LcidLocale.lcidToLocale((short) 0x040c).toString());
+        assertEquals(
+            "fr_FR", LcidLocale.lcidToLocale((short) 0x040c).toString());
         assertEquals("en_GB", LcidLocale.lcidToLocale((short) 2057).toString());
     }
 
@@ -675,12 +676,15 @@ public class Olap4jUtilTest extends TestCase {
     public void testLocaleToLcid() {
         assertEquals(0x0409, LcidLocale.localeToLcid(Locale.US));
         assertEquals(1033, LcidLocale.localeToLcid(Locale.US));
-        assertEquals(0x040c, LcidLocale.localeToLcid(Locale.FRENCH));
+        assertEquals(0x000c, LcidLocale.localeToLcid(Locale.FRENCH));
         assertEquals(0x040c, LcidLocale.localeToLcid(Locale.FRANCE));
         assertEquals(2060, LcidLocale.localeToLcid(new Locale("fr", "BE")));
         assertEquals(2057, LcidLocale.localeToLcid(Locale.UK));
-        assertEquals(1031, LcidLocale.localeToLcid(Locale.GERMAN));
-        assertEquals(1031, LcidLocale.localeToLcid(Locale.GERMANY));
+        assertEquals(0x0007, LcidLocale.localeToLcid(Locale.GERMAN));
+        assertEquals(0x0407, LcidLocale.localeToLcid(Locale.GERMANY));
+
+        // Locale en_SG is unknown; fall back to en. For bug 3526908.
+        assertEquals(0x0009, LcidLocale.localeToLcid(new Locale("en", "SG")));
     }
 
     /**
