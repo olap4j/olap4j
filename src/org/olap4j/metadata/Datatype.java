@@ -30,10 +30,9 @@ package org.olap4j.metadata;
  * @since Aug 23, 2006
  */
 public enum Datatype implements XmlaConstant {
-    /*
-    * The following values exactly match VARENUM
-    * in Automation and may be used in VARIANT.
-    */
+    // The following values exactly match VARENUM
+    // in Automation and may be used in VARIANT.
+
     INTEGER(3, "DBTYPE_I4", "A four-byte, signed integer: INTEGER"),
 
     DOUBLE(5, "DBTYPE_R8", "A double-precision floating-point value: Double"),
@@ -67,18 +66,16 @@ public enum Datatype implements XmlaConstant {
      */
     UNSIGNED_INTEGER(19, "DBTYPE_UI4", "A four-byte, unsigned integer"),
 
-    /*
-    * The following values exactly match VARENUM
-    * in Automation but cannot be used in VARIANT.
-    */
+    // The following values exactly match VARENUM
+    // in Automation but cannot be used in VARIANT.
+
     LARGE_INTEGER(
         20,
         "DBTYPE_I8",
         "An eight-byte, signed integer: LARGE_INTEGER"),
 
-    /*
-    * The following values are not in VARENUM in OLE.
-    */
+    // The following values are not in VARENUM in OLE.
+
     STRING(
         130,
         "DBTYPE_WSTR",

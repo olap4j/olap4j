@@ -184,29 +184,6 @@ public class XmlaOlap4jDriver implements Driver {
         }
     }
 
-    /*
-
-        String factoryClassName;
-        try {
-            Class.forName("java.sql.Wrapper");
-            factoryClassName = "org.olap4j.driver.xmla.FactoryJdbc4Impl";
-        } catch (ClassNotFoundException e) {
-            // java.sql.Wrapper is not present. This means we are running JDBC
-            // 3.0 or earlier (probably JDK 1.5). Load the JDBC 3.0 factory
-            factoryClassName = "org.olap4j.driver.xmla.FactoryJdbc3Impl";
-        }
-        try {
-            final Class<?> clazz = Class.forName(factoryClassName);
-            factory = (Factory) clazz.newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        }
-     */
-
     private static String getFactoryClassName() {
         try {
             // If java.sql.PseudoColumnUsage is present, we are running JDBC 4.1

@@ -280,10 +280,8 @@ public class ConnectStringParser {
                 if (value == null) {
                     sb.append("'null'");
                 } else {
-                    /*
-                     * Quote a property value if is has a semi colon in it
-                     * 'xxx;yyy';
-                     */
+                    // Quote a property value if is has a semi colon in it
+                    // 'xxx;yyy'
                     if (value.indexOf(';') >= 0 && value.charAt(0) != '\'') {
                         sb.append("'");
                     }

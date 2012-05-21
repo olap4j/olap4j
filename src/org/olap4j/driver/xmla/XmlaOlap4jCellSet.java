@@ -128,20 +128,20 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         Element fault =
             findChild(body, SOAP_NS, "Fault");
         if (fault != null) {
-            /*
-        <SOAP-ENV:Fault>
-            <faultcode>SOAP-ENV:Client.00HSBC01</faultcode>
-            <faultstring>XMLA connection datasource not found</faultstring>
-            <faultactor>Mondrian</faultactor>
-            <detail>
-                <XA:error xmlns:XA="http://mondrian.sourceforge.net">
-                    <code>00HSBC01</code>
-                    <desc>The Mondrian XML: Mondrian Error:Internal
-                        error: no catalog named 'LOCALDB'</desc>
-                </XA:error>
-            </detail>
-        </SOAP-ENV:Fault>
-             */
+            // <SOAP-ENV:Fault>
+            //     <faultcode>SOAP-ENV:Client.00HSBC01</faultcode>
+            //     <faultstring>XMLA connection datasource not
+            //                  found</faultstring>
+            //     <faultactor>Mondrian</faultactor>
+            //     <detail>
+            //         <XA:error xmlns:XA="http://mondrian.sourceforge.net">
+            //             <code>00HSBC01</code>
+            //             <desc>The Mondrian XML: Mondrian Error:Internal
+            //                 error: no catalog named 'LOCALDB'</desc>
+            //         </XA:error>
+            //     </detail>
+            // </SOAP-ENV:Fault>
+            //
             // TODO: log doc to logfile
             throw getHelper().createException(
                 "XMLA provider gave exception: "
@@ -186,14 +186,12 @@ abstract class XmlaOlap4jCellSet implements CellSet {
 
         // todo: use CellInfo element to determine mapping of cell properties
         // to XML tags
-        /*
-                        <CellInfo>
-                            <Value name="VALUE"/>
-                            <FmtValue name="FORMATTED_VALUE"/>
-                            <FormatString name="FORMAT_STRING"/>
-                        </CellInfo>
-         */
-
+        //
+        //  <CellInfo>
+        //      <Value name="VALUE"/>
+        //      <FmtValue name="FORMATTED_VALUE"/>
+        //      <FormatString name="FORMAT_STRING"/>
+        //  </CellInfo>
         final Element axesNode = findChild(root, MDDATASET_NS, "Axes");
 
         // First pass, gather up a list of member unique names to fetch
@@ -427,27 +425,25 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                 findChildren(axisInfo, MDDATASET_NS, "HierarchyInfo");
             final List<Hierarchy> hierarchyList =
                 new ArrayList<Hierarchy>();
-            /*
-            <OlapInfo>
-                <AxesInfo>
-                    <AxisInfo name="Axis0">
-                        <HierarchyInfo name="Customers">
-                            <UName name="[Customers].[MEMBER_UNIQUE_NAME]"/>
-                            <Caption name="[Customers].[MEMBER_CAPTION]"/>
-                            <LName name="[Customers].[LEVEL_UNIQUE_NAME]"/>
-                            <LNum name="[Customers].[LEVEL_NUMBER]"/>
-                            <DisplayInfo name="[Customers].[DISPLAY_INFO]"/>
-                        </HierarchyInfo>
-                    </AxisInfo>
-                    ...
-                </AxesInfo>
-                <CellInfo>
-                    <Value name="VALUE"/>
-                    <FmtValue name="FORMATTED_VALUE"/>
-                    <FormatString name="FORMAT_STRING"/>
-                </CellInfo>
-            </OlapInfo>
-             */
+            // <OlapInfo>
+            //     <AxesInfo>
+            //         <AxisInfo name="Axis0">
+            //             <HierarchyInfo name="Customers">
+            //                 <UName name="[Customers].[MEMBER_UNIQUE_NAME]"/>
+            //                 <Caption name="[Customers].[MEMBER_CAPTION]"/>
+            //                 <LName name="[Customers].[LEVEL_UNIQUE_NAME]"/>
+            //                 <LNum name="[Customers].[LEVEL_NUMBER]"/>
+            //                 <DisplayInfo name="[Customers].[DISPLAY_INFO]"/>
+            //             </HierarchyInfo>
+            //         </AxisInfo>
+            //         ...
+            //     </AxesInfo>
+            //     <CellInfo>
+            //         <Value name="VALUE"/>
+            //         <FmtValue name="FORMATTED_VALUE"/>
+            //         <FormatString name="FORMAT_STRING"/>
+            //     </CellInfo>
+            // </OlapInfo>
             final List<XmlaOlap4jCellSetMemberProperty> propertyList =
                 new ArrayList<XmlaOlap4jCellSetMemberProperty>();
             for (Element hierarchyInfo : hierarchyInfos) {

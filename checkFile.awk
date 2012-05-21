@@ -197,6 +197,9 @@ FNR < headerCount {
         # beginning of multiline comment "/*"
         inComment = 1;
         gsub(/\/\*.*$/, "/* comment */", s);
+        if (strict > 0 && FNR > 1 && $0 !~ /\/\*\*/) {
+            error(fname, FNR, "Multi-line c-style comment not allowed");
+        }
     } else {
         # mask out /* */ comments
         gsub(/\/\*.*\*\//, "/* comment */", s);

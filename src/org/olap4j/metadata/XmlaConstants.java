@@ -470,10 +470,8 @@ public class XmlaConstants
      * below.
      */
     public enum DBType implements XmlaConstant {
-        /*
-        * The following values exactly match VARENUM
-        * in Automation and may be used in VARIANT.
-        */
+        // The following values exactly match VARENUM
+        // in Automation and may be used in VARIANT.
         I4(
             "INTEGER", 3, "DBTYPE_I4", "A four-byte, signed integer: INTEGER"),
 
@@ -511,17 +509,13 @@ public class XmlaConstants
             "UNSIGNED_INTEGER", 19, "DBTYPE_UI4",
             "A four-byte, unsigned integer"),
 
-        /*
-        * The following values exactly match VARENUM
-        * in Automation but cannot be used in VARIANT.
-        */
+        // The following values exactly match VARENUM
+        // in Automation but cannot be used in VARIANT.
         I8(
             "LARGE_INTEGER", 20, "DBTYPE_I8",
             "An eight-byte, signed integer: LARGE_INTEGER"),
 
-        /*
-        * The following values are not in VARENUM in OLE.
-        */
+        // The following values are not in VARENUM in OLE.
         WSTR(
             "STRING", 130, "DBTYPE_WSTR",
             "A null-terminated Unicode character string: wchar_t[length]; If "
@@ -539,29 +533,7 @@ public class XmlaConstants
 
         public final String userName;
 
-        /**
-         * The length of a non-numeric column or parameter that refers to either
-         * the maximum or the length defined for this type by the provider. For
-         * character data, this is the maximum or defined length in characters.
-         * For DateTime data types, this is the length of the string
-         * representation (assuming the maximum allowed precision of the
-         * fractional seconds component).
-         *
-         * If the data type is numeric, this is the upper bound on the maximum
-         * precision of the data type.
-         int columnSize;
-         */
-
         private final int xmlaOrdinal;
-
-        /*
-         *  A Boolean that indicates whether the data type is nullable.
-         *  VARIANT_TRUE indicates that the data type is nullable.
-         *  VARIANT_FALSE indicates that the data type is not nullable.
-         *  NULL-- indicates that it is not known whether the data type is
-         *  nullable.
-         boolean isNullable;
-         */
 
         private String description;
 
@@ -742,39 +714,38 @@ public class XmlaConstants
             "A text command, such as an SQL statement."),
         USER_NAME(19, null, 0, null, null, null);
 
-        /*
         // Enum DBLITERALENUM and DBLITERALENUM20, OLEDB.H.
-        public static final int DBLITERAL_INVALID   = 0,
-        DBLITERAL_BINARY_LITERAL    = 1,
-        DBLITERAL_CATALOG_NAME  = 2,
-        DBLITERAL_CATALOG_SEPARATOR = 3,
-        DBLITERAL_CHAR_LITERAL  = 4,
-        DBLITERAL_COLUMN_ALIAS  = 5,
-        DBLITERAL_COLUMN_NAME   = 6,
-        DBLITERAL_CORRELATION_NAME  = 7,
-        DBLITERAL_CURSOR_NAME   = 8,
-        DBLITERAL_ESCAPE_PERCENT    = 9,
-        DBLITERAL_ESCAPE_UNDERSCORE = 10,
-        DBLITERAL_INDEX_NAME    = 11,
-        DBLITERAL_LIKE_PERCENT  = 12,
-        DBLITERAL_LIKE_UNDERSCORE   = 13,
-        DBLITERAL_PROCEDURE_NAME    = 14,
-        DBLITERAL_QUOTE = 15,
-        DBLITERAL_QUOTE_PREFIX = DBLITERAL_QUOTE,
-        DBLITERAL_SCHEMA_NAME   = 16,
-        DBLITERAL_TABLE_NAME    = 17,
-        DBLITERAL_TEXT_COMMAND  = 18,
-        DBLITERAL_USER_NAME = 19,
-        DBLITERAL_VIEW_NAME = 20,
-        DBLITERAL_CUBE_NAME = 21,
-        DBLITERAL_DIMENSION_NAME    = 22,
-        DBLITERAL_HIERARCHY_NAME    = 23,
-        DBLITERAL_LEVEL_NAME    = 24,
-        DBLITERAL_MEMBER_NAME   = 25,
-        DBLITERAL_PROPERTY_NAME = 26,
-        DBLITERAL_SCHEMA_SEPARATOR  = 27,
-        DBLITERAL_QUOTE_SUFFIX  = 28;
-*/
+        //
+        // public static final int DBLITERAL_INVALID   = 0,
+        //   DBLITERAL_BINARY_LITERAL    = 1,
+        //   DBLITERAL_CATALOG_NAME  = 2,
+        //   DBLITERAL_CATALOG_SEPARATOR = 3,
+        //   DBLITERAL_CHAR_LITERAL  = 4,
+        //   DBLITERAL_COLUMN_ALIAS  = 5,
+        //   DBLITERAL_COLUMN_NAME   = 6,
+        //   DBLITERAL_CORRELATION_NAME  = 7,
+        //   DBLITERAL_CURSOR_NAME   = 8,
+        //   DBLITERAL_ESCAPE_PERCENT    = 9,
+        //   DBLITERAL_ESCAPE_UNDERSCORE = 10,
+        //   DBLITERAL_INDEX_NAME    = 11,
+        //   DBLITERAL_LIKE_PERCENT  = 12,
+        //   DBLITERAL_LIKE_UNDERSCORE   = 13,
+        //   DBLITERAL_PROCEDURE_NAME    = 14,
+        //   DBLITERAL_QUOTE = 15,
+        //   DBLITERAL_QUOTE_PREFIX = DBLITERAL_QUOTE,
+        //   DBLITERAL_SCHEMA_NAME   = 16,
+        //   DBLITERAL_TABLE_NAME    = 17,
+        //   DBLITERAL_TEXT_COMMAND  = 18,
+        //   DBLITERAL_USER_NAME = 19,
+        //   DBLITERAL_VIEW_NAME = 20,
+        //   DBLITERAL_CUBE_NAME = 21,
+        //   DBLITERAL_DIMENSION_NAME    = 22,
+        //   DBLITERAL_HIERARCHY_NAME    = 23,
+        //   DBLITERAL_LEVEL_NAME    = 24,
+        //   DBLITERAL_MEMBER_NAME   = 25,
+        //   DBLITERAL_PROPERTY_NAME = 26,
+        //   DBLITERAL_SCHEMA_SEPARATOR  = 27,
+        //   DBLITERAL_QUOTE_SUFFIX  = 28;
 
         private int xmlaOrdinal;
         private final String literalValue;

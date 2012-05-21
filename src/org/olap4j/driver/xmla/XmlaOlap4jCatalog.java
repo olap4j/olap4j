@@ -83,11 +83,9 @@ class XmlaOlap4jCatalog implements Catalog, Named {
                     throws OlapException
                 {
                     try {
-                        /*
-                         * Some OLAP servers don't support DBSCHEMA_SCHEMATA
-                         * so we fork the behavior here according to the
-                         * database product name.
-                         */
+                        // Some OLAP servers don't support DBSCHEMA_SCHEMATA so
+                        // we fork the behavior here according to the database
+                        // product name.
                         if (XmlaOlap4jCatalog.this.olap4jDatabaseMetaData
                             .getDatabaseProductName().contains("Mondrian"))
                         {

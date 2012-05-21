@@ -1294,20 +1294,19 @@ public class ConnectionTest extends TestCase {
         }
 
         // todo: test CellSetAxis methods
-        /*
-    public int getAxisOrdinal()
-    public CellSet getCellSet()
-    public CellSetAxisMetaData getAxisMetaData()
-    public List<Position> getPositions()
-    public int getPositionCount()
-    public ListIterator<Position> iterate()
-
-    todo: test OlapResultAxisMetaData methods
-
-    public org.olap4j.Axis getAxisOrdinal()
-    public List<Hierarchy> getHierarchies()
-    public List<Property> getProperties()
-         */
+        //
+        //     public int getAxisOrdinal()
+        //     public CellSet getCellSet()
+        //     public CellSetAxisMetaData getAxisMetaData()
+        //     public List<Position> getPositions()
+        //     public int getPositionCount()
+        //     public ListIterator<Position> iterate()
+        //
+        // todo: test OlapResultAxisMetaData methods
+        //
+        //     public org.olap4j.Axis getAxisOrdinal()
+        //     public List<Hierarchy> getHierarchies()
+        //     public List<Property> getProperties()
     }
 
     /**
@@ -3292,10 +3291,8 @@ public class ConnectionTest extends TestCase {
         if (tester.getFlavor() == Flavor.XMLA
             || tester.getFlavor() == Flavor.REMOTE_XMLA)
         {
-            /*
-             * TODO Implement a way to pass an XmlaRequestCallback to
-             * the tested servlet so we can pass the roles down.
-             */
+            // TODO Implement a way to pass an XmlaRequestCallback to
+            // the tested servlet so we can pass the roles down.
             return;
         }
         connection = tester.createConnection();
@@ -3322,10 +3319,8 @@ public class ConnectionTest extends TestCase {
         if (tester.getFlavor() == Flavor.XMLA
             || tester.getFlavor() == Flavor.REMOTE_XMLA)
         {
-            /*
-             * TODO Implement a way to pass an XmlaRequestCallback to
-             * the tested servlet so we can pass the roles down.
-             */
+            // TODO Implement a way to pass an XmlaRequestCallback to
+            // the tested servlet so we can pass the roles down.
             return;
         }
         connection = tester.createConnection();
@@ -3364,10 +3359,8 @@ public class ConnectionTest extends TestCase {
         if (tester.getFlavor() == Flavor.XMLA
             || tester.getFlavor() == Flavor.REMOTE_XMLA)
         {
-            /*
-             * TODO Implement a way to pass an XmlaRequestCallback to
-             * the tested servlet so we can pass the roles down.
-             */
+            // TODO Implement a way to pass an XmlaRequestCallback to
+            // the tested servlet so we can pass the roles down.
             return;
         }
         connection = tester.createConnection();
@@ -3406,10 +3399,8 @@ public class ConnectionTest extends TestCase {
         if (tester.getFlavor() == Flavor.XMLA
             || tester.getFlavor() == Flavor.REMOTE_XMLA)
         {
-            /*
-             * TODO Implement a way to pass an XmlaRequestCallback to
-             * the tested servlet so we can pass the roles down.
-             */
+            // TODO Implement a way to pass an XmlaRequestCallback to
+            // the tested servlet so we can pass the roles down.
             return;
         }
         connection = tester.createConnection();
@@ -3441,10 +3432,8 @@ public class ConnectionTest extends TestCase {
         if (tester.getFlavor() == Flavor.XMLA
             || tester.getFlavor() == Flavor.REMOTE_XMLA)
         {
-            /*
-             * TODO Implement a way to pass an XmlaRequestCallback to
-             * the tested servlet so we can pass the roles down.
-             */
+            // TODO Implement a way to pass an XmlaRequestCallback to
+            // the tested servlet so we can pass the roles down.
             return;
         }
         connection = tester.createConnection();
@@ -3509,10 +3498,8 @@ public class ConnectionTest extends TestCase {
         if (tester.getFlavor() == Flavor.XMLA
             || tester.getFlavor() == Flavor.REMOTE_XMLA)
         {
-            /*
-             * TODO Implement a way to pass an XmlaRequestCallback to
-             * the tested servlet so we can pass the roles down.
-             */
+            // TODO Implement a way to pass an XmlaRequestCallback to
+            // the tested servlet so we can pass the roles down.
             return;
         }
         connection = tester.createConnection();

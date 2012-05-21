@@ -269,8 +269,8 @@ abstract class Olap4jNodeConverter {
         }
     }
 
-    /*
-     * This method merges the selections into a single
+    /**
+     * Merges the selections into a single
      * MDX axis selection.  Right now we do a simple
      * crossjoin.
      * It might return null if there are no dimensions placed on the axis.

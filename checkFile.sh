@@ -161,7 +161,7 @@ doCheck() {
     else
         gawk -f "$CHECKFILE_AWK" \
             -v fname="$filePath" \
-            -v lenient="$lenient" \
+            -v strict="$strict" \
             -v maxLineLength="$maxLineLength" \
             "$file"
     fi
@@ -172,11 +172,22 @@ doCheckDeferred() {
         maxLineLength=80
         cat "${deferred_file}" |
         xargs gawk -f "$CHECKFILE_AWK" \
-            -v lenient="$lenient" \
+            -v strict="$strict" \
             -v maxLineLength="$maxLineLength"
    fi
    rm -f "${deferred_file}"
 }
+
+function guessCoreCount() {
+    if [ -f /proc/cpuinfo ]; then
+         cat /proc/cpuinfo | awk '$1 == "processor"' | wc -l
+    else
+         # File doe not exist on Darwin or cygwin
+         echo 2
+    fi
+}
+
+export CORE_COUNT=$(guessCoreCount)
 
 export deferred=true
 
@@ -188,9 +199,9 @@ if [ "$1" == --test ]; then
     shift
 fi
 
-lenient=
+strict=1
 if [ "$1" == --lenient ]; then
-    lenient=true
+    strict=0
     shift
 fi
 
@@ -199,9 +210,8 @@ if [ "$1" == --help ]; then
     exit 0
 fi
 
-strict=
 if [ "$1" == --strict ]; then
-    strict=true
+    strict=2
     shift
 fi
 
@@ -240,7 +250,12 @@ fi
 
 if [ ! -f "$CHECKFILE_AWK" ]
 then
-    export CHECKFILE_AWK="$(dirname $(readlink -f $0))/checkFile.awk"
+    case $(uname) in
+    (Darwin)
+        export CHECKFILE_AWK="$(cd $(dirname $0); pwd -P)/checkFile.awk";;
+    (*)
+        export CHECKFILE_AWK="$(dirname $(readlink -f $0))/checkFile.awk";;
+    esac
 fi
 
 export deferred_file=/tmp/checkFile_deferred_$$.txt
@@ -282,7 +297,6 @@ status=0
 if [ -s /tmp/checkFile_output_$$.txt ]; then
     status=1
 fi
-
 rm -f /tmp/checkFile_output_$$.txt
 
 exit $status

@@ -47,10 +47,7 @@ class XmlaOlap4jMember
     private final XmlaOlap4jLevel olap4jLevel;
 
     // TODO: We would rather have a refernce to the parent member, but it is
-    // tricky to populate
-    /*
-    private final XmlaOlap4jMember parentMember;
-    */
+    // tricky to populate.
     private final String parentMemberUniqueName;
     private final Type type;
     private XmlaOlap4jMember parentMember;

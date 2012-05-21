@@ -229,10 +229,8 @@ class DefaultMdxValidatorImpl
         List<IdentifierSegment> segments,
         boolean allowProp)
     {
-        // todo: something like
-     /*
-        final Exp element = Util.lookup(select, names, true);
-        */
+        // todo: something like this:
+        //  final Exp element = Util.lookup(select, names, true);
         throw new UnsupportedOperationException();
     }
 }
