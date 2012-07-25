@@ -2991,11 +2991,13 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name], [Gender].[Gender]");
         assertDrillRowsEquals(
             rs,
-            "ROW:5956.0,M,\n"
-            + "ROW:6013.0,M,\n"
-            + "ROW:7293.0,M,\n"
-            + "ROW:7683.0,F,\n"
-            + "ROW:7683.0,F,\n");
+            new String[] {
+                "ROW:5956.0,M,",
+                "ROW:6013.0,M,",
+                "ROW:7293.0,M,",
+                "ROW:7683.0,F,",
+                "ROW:7683.0,F,"
+            });
     }
 
     /**
@@ -3017,11 +3019,13 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name]");
         assertDrillRowsEquals(
             rs,
-            "ROW:5956.0,\n"
-            + "ROW:6013.0,\n"
-            + "ROW:7293.0,\n"
-            + "ROW:7683.0,\n"
-            + "ROW:7683.0,\n");
+            new String[] {
+                "ROW:5956.0,",
+                "ROW:6013.0,",
+                "ROW:7293.0,",
+                "ROW:7683.0,",
+                "ROW:7683.0,"
+            });
     }
 
     /**
@@ -3043,11 +3047,13 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name]");
         assertDrillRowsEquals(
             rs,
-            "ROW:5956.0,\n"
-            + "ROW:6013.0,\n"
-            + "ROW:7293.0,\n"
-            + "ROW:7683.0,\n"
-            + "ROW:7683.0,\n");
+            new String[] {
+                "ROW:5956.0,",
+                "ROW:6013.0,",
+                "ROW:7293.0,",
+                "ROW:7683.0,",
+                "ROW:7683.0,"
+            });
     }
 
     /**
@@ -3072,7 +3078,9 @@ public class ConnectionTest extends TestCase {
             + "RETURN [Measures].[Unit Sales], [Measures].[Store Sales]");
         assertDrillRowsEquals(
             rs,
-            "ROW:1.0,0.8,\n");
+            new String[] {
+                "ROW:1.0,0.8,"
+            });
     }
 
     /**
@@ -3097,7 +3105,9 @@ public class ConnectionTest extends TestCase {
             + "RETURN [Measures].[Store Sales]");
         assertDrillRowsEquals(
             rs,
-            "ROW:0.8,\n");
+            new String[] {
+                "ROW:0.8,"
+            });
     }
 
     /**
@@ -3119,11 +3129,13 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Measures].[Store Sales]");
         assertDrillRowsEquals(
             rs,
-            "ROW:1.27,\n"
-            + "ROW:1.95,\n"
-            + "ROW:2.82,\n"
-            + "ROW:2.84,\n"
-            + "ROW:3.46,\n");
+            new String[] {
+                "ROW:1.27,",
+                "ROW:1.95,",
+                "ROW:2.82,",
+                "ROW:2.84,",
+                "ROW:3.46,"
+            });
     }
 
     /**
@@ -3145,11 +3157,13 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers], [Measures].[Promotion Sales]");
         assertDrillRowsEquals(
             rs,
-            "ROW:USA,1.27,\n"
-            + "ROW:USA,1.95,\n"
-            + "ROW:USA,2.82,\n"
-            + "ROW:USA,2.84,\n"
-            + "ROW:USA,3.46,\n");
+            new String[] {
+                "ROW:USA,1.27,",
+                "ROW:USA,1.95,",
+                "ROW:USA,2.82,",
+                "ROW:USA,2.84,",
+                "ROW:USA,3.46,"
+            });
     }
 
     /**
@@ -3171,11 +3185,13 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[City], [Measures].[Promotion Sales]");
         assertDrillRowsEquals(
             rs,
-            "ROW:Walla Walla,1.27,\n"
-            + "ROW:Walla Walla,1.95,\n"
-            + "ROW:Walla Walla,2.82,\n"
-            + "ROW:Walla Walla,2.84,\n"
-            + "ROW:Walla Walla,3.46,\n");
+            new String[] {
+                "ROW:Walla Walla,1.27,",
+                "ROW:Walla Walla,1.95,",
+                "ROW:Walla Walla,2.82,",
+                "ROW:Walla Walla,2.84,",
+                "ROW:Walla Walla,3.46,"
+            });
     }
 
     /**
@@ -3197,15 +3213,17 @@ public class ConnectionTest extends TestCase {
             "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread])");
         assertDrillRowsEquals(
             rs,
-            "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Great,Great Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Joe. Burnett,7293.0,Partial High School,M,S,$30K - $50K,1.0,\n"
-            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Cranberry Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Geraldine Aubrecht,5956.0,Partial High School,M,S,$30K - $50K,1.0,\n"
-            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Sliced Bread,Colony,Colony White Bread,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Rena Shaw,6013.0,Partial High School,M,M,$10K - $30K,2.0,\n"
-            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Blueberry Muffins,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683.0,High School Degree,F,M,$50K - $70K,1.0,\n"
-            + "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683.0,High School Degree,F,M,$50K - $70K,1.0,\n");
+            new String[] {
+                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Great,Great Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Joe. Burnett,7293.0,Partial High School,M,S,$30K - $50K,1.0,",
+                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Cranberry Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Geraldine Aubrecht,5956.0,Partial High School,M,S,$30K - $50K,1.0,",
+                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Sliced Bread,Colony,Colony White Bread,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Rena Shaw,6013.0,Partial High School,M,M,$10K - $30K,2.0,",
+                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Blueberry Muffins,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683.0,High School Degree,F,M,$50K - $70K,1.0,",
+                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683.0,High School Degree,F,M,$50K - $70K,1.0,"
+            });
     }
 
     private void assertDrillRowsEquals(
-        ResultSet rs, String expected)
+        ResultSet rs, String[] expected)
         throws Exception
     {
         final List<String> rows = new ArrayList<String>();
@@ -3221,14 +3239,12 @@ public class ConnectionTest extends TestCase {
             rows.add(sb.toString());
         }
         Collections.sort(rows);
-        StringBuilder sb = new StringBuilder();
-        for (String str : rows) {
-            sb.append(str);
-            sb.append("\n");
+        Arrays.sort(expected);
+        for (int i = 0; i < rows.size(); i++) {
+            assertEquals(
+                rows.get(i),
+                expected[i]);
         }
-        assertEquals(
-            expected,
-            sb.toString());
     }
 
     /**
