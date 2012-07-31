@@ -3214,11 +3214,11 @@ public class ConnectionTest extends TestCase {
         assertDrillRowsEquals(
             rs,
             new String[] {
-                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Great,Great Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Joe.,7293.0,Partial High School,M,S,$30K - $50K,1.0,",
-                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Cranberry Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Geraldine,5956.0,Partial High School,M,S,$30K - $50K,1.0,",
-                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Sliced Bread,Colony,Colony White Bread,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Rena,6013.0,Partial High School,M,M,$10K - $30K,2.0,",
-                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Blueberry Muffins,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura,7683.0,High School Degree,F,M,$50K - $70K,1.0,",
-                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura,7683.0,High School Degree,F,M,$50K - $70K,1.0,"
+                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Great,Great Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Joe. Burnett,7293.0,Partial High School,M,S,$30K - $50K,1.0,",
+                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Cranberry Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Geraldine Aubrecht,5956.0,Partial High School,M,S,$30K - $50K,1.0,",
+                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Sliced Bread,Colony,Colony White Bread,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Rena Shaw,6013.0,Partial High School,M,M,$10K - $30K,2.0,",
+                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Blueberry Muffins,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683.0,High School Degree,F,M,$50K - $70K,1.0,",
+                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683.0,High School Degree,F,M,$50K - $70K,1.0,"
             });
     }
 
