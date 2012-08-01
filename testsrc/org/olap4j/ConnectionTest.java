@@ -785,13 +785,15 @@ public class ConnectionTest extends TestCase {
                     case TypeName:
                         String typeName =
                             parameterMetaData.getParameterTypeName(paramIndex);
-                        assertEquals("MemberType<hierarchy=[Store]>", typeName);
+                        assertEquals(
+                            "MemberType<hierarchy=[Store].[Store]>",
+                            typeName);
                         break;
                     case OlapType:
                         Type olapType =
                             parameterMetaData.getParameterOlapType(paramIndex);
                         assertEquals(
-                            "MemberType<hierarchy=[Store]>",
+                            "MemberType<hierarchy=[Store].[Store]>",
                             olapType.toString());
                         break;
                     default:
@@ -824,14 +826,14 @@ public class ConnectionTest extends TestCase {
         String s = TestContext.toString(cellSet);
         final String expected =
             "Axis #0:\n"
-            + "{[Gender].[M]}\n"
+            + "{[Gender].[Gender].[M]}\n"
             + "Axis #1:\n"
-            + "{[Store].[USA]}\n"
-            + "{[Store].[USA].[CA].[Alameda]}\n"
-            + "{[Store].[USA].[CA].[Beverly Hills]}\n"
-            + "{[Store].[USA].[CA].[Los Angeles]}\n"
-            + "{[Store].[USA].[CA].[San Diego]}\n"
-            + "{[Store].[USA].[CA].[San Francisco]}\n"
+            + "{[Store].[Store].[USA]}\n"
+            + "{[Store].[Store].[USA].[CA].[Alameda]}\n"
+            + "{[Store].[Store].[USA].[CA].[Beverly Hills]}\n"
+            + "{[Store].[Store].[USA].[CA].[Los Angeles]}\n"
+            + "{[Store].[Store].[USA].[CA].[San Diego]}\n"
+            + "{[Store].[Store].[USA].[CA].[San Francisco]}\n"
             + "Row #0: 135,215\n"
             + "Row #0: \n"
             + "Row #0: 10,562\n"
@@ -862,10 +864,10 @@ public class ConnectionTest extends TestCase {
         s = TestContext.toString(cellSet2);
         final String expected2 =
             "Axis #0:\n"
-            + "{[Gender].[M]}\n"
+            + "{[Gender].[Gender].[M]}\n"
             + "Axis #1:\n"
-            + "{[Store].[USA].[CA]}\n"
-            + "{[Store].[USA].[CA].[San Francisco].[Store 14]}\n"
+            + "{[Store].[Store].[USA].[CA]}\n"
+            + "{[Store].[Store].[USA].[CA].[San Francisco].[Store 14]}\n"
             + "Row #0: 37,989\n"
             + "Row #0: 1,053\n";
         TestContext.assertEqualsVerbose(expected2, s);
@@ -878,10 +880,10 @@ public class ConnectionTest extends TestCase {
 
         // Re-execute with a new MDX string.
         CellSet cellSet3 = pstmt.executeOlapQuery(
-            "SELECT FROM [Sales] WHERE [Time.Weekly].[1997].[3]");
+            "SELECT FROM [Sales] WHERE [Time].[Weekly].[1997].[3]");
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Time.Weekly].[1997].[3]}\n"
+            + "{[Time].[Weekly].[1997].[3]}\n"
             + "9,518",
             TestContext.toString(cellSet3));
 
@@ -910,13 +912,13 @@ public class ConnectionTest extends TestCase {
         SelectNode select =
             mdxParser.parseSelect(
                 "select {[Gender]} on columns from [sales]\n"
-                + "where [Time].[1997].[Q4]");
+                + "where [Time].[Time].[1997].[Q4]");
         CellSet cellSet5 = pstmt.executeOlapQuery(select);
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Time].[1997].[Q4]}\n"
+            + "{[Time].[Time].[1997].[Q4]}\n"
             + "Axis #1:\n"
-            + "{[Gender].[All Gender]}\n"
+            + "{[Gender].[Gender].[All Gender]}\n"
             + "Row #0: 72,024\n",
             TestContext.toString(cellSet5));
 
@@ -1114,14 +1116,14 @@ public class ConnectionTest extends TestCase {
         String s = TestContext.toString(cellSet);
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Time].[1997].[Q2]}\n"
+            + "{[Time].[Time].[1997].[Q2]}\n"
             + "Axis #1:\n"
             + "{[Measures].[Unit Sales]}\n"
             + "{[Measures].[Store Sales]}\n"
             + "Axis #2:\n"
-            + "{[Gender].[M], [Product].[Drink]}\n"
-            + "{[Gender].[M], [Product].[Food]}\n"
-            + "{[Gender].[M], [Product].[Non-Consumable]}\n"
+            + "{[Gender].[Gender].[M], [Product].[Product].[Drink]}\n"
+            + "{[Gender].[Gender].[M], [Product].[Product].[Food]}\n"
+            + "{[Gender].[Gender].[M], [Product].[Product].[Non-Consumable]}\n"
             + "Row #0: 3,023\n"
             + "Row #0: 6,004.80\n"
             + "Row #1: 22,558\n"
@@ -1626,7 +1628,7 @@ public class ConnectionTest extends TestCase {
 
         Member member =
             cube.lookupMember(nameList("Time", "1997", "Q2"));
-        assertEquals("[Time].[1997].[Q2]", member.getUniqueName());
+        assertEquals("[Time].[Time].[1997].[Q2]", member.getUniqueName());
 
         // Member.getChildMemberCount
         assertEquals(3, member.getChildMemberCount());
@@ -1636,10 +1638,12 @@ public class ConnectionTest extends TestCase {
             member.getChildMembers();
         assertEquals(3, childMembers.size());
         assertEquals(
-            "[Time].[1997].[Q2].[4]", childMembers.get(0).getUniqueName());
+            "[Time].[Time].[1997].[Q2].[4]",
+            childMembers.get(0).getUniqueName());
         assertEquals(0, childMembers.get(0).getChildMemberCount());
         assertEquals(
-            "[Time].[1997].[Q2].[6]", childMembers.get("6").getUniqueName());
+            "[Time].[Time].[1997].[Q2].[6]",
+            childMembers.get("6").getUniqueName());
         assertNull(childMembers.get("1"));
 
         member =
@@ -1695,10 +1699,10 @@ public class ConnectionTest extends TestCase {
             break;
         default:
             expected =
-                "[Time].[1997]\n"
-                + "[Time].[1997].[Q2].[4]\n"
-                + "[Time].[1997].[Q2].[5]\n"
-                + "[Time].[1997].[Q2].[6]\n";
+                "[Time].[Time].[1997]\n"
+                + "[Time].[Time].[1997].[Q2].[4]\n"
+                + "[Time].[Time].[1997].[Q2].[5]\n"
+                + "[Time].[Time].[1997].[Q2].[6]\n";
         }
         TestContext.assertEqualsVerbose(
             expected,
@@ -1719,7 +1723,7 @@ public class ConnectionTest extends TestCase {
                     Member.TreeOp.ANCESTORS, Member.TreeOp.PARENT),
                 nameList("Time", "1997", "Q2"));
         TestContext.assertEqualsVerbose(
-            "[Time].[1997]\n",
+            "[Time].[Time].[1997]\n",
             memberListToString(memberList));
 
         // ask for parent of root member, should not get null member in list
@@ -1743,21 +1747,21 @@ public class ConnectionTest extends TestCase {
             // TODO: fix mondrian's XMLA driver to return members ordered by
             // level then ordinal
             expected =
-                "[Time].[1997].[Q2].[4]\n"
-                + "[Time].[1997].[Q2].[5]\n"
-                + "[Time].[1997].[Q2].[6]\n"
-                + "[Time].[1997].[Q1]\n"
-                + "[Time].[1997].[Q3]\n"
-                + "[Time].[1997].[Q4]\n";
+                "[Time].[Time].[1997].[Q2].[4]\n"
+                + "[Time].[Time].[1997].[Q2].[5]\n"
+                + "[Time].[Time].[1997].[Q2].[6]\n"
+                + "[Time].[Time].[1997].[Q1]\n"
+                + "[Time].[Time].[1997].[Q3]\n"
+                + "[Time].[Time].[1997].[Q4]\n";
             break;
         default:
             expected =
-                "[Time].[1997].[Q1]\n"
-                + "[Time].[1997].[Q2].[4]\n"
-                + "[Time].[1997].[Q2].[5]\n"
-                + "[Time].[1997].[Q2].[6]\n"
-                + "[Time].[1997].[Q3]\n"
-                + "[Time].[1997].[Q4]\n";
+                "[Time].[Time].[1997].[Q1]\n"
+                + "[Time].[Time].[1997].[Q2].[4]\n"
+                + "[Time].[Time].[1997].[Q2].[5]\n"
+                + "[Time].[Time].[1997].[Q2].[6]\n"
+                + "[Time].[Time].[1997].[Q3]\n"
+                + "[Time].[Time].[1997].[Q4]\n";
             break;
         }
         TestContext.assertEqualsVerbose(
@@ -1770,7 +1774,7 @@ public class ConnectionTest extends TestCase {
                 Olap4jUtil.enumSetOf(Member.TreeOp.SIBLINGS),
                 nameList("Time", "1997"));
         TestContext.assertEqualsVerbose(
-            "[Time].[1998]\n",
+            "[Time].[Time].[1998]\n",
             memberListToString(memberList));
 
         memberList =
@@ -1779,9 +1783,9 @@ public class ConnectionTest extends TestCase {
                     Member.TreeOp.SIBLINGS, Member.TreeOp.SELF),
                 nameList("Customers", "USA", "OR"));
         TestContext.assertEqualsVerbose(
-            "[Customers].[USA].[CA]\n"
-            + "[Customers].[USA].[OR]\n"
-            + "[Customers].[USA].[WA]\n",
+            "[Customers].[Customers].[USA].[CA]\n"
+            + "[Customers].[Customers].[USA].[OR]\n"
+            + "[Customers].[Customers].[USA].[WA]\n",
             memberListToString(memberList));
     }
 
@@ -1905,7 +1909,7 @@ public class ConnectionTest extends TestCase {
         // Look for the Time.Weekly hierarchy, the 2nd hierarchy in the Time
         // dimension.
         final Hierarchy timeWeeklyHierarchy =
-            cube.getHierarchies().get("Time.Weekly");
+            cube.getHierarchies().get("Weekly");
         assertNotNull(timeWeeklyHierarchy);
         assertEquals("Time", timeWeeklyHierarchy.getDimension().getName());
         assertEquals(
@@ -1957,22 +1961,27 @@ public class ConnectionTest extends TestCase {
             cube.lookupMember(
                 nameList("Product", "Food", "Baked Goods", "Bread"));
 
-        assertEquals("[Product].[Food]", member.getUniqueName());
+        assertEquals("[Product].[Product].[Food]", member.getUniqueName());
         assertEquals("Food", member.getName());
         assertEquals(
-            "[Product].[Product Family]",
+            "[Product].[Product].[Product Family]",
             member.getLevel().getUniqueName());
         assertEquals(Member.Type.REGULAR, member.getMemberType());
 
         assertEquals(
-            "[Product].[Food].[Baked Goods]",
+            "[Product].[Product].[Food].[Baked Goods]",
             bread.getParentMember().getUniqueName());
         final List<Member> list = bread.getAncestorMembers();
         assertEquals(3, list.size());
         assertEquals(
-            "[Product].[Food].[Baked Goods]", list.get(0).getUniqueName());
-        assertEquals("[Product].[Food]", list.get(1).getUniqueName());
-        assertEquals("[Product].[All Products]", list.get(2).getUniqueName());
+            "[Product].[Product].[Food].[Baked Goods]",
+            list.get(0).getUniqueName());
+        assertEquals(
+            "[Product].[Product].[Food]",
+            list.get(1).getUniqueName());
+        assertEquals(
+            "[Product].[Product].[All Products]",
+            list.get(2).getUniqueName());
 
         assertEquals("Food", member.getCaption());
 
@@ -2002,11 +2011,12 @@ public class ConnectionTest extends TestCase {
         // All member
         final Member allProductsMember = member.getParentMember();
         assertEquals(
-            "[Product].[All Products]",
+            "[Product].[Product].[All Products]",
             allProductsMember.getUniqueName());
         assertEquals("(All)", allProductsMember.getLevel().getName());
         assertEquals(
-            "[Product].[(All)]", allProductsMember.getLevel().getUniqueName());
+            "[Product].[Product].[(All)]",
+            allProductsMember.getLevel().getUniqueName());
         assertEquals(1, allProductsMember.getLevel().getMembers().size());
         assertTrue(allProductsMember.isAll());
         assertNull(allProductsMember.getParentMember());
@@ -2034,10 +2044,10 @@ public class ConnectionTest extends TestCase {
         assertNull(
             allProductsMember.getPropertyValue(parentUniqueNameProperty));
         assertEquals(
-            "[Product].[All Products]",
+            "[Product].[Product].[All Products]",
             member.getPropertyValue(parentUniqueNameProperty));
         assertEquals(
-            "[Product].[Food].[Baked Goods]",
+            "[Product].[Product].[Food].[Baked Goods]",
             bread.getPropertyValue(parentUniqueNameProperty));
 
         // Measures
@@ -2190,21 +2200,21 @@ public class ConnectionTest extends TestCase {
             "Axis #0:\n"
             + "{}\n"
             + "Axis #1:\n"
-            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n"
-            + "{[Product].[Food].[Baked Goods].[Bread]}\n"
+            + "{[Product].[Product].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n"
+            + "{[Product].[Product].[Food].[Baked Goods].[Bread]}\n"
             + "Axis #2:\n"
-            + "{[Store].[USA].[CA].[Alameda], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[USA].[CA].[Alameda], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[USA].[CA].[Alameda], [Time].[1997].[Q1].[3]}\n"
-            + "{[Store].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[USA].[CA].[Beverly Hills], [Time].[1997].[Q1].[3]}\n"
-            + "{[Store].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[USA].[CA].[Los Angeles], [Time].[1997].[Q1].[3]}\n"
-            + "{[Store].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[1]}\n"
-            + "{[Store].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[2]}\n"
-            + "{[Store].[USA].[CA].[San Francisco], [Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[Store].[USA].[CA].[Alameda], [Time].[Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[Store].[USA].[CA].[Alameda], [Time].[Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[Store].[USA].[CA].[Alameda], [Time].[Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[Store].[USA].[CA].[Beverly Hills], [Time].[Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[Store].[USA].[CA].[Beverly Hills], [Time].[Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[Store].[USA].[CA].[Beverly Hills], [Time].[Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[Store].[USA].[CA].[Los Angeles], [Time].[Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[Store].[USA].[CA].[Los Angeles], [Time].[Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[Store].[USA].[CA].[Los Angeles], [Time].[Time].[1997].[Q1].[3]}\n"
+            + "{[Store].[Store].[USA].[CA].[San Francisco], [Time].[Time].[1997].[Q1].[1]}\n"
+            + "{[Store].[Store].[USA].[CA].[San Francisco], [Time].[Time].[1997].[Q1].[2]}\n"
+            + "{[Store].[Store].[USA].[CA].[San Francisco], [Time].[Time].[1997].[Q1].[3]}\n"
             + "Row #0: \n"
             + "Row #0: \n"
             + "Row #1: \n"
@@ -2451,7 +2461,7 @@ public class ConnectionTest extends TestCase {
         final Type filterType = filterAxis.getExpression().getType();
         assertTrue(filterType instanceof TupleType);
         assertEquals(
-            "TupleType<MemberType<member=[Time].[1997].[Q4]>, MemberType<member=[Marital Status].[S]>>",
+            "TupleType<MemberType<member=[Time].[Time].[1997].[Q4]>, MemberType<member=[Marital Status].[Marital Status].[S]>>",
             filterType.toString());
     }
 
@@ -2738,15 +2748,15 @@ public class ConnectionTest extends TestCase {
                 + "WHERE ([Time.Weekly].[Week].[5])");
         TestContext.assertEqualsVerbose(
             "Axis #0:\n"
-            + "{[Time.Weekly].[1997].[5]}\n"
+            + "{[Time].[Weekly].[1997].[5]}\n"
             + "Axis #1:\n"
             + "{[Measures].[Average Profit]}\n"
             + "Axis #2:\n"
-            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Good]}\n"
-            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Pearl]}\n"
-            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Portsmouth]}\n"
-            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Top Measure]}\n"
-            + "{[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Walrus]}\n"
+            + "{[Product].[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Good]}\n"
+            + "{[Product].[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Pearl]}\n"
+            + "{[Product].[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Portsmouth]}\n"
+            + "{[Product].[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Top Measure]}\n"
+            + "{[Product].[Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Beer].[Walrus]}\n"
             + "Row #0: $2.17\n"
             + "Row #1: $2.60\n"
             + "Row #2: $6.03\n"
@@ -2801,13 +2811,13 @@ public class ConnectionTest extends TestCase {
             "Axis #0:\n"
             + "{}\n"
             + "Axis #1:\n"
-            + "{[Gender].[All Gender]}\n"
-            + "{[Gender].[F]}\n"
-            + "{[Gender].[M]}\n"
+            + "{[Gender].[Gender].[All Gender]}\n"
+            + "{[Gender].[Gender].[F]}\n"
+            + "{[Gender].[Gender].[M]}\n"
             + "Axis #2:\n"
-            + "{[Customers].[USA].[CA]}\n"
-            + "{[Customers].[USA].[OR]}\n"
-            + "{[Customers].[USA].[WA]}\n"
+            + "{[Customers].[Customers].[USA].[CA]}\n"
+            + "{[Customers].[Customers].[USA].[OR]}\n"
+            + "{[Customers].[Customers].[USA].[WA]}\n"
             + "Row #0: 74,748\n"
             + "Row #0: 36,759\n"
             + "Row #0: 37,989\n"

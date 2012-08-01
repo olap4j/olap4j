@@ -129,7 +129,7 @@ public class TransformTest extends TestCase {
             "SELECT {[Measures].[Unit Sales], "
             + "        [Measures].[Store Cost], "
             + "        [Measures].[Store Sales]} ON COLUMNS, "
-            + "       {[Product].[All Products].Children} ON ROWS "
+            + "       {[Product].[Product].[All Products].Children} ON ROWS "
             + "FROM Sales "
             + "WHERE ([Time].[1997])";
 
@@ -163,7 +163,7 @@ public class TransformTest extends TestCase {
             "SELECT {[Measures].[Unit Sales], "
             + "        [Measures].[Store Cost], "
             + "        [Measures].[Store Sales]} ON COLUMNS, "
-            + "       {[Product].[Food].[Deli].Parent.Level.Members} ON ROWS "
+            + "       {[Product].[Product].[Food].[Deli].Parent.Level.Members} ON ROWS "
             + "FROM Sales "
             + "WHERE ([Time].[1997])";
 
