@@ -52,8 +52,6 @@
 
     <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7"/>
 
-    <dependency org="simple-jndi" name="simple-jndi" rev="0.11.4.1"/>
-
     <dependency org="commons-pool" name="commons-pool" rev="1.1"/>
 
     <dependency org="commons-collections" name="commons-collections" rev="3.2"/>
@@ -69,9 +67,10 @@
     <dependency org="junit" name="junit" rev="3.8.1"/>
 
     <!-- OLAP tests dependencies - uses Mondrian -->
-    <dependency org="pentaho" name="mondrian" rev="TRUNK-SNAPSHOT" changing="true">
+    <dependency org="pentaho" name="mondrian" rev="4.0.0-SNAPSHOT" changing="true">
       <exclude org="${ivy.artifact.group}" module="${ivy.artifact.id}"/>
     </dependency>
+    <dependency org="pentaho" name="mondrian-data-foodmart" rev="0.9-SNAPSHOT" conf="test->default"/>
   </dependencies>
 </ivy-module>
 

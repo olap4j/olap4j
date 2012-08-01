@@ -90,7 +90,13 @@ src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
       </or>
     </condition>
 
-    <target name="setup" depends="version-properties,compile,create-dot-classpath"
+    <condition property="init.foodmart">
+        <not>
+            <isset property="org.olap4j.foodmartLoader.disabled"/>
+        </not>
+    </condition>
+
+    <target name="setup" depends="version-properties,compile,create-dot-classpath,init-foodmart"
         description="Setups the project for eclipse." />
 
     <target name="hudson" depends="clean-all,clean-tests,version-properties,jar,source.jar,tck-jar,xmla-jar,test,jar-jdk14"
@@ -99,7 +105,8 @@ src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
     <target name="hudson-notest" depends="clean-all,clean-tests,version-properties,jar,source.jar,tck-jar,xmla-jar,jar-jdk14"
             description="Sugar goal to build olap4j from hudson." />
 
-    <target name="clean" depends="subfloor.clean, clean-generated"/>
+    <target name="clean" depends="subfloor.clean, clean-generated, clean-foodmart"/>
+    <target name="clean-all" depends="subfloor.clean-all, clean-generated, clean-foodmart"/>
 
     <target name="clean-generated">
         <delete includeemptydirs="true" quiet="true">
@@ -293,31 +300,55 @@ class XmlaOlap4jDriverVersion {
             javacchome="${lib.dir}"/>
     </target>
 
-    <target name="clean-tests" depends="subfloor.clean-tests">
-        <antcall target="init-hsql"/>
-    </target>
-
-    <target name="clean-hsql">
+    <target name="clean-foodmart">
         <delete includeemptydirs="false">
             <fileset
                 dir="${basedir}/foodmart"
                 defaultexcludes="true">
-                <exclude name="foodmart.zip"/>
                 <exclude name="FoodMart.xml"/>
+                <exclude name=".svn"/>
             </fileset>
         </delete>
     </target>
 
-    <target name="init-hsql" depends="clean-hsql">
-        <unzip src="${basedir}/foodmart/foodmart.zip" dest="${basedir}/foodmart/"
-            overwrite="false" />
+    <target name="init-foodmart" if="init.foodmart">
+        <pathconvert
+            property="test.classpath.formatted"
+            pathsep="${line.separator} "
+            refid="test.classpath" />
+        <fail message="Missing Foodmart loader driver in test classpath: ${line.separator}${test.classpath.formatted}">
+            <condition>
+                <not>
+                    <available classname="${org.olap4j.foodmartLoader.driver}"
+                        classpathref="test.classpath"/>
+                </not>
+            </condition>
+        </fail>
+        <!-- HSQL SPECIFIC: Always clean first because foodmart
+             might be created when running the tests before calling
+             init-foodmart. -->
+        <antcall target="clean-foodmart"/>
+        <java classname="mondrian.test.loader.MondrianFoodMartLoader" maxmemory="1024m" fork="true">
+            <classpath refid="test.classpath"/>
+            <arg value="-verbose"/>
+            <arg value="-tables"/>
+            <arg value="-indexes"/>
+            <arg value="-data"/>
+            <arg value="-aggregates"/>
+            <arg value="-outputJdbcBatchSize=100"/>
+            <arg value="-dataset=FOODMART"/>
+            <arg value="-inputFile=jar:file:testlib/mondrian-data-foodmart.jar!/data.sql"/>
+            <arg value="-afterFile=jar:file:testlib/mondrian-data-foodmart.jar!/after.sql"/>
+            <arg value="-jdbcDrivers=${org.olap4j.foodmartLoader.driver}"/>
+            <arg value="-outputJdbcURL=${org.olap4j.foodmartLoader.url}"/>
+            <arg value="-outputJdbcUser=${org.olap4j.foodmartLoader.user}"/>
+            <arg value="-outputJdbcPassword=${org.olap4j.foodmartLoader.password}"/>
+        </java>
+        <!-- HSQL SPECIFIC: Delete the lock file. -->
+    	<delete file="${basedir}/foodmart/foodmart.lck" failonerror="false"/>
     </target>
 
-    <target name="init-tests" depends="clean-tests">
-        <mkdir dir="${testclasses.dir}" />
-        <mkdir dir="${testsrc.dir}" />
-        <antcall target="init-hsql"/>
-    </target>
+    <target name="init-tests" depends="subfloor.init-tests,init-foodmart"/>
 
     <!-- Override of subfloor to resolve modules artifacts -->
     <target name="resolve" depends="install-ivy,install-antcontrib">
