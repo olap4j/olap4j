@@ -494,19 +494,19 @@ public class MetadataTest extends TestCase {
             PROPERTIES_COLUMN_NAMES);
         assertContains(
             "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse and Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store], LEVEL_UNIQUE_NAME=[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Frozen Sqft, PROPERTY_CAPTION=Frozen Sqft, PROPERTY_TYPE=1, DATA_TYPE=5, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Warehouse and Sales Cube - Store Hierarchy - Store Name Level - Frozen Sqft Property",
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse and Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store].[Store], LEVEL_UNIQUE_NAME=[Store].[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Frozen Sqft, PROPERTY_CAPTION=Frozen Sqft, PROPERTY_TYPE=1, DATA_TYPE=5, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Warehouse and Sales Cube - Store Hierarchy - Store Name Level - Frozen Sqft Property",
             s);
         assertEquals(s, 66, linecount(s));
 
         s = checkResultSet(
             olapDatabaseMetaData.getProperties(
                 catalogName, "FoodMart", "Sales",
-                null, null, "[Store].[Store Name]",
+                null, null, "[Store].[Store].[Store Name]",
                 null, null),
             PROPERTIES_COLUMN_NAMES);
         assertContains(
             "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store], LEVEL_UNIQUE_NAME=[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Has coffee bar, PROPERTY_CAPTION=Has coffee bar, PROPERTY_TYPE=1, DATA_TYPE=11, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Sales Cube - Store Hierarchy - Store Name Level - Has coffee bar Property",
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store].[Store], LEVEL_UNIQUE_NAME=[Store].[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Has coffee bar, PROPERTY_CAPTION=Has coffee bar, PROPERTY_TYPE=1, DATA_TYPE=130, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Sales Cube - Store Hierarchy - Store Name Level - Has coffee bar Property",
             s);
         assertNotContains(
             "CATALOG_NAME=" + catalogName
@@ -602,7 +602,7 @@ public class MetadataTest extends TestCase {
             "CATALOG_NAME=" + catalogName
             + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_NAME=Education Level, DIMENSION_UNIQUE_NAME=[Education Level], DIMENSION_GUID=null, DIMENSION_CAPTION=Education Level, DIMENSION_ORDINAL=9, DIMENSION_TYPE=3, DIMENSION_CARDINALITY=6, DEFAULT_HIERARCHY=[Education Level], DESCRIPTION=Sales Cube - Education Level Dimension, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_MASTER_UNIQUE_NAME=null, DIMENSION_IS_VISIBLE=true",
             s);
-        assertEquals(68, linecount(s));
+        assertEquals(62, linecount(s));
     }
 
     public void testDatabaseMetaDataGetFunctions() throws SQLException {
@@ -630,7 +630,7 @@ public class MetadataTest extends TestCase {
             HIERARCHIES_COLUMN_NAMES);
         assertContains(
             "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=HR, DIMENSION_UNIQUE_NAME=[Employees], HIERARCHY_NAME=Employees, HIERARCHY_UNIQUE_NAME=[Employees], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Employees, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=1156, DEFAULT_MEMBER=[Employees].[All Employees], ALL_MEMBER=[Employees].[All Employees], DESCRIPTION=HR Cube - Employees Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_IS_VISIBLE=true, HIERARCHY_ORDINAL=7, DIMENSION_IS_SHARED=true, PARENT_CHILD=true",
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=HR, DIMENSION_UNIQUE_NAME=[Employees], HIERARCHY_NAME=Employees, HIERARCHY_UNIQUE_NAME=[Employees].[Employees], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Employees, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=1156, DEFAULT_MEMBER=[Employees].[Employees].[All Employees], ALL_MEMBER=[Employees].[Employees].[All Employees], DESCRIPTION=HR Cube - Employees Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_IS_VISIBLE=true, HIERARCHY_ORDINAL=7, DIMENSION_IS_SHARED=true, PARENT_CHILD=true",
             s);
 
         s = checkResultSet(
@@ -639,7 +639,7 @@ public class MetadataTest extends TestCase {
             HIERARCHIES_COLUMN_NAMES);
         TestContext.assertEqualsVerbose(
             "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_NAME=Store, HIERARCHY_UNIQUE_NAME=[Store], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Store, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=63, DEFAULT_MEMBER=[Store].[All Stores], ALL_MEMBER=[Store].[All Stores], DESCRIPTION=Sales Cube - Store Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_IS_VISIBLE=true, HIERARCHY_ORDINAL=1, DIMENSION_IS_SHARED=true, PARENT_CHILD=false\n",
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_NAME=Store, HIERARCHY_UNIQUE_NAME=[Store].[Store], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Store, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=63, DEFAULT_MEMBER=[Store].[Store].[All Stores], ALL_MEMBER=[Store].[Store].[All Stores], DESCRIPTION=Sales Cube - Store Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_IS_VISIBLE=true, HIERARCHY_ORDINAL=1, DIMENSION_IS_SHARED=true, PARENT_CHILD=false\n",
             s);
 
         // With dimension unique name (bug 2527862).
@@ -649,7 +649,7 @@ public class MetadataTest extends TestCase {
             HIERARCHIES_COLUMN_NAMES);
         TestContext.assertEqualsVerbose(
             "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_NAME=Store, HIERARCHY_UNIQUE_NAME=[Store], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Store, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=63, DEFAULT_MEMBER=[Store].[All Stores], ALL_MEMBER=[Store].[All Stores], DESCRIPTION=Sales Cube - Store Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_IS_VISIBLE=true, HIERARCHY_ORDINAL=1, DIMENSION_IS_SHARED=true, PARENT_CHILD=false\n",
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_NAME=Store, HIERARCHY_UNIQUE_NAME=[Store].[Store], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Store, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=63, DEFAULT_MEMBER=[Store].[Store].[All Stores], ALL_MEMBER=[Store].[Store].[All Stores], DESCRIPTION=Sales Cube - Store Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_IS_VISIBLE=true, HIERARCHY_ORDINAL=1, DIMENSION_IS_SHARED=true, PARENT_CHILD=false\n",
             s);
     }
 
@@ -659,12 +659,12 @@ public class MetadataTest extends TestCase {
                 catalogName, null, null, null, null, null),
             LEVELS_COLUMN_NAMES);
         assertContains(
-            "CATALOG_NAME=FoodMart, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Measures], HIERARCHY_UNIQUE_NAME=[Measures], LEVEL_NAME=MeasuresLevel, LEVEL_UNIQUE_NAME=[Measures].[MeasuresLevel], LEVEL_GUID=null, LEVEL_CAPTION=MeasuresLevel, LEVEL_NUMBER=0, LEVEL_CARDINALITY=9, LEVEL_TYPE=0, CUSTOM_ROLLUP_SETTINGS=0, LEVEL_UNIQUE_SETTINGS=0, LEVEL_IS_VISIBLE=true, DESCRIPTION=Sales Cube - Measures Hierarchy - MeasuresLevel Level",
+            "CATALOG_NAME=FoodMart, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Measures], HIERARCHY_UNIQUE_NAME=[Measures], LEVEL_NAME=MeasuresLevel, LEVEL_UNIQUE_NAME=[Measures].[MeasuresLevel], LEVEL_GUID=null, LEVEL_CAPTION=MeasuresLevel, LEVEL_NUMBER=0, LEVEL_CARDINALITY=9, LEVEL_TYPE=0, CUSTOM_ROLLUP_SETTINGS=0, LEVEL_UNIQUE_SETTINGS=1, LEVEL_IS_VISIBLE=true, DESCRIPTION=Sales Cube - Measures Hierarchy - MeasuresLevel Level",
             s);
 
         s = checkResultSet(
             olapDatabaseMetaData.getLevels(
-                catalogName, null, "Sales", null, "[Store]", null),
+                catalogName, null, "Sales", null, "[Store].[Store]", null),
             LEVELS_COLUMN_NAMES);
         assertEquals(s, 5, linecount(s));
     }
