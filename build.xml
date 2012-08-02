@@ -96,7 +96,7 @@ src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
         </not>
     </condition>
 
-    <target name="setup" depends="version-properties,compile,create-dot-classpath,init-foodmart"
+    <target name="setup" depends="version-properties,compile,create-dot-classpath"
         description="Setups the project for eclipse." />
 
     <target name="hudson" depends="clean-all,clean-tests,version-properties,jar,source.jar,tck-jar,xmla-jar,test,jar-jdk14"
@@ -311,7 +311,7 @@ class XmlaOlap4jDriverVersion {
         </delete>
     </target>
 
-    <target name="init-foodmart" if="init.foodmart">
+    <target name="init-foodmart" if="init.foodmart" description="Initializes the FoodMart database. Make sure to read and modify test.properties first.">
         <pathconvert
             property="test.classpath.formatted"
             pathsep="${line.separator} "
@@ -324,10 +324,6 @@ class XmlaOlap4jDriverVersion {
                 </not>
             </condition>
         </fail>
-        <!-- HSQL SPECIFIC: Always clean first because foodmart
-             might be created when running the tests before calling
-             init-foodmart. -->
-        <antcall target="clean-foodmart"/>
         <java classname="mondrian.test.loader.MondrianFoodMartLoader" maxmemory="1024m" fork="true">
             <classpath refid="test.classpath"/>
             <arg value="-verbose"/>
@@ -344,11 +340,7 @@ class XmlaOlap4jDriverVersion {
             <arg value="-outputJdbcUser=${org.olap4j.foodmartLoader.user}"/>
             <arg value="-outputJdbcPassword=${org.olap4j.foodmartLoader.password}"/>
         </java>
-        <!-- HSQL SPECIFIC: Delete the lock file. -->
-    	<delete file="${basedir}/foodmart/foodmart.lck" failonerror="false"/>
     </target>
-
-    <target name="init-tests" depends="subfloor.init-tests,init-foodmart"/>
 
     <!-- Override of subfloor to resolve modules artifacts -->
     <target name="resolve" depends="install-ivy,install-antcontrib">
