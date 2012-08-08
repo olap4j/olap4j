@@ -1194,8 +1194,9 @@ public class ConnectionTest extends TestCase {
             // Most databases return 5 columns. Derby returns 9 because of
             // 4 columns in the ORDER BY clause.
             assertTrue(metaData.getColumnCount() >= 5);
-            assertEquals("Year", metaData.getColumnLabel(1));
-            assertEquals("Store Sales", metaData.getColumnLabel(5));
+            assertEquals("Day (Key)", metaData.getColumnLabel(1));
+            assertEquals("Quarter (Key)", metaData.getColumnLabel(2));
+            assertEquals("Store Sales", metaData.getColumnLabel(11));
             resultSet.close();
             break;
         }
@@ -3140,11 +3141,7 @@ public class ConnectionTest extends TestCase {
         assertDrillRowsEquals(
             rs,
             new String[] {
-                "ROW:1.27,",
-                "ROW:1.95,",
-                "ROW:2.82,",
-                "ROW:2.84,",
-                "ROW:3.46,"
+                "ROW:12.34,"
             });
     }
 
@@ -3168,11 +3165,7 @@ public class ConnectionTest extends TestCase {
         assertDrillRowsEquals(
             rs,
             new String[] {
-                "ROW:USA,1.27,",
-                "ROW:USA,1.95,",
-                "ROW:USA,2.82,",
-                "ROW:USA,2.84,",
-                "ROW:USA,3.46,"
+                "ROW:USA,12.34,"
             });
     }
 
@@ -3196,17 +3189,14 @@ public class ConnectionTest extends TestCase {
         assertDrillRowsEquals(
             rs,
             new String[] {
-                "ROW:Walla Walla,1.27,",
-                "ROW:Walla Walla,1.95,",
-                "ROW:Walla Walla,2.82,",
-                "ROW:Walla Walla,2.84,",
-                "ROW:Walla Walla,3.46,"
+                "ROW:WA,Walla Walla,12.34,"
             });
     }
 
     /**
      * Drillthrough with a measure on the axis and no RETURN
-     * clause specified.
+     * clause specified. By default we return whatever is
+     * in the slicer, plus the individual measure values.
      */
     public void testCubesDrillthroughReturnClause9() throws Exception {
         if (tester.getFlavor().equals(Flavor.XMLA)
@@ -3224,11 +3214,11 @@ public class ConnectionTest extends TestCase {
         assertDrillRowsEquals(
             rs,
             new String[] {
-                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Great,Great Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Joe. Burnett,7293.0,Partial High School,M,S,$30K - $50K,1.0,",
-                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Cranberry Muffins,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Geraldine Aubrecht,5956.0,Partial High School,M,S,$30K - $50K,1.0,",
-                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,8.0,34.0,14.0,Food,Baked Goods,Bread,Sliced Bread,Colony,Colony White Bread,Sunday Paper,One Day Sale,USA,WA,Walla Walla,Rena Shaw,6013.0,Partial High School,M,M,$10K - $30K,2.0,",
-                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Blueberry Muffins,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683.0,High School Degree,F,M,$50K - $70K,1.0,",
-                "ROW:WA,Walla Walla,Store 22,null,Small Grocery,1997.0,Q3,9.0,38.0,10.0,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,Cash Register Handout,One Day Sale,USA,WA,Walla Walla,Laura Welden,7683.0,High School Degree,F,M,$50K - $70K,1.0,"
+                "ROW:WA,Walla Walla,Store 22,1997.0,Q3,8.0,Food,Baked Goods,Bread,Muffins,Great,Great Muffins,One Day Sale,1.0,",
+                "ROW:WA,Walla Walla,Store 22,1997.0,Q3,8.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Cranberry Muffins,One Day Sale,1.0,",
+                "ROW:WA,Walla Walla,Store 22,1997.0,Q3,8.0,Food,Baked Goods,Bread,Sliced Bread,Colony,Colony White Bread,One Day Sale,2.0,",
+                "ROW:WA,Walla Walla,Store 22,1997.0,Q3,9.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Blueberry Muffins,One Day Sale,1.0,",
+                "ROW:WA,Walla Walla,Store 22,1997.0,Q3,9.0,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,One Day Sale,1.0,"
             });
     }
 
@@ -3252,8 +3242,8 @@ public class ConnectionTest extends TestCase {
         Arrays.sort(expected);
         for (int i = 0; i < rows.size(); i++) {
             assertEquals(
-                rows.get(i),
-                expected[i]);
+                expected[i],
+                rows.get(i));
         }
     }
 
