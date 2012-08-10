@@ -3223,6 +3223,31 @@ public class ConnectionTest extends TestCase {
             });
     }
 
+    /**
+     * Drillthrough with a measure on the axis, with
+     * two different measures as part of the RETURN clause.
+     */
+    public void testCubesDrillthroughReturnClause10() throws Exception {
+        if (tester.getFlavor().equals(Flavor.XMLA)
+            || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
+        {
+            // TODO: Drillthrough is not implemented in XMLA yet.
+            return;
+        }
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        ResultSet rs = olapConnection.createStatement().executeQuery(
+            "DRILLTHROUGH SELECT from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Time].[Day], [Measures].[Store Sales], [Measures].[Store Cost]");
+        assertDrillRowsEquals(
+            rs,
+            new String[] {
+                "ROW:1997.0,34.0,14.0,9.12,3.443,",
+                "ROW:1997.0,38.0,10.0,3.22,1.288,"
+            });
+    }
+
     private void assertDrillRowsEquals(
         ResultSet rs, String[] expected)
         throws Exception
