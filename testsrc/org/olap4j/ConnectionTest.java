@@ -1194,8 +1194,9 @@ public class ConnectionTest extends TestCase {
             // Most databases return 5 columns. Derby returns 9 because of
             // 4 columns in the ORDER BY clause.
             assertTrue(metaData.getColumnCount() >= 5);
-            assertEquals("Day (Key)", metaData.getColumnLabel(1));
-            assertEquals("Quarter (Key)", metaData.getColumnLabel(2));
+            assertEquals("Quarter", metaData.getColumnLabel(1));
+            assertEquals("Quarter_0", metaData.getColumnLabel(2));
+            assertEquals("Month", metaData.getColumnLabel(3));
             assertEquals("Store Sales", metaData.getColumnLabel(11));
             resultSet.close();
             break;
