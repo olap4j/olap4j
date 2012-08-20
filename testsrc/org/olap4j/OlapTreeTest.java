@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class OlapTreeTest extends TestCase {
 
-    private final TestContext.Tester tester =
+    private TestContext.Tester tester =
         TestContext.instance().getTester();
 
     /**
@@ -45,6 +45,7 @@ public class OlapTreeTest extends TestCase {
     private Connection connection;
 
     protected void tearDown() throws Exception {
+        super.tearDown();
         // Simple strategy to prevent connection leaks
         if (connection != null
             && !connection.isClosed())
@@ -52,6 +53,7 @@ public class OlapTreeTest extends TestCase {
             connection.close();
             connection = null;
         }
+        tester = null;
     }
 
     /**

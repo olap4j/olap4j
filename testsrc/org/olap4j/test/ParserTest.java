@@ -50,7 +50,7 @@ public class ParserTest extends TestCase {
         Pattern.compile(
             "(?s)From line ([0-9]+), column ([0-9]+) to line ([0-9]+), column ([0-9]+): (.*)");
 
-    final TestContext testContext = TestContext.instance();
+    private TestContext testContext = TestContext.instance();
     private Connection connection;
 
     public ParserTest(String name) {
@@ -70,6 +70,7 @@ public class ParserTest extends TestCase {
             connection.close();
             connection = null;
         }
+        testContext = null;
     }
 
     private MdxParser createParser() {
