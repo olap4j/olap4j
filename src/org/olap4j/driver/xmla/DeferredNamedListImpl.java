@@ -26,6 +26,7 @@ import org.olap4j.metadata.NamedList;
 
 import java.util.AbstractList;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 /**
  * Named list which instantiates itself on first use.
@@ -57,6 +58,7 @@ class DeferredNamedListImpl<T extends Named>
     protected final XmlaOlap4jConnection.Context context;
     protected final XmlaOlap4jConnection.Handler<T> handler;
     protected final Object[] restrictions;
+    protected final Semaphore semaphore = new Semaphore(1);
 
     DeferredNamedListImpl(
         XmlaOlap4jConnection.MetadataRequest metadataRequest,
@@ -80,24 +82,32 @@ class DeferredNamedListImpl<T extends Named>
     }
 
     private NamedList<T> getList() {
-        switch (state) {
-        case POPULATING:
-            throw new RuntimeException("recursive population");
-        case NEW:
-            try {
-                state = State.POPULATING;
-                populateList(list);
-                state = State.POPULATED;
-            } catch (OlapException e) {
-                state = State.NEW;
-                // TODO: fetch metadata on getCollection() method, so we
-                // can't get an exception while traversing the list
-                throw new RuntimeException(e);
+        try {
+            semaphore.acquire();
+            switch (state) {
+            case POPULATING:
+                throw new RuntimeException("recursive population");
+            case NEW:
+                try {
+                    state = State.POPULATING;
+                    populateList(list);
+                    state = State.POPULATED;
+                } catch (OlapException e) {
+                    state = State.NEW;
+                    // TODO: fetch metadata on getCollection() method, so we
+                    // can't get an exception while traversing the list
+                    throw new RuntimeException(e);
+                }
+                // fall through
+            case POPULATED:
+            default:
+                return list;
             }
-            // fall through
-        case POPULATED:
-        default:
-            return list;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } finally {
+            semaphore.release();
         }
     }
 
