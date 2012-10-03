@@ -1190,15 +1190,18 @@ public class ConnectionTest extends TestCase {
             break;
         default:
             final ResultSet resultSet = cell.drillThrough();
-            final ResultSetMetaData metaData = resultSet.getMetaData();
-            // Most databases return 5 columns. Derby returns 9 because of
-            // 4 columns in the ORDER BY clause.
-            assertTrue(metaData.getColumnCount() >= 5);
-            assertEquals("Quarter", metaData.getColumnLabel(1));
-            assertEquals("Quarter_0", metaData.getColumnLabel(2));
-            assertEquals("Month", metaData.getColumnLabel(3));
-            assertEquals("Store Sales", metaData.getColumnLabel(11));
-            resultSet.close();
+            try {
+                final ResultSetMetaData metaData = resultSet.getMetaData();
+                // Most databases return 5 columns. Derby returns 9 because of
+                // 4 columns in the ORDER BY clause.
+                assertTrue(metaData.getColumnCount() >= 5);
+                assertEquals("Quarter", metaData.getColumnLabel(1));
+                assertEquals("Quarter_0", metaData.getColumnLabel(2));
+                assertEquals("Month", metaData.getColumnLabel(3));
+                assertEquals("Store Sales", metaData.getColumnLabel(11));
+            } finally {
+                resultSet.close();
+            }
             break;
         }
 
@@ -2999,10 +3002,18 @@ public class ConnectionTest extends TestCase {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        ResultSet rs = olapConnection.createStatement().executeQuery(
-            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name], [Gender].[Gender]");
-        assertDrillRowsEquals(
-            rs,
+        ResultSet rs =
+            olapConnection.createStatement().executeQuery(
+                "DRILLTHROUGH\n"
+                + "SELECT {[Measures].[Unit Sales]} on columns\n"
+                + "from [Sales]\n"
+                + "where ([Promotions].[One Day Sale],\n"
+                + " [Store].[Store City].[Walla Walla],\n"
+                + " [Product].[Product Category].[Bread])\n"
+                + "RETURN [Customers].[Name], [Gender].[Gender]");
+        try {
+            assertDrillRowsEquals(
+                rs,
             new String[] {
                 "ROW:5956.0,M,",
                 "ROW:6013.0,M,",
@@ -3010,6 +3021,9 @@ public class ConnectionTest extends TestCase {
                 "ROW:7683.0,F,",
                 "ROW:7683.0,F,"
             });
+        } finally {
+            rs.close();
+        }
     }
 
     /**
@@ -3027,17 +3041,28 @@ public class ConnectionTest extends TestCase {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        ResultSet rs = olapConnection.createStatement().executeQuery(
-            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name]");
-        assertDrillRowsEquals(
-            rs,
-            new String[] {
-                "ROW:5956.0,",
-                "ROW:6013.0,",
-                "ROW:7293.0,",
-                "ROW:7683.0,",
-                "ROW:7683.0,"
-            });
+        ResultSet rs =
+            olapConnection.createStatement().executeQuery(
+                "DRILLTHROUGH\n"
+                + "SELECT {[Measures].[Unit Sales]} on columns\n"
+                + "from [Sales]\n"
+                + "where ([Promotions].[One Day Sale],\n"
+                + " [Store].[Store City].[Walla Walla],\n"
+                + " [Product].[Product Category].[Bread])\n"
+                + "RETURN [Customers].[Name]");
+        try {
+            assertDrillRowsEquals(
+                rs,
+                new String[] {
+                    "ROW:5956.0,",
+                    "ROW:6013.0,",
+                    "ROW:7293.0,",
+                    "ROW:7683.0,",
+                    "ROW:7683.0,"
+                });
+        } finally {
+            rs.close();
+        }
     }
 
     /**
@@ -3055,17 +3080,28 @@ public class ConnectionTest extends TestCase {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        ResultSet rs = olapConnection.createStatement().executeQuery(
-            "DRILLTHROUGH SELECT from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[Name]");
-        assertDrillRowsEquals(
-            rs,
-            new String[] {
-                "ROW:5956.0,",
-                "ROW:6013.0,",
-                "ROW:7293.0,",
-                "ROW:7683.0,",
-                "ROW:7683.0,"
-            });
+        ResultSet rs =
+            olapConnection.createStatement().executeQuery(
+                "DRILLTHROUGH\n"
+                + "SELECT\n"
+                + "from [Sales]\n"
+                + "where ([Promotions].[One Day Sale],\n"
+                + " [Store].[Store City].[Walla Walla],\n"
+                + " [Product].[Product Category].[Bread])\n"
+                + "RETURN [Customers].[Name]");
+        try {
+            assertDrillRowsEquals(
+                rs,
+                new String[] {
+                    "ROW:5956.0,",
+                    "ROW:6013.0,",
+                    "ROW:7293.0,",
+                    "ROW:7683.0,",
+                    "ROW:7683.0,"
+                });
+        } finally {
+            rs.close();
+        }
     }
 
     /**
@@ -3083,16 +3119,23 @@ public class ConnectionTest extends TestCase {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        ResultSet rs = olapConnection.createStatement().executeQuery(
-            "DRILLTHROUGH SELECT {[Promotions].[One Day Sale]} on columns, "
-            + "{[Store].[Store City].[Walla Walla]} on rows "
-            + "from [Sales] where ([Product].[Product Category].[Pizza]) "
-            + "RETURN [Measures].[Unit Sales], [Measures].[Store Sales]");
-        assertDrillRowsEquals(
-            rs,
-            new String[] {
-                "ROW:1.0,0.8,"
-            });
+        ResultSet rs =
+            olapConnection.createStatement().executeQuery(
+                "DRILLTHROUGH\n"
+                + "SELECT {[Promotions].[One Day Sale]} on columns,\n"
+                + "{[Store].[Store City].[Walla Walla]} on rows\n"
+                + "from [Sales]\n"
+                + "where ([Product].[Product Category].[Pizza])\n"
+                + "RETURN [Measures].[Unit Sales], [Measures].[Store Sales]");
+        try {
+            assertDrillRowsEquals(
+                rs,
+                new String[] {
+                    "ROW:1.0,0.8,"
+                });
+        } finally {
+            rs.close();
+        }
     }
 
     /**
@@ -3110,16 +3153,23 @@ public class ConnectionTest extends TestCase {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        ResultSet rs = olapConnection.createStatement().executeQuery(
-            "DRILLTHROUGH SELECT {[Promotions].[One Day Sale]} on columns, "
-            + "{[Store].[Store City].[Walla Walla]} on rows "
-            + "from [Sales] where ([Product].[Product Category].[Pizza]) "
-            + "RETURN [Measures].[Store Sales]");
-        assertDrillRowsEquals(
-            rs,
-            new String[] {
-                "ROW:0.8,"
-            });
+        ResultSet rs =
+            olapConnection.createStatement().executeQuery(
+                "DRILLTHROUGH\n"
+                + "SELECT {[Promotions].[One Day Sale]} on columns,\n"
+                + "{[Store].[Store City].[Walla Walla]} on rows\n"
+                + "from [Sales]\n"
+                + "where ([Product].[Product Category].[Pizza])\n"
+                + "RETURN [Measures].[Store Sales]");
+        try {
+            assertDrillRowsEquals(
+                rs,
+                new String[] {
+                    "ROW:0.8,"
+                });
+        } finally {
+            rs.close();
+        }
     }
 
     /**
@@ -3137,13 +3187,24 @@ public class ConnectionTest extends TestCase {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        ResultSet rs = olapConnection.createStatement().executeQuery(
-            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Measures].[Store Sales]");
-        assertDrillRowsEquals(
-            rs,
+        ResultSet rs =
+            olapConnection.createStatement().executeQuery(
+                "DRILLTHROUGH\n"
+                + "SELECT {[Measures].[Unit Sales]} on columns\n"
+                + "from [Sales]\n"
+                + "where ([Promotions].[One Day Sale],\n"
+                + " [Store].[Store City].[Walla Walla],\n"
+                + " [Product].[Product Category].[Bread])\n"
+                + "RETURN [Measures].[Store Sales]");
+        try {
+            assertDrillRowsEquals(
+                rs,
             new String[] {
                 "ROW:12.34,"
             });
+        } finally {
+            rs.close();
+        }
     }
 
     /**
@@ -3161,13 +3222,24 @@ public class ConnectionTest extends TestCase {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        ResultSet rs = olapConnection.createStatement().executeQuery(
-            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers], [Measures].[Promotion Sales]");
-        assertDrillRowsEquals(
-            rs,
+        ResultSet rs =
+            olapConnection.createStatement().executeQuery(
+                "DRILLTHROUGH\n"
+                + "SELECT {[Measures].[Unit Sales]} on columns\n"
+                + "from [Sales]\n"
+                + "where ([Promotions].[One Day Sale],\n"
+                + " [Store].[Store City].[Walla Walla],\n"
+                + " [Product].[Product Category].[Bread])\n"
+                + "RETURN [Customers], [Measures].[Promotion Sales]");
+        try {
+            assertDrillRowsEquals(
+                rs,
             new String[] {
                 "ROW:USA,12.34,"
             });
+        } finally {
+            rs.close();
+        }
     }
 
     /**
@@ -3185,13 +3257,24 @@ public class ConnectionTest extends TestCase {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        ResultSet rs = olapConnection.createStatement().executeQuery(
-            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread]) RETURN [Customers].[City], [Measures].[Promotion Sales]");
-        assertDrillRowsEquals(
-            rs,
+        ResultSet rs =
+            olapConnection.createStatement().executeQuery(
+                "DRILLTHROUGH\n"
+                + "SELECT {[Measures].[Unit Sales]} on columns\n"
+                + "from [Sales]\n"
+                + "where ([Promotions].[One Day Sale],\n"
+                + " [Store].[Store City].[Walla Walla],\n"
+                + " [Product].[Product Category].[Bread])\n"
+                + "RETURN [Customers].[City], [Measures].[Promotion Sales]");
+        try {
+            assertDrillRowsEquals(
+                rs,
             new String[] {
                 "ROW:WA,Walla Walla,12.34,"
             });
+        } finally {
+            rs.close();
+        }
     }
 
     /**
@@ -3210,10 +3293,17 @@ public class ConnectionTest extends TestCase {
         connection = tester.createConnection();
         OlapConnection olapConnection =
             tester.getWrapper().unwrap(connection, OlapConnection.class);
-        ResultSet rs = olapConnection.createStatement().executeQuery(
-            "DRILLTHROUGH SELECT {[Measures].[Unit Sales]} on columns from [Sales] where ([Promotions].[One Day Sale], [Store].[Store City].[Walla Walla], [Product].[Product Category].[Bread])");
-        assertDrillRowsEquals(
-            rs,
+        ResultSet rs =
+            olapConnection.createStatement().executeQuery(
+                "DRILLTHROUGH\n"
+                + "SELECT {[Measures].[Unit Sales]} on columns\n"
+                + "from [Sales]\n"
+                + "where ([Promotions].[One Day Sale],\n"
+                + " [Store].[Store City].[Walla Walla],\n"
+                + " [Product].[Product Category].[Bread])");
+        try {
+            assertDrillRowsEquals(
+                rs,
             new String[] {
                 "ROW:WA,Walla Walla,Store 22,1997.0,Q3,8.0,Food,Baked Goods,Bread,Muffins,Great,Great Muffins,One Day Sale,1.0,",
                 "ROW:WA,Walla Walla,Store 22,1997.0,Q3,8.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Cranberry Muffins,One Day Sale,1.0,",
@@ -3221,6 +3311,9 @@ public class ConnectionTest extends TestCase {
                 "ROW:WA,Walla Walla,Store 22,1997.0,Q3,9.0,Food,Baked Goods,Bread,Muffins,Modell,Modell Blueberry Muffins,One Day Sale,1.0,",
                 "ROW:WA,Walla Walla,Store 22,1997.0,Q3,9.0,Food,Baked Goods,Bread,Sliced Bread,Sphinx,Sphinx Wheat Bread,One Day Sale,1.0,"
             });
+        } finally {
+            rs.close();
+        }
     }
 
     /**
@@ -3249,12 +3342,14 @@ public class ConnectionTest extends TestCase {
     }
 
     private void assertDrillRowsEquals(
-        ResultSet rs, String[] expected)
+        ResultSet rs,
+        String[] expected)
         throws Exception
     {
         final List<String> rows = new ArrayList<String>();
+        StringBuilder sb = new StringBuilder();
         while (rs.next()) {
-            StringBuilder sb = new StringBuilder();
+            sb.setLength(0);
             sb.append("ROW:");
             for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
                 sb.append(
