@@ -19,6 +19,9 @@
 */
 package org.olap4j.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -28,10 +31,10 @@ import java.util.*;
  * @author jhyde
  */
 public class LcidLocale {
-    final Map<Short, String> lcidLocaleMap = new HashMap<Short, String>();
-    final Map<String, Short> localeToLcidMap = new HashMap<String, Short>();
+    final Map<Short, Info> lcidLocaleMap = new HashMap<Short, Info>();
+    final Map<String, Info> localeToLcidMap = new HashMap<String, Info>();
 
-    private static final Object[] LOCALE_DATA = {
+    private static final Object[] LOCALE_DATA_ = {
         "", (short) 0x007f, "invariant culture",
         "ar", (short) 0x0001, "Arabic",
         "bg", (short) 0x0002, "Bulgarian",
@@ -268,19 +271,56 @@ public class LcidLocale {
     private static LcidLocale INSTANCE;
 
     private LcidLocale() {
-        for (int i = 0; i < LOCALE_DATA.length;) {
-            String localeName = (String) LOCALE_DATA[i++];
-            Short lcid = (Short) LOCALE_DATA[i++];
-            Olap4jUtil.discard((String) LOCALE_DATA[i++]); // description
-            lcidLocaleMap.put(lcid, localeName);
-            localeToLcidMap.put(localeName, lcid);
+        URL resource = getClass().getResource("nls.properties");
+        InputStream inputStream = null;
+        try {
+            inputStream = resource.openStream();
+            Properties properties = new Properties();
+            properties.load(inputStream);
+            @SuppressWarnings("unchecked")
+            final Map<String, String> map = (Map) properties;
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                if (key.endsWith(".lcid")) {
+                    final String root =
+                        key.substring(0, key.length() - ".lcid".length());
+                    String lcname =
+                        root.substring(root.indexOf('.') + 1).replace('-', '_');
+                    short lcid = Short.parseShort(value.substring(2), 16);
+                    String locale = map.get(root + ".locale");
+                    String language = map.get(root + ".language");
+                    String languageLocal = map.get(root + ".languageLocal");
+                    String codepageAnsi = map.get(root + ".codepageAnsi");
+                    String codepageOem = map.get(root + ".codepageOem");
+                    String regionAbbrev = map.get(root + ".regionAbbrev");
+                    String languageAbbrev = map.get(root + ".languageAbbrev");
+                    Info info =
+                        new Info(
+                            lcid,
+                            lcname,
+                            locale,
+                            language,
+                            languageLocal,
+                            Short.parseShort(codepageAnsi),
+                            Short.parseShort(codepageOem),
+                            regionAbbrev,
+                            languageAbbrev);
+                    lcidLocaleMap.put(lcid, info);
+                    localeToLcidMap.put(lcname, info);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
         }
-        assert LOCALE_DATA.length % 3 == 0;
-        assert lcidLocaleMap.size() == LOCALE_DATA.length / 3;
-
-        // Off by one because Spanish (traditional) and Spanish (modern) share
-        // locale "es_ES".
-        assert localeToLcidMap.size() == LOCALE_DATA.length / 3 - 1;
     }
 
     /**
@@ -301,11 +341,11 @@ public class LcidLocale {
      * @throws RuntimeException if LCID is not valid
      */
     private Locale toLocale(short lcid) {
-        final String s = lcidLocaleMap.get(lcid);
+        final Info s = lcidLocaleMap.get(lcid);
         if (s == null) {
             throw new RuntimeException("Unknown LCID " + lcid);
         }
-        return parseLocale(s);
+        return parseLocale(s.locale);
     }
 
     /**
@@ -348,9 +388,9 @@ public class LcidLocale {
     private short toLcid(String localeName) {
         final String localeName0 = localeName;
         for (;;) {
-            final Short lcid = localeToLcidMap.get(localeName);
-            if (lcid != null) {
-                return lcid;
+            final Info info = localeToLcidMap.get(localeName);
+            if (info != null) {
+                return info.lcid;
             }
             final int underscore = localeName.lastIndexOf('_');
             if (underscore < 0) {
@@ -380,6 +420,40 @@ public class LcidLocale {
         default:
             throw new RuntimeException(
                 "bad locale string '" + localeString + "'");
+        }
+    }
+
+    public static class Info {
+        public final short lcid;
+        public final String locale;
+        public final String localeFull;
+        public final String language;
+        public final String languageLocal;
+        public final short codepageAnsi;
+        public final short codepageOem;
+        public final String regionAbbrev;
+        public final String languageAbbrev;
+
+        public Info(
+            short lcid,
+            String locale,
+            String localeFull,
+            String language,
+            String languageLocal,
+            short codepageAnsi,
+            short codepageOem,
+            String regionAbbrev,
+            String languageAbbrev)
+        {
+            this.lcid = lcid;
+            this.locale = locale;
+            this.localeFull = localeFull;
+            this.language = language;
+            this.languageLocal = languageLocal;
+            this.codepageAnsi = codepageAnsi;
+            this.codepageOem = codepageOem;
+            this.regionAbbrev = regionAbbrev;
+            this.languageAbbrev = languageAbbrev;
         }
     }
 }

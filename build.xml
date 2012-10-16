@@ -48,7 +48,9 @@ src/org/olap4j/mdx/parser/impl/TokenMgrError.java,
 src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
 
     <target name="checkIsJdk15" if="jdk15.not.present">
+<!--
         <fail message="The 'dist' target (used to make an official release) must be run under JDK 1.5." />
+-->
     </target>
 
     <condition property="jdk15.present">
@@ -177,6 +179,8 @@ VERSION.txt" />
                 excludes="
 org/olap4j/driver/**,
 META-INF/**"/>
+            <zipfileset dir="${src.dir}" prefix=""
+                includes="org/olap4j/impl/nls.properties"/>
         </zip>
     </target>
 

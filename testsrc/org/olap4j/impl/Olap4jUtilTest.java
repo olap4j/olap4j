@@ -683,8 +683,19 @@ public class Olap4jUtilTest extends TestCase {
         assertEquals(0x0007, LcidLocale.localeToLcid(Locale.GERMAN));
         assertEquals(0x0407, LcidLocale.localeToLcid(Locale.GERMANY));
 
-        // Locale en_SG is unknown; fall back to en. For bug 3526908.
-        assertEquals(0x0009, LcidLocale.localeToLcid(new Locale("en", "SG")));
+        // Locale en_SG was previously unknown, now known.
+        String s = Integer.toHexString(18441);
+        assertEquals(0x4809, LcidLocale.localeToLcid(new Locale("en", "SG")));
+
+        // Locale en_XX is unknown; fall back to en.
+        // For bug http://sourceforge.net/p/olap4j/bugs/73.
+        assertEquals(0x0009, LcidLocale.localeToLcid(new Locale("en", "XX")));
+
+        // For bug http://sourceforge.net/p/olap4j/bugs/76/,
+        // "Still missing codes from LCID-to-Locale mapping".
+        assertEquals(0x0C0A, LcidLocale.localeToLcid(new Locale("es", "ES")));
+        assertEquals(
+            "es_ES", LcidLocale.lcidToLocale((short) 0x0C0A).toString());
     }
 
     /**
