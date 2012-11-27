@@ -23,6 +23,7 @@ import org.olap4j.mdx.*;
 
 import junit.framework.TestCase;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -685,6 +686,7 @@ public class Olap4jUtilTest extends TestCase {
 
         // Locale en_SG was previously unknown, now known.
         String s = Integer.toHexString(18441);
+        assertEquals("4809", s);
         assertEquals(0x4809, LcidLocale.localeToLcid(new Locale("en", "SG")));
 
         // Locale en_XX is unknown; fall back to en.
@@ -722,6 +724,41 @@ public class Olap4jUtilTest extends TestCase {
         }
     }
 
+    /**
+     * Unit test for {@link org.olap4j.impl.Spacer}.
+     */
+    public void testSpacer() {
+        final Spacer spacer = new Spacer();
+        assertEquals("", spacer.toString());
+        spacer.add(2);
+        assertEquals(2, spacer.toString().length());
+
+        final StringWriter stringWriter = new StringWriter();
+        spacer.spaces(stringWriter);
+        assertEquals(2, stringWriter.toString().length());
+
+        try {
+            spacer.spaces((Writer) stringWriter);
+        } catch (IOException e) {
+            throw new RuntimeException("fail", e);
+        }
+        assertEquals(4, stringWriter.toString().length());
+
+        final PrintWriter printWriter = new PrintWriter(stringWriter);
+        spacer.spaces(printWriter);
+        printWriter.flush();
+        assertEquals(6, stringWriter.toString().length());
+
+        final StringBuilder stringBuilder = new StringBuilder();
+        spacer.spaces(stringBuilder);
+        assertEquals(2, stringBuilder.toString().length());
+
+        spacer.add(3);
+        assertEquals(5, spacer.toString().length());
+
+        spacer.subtract(1);
+        assertEquals(4, spacer.toString().length());
+    }
 }
 
 // End Olap4jUtilTest.java

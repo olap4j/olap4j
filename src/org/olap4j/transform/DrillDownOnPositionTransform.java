@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Drill down on position transform
  *
- * TODO: transform to be completed, not working for now.
+ * <p>TODO: transform to be completed, not working for now.</p>
  *
  * <p>Description: Adds the children of a member at a specific position on an
  * axis. The member to drill is identified from a CellSet with the axis,
@@ -51,21 +51,17 @@ import java.util.List;
  */
 public class DrillDownOnPositionTransform extends AxisTransform {
 
-    // private final int positionOrdinalInAxis;
-    // private final int memberOrdinalInPosition;
-    // private final CellSet cellSet;
-
     private final Position positionToDrill;
     private final Member memberToDrill;
     private final List<Member> pathToMember;
 
     /**
-     * ctor
+     * Creates a DrillDownOnPositionTransform.
      *
-     * @param axis
-     * @param positionOrdinalInAxis
-     * @param memberOrdinalInPosition
-     * @param cellSet
+     * @param axis Axis
+     * @param positionOrdinalInAxis Position ordinal on axis
+     * @param memberOrdinalInPosition Member ordinal in Position
+     * @param cellSet Cell set
      */
     public DrillDownOnPositionTransform(
         Axis axis,
@@ -74,10 +70,6 @@ public class DrillDownOnPositionTransform extends AxisTransform {
         CellSet cellSet)
     {
         super(axis);
-        // this.positionOrdinalInAxis = positionOrdinalInAxis;
-        // this.memberOrdinalInPosition = memberOrdinalInPosition;
-        // this.cellSet = cellSet;
-
         positionToDrill =
             TransformUtil.getPositionFromCellSet(
                 axis, positionOrdinalInAxis, cellSet);

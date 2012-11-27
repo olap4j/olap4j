@@ -45,21 +45,15 @@ import org.olap4j.metadata.Member;
  */
 public class RollUpLevelTransform extends AxisTransform {
 
-    // private final int positionOrdinalInAxis;
-    // private final int memberOrdinalInPosition;
-    // private final CellSet cellSet;
-
-    // private final Position positionToDrill;
     private final Member memberToDrill;
-    // private final List<Member> pathToMember;
 
     /**
-     * ctor
+     * Creates a RollUpLevelTransform.
      *
-     * @param axis
-     * @param positionOrdinalInAxis
-     * @param memberOrdinalInPosition
-     * @param cellSet
+     * @param axis Axis
+     * @param positionOrdinalInAxis Position ordinal on Axis
+     * @param memberOrdinalInPosition Member ordinal in Position
+     * @param cellSet Cell set
      */
     public RollUpLevelTransform(
         Axis axis,
@@ -69,17 +63,8 @@ public class RollUpLevelTransform extends AxisTransform {
     {
         super(axis);
 
-        // this.positionOrdinalInAxis = positionOrdinalInAxis;
-        // this.memberOrdinalInPosition = memberOrdinalInPosition;
-        // this.cellSet = cellSet;
-
-        // Position positionToDrill =
-        //     TransformUtil.getPositionFromCellSet(axis, positionOrdinalInAxis,
-        //          cellSet);
         memberToDrill = TransformUtil.getMemberFromCellSet(
             axis, positionOrdinalInAxis, memberOrdinalInPosition, cellSet);
-        // pathToMember = getPathToMember(positionToDrill,
-        //        memberOrdinalInPosition);
     }
 
     public String getName() {
@@ -101,7 +86,6 @@ public class RollUpLevelTransform extends AxisTransform {
                     MdxHelper.makeParentCallNode(
                         MdxHelper.makeMemberNode(memberToDrill)))));
     }
-
 }
 
 // End RollUpLevelTransform.java

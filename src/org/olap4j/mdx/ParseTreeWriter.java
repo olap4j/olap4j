@@ -19,6 +19,8 @@
 */
 package org.olap4j.mdx;
 
+import org.olap4j.impl.Spacer;
+
 import java.io.PrintWriter;
 import java.io.Writer;
 
@@ -49,11 +51,9 @@ import java.io.Writer;
  */
 public class ParseTreeWriter {
     private final PrintWriter pw;
-    private int linePrefixLength;
-    private String linePrefix;
+    private final Spacer spacer = new Spacer();
 
     private static final int INDENT = 4;
-    private static String bigString = "                ";
 
     /**
      * Creates a ParseTreeWriter.
@@ -74,11 +74,9 @@ public class ParseTreeWriter {
             @Override
             public void println() {
                 super.println();
-                print(linePrefix);
+                spacer.spaces(this);
             }
         };
-        this.linePrefixLength = 0;
-        setPrefix();
     }
 
     /**
@@ -94,33 +92,14 @@ public class ParseTreeWriter {
      * Increases the indentation level.
      */
     public void indent() {
-        linePrefixLength += INDENT;
-        setPrefix();
-    }
-
-    private void setPrefix() {
-        linePrefix = spaces(linePrefixLength);
+        spacer.add(INDENT);
     }
 
     /**
      * Decreases the indentation level.
      */
     public void outdent() {
-        linePrefixLength -= INDENT;
-        setPrefix();
-    }
-
-    /**
-     * Returns a string of N spaces.
-     * @param n Number of spaces
-     * @return String of N spaces
-     */
-    private static synchronized String spaces(int n)
-    {
-        while (n > bigString.length()) {
-            bigString = bigString + bigString;
-        }
-        return bigString.substring(0, n);
+        spacer.subtract(INDENT);
     }
 }
 

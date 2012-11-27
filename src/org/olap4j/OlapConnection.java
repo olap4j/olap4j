@@ -93,9 +93,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * first one available.
      *
      * @return The name of the database currently active for this connection.
-     * @throws OlapException
-     *             An exception will be thrown, if any of these conditions
-     *             are true:
+     * @throws OlapException if any of these conditions are true:
      *             <ul>
      *             <li>A server error occurs.</li>
      *             <li>No databases exist on the server.</li>
@@ -109,11 +107,8 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * Sets the name of the database that will be used for this connection.
      * Overrides the value passed, if any, through the JDBC URL.
      *
-     * @param databaseName
-     *            The name of the database to use.
-     * @throws OlapException
-     *             An exception will be thrown, if any of these conditions
-     *             are true:
+     * @param databaseName The name of the database to use.
+     * @throws OlapException if any of these conditions are true:
      *             <ul>
      *             <li>A server error occurs.</li>
      *             <li>The user specified a database name which does not
@@ -133,9 +128,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * @see #getOlapDatabases()
      * @return The currently active Database, or null of none are currently
      *         selected.
-     * @throws OlapException
-     *             An exception will be thrown, if any of these conditions
-     *             are true:
+     * @throws OlapException if any of these conditions are true:
      *             <ul>
      *             <li>A server error occurs.</li>
      *             <li>No databases exist on the server.</li>
@@ -168,9 +161,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * the driver will also use the first one available on the server.
      *
      * @return The name of the catalog which is active for this connection.
-     * @throws OlapException
-     *             An exception will be thrown, if any of these conditions
-     *             are true:
+     * @throws OlapException if any of these conditions are true:
      *             <ul>
      *             <li>A server error occurs.</li>
      *             <li>No database name was specified and no databases exist
@@ -189,11 +180,8 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * Sets the name of the catalog that will be used for this connection.
      * Overrides the value passed, if any, through the JDBC URL.
      *
-     * @param catalogName
-     *            The name of the catalog to use for this connection.
-     * @throws OlapException
-     *             An exception will be thrown, if any of these conditions
-     *             are true:
+     * @param catalogName The name of the catalog to use for this connection.
+     * @throws OlapException if any of these conditions are true:
      *             <ul>
      *             <li>A server error occurs.</li>
      *             <li>No database name was specified and no databases
@@ -219,9 +207,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
      *
      * @return The currently active catalog, or null of none are
      * currently selected.
-     * @throws OlapException
-     *             An exception will be thrown, if any of these conditions
-     *             are true:
+     * @throws OlapException if any of these conditions are true:
      *             <ul>
      *             <li>A server error occurs.</li>
      *             <li>No database name was specified and no databases
@@ -250,9 +236,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * if the caller modifies the list, behavior is undefined.
      *
      * @return List of Catalogs in this connection's OLAP server
-     * @throws OlapException
-     *             An exception will be thrown, if any of these conditions
-     *             are true:
+     * @throws OlapException if any of these conditions are true:
      *             <ul>
      *             <li>A server error occurs.</li>
      *             <li>No database name was specified and no databases
@@ -276,9 +260,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * account the specified Database, Catalog and Schema names, if any.
      *
      * @return The name of the schema currently selected for this connection.
-     * @throws OlapException
-     *             An exception will be thrown, if any of these conditions
-     *             are true:
+     * @throws OlapException if any of these conditions are true:
      *             <ul>
      *             <li>A server error occurs.</li>
      *             <li>No database name was specified and no databases
@@ -302,9 +284,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * Overrides the value passed, if any, through the JDBC URL.
      *
      * @param schemaName The name of the schema to use for this connection.
-     * @throws OlapException
-     *             An exception will be thrown, if any of these conditions
-     *             are true:
+     * @throws OlapException if any of these conditions are true:
      *             <ul>
      *             <li>A server error occurs.</li>
      *             <li>No database name was specified and no databases
@@ -335,9 +315,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * account the specified Database, Catalog and Schema names, if any.
      *
      * @return The currently active schema
-     * @throws OlapException
-     *             An exception will be thrown, if any of these conditions
-     *             are true:
+     * @throws OlapException if any of these conditions are true:
      *             <ul>
      *             <li>A server error occurs.</li>
      *             <li>No database name was specified and no databases
@@ -371,9 +349,7 @@ public interface OlapConnection extends Connection, OlapWrapper {
      * if the caller modifies the list, behavior is undefined.
      *
      * @return List of Catalogs in this connection's OLAP server
-     * @throws OlapException
-     *             An exception will be thrown, if any of these conditions
-     *             are true:
+     * @throws OlapException if any of these conditions are true:
      *             <ul>
      *             <li>A server error occurs.</li>
      *             <li>No database name was specified and no databases
