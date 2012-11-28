@@ -1284,7 +1284,8 @@ TYPICAL TARGET SEQUENCE
            optimize="false"
            source="${javac.source}"
            target="${javac.target}"
-           fork="true">
+           fork="true"
+           includeantruntime="false">
       <src path="${testsrc.dir}" />
       <classpath refid="test.classpath" />
     </javac>

@@ -19,7 +19,6 @@
     -->
 <project name="olap4j" basedir="." default="dist" xmlns:ivy="antlib:org.apache.ivy.ant">
     <property file="${basedir}/test.properties"/>
-    <property name="unix.script" value="${basedir}/buildOnJdk.sh"/>
     <import file="subfloor.xml" />
 
     <property name="jar-jdk14.file"
@@ -47,50 +46,30 @@ src/org/olap4j/mdx/parser/impl/Token.java,
 src/org/olap4j/mdx/parser/impl/TokenMgrError.java,
 src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
 
-    <target name="checkIsJdk15" if="jdk15.not.present">
-<!--
-        <fail message="The 'dist' target (used to make an official release) must be run under JDK 1.5." />
--->
+    <target name="checkJdkVersion" unless="jdk17.present">
+      <fail message="The 'jar' target (and dependent targets 'dist', 'binzip')
+                     must be run under JDK 1.7." />
     </target>
 
     <condition property="jdk15.present">
         <contains string="${java.version}" substring="1.5." />
     </condition>
 
-    <condition property="jdk15.not.present">
-        <not>
-          <contains string="${java.version}" substring="1.5." />
-        </not>
-    </condition>
-
     <condition property="jdk16.present">
         <contains string="${java.version}" substring="1.6." />
-    </condition>
-
-    <condition property="jdk16.not.present">
-        <not>
-          <contains string="${java.version}" substring="1.6." />
-        </not>
     </condition>
 
     <condition property="jdk17.present">
         <contains string="${java.version}" substring="1.7." />
     </condition>
 
-    <condition property="jdk17.not.present">
-        <not>
-           <contains string="${java.version}" substring="1.7." />
-        </not>
-    </condition>
+    <path id="project.bootclasspath.jdk15">
+      <pathelement location="${lib.dir}/rt-jdk1.5.jar"/>
+    </path>
 
-    <condition property="java.version.matches.requested">
-      <or>
-        <not>
-          <isset property="requested.java.version"/>
-        </not>
-        <matches pattern="^${requested.java.version}.*" string="jdk${java.runtime.version}" />
-      </or>
-    </condition>
+    <path id="project.bootclasspath.jdk16">
+      <pathelement location="${lib.dir}/rt-java6.jar"/>
+    </path>
 
     <condition property="init.foodmart">
         <not>
@@ -117,7 +96,7 @@ src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
     </target>
 
     <!-- Override to create a proper release. -->
-    <target name="dist" depends="checkIsJdk15, all"/>
+    <target name="dist" depends="all"/>
 
     <target name="all"
         depends="clean,version-properties,jar,tck-jar,xmla-jar,javadoc,javadoc-pdf,jar-jdk14,source.zip"
@@ -165,7 +144,7 @@ olap4j_api.pdf"
         depends="init, compile.pre, compileJdk15, compileJdk16, compileJdk17, compile.src_copy, compile.res_copy, compile.lic_copy, compile.post"
         description="Performs all the steps to prepare the bin directory with a complete compilation" />
 
-    <target name="jar" depends="init, compile.pre, compileJdk15, compileJdk16, compileJdk17, compile, compile-tests, set-build.id, generate.manifest"
+    <target name="jar" depends="checkJdkVersion, compile, compile-tests, set-build.id, generate.manifest"
         description="Jars up the bin directory after a compile">
         <zip destfile="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">
             <zipfileset dir="${basedir}" prefix=""
@@ -215,30 +194,59 @@ VERSION.txt" />
     </target>
 
     <target name="compileJdk15">
-        <exec osfamily="unix" executable="${unix.script}">
-            <arg line="jdk1.5 -Dskip.download=true compile.compile"/>
-        </exec>
-        <exec osfamily="windows" dir="." executable="cmd">
-            <arg line="/c .\buildOnJdk.bat jdk1.5 -Dskip.download=true compile.compile"/>
-        </exec>
+      <javac
+          destdir="${classes.dir}"
+          debug="${javac.debug}"
+          deprecation="${javac.deprecation}"
+          fork="true"
+          bootclasspathref="project.bootclasspath.jdk15"
+          source="1.5"
+          target="1.5"
+          includeantruntime="false">
+        <classpath>
+          <path refid="classpath" />
+        </classpath>
+        <src path="${src.dir}" />
+        <exclude name="org/olap4j/driver/xmla/FactoryJdbc4Impl.java"/>
+        <exclude name="org/olap4j/driver/xmla/FactoryJdbc4Plus.java"/>
+        <exclude name="org/olap4j/driver/xmla/FactoryJdbc41Impl.java"/>
+      </javac>
     </target>
 
     <target name="compileJdk16">
-        <exec osfamily="unix" executable="${unix.script}">
-            <arg line="jdk1.6 -Dskip.download=true compile.compile"/>
-        </exec>
-        <exec osfamily="windows" dir="." executable="cmd">
-            <arg line="/c .\buildOnJdk.bat jdk1.6 -Dskip.download=true compile.compile"/>
-        </exec>
+      <javac
+          destdir="${classes.dir}"
+          debug="${javac.debug}"
+          deprecation="${javac.deprecation}"
+          fork="true"
+          bootclasspathref="project.bootclasspath.jdk16"
+          source="1.6"
+          target="1.6"
+          includeantruntime="false">
+        <classpath>
+          <path refid="classpath" />
+        </classpath>
+        <src path="${src.dir}" />
+        <include name="org/olap4j/driver/xmla/FactoryJdbc4Impl.java"/>
+        <include name="org/olap4j/driver/xmla/FactoryJdbc4Plus.java"/>
+      </javac>
     </target>
 
     <target name="compileJdk17">
-        <exec osfamily="unix" executable="${unix.script}">
-            <arg line="jdk1.7 -Dskip.download=true compile.compile"/>
-        </exec>
-        <exec osfamily="windows" dir="." executable="cmd">
-            <arg line="/c .\buildOnJdk.bat jdk1.7 -Dskip.download=true compile.compile"/>
-        </exec>
+      <javac
+          destdir="${classes.dir}"
+          debug="${javac.debug}"
+          deprecation="${javac.deprecation}"
+          fork="true"
+          source="1.7"
+          target="1.7"
+          includeantruntime="false">
+        <classpath>
+          <path refid="classpath" />
+        </classpath>
+        <src path="${src.dir}" />
+        <include name="org/olap4j/driver/xmla/FactoryJdbc41Impl.java"/>
+      </javac>
     </target>
 
     <target name="source.zip">
@@ -263,8 +271,6 @@ xmla-cache/**,
 .project,
 build.properties,
 build.xml,
-buildOnJdk.bat,
-buildOnJdk.sh,
 checkFile.sh,
 checkFile.awk,
 ivy.xml,
@@ -397,34 +403,7 @@ class XmlaOlap4jDriverVersion {
         <!-- Purposely left empty. Exportable Ivy files are generated when resolving. -->
     </target>
 
-    <target name="apologise" unless="java.version.matches.requested">
-      <echo>Actual JVM Version (${java.runtime.version}) does not match
-requested (${requested.java.version}); skipping compile for this JDK.
-If you wish to build for this JDK, modify ${unix.script}.
-      </echo>
-    </target>
-
-    <!-- override compile task to account for special jdk handling -->
-    <target name="compile.compile" depends="apologise" if="java.version.matches.requested">
-        <javac destdir="${classes.dir}" debug="${javac.debug}"
-            deprecation="${javac.deprecation}" fork="true">
-            <classpath>
-                <path refid="classpath" />
-            </classpath>
-            <src path="${src.dir}" />
-            <exclude name="org/olap4j/driver/xmla/FactoryJdbc3Impl.java"
-                if="jdk15.not.present" />
-            <exclude name="org/olap4j/driver/xmla/FactoryJdbc4Impl.java"
-                if="jdk16.not.present" />
-            <exclude name="org/olap4j/driver/xmla/FactoryJdbc4Plus.java"
-                if="jdk16.not.present" />
-            <exclude name="org/olap4j/driver/xmla/FactoryJdbc41Impl.java"
-                if="jdk17.not.present" />
-        </javac>
-    </target>
-
-    <target name="compile.pre" depends="parser">
-    </target>
+    <target name="compile.pre" depends="parser"/>
 
     <target name="compile.post">
         <copy todir="${classes.dir}">
