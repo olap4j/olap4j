@@ -200,11 +200,17 @@ public interface Level extends MetadataElement {
 
         /**
          * Indicates that the level is not related to time.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_REGULAR(0x0000)</code>.</p>
          */
         REGULAR(0x0000),
 
         /**
          * Indicates that the level contains the 'all' member of its hierarchy.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_ALL(0x0001)</code>.</p>
          */
         ALL(0x0001),
 
@@ -216,99 +222,216 @@ public interface Level extends MetadataElement {
 
         /**
          * Indicates that a level refers to years.
-         * It must be used in a dimension whose type is
-         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_TIME_YEARS(0x0014)</code>.</p>
+         *
+         * <p>It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.</p>
          */
         TIME_YEARS(0x0014),
 
         /**
          * Indicates that a level refers to half years.
-         * It must be used in a dimension whose type is
-         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_TIME_HALF_YEAR(0x0304)</code>.</p>
+         *
+         * <p>It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.</p>
          */
         TIME_HALF_YEAR(0x0024),
 
         /**
          * Indicates that a level refers to quarters.
-         * It must be used in a dimension whose type is
-         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_TIME_QUARTERS(0x0044)</code>.</p>
+         *
+         * <p>It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.</p>
          */
         TIME_QUARTERS(0x0044),
 
         /**
          * Indicates that a level refers to months.
-         * It must be used in a dimension whose type is
-         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_TIME_MONTHS(0x0084)</code>.</p>
+         *
+         * <p>It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.</p>
          */
         TIME_MONTHS(0x0084),
 
         /**
          * Indicates that a level refers to weeks.
-         * It must be used in a dimension whose type is
-         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_TIME_WEEKS(0x0104)</code>.</p>
+         *
+         * <p>It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.</p>
          */
         TIME_WEEKS(0x0104),
 
         /**
          * Indicates that a level refers to days.
-         * It must be used in a dimension whose type is
-         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_TIME_DAYS(0x0204)</code>.</p>
+         *
+         * <p>It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.</p>
          */
         TIME_DAYS(0x0204),
 
         /**
          * Indicates that a level refers to hours.
-         * It must be used in a dimension whose type is
-         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_TIME_HOURS(0x0304)</code>.</p>
+         *
+         * <p>It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.</p>
          */
         TIME_HOURS(0x0304),
 
         /**
          * Indicates that a level refers to minutes.
-         * It must be used in a dimension whose type is
-         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_TIME_MINUTES(0x0404)</code>.</p>
+         *
+         * <p>It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.</p>
          */
         TIME_MINUTES(0x0404),
 
         /**
          * Indicates that a level refers to seconds.
-         * It must be used in a dimension whose type is
-         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_TIME_SECONDS(0x0804)</code>.</p>
+         *
+         * <p>It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.</p>
          */
         TIME_SECONDS(0x0804),
 
         /**
-         * Indicates that a level refers to days.
-         * It must be used in a dimension whose type is
-         * {@link org.olap4j.metadata.Dimension.Type#TIME}.
+         * Indicates that a level refers to an unspecified time unit.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVEL_TYPE_TIME_UNDEFINED(0x1004)</code>.</p>
+         *
+         * <p>It must be used in a dimension whose type is
+         * {@link org.olap4j.metadata.Dimension.Type#TIME}.</p>
          */
         TIME_UNDEFINED(0x1004),
 
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_GEO_CONTINENT(0x2001)</code>. */
         GEO_CONTINENT(0x2001),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_GEO_REGION(0x2002)</code>. */
         GEO_REGION(0x2002),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_GEO_COUNTRY(0x2003)</code>. */
         GEO_COUNTRY(0x2003),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_GEO_STATE_OR_PROVINCE(0x2004)</code>. */
         GEO_STATE_OR_PROVINCE(0x2004),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_GEO_COUNTY(0x2005)</code>. */
         GEO_COUNTY(0x2005),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_GEO_CITY(0x2006)</code>. */
         GEO_CITY(0x2006),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_GEO_POSTALCODE(0x2007)</code>. */
         GEO_POSTALCODE(0x2007),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_GEO_POINT(0x2008)</code>. */
         GEO_POINT(0x2008),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_ORG_UNIT(0x1011)</code>. */
         ORG_UNIT(0x1011),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_BOM_RESOURCE(0x1012)</code>. */
         BOM_RESOURCE(0x1012),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_QUANTITATIVE(0x1013)</code>. */
         QUANTITATIVE(0x1013),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_ACCOUNT(0x1014)</code>. */
         ACCOUNT(0x1014),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_CUSTOMER(0x1021)</code>. */
         CUSTOMER(0x1021),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_CUSTOMER_GROUP(0x1022)</code>. */
         CUSTOMER_GROUP(0x1022),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_CUSTOMER_HOUSEHOLD(0x1023)</code>. */
         CUSTOMER_HOUSEHOLD(0x1023),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_PRODUCT(0x1031)</code>. */
         PRODUCT(0x1031),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_PRODUCT_GROUP(0x1032)</code>. */
         PRODUCT_GROUP(0x1032),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_SCENARIO(0x1015)</code>. */
         SCENARIO(0x1015),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_UTILITY(0x1016)</code>. */
         UTILITY(0x1016),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_PERSON(0x1041)</code>. */
         PERSON(0x1041),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_COMPANY(0x1042)</code>. */
         COMPANY(0x1042),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_CURRENCY_SOURCE(0x1051)</code>. */
         CURRENCY_SOURCE(0x1051),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_CURRENCY_DESTINATION(0x1052)</code>. */
         CURRENCY_DESTINATION(0x1052),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_CHANNEL(0x1061)</code>. */
         CHANNEL(0x1061),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_REPRESENTATIVE(0x1062)</code>. */
         REPRESENTATIVE(0x1062),
+
+        /** Corresponds to XMLA constant
+         * <code>MDLEVEL_TYPE_PROMOTION(0x1071)</code>. */
         PROMOTION(0x1071);
 
         private final int xmlaOrdinal;

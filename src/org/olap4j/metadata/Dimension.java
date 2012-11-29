@@ -80,32 +80,88 @@ public interface Dimension extends MetadataElement {
     public enum Type implements XmlaConstant {
         /**
          * Indicates that the dimension is not related to time.
+         *
+         * <p>Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_UNKNOWN(0)</code>.</p>
          */
         UNKNOWN(0),
 
         /**
          * Indicates that a dimension is a time dimension.
+         *
+         * <p>Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_TIME(1)</code>.</p>
          */
         TIME(1),
 
         /**
          * Indicates that a dimension is the Measures dimension.
+         *
+         * <p>Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_MEASURE(2)</code>.</p>
          */
         MEASURE(2),
 
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_OTHER(3)</code>. */
         OTHER(3),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_QUANTITATIVE(5)</code>. */
         QUANTITATIVE(5),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_ACCOUNTS(6)</code>. */
         ACCOUNTS(6),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_CUSTOMERS(7)</code>. */
         CUSTOMERS(7),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_PRODUCTS(8)</code>. */
         PRODUCTS(8),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_SCENARIO(9)</code>. */
         SCENARIO(9),
-        UTILITY(10),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_UTILIY(10)</code> (sic). */
+        UTILITY(10) {
+            public String xmlaName() {
+                // The XMLA constant is apparently mis-spelled.
+                // Who are we to question?
+                return "MD_DIMTYPE_UTILIY";
+            }
+        },
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_CURRENCY(11)</code>. */
         CURRENCY(11),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_RATES(12)</code>. */
         RATES(12),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_CHANNEL(13)</code>. */
         CHANNEL(13),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_PROMOTION(14)</code>. */
         PROMOTION(14),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_ORGANIZATION(15)</code>. */
         ORGANIZATION(15),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_BILL_OF_MATERIALS(16)</code>. */
         BILL_OF_MATERIALS(16),
+
+        /** Corresponds to the XMLA constant
+         * <code>MD_DIMTYPE_GEOGRAPHY(17)</code>. */
         GEOGRAPHY(17);
 
         private final int xmlaOrdinal;

@@ -192,7 +192,7 @@ FNR < headerCount {
         # beginning of multiline comment "/*"
         inComment = 1;
         gsub(/\/\*.*$/, "/* comment */", s);
-        if (strict > 0 && FNR > 1 && $0 !~ /\/\*\*/) {
+        if (strict > 0 && FNR > 1 && $0 !~ /\/\*\*/ && $0 !~ /^\/\*/) {
             error(fname, FNR, "Multi-line c-style comment not allowed");
         }
     } else {
@@ -285,6 +285,8 @@ FNR < headerCount {
         importGroup = "b";
     } else if (thisImport ~ /^mondrian.*/) {
         importGroup = "bb";
+    } else if (thisImport ~ /^org.olap4j.xmla.server.*/) {
+        importGroup = "bc";
     } else if (thisImport ~ /^openjava.*/) {
         importGroup = "cc";
     } else if (thisImport ~ /^org.apache.*/) {
