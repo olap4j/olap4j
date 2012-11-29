@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -26,7 +24,6 @@ package org.olap4j.metadata;
  * numeric. Every measure is a member of a special dimension called "Measures".
  *
  * @author jhyde
- * @version $Id$
  * @since Oct 13, 2006
  */
 public interface Measure extends Member {

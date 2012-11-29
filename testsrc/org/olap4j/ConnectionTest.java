@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -50,7 +48,6 @@ import static org.olap4j.test.TestContext.nameList;
  * use the XMLA driver.
  *
  * @author jhyde
- * @version $Id$
  */
 public class ConnectionTest extends TestCase {
     private TestContext testContext = TestContext.instance();

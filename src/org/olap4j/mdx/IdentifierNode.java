@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -75,7 +73,6 @@ import java.util.*;
  * </li>
  * </ul>
  *
- * @version $Id$
  * @author jhyde
  */
 public class IdentifierNode

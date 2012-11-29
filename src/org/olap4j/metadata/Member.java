@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -28,7 +26,6 @@ import java.util.List;
  * <code>Member</code> is a data value in an OLAP Dimension.
  *
  * @author jhyde
- * @version $Id$
  * @since Aug 22, 2006
  */
 public interface Member extends MetadataElement {

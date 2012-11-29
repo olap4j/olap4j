@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -36,7 +34,6 @@ import java.util.*;
  * can be referenced by many QueryDimension objects.
  *
  * @author jdixon, jhyde, Luc Boudreau
- * @version $Id$
  * @since May 29, 2007
  */
 public class QueryDimension extends QueryNodeImpl {

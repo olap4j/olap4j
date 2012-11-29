@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -35,8 +33,6 @@ import java.io.PrintWriter;
  * type, defaultValueExpr)</code> function introduces a parameter, and
  * <code>ParamRef(name)</code> creates a reference to a parameter defined
  * elsewhere in the query.
- *
- * @version $Id$
  */
 public class ParameterNode implements ParseTreeNode {
     private String name;

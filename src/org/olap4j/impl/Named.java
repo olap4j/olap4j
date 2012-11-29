@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -25,7 +23,6 @@ package org.olap4j.impl;
  * {@link org.olap4j.metadata.NamedList} which works on such objects.
  *
  * @author jhyde
- * @version $Id$
  * @since May 23, 2007
  */
 public interface Named {

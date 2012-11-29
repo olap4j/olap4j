@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -32,7 +30,6 @@ import java.sql.DriverManager;
  * to a Palo server. Thanks to Vladislav Malicevic for this
  * contribution.
  *
- * @version $Id$
  * @author Luc Boudreau
  */
 public class PaloConnection {

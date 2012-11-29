@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -23,7 +21,6 @@ package org.olap4j.type;
  * The type of a null expression.
  *
  * @author medstat
- * @version $Id$
  * @since Aug 21, 2006
  */
 public class NullType extends ScalarType

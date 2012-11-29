@@ -1,5 +1,3 @@
-# $Id$
-
 olap4j, release 1.0.1
 
 Contents of this distribution

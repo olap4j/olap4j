@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -33,7 +31,6 @@ import java.util.List;
  *
  * @see org.olap4j.mdx.NameSegment
  *
- * @version $Id$
  * @author jhyde
  */
 public class KeySegment implements IdentifierSegment {

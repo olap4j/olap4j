@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -39,7 +37,6 @@ import java.util.concurrent.Future;
  * conform to cookie domain rules.
  *
  * @author Luc Boudreau and Julian Hyde
- * @version $Id$
  */
 public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
 {

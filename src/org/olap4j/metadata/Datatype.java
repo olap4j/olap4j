@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -26,7 +24,6 @@ package org.olap4j.metadata;
  * subset of the OLE DB Types Indicators returned by SQL Server.
  *
  * @author jhyde
- * @version $Id$
  * @since Aug 23, 2006
  */
 public enum Datatype implements XmlaConstant {

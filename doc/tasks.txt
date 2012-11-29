@@ -1,6 +1,5 @@
 # Tasks for olap4j 0.9 
 # Author: Julian Hyde
-# $Id$
 
 Introduction: How to use this document
 --------------------------------------

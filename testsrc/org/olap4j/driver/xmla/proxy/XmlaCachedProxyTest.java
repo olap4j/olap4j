@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -33,7 +31,6 @@ import java.util.Map;
  * IXmlaOlap4jCache implementation (XmlaOlap4jNamedMemoryCache).
  *
  * @author Luc Boudreau
- * @version $Id$
  */
 public class XmlaCachedProxyTest extends TestCase {
     final XmlaOlap4jDriver dummyDriver = new XmlaOlap4jDriver() {};

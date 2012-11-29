@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -32,7 +30,6 @@ import java.util.Map;
  * package. The methods in this interface are NOT part of the public olap4j API.
  *
  * @author jhyde
- * @version $Id$
  * @since Nov 1, 2008
  */
 interface XmlaOlap4jMemberBase

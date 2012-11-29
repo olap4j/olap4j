@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -34,7 +32,6 @@ import java.util.*;
  * dimensions that are placed on it.
  *
  * @author jdixon, Luc Boudreau
- * @version $Id$
  * @since May 29, 2007
  */
 public class QueryAxis extends QueryNodeImpl {

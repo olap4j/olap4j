@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -33,7 +31,6 @@ import java.util.*;
  * to the olap4j driver for XML/A.
  *
  * @author jhyde
- * @version $Id$
  */
 public class XmlaTester implements TestContext.Tester {
     private final TestContext testContext;

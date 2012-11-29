@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -30,7 +28,6 @@ import java.util.*;
  * class has one fewer wrapper object, saving space and indirection effort.
  *
  * @author jhyde
- * @version $Id$
  * @since May 7, 2009
  */
 public class UnmodifiableArrayList<T>

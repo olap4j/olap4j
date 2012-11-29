@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -78,8 +76,6 @@ import java.util.List;
  * for the server's benefit. If granularity is only {@link Granularity#COARSE},
  * the server may be able to store less information in order to track the cell
  * set.
- *
- * @version $Id$
  */
 public interface CellSetListener {
 

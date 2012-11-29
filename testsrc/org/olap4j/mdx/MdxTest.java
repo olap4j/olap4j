@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -31,7 +29,6 @@ import java.util.*;
  * Testcase for org.olap4j.mdx package.
  *
  * @author jhyde
- * @version $Id$
  * @since Dec 12, 2007
  */
 public class MdxTest extends TestCase {

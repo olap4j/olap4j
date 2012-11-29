@@ -1,6 +1,4 @@
 /*
-// $Id: ArrayNamedListImpl.java 482 2012-01-05 23:27:27Z jhyde $
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -27,7 +25,6 @@ import java.util.*;
  * Map backed by a {@link org.olap4j.metadata.NamedList}.
  *
  * @author jhyde
- * @version $Id: AbstractNamedList.java 482 2012-01-05 23:27:27Z jhyde $
  */
 class NamedListMap<T> extends AbstractMap<String, T> {
     private final NamedList<T> namedList;

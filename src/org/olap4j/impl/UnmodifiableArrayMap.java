@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -35,7 +33,6 @@ import java.util.Map;
  * these are even more space-efficient for maps of size 0 and 1.
  *
  * @author jhyde
- * @version $Id$
  * @since Jan 16, 2010
  */
 public class UnmodifiableArrayMap<K, V>

@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -40,7 +38,6 @@ import java.util.concurrent.Future;
  * saveCookies(URL) and useCookies(URL).
  *
  * @author Luc Boudreau
- * @version $Id$
  */
 abstract class XmlaOlap4jAbstractHttpProxy
     implements XmlaOlap4jCachedProxy

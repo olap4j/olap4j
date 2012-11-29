@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -32,7 +30,6 @@ import java.util.regex.Pattern;
  * methods in {@link Olap4jUtil}, and not instantiate it at all.
  *
  * @author jhyde
- * @version $Id$
  * @since Feb 5, 2007
  */
 public class Olap4jUtilCompatibleJdk15 implements Olap4jUtilCompatible {

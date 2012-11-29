@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -25,7 +23,6 @@ import junit.framework.TestCase;
  * <p>Test for {@link org.olap4j.driver.xmla.cache.XmlaOlap4jShaEncoder}.
  *
  * @author Luc Boudreau
- * @version $Id$
  */
 public class XmlaShaEncoderTest extends TestCase {
 

@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -37,7 +35,6 @@ import org.olap4j.mdx.SelectNode;
  * @see MdxParser
  *
  * @author jhyde
- * @version $Id$
  * @since Aug 22, 2006
  */
 public interface MdxValidator {

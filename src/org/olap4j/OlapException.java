@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -33,7 +31,6 @@ import java.sql.*;
  * identify the location of the error. This information is
  *
  * @author jhyde
- * @version $Id$
  * @since Oct 23, 2006
  */
 public class OlapException extends SQLException {

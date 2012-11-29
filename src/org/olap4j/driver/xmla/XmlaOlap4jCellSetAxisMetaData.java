@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -32,9 +30,8 @@ import java.util.List;
  * for XML/A providers.
  *
  * @author jhyde
- * @version $Id$
-* @since Nov 17, 2007
-*/
+ * @since Nov 17, 2007
+ */
 class XmlaOlap4jCellSetAxisMetaData implements CellSetAxisMetaData {
     private final Axis axis;
     private final List<Hierarchy> hierarchyList;

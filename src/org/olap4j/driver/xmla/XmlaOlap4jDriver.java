@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -126,7 +124,6 @@ import java.util.logging.Logger;
  * </table>
  *
  * @author jhyde, Luc Boudreau
- * @version $Id$
  * @since May 22, 2007
  */
 public class XmlaOlap4jDriver implements Driver {

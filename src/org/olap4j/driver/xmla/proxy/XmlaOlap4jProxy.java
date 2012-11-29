@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -25,7 +23,6 @@ import java.util.concurrent.Future;
 
 /**
  * Defines a common set of methods for proxy objects.
- * @version $Id$
  */
 public interface XmlaOlap4jProxy {
     /**

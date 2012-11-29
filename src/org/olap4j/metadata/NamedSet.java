@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -25,7 +23,6 @@ import org.olap4j.mdx.ParseTreeNode;
  * Metadata object describing a named set defined against a {@link Cube}.
  *
  * @author jhyde
- * @version $Id$
  * @since Oct 24, 2006
  */
 public interface NamedSet extends MetadataElement {

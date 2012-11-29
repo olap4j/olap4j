@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -95,7 +93,6 @@ import java.util.List;
  * two positions, each with one member.</p>
  *
  * @author jhyde
- * @version $Id$
  * @since Aug 22, 2006
  */
 public interface Position {

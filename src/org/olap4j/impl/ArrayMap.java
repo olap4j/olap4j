@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -30,7 +28,6 @@ import java.util.*;
  * proportional to the number of keys.
  *
  * @author jhyde
- * @version $Id$
  * @since Dec 9, 2007
  */
 public class ArrayMap<K, V>

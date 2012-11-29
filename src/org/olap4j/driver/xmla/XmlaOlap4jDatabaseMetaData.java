@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -40,7 +38,6 @@ import java.util.regex.Pattern;
  * it is instantiated using {@link Factory#newDatabaseMetaData}.</p>
  *
  * @author jhyde
- * @version $Id$
  * @since May 23, 2007
  */
 abstract class XmlaOlap4jDatabaseMetaData implements OlapDatabaseMetaData {

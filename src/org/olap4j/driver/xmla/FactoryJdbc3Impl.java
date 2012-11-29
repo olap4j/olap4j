@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -29,7 +27,6 @@ import java.util.*;
  * Implementation of {@link Factory} for JDBC 3.0.
  *
  * @author jhyde
- * @version $Id$
  * @since Jun 14, 2007
  */
 class FactoryJdbc3Impl implements Factory {

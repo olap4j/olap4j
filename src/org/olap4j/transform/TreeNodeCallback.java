@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -27,7 +25,6 @@ package org.olap4j.transform;
  * <p>REVIEW: Should this class be in the public olap4j API? (jhyde, 2008/8/14)
  *
  * @author etdub
- * @version $Id$
  * @since Aug 7, 2008
  */
 interface TreeNodeCallback<T> {

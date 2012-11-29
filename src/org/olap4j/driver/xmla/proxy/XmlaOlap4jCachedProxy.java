@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -29,8 +27,6 @@ import java.util.Map;
  * Extended Proxy interface which supports cached SOAP calls.
  *
  * @author Luc Boudreau
- * @version $Id$
- *
  */
 public interface XmlaOlap4jCachedProxy extends XmlaOlap4jProxy {
 

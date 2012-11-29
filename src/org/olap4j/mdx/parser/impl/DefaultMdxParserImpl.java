@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -33,7 +31,6 @@ import java.util.regex.Pattern;
  * Default implementation of {@link org.olap4j.mdx.parser.MdxParser MDX Parser}.
  *
  * @author jhyde
- * @version $Id$
  * @since Aug 22, 2006
  */
 public class DefaultMdxParserImpl implements MdxParser {

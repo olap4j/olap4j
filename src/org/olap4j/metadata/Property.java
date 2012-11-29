@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -29,7 +27,6 @@ import java.util.Set;
  * {@link org.olap4j.Cell}.
  *
  * @author jhyde
- * @version $Id$
  * @since Aug 23, 2006
  */
 public interface Property extends MetadataElement {

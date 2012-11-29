@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -27,9 +25,7 @@ import org.olap4j.mdx.*;
  * a single query axis (e.g. drill-down on member, roll-up, ...)
  *
  * @author etdub
- * @version $Id$
  * @since Aug 7, 2008
- *
  */
 public abstract class AxisTransform implements MdxQueryTransform {
 

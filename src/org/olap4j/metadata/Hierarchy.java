@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -32,7 +30,6 @@ import org.olap4j.OlapException;
  * but most have exactly one Hierarchy.</p>
  *
  * @author jhyde
- * @version $Id$
  * @since Aug 23, 2006
  */
 public interface Hierarchy extends MetadataElement {

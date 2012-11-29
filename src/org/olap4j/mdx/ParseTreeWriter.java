@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -46,7 +44,6 @@ import java.io.Writer;
  * @see org.olap4j.mdx.ParseTreeNode#unparse(ParseTreeWriter)
  *
  * @author jhyde
- * @version $Id$
  * @since Jun 4, 2007
  */
 public class ParseTreeWriter {

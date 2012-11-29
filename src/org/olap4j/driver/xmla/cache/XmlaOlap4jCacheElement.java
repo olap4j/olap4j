@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -26,7 +24,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * Internal POJO class definition for the XmlaOlap4jMemoryCache.
  *
  * @author Luc Boudreau
- * @version $Id$
  */
 class XmlaOlap4jCacheElement {
 

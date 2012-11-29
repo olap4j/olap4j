@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -26,7 +24,6 @@ import java.security.NoSuchAlgorithmException;
  * SHA encoder to create unique hash strings for cache elements.
  *
  * @author Luc Boudreau
- * @version $Id$
  */
 class XmlaOlap4jShaEncoder {
 

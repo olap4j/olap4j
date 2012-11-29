@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -28,7 +26,6 @@ import java.net.URL;
 /**
  * Unit test for cookie manager.
  *
- * @version $Id$
  * @author Luc Boudreau
  */
 public class XmlaCookieManagerTest extends TestCase {

@@ -1,5 +1,4 @@
 #!/bin/gawk
-# $Id$
 #
 # Licensed to Julian Hyde under one or more contributor license
 # agreements. See the NOTICE file distributed with this work for
@@ -136,10 +135,6 @@ FNR == 1 {
         # generated; does not contain standard header
     } else if (1) {
         headers[headerCount++] = "/\\*$";
-        if (_isOlap4j(fname)) {
-            headers[headerCount++] = /^\/\/ \$Id: /;
-            headers[headerCount++] = "//";
-        }
         headers[headerCount++] = "// Licensed to Julian Hyde under one or more contributor license$";
         headers[headerCount++] = "// agreements. See the NOTICE file distributed with this work for$";
         headers[headerCount++] = "// additional information regarding copyright ownership.$";

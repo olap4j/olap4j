@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -45,7 +43,6 @@ import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
  * it is instantiated using {@link Factory#newCellSet}.</p>
  *
  * @author jhyde
- * @version $Id$
  * @since May 24, 2007
  */
 abstract class XmlaOlap4jCellSet implements CellSet {

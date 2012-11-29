@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -35,7 +33,6 @@ import java.util.Set;
  * which have different implementations in different environments.</p>
  *
  * @author jhyde
- * @version $Id$
  * @since Feb 5, 2007
  */
 public interface Olap4jUtilCompatible {

@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -28,7 +26,6 @@ import java.util.Iterator;
  * the pairs {@code {0, 0}, {0, 1}, {1, 0}, {1, 1}, {2, 0}, {2, 1} }.
  *
  * @author jhyde
- * @version $Id$
  * @since Apr 7, 2009
  */
 public class CoordinateIterator implements Iterator<int[]> {

@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -26,7 +24,6 @@ import java.util.Map;
 /**
  * Unit test for {@link org.olap4j.impl.ConnectStringParser}.
  *
- * @version $Id$
  * @author jhyde
  */
 public class ConnectStringParserTest extends TestCase {

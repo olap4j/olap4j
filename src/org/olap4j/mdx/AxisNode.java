@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -29,8 +27,6 @@ import java.util.List;
 /**
  * An axis in an MDX query. For example, the typical MDX query has two axes,
  * which appear as the "ON COLUMNS" and "ON ROWS" clauses.
- *
- * @version $Id$
  */
 public class AxisNode implements ParseTreeNode {
 

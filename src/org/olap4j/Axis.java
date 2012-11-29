@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -31,7 +29,6 @@ import java.util.Locale;
  * <code>WHERE</code> clause in an MDX statement).
  *
  * @author jhyde
- * @version $Id$
  * @since Oct 23, 2006
  */
 public interface Axis {

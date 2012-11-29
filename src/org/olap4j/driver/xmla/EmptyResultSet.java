@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -41,7 +39,6 @@ import javax.sql.rowset.RowSetMetaDataImpl;
  * it is instantiated using {@link Factory#newEmptyResultSet}.</p>
  *
  * @author jhyde
- * @version $Id$
  * @since May 24, 2007
  */
 abstract class EmptyResultSet implements ResultSet, OlapWrapper {

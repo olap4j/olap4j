@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -30,8 +28,6 @@ import java.util.*;
 
 /**
  * Unit test for olap4j metadata methods.
- *
- * @version $Id$
  */
 public class MetadataTest extends TestCase {
     private TestContext testContext = TestContext.instance();

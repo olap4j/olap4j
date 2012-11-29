@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -26,7 +24,6 @@ import org.olap4j.OlapException;
  * are performed but it hasn't been initialized.
  *
  * @author Luc Boudreau
- * @version $Id$
  */
 public class XmlaOlap4jInvalidStateException extends OlapException {
     private static final long serialVersionUID = 7265273715459263740L;

@@ -1,5 +1,4 @@
 #!/bin/bash
-# $Id$
 #
 # Licensed to Julian Hyde under one or more contributor license
 # agreements. See the NOTICE file distributed with this work for
@@ -33,8 +32,7 @@ usage() {
     echo "checkFile  [ <options> ] <file>..."
     echo "    Checks a list of files."
     echo "checkFile  [ <options> ] --opened"
-    echo "    Checks all files that are opened for edit in the current"
-    echo "    perforce client."
+    echo "    Checks all files that are opened in git. Implies --strict."
     echo "checkFile  [ <options> ] --under <dir>"
     echo "    Recursively checks all files under a given directory."
     echo "checkFile --help"
@@ -171,7 +169,7 @@ doCheckDeferred() {
     if [ -s "${deferred_file}" ]; then
         maxLineLength=80
         cat "${deferred_file}" |
-        xargs gawk -f "$CHECKFILE_AWK" \
+        xargs -P $(expr ${CORE_COUNT} \* 2) -n 100 gawk -f "$CHECKFILE_AWK" \
             -v strict="$strict" \
             -v maxLineLength="$maxLineLength"
    fi
@@ -226,6 +224,7 @@ opened=
 if [ "$1" == --opened ]; then
     opened=true
     deferred=
+    strict=2
     shift
 fi
 
@@ -272,10 +271,9 @@ if [ "$under" ]; then
         doCheck "$filePath" "$file" ""
     done
 elif [ "$opened" ]; then
-    p4 opened |
-    gawk -F'#' '$2 !~ / - delete/ {print $1}' |
-    while read line; do
-        file=$(p4 where "$line" | gawk '{print $3}' | tr \\\\ /)
+    git checkout |
+    gawk '$1 != "D" {print $2}' |
+    while read file; do
         doCheck "$file" "$file" "80"
     done
 else
@@ -302,4 +300,3 @@ rm -f /tmp/checkFile_output_$$.txt
 exit $status
 
 # End checkFile.sh
-

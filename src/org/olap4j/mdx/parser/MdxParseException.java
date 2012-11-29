@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -26,7 +24,6 @@ import org.olap4j.mdx.ParseRegion;
  * indicate an error in parsing. Has a {@link org.olap4j.mdx.ParseRegion}.
  *
  * @author jhyde
- * @version $Id$
  */
 public class MdxParseException extends RuntimeException {
     private final ParseRegion region;

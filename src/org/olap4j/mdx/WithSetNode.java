@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -27,7 +25,6 @@ import java.io.PrintWriter;
  * Parse tree node which declares a calculated set. Represented as the
  * <code>WITH SET</code> clause of an MDX <code>SELECT</code> statement.
  *
- * @version $Id$
  * @author jhyde
  */
 public class WithSetNode implements ParseTreeNode {

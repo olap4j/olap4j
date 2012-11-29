@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -46,9 +44,8 @@ import java.util.regex.Pattern;
  * {@link org.olap4j.test.TestContext.Property}.
  *
  * @author jhyde
- * @version $Id$
  * @since Jun 7, 2007
-*/
+ */
 public class TestContext {
     public static final String NL = System.getProperty("line.separator");
     private static final String indent = "                ";

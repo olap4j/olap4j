@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -28,7 +26,6 @@ import java.util.List;
  * Parse tree node which declares a calculated member. Represented as the
  * <code>WITH MEMBER</code> clause of an MDX <code>SELECT</code> statement.
  *
- * @version $Id$
  * @author jhyde
  */
 public class WithMemberNode implements ParseTreeNode {

@@ -1,5 +1,3 @@
-# $Id$
-
 olap4j release check-list
 =========================
 

@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -28,7 +26,6 @@ import java.util.List;
  * all with the same attributes and at the same depth in the hierarchy.
  *
  * @author jhyde
- * @version $Id$
  * @since Aug 23, 2006
  */
 public interface Level extends MetadataElement {

@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -31,7 +29,6 @@ import java.util.*;
  * for XML/A providers.
  *
  * @author jhyde
- * @version $Id$
  * @since May 24, 2007
  */
 class XmlaOlap4jSchema implements Schema, Named {

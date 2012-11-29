@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -40,7 +38,6 @@ import java.util.regex.Pattern;
  * Tests the MDX parser.
  *
  * @author gjohnson, jhyde
- * @version $Id$
  */
 public class ParserTest extends TestCase {
     private static final Pattern lineColPattern =

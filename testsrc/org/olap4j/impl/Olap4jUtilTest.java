@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -30,7 +28,6 @@ import java.util.*;
  * Tests for methods in {@link org.olap4j.impl.Olap4jUtil}.
  *
  * @author jhyde
- * @version $Id$
  * @since Dec 12, 2007
  */
 public class Olap4jUtilTest extends TestCase {

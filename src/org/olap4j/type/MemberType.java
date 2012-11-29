@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -27,7 +25,6 @@ import org.olap4j.metadata.*;
  *
  * @author jhyde
  * @since Feb 17, 2005
- * @version $Id$
  */
 public class MemberType implements Type {
     private final Hierarchy hierarchy;

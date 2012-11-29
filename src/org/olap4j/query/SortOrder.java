@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -18,10 +16,11 @@
 // limitations under the License.
 */
 package org.olap4j.query;
+
 /**
  * Defines in what order to perform sort operations.
+ *
  * @author Luc Boudreau
- * @version $Id$
  * @since 0.9.8
  */
 public enum SortOrder {

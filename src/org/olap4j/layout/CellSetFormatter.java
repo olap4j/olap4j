@@ -1,6 +1,4 @@
 /*
-// $Id$
-//
 // Licensed to Julian Hyde under one or more contributor license
 // agreements. See the NOTICE file distributed with this work for
 // additional information regarding copyright ownership.
@@ -30,7 +28,6 @@ import java.io.PrintWriter;
  * specification and is subject to change without notice.</b></p>
  *
  * @author jhyde
- * @version $Id$
  * @since Apr 15, 2009
  */
 public interface CellSetFormatter {
