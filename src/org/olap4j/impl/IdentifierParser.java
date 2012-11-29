@@ -291,10 +291,11 @@ public class IdentifierParser {
                     break;
                 case '&':
                     state = BEFORE_SEG;
-                    if (syntax == Builder.Syntax.FIRST_KEY) {
-                        syntax = Builder.Syntax.NEXT_KEY;
-                    } else {
+                    // Roll the syntax - NAME=>FIRST_KEY=>NEXT_KEY=>NEXT_KEY...
+                    if (syntax == Builder.Syntax.NAME) {
                         syntax = Builder.Syntax.FIRST_KEY;
+                    } else {
+                        syntax = Builder.Syntax.NEXT_KEY;
                     }
                     ++i;
                     break;

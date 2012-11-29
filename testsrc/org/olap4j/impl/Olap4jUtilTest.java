@@ -469,20 +469,72 @@ public class Olap4jUtilTest extends TestCase {
         assertEquals("City", s1.getName());
         assertEquals(Quoting.QUOTED, s1.getQuoting());
         assertTrue(segments.get(2) instanceof KeySegment);
-        KeySegment s2 =
-            (KeySegment) segments.get(2);
+        final KeySegment s2 = (KeySegment) segments.get(2);
         assertEquals(3, s2.getKeyParts().size());
         final NameSegment s2k0 = s2.getKeyParts().get(0);
         assertEquals("San Francisco", s2k0.getName());
         assertEquals(Quoting.QUOTED, s2k0.getQuoting());
         final NameSegment s2k1 = s2.getKeyParts().get(1);
         assertEquals("CA", s2k1.getName());
+        assertEquals(Quoting.UNQUOTED, s2k1.getQuoting());
+        final NameSegment s2k2 = s2.getKeyParts().get(2);
+        assertEquals("USA", s2k2.getName());
+        assertEquals(Quoting.UNQUOTED, s2k2.getQuoting());
+        final KeySegment s3 = (KeySegment) segments.get(3);
+        assertNull(s3.getName());
+        assertEquals(1, s3.getKeyParts().size());
+        final NameSegment s3k0 = s3.getKeyParts().get(0);
+        assertEquals("cust1234", s3k0.getName());
+        assertEquals(Quoting.QUOTED, s3k0.getQuoting());
+    }
+
+    /**
+     * Advanced test for the {@link IdentifierNode#parseIdentifier}
+     * method.  There was a bug that QUOTED sub-segments were skipped
+     * after 2 sub-segments and new segments were created.  This test
+     * verifies that any number of QUOTED sub-segments can be under a
+     * segment.
+     */
+    public void testParseIdentifierAdvanced2() {
+        List<IdentifierSegment> segments;
+
+        // detailed example, per javadoc
+        //
+        // A more complex example illustrates a compound key. The identifier
+        // [Customers].[City].&[San Francisco]&[CA]&[USA].&[cust1234]
+        // contains four segments as follows:
+        //
+        // * Segment #0 is QUOTED, name "Customers"
+        // * Segment #1 is QUOTED, name "City"
+        // * Segment #2 is a KEY. It has 3 sub-segments:
+        //    ** Sub-segment #0 is QUOTED, name "San Francisco"
+        //    ** Sub-segment #1 is QUOTED, name "CA"
+        //    ** Sub-segment #2 is QUOTED, name "USA"
+        // * Segment #3 is a KEY. It has 1 sub-segment:
+        //    ** Sub-segment #0 is QUOTED, name "cust1234"</li>
+        segments =
+            IdentifierParser.parseIdentifier(
+                "[Customers].[City].&[San Francisco]&[CA]&[USA].&[cust1234]");
+        assertEquals(4, segments.size());
+        final IdentifierSegment s0 = segments.get(0);
+        assertEquals("Customers", s0.getName());
+        assertEquals(Quoting.QUOTED, s0.getQuoting());
+        final IdentifierSegment s1 = segments.get(1);
+        assertEquals("City", s1.getName());
+        assertEquals(Quoting.QUOTED, s1.getQuoting());
+        assertTrue(segments.get(2) instanceof KeySegment);
+        final KeySegment s2 = (KeySegment) segments.get(2);
+        assertEquals(3, s2.getKeyParts().size());
+        final NameSegment s2k0 = s2.getKeyParts().get(0);
+        assertEquals("San Francisco", s2k0.getName());
         assertEquals(Quoting.QUOTED, s2k0.getQuoting());
-        final NameSegment s2k2 = s2.getKeyParts().get(0);
-        assertEquals("San Francisco", s2k2.getName());
+        final NameSegment s2k1 = s2.getKeyParts().get(1);
+        assertEquals("CA", s2k1.getName());
+        assertEquals(Quoting.QUOTED, s2k1.getQuoting());
+        final NameSegment s2k2 = s2.getKeyParts().get(2);
+        assertEquals("USA", s2k2.getName());
         assertEquals(Quoting.QUOTED, s2k2.getQuoting());
-        KeySegment s3 =
-            (KeySegment) segments.get(3);
+        final KeySegment s3 = (KeySegment) segments.get(3);
         assertNull(s3.getName());
         assertEquals(1, s3.getKeyParts().size());
         final NameSegment s3k0 = s3.getKeyParts().get(0);
