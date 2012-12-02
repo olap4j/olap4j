@@ -23,7 +23,7 @@ Olap4j requires ant (version 1.7 or later) and JDK 1.7 to build. (Once built, it
 ## Download and build ##
 
 ```bash
-$ git clone git://github.com/julianhyde/olap4j.git
+$ git clone git://github.com/olap4j/olap4j.git
 $ cd olap4j
 $ ant
 ```
@@ -104,7 +104,7 @@ General project information:
 * License: <a href="NOTICE">Apache License, Version 2.0</a>.
 * Lead developers: <a href="https://github.com/julianhyde">Julian Hyde</a>, <a href="https://github.com/lucboudreau">Luc Boudreau</a>.
 * Project page: http://www.olap4j.org
-* Specification: <a href="http://www.olap4j.org/olap4j_fs.html">HTML</a>, <a href="http://www.olap4j.org/olap4j_fs.pdf">PDF</a>, <a href="https://github.com/julianhyde/olap4j/commits/master/doc/olap4j_fs.html">history</a>.
+* Specification: <a href="http://www.olap4j.org/olap4j_fs.html">HTML</a>, <a href="http://www.olap4j.org/olap4j_fs.pdf">PDF</a>, <a href="https://github.com/olap4j/olap4j/commits/master/doc/olap4j_fs.html">history</a>.
 * Javadoc: http://www.olap4j.org/api
 * Source code: http://github.com/julianhyde/olap4j
 * Developers list: https://lists.sourceforge.net/lists/listinfo/olap4j-devel
@@ -112,7 +112,7 @@ General project information:
 
 Related projects:
 * <a href="https://github.com/pentaho/mondrian">Mondrian</a>
-* <a href="https://github.com/julianhyde/olap4j-xmlaserver">olap4j-xmlaserver</a>
+* <a href="https://github.com/olap4j/olap4j-xmlaserver">olap4j-xmlaserver</a>
 
 If you have downloaded a release:
 * <a href="README.txt">README.txt</a> describes the release structure.

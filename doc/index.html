@@ -3,6 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <!--
+  == $Id$
+  ==
   == Licensed to Julian Hyde under one or more contributor license
   == agreements. See the NOTICE file distributed with this work for
   == additional information regarding copyright ownership.
@@ -182,95 +184,151 @@ a:hover, a:active {
         <tr>
           <td width="100%" valign="top" style="padding-bottom: 10px;">
           <h4>Status</h4>
-          <p><b>olap4j 1.0.1 was released on February 27th, 2012.</b></p><br/>
-          <p>This olap4j release includes the specification, a technology compatibility kit (TCK)
-          and a generic XML/A driver compatible with Pentaho Analysis (Mondrian), Microsoft SQL Server Analysis Services, Palo and SAP BW.</p><br/>
-          <p>This release is a maintenance release and maintains backwards compatibility
-          with version 1.0.0. The license under which olap4j is distributed has changed
-          starting with this release. Olap4j is now distributed under the
-          Apache Software License Version 2.0.</p><br/>
-          <p>Among other notable changes, this version introduces support for JDBC 4.1.</p>
+
+          <p><b>olap4j 1.0.1 was released on February 7th,
+          2012.</b></p><br/>
+
+          <p>This olap4j release includes the specification, a
+          technology compatibility kit (TCK) and a generic XML/A
+          driver compatible with Pentaho Analysis (Mondrian),
+          Microsoft SQL Server Analysis Services, Palo and SAP
+          BW.</p><br/>
+
+          <p>This release is a maintenance release and maintains
+          backwards compatibility with version 1.0.0. The license
+          under which olap4j is distributed has changed starting with
+          this release. Olap4j is now distributed under the Apache
+          Software License Version 2.0.</p><br/>
+
+          <p>Among other notable changes, this version introduces
+          support for JDBC 4.1.</p>
 
           <h4>Resources</h4>
             <ul>
-              <li><a href="http://sourceforge.net/projects/olap4j">olap4j project at SourceForge</a>.</li>
-              <li>Download 1.0.1 <a href="http://sourceforge.net/project/showfiles.php?group_id=168953">release</a>
-              and specification (<a href="olap4j_fs.pdf">PDF</a> or <a href="olap4j_fs.html">HTML</a>).</li>
+              <li><a href="http://sourceforge.net/p/olap4j/discussion/577988/">Discussion forum</a>.</li>
+              <li><a href="http://sourceforge.net/p/olap4j/bugs/">Bug database</a>.</li>
+              <li>Download 1.0.1 <a href="http://sourceforge.net/project/showfiles.php?group_id=168953">release</a></li>
+              <li>Specification (<a href="olap4j_fs.pdf">PDF</a>, <a href="olap4j_fs.html">HTML</a>).</li>
               <li><a href="api/index.html">API javadoc</a>.</li>
-              <li><a href="http://olap4j-demo.googlecode.com/svn/trunk/doc/Olap4j_Introduction_An_end_user_perspective.pdf">Primer</a> and <a href="http://code.google.com/p/olap4j-demo/">code examples</a>.</li>
-              <li>For project committers: latest <a href="head/api/index.html">API</a>
-                  and specification (<a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/doc/olap4j_fs.html">HTML</a> only).</li>
+              <li><a href="http://olap4j-demo.googlecode.com/svn/trunk/doc/Olap4j_Introduction_An_end_user_perspective.pdf">Primer</a>
+              and <a href="http://code.google.com/p/olap4j-demo/">code
+              examples</a>.</li>
+              <li>See also 'Developer resources' on this page.</li>
             </ul>
 
           <h4>Modules</h4>
-          <p>Olap4j is distributed as four Java JAR libraries.</p><br/>
-          <p>
-            <ul>
-              <li><strong>olap4j</strong><br/>
-              Core API, Query Model, Transformation and other auxiliary packages,
-              along with the driver specification.</li><br/>
-              <li><strong>olap4j-xmla</strong><br/>
-              Driver implementation of olap4j for XML/A data sources. It is compatible with Mondrian, Palo,
-              SAP BW and SQL Server 2005+.</li><br/>
-              <li><strong>olap4j-tck</strong><br/>
-              Technology compatibility kit. Consists mostly of JUnit tests.</li><br/>
-              <li><strong>olap4j-jdk14</strong><br/>
-              Olap4j distribution compatible with Java 1.4. Includes the core API and
-              the XML/A driver.</li>
-            </ul>
-          </p>
+          <p>Olap4j is distributed as four Java JAR libraries.</p>
+
+          <br/>
+
+          <table border=1 style="border-collapse: collapse;">
+            <tr>
+              <td><strong>olap4j</strong></td>
+              <td>Core API, Query Model, Transformation and other auxiliary packages,
+                along with the driver specification.</td>
+            </tr>
+            <tr>
+              <td><strong>olap4j-xmla</strong></td>
+              <td>Driver implementation of olap4j for XML/A data
+                sources. It is compatible with Mondrian, Palo, SAP BW
+                and SQL Server 2005+.</td>
+            </tr>
+            <tr>
+              <td><strong>olap4j-tck</strong></td>
+              <td>Technology compatibility kit. Consists mostly of JUnit tests.</td>
+            </tr>
+            <tr>
+              <td><strong>olap4j-jdk14</strong></td>
+              <td>Olap4j distribution compatible with Java 1.4. Includes the core API and
+                the XML/A driver.</td>
+            </tr>
+          </table>
 
           <h4>Packages and Roadmap</h4>
 
-          <p>The core API of olap4j version 1.0 is a Long Term Support (LTS) release,
-          but some parts of the olap4j project will remain considered as experimental,
-          thus subject to change in future releases.
+          <p>The core API of olap4j version 1.0 is a Long Term Support
+          (LTS) release, but some parts of the olap4j project will
+          remain considered as experimental, thus subject to change in
+          future releases.</p>
 
           <h5>Core packages</h5>
+
           <p>The core packages in olap4j-1.0 are as follows.</p><br/>
-          <p>
-            <ul>
-              <li><strong>org.olap4j.driver.xmla</strong><br/>
-              Generic XML/A driver.</li><br/>
-              <li><strong>org.olap4j.mdx</strong><br/>
-              Core objects of the MDX model.</li><br/>
-              <li><strong>org.olap4j.mdx.parser</strong><br/>
-              Parser for the MDX query language.</li><br/>
-              <li><strong>org.olap4j.metadata</strong><br/>
-              Discovery of OLAP servers metadata.</li><br/>
-              <li><strong>org.olap4j.type</strong><br/>
-              System for the core MDX object model and the metadata package.</li>
-            </ul>
-          </p>
+
+          <table border=1 style="border-collapse: collapse;">
+            <tr>
+              <td><a href="api/org/olap4j/driver/xmla/package-summary.html">org.olap4j.driver.xmla</a></td>
+              <td>Generic XML/A driver.</td>
+            </tr>
+            <tr>
+              <td><a href="api/org/olap4j/mdx/package-summary.html">org.olap4j.mdx</a></td>
+              <td>Core objects of the MDX model</td>
+            </tr>
+            <tr>
+              <td><a href="api/org/olap4j/mdx/parser/package-summary.html">org.olap4j.mdx.parser</a></td>
+              <td>Parser for the MDX query language</td>
+            </tr>
+            <tr>
+              <td><a href="api/org/olap4j/metadata/package-summary.html">org.olap4j.metadata</a></td>
+              <td>Discovery of OLAP servers metadata</td>
+            </tr>
+            <tr>
+              <td><a href="api/org/olap4j/type/package-summary.html">org.olap4j.type</a></td>
+              <td>System for the core MDX object model and the metadata package</td>
+            </tr>
+          </table>
+
           <h5>Experimental packages</h5>
-          <p>The following packages are considered experimental
-          and are subject to change.</p><br/>
+
+          <p>The following packages are considered experimental and
+          are subject to change.</p><br/>
+
+          <table border=1 style="border-collapse: collapse;">
+            <tr>
+              <td><a href="api/org/olap4j/query/package-summary.html">org.olap4j.query</a></td>
+              <td>Programmatic Query Model</td>
+            </tr>
+            <tr>
+              <td><a href="api/org/olap4j/transform/package-summary.html">org.olap4j.transform</a></td>
+              <td>Core MDX object model transformation utilities</td>
+            </tr>
+            <tr>
+              <td><a href="api/org/olap4j/layout/package-summary.html">org.olap4j.layout</a></td>
+              <td>Utility classes to display CellSets</td>
+            </tr>
+            <tr>
+              <td><a href="api/org/olap4j/CellSetListener.html">org.olap4j.CellSetListener</a> and associated classes</td>
+              <td>Event-based system for real time updates of CellSet objects</td>
+            </tr>
+            <tr>
+              <td><a href="api/org/olap4j/Scenario.html">org.olap4j.Scenario</a> and associated classes</td>
+              <td>Statistical simulations module</td>
+            </tr>
+          </table>
+
+          <h4>Related projects</h4>
+
           <p>
-            <ul>
-              <li><strong>org.olap4j.query</strong><br/>
-              Programmatic Query Model.</li><br/>
-              <li><strong>org.olap4j.transform</strong><br/>
-              Core MDX object model transformation utilities.</li><br/>
-              <li><strong>org.olap4j.layout</strong><br/>
-              Utility classes to display CellSets.</li><br/>
-              <li><strong>org.olap4j.CellSetListener and all associated classes</strong><br/>
-              Event-based system for real time updates of CellSet objects.</li><br/>
-              <li><strong>org.olap4j.Scenario and all associated classes</strong><br/>
-              Statistical simulations module.</li>
-            </ul>
+          <ul>
+            <li><a href="http://mondrian.pentaho.com">Mondrian</a>, an
+            OLAP engine that natively supports olap4j</li>
+            <li><a href="http://github.com/olap4j/olap4j-xmlaserver">olap4j-xmlaserver</a>,
+            a wrapper that converts olap4j data source into an XMLA
+            server</li>
+          </ul>
           </p>
 
-            <h4>Get involved!</h4>
+          <h4>Get involved!</h4>
 
-            <p>Join the
+          <p>Join the
             <a href="http://sourceforge.net/forum/forum.php?forum_id=577988">forum</a>,
             download the specification, and give us your feedback. If you are
             developing an OLAP server, component or application, let's work
             together to make your project olap4j-compliant.</p><br/>
 
-            <p>There are olap4j drivers for mondrian and XML/A; we are looking
+          <p>There are olap4j drivers for mondrian and XML/A; we are looking
             for committers to port the XML/A driver to new servers, and to write
-            native drivers for other OLAP engines.</p>
+            native drivers for other OLAP engines.</p><br/>
           </td>
           <td rowspan="5" class="col_spacer" style="padding-bottom: 10px;"><img src="images/spacer.png" class="col_spacer"/></td>
           <td rowspan="4" valign="top" style="padding-bottom: 10px;">
@@ -299,9 +357,9 @@ a:hover, a:active {
             </ul>
             <h4 style="margin: 0px;">Developer resources</h4>
             <ul>
+                <li><a href="https://github.com/olap4j/olap4j">Source on GitHub</a></li>
                 <li><a href="http://ci.pentaho.com/view/Analysis/job/olap4j/">Continuous Integration</a></li>
                 <li><a href="head/api/index.html">API</a></li>
-                <li><a href="http://olap4j.svn.sourceforge.net/viewvc/olap4j/trunk/">Source server</a></li>
                 <li><a href="https://lists.sourceforge.net/lists/listinfo/olap4j-devel">Developer's mailing list</a></li>
                 <li><a href="http://repository.pentaho.org/artifactory/pentaho">Maven repository</a>
                 (<i>group id 'org.olap4j', artifact 'olap4j'</i>)</li>
