@@ -1533,6 +1533,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 stringElement(row, "MEASURE_CAPTION");
             final String description =
                 stringElement(row, "DESCRIPTION");
+            final String formatString =
+                stringElement(row, "DEFAULT_FORMAT_STRING");
             final Measure.Aggregator measureAggregator =
                 Measure.Aggregator.getDictionary().forOrdinal(
                     integerElement(
@@ -1564,8 +1566,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             list.add(
                 new XmlaOlap4jMeasure(
                     (XmlaOlap4jLevel)member.getLevel(), measureUniqueName,
-                    measureName, measureCaption, description, null,
-                    measureAggregator, datatype, measureIsVisible,
+                    measureName, measureCaption, description, formatString,
+                    null, measureAggregator, datatype, measureIsVisible,
                     member.getOrdinal()));
         }
 

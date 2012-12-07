@@ -57,6 +57,7 @@ class XmlaOlap4jMeasure
         String name,
         String caption,
         String description,
+        String formatString,
         String parentMemberUniqueName,
         Aggregator aggregator,
         Datatype datatype,
@@ -73,6 +74,8 @@ class XmlaOlap4jMeasure
         this.aggregator = aggregator;
         this.datatype = datatype;
         this.visible = visible;
+        setProperty(
+            Property.StandardCellProperty.FORMAT_STRING, formatString);
     }
 
     public Aggregator getAggregator() {
