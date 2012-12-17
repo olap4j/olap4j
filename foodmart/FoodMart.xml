@@ -750,6 +750,7 @@ CONCAT(CONCAT("customer"."fname", ' '), "customer"."lname")
   <VirtualCubeMeasure cubeName="Sales" name="[Measures].[Unit Sales]"/>
   <VirtualCubeMeasure cubeName="Sales" name="[Measures].[Profit]"/>
   <VirtualCubeMeasure cubeName="Sales" name="[Measures].[Profit Growth]"/>
+  <VirtualCubeMeasure cubeName="Sales" name="[Measures].[Profit last Period]"/>
   <VirtualCubeMeasure cubeName="Warehouse" name="[Measures].[Store Invoice]"/>
   <VirtualCubeMeasure cubeName="Warehouse" name="[Measures].[Supply Time]"/>
   <VirtualCubeMeasure cubeName="Warehouse" name="[Measures].[Units Ordered]"/>
