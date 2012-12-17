@@ -62,11 +62,11 @@ src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
     </condition>
 
     <path id="project.bootclasspath.jdk15">
-      <pathelement location="${lib.dir}/rt-jdk1.5.jar"/>
+      <pathelement location="${testlib.dir}/rt-jdk1.5.jar"/>
     </path>
 
     <path id="project.bootclasspath.jdk16">
-      <pathelement location="${lib.dir}/rt-java6.jar"/>
+      <pathelement location="${testlib.dir}/rt-java6.jar"/>
     </path>
 
     <condition property="init.foodmart">
