@@ -20,7 +20,7 @@ package org.olap4j.driver.xmla;
 import org.olap4j.impl.Named;
 import org.olap4j.metadata.*;
 
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Implementation of {@link org.olap4j.metadata.Measure}
@@ -57,7 +57,7 @@ class XmlaOlap4jMeasure
         String name,
         String caption,
         String description,
-        String formatString,
+        final String formatString,
         String parentMemberUniqueName,
         Aggregator aggregator,
         Datatype datatype,
@@ -68,14 +68,20 @@ class XmlaOlap4jMeasure
             olap4jLevel, uniqueName, name, caption, description,
             parentMemberUniqueName,
             aggregator == Aggregator.CALCULATED ? Type.FORMULA : Type.MEASURE,
-            0, ordinal, Collections.<Property, Object>emptyMap());
+            0, ordinal,
+            new HashMap<Property, Object>() {
+                public Set<java.util.Map.Entry<Property, Object>> entrySet() {
+                    this.put(
+                        Property.StandardCellProperty.FORMAT_STRING,
+                        formatString);
+                    return this.entrySet();
+                }
+            });
         assert olap4jLevel.olap4jHierarchy.olap4jDimension.type
             == Dimension.Type.MEASURE;
         this.aggregator = aggregator;
         this.datatype = datatype;
         this.visible = visible;
-        setProperty(
-            Property.StandardCellProperty.FORMAT_STRING, formatString);
     }
 
     public Aggregator getAggregator() {

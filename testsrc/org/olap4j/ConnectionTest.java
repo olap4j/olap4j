@@ -28,6 +28,8 @@ import org.olap4j.test.TestContext.Tester;
 import org.olap4j.test.TestContext.Tester.Flavor;
 import org.olap4j.type.*;
 
+import com.mysql.jdbc.StringUtils;
+
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
@@ -1694,10 +1696,10 @@ public class ConnectionTest extends TestCase {
             // TODO: Fix mondrian's XMLA driver to return members ordered by
             // level then by ordinal as per XMLA spec
             expected =
-                "[Time].[1997].[Q2].[4]\n"
-                + "[Time].[1997].[Q2].[5]\n"
-                + "[Time].[1997].[Q2].[6]\n"
-                + "[Time].[1997]\n";
+                "[Time].[Time].[1997].[Q2].[4]\n"
+                + "[Time].[Time].[1997].[Q2].[5]\n"
+                + "[Time].[Time].[1997].[Q2].[6]\n"
+                + "[Time].[Time].[1997]\n";
             break;
         default:
             expected =
@@ -1987,22 +1989,14 @@ public class ConnectionTest extends TestCase {
 
         assertEquals("Food", member.getCaption());
 
-        switch (tester.getFlavor()) {
-        case XMLA:
-        case REMOTE_XMLA:
-            assertEquals("", member.getDescription());
-            assertEquals(204, member.getOrdinal());
-            break;
-        default:
-            assertNull(member.getDescription());
-            // mondrian does not set ordinals correctly
-            assertEquals(-1, member.getOrdinal());
-            assertEquals(1, member.getDepth());
-            assertEquals(-1, member.getSolveOrder());
-            assertFalse(member.isHidden());
-            assertNull(member.getDataMember());
-            assertFalse(member.isCalculatedInQuery());
-        }
+        assertTrue(
+            StringUtils.isNullOrEmpty(member.getDescription()));
+        assertEquals(1, member.getOrdinal());
+        assertEquals(1, member.getDepth());
+        assertEquals(-1, member.getSolveOrder());
+        assertFalse(member.isHidden());
+        assertNull(member.getDataMember());
+        assertFalse(member.isCalculatedInQuery());
 
         final NamedList<Property> propertyList = member.getProperties();
         final Property property = propertyList.get("MEMBER_CAPTION");
@@ -2162,21 +2156,24 @@ public class ConnectionTest extends TestCase {
         assertEquals(
             new HashSet<String>(
                 Arrays.asList(
-                    "Sales Count",
-                    "Store Cost",
-                    "Store Sales",
-                    "Unit Sales",
-                    "Profit",
-                    "Profit Growth",
-                    "Profit Per Unit Shipped",
-                    "Store Invoice",
-                    "Supply Time",
-                    "Units Ordered",
-                    "Units Shipped",
-                    "Warehouse Cost",
-                    "Warehouse Profit",
+                    "Customer Count",
                     "Warehouse Sales",
-                    "Average Warehouse Sale")),
+                    "Profit last Period",
+                    "Warehouse Cost",
+                    "Store Cost",
+                    "Promotion Sales",
+                    "Units Shipped",
+                    "Store Sales",
+                    "Profit Growth",
+                    "Sales Count",
+                    "Supply Time",
+                    "Store Invoice",
+                    "Units Ordered",
+                    "Average Warehouse Sale",
+                    "Profit Per Unit Shipped",
+                    "Profit",
+                    "Warehouse Profit",
+                    "Unit Sales")),
             measureVcNameSet);
     }
 
@@ -2266,7 +2263,8 @@ public class ConnectionTest extends TestCase {
         assertEquals("All Employees", member0.getName());
         assertEquals(0, member0.getDepth());
         Member member1 = rowsAxis.getPositions().get(1).getMembers().get(0);
-        assertEquals("[Employees].[Sheri Nowmer]", member1.getUniqueName());
+        assertEquals(
+            "[Employees].[Employees].[Sheri Nowmer]", member1.getUniqueName());
         assertEquals(1, member1.getDepth());
         assertEquals(1, member1.getLevel().getDepth());
         assertEquals(
@@ -2276,14 +2274,15 @@ public class ConnectionTest extends TestCase {
         Member member2 = rowsAxis.getPositions().get(2).getMembers().get(0);
         assertTrue(
             member2.getUniqueName().equals(
-                "[Employees].[Derrick Whelply]")
+                "[Employees].[Employees].[Derrick Whelply]")
             || member2.getUniqueName().equals(
-                "[Employees].[Sheri Nowmer].[Derrick Whelply]"));
+                "[Employees].[Employees].[Sheri Nowmer].[Derrick Whelply]"));
         assertEquals(2, member2.getDepth());
         assertEquals(1, member2.getLevel().getDepth());
         final Member parent = member2.getParentMember();
         assertNotNull(parent);
-        assertEquals("[Employees].[Sheri Nowmer]", parent.getUniqueName());
+        assertEquals(
+            "[Employees].[Employees].[Sheri Nowmer]", parent.getUniqueName());
         assertEquals(1, parent.getDepth());
         assertEquals(member2.getLevel(), parent.getLevel());
         assertEquals(member1, parent);
@@ -3520,6 +3519,7 @@ public class ConnectionTest extends TestCase {
                     "Promotion Media",
                     "Promotions",
                     "Customers",
+                    "Gender",
                     "Education Level",
                     "Marital Status",
                     "Yearly Income"),

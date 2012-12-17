@@ -159,7 +159,7 @@ class XmlaOlap4jMember
     }
 
     public int getSolveOrder() {
-        throw new UnsupportedOperationException();
+        return -1;
     }
 
     public ParseTreeNode getExpression() {
@@ -177,7 +177,7 @@ class XmlaOlap4jMember
     }
 
     public boolean isCalculatedInQuery() {
-        throw new UnsupportedOperationException();
+        return false;
     }
 
     public Object getPropertyValue(Property property) throws OlapException {
@@ -312,7 +312,7 @@ class XmlaOlap4jMember
     }
 
     public boolean isHidden() {
-        throw new UnsupportedOperationException();
+        return false;
     }
 
     public int getDepth() {
@@ -342,7 +342,7 @@ class XmlaOlap4jMember
     }
 
     public Member getDataMember() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 }
 

@@ -598,7 +598,7 @@ public class MetadataTest extends TestCase {
             "CATALOG_NAME=" + catalogName
             + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_NAME=Education Level, DIMENSION_UNIQUE_NAME=[Education Level], DIMENSION_GUID=null, DIMENSION_CAPTION=Education Level, DIMENSION_ORDINAL=9, DIMENSION_TYPE=3, DIMENSION_CARDINALITY=6, DEFAULT_HIERARCHY=[Education Level], DESCRIPTION=Sales Cube - Education Level Dimension, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_MASTER_UNIQUE_NAME=null, DIMENSION_IS_VISIBLE=true",
             s);
-        assertEquals(62, linecount(s));
+        assertEquals(68, linecount(s));
     }
 
     public void testDatabaseMetaDataGetFunctions() throws SQLException {
@@ -710,9 +710,9 @@ public class MetadataTest extends TestCase {
             "CATALOG_NAME=" + catalogName
             + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender].[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender].[(All)], LEVEL_NUMBER=0, MEMBER_ORDINAL=0, MEMBER_NAME=All Gender, MEMBER_UNIQUE_NAME=[Gender].[Gender].[All Gender], MEMBER_TYPE=2, MEMBER_GUID=null, MEMBER_CAPTION=All Gender, CHILDREN_CARDINALITY=2, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=null, PARENT_COUNT=0, TREE_OP=null, DEPTH=0\n"
             + "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender].[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender].[Gender], LEVEL_NUMBER=1, MEMBER_ORDINAL=1, MEMBER_NAME=F, MEMBER_UNIQUE_NAME=[Gender].[Gender].[F], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=F, CHILDREN_CARDINALITY=0, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Gender].[Gender].[All Gender], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender].[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender].[Gender], LEVEL_NUMBER=1, MEMBER_ORDINAL=0, MEMBER_NAME=F, MEMBER_UNIQUE_NAME=[Gender].[Gender].[F], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=F, CHILDREN_CARDINALITY=0, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Gender].[Gender].[All Gender], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
             + "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender].[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender].[Gender], LEVEL_NUMBER=1, MEMBER_ORDINAL=2, MEMBER_NAME=M, MEMBER_UNIQUE_NAME=[Gender].[Gender].[M], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=M, CHILDREN_CARDINALITY=0, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Gender].[Gender].[All Gender], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n",
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender].[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender].[Gender], LEVEL_NUMBER=1, MEMBER_ORDINAL=1, MEMBER_NAME=M, MEMBER_UNIQUE_NAME=[Gender].[Gender].[M], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=M, CHILDREN_CARDINALITY=0, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Gender].[Gender].[All Gender], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n",
             s);
 
         // by member unique name
@@ -723,7 +723,7 @@ public class MetadataTest extends TestCase {
             MEMBERS_COLUMN_NAMES);
         TestContext.assertEqualsVerbose(
             "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Time], HIERARCHY_UNIQUE_NAME=[Time].[Time], LEVEL_UNIQUE_NAME=[Time].[Time].[Month], LEVEL_NUMBER=2, MEMBER_ORDINAL=6, MEMBER_NAME=4, MEMBER_UNIQUE_NAME=[Time].[Time].[1997].[Q2].[4], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=4, CHILDREN_CARDINALITY=0, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Time].[Time].[1997].[Q2], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n",
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Time], HIERARCHY_UNIQUE_NAME=[Time].[Time], LEVEL_UNIQUE_NAME=[Time].[Time].[Month], LEVEL_NUMBER=2, MEMBER_ORDINAL=7, MEMBER_NAME=4, MEMBER_UNIQUE_NAME=[Time].[Time].[1997].[Q2].[4], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=4, CHILDREN_CARDINALITY=0, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Time].[Time].[1997].[Q2], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n",
             s);
 
         // with treeop
@@ -740,11 +740,11 @@ public class MetadataTest extends TestCase {
             // by level depth
             TestContext.assertEqualsVerbose(
                 "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=7235, MEMBER_NAME=OR, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[OR], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=OR, CHILDREN_CARDINALITY=11, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
+                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=3, MEMBER_NAME=OR, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[OR], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=OR, CHILDREN_CARDINALITY=11, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
                 + "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=8298, MEMBER_NAME=WA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[WA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=WA, CHILDREN_CARDINALITY=22, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
+                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=4, MEMBER_NAME=WA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[WA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=WA, CHILDREN_CARDINALITY=22, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
                 + "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[Country], LEVEL_NUMBER=1, MEMBER_ORDINAL=2966, MEMBER_NAME=USA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=USA, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Customers].[Customers].[All Customers], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
+                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[Country], LEVEL_NUMBER=1, MEMBER_ORDINAL=0, MEMBER_NAME=USA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=USA, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Customers].[Customers].[All Customers], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
                 + "CATALOG_NAME=" + catalogName
                 + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[(All)], LEVEL_NUMBER=0, MEMBER_ORDINAL=0, MEMBER_NAME=All Customers, MEMBER_UNIQUE_NAME=[Customers].[Customers].[All Customers], MEMBER_TYPE=2, MEMBER_GUID=null, MEMBER_CAPTION=All Customers, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=null, PARENT_COUNT=0, TREE_OP=null, DEPTH=0\n",
                 s);
@@ -754,11 +754,11 @@ public class MetadataTest extends TestCase {
                 "CATALOG_NAME=" + catalogName
                 + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[(All)], LEVEL_NUMBER=0, MEMBER_ORDINAL=0, MEMBER_NAME=All Customers, MEMBER_UNIQUE_NAME=[Customers].[Customers].[All Customers], MEMBER_TYPE=2, MEMBER_GUID=null, MEMBER_CAPTION=All Customers, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=null, PARENT_COUNT=0, TREE_OP=null, DEPTH=0\n"
                 + "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[Country], LEVEL_NUMBER=1, MEMBER_ORDINAL=2966, MEMBER_NAME=USA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=USA, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Customers].[Customers].[All Customers], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
+                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[Country], LEVEL_NUMBER=1, MEMBER_ORDINAL=0, MEMBER_NAME=USA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=USA, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Customers].[Customers].[All Customers], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
                 + "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=7235, MEMBER_NAME=OR, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[OR], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=OR, CHILDREN_CARDINALITY=11, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
+                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=3, MEMBER_NAME=OR, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[OR], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=OR, CHILDREN_CARDINALITY=11, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
                 + "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=8298, MEMBER_NAME=WA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[WA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=WA, CHILDREN_CARDINALITY=22, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n",
+                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=4, MEMBER_NAME=WA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[WA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=WA, CHILDREN_CARDINALITY=22, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n",
                 s);
             break;
         }
