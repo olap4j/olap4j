@@ -2,6 +2,35 @@
 
 ###############################################################################
 
+# Olap4j 1.1.0
+
+This release is a minor update to the olap4j specification. There have been
+changes to the internal APIs which will affect developers and implementors
+of the specification. This release is backwards compatible with applications
+written against olap4j 1.0.
+
+This release is also the first to introduce our new sister project:
+olap4j-xmlaserver. It consists of a Java Servlet implementation which provides
+XMLA services from an olap4j connection. For more details, consult our GitHub
+page at github.com/olap4j
+
+* New Features / Improvements
+    - Switched to the JavaCC parser (was previously JavaCUP).
+    - Added compatibility with Mondrian 4+.
+    - Minor changes to the NamedList interface.
+
+* Bug Fixes in Core
+    - Fix bug 3526908. Incomplete LCID list.
+    - Fix bug 3515404. Inconsistent behavior when parsing ".CHILDREN" and
+     ".Children"
+
+* Bug Fixes in XMLA
+    - Fixes compatibility issues with Essbase.
+    - Fixes compatibility issues with SAP BW.
+    - Fixes a thread safety issue in DeferredNamedList.
+
+###############################################################################
+
 # Olap4j 1.0.1
 
 This release is a maintenance release and maintains backwards compatibility
@@ -27,6 +56,8 @@ Among other notable changes, this version introduces support for JDBC 4.1.
       of the XMLA's PropertyList payload.
     - The XmlaDriver now exposes a public constructor to prevent
       errors in Sun's JDBC implementation.
+
+###############################################################################
 
 # Olap4j 1.0.0
 

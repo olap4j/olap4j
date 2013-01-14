@@ -455,6 +455,14 @@ class XmlaOlap4jDriverVersion {
                 </copy>
             </then>
         </if>
+        <if>
+            <available file="${src.dir}/org/olap4j/impl/nls.properties" />
+            <then>
+                <copy todir="${classes.dir}/org/olap4j/impl/">
+                    <fileset file="${src.dir}/org/olap4j/impl/nls.properties" />
+                </copy>
+            </then>
+        </if>
     </target>
 
     <!-- override from subfloor to publish tck and xmla artifacts as well -->
