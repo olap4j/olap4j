@@ -112,7 +112,9 @@ VERSION.txt" />
             <zipfileset dir="${javadoc.dir}" prefix="${ivy.artifact.id}-${project.revision}/doc/api"
                 includes="**/*" />
             <zipfileset dir="${dist.dir}" prefix="${ivy.artifact.id}-${project.revision}/lib" includes="olap4j-*.jar" />
-            <zipfileset dir="${lib.dir}" prefix="${ivy.artifact.id}-${project.revision}/lib" includes="*.jar" />
+            <zipfileset dir="${lib.dir}"
+                prefix="${ivy.artifact.id}-${project.revision}/lib"
+                includes="xercesImpl.jar"/>
             <zipfileset dir="${dist.dir}" prefix="${ivy.artifact.id}-${project.revision}" includes="${source.zip.filename}" />
         </zip>
     </target>
