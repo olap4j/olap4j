@@ -282,7 +282,23 @@ test.properties" />
     </target>
 
     <target name="version-properties">
-        <echo message="olap4j ${project.revision}${line.separator}" file="VERSION.txt" />
+        <exec executable="git" outputproperty="git.commit">
+            <arg line="log -n 1 --format=format:%H"/>
+        </exec>
+        <tstamp>
+            <format property="build.time" timezone="UTC" pattern="yyyy/MM/dd HH:mm:ss z"/>
+        </tstamp>
+        <!--echo message="olap4j ${project.revision}${line.separator}" file="VERSION.txt" /-->
+        <echo file="VERSION.txt">Title: ${ant.project.name}
+Version: ${project.revision}
+VersionMajor: ${project.revision.major}
+VersionMinor: ${project.revision.minor}
+Git-Latest-Commit: ${git.commit}
+Ant-Version: ${ant.version}
+Created-By: ${java.version} (${java.vendor})
+Built-On: ${build.time}
+Built-By: ${user.name}
+Built-In: ${user.dir}</echo>
         <echo file="${src.dir}/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java">/*
  * Project version information. Generated - do not modify.
  */
