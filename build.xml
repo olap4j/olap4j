@@ -158,8 +158,6 @@ VERSION.txt" />
                 excludes="
 org/olap4j/driver/**,
 META-INF/**"/>
-            <zipfileset dir="${src.dir}" prefix=""
-                includes="org/olap4j/impl/nls.properties"/>
         </zip>
     </target>
 
