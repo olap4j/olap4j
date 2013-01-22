@@ -1346,6 +1346,93 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         }
     }
 
+    static class MeasureGroupHandler
+        extends HandlerImpl<XmlaOlap4jMeasureGroup>
+    {
+        public void handle(
+            Element row,
+            Context context,
+            List<XmlaOlap4jMeasureGroup> list)
+            throws OlapException
+        {
+            // Example:
+            //
+            // <row>
+            //     <CATALOG_NAME>FoodMart</CATALOG_NAME>
+            //     <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
+            //     <CUBE_NAME>Sales</CUBE_NAME>
+            //     <MEASUREGROUP_NAME>Internet Sales</MEASUREGROUP_NAME>
+            //     <DESCRIPTION>Sales Cube - Internet Sales</DESCRIPTION>
+            //     <IS_WRITE_ENABLED>false</IS_WRITE_ENABLED>
+            //     <MEASUREGROUP_CAPTION>Internet Sales</MEASUREGROUP_CAPTION>
+            // </row>
+            //
+            // Unused: CATALOG_NAME, SCHEMA_NAME, CUBE_NAME, IS_WRITE_ENABLED
+            String measureGroupName = stringElement(row, "MEASUREGROUP_NAME");
+            String caption = stringElement(row, "MEASUREGROUP_CAPTION");
+            if (caption == null) {
+                caption = measureGroupName;
+            }
+            String description = stringElement(row, "DESCRIPTION");
+            XmlaOlap4jMeasureGroup measureGroup =
+                new XmlaOlap4jMeasureGroup(
+                    context.olap4jCube,
+                    measureGroupName,
+                    caption,
+                    description);
+            list.add(measureGroup);
+        }
+    }
+
+    static class MeasureGroupDimensionHandler
+        extends HandlerImpl<XmlaOlap4jDimension>
+    {
+        private final XmlaOlap4jCube cubeForCallback;
+
+        public MeasureGroupDimensionHandler(XmlaOlap4jCube cube) {
+            this.cubeForCallback = cube;
+        }
+
+        public void handle(
+            Element row,
+            Context context,
+            List<XmlaOlap4jDimension> list)
+        {
+            // Example:
+            //
+            // <row>
+            //     <CATALOG_NAME>FoodMart</CATALOG_NAME>
+            //     <SCHEMA_NAME>FoodMart</SCHEMA_NAME>
+            //     <CUBE_NAME>Sales</CUBE_NAME>
+            //     <MEASUREGROUP_NAME>Internet Sales</MEASUREGROUP_NAME>
+            //     <MEASUREGROUP_CARDINALITY>one</MEASUREGROUP_CARDINALITY>
+            //     <DIMENSION_UNIQUE_NAME>[Department]</DIMENSION_UNIQUE_NAME>
+            //     <DIMENSION_CARDINALITY>one</DIMENSION_CARDINALITY>
+            //     <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
+            //     <DIMENSION_IS_FACT_DIMENSION>false
+            //     </DIMENSION_IS_FACT_DIMENSION>
+            //     <DIMENSION_PATH>???</DIMENSION_PATH>
+            //     <DIMENSION_GRANULARITY>???</DIMENSION_GRANULARITY>
+            // </row>
+            //
+            // Unused: CATALOG_NAME, SCHEMA_NAME, CUBE_NAME, MEASUREGROUP_NAME,
+            //   MEASUREGROUP_CARDINALITY, DIMENSION_CARDINALITY,
+            //   DIMENSION_IS_VISIBLE, DIMENSION_IS_VISIBLE,
+            //   DIMENSION_IS_FACT_DIMENSION, DIMENSION_PATH,
+            //   DIMENSION_GRANULARITY
+            String dimensionUniqueName =
+                stringElement(row, "DIMENSION_UNIQUE_NAME");
+            // Cannot use cubeForCallback.dimensionsByUname because it may not
+            // be fully populated
+            for (XmlaOlap4jDimension dimension : cubeForCallback.dimensions) {
+                if (dimension.getUniqueName().equals(dimensionUniqueName)) {
+                    list.add(dimension);
+                    break;
+                }
+            }
+        }
+    }
+
     static class DimensionHandler extends HandlerImpl<XmlaOlap4jDimension> {
         private final XmlaOlap4jCube cubeForCallback;
 
@@ -2380,6 +2467,26 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             new MetadataColumn("LEVEL_UNIQUE_SETTINGS"),
             new MetadataColumn("LEVEL_IS_VISIBLE"),
             new MetadataColumn("DESCRIPTION")),
+        MDSCHEMA_MEASUREGROUP_DIMENSIONS(
+            new MetadataColumn("CATALOG_NAME"),
+            new MetadataColumn("SCHEMA_NAME"),
+            new MetadataColumn("CUBE_NAME"),
+            new MetadataColumn("MEASUREGROUP_NAME"),
+            new MetadataColumn("MEASUREGROUP_CARDINALITY"),
+            new MetadataColumn("DIMENSION_UNIQUE_NAME"),
+            new MetadataColumn("DIMENSION_CARDINALITY"),
+            new MetadataColumn("DIMENSION_IS_VISIBLE"),
+            new MetadataColumn("DIMENSION_IS_FACT_DIMENSION"),
+            new MetadataColumn("DIMENSION_PATH"),
+            new MetadataColumn("DIMENSION_GRANULARITY")),
+        MDSCHEMA_MEASUREGROUPS(
+            new MetadataColumn("CATALOG_NAME"),
+            new MetadataColumn("SCHEMA_NAME"),
+            new MetadataColumn("CUBE_NAME"),
+            new MetadataColumn("MEASUREGROUP_NAME"),
+            new MetadataColumn("DESCRIPTION"),
+            new MetadataColumn("IS_WRITE_ENABLED"),
+            new MetadataColumn("MEASUREGROUP_CAPTION")),
         MDSCHEMA_MEASURES(
             new MetadataColumn("CATALOG_NAME"),
             new MetadataColumn("SCHEMA_NAME"),

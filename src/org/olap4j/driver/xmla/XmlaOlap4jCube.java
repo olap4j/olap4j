@@ -48,6 +48,8 @@ class XmlaOlap4jCube implements Cube, Named
         new HashMap<String, XmlaOlap4jHierarchy>();
     final Map<String, XmlaOlap4jLevel> levelsByUname =
         new HashMap<String, XmlaOlap4jLevel>();
+    final NamedList<XmlaOlap4jMeasureGroup> measureGroups =
+        new NamedListImpl<XmlaOlap4jMeasureGroup>();
     final List<XmlaOlap4jMeasure> measures =
         new ArrayList<XmlaOlap4jMeasure>();
     private final NamedList<XmlaOlap4jNamedSet> namedSets;
@@ -108,6 +110,18 @@ class XmlaOlap4jCube implements Cube, Named
             restrictions);
 
         // populate measures up front; a measure is needed in every query
+        try {
+            olap4jConnection.populateList(
+                measureGroups,
+                context,
+                XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEASUREGROUPS,
+                new XmlaOlap4jConnection.MeasureGroupHandler(),
+                restrictions);
+        } catch (OlapException e) {
+            // Maybe the server does not support measure groups (Mondrian)
+            // Just ignore the exception and do nothing
+        }
+
         olap4jConnection.populateList(
             measures,
             context,
@@ -148,6 +162,10 @@ class XmlaOlap4jCube implements Cube, Named
 
     public boolean isVisible() {
         return true;
+    }
+
+    public NamedList<MeasureGroup> getMeasureGroups() {
+        return Olap4jUtil.cast(measureGroups);
     }
 
     public NamedList<Dimension> getDimensions() {

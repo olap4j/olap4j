@@ -67,6 +67,13 @@ public interface Cube extends MetadataElement {
     NamedList<Hierarchy> getHierarchies();
 
     /**
+     * Returns a list of {@link MeasureGroup} objects in this Cube.
+     *
+     * @return list of MeasureGroups
+     */
+    NamedList<MeasureGroup> getMeasureGroups();
+
+    /**
      * Returns a list of {@link Measure} objects in this Cube.
      *
      * <p>The list includes both stored and calculated members, and (unlike
