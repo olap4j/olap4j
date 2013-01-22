@@ -50,8 +50,11 @@ abstract class XmlaOlap4jUtil {
         "urn:schemas-microsoft-com:xml-analysis:mddataset";
     static final String ROWSET_NS =
         "urn:schemas-microsoft-com:xml-analysis:rowset";
+    static final String SQL_NS =
+        "urn:schemas-microsoft-com:xml-sql";
 
     static final String XSD_PREFIX = "xsd";
+    static final String XSD_NS = "http://www.w3.org/2001/XMLSchema";
     static final String XMLNS = "xmlns";
 
     static final String NAMESPACES_FEATURE_ID =

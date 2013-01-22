@@ -358,8 +358,9 @@ public class QueryAxis extends QueryNodeImpl {
 
     /**
      * Returns a specified number of items from the
-     *  top of the axis set.
-     * @param n
+     * top of the axis set.
+     *
+     * @param n Number of items
      */
     public void topCount(BigDecimal n) {
         this.limitFunction = LimitFunction.TopCount;
@@ -369,7 +370,8 @@ public class QueryAxis extends QueryNodeImpl {
     /**
      * Returns a specified number of items from the
      * bottom of the axis set.
-     * @param n
+     *
+     * @param n Number of items
      */
     public void bottomCount(BigDecimal n) {
         this.limitFunction = LimitFunction.BottomCount;
@@ -379,7 +381,8 @@ public class QueryAxis extends QueryNodeImpl {
     /**
      * Limit the axis set to a specified number of items depending
      * on the limitSortLiteral and {@link LimitFunction}.
-     * @param n - number of items/cumulative sum/percentage
+     *
+     * @param n Number of items/cumulative sum/percentage
      */
     public void limit(
         LimitFunction function, BigDecimal n, String limitSortLiteral)
@@ -417,6 +420,7 @@ public class QueryAxis extends QueryNodeImpl {
      * Returns the current sort literal being used by the
      * limit functionMight return null of none
      * is currently specified.
+     *
      * @return sort literal of the limit function
      */
     public String getLimitFunctionSortLiteral() {
@@ -424,9 +428,10 @@ public class QueryAxis extends QueryNodeImpl {
     }
 
     /**
-     * Filter the axis using the given condition before TopCount / Order
+     * Filters the axis using the given condition before TopCount / Order
      * are applied.
-     * @param filterCondition - the condition used for Filter()
+     *
+     * @param filterCondition The condition used for Filter()
      */
     public void filter(String filterCondition) {
         this.filterCondition = filterCondition;
@@ -434,6 +439,7 @@ public class QueryAxis extends QueryNodeImpl {
 
     /**
      * Returns the Filter Condition used to filter the axis set.
+     *
      * @return filter condition
      */
     public String getFilterCondition() {
@@ -449,5 +455,3 @@ public class QueryAxis extends QueryNodeImpl {
 }
 
 // End QueryAxis.java
-
-

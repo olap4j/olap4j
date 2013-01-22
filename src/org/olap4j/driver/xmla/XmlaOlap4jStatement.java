@@ -17,13 +17,44 @@
 */
 package org.olap4j.driver.xmla;
 
-import org.olap4j.*;
+import org.olap4j.CellSet;
+import org.olap4j.CellSetListener;
+import org.olap4j.OlapConnection;
+import org.olap4j.OlapException;
+import org.olap4j.OlapStatement;
 import org.olap4j.driver.xmla.XmlaOlap4jConnection.BackendFlavor;
-import org.olap4j.mdx.*;
+import org.olap4j.mdx.ParseTreeNode;
+import org.olap4j.mdx.ParseTreeWriter;
+import org.olap4j.mdx.SelectNode;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
 import java.io.StringWriter;
-import java.sql.*;
-import java.util.concurrent.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.ROWSET_NS;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.SOAP_NS;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.SQL_NS;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.XMLA_NS;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.XSD_NS;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.childElements;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.findChild;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.findChildren;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.parse;
+import static org.olap4j.driver.xmla.XmlaOlap4jUtil.prettyPrint;
 
 /**
  * Implementation of {@link org.olap4j.OlapStatement}
@@ -74,7 +105,160 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
     // implement Statement
 
     public ResultSet executeQuery(String sql) throws SQLException {
-        throw new UnsupportedOperationException();
+        final String catalog = olap4jConnection.getCatalog();
+        final String dataSourceInfo = olap4jConnection.getDatabase();
+        final String roleName = olap4jConnection.getRoleName();
+        final String propList = olap4jConnection.makeConnectionPropertyList();
+        final StringBuilder buf = new StringBuilder(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            + "<soapenv:Envelope\n"
+            + "    xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+            + "    xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n"
+            + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
+            + "    <soapenv:Body>\n"
+            + "        <Execute xmlns=\"urn:schemas-microsoft-com:xml-analysis\">\n"
+            + "        <Command>\n"
+            + "        <Statement>\n"
+            + "           <![CDATA[\n" + sql + "]]>\n"
+            + "         </Statement>\n"
+            + "        </Command>\n"
+            + "        <Properties>\n"
+            + "          <PropertyList>\n");
+        if (catalog != null) {
+            buf.append("            <Catalog>");
+            buf.append(catalog);
+            buf.append("</Catalog>\n");
+        }
+        if (propList != null) {
+            buf.append(propList);
+        }
+        if (roleName != null && !("".equals(roleName))) {
+            buf.append("        <Roles>");
+            buf.append(roleName);
+            buf.append("</Roles>\n");
+        }
+        if (dataSourceInfo != null) {
+            buf.append("            <DataSourceInfo>");
+            buf.append(dataSourceInfo);
+            buf.append("</DataSourceInfo>\n");
+        }
+        buf.append(
+            "            <Format>Tabular</Format>\n"
+            + "            <AxisFormat>TupleFormat</AxisFormat>\n"
+            + "          </PropertyList>\n"
+            + "        </Properties>\n"
+            + "</Execute>\n"
+            + "</soapenv:Body>\n"
+            + "</soapenv:Envelope>");
+        final String request = buf.toString();
+
+        this.future =
+            olap4jConnection.proxy.submit(
+                olap4jConnection.serverInfos, request);
+
+        byte[] bytes = this.getBytes();
+
+        Document doc;
+        try {
+            doc = parse(bytes);
+        } catch (IOException e) {
+            throw getHelper().createException("error creating ResultSet", e);
+        } catch (SAXException e) {
+            throw getHelper().createException("error creating ResultSet", e);
+        }
+
+        // <SOAP-ENV:Envelope>
+        //   <SOAP-ENV:Header/>
+        //   <SOAP-ENV:Body>
+        //     <xmla:ExecuteResponse>
+        //       <xmla:return>
+        //         <root>
+        //           (see below)
+        //         </root>
+        //       <xmla:return>
+        //     </xmla:ExecuteResponse>
+        //   </SOAP-ENV:Body>DEBUG
+        // </SOAP-ENV:Envelope>
+        final Element envelope = doc.getDocumentElement();
+        assert envelope.getLocalName().equals("Envelope");
+        assert envelope.getNamespaceURI().equals(SOAP_NS);
+        Element body =
+            findChild(envelope, SOAP_NS, "Body");
+        Element fault =
+            findChild(body, SOAP_NS, "Fault");
+        if (fault != null) {
+/*
+        <SOAP-ENV:Fault>
+            <faultcode>SOAP-ENV:Client.00HSBC01</faultcode>
+            <faultstring>XMLA connection datasource not found</faultstring>
+            <faultactor>Mondrian</faultactor>
+            <detail>
+                <XA:error xmlns:XA="http://mondrian.sourceforge.net">
+                    <code>00HSBC01</code>
+                    <desc>The Mondrian XML: Mondrian Error:Internal
+                        error: no catalog named 'LOCALDB'</desc>
+                </XA:error>
+            </detail>
+        </SOAP-ENV:Fault>
+*/
+            // TODO: log doc to logfile
+            throw getHelper().createException(
+                "XMLA provider gave exception: "
+                + prettyPrint(fault));
+        }
+        Element executeResponse =
+            findChild(body, XMLA_NS, "ExecuteResponse");
+        Element returnElement =
+            findChild(executeResponse, XMLA_NS, "return");
+        // <root> has children
+        //   <xsd:schema/>
+        //   <row> ...
+        final Element root =
+            findChild(returnElement, ROWSET_NS, "root");
+
+        Element schema = findChild(root, XSD_NS, "schema");
+        List<Element> complexTypes =
+            findChildren(schema, XSD_NS, "complexType");
+
+        List<String> headerList = new ArrayList<String>();
+        List<String> elementNameList = new ArrayList<String>();
+        for (Element complexType : complexTypes) {
+            if (complexType.getAttribute("name").equals("row")) {
+                Element sequence = findChild(complexType, XSD_NS, "sequence");
+                List<Element> elements =
+                    findChildren(sequence, XSD_NS, "element");
+                for (Element element : elements) {
+                    String sqlField = element.getAttributeNS(SQL_NS, "field");
+                    headerList.add(sqlField);
+
+                    String name = element.getAttribute("name");
+                    elementNameList.add(name);
+                }
+
+                break;
+            }
+        }
+
+        final List<Element> rowNodes = findChildren(root, ROWSET_NS, "row");
+
+        List<List<Object>> rowList = new ArrayList<List<Object>>();
+        for (Element rowNode : rowNodes) {
+            List<Object> row = new ArrayList<Object>();
+            rowList.add(row);
+
+            row.addAll(Collections.nCopies(headerList.size(), null));
+
+            for (Element childElement : childElements(rowNode)) {
+                String elementName = childElement.getLocalName();
+                String value = childElement.getTextContent();
+
+                int index = elementNameList.indexOf(elementName);
+                row.set(index, value);
+            }
+        }
+
+        return olap4jConnection.factory
+            .newFixedResultSet(olap4jConnection, headerList, rowList);
     }
 
     public int executeUpdate(String sql) throws SQLException {
@@ -320,7 +504,7 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
         if (propList != null) {
             buf.append(propList);
         }
-        if (roleName != null && !("".equals(roleName))) {
+        if (roleName != null && !roleName.equals("")) {
             buf.append("        <Roles>");
             buf.append(roleName);
             buf.append("</Roles>\n");
