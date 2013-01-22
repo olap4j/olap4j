@@ -71,7 +71,7 @@ public interface Hierarchy extends MetadataElement {
     Member getDefaultMember() throws OlapException;
 
     /**
-     * Returns the root member or members of this Dimension.
+     * Returns the root member or members of this <code>Hierarchy</code>.
      *
      * <p>If the dimension has an 'all' member, then this will be the sole
      * root member.
@@ -90,6 +90,13 @@ public interface Hierarchy extends MetadataElement {
      * @throws OlapException on database error
      */
     NamedList<Member> getRootMembers() throws OlapException;
+
+    /**
+     * Returns the structure of this <code>Hierarchy</code>.
+     *
+     * @return hierarchy structure, never null
+     */
+    Structure getStructure();
 
     /** Source of a hierarchy. */
     enum Origin implements XmlaConstant {

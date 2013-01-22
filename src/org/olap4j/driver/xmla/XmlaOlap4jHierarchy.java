@@ -39,6 +39,7 @@ class XmlaOlap4jHierarchy
     private final boolean all;
     private final String defaultMemberUniqueName;
     private final String hierarchyDisplayFolder;
+    private final Structure structure;
 
     XmlaOlap4jHierarchy(
         XmlaOlap4jDimension olap4jDimension,
@@ -48,14 +49,17 @@ class XmlaOlap4jHierarchy
         String description,
         String hierarchyDisplayFolder,
         boolean all,
-        String defaultMemberUniqueName) throws OlapException
+        String defaultMemberUniqueName,
+        Structure structure) throws OlapException
     {
         super(uniqueName, name, caption, description);
         assert olap4jDimension != null;
+        assert structure != null;
         this.olap4jDimension = olap4jDimension;
         this.all = all;
         this.defaultMemberUniqueName = defaultMemberUniqueName;
         this.hierarchyDisplayFolder = hierarchyDisplayFolder;
+        this.structure = structure;
 
         String[] hierarchyRestrictions = {
             "CATALOG_NAME",
@@ -116,9 +120,12 @@ class XmlaOlap4jHierarchy
         return Olap4jUtil.cast(list);
     }
 
-    @Override
     public String getDisplayFolder() {
         return hierarchyDisplayFolder;
+    }
+
+  public Structure getStructure() {
+        return structure;
     }
 
     public boolean equals(Object obj) {
