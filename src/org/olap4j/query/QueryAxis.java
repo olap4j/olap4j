@@ -23,6 +23,7 @@ import org.olap4j.mdx.IdentifierSegment;
 import org.olap4j.metadata.Measure;
 import org.olap4j.metadata.Member;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -43,7 +44,9 @@ public class QueryAxis extends QueryNodeImpl {
     private boolean nonEmpty;
     private SortOrder sortOrder = null;
     private String sortEvaluationLiteral = null;
-
+    private LimitFunction limitFunction = null;
+    private BigDecimal limitFunctionN = null;
+    private String limitFunctionSortLiteral = null;
     /**
      * Creates a QueryAxis.
      *
@@ -351,6 +354,72 @@ public class QueryAxis extends QueryNodeImpl {
     public String getSortIdentifierNodeName() {
         return sortEvaluationLiteral;
     }
+    
+    /**
+     * Returns a specified number of items from the 
+     *  top of the axis set
+     * @param n
+     */
+    public void topCount(BigDecimal n) {
+    	this.limitFunction = LimitFunction.TopCount;
+    	this.limitFunctionN = n;
+    }
+
+    /**
+     * Returns a specified number of items from the 
+     * bottom of the axis set
+     * @param n
+     */    
+    public void bottomCount(BigDecimal n) {
+    	this.limitFunction = LimitFunction.BottomCount;
+    	this.limitFunctionN = n;
+    }
+    
+    /**
+     * Limit the axis set to a specified number of items depending
+     * on the sortLiteral and {@link LimitFunction}
+     * @param n - number of items/cumulative sum/percentage
+     */
+    public void limit(LimitFunction function, BigDecimal n, String limitSortLiteral) {
+    	this.limitFunction = function;
+    	this.limitFunctionN = n;
+    	this.limitFunctionSortLiteral = limitSortLiteral;
+    }
+    
+    /**
+     * Clears the limit parameters of that axis
+     */
+    public void clearLimitFunction() {
+    	this.limitFunction = null;
+    	this.limitFunctionN = null;
+    	this.limitFunctionSortLiteral = null;
+    }
+
+	/**
+	 * @return The {@link LimitFunction}
+	 */
+	public LimitFunction getLimitFunction() {
+		return limitFunction;
+	}
+
+	/**
+	 * @return the number of items/cumulative sum/percentage
+	 * being used by the {@link LimitFunction)}
+	 */
+	public BigDecimal getLimitFunctionN() {
+		return limitFunctionN;
+	}
+
+    /**
+     * Returns the current sort literal being used by the
+     * limit functionMight return null of none
+     * is currently specified.
+     * @return sort literal of the limit function
+     */	public String getLimitFunctionSortLiteral() {
+		return limitFunctionSortLiteral;
+	}
+    
+    
 }
 
 // End QueryAxis.java

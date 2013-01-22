@@ -27,6 +27,7 @@ import org.olap4j.test.TestContext;
 
 import junit.framework.TestCase;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -1427,6 +1428,102 @@ public class OlapTest extends TestCase {
             + "Row #2: \n",
             resultsString);
         query.validate();
+    }
+    public void testLimitFunction() throws Exception {
+        Cube cube = getFoodmartCube("Sales");
+        if (cube == null) {
+            fail("Could not find Sales cube");
+        }
+        // Setup a base query.
+        Query query = new Query("my query", cube);
+        QueryDimension productDimension = query.getDimension("Product");
+        NamedList<Level> productLevels =
+            productDimension.getDimension()
+                .getDefaultHierarchy().getLevels();
+
+        Level productLevel = productLevels.get("Product Category");
+        productDimension.include(productLevel);
+        
+        QueryDimension measuresDimension = query.getDimension("Measures");
+        measuresDimension.include(nameList("Measures", "Sales Count"));
+
+        query.getAxis(Axis.ROWS).addDimension(productDimension);
+        query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+        
+        query.getAxis(Axis.ROWS).topCount(new BigDecimal(6));
+        
+        query.validate();
+
+        // Validate the generated MDX
+        String mdxString = query.getSelect().toString();
+        TestContext.assertEqualsVerbose(
+            "SELECT\n"
+            + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+            + "TopCount({[Product].[Product].[Product Category].Members}, 6) ON ROWS\n"
+            + "FROM [Sales]",
+            mdxString);
+
+        // Validate the returned results
+        CellSet results = query.execute();
+        String resultsString = TestContext.toString(results);
+        TestContext.assertEqualsVerbose(
+            "Axis #0:\n"
+            + "{}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[Sales Count]}\n"
+            + "Axis #2:\n"
+            + "{[Product].[Product].[Drink].[Alcoholic Beverages].[Beer and Wine]}\n"
+            + "{[Product].[Product].[Drink].[Beverages].[Carbonated Beverages]}\n"
+            + "{[Product].[Product].[Drink].[Beverages].[Drinks]}\n"
+            + "{[Product].[Product].[Drink].[Beverages].[Hot Beverages]}\n"
+            + "{[Product].[Product].[Drink].[Beverages].[Pure Juice Beverages]}\n"
+            + "{[Product].[Product].[Drink].[Dairy].[Dairy]}\n"
+            + "Row #0: 2,219\n"
+            + "Row #1: 1,107\n"
+            + "Row #2: 798\n"
+            + "Row #3: 1,391\n"
+            + "Row #4: 1,096\n"
+            + "Row #5: 1,367\n",
+            resultsString);
+        
+        query.getAxis(Axis.ROWS).limit(
+        	    LimitFunction.TopCount, 
+        	    new BigDecimal(6), 
+        	    "[Measures].[Sales Count]");
+        
+        query.validate();
+
+        // Validate the generated MDX
+        mdxString = query.getSelect().toString();
+        TestContext.assertEqualsVerbose(
+            "SELECT\n"
+            + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+            + "TopCount({[Product].[Product].[Product Category].Members}, 6, [Measures].[Sales Count]) ON ROWS\n"
+            + "FROM [Sales]",
+            mdxString);
+
+        // Validate the returned results
+        results = query.execute();
+        resultsString = TestContext.toString(results);
+        TestContext.assertEqualsVerbose(
+            "Axis #0:\n"
+            + "{}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[Sales Count]}\n"
+            + "Axis #2:\n"
+            + "{[Product].[Product].[Food].[Snack Foods].[Snack Foods]}\n"
+            + "{[Product].[Product].[Food].[Produce].[Vegetables]}\n"
+            + "{[Product].[Product].[Food].[Dairy].[Dairy]}\n"
+            + "{[Product].[Product].[Food].[Baking Goods].[Jams and Jellies]}\n"
+            + "{[Product].[Product].[Food].[Produce].[Fruit]}\n"
+            + "{[Product].[Product].[Food].[Deli].[Meat]}\n"
+            + "Row #0: 9,957\n"
+            + "Row #1: 6,751\n"
+            + "Row #2: 4,189\n"
+            + "Row #3: 3,868\n"
+            + "Row #4: 3,836\n"
+            + "Row #5: 3,064\n",
+            resultsString);
     }
     public void testHierarchyConsistency() throws Exception {
         Cube cube = getFoodmartCube("Sales");

@@ -299,6 +299,40 @@ abstract class Olap4jNodeConverter {
             }
         }
 
+        // We might need to limit the axis set
+        ParseTreeNode limitedNode = null;
+        if (axis.getLimitFunction() != null) {
+        	ParseTreeNode n =
+        	    LiteralNode.createNumeric(
+        	            null, 
+        	            axis.getLimitFunctionN(), 
+        	            false);
+        	if (axis.getLimitFunctionSortLiteral() != null) {
+            	LiteralNode evaluatorNode = null;
+        		evaluatorNode = 
+        		    LiteralNode.createSymbol(
+                        null,
+                        axis.getLimitFunctionSortLiteral());
+        	    limitedNode =
+        	    	    new CallNode(
+        	    	    	    null,
+        	    	    	    axis.getLimitFunction().toString(),
+        	    	    	    Syntax.Function,
+        	    	    	    callNode,
+        	    	    	    n,
+        	    	    	    evaluatorNode);
+        	} else {
+        		limitedNode =
+        	    	    new CallNode(
+        	    	    	    null,
+        	    	    	    axis.getLimitFunction().toString(),
+        	    	    	    Syntax.Function,
+        	    	    	    callNode,
+        	    	    	    n);
+        	}
+        } else {
+        	limitedNode = callNode;
+        }
         // We might need to sort the whole axis.
         ParseTreeNode sortedNode = null;
         if (axis.getSortOrder() != null) {
@@ -311,12 +345,12 @@ abstract class Olap4jNodeConverter {
                     null,
                     "Order",
                     Syntax.Function,
-                    callNode,
+                    limitedNode,
                     evaluatorNode,
                     LiteralNode.createSymbol(
                         null, axis.getSortOrder().name()));
         } else {
-            sortedNode = callNode;
+            sortedNode = limitedNode;
         }
 
         return new AxisNode(
