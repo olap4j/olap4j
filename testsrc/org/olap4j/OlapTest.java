@@ -1525,6 +1525,114 @@ public class OlapTest extends TestCase {
             + "Row #5: 3,064\n",
             resultsString);
     }
+    public void testFilter() throws Exception {
+        Cube cube = getFoodmartCube("Sales");
+        if (cube == null) {
+            fail("Could not find Sales cube");
+        }
+        // Setup a base query.
+        Query query = new Query("my query", cube);
+        QueryDimension productDimension = query.getDimension("Product");
+        NamedList<Level> productLevels =
+            productDimension.getDimension()
+                .getDefaultHierarchy().getLevels();
+
+        Level productLevel = productLevels.get("Product Category");
+        productDimension.include(productLevel);
+        
+        QueryDimension measuresDimension = query.getDimension("Measures");
+        measuresDimension.include(nameList("Measures", "Sales Count"));
+
+        query.getAxis(Axis.ROWS).addDimension(productDimension);
+        query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
+        
+        query.getAxis(Axis.ROWS).filter("InStr(Product.CurrentMember.Name, 'Beverages') > 0");
+        
+        query.validate();
+
+        // Validate the generated MDX
+        String mdxString = query.getSelect().toString();
+        TestContext.assertEqualsVerbose(
+            "SELECT\n"
+            + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+            + "Filter({[Product].[Product].[Product Category].Members}, InStr(Product.CurrentMember.Name, 'Beverages') > 0) ON ROWS\n"
+            + "FROM [Sales]",
+            mdxString);
+
+        // Validate the returned results
+        CellSet results = query.execute();
+        String resultsString = TestContext.toString(results);
+        TestContext.assertEqualsVerbose(
+            "Axis #0:\n"
+            + "{}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[Sales Count]}\n"
+            + "Axis #2:\n"
+            + "{[Product].[Product].[Drink].[Beverages].[Carbonated Beverages]}\n"
+            + "{[Product].[Product].[Drink].[Beverages].[Hot Beverages]}\n"
+            + "{[Product].[Product].[Drink].[Beverages].[Pure Juice Beverages]}\n"
+            + "Row #0: 1,107\n"
+            + "Row #1: 1,391\n"
+            + "Row #2: 1,096\n",
+            resultsString);
+        
+        query.getAxis(Axis.ROWS).limit(
+        	    LimitFunction.TopCount, 
+        	    new BigDecimal(2), 
+        	    "[Measures].[Sales Count]");
+        
+        query.validate();
+
+        // Validate the generated MDX
+        mdxString = query.getSelect().toString();
+        TestContext.assertEqualsVerbose(
+            "SELECT\n"
+            + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+            + "TopCount(Filter({[Product].[Product].[Product Category].Members}, InStr(Product.CurrentMember.Name, 'Beverages') > 0), 2, [Measures].[Sales Count]) ON ROWS\n"
+            + "FROM [Sales]",
+            mdxString);
+
+        // Validate the returned results
+        results = query.execute();
+        resultsString = TestContext.toString(results);
+        TestContext.assertEqualsVerbose(
+            "Axis #0:\n"
+            + "{}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[Sales Count]}\n"
+            + "Axis #2:\n"
+            + "{[Product].[Product].[Drink].[Beverages].[Hot Beverages]}\n"
+            + "{[Product].[Product].[Drink].[Beverages].[Carbonated Beverages]}\n"
+            + "Row #0: 1,391\n"
+            + "Row #1: 1,107\n",
+            resultsString);
+        
+        query.getAxis(Axis.ROWS).filter("InStr(Product.CurrentMember.Name, 'NoMatchingString') > 0");
+        
+        query.validate();
+
+        // Validate the generated MDX
+        mdxString = query.getSelect().toString();
+        TestContext.assertEqualsVerbose(
+            "SELECT\n"
+            + "{[Measures].[Sales Count]} ON COLUMNS,\n"
+            + "TopCount(Filter({[Product].[Product].[Product Category].Members}, InStr(Product.CurrentMember.Name, 'NoMatchingString') > 0), 2, [Measures].[Sales Count]) ON ROWS\n"
+            + "FROM [Sales]",
+            mdxString);
+
+        // Validate the returned results
+        results = query.execute();
+        resultsString = TestContext.toString(results);
+        TestContext.assertEqualsVerbose(
+            "Axis #0:\n"
+            + "{}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[Sales Count]}\n"
+            + "Axis #2:\n",
+            resultsString);
+        
+
+    }
     public void testHierarchyConsistency() throws Exception {
         Cube cube = getFoodmartCube("Sales");
         if (cube == null) {

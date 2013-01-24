@@ -47,6 +47,7 @@ public class QueryAxis extends QueryNodeImpl {
     private LimitFunction limitFunction = null;
     private BigDecimal limitFunctionN = null;
     private String limitFunctionSortLiteral = null;
+    private String filterCondition = null;
     /**
      * Creates a QueryAxis.
      *
@@ -418,7 +419,30 @@ public class QueryAxis extends QueryNodeImpl {
      */	public String getLimitFunctionSortLiteral() {
 		return limitFunctionSortLiteral;
 	}
-    
+
+     /**
+      * Filter the axis using the given condition before TopCount / Order
+      * are applied
+      * @param filterCondition - the condition used for Filter()
+      */
+     public void filter(String filterCondition) {
+     	this.filterCondition = filterCondition;
+     }
+     
+     /**
+      * Returns the Filter Condition used to filter the axis set
+      * @return filter condition
+      */
+     public String getFilterCondition() {
+    	 return this.filterCondition;
+     }
+     
+     /**
+      * Clears the filter for this axis
+      */
+     public void clearFilter() {
+    	 this.filterCondition = null;
+     }
     
 }
 
