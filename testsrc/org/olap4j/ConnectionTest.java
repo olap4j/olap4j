@@ -28,8 +28,6 @@ import org.olap4j.test.TestContext.Tester;
 import org.olap4j.test.TestContext.Tester.Flavor;
 import org.olap4j.type.*;
 
-import com.mysql.jdbc.StringUtils;
-
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
@@ -1989,8 +1987,7 @@ public class ConnectionTest extends TestCase {
 
         assertEquals("Food", member.getCaption());
 
-        assertTrue(
-            StringUtils.isNullOrEmpty(member.getDescription()));
+        assertTrue(isNullOrEmpty(member.getDescription()));
         assertEquals(1, member.getOrdinal());
         assertEquals(1, member.getDepth());
         assertEquals(-1, member.getSolveOrder());
@@ -2090,6 +2087,10 @@ public class ConnectionTest extends TestCase {
                     "Store Sales",
                     "Store Cost")),
             measureNameSet);
+    }
+
+    private static boolean isNullOrEmpty(String s) {
+        return s == null || s.equals("");
     }
 
     /**
