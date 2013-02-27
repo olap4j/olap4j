@@ -771,9 +771,7 @@ public class MetadataTest extends TestCase {
             SETS_COLUMN_NAMES);
         TestContext.assertEqualsVerbose(
             "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse, SET_NAME=[Top Sellers], SCOPE=1\n"
-            + "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse and Sales, SET_NAME=[Top Sellers], SCOPE=1\n",
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse, SET_NAME=[Top Sellers], SCOPE=1\n",
             s);
 
         s = checkResultSet(
