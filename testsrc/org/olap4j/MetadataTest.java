@@ -17,6 +17,7 @@
 */
 package org.olap4j;
 
+import org.olap4j.impl.Bug;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
 import org.olap4j.test.TestContext;
@@ -701,6 +702,13 @@ public class MetadataTest extends TestCase {
     }
 
     public void testDatabaseMetaDataGetMembers() throws SQLException {
+        if (!Bug.BugMondrian1378Fixed) {
+            // Member ordinal values can vary based on how the member
+            // was loaded.  This test can be re-enabled when member
+            // ordinal has been removed.
+            return;
+        }
+
         String s = checkResultSet(
             olapDatabaseMetaData.getMembers(
                 catalogName, "FoodMart", "Sales", null, "[Gender].[Gender]",

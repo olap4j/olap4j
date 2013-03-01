@@ -69,6 +69,14 @@ public abstract class Bug {
      */
     public static final boolean BugOlap4j3126853Fixed = false;
 
+    /**
+     * Whether
+     * <a href="http://jira.pentaho.com/browse/MONDRIAN-1378">,
+     * "Deprecate MemberOrdinal Property"</a>
+     * has been completed.
+     */
+    public static final boolean BugMondrian1378Fixed = false;
+
 }
 
 // End Bug.java
