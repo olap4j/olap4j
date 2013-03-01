@@ -3665,6 +3665,26 @@ public class ConnectionTest extends TestCase {
         }
     }
 
+    public void testLevelMembersIncludeCalculatedMembers()
+        throws Exception
+    {
+        connection = tester.createConnection();
+        final OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+        List<Measure> measures =
+            olapConnection.getOlapSchema()
+                .getCubes().get("Sales")
+                .getMeasures();
+        for (Measure m : measures) {
+            if (m.getUniqueName().equals("[Measures].[Profit]")
+                && m.isCalculated())
+            {
+                return;
+            }
+        }
+        fail("Calculated measures not returned.");
+    }
+
     protected void assertListsEquals(List<String> list1, List<String> list2) {
         Collections.sort(list1);
         Collections.sort(list2);

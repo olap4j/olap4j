@@ -17,6 +17,7 @@
 */
 package org.olap4j.metadata;
 
+import org.olap4j.CellSet;
 import org.olap4j.OlapException;
 
 import java.util.List;
@@ -87,7 +88,9 @@ public interface Level extends MetadataElement {
     /**
      * Returns a list of {@link Member} objects that belong to this Level.
      *
-     * <p>The list does not include calculated members.</p>
+     * <p>Since olap4j 2.0, the list includes calculated members which are
+     * defined server-side, if any. The list does not include any calculated
+     * members from an MDX query, if accessed through a {@link CellSet}.</p>
      *
      * <p>Some levels have a very many members. In this case, calling this
      * method may be expensive in space and/or time and is not recommended.</p>
