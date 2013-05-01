@@ -694,7 +694,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             if (coordinate < 0 || coordinate >= axis.getPositionCount()) {
                 throw new IndexOutOfBoundsException(
                     "Coordinate " + coordinate
-                    + " of axis " + k
+                    + " of axis " + (k - 1)
                     + " is out of range ("
                     + getBoundsAsString() + ")");
             }
