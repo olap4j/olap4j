@@ -23,3 +23,6 @@ Existing bugs, features and pull requests
 * TODO: review bugs at SF.net http://sourceforge.net/p/olap4j/bugs
 * Measure group names http://sourceforge.net/p/olap4j/discussion/577988/thread/781635f9
 
+Julian's wishlist:
+* Add pretty much all of the latest SSAS and XMLA concepts. Even ones that don't exist in Mondrian. We'd just leave out things which are .NET-specific and obsolete features that are in XMLA just for compatibility.
+* Add a mechanism to transmit user-defined extensions to the model. (In Mondrian these are defined as annotations in the schema.)
