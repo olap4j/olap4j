@@ -98,6 +98,19 @@ The following packages are considered experimental and are subject to change:
 * <a href="http://www.olap4j.org/api/org/olap4j/CellSetListener.html">org.olap4j.CellSetListener</a> and all associated classes - Event-based system for real time updates of CellSet objects.
 * <a href="http://www.olap4j.org/api/org/olap4j/Scenario.html">org.olap4j.Scenario</a> and all associated classes - Statistical simulations module.
 
+### Version 2.0
+
+Olap4j version 2.0 is currently under development. Goals are:
+* Support metadata and API changes in recent SSAS (Microsoft SQL Server Analysis Services) and XMLA (XML for Analysis)
+* Support metadata and API changes in Mondrian version 4
+
+We aim to be backwards compatible in the same way that each JDBC release is backwards compatible:
+* Applications developed against earlier versions will work against 2
+* Drivers supporting version 2 will also serve as 1.x drivers (JDBC version 4 broke this rule, and it was painful for driver developers)
+* Some work will be required to convert a version 1.x driver to a version 2 driver
+
+Version 2 specification is <a href="olap4j_version_2_specification.md">here</a>.
+
 ## More information ##
 
 General project information:
