@@ -26,3 +26,4 @@ Existing bugs, features and pull requests
 Julian's wishlist:
 * Add pretty much all of the latest SSAS and XMLA concepts. Even ones that don't exist in Mondrian. We'd just leave out things which are .NET-specific and obsolete features that are in XMLA just for compatibility.
 * Add a mechanism to transmit user-defined extensions to the model. (In Mondrian these are defined as annotations in the schema.)
+* If we can remove <a href="http://mondrian.pentaho.com/api/mondrian/xmla/XmlaHandler.XmlaExtra.html">XmlaExtra</a> we're definitely on the right track. (I anticipate future unanticipated requirements, so we'll probably slim it down to zero methods rather than remove it.)
