@@ -19,7 +19,7 @@ package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
 import org.olap4j.impl.Olap4jUtil;
-import org.olap4j.mdx.ParseTreeNode;
+import org.olap4j.mdx.*;
 import org.olap4j.metadata.*;
 
 import org.w3c.dom.Document;
@@ -46,6 +46,44 @@ import static org.olap4j.driver.xmla.XmlaOlap4jUtil.*;
  * @since May 24, 2007
  */
 abstract class XmlaOlap4jCellSet implements CellSet {
+    private static final String VALUE_TAG = "Value";
+    enum XsdTypes {
+        XSD_INT("xsd:int"),
+        XSD_INTEGER("xsd:integer"),
+        XSD_DOUBLE("xsd:double"),
+        XSD_POSITIVEINTEGER("xsd:positiveInteger"),
+        XSD_DECIMAL("xsd:decimal"),
+        XSD_SHORT("xsd:short"),
+        XSD_FLOAT("xsd:float"),
+        XSD_LONG("xsd:long"),
+        XSD_BOOLEAN("xsd:boolean"),
+        XSD_BYTE("xsd:byte"),
+        XSD_UNSIGNEDBYTE("xsd:unsignedByte"),
+        XSD_UNSIGNEDSHORT("xsd:unsignedShort"),
+        XSD_UNSIGNEDLONG("xsd:unsignedLong"),
+        XSD_UNSIGNEDINT("xsd:unsignedInt"),
+        XSD_STRING("xsd:string");
+
+        private final String name;
+        private static final Map<String, XsdTypes> TYPES;
+        static {
+            Map typesInitial = new HashMap<String, XsdTypes>();
+            for (XsdTypes type : values()) {
+                typesInitial.put(type.name, type);
+            }
+            TYPES = Collections.unmodifiableMap(typesInitial);
+        }
+
+        XsdTypes(String name) {
+            this.name = name;
+        }
+
+        public static XsdTypes fromString(String name) {
+            XsdTypes type = TYPES.get(name);
+            return type == null ? XSD_STRING : type;
+        }
+    }
+
     final XmlaOlap4jStatement olap4jStatement;
     protected boolean closed;
     private XmlaOlap4jCellSetMetaData metaData;
@@ -338,7 +376,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
      * <a href="http://books.xmlschemata.org/relaxng/relax-CHP-19.html">RELAX
      * NG, Chapter 19</a> for a full list of possible data types.
      *
-     * <p>This method does not currently support all types; must numeric types
+     * <p>This method does not currently support all types; most numeric types
      * are supported, but no dates are yet supported. Those not supported
      * fall back to Strings.
      *
@@ -347,7 +385,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
      * @throws OlapException if any error is encountered while casting the cell
      * value
      */
-    private Object getTypedValue(Element cell) throws OlapException {
+     private Object getTypedValue(Element cell) throws OlapException {
         Element elm = findChild(cell, MDDATASET_NS, "Value");
         if (elm == null) {
             // Cell is null.
@@ -356,21 +394,40 @@ abstract class XmlaOlap4jCellSet implements CellSet {
 
         // The object type is contained in xsi:type attribute.
         String type = elm.getAttribute("xsi:type");
+        XsdTypes xsdType =  XsdTypes.fromString(elm.getAttribute("xsi:type"));
+
         try {
-            if (type.equals("xsd:int")) {
-                return XmlaOlap4jUtil.intElement(cell, "Value");
-            } else if (type.equals("xsd:integer")) {
-                return XmlaOlap4jUtil.integerElement(cell, "Value");
-            } else if (type.equals("xsd:double")) {
-                return XmlaOlap4jUtil.doubleElement(cell, "Value");
-            } else if (type.equals("xsd:float")) {
-                return XmlaOlap4jUtil.floatElement(cell, "Value");
-            } else if (type.equals("xsd:long")) {
-                return XmlaOlap4jUtil.longElement(cell, "Value");
-            } else if (type.equals("xsd:boolean")) {
-                return XmlaOlap4jUtil.booleanElement(cell, "Value");
-            } else {
-                return XmlaOlap4jUtil.stringElement(cell, "Value");
+            switch (xsdType) {
+            case XSD_BOOLEAN:
+                return XmlaOlap4jUtil.booleanElement(cell, VALUE_TAG);
+            case XSD_INT:
+                return XmlaOlap4jUtil.intElement(cell, VALUE_TAG);
+            case XSD_INTEGER:
+                return XmlaOlap4jUtil.bigIntegerElement(cell, VALUE_TAG);
+            case XSD_DOUBLE:
+                return XmlaOlap4jUtil.doubleElement(cell, VALUE_TAG);
+            case XSD_POSITIVEINTEGER:
+                return XmlaOlap4jUtil.bigIntegerElement(cell, VALUE_TAG);
+            case XSD_DECIMAL:
+                return XmlaOlap4jUtil.bigDecimalElement(cell, VALUE_TAG);
+            case XSD_SHORT:
+                return XmlaOlap4jUtil.shortElement(cell, VALUE_TAG);
+            case XSD_FLOAT:
+                return XmlaOlap4jUtil.floatElement(cell, VALUE_TAG);
+            case XSD_LONG:
+                return XmlaOlap4jUtil.longElement(cell, VALUE_TAG);
+            case XSD_BYTE:
+                return XmlaOlap4jUtil.byteElement(cell, VALUE_TAG);
+            case XSD_UNSIGNEDBYTE:
+                return XmlaOlap4jUtil.shortElement(cell, VALUE_TAG);
+            case XSD_UNSIGNEDSHORT:
+                return XmlaOlap4jUtil.intElement(cell, VALUE_TAG);
+            case XSD_UNSIGNEDLONG:
+                return XmlaOlap4jUtil.bigDecimalElement(cell, VALUE_TAG);
+            case XSD_UNSIGNEDINT:
+                return XmlaOlap4jUtil.longElement(cell, VALUE_TAG);
+            default:
+                return XmlaOlap4jUtil.stringElement(cell, VALUE_TAG);
             }
         } catch (Exception e) {
             throw getHelper().createException(
