@@ -26,6 +26,7 @@ import org.w3c.dom.*;
 import org.xml.sax.*;
 
 import java.io.*;
+import java.math.*;
 import java.util.*;
 
 /**
@@ -292,12 +293,25 @@ abstract class XmlaOlap4jUtil {
         }
     }
 
+    static byte byteElement(Element row, String name) {
+        return Byte.valueOf(stringElement(row, name)).byteValue();
+    }
+
+    static short shortElement(Element row, String name) {
+        return Short.valueOf(stringElement(row, name));
+    }
+
+
     static int intElement(Element row, String name) {
         return integerElement(row, name).intValue();
     }
 
     static Double doubleElement(Element row, String name) {
         return Double.valueOf(stringElement(row, name));
+    }
+
+    static BigDecimal bigDecimalElement(Element row, String name) {
+        return new BigDecimal(stringElement(row, name));
     }
 
     static boolean booleanElement(Element row, String name) {
@@ -310,6 +324,10 @@ abstract class XmlaOlap4jUtil {
 
     static long longElement(Element row, String name) {
         return Long.valueOf(stringElement(row, name)).longValue();
+    }
+
+    static Object bigIntegerElement(Element row, String name) {
+        return new BigInteger(stringElement(row, name));
     }
 
     static List<Element> childElements(Element memberNode) {
@@ -404,6 +422,8 @@ abstract class XmlaOlap4jUtil {
             return null;
         }
     }
+
+
 
     /**
      * Error handler plus helper methods.
