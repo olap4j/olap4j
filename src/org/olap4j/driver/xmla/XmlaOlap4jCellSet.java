@@ -1377,6 +1377,8 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         private final int lnum;
         private final String caption;
         private final String uname;
+        private Member parentMember;
+        private final String parentMemberUniqueName;
 
         /**
          * Creates an XmlaOlap4jSurpriseMember.
@@ -1402,6 +1404,15 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             this.lnum = lnum;
             this.caption = caption;
             this.uname = uname;
+            parentMemberUniqueName = getParentUniqueName();
+        }
+
+        private String getParentUniqueName() {
+            List<IdentifierSegment> segments = IdentifierNode
+                .parseIdentifier(getUniqueName()).getSegmentList();
+            IdentifierNode parentIdentifier = new IdentifierNode(
+                segments.subList(0, segments.size() - 1));
+            return parentIdentifier.toString();
         }
 
         public final XmlaOlap4jCube getCube() {
@@ -1429,8 +1440,54 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             return 0;
         }
 
+
+        /**
+         * In the case of a query-calculated member over XMLA, the only
+         * information we have to determine parent is this member's own
+         * unique name, its level number, and whether .hasAll() is true.
+         *
+         * This method attempts to figure out the parent member based on
+         * what we hope is the unique name of the parent--i.e. the member's
+         * own unique name with the last segment stripped off.
+         *
+         * For calculated members defined directly on the hierarchy,
+         * stripping off the last segment does not produce a valid member
+         * unique name.  In that case, though, the level depth is 0, which
+         * we can take as an indication that the parent is null.
+         */
         public Member getParentMember() {
-            return null;
+            if (getLevel().getDepth() == 0 || parentMemberUniqueName == null) {
+                return null;
+            }
+            if (parentMember == null) {
+                try {
+                    parentMember =
+                        getCube().getMetadataReader()
+                            .lookupMemberByUniqueName(parentMemberUniqueName);
+                    if (parentMember == null
+                            && getLevel().getDepth() == 1
+                            && getHierarchy().hasAll())
+                    {
+                        // couldn't find the parent by the constructed
+                        // unique name, but we know it's (All) in this case.
+                        parentMember = getAllMember();
+                    }
+                } catch (OlapException e) {
+                    throw new RuntimeException(
+                        "Failed to retrieve parent of " + getName(), e);
+                }
+            }
+            return parentMember;
+        }
+
+        private Member getAllMember() throws OlapException {
+            if (!getHierarchy().hasAll()) {
+                return null;
+            }
+            List<Member> roots = getHierarchy().getRootMembers();
+            assert roots.size() == 1;
+
+            return roots.get(0);
         }
 
         public Level getLevel() {
