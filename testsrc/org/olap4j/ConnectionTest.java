@@ -2157,12 +2157,10 @@ public class ConnectionTest extends TestCase {
         assertEquals(
             new HashSet<String>(
                 Arrays.asList(
-                    "Customer Count",
                     "Warehouse Sales",
                     "Profit last Period",
                     "Warehouse Cost",
                     "Store Cost",
-                    "Promotion Sales",
                     "Units Shipped",
                     "Store Sales",
                     "Profit Growth",
