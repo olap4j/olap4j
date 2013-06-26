@@ -2157,12 +2157,10 @@ public class ConnectionTest extends TestCase {
         assertEquals(
             new HashSet<String>(
                 Arrays.asList(
-                    "Customer Count",
                     "Warehouse Sales",
                     "Profit last Period",
                     "Warehouse Cost",
                     "Store Cost",
-                    "Promotion Sales",
                     "Units Shipped",
                     "Store Sales",
                     "Profit Growth",
@@ -2294,6 +2292,69 @@ public class ConnectionTest extends TestCase {
         assertEquals(0, positions.get(0).getOrdinal());
         // No WHERE clause, therefore slicer is empty (but not null).
         assertEquals(0, positions.get(0).getMembers().size());
+    }
+
+    public void testCalculatedMemberParent()
+        throws ClassNotFoundException, SQLException
+    {
+        Class.forName(tester.getDriverClassName());
+        connection = tester.createConnection();
+        OlapConnection olapConnection =
+            tester.getWrapper().unwrap(connection, OlapConnection.class);
+
+        // map of calc member names -> expected parent
+        Map<String, String> tests = new HashMap<String, String>();
+        // on top level member of hierarchy w/o All
+        tests.put("Time.[1997].calc", "Time.[1997]");
+        // defined against the hierarchy
+        tests.put("[Time].[Time].[calc]", null);
+        // under [All]
+        tests.put("[Store].[All Stores].calc", "[Store].[All Stores]");
+        // defined using Level name
+        tests.put(
+            "[Store].[Store Country].[USA].calc",
+            "[Store].[All Stores].[USA]");
+        // parent child
+        tests.put(
+            "[Employees].[Employees].[All Employees].calc",
+            "[Employees].[Employees].[All Employees]");
+        // under [All] member of single level dimension
+        tests.put(
+            "[Pay Type].[All Pay Types].calc",
+            "[Pay Type].[All Pay Types]");
+
+        String mdxWith = "with member %s as '1' ";
+        String mdxSelect = "select {%s} on 0 from hr";
+        for (String calcMember : tests.keySet()) {
+            // Get the calc member
+            String calcMemberQuery = String
+                    .format(mdxWith + mdxSelect, calcMember, calcMember);
+            CellSet calcCell = olapConnection.createStatement()
+                .executeOlapQuery(calcMemberQuery);
+            Member calc = calcCell.getAxes().get(0).getPositions()
+                .get(0).getMembers().get(0);
+
+            String parentMemberName = tests.get(calcMember);
+
+            if (parentMemberName != null) {
+                // Retrieve the parent member
+                String parentMemberQuery = String
+                        .format(mdxSelect, parentMemberName);
+                CellSet parentCell = olapConnection.createStatement()
+                    .executeOlapQuery(parentMemberQuery);
+
+                Member parent = parentCell.getAxes().get(0).getPositions()
+                    .get(0).getMembers().get(0);
+                // verify parent member and calc.getParentMember() are the same
+                assertEquals(
+                    "Parent member of " + calcMember + " is unexpected.",
+                    parent, calc.getParentMember());
+            } else {
+                assertEquals(
+                    "Expecting a null parent member for " + calcMember,
+                    null, calc.getParentMember());
+            }
+        }
     }
 
     /**
