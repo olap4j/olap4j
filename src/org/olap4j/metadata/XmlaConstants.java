@@ -469,6 +469,8 @@ public class XmlaConstants
     public enum DBType implements XmlaConstant {
         // The following values exactly match VARENUM
         // in Automation and may be used in VARIANT.
+        I2("I2", -1, null, null),
+
         I4(
             "INTEGER", 3, "DBTYPE_I4", "A four-byte, signed integer: INTEGER"),
 
@@ -525,8 +527,11 @@ public class XmlaConstants
             + "either case, the actual length of the string is determined from "
             + "the bound length value. The maximum length of the string is the "
             + "number of allocated bytes divided by sizeof(wchar_t) and "
-            + "truncated to the nearest integer.");
+            + "truncated to the nearest integer."),
 
+        GUID("GUID", -1, null, null),
+
+        DBTIMESTAMP("DBTIMESTAMP", -1, null, null);
 
         public final String userName;
 
