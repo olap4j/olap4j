@@ -37,14 +37,14 @@ import java.util.*;
  */
 public class MetaModelTest extends TestCase {
 
-    private static final Type GUID = Type.of(XmlaConstants.DBType.GUID);
-    private static final Type DBTIMESTAMP = Type.of(XmlaConstants.DBType.DBTIMESTAMP);
-    private static final Type UI2 = Type.of(XmlaConstants.DBType.UI2);
-    private static final Type I2 = Type.of(XmlaConstants.DBType.I2);
-    private static final Type I4 = Type.of(XmlaConstants.DBType.I4);
-    private static final Type INTODO = Type.of(XmlaConstants.DBType.UI2);
-    private static final Type WSTR = Type.of(XmlaConstants.DBType.WSTR);
-    private static final Type BOOL = Type.of(XmlaConstants.DBType.BOOL);
+    private static final FullType GUID = FullType.of(XmlaConstants.DBType.GUID);
+    private static final FullType DBTIMESTAMP = FullType.of(XmlaConstants.DBType.DBTIMESTAMP);
+    private static final FullType UI2 = FullType.of(XmlaConstants.DBType.UI2);
+    private static final FullType I2 = FullType.of(XmlaConstants.DBType.I2);
+    private static final FullType I4 = FullType.of(XmlaConstants.DBType.I4);
+    private static final FullType INTODO = FullType.of(XmlaConstants.DBType.UI2);
+    private static final FullType WSTR = FullType.of(XmlaConstants.DBType.WSTR);
+    private static final FullType BOOL = FullType.of(XmlaConstants.DBType.BOOL);
 
     public void testGenerateMethods() {
         final PrintWriter out = new PrintWriter(System.out);
@@ -108,7 +108,7 @@ public class MetaModelTest extends TestCase {
         javadoc(out, "@throws OlapException if a database access error occurs");
     }
 
-    private String typeString(Type type, boolean nullable) {
+    private String typeString(FullType type, boolean nullable) {
         String s = type.java;
         if (nullable) {
             s += " (may be <code>null</code>)";
@@ -464,12 +464,12 @@ public class MetaModelTest extends TestCase {
     public static class Attribute {
         private final Entity entity;
         private final String name;
-        private final Type type;
+        private final FullType type;
         private final boolean nullable;
         private final Param param;
         private final String description;
 
-        public Attribute(Entity entity, String name, Type type, boolean nullable, Param param, String description) {
+        public Attribute(Entity entity, String name, FullType type, boolean nullable, Param param, String description) {
             this.entity = entity;
             this.name = getString(name);
             this.type = type;
@@ -610,7 +610,7 @@ public class MetaModelTest extends TestCase {
 
     private static class Parameter {
 
-        public Parameter(String name, Type type, String description) {
+        public Parameter(String name, FullType type, String description) {
 
         }
     }
@@ -619,36 +619,36 @@ public class MetaModelTest extends TestCase {
         return null;
     }
 
-    private static Type asI4(Class<? extends XmlaConstant> aClass) {
-        return Type.of(aClass, XmlaConstants.DBType.I4);
+    private static FullType asI4(Class<? extends XmlaConstant> aClass) {
+        return FullType.of(aClass, XmlaConstants.DBType.I4);
     }
 
-    private static Type asI2(Class<? extends XmlaConstant> aClass) {
-        return Type.of(aClass, XmlaConstants.DBType.I2);
+    private static FullType asI2(Class<? extends XmlaConstant> aClass) {
+        return FullType.of(aClass, XmlaConstants.DBType.I2);
     }
 
-    private static Type enumSet(Class<? extends XmlaConstant> clazz, XmlaConstants.DBType dbType) {
-        return Type.of(clazz, dbType);
+    private static FullType enumSet(Class<? extends XmlaConstant> clazz, XmlaConstants.DBType dbType) {
+        return FullType.of(clazz, dbType);
     }
 
-    private static Type enumOf(Class<? extends XmlaConstant> clazz, XmlaConstants.DBType dbType) {
-        return Type.of(clazz, dbType);
+    private static FullType enumOf(Class<? extends XmlaConstant> clazz, XmlaConstants.DBType dbType) {
+        return FullType.of(clazz, dbType);
     }
 
-    private static Type array(Class<? extends XmlaConstant> enumClass, XmlaConstants.DBType i4) {
-        return Type.of(enumClass, i4);
+    private static FullType array(Class<? extends XmlaConstant> enumClass, XmlaConstants.DBType i4) {
+        return FullType.of(enumClass, i4);
     }
 
-    static class Type {
-        static Type of(XmlaConstants.DBType dbType) {
+    static class FullType {
+        static FullType of(XmlaConstants.DBType dbType) {
             return null;
         }
 
-        static Type of(Class<? extends XmlaConstant> enumClass, XmlaConstants.DBType dbType) {
+        static FullType of(Class<? extends XmlaConstant> enumClass, XmlaConstants.DBType dbType) {
             return null;
         }
 
-        private Type(String java) {
+        private FullType(String java) {
             this.java = java;
         }
 
