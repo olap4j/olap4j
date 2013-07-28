@@ -17,6 +17,10 @@
 */
 package org.olap4j.metadata;
 
+import org.olap4j.impl.UnmodifiableArrayMap;
+
+import java.util.Map;
+
 /**
  * Collection of various enumerations and constants defined by the XML for
  * Analysis (XMLA) and OLE DB for OLAP specifications.
@@ -818,8 +822,27 @@ public class XmlaConstants
         }
     }
 
-    public interface EnumWithDesc {
-        String getDescription();
+    public enum ResponseMimeType {
+        SOAP("text/xml"),
+        JSON("application/json");
+
+        public static final Map<String, ResponseMimeType> MAP =
+            UnmodifiableArrayMap.of(
+                "application/soap+xml", SOAP,
+                "application/xml", SOAP,
+                "text/xml", SOAP,
+                "application/json", JSON,
+                "*/*", SOAP);
+
+        private final String mimeType;
+
+        ResponseMimeType(String mimeType) {
+            this.mimeType = mimeType;
+        }
+
+        public String getMimeType() {
+            return mimeType;
+        }
     }
 }
 

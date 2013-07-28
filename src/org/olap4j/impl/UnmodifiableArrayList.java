@@ -44,8 +44,30 @@ public class UnmodifiableArrayList<T>
      *
      * @param elements Array
      */
-    public UnmodifiableArrayList(T... elements) {
+    private UnmodifiableArrayList(T... elements) {
         this.elements = elements;
+    }
+
+    /** Returns the empty immutable list. */
+    public static <T> List<T> of() {
+        return Collections.emptyList();
+    }
+
+    /** Returns an immutable list containing one element. */
+    public static <T> List<T> of(T element) {
+        return Collections.singletonList(element);
+    }
+
+    /** Creates an unmodifiable list that contains a copy of an array. */
+    public static <T> List<T> of(T... elements) {
+        switch (elements.length) {
+        case 0:
+            return Collections.emptyList();
+        case 1:
+            return Collections.singletonList(elements[0]);
+        default:
+            return new UnmodifiableArrayList<T>(elements.clone());
+        }
     }
 
     public T get(int index) {
@@ -67,6 +89,7 @@ public class UnmodifiableArrayList<T>
      * @return Unmodifiable list with same contents that the array had at call
      * time
      */
+    @Deprecated
     public static <T> UnmodifiableArrayList<T> asCopyOf(T... elements) {
         return new UnmodifiableArrayList<T>(elements.clone());
     }
@@ -82,12 +105,24 @@ public class UnmodifiableArrayList<T>
      * @return Unmodifiable list with same contents that the collection had at
      * call time
      */
-    public static <T> UnmodifiableArrayList<T> of(
-        Collection<? extends T> collection)
-    {
-        //noinspection unchecked
-        return new UnmodifiableArrayList<T>(
-            (T[]) collection.toArray());
+    public static <T> List<T> copyOf(Collection<? extends T> collection) {
+        if (collection instanceof UnmodifiableArrayList) {
+            //noinspection unchecked
+            return (List<T>) collection;
+        }
+        switch (collection.size()) {
+        case 0:
+            return Collections.emptyList();
+        case 1:
+            //noinspection unchecked
+            final T t = collection instanceof List
+                ? (T) ((List) collection).get(0)
+                : collection.iterator().next();
+            return Collections.singletonList(t);
+        default:
+            //noinspection unchecked
+            return new UnmodifiableArrayList<T>((T[]) collection.toArray());
+        }
     }
 }
 

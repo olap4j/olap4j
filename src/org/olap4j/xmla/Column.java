@@ -17,8 +17,6 @@
 */
 package org.olap4j.xmla;
 
-import mondrian.xmla.*;
-
 import java.lang.reflect.*;
 
 /**

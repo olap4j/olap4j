@@ -90,7 +90,7 @@ public class IdentifierNode
         if (segments.length < 1) {
             throw new IllegalArgumentException();
         }
-        this.segments = UnmodifiableArrayList.asCopyOf(segments);
+        this.segments = UnmodifiableArrayList.of(segments);
     }
 
     /**
@@ -102,10 +102,7 @@ public class IdentifierNode
         if (segments.size() < 1) {
             throw new IllegalArgumentException();
         }
-        this.segments =
-            new UnmodifiableArrayList<IdentifierSegment>(
-                segments.toArray(
-                    new IdentifierSegment[segments.size()]));
+        this.segments = UnmodifiableArrayList.copyOf(segments);
     }
 
     public Type getType() {

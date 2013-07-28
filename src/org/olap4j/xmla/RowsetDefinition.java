@@ -17,8 +17,6 @@
 */
 package org.olap4j.xmla;
 
-import org.olap4j.xmla.server.impl.Util;
-
 import java.util.*;
 
 /**
@@ -524,7 +522,6 @@ public enum RowsetDefinition {
         String description,
         Entity entity)
     {
-        Util.discard(ordinal);
         this.description = description;
         this.columns = entity.columns();
         this.sortColumns = entity.sortColumns();

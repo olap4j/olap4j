@@ -17,7 +17,6 @@
 */
 package org.olap4j.xmla;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**

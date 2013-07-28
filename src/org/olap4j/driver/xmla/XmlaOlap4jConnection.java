@@ -2447,7 +2447,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     new MetadataColumn("CATALOG_NAME", "TABLE_CAT")
                 };
             }
-            this.columns = UnmodifiableArrayList.asCopyOf(columns);
+            this.columns = UnmodifiableArrayList.of(columns);
             final Map<String, MetadataColumn> map =
                 new HashMap<String, MetadataColumn>();
             for (MetadataColumn column : columns) {

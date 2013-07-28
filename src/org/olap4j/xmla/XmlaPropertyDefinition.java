@@ -166,7 +166,7 @@ public enum XmlaPropertyDefinition {
 
     // Mondrian-specific extension to XMLA.
     /**
-     * @see mondrian.xmla.Enumeration.ResponseMimeType
+     * @see org.olap4j.metadata.XmlaConstants.ResponseMimeType
      */
     ResponseMimeType(
         XmlaType.String,
@@ -265,7 +265,7 @@ public enum XmlaPropertyDefinition {
     }
 
     /**
-     * Returns the description of this PropertyDefinition.
+     * Returns the description of this property.
      *
      * @return description
      */

@@ -45,7 +45,7 @@ public class KeySegment implements IdentifierSegment {
         if (subSegments.length < 1) {
             throw new IllegalArgumentException();
         }
-        this.subSegmentList = UnmodifiableArrayList.asCopyOf(subSegments);
+        this.subSegmentList = UnmodifiableArrayList.of(subSegments);
     }
 
     /**
@@ -57,10 +57,7 @@ public class KeySegment implements IdentifierSegment {
         if (subSegmentList.size() < 1) {
             throw new IllegalArgumentException();
         }
-        this.subSegmentList =
-            new UnmodifiableArrayList<NameSegment>(
-                subSegmentList.toArray(
-                    new NameSegment[subSegmentList.size()]));
+        this.subSegmentList = UnmodifiableArrayList.copyOf(subSegmentList);
     }
 
     public String toString() {

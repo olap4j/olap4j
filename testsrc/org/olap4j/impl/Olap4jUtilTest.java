@@ -190,10 +190,11 @@ public class Olap4jUtilTest extends TestCase {
      */
     public void testUnmodifiableArrayList() {
         String[] a = {"x", "y"};
-        final UnmodifiableArrayList<String> list =
-            new UnmodifiableArrayList<String>(a);
-        final UnmodifiableArrayList<String> copyList =
-            UnmodifiableArrayList.asCopyOf(a);
+        final List<String> list0 = Arrays.asList(a);
+        final List<String> list =
+            UnmodifiableArrayList.copyOf(list0);
+        final List<String> copyList =
+            UnmodifiableArrayList.of(a);
 
         assertEquals(2, list.size());
         assertEquals("x", list.get(0));
@@ -229,19 +230,21 @@ public class Olap4jUtilTest extends TestCase {
         }
         a[1] = "z";
         assertTrue(iterator.hasNext());
-        assertEquals("z", iterator.next());
+        // modifying the original list does not change the copy
+        assertEquals("y", iterator.next());
         assertFalse(iterator.hasNext());
 
         // modifying the array modifies the list, but not the clone list
-        assertEquals("z", list.get(1));
+        assertEquals("z", list0.get(1));
+        assertEquals("y", list.get(1));
         assertEquals("y", copyList.get(1));
 
         // test the of(Collection) method
         final List<String> arrayList = new ArrayList<String>();
         arrayList.add("foo");
         arrayList.add("bar");
-        final UnmodifiableArrayList<String> list3 =
-            UnmodifiableArrayList.of(arrayList);
+        final List<String> list3 =
+            UnmodifiableArrayList.copyOf(arrayList);
         assertEquals(2, list3.size());
         assertEquals(arrayList, list3);
         assertEquals(arrayList.hashCode(), list3.hashCode());

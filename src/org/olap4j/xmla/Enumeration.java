@@ -97,30 +97,6 @@ public class Enumeration {
     public List<? extends Enum> getValues() {
         return dictionary.getValues();
     }
-
-    public enum ResponseMimeType {
-        SOAP("text/xml"),
-        JSON("application/json");
-
-        public static final Map<String, ResponseMimeType> MAP =
-            UnmodifiableArrayMap.of(
-                "application/soap+xml", SOAP,
-                "application/xml", SOAP,
-                "text/xml", SOAP,
-                "application/json", JSON,
-                "*/*", SOAP);
-
-        private final String mimeType;
-
-        ResponseMimeType(String mimeType) {
-            this.mimeType = mimeType;
-        }
-
-        public String getMimeType() {
-            return mimeType;
-        }
-    }
-
 }
 
 // End Enumeration.java
