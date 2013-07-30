@@ -18,7 +18,7 @@
 package org.olap4j.query;
 
 /**
- * Defines in what order to perform sort operations.
+ * Defines the function used to limit an optionally sorted set.
  *
  * @author Paul Stoellberger
  * @since 1.0.1
