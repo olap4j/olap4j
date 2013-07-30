@@ -96,7 +96,7 @@ public interface Hierarchy extends MetadataElement {
         /**
          * Identifies levels in a user defined hierarchy.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_ORIGIN_USER_DEFINED</code> (1).</p>
          */
         USER_DEFINED(
@@ -105,7 +105,7 @@ public interface Hierarchy extends MetadataElement {
         /**
          * Identifies levels in an attribute hierarchy.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_ORIGIN_USER_DEFINED</code> (2).</p>
          */
         ATTRIBUTE(
@@ -114,7 +114,7 @@ public interface Hierarchy extends MetadataElement {
         /**
          * Identifies levels in a key attribute hierarchy.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_ORIGIN_KEY_ATTRIBUTE</code> (4).</p>
          */
         KEY_ATTRIBUTE(
@@ -123,7 +123,7 @@ public interface Hierarchy extends MetadataElement {
         /**
          * Identifies levels in a user defined hierarchy.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_ORIGIN_INTERNAL</code> (8).</p>
          */
         INTERNAL(
@@ -160,7 +160,7 @@ public interface Hierarchy extends MetadataElement {
         /**
          * No instance selection.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_INSTANCE_SELECTION_NONE</code> (1).</p>
          */
         NONE(1),
@@ -168,7 +168,7 @@ public interface Hierarchy extends MetadataElement {
         /**
          * Dropdown.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_INSTANCE_SELECTION_DROPDOWN</code> (2).</p>
          */
         DROPDOWN(2),
@@ -176,7 +176,7 @@ public interface Hierarchy extends MetadataElement {
         /**
          * List.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_INSTANCE_SELECTION_LIST</code> (3).</p>
          */
         LIST(3),
@@ -184,7 +184,7 @@ public interface Hierarchy extends MetadataElement {
         /**
          * Filtered list.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_INSTANCE_SELECTION_FILTEREDLIST</code> (4).</p>
          */
         FILTEREDLIST(4),
@@ -192,7 +192,7 @@ public interface Hierarchy extends MetadataElement {
         /**
          * Mandatory filter.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_INSTANCE_SELECTION_MANDATORYFILTER</code> (5).</p>
          */
         MANDATORYFILTER(5);
@@ -250,33 +250,33 @@ public interface Hierarchy extends MetadataElement {
     /** Type of hierarchy. */
     enum Structure implements XmlaConstant {
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_STRUCTURE_FULLYBALANCED</code> (0).</p>
          */
         FULLYBALANCED(0),
 
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_STRUCTURE_RAGGEDBALANCED</code> (1).</p>
          */
         RAGGEDBALANCED(1),
 
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_STRUCTURE_UNBALANCED</code> (2).</p>
          */
         UNBALANCED(2),
 
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MD_STRUCTURE_NETWORK</code> (3).</p>
          */
         NETWORK(3);
 
         private final int xmlaOrdinal;
 
-        public static final Dictionary<StructureType> DICTIONARY =
-            DictionaryImpl.forClass(StructureType.class);
+        public static final Dictionary<Structure> DICTIONARY =
+            DictionaryImpl.forClass(Structure.class);
 
         Structure(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;

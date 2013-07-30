@@ -532,12 +532,6 @@ public enum RowsetDefinition implements XmlaConstant {
     private final int xmlaOrdinal;
     private final String description;
 
-    /**
-     * Creates a rowset definition.
-     *
-     * @param xmlaOrdinal Rowset ordinal, per OLE DB for OLAP
-     * @param description Description
-     */
     RowsetDefinition(
         int xmlaOrdinal,
         String description,

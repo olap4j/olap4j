@@ -415,7 +415,7 @@ public interface Member extends MetadataElement {
         /**
          * The set has global scope.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDMEMBER_SCOPE_GLOBAL</code> (1).</p>
          */
         GLOBAL(1),
@@ -423,7 +423,7 @@ public interface Member extends MetadataElement {
         /**
          * The set has session scope.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDMEMBER_SCOPE_SESSION</code> (2).</p>
          */
         SESSION(2);

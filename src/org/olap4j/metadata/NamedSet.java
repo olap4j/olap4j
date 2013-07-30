@@ -46,7 +46,7 @@ public interface NamedSet extends MetadataElement {
         /**
          * The set has global scope.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDSET_SCOPE_GLOBAL</code> (1).</p>
          */
         GLOBAL(1),
@@ -54,7 +54,7 @@ public interface NamedSet extends MetadataElement {
         /**
          * The set has session scope.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDSET_SCOPE_SESSION</code> (2).</p>
          */
         SESSION(2);
@@ -87,7 +87,7 @@ public interface NamedSet extends MetadataElement {
         /**
          * The set is evaluated in static context.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDSET_RESOLUTION_STATIC</code> (1).</p>
          */
         STATIC(1),
@@ -95,7 +95,7 @@ public interface NamedSet extends MetadataElement {
         /**
          * The set is evaluated in dynamic context.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDSET_RESOLUTION_DYNAMIC</code> (2).</p>
          */
         DYNAMIC(2);

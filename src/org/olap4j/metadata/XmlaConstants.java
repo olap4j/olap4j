@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * Collection of various enumerations and constants defined by the XML for
- * Analysis (XMLA) and OLE DB for OLAP specifications.
+ * Analysis (XMLA) and XMLA specifications.
  *
  * @author jhyde
  */
@@ -252,22 +252,22 @@ public class XmlaConstants
 
     public static enum FontFlag implements XmlaConstant {
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * {@code MDFF_BOLD} (0x01).</p>
          */
         BOLD(1),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * {@code MDFF_ITALIC} (0x02).</p>
          */
         ITALIC(2),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * {@code MDFF_UNDERLINE} (0x04).</p>
          */
         UNDERLINE(4),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * {@code MDFF_STRIKEOUT} (0x08).</p>
          */
         STRIKEOUT(8);
@@ -300,47 +300,47 @@ public class XmlaConstants
      */
     public static enum ActionType implements XmlaConstant {
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_TYPE_URL</code> (0x01).</p>
          */
         URL(0x01),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_TYPE_HTML</code> (0x02).</p>
          */
         HTML(0x02),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_TYPE_STATEMENT</code> (0x04).</p>
          */
         STATEMENT(0x04),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_TYPE_DATASET</code> (0x08).</p>
          */
         DATASET(0x08),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_TYPE_ROWSET</code> (0x10).</p>
          */
         ROWSET(0x10),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_TYPE_COMMANDLINE</code> (0x20).</p>
          */
         COMMANDLINE(0x20),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_TYPE_PROPRIETARY</code> (0x40).</p>
          */
         PROPRIETARY(0x40),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_TYPE_REPORT</code> (0x80).</p>
          */
         REPORT(0x80),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_TYPE_DRILLTHROUGH</code> (0x100).</p>
          */
         DRILLTHROUGH(0x100);
@@ -373,32 +373,32 @@ public class XmlaConstants
      */
     public static enum CoordinateType implements XmlaConstant {
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_COORDINATE_CUBE</code> (1).</p>
          */
         CUBE(1),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_COORDINATE_DIMENSION</code> (2).</p>
          */
         DIMENSION(2),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_COORDINATE_LEVEL</code> (3).</p>
          */
         LEVEL(3),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_COORDINATE_MEMBER</code> (4).</p>
          */
         MEMBER(4),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_COORDINATE_SET</code> (5).</p>
          */
         SET(5),
         /**
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_COORDINATE_CELL</code> (6).</p>
          */
         CELL(6);
@@ -434,7 +434,7 @@ public class XmlaConstants
          * Indicates a regular action used during normal operations. This is the
          * default value for this column.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_INVOCATION_INTERACTIVE</code> (1).</p>
          */
         INTERACTIVE(
@@ -446,7 +446,7 @@ public class XmlaConstants
          * Indicates that the action should be performed when the cube is first
          * opened.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_INVOCATION_ON_OPEN</code> (2).</p>
          */
         ON_OPEN(
@@ -458,7 +458,7 @@ public class XmlaConstants
          * Indicates that the action is performed as part of a batch operation
          * or Microsoft SQL Server Integration Services task.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDACTION_INVOCATION_BATCH</code> (4).</p>
          */
         BATCH(

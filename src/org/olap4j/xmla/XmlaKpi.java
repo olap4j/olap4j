@@ -28,7 +28,7 @@ import static org.olap4j.xmla.Column.Restriction;
 /**
  * XML for Analysis entity representing a key performance indicator (KPI).
  *
- * <p>Corresponds to the XML/A {@code MDSCHEMA_CUBES} schema rowset.</p>
+ * <p>Corresponds to the XML/A {@code MDSCHEMA_KPIS} schema rowset.</p>
  */
 public class XmlaKpi extends Entity {
     public static final XmlaKpi INSTANCE =
@@ -244,7 +244,7 @@ public class XmlaKpi extends Entity {
         /**
          * The KPI has global scope.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDKPI_SCOPE_GLOBAL</code> (1).</p>
          */
         GLOBAL(1),
@@ -252,7 +252,7 @@ public class XmlaKpi extends Entity {
         /**
          * The KPI has session scope.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDKPI_SCOPE_SESSION</code> (2).</p>
          */
         SESSION(2);

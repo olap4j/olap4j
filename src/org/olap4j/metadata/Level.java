@@ -138,7 +138,7 @@ public interface Level extends MetadataElement {
      * <code>LEVEL_TYPE</code> property in the <code>MDSCHEMA_LEVELS</code>
      * schema rowset.
      *
-     * <p>Some of the values are specified by OLE DB for OLAP:
+     * <p>Some of the values are specified by OLE DB for OLAP:</p>
      * <ul>
      * <li>MDLEVEL_TYPE_REGULAR         (0x0000)
      * <li>MDLEVEL_TYPE_ALL             (0x0001)
@@ -154,8 +154,8 @@ public interface Level extends MetadataElement {
      * <li>MDLEVEL_TYPE_TIME_UNDEFINED  (0x1004)
      * </ul>
      *
-     * Some of the OLE DB for OLAP values are as flags, and do not become
-     * values of the enumeration:
+     * <p>Some of the OLE DB for OLAP values are as flags, and do not become
+     * values of the enumeration:</p>
      * <ul>
      * <li>MDLEVEL_TYPE_UNKNOWN (0x0000) signals that no other flags are set.
      *     Use {@link #REGULAR}
@@ -166,7 +166,7 @@ public interface Level extends MetadataElement {
      * <li>MDLEVEL_TYPE_RESERVED1 (0x0008) is reserved for future use.
      * </ul>
      *
-     * <p>Some of the values are specified by XMLA:
+     * <p>Some of the values are specified by XMLA:</p>
      * <ul>
      * <li>MDLEVEL_TYPE_GEO_CONTINENT (0x2001)
      * <li>MDLEVEL_TYPE_GEO_REGION (0x2002)
@@ -204,7 +204,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that the level is not related to time.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_REGULAR(0x0000)</code>.</p>
          */
         REGULAR(0x0000),
@@ -212,7 +212,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that the level contains the 'all' member of its hierarchy.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_ALL(0x0001)</code>.</p>
          */
         ALL(0x0001),
@@ -226,7 +226,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that a level refers to years.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_TIME_YEARS(0x0014)</code>.</p>
          *
          * <p>It must be used in a dimension whose type is
@@ -237,7 +237,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that a level refers to half years.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_TIME_HALF_YEAR(0x0304)</code>.</p>
          *
          * <p>It must be used in a dimension whose type is
@@ -248,7 +248,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that a level refers to quarters.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_TIME_QUARTERS(0x0044)</code>.</p>
          *
          * <p>It must be used in a dimension whose type is
@@ -259,7 +259,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that a level refers to months.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_TIME_MONTHS(0x0084)</code>.</p>
          *
          * <p>It must be used in a dimension whose type is
@@ -270,7 +270,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that a level refers to weeks.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_TIME_WEEKS(0x0104)</code>.</p>
          *
          * <p>It must be used in a dimension whose type is
@@ -281,7 +281,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that a level refers to days.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_TIME_DAYS(0x0204)</code>.</p>
          *
          * <p>It must be used in a dimension whose type is
@@ -292,7 +292,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that a level refers to hours.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_TIME_HOURS(0x0304)</code>.</p>
          *
          * <p>It must be used in a dimension whose type is
@@ -303,7 +303,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that a level refers to minutes.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_TIME_MINUTES(0x0404)</code>.</p>
          *
          * <p>It must be used in a dimension whose type is
@@ -314,7 +314,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that a level refers to seconds.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_TIME_SECONDS(0x0804)</code>.</p>
          *
          * <p>It must be used in a dimension whose type is
@@ -325,7 +325,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that a level refers to an unspecified time unit.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVEL_TYPE_TIME_UNDEFINED(0x1004)</code>.</p>
          *
          * <p>It must be used in a dimension whose type is
@@ -443,12 +443,6 @@ public interface Level extends MetadataElement {
         public static final Dictionary<Type> DICTIONARY =
             DictionaryImpl.forClass(Type.class);
 
-        /**
-         * Creates a level type.
-         *
-         * @param xmlaOrdinal Ordinal code in XMLA or OLE DB for OLAP
-         * specification
-         */
         private Type(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
         }
@@ -503,7 +497,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates an expression exists for this level. (Deprecated.)
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVELS_CUSTOM_ROLLUP_EXPRESSION</code> (1).</p>
          */
         CUSTOM_ROLLUP_EXPRESSION(
@@ -512,7 +506,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that there is a custom rollup column for this level.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVELS_CUSTOM_ROLLUP_COLUMN</code> (2).</p>
          */
         CUSTOM_ROLLUP_COLUMN(
@@ -523,7 +517,7 @@ public interface Level extends MetadataElement {
          * Indicates that there is a skipped level associated with members of
          * this level.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVELS_SKIPPED_LEVELS</code> (4).</p>
          */
         SKIPPED_LEVELS(
@@ -534,7 +528,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that members of the level have custom member properties.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVELS_CUSTOM_MEMBER_PROPERTIES</code> (8).</p>
          */
         CUSTOM_MEMBER_PROPERTIES(
@@ -545,7 +539,7 @@ public interface Level extends MetadataElement {
         /**
          * Indicates that members on the level have unary operators.
          *
-         * <p>Corresponds to the OLE DB for OLAP constant
+         * <p>Corresponds to the XMLA constant
          * <code>MDLEVELS_UNARY_OPERATOR</code> (16).</p>
          */
         UNARY_OPERATOR(
