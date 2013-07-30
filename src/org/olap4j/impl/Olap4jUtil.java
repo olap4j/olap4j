@@ -399,6 +399,36 @@ public class Olap4jUtil {
     }
 
     /**
+     * Converts an upper-case name with underscores name to a camel-case name.
+     *
+     * <p>For example:
+     * <ul>
+     * <li><code>camelToUpper("FOO_BAR", false)</code> returns "fooBar"</li>
+     * <li><code>camelToUpper("FOO_BAR", true)</code> returns "FooBar"</li>
+     * </ul>
+     *
+     * @param s Upper-case string
+     * @param startUpper Whether the first letter should be upper-case
+     * @return  Camel-case string
+     */
+    public static String upperToCamel(String s, boolean startUpper) {
+        StringBuilder buf = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); ++i) {
+            char c = s.charAt(i);
+            if (c == '_') {
+                startUpper = true;
+            } else {
+                buf.append(
+                    startUpper
+                        ? Character.toUpperCase(c)
+                        : Character.toLowerCase(c));
+                startUpper = false;
+            }
+        }
+        return buf.toString();
+    }
+
+    /**
      * Returns an exception which indicates that a particular piece of
      * functionality should work, but a developer has not implemented it yet.
      *

@@ -24,10 +24,9 @@ import java.util.Set;
  * Enumerated value that belongs to a set of constants in the XML for Analysis
  * (XMLA) specification.
  *
- * <p>Every {@code enum} E that implements this interface also has a method to
- * get the {@link org.olap4j.metadata.XmlaConstant.Dictionary} of all its values:
- *
- * <blockquote>public static Dictionary&lt;E&gt; getDictionary();</blockquote>
+ * <p>Every {@code enum} E that implements this interface also has public static
+ * final member {@code DICTIONARY} that contains the
+ * {@link org.olap4j.metadata.XmlaConstant.Dictionary}.
  *
  * <p>Here is a collection of enum classes and the prefix used to generate
  * their XMLA constant names.

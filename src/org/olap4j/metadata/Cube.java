@@ -214,6 +214,37 @@ public interface Cube extends MetadataElement {
      * @return True if drillthrough is enabled, false otherwise.
      */
     boolean isDrillThroughEnabled();
+
+    /** Type of a cube. */
+    enum Type implements XmlaConstant {
+        /** Cube (1). */
+        CUBE(1),
+
+        /** Dimension (2). */
+        DIMENSION(2);
+
+        private final int xmlaOrdinal;
+
+        /** Per {@link XmlaConstant}. */
+        public static final DictionaryImpl<Type> DICTIONARY =
+            DictionaryImpl.forClass(Type.class);
+
+        private Type(int xmlaOrdinal) {
+            this.xmlaOrdinal = xmlaOrdinal;
+        }
+
+        public String xmlaName() {
+            return name();
+        }
+
+        public String getDescription() {
+            return "";
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
+        }
+    }
 }
 
 // End Cube.java

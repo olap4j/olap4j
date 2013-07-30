@@ -49,32 +49,31 @@ public class XmlaEnumerator extends Entity {
     public final Column EnumName =
         new Column(
             "EnumName",
-            XmlaType.StringArray,
-            null,
+            XmlaType.StringArray.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the enumerator that contains a set of values.");
     public final Column EnumDescription =
         new Column(
             "EnumDescription",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A localizable description of the enumerator.");
     public final Column EnumType =
         new Column(
             "EnumType",
-            XmlaType.String,
-            null,
+            // Note: SQL Server always has EnumType string.
+            // Need type of element of array, not the array
+            // itself.
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The data type of the Enum values.");
     public final Column ElementName =
         new Column(
             "ElementName",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The name of one of the value elements in the enumerator set.\n"
@@ -82,19 +81,18 @@ public class XmlaEnumerator extends Entity {
     public final Column ElementDescription =
         new Column(
             "ElementDescription",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "A localizable description of the element (optional).");
+            "A localizable description of the element.");
     public final Column ElementValue =
         new Column(
             "ElementValue",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "The value of the element.\n" + "Example: 01");
+            "The value of the element.\n"
+            + "Example: 01");
 }
 
 // End XmlaEnumerator.java

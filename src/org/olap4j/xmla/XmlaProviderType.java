@@ -58,24 +58,21 @@ public class XmlaProviderType extends Entity {
     public final Column TypeName =
         new Column(
             "TYPE_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The provider-specific data type name.");
     public final Column DataType =
         new Column(
             "DATA_TYPE",
-            XmlaType.UnsignedShort,
-            null,
+            XmlaType.UnsignedShort.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The indicator of the data type.");
     public final Column ColumnSize =
         new Column(
             "COLUMN_SIZE",
-            XmlaType.UnsignedInteger,
-            null,
+            XmlaType.UnsignedInteger.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The length of a non-numeric column. If the data type is "
@@ -84,8 +81,7 @@ public class XmlaProviderType extends Entity {
     public final Column LiteralPrefix =
         new Column(
             "LITERAL_PREFIX",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The character or characters used to prefix a literal of this "
@@ -93,8 +89,7 @@ public class XmlaProviderType extends Entity {
     public final Column LiteralSuffix =
         new Column(
             "LITERAL_SUFFIX",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The character or characters used to suffix a literal of this "
@@ -102,8 +97,7 @@ public class XmlaProviderType extends Entity {
     public final Column IsNullable =
         new Column(
             "IS_NULLABLE",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A Boolean that indicates whether the data type is nullable. "
@@ -112,8 +106,7 @@ public class XmlaProviderType extends Entity {
     public final Column CaseSensitive =
         new Column(
             "CASE_SENSITIVE",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A Boolean that indicates whether the data type is a "
@@ -121,8 +114,7 @@ public class XmlaProviderType extends Entity {
     public final Column Searchable =
         new Column(
             "SEARCHABLE",
-            XmlaType.UnsignedInteger,
-            null,
+            XmlaType.UnsignedInteger.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "An integer indicating how the data type can be used in "
@@ -131,16 +123,14 @@ public class XmlaProviderType extends Entity {
     public final Column UnsignedAttribute =
         new Column(
             "UNSIGNED_ATTRIBUTE",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A Boolean that indicates whether the data type is unsigned.");
     public final Column FixedPrecScale =
         new Column(
             "FIXED_PREC_SCALE",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A Boolean that indicates whether the data type has a fixed "
@@ -148,8 +138,7 @@ public class XmlaProviderType extends Entity {
     public final Column AutoUniqueValue =
         new Column(
             "AUTO_UNIQUE_VALUE",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A Boolean that indicates whether the data type is "
@@ -157,8 +146,7 @@ public class XmlaProviderType extends Entity {
     public final Column IsLong =
         new Column(
             "IS_LONG",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A Boolean that indicates whether the data type is a binary "
@@ -166,8 +154,7 @@ public class XmlaProviderType extends Entity {
     public final Column BestMatch =
         new Column(
             "BEST_MATCH",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.RESTRICTION,
             Column.OPTIONAL,
             "A Boolean that indicates whether the data type is a best "

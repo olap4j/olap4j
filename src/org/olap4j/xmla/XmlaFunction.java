@@ -41,6 +41,10 @@ public class XmlaFunction extends Entity {
             Origin,
             InterfaceName,
             LibraryName,
+            DllName,
+            HelpFile,
+            HelpContext,
+            Object,
             Caption);
     }
 
@@ -55,40 +59,35 @@ public class XmlaFunction extends Entity {
     public final Column FunctionName =
         new Column(
             "FUNCTION_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the function.");
     public final Column Description =
         new Column(
             "DESCRIPTION",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A description of the function.");
     public final Column ParameterList =
         new Column(
             "PARAMETER_LIST",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A comma delimited list of parameters.");
     public final Column ReturnType =
         new Column(
             "RETURN_TYPE",
-            XmlaType.Integer,
-            null,
+            XmlaType.Integer.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The VARTYPE of the return data type of the function.");
     public final Column Origin =
         new Column(
             "ORIGIN",
-            XmlaType.Integer,
-            null,
+            XmlaType.Integer.of(Enumeration.FUNCTION_ORIGIN),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The origin of the function:  1 for MDX functions.  2 for "
@@ -96,25 +95,58 @@ public class XmlaFunction extends Entity {
     public final Column InterfaceName =
         new Column(
             "INTERFACE_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the interface for user-defined functions");
     public final Column LibraryName =
         new Column(
             "LIBRARY_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the type library for user-defined functions. "
             + "NULL for MDX functions.");
+    public final Column DllName =
+        new Column(
+            "DLL_NAME",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "The name of the assembly that implements the user-defined "
+            + "function.\n"
+            + "Returns null for MDX functions.");
+    public final Column HelpFile =
+        new Column(
+            "HELP_FILE",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "The name of the file that contains the help documentation for the "
+            + "user-defined function.\n"
+            + "Returns null for MDX functions.");
+    public final Column HelpContext =
+        new Column(
+            "HELP_CONTEXT",
+            XmlaType.Integer.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "Returns the Help context ID for this function.");
+    public final Column Object =
+        new Column(
+            "OBJECT",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "The generic name of the object class to which a property applies. "
+            + "For example, the rowset corresponding to the "
+            + "<level_name>.Members function returns \"Level\".\n"
+            + "Returns NULL for user-defined functions, or non-property MDX "
+            + "functions.");
     public final Column Caption =
         new Column(
             "CAPTION",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The display caption for the function.");

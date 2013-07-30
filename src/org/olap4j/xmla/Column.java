@@ -17,6 +17,8 @@
 */
 package org.olap4j.xmla;
 
+import org.olap4j.metadata.Dimension;
+
 import java.lang.reflect.*;
 
 /**
@@ -27,11 +29,11 @@ public class Column {
     /**
      * This is used as the true value for the restriction parameter.
      */
-    public static final boolean RESTRICTION = true;
+    public static final Restriction RESTRICTION = Restriction.OPTIONAL;
     /**
      * This is used as the false value for the restriction parameter.
      */
-    public static final boolean NOT_RESTRICTION = false;
+    public static final Restriction NOT_RESTRICTION = Restriction.NO;
 
     /**
      * This is used as the false value for the nullable parameter.
@@ -55,7 +57,10 @@ public class Column {
     public final XmlaType type;
     public final Enumeration enumeration;
     public final String description;
-    public final boolean restriction;
+
+    /** @deprecated Use {@link Entity#restrictionColumns()}. */
+    @Deprecated
+    public final Restriction restriction;
     public final boolean nullable;
     public final boolean unbounded;
 
@@ -64,8 +69,6 @@ public class Column {
      *
      * @param name Name of column
      * @param type A {@link XmlaType} value
-     * @param enumeratedType Must be specified for enumeration or array
-     *                       of enumerations
      * @param description Description of column
      * @param restriction Whether column can be used as a filter on its
      *     rowset
@@ -79,38 +82,36 @@ public class Column {
      */
     Column(
         String name,
-        XmlaType type,
-        Enumeration enumeratedType,
-        boolean restriction,
+        XmlaType.ColumnType type,
+        Restriction restriction,
         boolean nullable,
         String description)
     {
         this(
-            name, type, enumeratedType,
+            name, type,
             restriction, nullable, ONE_MAX, description);
     }
 
     Column(
         String name,
-        XmlaType type,
-        Enumeration enumeratedType,
-        boolean restriction,
+        XmlaType.ColumnType type,
+        Restriction restriction,
         boolean nullable,
         boolean unbounded,
         String description)
     {
         assert type != null;
-        assert (type == XmlaType.Enumeration
-                || type == XmlaType.EnumerationArray
-                || type == XmlaType.EnumString)
-               == (enumeratedType != null);
+        assert (type.xmlaType == XmlaType.Enumeration
+                || type.xmlaType == XmlaType.EnumerationArray
+                || type.xmlaType == XmlaType.EnumString)
+               == (type.enumeratedType != null);
         // Line endings must be UNIX style (LF) not Windows style (LF+CR).
         // Thus the client will receive the same XML, regardless
         // of the server O/S.
         assert description == null || description.indexOf('\r') == -1;
         this.name = name;
-        this.type = type;
-        this.enumeration = enumeratedType;
+        this.type = type.xmlaType;
+        this.enumeration = type.enumeratedType;
         this.description = description;
         this.restriction = restriction;
         this.nullable = nullable;
@@ -188,6 +189,24 @@ public class Column {
             return enumeration.type.columnType;
         }
         return type.columnType;
+    }
+
+    public static class Restriction {
+        public static final Restriction NO = new Restriction(null, null);
+        public static final Restriction OPTIONAL = new Restriction(null, null);
+        public static final Restriction MANDATORY = new Restriction(null, null);
+
+        private final Restriction parent;
+        private final Enumeration enumeration;
+
+        private Restriction(Restriction parent, Enumeration enumeration) {
+            this.parent = parent;
+            this.enumeration = enumeration;
+        }
+
+        public Restriction of(Enumeration enumeration, Enum<?> default_) {
+            return new Restriction(this, enumeration);
+        }
     }
 }
 

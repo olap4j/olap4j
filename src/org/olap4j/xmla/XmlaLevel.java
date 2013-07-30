@@ -17,6 +17,10 @@
 */
 package org.olap4j.xmla;
 
+import org.olap4j.metadata.Cube;
+import org.olap4j.metadata.Dimension;
+import org.olap4j.metadata.Hierarchy;
+
 import java.util.List;
 
 /**
@@ -49,7 +53,17 @@ public class XmlaLevel extends Entity {
             CustomRollupSettings,
             LevelUniqueSettings,
             LevelIsVisible,
-            Description);
+            Description,
+            LevelOrderingProperty,
+            LevelDbtype,
+            LevelMasterUniqueName,
+            LevelNameSqlColumnName,
+            LevelKeySqlColumnName,
+            LevelUniqueNameSqlColumnName,
+            LevelAttributeHierarchyName,
+            LevelKeyCardinality,
+            LevelOrigin,
+            Annotations);
     }
 
     public List<Column> sortColumns() {
@@ -62,35 +76,46 @@ public class XmlaLevel extends Entity {
             LevelNumber);
     }
 
+    @Override
+    List<Column> restrictionColumns() {
+        return list(
+            CatalogName,
+            SchemaName,
+            CubeName,
+            DimensionUniqueName,
+            HierarchyUniqueName,
+            LevelName,
+            LevelUniqueName,
+            LevelOrigin,
+            CubeSource,
+            LevelVisibility);
+    }
+
     public final Column CatalogName =
         new Column(
             "CATALOG_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the catalog to which this level belongs.");
     public final Column SchemaName =
         new Column(
             "SCHEMA_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the schema to which this level belongs.");
     public final Column CubeName =
         new Column(
             "CUBE_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the cube to which this level belongs.");
     public final Column DimensionUniqueName =
         new Column(
             "DIMENSION_UNIQUE_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The unique name of the dimension to which this level "
@@ -98,48 +123,47 @@ public class XmlaLevel extends Entity {
     public final Column HierarchyUniqueName =
         new Column(
             "HIERARCHY_UNIQUE_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
-            "The unique name of the hierarchy.");
+            "The unique name of the hierarchy. If the level belongs to more "
+            + "than one hierarchy, there is one row for each hierarchy to "
+            + "which it belongs. For providers that generate unique names by "
+            + "qualification, each component of this name is delimited.");
     public final Column LevelName =
         new Column(
             "LEVEL_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the level.");
     public final Column LevelUniqueName =
         new Column(
             "LEVEL_UNIQUE_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The properly escaped unique name of the level.");
     public final Column LevelGuid =
         new Column(
             "LEVEL_GUID",
-            XmlaType.UUID,
-            null,
+            XmlaType.UUID.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "Level GUID.");
+            "Not supported.");
     public final Column LevelCaption =
         new Column(
             "LEVEL_CAPTION",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
-            "A label or caption associated with the hierarchy.");
+            "A label or caption associated with the hierarchy. Used primarily "
+            + "for display purposes. If a caption does not exist, "
+            + "LEVEL_NAME is returned.");
     public final Column LevelNumber =
         new Column(
             "LEVEL_NUMBER",
-            XmlaType.UnsignedInteger,
-            null,
+            XmlaType.UnsignedInteger.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The distance of the level from the root of the hierarchy. "
@@ -147,8 +171,7 @@ public class XmlaLevel extends Entity {
     public final Column LevelCardinality =
         new Column(
             "LEVEL_CARDINALITY",
-            XmlaType.UnsignedInteger,
-            null,
+            XmlaType.UnsignedInteger.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The number of members in the level. This value can be an "
@@ -156,24 +179,21 @@ public class XmlaLevel extends Entity {
     public final Column LevelType =
         new Column(
             "LEVEL_TYPE",
-            XmlaType.Integer,
-            null,
+            XmlaType.Integer.of(Enumeration.LEVEL_TYPE),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "Type of the level");
     public final Column CustomRollupSettings =
         new Column(
             "CUSTOM_ROLLUP_SETTINGS",
-            XmlaType.Integer,
-            null,
+            XmlaType.Integer.of(Enumeration.LEVEL_CUSTOM_ROLLUP),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "A bitmap that specifies the custom rollup options.");
     public final Column LevelUniqueSettings =
         new Column(
             "LEVEL_UNIQUE_SETTINGS",
-            XmlaType.Integer,
-            null,
+            XmlaType.Integer.of(Enumeration.DIMENSION_KEY_UNIQUENESS),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "A bitmap that specifies which columns contain unique values, "
@@ -181,20 +201,115 @@ public class XmlaLevel extends Entity {
     public final Column LevelIsVisible =
         new Column(
             "LEVEL_IS_VISIBLE",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "A Boolean that indicates whether the level is visible.");
     public final Column Description =
         new Column(
             "DESCRIPTION",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A human-readable description of the level. NULL if no "
             + "description exists.");
+    public final Column LevelOrderingProperty =
+        new Column(
+            "LEVEL_ORDERING_PROPERTY",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "The ID of the attribute that the level is sorted on.");
+    public final Column LevelDbtype =
+        new Column(
+            "LEVEL_DBTYPE",
+            XmlaType.Integer.of(Enumeration.DBTYPE),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "The DBTYPE enumeration of the member key column that is used for "
+            + "the level attribute.\n"
+            + "Null if concatenated keys are used as the member key column.");
+    public final Column LevelMasterUniqueName =
+        new Column(
+            "LEVEL_MASTER_UNIQUE_NAME",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "Always returns NULL.");
+    public final Column LevelNameSqlColumnName =
+        new Column(
+            "LEVEL_NAME_SQL_COLUMN_NAME",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "The SQL representation of the level member names.");
+    public final Column LevelKeySqlColumnName =
+        new Column(
+            "LEVEL_KEY_SQL_COLUMN_NAME",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "The SQL representation of the level member key values.");
+    public final Column LevelUniqueNameSqlColumnName =
+        new Column(
+            "LEVEL_UNIQUE_NAME_SQL_COLUMN_NAME",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "The SQL representation of the member unique names.");
+    public final Column LevelAttributeHierarchyName =
+        new Column(
+            "LEVEL_ATTRIBUTE_HIERARCHY_NAME",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "The name of the attribute hierarchy providing the source of the "
+            + "level");
+    public final Column LevelKeyCardinality =
+        new Column(
+            "LEVEL_KEY_CARDINALITY",
+            XmlaType.UnsignedShort.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "The number of columns in the level key.");
+    public final Column LevelOrigin =
+        new Column(
+            "LEVEL_ORIGIN",
+            XmlaType.UnsignedShort.of(Enumeration.ORIGIN),
+            Column.Restriction.OPTIONAL.of(
+                Enumeration.ORIGIN,
+                Hierarchy.Origin.USER_DEFINED), // + MD_SYSTEM_ENABLED
+            Column.OPTIONAL,
+            "A bit map that defines how the level was sourced.");
+
+    // Mondrian extension; not in XMLA spec.
+    public final Column Annotations =
+        new Column(
+            "ANNOTATIONS",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "A set of notes, in XML format.");
+
+    // Only a restriction.
+    public final Column CubeSource =
+        new Column(
+            "CUBE_SOURCE",
+            XmlaType.UnsignedShort.scalar(),
+            Column.Restriction.OPTIONAL.of(
+                Enumeration.CUBE_TYPE, Cube.Type.CUBE),
+            Column.OPTIONAL,
+            null);
+
+    // Only a restriction.
+    public final Column LevelVisibility =
+        new Column(
+            "LEVEL_VISIBILITY",
+            XmlaType.UnsignedShort.scalar(),
+            Column.Restriction.OPTIONAL.of(
+                Enumeration.VISIBILITY, Dimension.Visibility.VISIBLE),
+            Column.OPTIONAL,
+            null);
 }
 
 // End XmlaLevel.java

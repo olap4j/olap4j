@@ -17,8 +17,6 @@
 */
 package org.olap4j.xmla;
 
-import org.olap4j.xmla.Enumeration;
-
 import java.util.List;
 
 /**
@@ -51,51 +49,46 @@ public class XmlaDatabaseProperty extends Entity {
     public final Column PropertyName =
         new Column(
             "PropertyName",
-            XmlaType.StringSometimesArray,
-            null,
+            XmlaType.StringSometimesArray.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the property.");
     public final Column PropertyDescription =
         new Column(
             "PropertyDescription",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
-            Column.REQUIRED,
+            Column.OPTIONAL,
             "A localizable text description of the property.");
     public final Column PropertyType =
         new Column(
             "PropertyType",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
-            Column.REQUIRED,
+            Column.OPTIONAL,
             "The XML data type of the property.");
     public final Column PropertyAccessType =
         new Column(
             "PropertyAccessType",
-            XmlaType.EnumString,
-            Enumeration.ACCESS,
+            XmlaType.EnumString.of(Enumeration.ACCESS),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
-            "Access for the property. The value can be Read, Write, or "
+            "The access for the property. The value can be Read, Write, or "
             + "ReadWrite.");
     public final Column IsRequired =
         new Column(
             "IsRequired",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
-            Column.REQUIRED,
-            "True if a property is required, false if it is not required.");
+            Column.OPTIONAL,
+            "A Boolean that indicates whether a property is required. "
+            + "True if a property is required; false if it is not required.");
     public final Column Value =
         new Column(
             "Value",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
-            Column.REQUIRED,
+            Column.OPTIONAL,
             "The current value of the property.");
 }
 

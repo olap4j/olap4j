@@ -17,6 +17,8 @@
 */
 package org.olap4j.xmla;
 
+import org.olap4j.impl.UnmodifiableArrayList;
+
 import java.util.*;
 
 /**
@@ -45,6 +47,17 @@ public abstract class Entity {
 
     abstract List<Column> columns();
     abstract List<Column> sortColumns();
+
+    List<Column> restrictionColumns() {
+        final ArrayList<Column> list = new ArrayList<Column>();
+        for (Column column : columns()) {
+            if (column.restriction != Column.Restriction.NO) {
+                list.add(column);
+            }
+        }
+        return UnmodifiableArrayList.copyOf(list);
+    }
+
     public abstract RowsetDefinition def();
 }
 

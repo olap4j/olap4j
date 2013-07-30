@@ -56,32 +56,28 @@ public class XmlaTable extends Entity {
     public final Column TableCatalog =
         new Column(
             "TABLE_CATALOG",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the catalog to which this object belongs.");
     public final Column TableSchema =
         new Column(
             "TABLE_SCHEMA",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the cube to which this object belongs.");
     public final Column TableName =
         new Column(
             "TABLE_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the object, if TABLE_TYPE is TABLE.");
     public final Column TableType =
         new Column(
             "TABLE_TYPE",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The type of the table. TABLE indicates the object is a "
@@ -90,40 +86,35 @@ public class XmlaTable extends Entity {
     public final Column TableGuid =
         new Column(
             "TABLE_GUID",
-            XmlaType.UUID,
-            null,
+            XmlaType.UUID.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Not supported.");
     public final Column Description =
         new Column(
             "DESCRIPTION",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A human-readable description of the object.");
     public final Column TablePropId =
         new Column(
             "TABLE_PROPID",
-            XmlaType.UnsignedInteger,
-            null,
+            XmlaType.UnsignedInteger.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Not supported.");
     public final Column DateCreated =
         new Column(
             "DATE_CREATED",
-            XmlaType.DateTime,
-            null,
+            XmlaType.DateTime.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Not supported.");
     public final Column DateModified =
         new Column(
             "DATE_MODIFIED",
-            XmlaType.DateTime,
-            null,
+            XmlaType.DateTime.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The date the object was last modified.");

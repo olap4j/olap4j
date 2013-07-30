@@ -80,6 +80,49 @@ public class Olap4jUtilTest extends TestCase {
     }
 
     /**
+     * Tests {@link Olap4jUtil#upperToCamel(String, boolean)}.
+     */
+    public void testToCamel() {
+        assertEquals(
+            "FooBar",
+            Olap4jUtil.upperToCamel("FOO_BAR", true));
+        assertEquals(
+            "fooBar",
+            Olap4jUtil.upperToCamel("FOO_BAR", false));
+        // multiple underscores count as one
+        assertEquals(
+            "fooBar",
+            Olap4jUtil.upperToCamel("FOO__BAR", false));
+        // trailing underscores ignored
+        assertEquals(
+            "fooBar",
+            Olap4jUtil.upperToCamel("FOO_BAR_", false));
+        // leading underscore causes upper-case start
+        assertEquals(
+            "FooBar",
+            Olap4jUtil.upperToCamel("_FOO_BAR", false));
+        // empty
+        assertEquals(
+            "",
+            Olap4jUtil.camelToUpper(""));
+        // null
+        try {
+            String x = Olap4jUtil.camelToUpper(null);
+            fail("expected error, got " + x);
+        } catch (NullPointerException e) {
+            // ok
+        }
+        // lower-case letters work fine too
+        assertEquals(
+            "fooBar",
+            Olap4jUtil.upperToCamel("foo_bar_", false));
+        // to get consecutive upper case, use lots of underscores
+        assertEquals(
+            "URLToClickOn",
+            Olap4jUtil.upperToCamel("U_R_L_to_Click_On", true));
+    }
+
+    /**
      * Tests {@link Olap4jUtil#equal}.
      */
     public void testEqual() {

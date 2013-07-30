@@ -59,48 +59,42 @@ public class XmlaColumn extends Entity {
     public final Column TableCatalog =
         new Column(
             "TABLE_CATALOG",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the Database.");
     public final Column TableSchema =
         new Column(
             "TABLE_SCHEMA",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.OPTIONAL,
             null);
     public final Column TableName =
         new Column(
             "TABLE_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the cube.");
     public final Column ColumnName =
         new Column(
             "COLUMN_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the attribute hierarchy or measure.");
     public final Column OrdinalPosition =
         new Column(
             "ORDINAL_POSITION",
-            XmlaType.UnsignedInteger,
-            null,
+            XmlaType.UnsignedInteger.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The position of the column, beginning with 1.");
     public final Column ColumnHasDefault =
         new Column(
             "COLUMN_HAS_DEFAULT",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Not supported.");
@@ -117,24 +111,21 @@ public class XmlaColumn extends Entity {
     public final Column ColumnFlags =
         new Column(
             "COLUMN_FLAGS",
-            XmlaType.UnsignedInteger,
-            null,
+            XmlaType.UnsignedInteger.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "A DBCOLUMNFLAGS bitmask indicating column properties.");
     public final Column IsNullable =
         new Column(
             "IS_NULLABLE",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "Always returns false.");
     public final Column DataType =
         new Column(
             "DATA_TYPE",
-            XmlaType.UnsignedShort,
-            null,
+            XmlaType.UnsignedShort.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The data type of the column. Returns a string for dimension "
@@ -142,16 +133,14 @@ public class XmlaColumn extends Entity {
     public final Column CharacterMaximumLength =
         new Column(
             "CHARACTER_MAXIMUM_LENGTH",
-            XmlaType.UnsignedInteger,
-            null,
+            XmlaType.UnsignedInteger.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The maximum possible length of a value within the column.");
     public final Column CharacterOctetLength =
         new Column(
             "CHARACTER_OCTET_LENGTH",
-            XmlaType.UnsignedInteger,
-            null,
+            XmlaType.UnsignedInteger.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The maximum possible length of a value within the column, in "
@@ -159,8 +148,7 @@ public class XmlaColumn extends Entity {
     public final Column NumericPrecision =
         new Column(
             "NUMERIC_PRECISION",
-            XmlaType.UnsignedShort,
-            null,
+            XmlaType.UnsignedShort.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The maximum precision of the column for numeric data types "
@@ -168,8 +156,7 @@ public class XmlaColumn extends Entity {
     public final Column NumericScale =
         new Column(
             "NUMERIC_SCALE",
-            XmlaType.Short,
-            null,
+            XmlaType.Short.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The number of digits to the right of the decimal point for "

@@ -106,7 +106,9 @@ public interface Measure extends Member {
         UNKNOWN(0);
 
         private final int xmlaOrdinal;
-        private static final DictionaryImpl<Aggregator> DICTIONARY =
+
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<Aggregator> DICTIONARY =
             DictionaryImpl.forClass(Aggregator.class);
 
         /**
@@ -129,16 +131,6 @@ public interface Measure extends Member {
 
         public int xmlaOrdinal() {
             return xmlaOrdinal;
-        }
-
-        /**
-         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<Aggregator> getDictionary() {
-            return DICTIONARY;
         }
     }
 }

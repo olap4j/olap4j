@@ -49,18 +49,9 @@ public class XmlaConstants
         private final int xmlaOrdinal;
         private final String description;
 
-        private static final DictionaryImpl<VisualMode> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<VisualMode> DICTIONARY =
             DictionaryImpl.forClass(VisualMode.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<VisualMode> getDictionary() {
-            return DICTIONARY;
-        }
 
         VisualMode(
             int xmlaOrdinal, String description)
@@ -87,18 +78,9 @@ public class XmlaConstants
         EXECUTE,
         DISCOVER_AND_EXECUTE;
 
-        private static final DictionaryImpl<Method> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<Method> DICTIONARY =
             DictionaryImpl.forClass(Method.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<Method> getDictionary() {
-            return DICTIONARY;
-        }
 
         public String xmlaName() {
             return name();
@@ -120,18 +102,9 @@ public class XmlaConstants
 
         private final int xmlaOrdinal;
 
-        private static final DictionaryImpl<Access> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<Access> DICTIONARY =
             DictionaryImpl.forClass(Access.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<Access> getDictionary() {
-            return DICTIONARY;
-        }
 
         Access(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
@@ -162,18 +135,9 @@ public class XmlaConstants
 
         private final String description;
 
-        private static final DictionaryImpl<AuthenticationMode> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<AuthenticationMode> DICTIONARY =
             DictionaryImpl.forClass(AuthenticationMode.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<AuthenticationMode> getDictionary() {
-            return DICTIONARY;
-        }
 
         AuthenticationMode(String description) {
             this.description = description;
@@ -201,18 +165,9 @@ public class XmlaConstants
 
         private final String description;
 
-        private static final DictionaryImpl<ProviderType> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<ProviderType> DICTIONARY =
             DictionaryImpl.forClass(ProviderType.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<ProviderType> getDictionary() {
-            return DICTIONARY;
-        }
 
         private ProviderType(String description) {
             this.description = description;
@@ -290,18 +245,9 @@ public class XmlaConstants
         private final int xmlaOrdinal;
         private final String description;
 
-        private static final Dictionary<Updateable> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<Updateable> DICTIONARY =
             DictionaryImpl.forClass(Updateable.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<Updateable> getDictionary() {
-            return DICTIONARY;
-        }
 
         Updateable(int xmlaOrdinal, String description) {
             this.xmlaOrdinal = xmlaOrdinal;
@@ -329,18 +275,9 @@ public class XmlaConstants
 
         private final int xmlaOrdinal;
 
-        private static final Dictionary<FontFlag> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<FontFlag> DICTIONARY =
             DictionaryImpl.forClass(FontFlag.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<FontFlag> getDictionary() {
-            return DICTIONARY;
-        }
 
         FontFlag(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
@@ -361,42 +298,59 @@ public class XmlaConstants
 
     /**
      * Action type.
-     *
-     * <p>Fields correspond to XMLA constants MDACTION_TYPE_URL (0x01),
-     * MDACTION_TYPE_HTML (0x02),
-     * MDACTION_TYPE_STATEMENT (0x04),
-     * MDACTION_TYPE_DATASET (0x08),
-     * MDACTION_TYPE_ROWSET (0x10),
-     * MDACTION_TYPE_COMMANDLINE (0x20),
-     * MDACTION_TYPE_PROPRIETARY (0x40),
-     * MDACTION_TYPE_REPORT (0x80),
-     * MDACTION_TYPE_DRILLTHROUGH (0x100)</p>
      */
     public static enum ActionType implements XmlaConstant {
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_TYPE_URL</code> (0x01).</p>
+         */
         URL(0x01),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_TYPE_HTML</code> (0x02).</p>
+         */
         HTML(0x02),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_TYPE_STATEMENT</code> (0x04).</p>
+         */
         STATEMENT(0x04),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_TYPE_DATASET</code> (0x08).</p>
+         */
         DATASET(0x08),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_TYPE_ROWSET</code> (0x10).</p>
+         */
         ROWSET(0x10),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_TYPE_COMMANDLINE</code> (0x20).</p>
+         */
         COMMANDLINE(0x20),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_TYPE_PROPRIETARY</code> (0x40).</p>
+         */
         PROPRIETARY(0x40),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_TYPE_REPORT</code> (0x80).</p>
+         */
         REPORT(0x80),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_TYPE_DRILLTHROUGH</code> (0x100).</p>
+         */
         DRILLTHROUGH(0x100);
 
         private final int xmlaOrdinal;
 
-        private static final Dictionary<ActionType> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<ActionType> DICTIONARY =
             DictionaryImpl.forClass(ActionType.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<ActionType> getDictionary() {
-            return DICTIONARY;
-        }
 
         ActionType(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
@@ -417,37 +371,44 @@ public class XmlaConstants
 
     /**
      * How the COORDINATE restriction column is interpreted.
-     *
-     * <p>Fields correspond to the XMLA values
-     * MDACTION_COORDINATE_CUBE (1),
-     * MDACTION_COORDINATE_DIMENSION (2)
-     * MDACTION_COORDINATE_LEVEL (3),
-     * MDACTION_COORDINATE_MEMBER (4),
-     * MDACTION_COORDINATE_SET (5),
-     * MDACTION_COORDINATE_CELL (6)</p>
      */
     public static enum CoordinateType implements XmlaConstant {
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_COORDINATE_CUBE</code> (1).</p>
+         */
         CUBE(1),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_COORDINATE_DIMENSION</code> (2).</p>
+         */
         DIMENSION(2),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_COORDINATE_LEVEL</code> (3).</p>
+         */
         LEVEL(3),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_COORDINATE_MEMBER</code> (4).</p>
+         */
         MEMBER(4),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_COORDINATE_SET</code> (5).</p>
+         */
         SET(5),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_COORDINATE_CELL</code> (6).</p>
+         */
         CELL(6);
 
         private final int xmlaOrdinal;
 
-        private static final Dictionary<ActionType> DICTIONARY =
-            DictionaryImpl.forClass(ActionType.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<ActionType> getDictionary() {
-            return DICTIONARY;
-        }
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<CoordinateType> DICTIONARY =
+            DictionaryImpl.forClass(CoordinateType.class);
 
         CoordinateType(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
@@ -467,7 +428,72 @@ public class XmlaConstants
     }
 
     /**
-     * The only OLE DB Types Indicators returned by SQL Server are thoses coded
+     * Information about how an action should be invoked.
+     */
+    public static enum Invocation implements XmlaConstant {
+        /**
+         * Indicates a regular action used during normal operations. This is the
+         * default value for this column.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_INVOCATION_INTERACTIVE</code> (1).</p>
+         */
+        INTERACTIVE(
+            1,
+            "Indicates a regular action used during normal operations. This is "
+            + "the default value for this column."),
+
+        /**
+         * Indicates that the action should be performed when the cube is first
+         * opened.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_INVOCATION_ON_OPEN</code> (2).</p>
+         */
+        ON_OPEN(
+            2,
+            "Indicates that the action should be performed when the cube is "
+            + "first opened."),
+
+        /**
+         * Indicates that the action is performed as part of a batch operation
+         * or Microsoft SQL Server Integration Services task.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDACTION_INVOCATION_BATCH</code> (4).</p>
+         */
+        BATCH(
+            4,
+            "Indicates that the action is performed as part of a batch "
+            + "operation or Microsoft SQL Server Integration Services task.");
+
+        private final int xmlaOrdinal;
+        private final String description;
+
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<Invocation> DICTIONARY =
+            DictionaryImpl.forClass(Invocation.class);
+
+        Invocation(int xmlaOrdinal, String description) {
+            this.xmlaOrdinal = xmlaOrdinal;
+            this.description = description;
+        }
+
+        public String xmlaName() {
+            return "MDACTION_INVOCATION_" + name();
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
+        }
+    }
+
+    /**
+     * The only OLE DB Types Indicators returned by SQL Server are those coded
      * below.
      */
     public enum DBType implements XmlaConstant {
@@ -538,23 +564,12 @@ public class XmlaConstants
         DBTIMESTAMP("DBTIMESTAMP", -1, null, null);
 
         public final String userName;
-
         private final int xmlaOrdinal;
+        private final String description;
 
-        private String description;
-
-        private static final Dictionary<DBType> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<DBType> DICTIONARY =
             DictionaryImpl.forClass(DBType.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<DBType> getDictionary() {
-            return DICTIONARY;
-        }
 
         DBType(
             String userName,
@@ -596,18 +611,9 @@ public class XmlaConstants
 
         private final String description;
 
-        private static final Dictionary<Format> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<Format> DICTIONARY =
             DictionaryImpl.forClass(Format.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<Format> getDictionary() {
-            return DICTIONARY;
-        }
 
         Format(String description) {
             this.description = description;
@@ -637,18 +643,9 @@ public class XmlaConstants
 
         private final String description;
 
-        private static final XmlaConstant.Dictionary<AxisFormat> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<AxisFormat> DICTIONARY =
             DictionaryImpl.forClass(AxisFormat.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static XmlaConstant.Dictionary<AxisFormat> getDictionary() {
-            return DICTIONARY;
-        }
 
         AxisFormat(String description) {
             this.description = description;
@@ -760,18 +757,9 @@ public class XmlaConstants
         private final String literalInvalidStartingChars;
         private final String description;
 
-        private static final Dictionary<Literal> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<Literal> DICTIONARY =
             DictionaryImpl.forClass(Literal.class);
-
-        /**
-         * Per {@link XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<Literal> getDictionary() {
-            return DICTIONARY;
-        }
 
         Literal(
             int xmlaOrdinal,
@@ -822,7 +810,7 @@ public class XmlaConstants
         }
     }
 
-    public enum ResponseMimeType {
+    public enum ResponseMimeType implements XmlaConstant {
         SOAP("text/xml"),
         JSON("application/json");
 
@@ -836,6 +824,10 @@ public class XmlaConstants
 
         private final String mimeType;
 
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<ResponseMimeType> DICTIONARY =
+            DictionaryImpl.forClass(ResponseMimeType.class);
+
         ResponseMimeType(String mimeType) {
             this.mimeType = mimeType;
         }
@@ -843,6 +835,50 @@ public class XmlaConstants
         public String getMimeType() {
             return mimeType;
         }
+
+        public String xmlaName() {
+            return name();
+        }
+
+        public String getDescription() {
+            return null;
+        }
+
+        public int xmlaOrdinal() {
+            return -1;
+        }
+    }
+
+    public enum FunctionOrigin implements XmlaConstant {
+        MDX(1),
+        USER_DEFINED(2);
+
+        private final int xmlaOrdinal;
+
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<FunctionOrigin> DICTIONARY =
+            DictionaryImpl.forClass(FunctionOrigin.class);
+
+        FunctionOrigin(int xmlaOrdinal) {
+            this.xmlaOrdinal = xmlaOrdinal;
+        }
+
+        public String xmlaName() {
+            return name();
+        }
+
+        public String getDescription() {
+            return null;
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
+        }
+    }
+
+    @Deprecated
+    public interface EnumWithDesc {
+        String getDescription();
     }
 }
 

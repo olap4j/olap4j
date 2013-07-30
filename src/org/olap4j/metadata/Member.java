@@ -133,7 +133,7 @@ public interface Member extends MetadataElement {
      * For example, if there is a formula (calculated) member on the Measures
      * dimension, it is listed as <code>FORMULA</code>.
      */
-    enum Type {
+    enum Type implements XmlaConstant {
         UNKNOWN(0),
         REGULAR(1),
         ALL(2),
@@ -146,17 +146,33 @@ public interface Member extends MetadataElement {
          */
         NULL(5);
 
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<Type> DICTIONARY =
+            DictionaryImpl.forClass(Type.class);
+
         private Type(int ordinal) {
             assert ordinal == ordinal();
+        }
+
+        public String xmlaName() {
+            return "MDMEMBER_TYPE_" + name();
+        }
+
+        public String getDescription() {
+            return null;
+        }
+
+        public int xmlaOrdinal() {
+            return ordinal();
         }
     }
 
     /**
      * Returns whether <code>member</code> is equal to, a child of, or a
-     * descendent of this Member.
+     * descendant of this Member.
      *
      * @param member Member
-     * @return Whether the given Member is a descendent of this Member
+     * @return Whether the given Member is a descendant of this Member
      */
     boolean isChildOrEqualTo(Member member);
 
@@ -372,18 +388,9 @@ public interface Member extends MetadataElement {
         private final int xmlaOrdinal;
         private String description;
 
-        private static final Dictionary<TreeOp> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<TreeOp> DICTIONARY =
             DictionaryImpl.forClass(TreeOp.class);
-
-        /**
-         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<TreeOp> getDictionary() {
-            return DICTIONARY;
-        }
 
         private TreeOp(int xmlaOrdinal, String description) {
             this.xmlaOrdinal = xmlaOrdinal;
@@ -396,6 +403,47 @@ public interface Member extends MetadataElement {
 
         public String getDescription() {
             return description;
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
+        }
+    }
+
+    /** The scope of a calculated member. */
+    enum Scope implements XmlaConstant {
+        /**
+         * The set has global scope.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDMEMBER_SCOPE_GLOBAL</code> (1).</p>
+         */
+        GLOBAL(1),
+
+        /**
+         * The set has session scope.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDMEMBER_SCOPE_SESSION</code> (2).</p>
+         */
+        SESSION(2);
+
+        private final int xmlaOrdinal;
+
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<Scope> DICTIONARY =
+            DictionaryImpl.forClass(Scope.class);
+
+        Scope(int xmlaOrdinal) {
+            this.xmlaOrdinal = xmlaOrdinal;
+        }
+
+        public String xmlaName() {
+            return "MDMEMBER_SCOPE_" + name();
+        }
+
+        public String getDescription() {
+            return null;
         }
 
         public int xmlaOrdinal() {

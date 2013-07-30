@@ -187,7 +187,8 @@ public enum Datatype implements XmlaConstant {
     private String dbTypeIndicator;
     private String description;
 
-    private static final DictionaryImpl<Datatype> DICTIONARY =
+    /** Per {@link XmlaConstant}. */
+    public static final DictionaryImpl<Datatype> DICTIONARY =
         DictionaryImpl.forClass(Datatype.class);
 
     Datatype(
@@ -220,16 +221,6 @@ public enum Datatype implements XmlaConstant {
      */
     public int xmlaOrdinal() {
         return xmlaOrdinal;
-    }
-
-    /**
-     * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
-     * of all values of this enumeration.
-     *
-     * @return Dictionary of all values
-     */
-    public static Dictionary<Datatype> getDictionary() {
-        return DICTIONARY;
     }
 }
 

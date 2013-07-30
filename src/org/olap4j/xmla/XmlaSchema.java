@@ -49,24 +49,21 @@ public class XmlaSchema extends Entity {
     public final Column CatalogName =
         new Column(
             "CATALOG_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The provider-specific data type name.");
     public final Column SchemaName =
         new Column(
             "SCHEMA_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The indicator of the data type.");
     public final Column SchemaOwner =
         new Column(
             "SCHEMA_OWNER",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The length of a non-numeric column. If the data type is "

@@ -17,6 +17,9 @@
 */
 package org.olap4j.xmla;
 
+import org.olap4j.metadata.DictionaryImpl;
+import org.olap4j.metadata.XmlaConstant;
+
 import java.util.*;
 
 /**
@@ -28,7 +31,7 @@ import java.util.*;
  *
  * @author jhyde
  */
-public enum RowsetDefinition {
+public enum RowsetDefinition implements XmlaConstant {
     /**
      * Returns a list of XML for Analysis data sources
      * available on the server or Web Service. (For an
@@ -504,27 +507,47 @@ public enum RowsetDefinition {
      *    SET_DISPLAY_FOLDER
      */
     MDSCHEMA_SETS(
-        20, null, XmlaSet.INSTANCE);
+        20, null, XmlaSet.INSTANCE),
+
+    MDSCHEMA_INPUT_DATASOURCES(
+        21, null, XmlaInputDatasource.INSTANCE),
+
+    MDSCHEMA_KPIS(
+        22, null, XmlaKpi.INSTANCE),
+
+    MDSCHEMA_MEASUREGROUP_DIMENSIONS(
+        23, null, XmlaMeasureGroupDimension.INSTANCE),
+
+    MDSCHEMA_MEASUREGROUPS(
+        24, null, XmlaMeasureGroup.INSTANCE);
+
+    /** Per {@link XmlaConstant}. */
+    public static final Dictionary<RowsetDefinition> DICTIONARY =
+        DictionaryImpl.forClass(RowsetDefinition.class);
 
     public transient final List<Column> columns;
     public transient final List<Column> sortColumns;
+    public transient final List<Column> restrictionColumns;
 
+    private final int xmlaOrdinal;
     private final String description;
 
     /**
      * Creates a rowset definition.
      *
-     * @param ordinal Rowset ordinal, per OLE DB for OLAP
+     * @param xmlaOrdinal Rowset ordinal, per OLE DB for OLAP
      * @param description Description
      */
     RowsetDefinition(
-        int ordinal,
+        int xmlaOrdinal,
         String description,
         Entity entity)
     {
+        this.xmlaOrdinal = xmlaOrdinal;
         this.description = description;
         this.columns = entity.columns();
         this.sortColumns = entity.sortColumns();
+        this.restrictionColumns = entity.restrictionColumns();
     }
 
     public Column lookupColumn(String name) {
@@ -536,8 +559,16 @@ public enum RowsetDefinition {
         return null;
     }
 
+    public String xmlaName() {
+        return name();
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public int xmlaOrdinal() {
+        return xmlaOrdinal;
     }
 }
 

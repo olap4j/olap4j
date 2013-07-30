@@ -43,8 +43,7 @@ public class XmlaKeyword extends Entity {
     public final Column Keyword =
         new Column(
             "Keyword",
-            XmlaType.StringSometimesArray,
-            null,
+            XmlaType.StringSometimesArray.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "A list of all the keywords reserved by a provider.\n"

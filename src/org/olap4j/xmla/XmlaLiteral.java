@@ -38,7 +38,8 @@ public class XmlaLiteral extends Entity {
             LiteralValue,
             LiteralInvalidChars,
             LiteralInvalidStartingChars,
-            LiteralMaxLength);
+            LiteralMaxLength,
+            LiteralNameEnumValue);
     }
 
     List<Column> sortColumns() {
@@ -48,8 +49,7 @@ public class XmlaLiteral extends Entity {
     public final Column LiteralName =
         new Column(
             "LiteralName",
-            XmlaType.StringSometimesArray,
-            null,
+            XmlaType.StringSometimesArray.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the literal described in the row.\n"
@@ -57,8 +57,7 @@ public class XmlaLiteral extends Entity {
     public final Column LiteralValue =
         new Column(
             "LiteralValue",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Contains the actual literal value.\n"
@@ -69,8 +68,7 @@ public class XmlaLiteral extends Entity {
     public final Column LiteralInvalidChars =
         new Column(
             "LiteralInvalidChars",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The characters, in the literal, that are not valid.\n"
@@ -80,8 +78,7 @@ public class XmlaLiteral extends Entity {
     public final Column LiteralInvalidStartingChars =
         new Column(
             "LiteralInvalidStartingChars",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The characters that are not valid as the first character of "
@@ -91,12 +88,20 @@ public class XmlaLiteral extends Entity {
     public final Column LiteralMaxLength =
         new Column(
             "LiteralMaxLength",
-            XmlaType.Integer,
-            null,
+            XmlaType.Integer.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The maximum number of characters in the literal. If there is "
-            + "no maximum or the maximum is unknown, the value is ?1.");
+            + "no maximum or the maximum is unknown, the value is -1.");
+
+    public final Column LiteralNameEnumValue =
+        new Column(
+            "LiteralNameEnumValue",
+            XmlaType.Integer.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            null);
+
 }
 
 // End XmlaLiteral.java

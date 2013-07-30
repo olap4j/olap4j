@@ -52,16 +52,14 @@ public class XmlaDatasource extends Entity {
     public final Column DataSourceName =
         new Column(
             "DataSourceName",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
-            "The name of the data source, such as FoodMart 2000.");
+            "The name of the data source, such as Adventure Works.");
     public final Column DataSourceDescription =
         new Column(
             "DataSourceDescription",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A description of the data source, as entered by the "
@@ -69,17 +67,15 @@ public class XmlaDatasource extends Entity {
     public final Column URL =
         new Column(
             "URL",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The unique path that shows where to invoke the XML for "
-            + "Analysis methods for that data source.");
+            + "Analysis (XMLA) methods for that data source.");
     public final Column DataSourceInfo =
         new Column(
             "DataSourceInfo",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A string containing any additional information required to "
@@ -89,32 +85,28 @@ public class XmlaDatasource extends Entity {
     public final Column ProviderName =
         new Column(
             "ProviderName",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the provider behind the data source.\n"
-            + "Example: \"MSDASQL\"");
+            + "Example: \"MSOLAP\".");
     public final Column ProviderType =
         new Column(
             "ProviderType",
-            XmlaType.EnumerationArray,
-            Enumeration.PROVIDER_TYPE,
+            XmlaType.EnumerationArray.of(Enumeration.PROVIDER_TYPE),
             Column.RESTRICTION,
             Column.REQUIRED,
             Column.UNBOUNDED,
-            "The types of data supported by the provider. May include one "
-            + "or more of the following types. Example follows this "
-            + "table.\n"
-            + "TDP: tabular data provider.\n"
+            "The types of data supported by the provider. This array can "
+            + "include one or more of the following types:\n"
             + "MDP: multidimensional data provider.\n"
-            + "DMP: data mining provider. A DMP provider implements the "
-            + "OLE DB for Data Mining specification.");
+            + "TDP: tabular data provider.\n"
+            + "DMP: data mining provider (implements the "
+            + "OLE DB for Data Mining specification).");
     public final Column AuthenticationMode =
         new Column(
             "AuthenticationMode",
-            XmlaType.EnumString,
-            Enumeration.AUTHENTICATION_MODE,
+            XmlaType.EnumString.of(Enumeration.AUTHENTICATION_MODE),
             Column.RESTRICTION,
             Column.REQUIRED,
             "Specification of what type of security mode the data source "

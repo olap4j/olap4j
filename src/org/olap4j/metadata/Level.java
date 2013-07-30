@@ -439,18 +439,9 @@ public interface Level extends MetadataElement {
 
         private final int xmlaOrdinal;
 
-        private static final Dictionary<Type> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<Type> DICTIONARY =
             DictionaryImpl.forClass(Type.class);
-
-        /**
-         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<Type> getDictionary() {
-            return DICTIONARY;
-        }
 
         /**
          * Creates a level type.
@@ -505,6 +496,82 @@ public interface Level extends MetadataElement {
             default:
                 return false;
             }
+        }
+    }
+
+    public enum CustomRollup implements XmlaConstant {
+        /**
+         * Indicates an expression exists for this level. (Deprecated.)
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVELS_CUSTOM_ROLLUP_EXPRESSION</code> (1).</p>
+         */
+        CUSTOM_ROLLUP_EXPRESSION(
+            1, "Indicates an expression exists for this level. (Deprecated.)"),
+
+        /**
+         * Indicates that there is a custom rollup column for this level.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVELS_CUSTOM_ROLLUP_COLUMN</code> (2).</p>
+         */
+        CUSTOM_ROLLUP_COLUMN(
+            2,
+            "Indicates that there is a custom rollup column for this level."),
+
+        /**
+         * Indicates that there is a skipped level associated with members of
+         * this level.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVELS_SKIPPED_LEVELS</code> (4).</p>
+         */
+        SKIPPED_LEVELS(
+            4,
+            "Indicates that there is a skipped level associated with members "
+            + "of this level."),
+
+        /**
+         * Indicates that members of the level have custom member properties.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVELS_CUSTOM_MEMBER_PROPERTIES</code> (8).</p>
+         */
+        CUSTOM_MEMBER_PROPERTIES(
+            8,
+            "Indicates that members of the level have custom member "
+            + "properties."),
+
+        /**
+         * Indicates that members on the level have unary operators.
+         *
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * <code>MDLEVELS_UNARY_OPERATOR</code> (16).</p>
+         */
+        UNARY_OPERATOR(
+            16, "Indicates that members on the level have unary operators.");
+
+        private final int xmlaOrdinal;
+        private final String description;
+
+        public static final Dictionary<CustomRollup> DICTIONARY =
+            DictionaryImpl.forClass(CustomRollup.class);
+
+        CustomRollup(int xmlaOrdinal, String description) {
+            this.xmlaOrdinal = xmlaOrdinal;
+            this.description = description;
+        }
+
+        public String xmlaName() {
+            return "MDLEVELS_" + name();
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
         }
     }
 }

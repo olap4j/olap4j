@@ -17,6 +17,9 @@
 */
 package org.olap4j.xmla;
 
+import org.olap4j.metadata.Cube;
+import org.olap4j.metadata.Dimension;
+
 import java.util.List;
 
 /**
@@ -51,6 +54,7 @@ public class XmlaDimension extends Entity {
             DimensionUniqueSettings,
             DimensionMasterUniqueName,
             DimensionIsVisible,
+            Annotations,
             Hierarchies);
     }
 
@@ -62,95 +66,97 @@ public class XmlaDimension extends Entity {
             DimensionName);
     }
 
+
+    @Override
+    List<Column> restrictionColumns() {
+        return list(
+            CatalogName,
+            SchemaName,
+            CubeName,
+            DimensionName,
+            DimensionUniqueName,
+            CubeSource,
+            DimensionVisibility);
+    }
+
     public final Column CatalogName =
         new Column(
             "CATALOG_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the database.");
     public final Column SchemaName =
         new Column(
             "SCHEMA_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.OPTIONAL,
-            "Not supported.");
+            "The name of the schema.");
     public final Column CubeName =
         new Column(
             "CUBE_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the cube.");
     public final Column DimensionName =
         new Column(
             "DIMENSION_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
-            "The name of the dimension.");
+            "The name of the dimension. If a dimension is part of more than "
+            + "one cube or measure group, then there is one row for each "
+            + "unique combination of dimension, measure group, and cube.");
     public final Column DimensionUniqueName =
         new Column(
             "DIMENSION_UNIQUE_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The unique name of the dimension.");
     public final Column DimensionGuid =
         new Column(
             "DIMENSION_GUID",
-            XmlaType.UUID,
-            null,
+            XmlaType.UUID.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Not supported.");
     public final Column DimensionCaption =
         new Column(
             "DIMENSION_CAPTION",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
-            "The caption of the dimension.");
+            "The caption of the dimension. This should be used when displaying "
+            + "the name of the dimension to the user, such as in the user "
+            + "interface or reports.");
     public final Column DimensionOrdinal =
         new Column(
             "DIMENSION_ORDINAL",
-            XmlaType.UnsignedInteger,
-            null,
+            XmlaType.UnsignedInteger.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The position of the dimension within the cube.");
-    // SQL Server returns values:
-    //   MD_DIMTYPE_TIME (1)
-    //   MD_DIMTYPE_MEASURE (2)
-    //   MD_DIMTYPE_OTHER (3)
     public final Column DimensionType =
         new Column(
             "DIMENSION_TYPE",
-            XmlaType.Short,
-            null,
+            XmlaType.Short.of(Enumeration.DIMENSION_TYPE),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The type of the dimension.");
     public final Column DimensionCardinality =
         new Column(
             "DIMENSION_CARDINALITY",
-            XmlaType.UnsignedInteger,
-            null,
+            XmlaType.UnsignedInteger.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The number of members in the key attribute.");
     public final Column DefaultHierarchy =
         new Column(
             "DEFAULT_HIERARCHY",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "A hierarchy from the dimension. Preserved for backwards "
@@ -158,34 +164,29 @@ public class XmlaDimension extends Entity {
     public final Column Description =
         new Column(
             "DESCRIPTION",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A user-friendly description of the dimension.");
     public final Column IsVirtual =
         new Column(
             "IS_VIRTUAL",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Always FALSE.");
     public final Column IsReadWrite =
         new Column(
             "IS_READWRITE",
-            XmlaType.Boolean,
-            null,
+            XmlaType.Boolean.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A Boolean that indicates whether the dimension is "
             + "write-enabled.");
-    // SQL Server returns values: 0 or 1
     public final Column DimensionUniqueSettings =
         new Column(
             "DIMENSION_UNIQUE_SETTINGS",
-            XmlaType.Integer,
-            null,
+            XmlaType.Integer.of(Enumeration.DIMENSION_KEY_UNIQUENESS),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A bitmap that specifies which columns contain unique values "
@@ -193,24 +194,52 @@ public class XmlaDimension extends Entity {
     public final Column DimensionMasterUniqueName =
         new Column(
             "DIMENSION_MASTER_UNIQUE_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Always NULL.");
     public final Column DimensionIsVisible =
         new Column(
             "DIMENSION_IS_VISIBLE",
-            XmlaType.Boolean,
-            null,
-            Column.NOT_RESTRICTION,
+            XmlaType.Boolean.scalar(),
+            Column.Restriction.NO,
             Column.OPTIONAL,
             "Always TRUE.");
+
+    // Mondrian extension; not in XMLA standard.
+    public final Column Annotations =
+        new Column(
+            "ANNOTATIONS",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "A set of notes, in XML format.");
+
+    // Only a restriction.
+    public final Column CubeSource =
+        new Column(
+            "CUBE_SOURCE",
+            XmlaType.UnsignedShort.scalar(),
+            Column.Restriction.OPTIONAL.of(
+                Enumeration.CUBE_TYPE, Cube.Type.CUBE),
+            Column.OPTIONAL,
+            null);
+
+    // Only a restriction.
+    public final Column DimensionVisibility =
+        new Column(
+            "DIMENSION_VISIBILITY",
+            XmlaType.UnsignedShort.scalar(),
+            Column.Restriction.OPTIONAL.of(
+                Enumeration.VISIBILITY, Dimension.Visibility.VISIBLE),
+            Column.OPTIONAL,
+            null);
+
+    // Mondrian extension.
     public final Column Hierarchies =
         new Column(
             "HIERARCHIES",
-            XmlaType.Rowset,
-            null,
+            XmlaType.Rowset.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Hierarchies in this dimension.");

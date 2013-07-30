@@ -17,7 +17,6 @@
 */
 package org.olap4j.xmla;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -46,39 +45,34 @@ public class XmlaSchemaRowset extends Entity {
     public final Column SchemaName =
         new Column(
             "SchemaName",
-            XmlaType.StringArray,
-            null,
+            XmlaType.StringArray.of(Enumeration.REQUEST_TYPES),
             Column.RESTRICTION,
             Column.REQUIRED,
-            "The name of the schema/request. This returns the values in "
-            + "the RequestTypes enumeration, plus any additional types "
-            + "supported by the provider. The provider defines rowset "
-            + "structures for the additional types");
+            "The name of the schema or request. This request returns the "
+            + "values in the RequestTypes enumeration, plus any additional "
+            + "types supported by the provider. The provider defines rowset "
+            + "structures for the additional types.");
     public final Column SchemaGuid =
         new Column(
             "SchemaGuid",
-            XmlaType.UUID,
-            null,
+            XmlaType.UUID.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The GUID of the schema.");
     public final Column Restrictions =
         new Column(
             "Restrictions",
-            XmlaType.Array,
-            null,
+            XmlaType.Array.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
-            "An array of the restrictions suppoted by provider. An example "
-            + "follows this table.");
+            "An array of the restrictions suppoted by the provider.");
     public final Column Description =
         new Column(
             "Description",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
-            "A localizable description of the schema");
+            "A localizable description of the schema.");
 }
 
 // End XmlaSchemaRowset.java

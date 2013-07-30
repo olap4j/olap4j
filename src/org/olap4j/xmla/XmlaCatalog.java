@@ -47,24 +47,21 @@ public class XmlaCatalog extends Entity {
     public final Column CatalogName =
         new Column(
             "CATALOG_NAME",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
             "Catalog name. Cannot be NULL.");
     public final Column Description =
         new Column(
             "DESCRIPTION",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "Human-readable description of the catalog.");
     public final Column Roles =
         new Column(
             "ROLES",
-            XmlaType.String,
-            null,
+            XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "A comma delimited list of roles to which the current user "
@@ -75,8 +72,7 @@ public class XmlaCatalog extends Entity {
     public final Column DateModified =
         new Column(
             "DATE_MODIFIED",
-            XmlaType.DateTime,
-            null,
+            XmlaType.DateTime.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The date that the catalog was last modified.");

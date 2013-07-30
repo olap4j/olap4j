@@ -66,6 +66,8 @@ public interface Property extends MetadataElement {
         /**
          * Identifies a property of a member. This property can be used in the
          * DIMENSION PROPERTIES clause of the SELECT statement.
+         *
+         * <p>Corresponds to the XMLA constant {@code MDPROP_MEMBER} (1).</p>
          */
         MEMBER(1),
 
@@ -73,16 +75,22 @@ public interface Property extends MetadataElement {
          * Identifies a property of a cell. This property can be used in the
          * CELL PROPERTIES clause that occurs at the end of the SELECT
          * statement.
+         *
+         * <p>Corresponds to the XMLA constant {@code MDPROP_CELL} (2).</p>
          */
         CELL(2),
 
         /**
          * Identifies an internal property.
+         *
+         * <p>Corresponds to the XMLA constant {@code MDPROP_SYSTEM} (4).</p>
          */
         SYSTEM(4),
 
         /**
          * Identifies a property which contains a binary large object (blob).
+         *
+         * <p>Corresponds to the XMLA constant {@code MDPROP_BLOB} (8).</p>
          */
         BLOB(8);
 
@@ -94,7 +102,9 @@ public interface Property extends MetadataElement {
         public static final Set<TypeFlag> MEMBER_TYPE_FLAG =
             Collections.unmodifiableSet(
                 Olap4jUtil.enumSetOf(TypeFlag.MEMBER));
-        private static final DictionaryImpl<TypeFlag> DICTIONARY =
+
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<TypeFlag> DICTIONARY =
             DictionaryImpl.forClass(TypeFlag.class);
 
         private TypeFlag(int xmlaOrdinal) {
@@ -111,16 +121,6 @@ public interface Property extends MetadataElement {
 
         public int xmlaOrdinal() {
             return xmlaOrdinal;
-        }
-
-        /**
-         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<TypeFlag> getDictionary() {
-            return DICTIONARY;
         }
     }
 
@@ -792,74 +792,336 @@ public interface Property extends MetadataElement {
      * whose {@link #xmlaOrdinal} is 0x21.
      */
     enum ContentType implements XmlaConstant {
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_REGULAR} (0x00).
+         */
         REGULAR(0x00),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ID} (0x01).
+         */
         ID(0x01),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_RELATION_TO_PARENT} (0x02).
+         */
         RELATION_TO_PARENT(0x02),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ROLLUP_OPERATOR} (0x03).
+         */
         ROLLUP_OPERATOR(0x03),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ORG_TITLE} (0x11).
+         */
         ORG_TITLE(0x11),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_CAPTION} (0x21).
+         */
         CAPTION(0x21),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_CAPTION_SHORT} (0x22).
+         */
         CAPTION_SHORT(0x22),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_CAPTION_DESCRIPTION} (0x23).
+         */
         CAPTION_DESCRIPTION(0x23),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_CAPTION_ABREVIATION} (0x24).
+         */
         CAPTION_ABREVIATION(0x24),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_WEB_URL} (0x31).
+         */
         WEB_URL(0x31),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_WEB_HTML} (0x32).
+         */
         WEB_HTML(0x32),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_WEB_XML_OR_XSL} (0x33).
+         */
         WEB_XML_OR_XSL(0x33),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_WEB_MAIL_ALIAS} (0x34).
+         */
         WEB_MAIL_ALIAS(0x34),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS} (0x41).
+         */
         ADDRESS(0x41),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_STREET} (0x42).
+         */
         ADDRESS_STREET(0x42),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_HOUSE} (0x43).
+         */
         ADDRESS_HOUSE(0x43),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_CITY} (0x44).
+         */
         ADDRESS_CITY(0x44),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_STATE_OR_PROVINCE} (0x45).
+         */
         ADDRESS_STATE_OR_PROVINCE(0x45),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_ZIP} (0x46).
+         */
         ADDRESS_ZIP(0x46),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_QUARTER} (0x47).
+         */
         ADDRESS_QUARTER(0x47),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_COUNTRY} (0x48).
+         */
         ADDRESS_COUNTRY(0x48),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_BUILDING} (0x49).
+         */
         ADDRESS_BUILDING(0x49),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_ROOM} (0x4A).
+         */
         ADDRESS_ROOM(0x4A),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_FLOOR} (0x4B).
+         */
         ADDRESS_FLOOR(0x4B),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_FAX} (0x4C).
+         */
         ADDRESS_FAX(0x4C),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_ADDRESS_PHONE} (0x4D).
+         */
         ADDRESS_PHONE(0x4D),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_GEO_CENTROID_X} (0x61).
+         */
         GEO_CENTROID_X(0x61),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_GEO_CENTROID_Y} (0x62).
+         */
         GEO_CENTROID_Y(0x62),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_GEO_CENTROID_Z} (0x63).
+         */
         GEO_CENTROID_Z(0x63),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_GEO_BOUNDARY_TOP} (0x64).
+         */
         GEO_BOUNDARY_TOP(0x64),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_GEO_BOUNDARY_LEFT} (0x65).
+         */
         GEO_BOUNDARY_LEFT(0x65),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_GEO_BOUNDARY_BOTTOM} (0x66).
+         */
         GEO_BOUNDARY_BOTTOM(0x66),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_GEO_BOUNDARY_RIGHT} (0x67).
+         */
         GEO_BOUNDARY_RIGHT(0x67),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_GEO_BOUNDARY_FRONT} (0x68).
+         */
         GEO_BOUNDARY_FRONT(0x68),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_GEO_BOUNDARY_REAR} (0x69).
+         */
         GEO_BOUNDARY_REAR(0x69),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_GEO_BOUNDARY_POLYGON} (0x6A).
+         */
         GEO_BOUNDARY_POLYGON(0x6A),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PHYSICAL_SIZE} (0x71).
+         */
         PHYSICAL_SIZE(0x71),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PHYSICAL_COLOR} (0x72).
+         */
         PHYSICAL_COLOR(0x72),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PHYSICAL_WEIGHT} (0x73).
+         */
         PHYSICAL_WEIGHT(0x73),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PHYSICAL_HEIGHT} (0x74).
+         */
         PHYSICAL_HEIGHT(0x74),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PHYSICAL_WIDTH} (0x75).
+         */
         PHYSICAL_WIDTH(0x75),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PHYSICAL_DEPTH} (0x76).
+         */
         PHYSICAL_DEPTH(0x76),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PHYSICAL_VOLUME} (0x77).
+         */
         PHYSICAL_VOLUME(0x77),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PHYSICAL_DENSITY} (0x78).
+         */
         PHYSICAL_DENSITY(0x78),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PERSON_FULL_NAME} (0x82).
+         */
         PERSON_FULL_NAME(0x82),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PERSON_FIRST_NAME} (0x83).
+         */
         PERSON_FIRST_NAME(0x83),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PERSON_LAST_NAME} (0x84).
+         */
         PERSON_LAST_NAME(0x84),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PERSON_MIDDLE_NAME} (0x85).
+         */
         PERSON_MIDDLE_NAME(0x85),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PERSON_DEMOGRAPHIC} (0x86).
+         */
         PERSON_DEMOGRAPHIC(0x86),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_PERSON_CONTACT} (0x87).
+         */
         PERSON_CONTACT(0x87),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_QTY_RANGE_LOW} (0x91).
+         */
         QTY_RANGE_LOW(0x91),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_QTY_RANGE_HIGH} (0x92).
+         */
         QTY_RANGE_HIGH(0x92),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_FORMATTING_COLOR} (0xA1).
+         */
         FORMATTING_COLOR(0xA1),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_FORMATTING_ORDER} (0xA2).
+         */
         FORMATTING_ORDER(0xA2),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_FORMATTING_FONT} (0xA3).
+         */
         FORMATTING_FONT(0xA3),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_FORMATTING_FONT_EFFECTS} (0xA4).
+         */
         FORMATTING_FONT_EFFECTS(0xA4),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_FORMATTING_FONT_SIZE} (0xA5).
+         */
         FORMATTING_FONT_SIZE(0xA5),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_FORMATTING_SUB_TOTAL} (0xA6).
+         */
         FORMATTING_SUB_TOTAL(0xA6),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_DATE} (0xB1).
+         */
         DATE(0xB1),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_DATE_START} (0xB2).
+         */
         DATE_START(0xB2),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_DATE_ENDED} (0xB3).
+         */
         DATE_ENDED(0xB3),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_DATE_CANCELED} (0xB4).
+         */
         DATE_CANCELED(0xB4),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_DATE_MODIFIED} (0xB5).
+         */
         DATE_MODIFIED(0xB5),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_DATE_DURATION} (0xB6).
+         */
         DATE_DURATION(0xB6),
+        /**
+         * Corresponds to the XMLA constant
+         * {@code MD_PROPTYPE_VERSION} (0xC1).
+         */
         VERSION(0xC1);
 
         private final int xmlaOrdinal;
-        private static final DictionaryImpl<ContentType> DICTIONARY =
+
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<ContentType> DICTIONARY =
             DictionaryImpl.forClass(ContentType.class);
 
         private ContentType(int xmlaOrdinal) {
@@ -876,16 +1138,6 @@ public interface Property extends MetadataElement {
 
         public int xmlaOrdinal() {
             return xmlaOrdinal;
-        }
-
-        /**
-         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<ContentType> getDictionary() {
-            return DICTIONARY;
         }
     }
 }

@@ -54,6 +54,23 @@ public enum XmlaType {
     public String getName() {
         return this == String ? "string" : name();
     }
+
+    ColumnType scalar() {
+        return new ColumnType(this, null);
+    }
+
+    public ColumnType of(Enumeration enumeration) {
+        return new ColumnType(this, enumeration);
+    }
+
+    static class ColumnType {
+        final XmlaType xmlaType;
+        Enumeration enumeratedType;
+
+        public ColumnType(XmlaType xmlaType, Enumeration access) {
+            this.xmlaType = xmlaType;
+        }
+    }
 }
 
 

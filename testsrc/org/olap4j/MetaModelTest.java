@@ -1,7 +1,26 @@
+/*
+// Licensed to Julian Hyde under one or more contributor license
+// agreements. See the NOTICE file distributed with this work for
+// additional information regarding copyright ownership.
+//
+// Julian Hyde licenses this file to you under the Apache License,
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at:
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+*/
 package org.olap4j;
 
-import junit.framework.TestCase;
 import org.olap4j.metadata.*;
+import org.olap4j.xmla.*;
+
+import junit.framework.TestCase;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -27,22 +46,144 @@ import java.util.*;
  * 6. complete class Function
  *
  * 7. Add a way to get functions from Database (or similar)
- * 
+ *
  * 8. fix {@link XmlaConstants.DBType#GUID},
  * fix {@link XmlaConstants.DBType#DBTIMESTAMP},
  * fix {@link XmlaConstants.DBType#I2},
  *
  * 9. Decide between {@link org.olap4j.metadata.Database.ProviderType}
  * and {@link XmlaConstants.ProviderType}
+ *
+ * 10. Bring classes up to XMLA 2012
+ *
+ * Class                   Updated
+ * ======================= =======
+ * XmlaAction              yes
+ * XmlaCatalog             yes
+ * XmlaColumn              no - but good enough
+ * XmlaCube                yes
+ * XmlaDatabaseProperty    yes
+ * XmlaDatasource          yes
+ * XmlaDimension           yes
+ * XmlaEnumerator          yes
+ * XmlaFunction            yes
+ * XmlaHierarchy           yes
+ * XmlaKeyword             yes
+ * XmlaLevel               yes
+ * XmlaLiteral             yes
+ * XmlaMeasure             yes
+ * XmlaMember              yes
+ * XmlaProperty            yes
+ * XmlaProviderType        no
+ * XmlaSchema              yes
+ * XmlaSchemaRowset        yes
+ * XmlaSet                 yes
+ * XmlaTableInfo           yes
+ * XmlaTable               no
+ * XmlaType                no
+ *
+ * 11. Can we obsolete {@link XmlaMember#Depth}? It seems to have same function
+ * as {@link XmlaMember#LevelNumber}.
+ *
+ * 12. Make sure every entity has an "annotation" attribute.
+ *
+ * <h2>Release notes</h2>
+ *
+ * <p>{@link org.olap4j.metadata.XmlaConstants.EnumWithDesc} is deprecated.
+ * Use an enum that implements {@link XmlaConstant} instead.
+ * (Should we remove?)</p>
+ *
+ * <h2>New entities</h2>
+ *
+ * {@link XmlaKpi}
+ * {@link XmlaMeasureGroup}
+ * {@link XmlaMeasureGroupDimension}
+ * {@link XmlaInputDatasource}
+ *
+ * <h2>New attributes</h2>
+ *
+ * {@link XmlaAction#ActionType}
+ * {@link XmlaAction#ActionCaption}
+ * {@link XmlaAction#Description}
+ * {@link XmlaAction#Content}
+ * {@link XmlaAction#Application}
+ * {@link XmlaAction#Invocation}
+ * {@link XmlaCube#BaseCubeName}
+ * {@link XmlaCube#Annotations}
+ * {@link XmlaDimension#Annotations}
+ * {@link XmlaLevel#Annotations}
+ * {@link XmlaLevel#LevelOrderingProperty}
+ * {@link XmlaLevel#LevelDbtype}
+ * {@link XmlaLevel#LevelMasterUniqueName}
+ * {@link XmlaLevel#LevelNameSqlColumnName}
+ * {@link XmlaLevel#LevelKeySqlColumnName}
+ * {@link XmlaLevel#LevelUniqueNameSqlColumnName}
+ * {@link XmlaLevel#LevelKeyCardinality}
+ * {@link XmlaLevel#LevelOrigin}
+ * {@link XmlaHierarchy#DimensionMasterUniqueName}
+ * {@link XmlaHierarchy#HierarchyOrigin}
+ * {@link XmlaHierarchy#HierarchyDisplayFolder}
+ * {@link XmlaHierarchy#InstanceSelection}
+ * {@link XmlaHierarchy#GroupingBehavior}
+ * {@link XmlaHierarchy#StructureType}
+ * {@link XmlaMeasure#NumericPrecision}
+ * {@link XmlaMeasure#NumericScale}
+ * {@link XmlaMeasure#MeasureUnits}
+ * {@link XmlaMeasure#Expression}
+ * {@link XmlaMeasure#MeasureNameSqlColumnName}
+ * {@link XmlaMeasure#MeasureUnqualifiedCaption}
+ * {@link XmlaMeasure#MeasuregroupName}
+ * {@link XmlaMeasure#MeasureDisplayFolder}
+ * {@link XmlaMember#Description}
+ * {@link XmlaMember#Expression}
+ * {@link XmlaMember#MemberKey}
+ * {@link XmlaMember#IsPlaceholdermember}
+ * {@link XmlaMember#IsDatamember}
+ * {@link XmlaMember#Scope}
+ * {@link XmlaProperty#CharacterMaximumLength}
+ * {@link XmlaProperty#CharacterOctetLength}
+ * {@link XmlaProperty#NumericPrecision}
+ * {@link XmlaProperty#NumericScale}
+ * {@link XmlaProperty#SqlColumnName}
+ * {@link XmlaProperty#Language}
+ * {@link XmlaProperty#PropertyOrigin}
+ * {@link XmlaProperty#PropertyAttributeHierarchyName}
+ * {@link XmlaProperty#PropertyCardinality}
+ * {@link XmlaProperty#MimeType}
+ * {@link XmlaProperty#PropertyIsVisible}
+ * {@link XmlaSet#Annotations}
+ * {@link XmlaSet#Expression}
+ * {@link XmlaSet#Dimensions}
+ * {@link XmlaSet#SetDisplayFolder}
+ * {@link XmlaSet#SetEvaluationContext}
+ *
+ * <h2>New restrictions</h2>
+ *
+ * {@link XmlaCube#BaseCubeName}
+ * {@link XmlaCube#CubeSource}
+ * {@link XmlaDimension#CubeSource}
+ * {@link XmlaDimension#DimensionVisibility}
+ * {@link XmlaLevel#LevelOrigin}
+ * {@link XmlaLevel#CubeSource}
+ * {@link XmlaLevel#LevelVisibility}
+ * {@link XmlaSet#CubeSource}
+ * {@link XmlaSet#HierarchyUniqueName}
+ *
+ * Other comments
+ *
+ * {@link XmlaMember#MemberOrdinal} is deprecated -- always returns 0. (Good
+ * news. Mondrian always had trouble generating this efficiently.)
  */
 public class MetaModelTest extends TestCase {
 
     private static final FullType GUID = FullType.of(XmlaConstants.DBType.GUID);
-    private static final FullType DBTIMESTAMP = FullType.of(XmlaConstants.DBType.DBTIMESTAMP);
+    private static final FullType DBTIMESTAMP =
+        FullType.of(XmlaConstants.DBType.DBTIMESTAMP);
     private static final FullType UI2 = FullType.of(XmlaConstants.DBType.UI2);
     private static final FullType I2 = FullType.of(XmlaConstants.DBType.I2);
     private static final FullType I4 = FullType.of(XmlaConstants.DBType.I4);
-    private static final FullType INTODO = FullType.of(XmlaConstants.DBType.UI2);
+    private static final FullType INTODO =
+        FullType.of(XmlaConstants.DBType.UI2);
     private static final FullType WSTR = FullType.of(XmlaConstants.DBType.WSTR);
     private static final FullType BOOL = FullType.of(XmlaConstants.DBType.BOOL);
 
@@ -59,10 +200,12 @@ public class MetaModelTest extends TestCase {
         code(out, "    ResultSet get" + entity.pluralName() + "(");
         final List<Attribute> parameters = entity.parameters();
         for (Ord<Attribute> attribute : Ord.zip(parameters)) {
-                code(out, "        " + attribute.e.type.java + " "
-                    + attribute.e.paramName()
-            + (attribute.i == parameters.size() - 1
-                ? ") throws OlapException;" : ","));
+            code(
+                out,
+                "        " + attribute.e.type.java + " "
+                + attribute.e.paramName()
+                + (attribute.i == parameters.size() - 1
+                   ? ") throws OlapException;" : ","));
         }
     }
 
@@ -72,39 +215,51 @@ public class MetaModelTest extends TestCase {
 
     private void entityJavadoc(PrintWriter out, Entity entity) {
         out.println();
-        javadoc(out, entity.javadocDescription()
-        + "\n"
-        + "\n"
-        + "<p>Specification as for XML/A " + entity.xmlaRowsetName() + " schema rowset.\n"
-                + "\n"
-                + "<p>Each " + entity.name.toLowerCase()
-                + " description has the following columns:\n<ol>");
+        javadoc(
+            out,
+            entity.javadocDescription()
+            + "\n"
+            + "\n"
+            + "<p>Specification as for XML/A " + entity.xmlaRowsetName()
+            + " schema rowset.\n"
+            + "\n"
+            + "<p>Each " + entity.name.toLowerCase()
+            + " description has the following columns:\n<ol>");
         for (Attribute attribute : entity.attributes) {
             boolean nullable = attribute.nullable;
-            if  (attribute.description.equals("Always returns <code>null</code>.")) {
+            if  (attribute.description.equals(
+                    "Always returns <code>null</code>."))
+            {
                 // if attribute is always null, don't state the obvious
                 nullable = false;
             }
-            javadoc(out,
+            javadoc(
+                out,
                 "<li><b>" + up(attribute.name) + "</b> "
-                    + typeString(attribute.type, nullable)
-                    + " => " + attribute.description);
+                + typeString(attribute.type, nullable)
+                + " => " + attribute.description);
         }
         int patternCount = 0;
         for (Attribute attribute : entity.attributes) {
-            if (attribute.param == Param.PATTERN) ++patternCount;
+            if (attribute.param == Param.PATTERN) {
+                ++patternCount;
+            }
             if (attribute.param == Param.NO) {
                 continue;
             }
-            javadoc(out, "\n"
+            javadoc(
+                out,
+                "\n"
                 + "@param " + attribute.paramName()
-                    + " " + attribute.paramDescription());
-
+                + " " + attribute.paramDescription());
         }
-        if (patternCount > 0 ) {
+        if (patternCount > 0) {
             javadoc(out, "@see #getSearchStringEscape");
         }
-        javadoc(out, "@return a <code>ResultSet</code> object in which each row is an OLAP " + entity.name + " description");
+        javadoc(
+            out,
+            "@return a <code>ResultSet</code> object in which each row is an OLAP "
+            + entity.name + " description");
         javadoc(out, "@throws OlapException if a database access error occurs");
     }
 
@@ -124,7 +279,6 @@ public class MetaModelTest extends TestCase {
                 buf.append('_');
             }
             buf.append(Character.toUpperCase(c));
-
         }
         return buf.toString();
     }
@@ -317,7 +471,7 @@ public class MetaModelTest extends TestCase {
                     new Attribute(this, "hierarchyOrdinal", INTODO, false, Param.NO, "The ordinal number of the hierarchy across all hierarchies of the cube."),
                     new Attribute(this, "dimensionIsShared", BOOL, false, Param.NO, "Always returns <code>true</code>."),
                     new Attribute(this, "parentChild", BOOL, false, Param.NO, "Is hierarchy a parent."), // REVIEW:
-                
+
                     // new
                     new Attribute(this, "origin", UI2, false, Param.NO, "Is hierarchy a parent."), // REVIEW:
                     new Attribute(this, "structureType", I2, false, Param.NO, "The structure of the hierarchy."),
@@ -490,8 +644,7 @@ public class MetaModelTest extends TestCase {
             String e = "catalog"; // TODO figure out from name
             switch (param) {
             case PARAM:
-            return 
-                (name.contains("Unique")
+            return (name.contains("Unique")
                  ? "unique name of a " + e + " (not a pattern); "
                  : "a " + e + " name;")
                 + "must match the " + e + " name as it is stored in the database; "
@@ -609,9 +762,7 @@ public class MetaModelTest extends TestCase {
     }
 
     private static class Parameter {
-
         public Parameter(String name, FullType type, String description) {
-
         }
     }
 
@@ -656,4 +807,4 @@ public class MetaModelTest extends TestCase {
     }
 }
 
-// End MetamodelTest.java
+// End MetaModelTest.java

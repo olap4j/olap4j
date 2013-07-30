@@ -18,6 +18,7 @@
 package org.olap4j.metadata;
 
 import org.olap4j.impl.Olap4jUtil;
+import org.olap4j.impl.UnmodifiableArrayList;
 
 import java.util.*;
 
@@ -26,7 +27,7 @@ import java.util.*;
  *
  * @author jhyde
  */
-class DictionaryImpl<E extends Enum<E> & XmlaConstant>
+public class DictionaryImpl<E extends Enum<E> & XmlaConstant>
     implements XmlaConstant.Dictionary<E>
 {
     private final Class<E> clazz;
@@ -37,7 +38,7 @@ class DictionaryImpl<E extends Enum<E> & XmlaConstant>
     private static final Map<Class, DictionaryImpl> map =
         new HashMap<Class, DictionaryImpl>();
 
-    public DictionaryImpl(Class<E> clazz) {
+    private DictionaryImpl(Class<E> clazz) {
         this.clazz = clazz;
         init();
     }
@@ -58,9 +59,8 @@ class DictionaryImpl<E extends Enum<E> & XmlaConstant>
         } catch (NullPointerException e) {
             return;
         }
-        this.values =
-            Collections.unmodifiableList(
-                Arrays.asList(constants));
+        //noinspection unchecked
+        this.values = UnmodifiableArrayList.of(constants);
         for (E e : values) {
             byName.put(e.xmlaName(), e);
             byOrdinal.put(e.xmlaOrdinal(), e);

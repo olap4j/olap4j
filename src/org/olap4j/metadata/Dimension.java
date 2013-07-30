@@ -166,18 +166,9 @@ public interface Dimension extends MetadataElement {
 
         private final int xmlaOrdinal;
 
-        private static final Dictionary<Type> DICTIONARY =
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<Type> DICTIONARY =
             DictionaryImpl.forClass(Type.class);
-
-        /**
-         * Per {@link org.olap4j.metadata.XmlaConstant}, returns a dictionary
-         * of all values of this enumeration.
-         *
-         * @return Dictionary of all values
-         */
-        public static Dictionary<Type> getDictionary() {
-            return DICTIONARY;
-        }
 
         /**
          * Creates a Dimension Type.
@@ -190,6 +181,71 @@ public interface Dimension extends MetadataElement {
 
         public String xmlaName() {
             return "MD_DIMTYPE_" + name();
+        }
+
+        public String getDescription() {
+            return "";
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
+        }
+    }
+
+    /** Flags that define whether a dimension's key is unique. */
+    public enum KeyUniqueness implements XmlaConstant {
+        /** Corresponds to the XMLA constant
+         * <code>MDDIMENSIONS_MEMBER_KEY_UNIQUE</code> (1). */
+        MEMBER_KEY_UNIQUE(1),
+
+        /** Corresponds to the XMLA constant
+         * <code>MDDIMENSIONS_MEMBER_NAME_UNIQUE</code> (2). */
+        MEMBER_NAME_UNIQUE(2);
+
+        private final int xmlaOrdinal;
+
+        /** Per {@link org.olap4j.metadata.XmlaConstant}. */
+        public static final DictionaryImpl<KeyUniqueness> DICTIONARY =
+            DictionaryImpl.forClass(KeyUniqueness.class);
+
+        private KeyUniqueness(int xmlaOrdinal) {
+            this.xmlaOrdinal = xmlaOrdinal;
+        }
+
+        public String xmlaName() {
+            return "MDDIMENSIONS_" + name();
+        }
+
+        public String getDescription() {
+            return "";
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
+        }
+    }
+
+    /** Flags for forming restrictions whether to return dimensions based on
+     * their visibility. */
+    public enum Visibility implements XmlaConstant {
+        /** Element is visible (1).  */
+        VISIBLE(1),
+
+        /** Element is not visible (2).  */
+        NOT_VISIBLE(2);
+
+        private final int xmlaOrdinal;
+
+        /** Per {@link org.olap4j.metadata.XmlaConstant}. */
+        public static final DictionaryImpl<Visibility> DICTIONARY =
+            DictionaryImpl.forClass(Visibility.class);
+
+        private Visibility(int xmlaOrdinal) {
+            this.xmlaOrdinal = xmlaOrdinal;
+        }
+
+        public String xmlaName() {
+            return name();
         }
 
         public String getDescription() {

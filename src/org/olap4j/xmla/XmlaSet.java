@@ -17,7 +17,11 @@
 */
 package org.olap4j.xmla;
 
+import org.olap4j.metadata.Cube;
+
 import java.util.List;
+
+import static org.olap4j.xmla.Column.Restriction;
 
 /**
  * XML for Analysis entity representing a Set.
@@ -51,59 +55,116 @@ public class XmlaSet extends Entity {
     public final Column CatalogName =
         new Column(
             "CATALOG_NAME",
-            XmlaType.String,
-            null,
-            true,
-            true,
-            null);
+            XmlaType.String.scalar(),
+            Column.Restriction.OPTIONAL,
+            Column.OPTIONAL,
+            "The name of the database.");
     public final Column SchemaName =
         new Column(
             "SCHEMA_NAME",
-            XmlaType.String,
-            null,
-            true,
-            true,
-            null);
+            XmlaType.String.scalar(),
+            Restriction.OPTIONAL,
+            Column.OPTIONAL,
+            "The name of the schema.");
     public final Column CubeName =
         new Column(
             "CUBE_NAME",
-            XmlaType.String,
-            null,
-            true,
-            false,
-            null);
+            XmlaType.String.scalar(),
+            Restriction.OPTIONAL,
+            Column.REQUIRED,
+            "The name of the cube.");
     public final Column SetName =
         new Column(
             "SET_NAME",
-            XmlaType.String,
-            null,
-            true,
-            false,
-            null);
+            XmlaType.String.scalar(),
+            Restriction.OPTIONAL,
+            Column.REQUIRED,
+            "The name of the set.");
     public final Column SetCaption =
         new Column(
             "SET_CAPTION",
-            XmlaType.String,
-            null,
-            true,
-            true,
-            null);
+            XmlaType.String.scalar(),
+            Restriction.NO,
+            Column.OPTIONAL,
+            "A label or caption associated with the set. The label or caption "
+            + "is used primarily for display purposes.");
     public final Column Scope =
         new Column(
             "SCOPE",
-            XmlaType.Integer,
-            null,
-            true,
-            false,
-            null);
+            XmlaType.Integer.of(Enumeration.SET_SCOPE),
+            Restriction.OPTIONAL,
+            Column.REQUIRED,
+            "The scope of the set.");
     public final Column Description =
         new Column(
             "DESCRIPTION",
-            XmlaType.String,
-            null,
-            false,
+            XmlaType.String.scalar(),
+            Restriction.NO,
+            Column.OPTIONAL,
+            "A human-readable description of the set.");
+    public final Column Expression =
+        new Column(
+            "EXPRESSION",
+            XmlaType.String.scalar(),
+            Restriction.NO,
+            Column.OPTIONAL,
+            "The expression for the set.");
+    public final Column Dimensions =
+        new Column(
+            "DIMENSIONS",
+            XmlaType.String.scalar(),
+            Restriction.NO,
+            Column.OPTIONAL,
+            "A comma delimited list of hierarchies included in the set.");
+    public final Column SetDisplayFolder =
+        new Column(
+            "SET_DISPLAY_FOLDER",
+            XmlaType.String.scalar(),
+            Restriction.NO,
+            Column.OPTIONAL,
+            "A string that identifies the path of the display folder that the "
+            + "client application uses to show the set. The folder level "
+            + "separator is defined by the client application. For the tools "
+            + "and clients supplied by Analysis Services, the backslash (\\) "
+            + "is the level separator. To provide multiple display folders, "
+            + "use a semicolon (;) to separate the folders.");
+    public final Column SetEvaluationContext =
+        new Column(
+            "SET_EVALUATION_CONTEXT",
+            XmlaType.Integer.of(Enumeration.SET_RESOLUTION),
+            Restriction.NO,
+            Column.OPTIONAL,
+            "The context for the set. The set can be static or dynamic.");
+
+    // Mondrian extension; not in XMLA standard.
+    public final Column Annotations =
+        new Column(
+            "ANNOTATIONS",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "A set of notes, in XML format.");
+
+    // Only a restriction.
+    public final Column CubeSource =
+        new Column(
+            "CUBE_SOURCE",
+            XmlaType.UnsignedShort.scalar(),
+            Column.Restriction.OPTIONAL.of(
+                Enumeration.CUBE_TYPE, Cube.Type.CUBE),
+            Column.OPTIONAL,
+            null);
+
+    // Only a restriction.
+    public final Column HierarchyUniqueName =
+        new Column(
+            "HIERARCHY_UNIQUE_NAME",
+            XmlaType.String.scalar(),
+            Restriction.OPTIONAL,
             true,
-            "A human-readable description of the measure.");
+            "Note: Only one hierarchy can be included, and only those named "
+            + "sets whose hierarchies exactly match the restriction are "
+            + "returned.");
 }
 
 // End XmlaSet.java
