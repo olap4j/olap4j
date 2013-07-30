@@ -30,32 +30,30 @@ import java.util.*;
  * with it, and provides code-generation utilities to be used by olap4j
  * developers.
  *
- * TODO
+ * <h2>TODO</h2>
  *
- * 1. Add support for DISCOVER_INSTANCES rowset
+ * <p>1. Add support for DISCOVER_INSTANCES rowset
  *
- * 2. Enum: Instance state {Started, Stopped, Starting, Stopping, Paused}
+ * <p>2. Enum: Instance state {Started, Stopped, Starting, Stopping, Paused}
  *
- * 3. Should enum constants be UPPER_CASE or UpperCamelCase as at present?
+ * <p>3. Should enum constants be UPPER_CASE or UpperCamelCase as at present?
  *
- * 4. Should enum constants always be in {@link XmlaConstants}, or in a more
+ * <p>4. Should enum constants always be in {@link XmlaConstants}, or in a more
  * specific class if possible?
  *
- * 5. add test that every XmlaConstant class has a getDictionary method
+ * <p>5. add test that every XmlaConstant class has a static DICTIONARY field
  *
- * 6. complete class Function
+ * <p>6. complete class Function
  *
- * 7. Add a way to get functions from Database (or similar)
+ * <p>7. Add a way to get functions from Database (or similar)
  *
- * 8. fix {@link XmlaConstants.DBType#GUID},
+ * <p>8. fix {@link XmlaConstants.DBType#GUID},
  * fix {@link XmlaConstants.DBType#DBTIMESTAMP},
  * fix {@link XmlaConstants.DBType#I2},
  *
- * 9. Decide between {@link org.olap4j.metadata.Database.ProviderType}
- * and {@link XmlaConstants.ProviderType}
+ * <p>10. Bring classes up to XMLA 2012
  *
- * 10. Bring classes up to XMLA 2012
- *
+ * <pre>
  * Class                   Updated
  * ======================= =======
  * XmlaAction              yes
@@ -81,6 +79,7 @@ import java.util.*;
  * XmlaTableInfo           yes
  * XmlaTable               no
  * XmlaType                no
+ * </pre>
  *
  * 11. Can we obsolete {@link XmlaMember#Depth}? It seems to have same function
  * as {@link XmlaMember#LevelNumber}.
@@ -95,84 +94,107 @@ import java.util.*;
  *
  * <h2>New entities</h2>
  *
- * {@link XmlaKpi}
- * {@link XmlaMeasureGroup}
- * {@link XmlaMeasureGroupDimension}
- * {@link XmlaInputDatasource}
+ * <ul>
+ *
+ * <li>{@link XmlaKpi}
+ * <li>{@link XmlaMeasureGroup}
+ * <li>{@link XmlaMeasureGroupDimension}
+ * <li>{@link XmlaInputDatasource}
+ *
+ * </ul>
  *
  * <h2>New attributes</h2>
  *
- * {@link XmlaAction#ActionType}
- * {@link XmlaAction#ActionCaption}
- * {@link XmlaAction#Description}
- * {@link XmlaAction#Content}
- * {@link XmlaAction#Application}
- * {@link XmlaAction#Invocation}
- * {@link XmlaCube#BaseCubeName}
- * {@link XmlaCube#Annotations}
- * {@link XmlaDimension#Annotations}
- * {@link XmlaLevel#Annotations}
- * {@link XmlaLevel#LevelOrderingProperty}
- * {@link XmlaLevel#LevelDbtype}
- * {@link XmlaLevel#LevelMasterUniqueName}
- * {@link XmlaLevel#LevelNameSqlColumnName}
- * {@link XmlaLevel#LevelKeySqlColumnName}
- * {@link XmlaLevel#LevelUniqueNameSqlColumnName}
- * {@link XmlaLevel#LevelKeyCardinality}
- * {@link XmlaLevel#LevelOrigin}
- * {@link XmlaHierarchy#DimensionMasterUniqueName}
- * {@link XmlaHierarchy#HierarchyOrigin}
- * {@link XmlaHierarchy#HierarchyDisplayFolder}
- * {@link XmlaHierarchy#InstanceSelection}
- * {@link XmlaHierarchy#GroupingBehavior}
- * {@link XmlaHierarchy#StructureType}
- * {@link XmlaMeasure#NumericPrecision}
- * {@link XmlaMeasure#NumericScale}
- * {@link XmlaMeasure#MeasureUnits}
- * {@link XmlaMeasure#Expression}
- * {@link XmlaMeasure#MeasureNameSqlColumnName}
- * {@link XmlaMeasure#MeasureUnqualifiedCaption}
- * {@link XmlaMeasure#MeasuregroupName}
- * {@link XmlaMeasure#MeasureDisplayFolder}
- * {@link XmlaMember#Description}
- * {@link XmlaMember#Expression}
- * {@link XmlaMember#MemberKey}
- * {@link XmlaMember#IsPlaceholdermember}
- * {@link XmlaMember#IsDatamember}
- * {@link XmlaMember#Scope}
- * {@link XmlaProperty#CharacterMaximumLength}
- * {@link XmlaProperty#CharacterOctetLength}
- * {@link XmlaProperty#NumericPrecision}
- * {@link XmlaProperty#NumericScale}
- * {@link XmlaProperty#SqlColumnName}
- * {@link XmlaProperty#Language}
- * {@link XmlaProperty#PropertyOrigin}
- * {@link XmlaProperty#PropertyAttributeHierarchyName}
- * {@link XmlaProperty#PropertyCardinality}
- * {@link XmlaProperty#MimeType}
- * {@link XmlaProperty#PropertyIsVisible}
- * {@link XmlaSet#Annotations}
- * {@link XmlaSet#Expression}
- * {@link XmlaSet#Dimensions}
- * {@link XmlaSet#SetDisplayFolder}
- * {@link XmlaSet#SetEvaluationContext}
+ * <ul>
+ *
+ * <li>{@link XmlaAction#ActionType}
+ * <li>{@link XmlaAction#ActionCaption}
+ * <li>{@link XmlaAction#Description}
+ * <li>{@link XmlaAction#Content}
+ * <li>{@link XmlaAction#Application}
+ * <li>{@link XmlaAction#Invocation}
+ * <li>{@link XmlaCube#BaseCubeName}
+ * <li>{@link XmlaCube#Annotations}
+ * <li>{@link XmlaDimension#Annotations}
+ * <li>{@link XmlaLevel#Annotations}
+ * <li>{@link XmlaLevel#LevelOrderingProperty}
+ * <li>{@link XmlaLevel#LevelDbtype}
+ * <li>{@link XmlaLevel#LevelMasterUniqueName}
+ * <li>{@link XmlaLevel#LevelNameSqlColumnName}
+ * <li>{@link XmlaLevel#LevelKeySqlColumnName}
+ * <li>{@link XmlaLevel#LevelUniqueNameSqlColumnName}
+ * <li>{@link XmlaLevel#LevelKeyCardinality}
+ * <li>{@link XmlaLevel#LevelOrigin}
+ * <li>{@link XmlaHierarchy#DimensionMasterUniqueName}
+ * <li>{@link XmlaHierarchy#HierarchyOrigin}
+ * <li>{@link XmlaHierarchy#HierarchyDisplayFolder}
+ * <li>{@link XmlaHierarchy#InstanceSelection}
+ * <li>{@link XmlaHierarchy#GroupingBehavior}
+ * <li>{@link XmlaHierarchy#StructureType}
+ * <li>{@link XmlaMeasure#NumericPrecision}
+ * <li>{@link XmlaMeasure#NumericScale}
+ * <li>{@link XmlaMeasure#MeasureUnits}
+ * <li>{@link XmlaMeasure#Expression}
+ * <li>{@link XmlaMeasure#MeasureNameSqlColumnName}
+ * <li>{@link XmlaMeasure#MeasureUnqualifiedCaption}
+ * <li>{@link XmlaMeasure#MeasuregroupName}
+ * <li>{@link XmlaMeasure#MeasureDisplayFolder}
+ * <li>{@link XmlaMember#Description}
+ * <li>{@link XmlaMember#Expression}
+ * <li>{@link XmlaMember#MemberKey}
+ * <li>{@link XmlaMember#IsPlaceholdermember}
+ * <li>{@link XmlaMember#IsDatamember}
+ * <li>{@link XmlaMember#Scope}
+ * <li>{@link XmlaProperty#CharacterMaximumLength}
+ * <li>{@link XmlaProperty#CharacterOctetLength}
+ * <li>{@link XmlaProperty#NumericPrecision}
+ * <li>{@link XmlaProperty#NumericScale}
+ * <li>{@link XmlaProperty#SqlColumnName}
+ * <li>{@link XmlaProperty#Language}
+ * <li>{@link XmlaProperty#PropertyOrigin}
+ * <li>{@link XmlaProperty#PropertyAttributeHierarchyName}
+ * <li>{@link XmlaProperty#PropertyCardinality}
+ * <li>{@link XmlaProperty#MimeType}
+ * <li>{@link XmlaProperty#PropertyIsVisible}
+ * <li>{@link XmlaSet#Annotations}
+ * <li>{@link XmlaSet#Expression}
+ * <li>{@link XmlaSet#Dimensions}
+ * <li>{@link XmlaSet#SetDisplayFolder}
+ * <li>{@link XmlaSet#SetEvaluationContext}
+ *
+ * </ul>
  *
  * <h2>New restrictions</h2>
  *
- * {@link XmlaCube#BaseCubeName}
- * {@link XmlaCube#CubeSource}
- * {@link XmlaDimension#CubeSource}
- * {@link XmlaDimension#DimensionVisibility}
- * {@link XmlaLevel#LevelOrigin}
- * {@link XmlaLevel#CubeSource}
+ * <ul>
+ *
+ * <li>{@link XmlaCube#BaseCubeName}
+ * <li>{@link XmlaCube#CubeSource}
+ * <li>{@link XmlaDimension#CubeSource}
+ * <li>{@link XmlaDimension#DimensionVisibility}
+ * <li>{@link XmlaLevel#LevelOrigin}
+ * <li>{@link XmlaLevel#CubeSource}
  * {@link XmlaLevel#LevelVisibility}
  * {@link XmlaSet#CubeSource}
  * {@link XmlaSet#HierarchyUniqueName}
  *
+ * </ul>
+ *
  * Other comments
  *
- * {@link XmlaMember#MemberOrdinal} is deprecated -- always returns 0. (Good
+ * <ul>
+ *
+ * <li>{@link XmlaMember#MemberOrdinal} is deprecated -- always returns 0. (Good
  * news. Mondrian always had trouble generating this efficiently.)
+ *
+ * <li>{@link XmlaCube#CubeType} used to be UI2, is now WSTR.
+ * But still a UI2 when used via {@link XmlaCube#CubeSource} or similar
+ * restrictions.
+ *
+ * <li>Merged {@link XmlaConstants}.ProviderType with
+ * {@link Database.ProviderType} and obsoleted the former.</li>
+ *
+ * </ul>
  */
 public class MetaModelTest extends TestCase {
 

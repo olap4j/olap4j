@@ -73,7 +73,7 @@ public class Enumeration {
             "ProviderType",
             "The types of data supported by the provider.",
             XmlaType.Array,
-            XmlaConstants.ProviderType.DICTIONARY);
+            Database.ProviderType.DICTIONARY);
 
     public static final Enumeration REQUEST_TYPES =
         new Enumeration(
@@ -107,7 +107,7 @@ public class Enumeration {
         new Enumeration(
             "CubeType",
             "Type of a cube.",
-            XmlaType.UnsignedShort,
+            XmlaType.String,
             Cube.Type.DICTIONARY);
 
     public static final Enumeration LEVEL_TYPE =

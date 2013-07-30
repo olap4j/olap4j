@@ -18,9 +18,12 @@
 package org.olap4j.metadata;
 
 import org.olap4j.impl.Olap4jUtil;
+import org.olap4j.xmla.Entity;
 
 import java.util.Collections;
 import java.util.Set;
+
+import static org.olap4j.metadata.XmlaConstants.*;
 
 /**
  * Definition of a property of a {@link Member} or
@@ -277,20 +280,31 @@ public interface Property extends MetadataElement {
         /**
          * Definition of the property which
          * holds the type of the member.
+         * Values are from the enumeration {@link Member.Type}.
          */
         MEMBER_TYPE(
             Datatype.STRING,
             20,
             false,
-            null,
+            Member.Type.class,
             "Required. Type of the member. Can be one of the following values: "
-            + "MDMEMBER_Datatype.TYPE_REGULAR, MDMEMBER_Datatype.TYPE_ALL, "
-            + "MDMEMBER_Datatype.TYPE_FORMULA, MDMEMBER_Datatype.TYPE_MEASURE, "
-            + "MDMEMBER_Datatype.TYPE_UNKNOWN. MDMEMBER_Datatype.TYPE_FORMULA "
-            + "takes precedence over MDMEMBER_Datatype.TYPE_MEASURE. "
-            + "Therefore, if there is a formula (calculated) member on the "
+            + sameXmlaName("MDMEMBER_TYPE_REGULAR", Member.Type.REGULAR)
+            + ", "
+            + sameXmlaName("MDMEMBER_TYPE_ALL", Member.Type.ALL)
+            + ",  "
+            + sameXmlaName("MDMEMBER_TYPE_FORMULA", Member.Type.FORMULA)
+            + ", "
+            + sameXmlaName("MDMEMBER_TYPE_MEASURE", Member.Type.MEASURE)
+            + ", "
+            + sameXmlaName("MDMEMBER_TYPE_UNKNOWN", Member.Type.UNKNOWN)
+            + ". "
+            + sameXmlaName("MDMEMBER_TYPE_FORMULA", Member.Type.FORMULA)
+            + " takes precedence over "
+            + sameXmlaName("MDMEMBER_TYPE_MEASURE", Member.Type.MEASURE)
+            + ". Therefore, if there is a formula (calculated) member on the "
             + "Measures dimension, it is listed as "
-            + "MDMEMBER_Datatype.TYPE_FORMULA."),
+            + sameXmlaName("MDMEMBER_TYPE_FORMULA", Member.Type.FORMULA)
+            + "."),
 
         /**
          * Definition of the property which
@@ -541,7 +555,7 @@ public interface Property extends MetadataElement {
      * Enumeration of the system properties available for every
      * {@link org.olap4j.Cell}.
      *
-     * <p>The following propertiess are mandatory for cells:<ul>
+     * <p>The following properties are mandatory for cells:<ul>
      * <li>{@link #BACK_COLOR}</li>
      * <li>{@link #CELL_EVALUATION_LIST}</li>
      * <li>{@link #CELL_ORDINAL}</li>

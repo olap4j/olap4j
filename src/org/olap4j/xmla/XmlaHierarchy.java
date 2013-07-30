@@ -22,6 +22,8 @@ import org.olap4j.metadata.Dimension;
 
 import java.util.List;
 
+import static org.olap4j.metadata.XmlaConstants.*;
+
 /**
  * XML for Analysis entity representing a Hierarchy.
  *
@@ -208,7 +210,11 @@ public class XmlaHierarchy extends Entity {
             XmlaType.Integer.of(Enumeration.DIMENSION_KEY_UNIQUENESS),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "Always returns MDDIMENSIONS_MEMBER_KEY_UNIQUE (1).");
+            "Always returns "
+            + sameXmlaNameCode(
+                "MDDIMENSIONS_MEMBER_KEY_UNIQUE (1)",
+                Dimension.KeyUniqueness.MEMBER_KEY_UNIQUE)
+             + ".");
     public final Column DimensionIsVisible =
         new Column(
             "DIMENSION_IS_VISIBLE",

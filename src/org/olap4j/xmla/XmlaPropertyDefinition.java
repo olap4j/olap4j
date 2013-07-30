@@ -22,6 +22,8 @@ import org.olap4j.metadata.XmlaConstants;
 
 import java.util.Set;
 
+import static org.olap4j.metadata.XmlaConstants.*;
+
 /**
  * Enumeration of standard XML for Analysis Properties.
  */
@@ -118,9 +120,13 @@ public enum XmlaPropertyDefinition {
         "Native",
         XmlaConstants.Method.DISCOVER_AND_EXECUTE,
         "Enumerator that determines the format of the returned result set. Values include:\n"
-        + "Tabular: a flat or hierarchical rowset. Similar to the XML RAW format in SQL. The Format property should be set to Tabular for OLE DB for Data Mining commands.\n"
-        + "Multidimensional: Indicates that the result set will use the MDDataSet format (Execute method only).\n"
-        + "Native: The client does not request a specific format, so the provider may return the format  appropriate to the query. (The actual result type is identified by namespace of the result.)"),
+        + sameXmlaName("Tabular", XmlaConstants.Format.Tabular)
+        + ": a flat or hierarchical rowset. Similar to the XML RAW format in SQL. The Format property should be set to Tabular for OLE DB for Data Mining commands.\n"
+        + sameXmlaName(
+            "Multidimensional", XmlaConstants.Format.Multidimensional)
+        + ": Indicates that the result set will use the MDDataSet format (Execute method only).\n"
+        + sameXmlaName("Native", XmlaConstants.Format.Native)
+        + ": The client does not request a specific format, so the provider may return the format  appropriate to the query. (The actual result type is identified by namespace of the result.)"),
 
     LocaleIdentifier(
         XmlaType.UnsignedInteger,
@@ -213,7 +219,11 @@ public enum XmlaPropertyDefinition {
         Integer.toString(XmlaConstants.VisualMode.VISUAL.ordinal()),
         XmlaConstants.Method.DISCOVER_AND_EXECUTE,
         "This property is equivalent to the OLE DB property, MDPROP_VISUALMODE.\n"
-        + "The default value for this property is zero (0), equivalent to DBPROPVAL_VISUAL_MODE_DEFAULT."),
+        + "The default value for this property is "
+        + sameXmlaNameCode(
+            "DBPROPVAL_VISUAL_MODE_DEFAULT (0)",
+            XmlaConstants.VisualMode.DEFAULT)
+        + "."),
 
     // mondrian-specific property for advanced drill-through
     TableFields(

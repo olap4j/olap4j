@@ -193,7 +193,7 @@ public interface Database {
     /**
      * Describes the possible provider types.
      */
-    public static enum ProviderType {
+    public static enum ProviderType implements XmlaConstant {
         /**
          * Designates providers which provide results in the form of
          * tabular data sets.
@@ -214,16 +214,24 @@ public interface Database {
 
         private final String description;
 
+        /** Per {@link XmlaConstant}. */
+        public static final Dictionary<ProviderType> DICTIONARY =
+            DictionaryImpl.forClass(ProviderType.class);
+
         private ProviderType(String description) {
             this.description = description;
         }
 
-        /**
-         * Provides a human readable description of the provider type.
-         * @return A description string.
-         */
+        public String xmlaName() {
+            return name();
+        }
+
         public String getDescription() {
             return description;
+        }
+
+        public int xmlaOrdinal() {
+            return -1;
         }
     }
 }

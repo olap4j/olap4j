@@ -119,7 +119,7 @@ import java.util.Set;
  *
  * <tr>
  * <td>none</td>
- * <td>{@link org.olap4j.metadata.XmlaConstants.ProviderType}</td>
+ * <td>{@link Database.ProviderType}</td>
  * </tr>
  *
  * <tr>

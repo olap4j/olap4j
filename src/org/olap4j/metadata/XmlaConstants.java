@@ -33,6 +33,19 @@ public class XmlaConstants
     private XmlaConstants() {
     }
 
+    private static String same(String s1, String s2) {
+        assert s1.equals(s2);
+        return s1;
+    }
+
+    public static String sameXmlaName(String s1, XmlaConstant c) {
+        return same(s1, c.xmlaName());
+    }
+
+    public static String sameXmlaNameCode(String s1, XmlaConstant c) {
+        return same(s1, c.xmlaName() + " (" + c.xmlaOrdinal() + ")");
+    }
+
     public enum VisualMode implements XmlaConstant {
         DEFAULT(
             0,
@@ -156,36 +169,6 @@ public class XmlaConstants
         }
     }
 
-    public static enum ProviderType implements XmlaConstant {
-        TDP("tabular data provider."),
-        MDP("multidimensional data provider."),
-        DMP(
-            "data mining provider. A DMP provider implements the OLE DB for "
-            + "Data Mining specification.");
-
-        private final String description;
-
-        /** Per {@link XmlaConstant}. */
-        public static final Dictionary<ProviderType> DICTIONARY =
-            DictionaryImpl.forClass(ProviderType.class);
-
-        private ProviderType(String description) {
-            this.description = description;
-        }
-
-        public String xmlaName() {
-            return name();
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public int xmlaOrdinal() {
-            return -1;
-        }
-    }
-
     public static enum Updateable implements XmlaConstant {
         MD_MASK_ENABLED(
             0x00000000,
@@ -268,9 +251,25 @@ public class XmlaConstants
     }
 
     public static enum FontFlag implements XmlaConstant {
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * {@code MDFF_BOLD} (0x01).</p>
+         */
         BOLD(1),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * {@code MDFF_ITALIC} (0x02).</p>
+         */
         ITALIC(2),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * {@code MDFF_UNDERLINE} (0x04).</p>
+         */
         UNDERLINE(4),
+        /**
+         * <p>Corresponds to the OLE DB for OLAP constant
+         * {@code MDFF_STRIKEOUT} (0x08).</p>
+         */
         STRIKEOUT(8);
 
         private final int xmlaOrdinal;

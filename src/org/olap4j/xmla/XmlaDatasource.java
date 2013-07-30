@@ -17,7 +17,12 @@
 */
 package org.olap4j.xmla;
 
+import org.olap4j.metadata.Database;
+import org.olap4j.metadata.XmlaConstants;
+
 import java.util.List;
+
+import static org.olap4j.metadata.XmlaConstants.*;
 
 /**
  * XML for Analysis entity representing a Data Source.
@@ -99,9 +104,12 @@ public class XmlaDatasource extends Entity {
             Column.UNBOUNDED,
             "The types of data supported by the provider. This array can "
             + "include one or more of the following types:\n"
-            + "MDP: multidimensional data provider.\n"
-            + "TDP: tabular data provider.\n"
-            + "DMP: data mining provider (implements the "
+            + sameXmlaName("MDP", Database.ProviderType.MDP)
+            + ": multidimensional data provider.\n"
+            + sameXmlaName("MDP", Database.ProviderType.TDP)
+            + ": tabular data provider.\n"
+            + sameXmlaName("DMP", Database.ProviderType.DMP)
+            + ": data mining provider (implements the "
             + "OLE DB for Data Mining specification).");
     public final Column AuthenticationMode =
         new Column(
@@ -111,10 +119,17 @@ public class XmlaDatasource extends Entity {
             Column.REQUIRED,
             "Specification of what type of security mode the data source "
             + "uses. Values can be one of the following:\n"
-            + "Unauthenticated: no user ID or password needs to be sent.\n"
-            + "Authenticated: User ID and Password must be included in the "
+            + sameXmlaName(
+                "Unauthenticated",
+                XmlaConstants.AuthenticationMode.Unauthenticated)
+            + ": no user ID or password needs to be sent.\n"
+            + sameXmlaName(
+                "Authenticated", XmlaConstants.AuthenticationMode.Authenticated)
+            + ": User ID and Password must be included in the "
             + "information required for the connection.\n"
-            + "Integrated: the data source uses the underlying security to "
+            + sameXmlaName(
+                "Integrated", XmlaConstants.AuthenticationMode.Integrated)
+            + ": the data source uses the underlying security to "
             + "determine authorization, such as Integrated Security "
             + "provided by Microsoft Internet Information Services (IIS).");
 }

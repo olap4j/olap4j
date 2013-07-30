@@ -90,7 +90,7 @@ public class XmlaFunction extends Entity {
             XmlaType.Integer.of(Enumeration.FUNCTION_ORIGIN),
             Column.RESTRICTION,
             Column.REQUIRED,
-            "The origin of the function:  1 for MDX functions.  2 for "
+            "The origin of the function: 1 for MDX functions, 2 for "
             + "user-defined functions.");
     public final Column InterfaceName =
         new Column(
@@ -98,7 +98,7 @@ public class XmlaFunction extends Entity {
             XmlaType.String.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
-            "The name of the interface for user-defined functions");
+            "The name of the interface for user-defined functions.");
     public final Column LibraryName =
         new Column(
             "LIBRARY_NAME",

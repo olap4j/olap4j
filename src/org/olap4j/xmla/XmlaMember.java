@@ -18,8 +18,11 @@
 package org.olap4j.xmla;
 
 import org.olap4j.metadata.Cube;
+import org.olap4j.metadata.Member;
 
 import java.util.List;
+
+import static org.olap4j.metadata.XmlaConstants.*;
 
 /**
  * XML for Analysis entity representing a Member.
@@ -229,7 +232,8 @@ public class XmlaMember extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The expression for calculations, if the member is of type "
-            + "MDMEMBER_TYPE_FORMULA.");
+            + sameXmlaName("MDMEMBER_TYPE_FORMULA", Member.Type.FORMULA)
+            + ".");
     public final Column MemberKey =
         new Column(
             "MEMBER_KEY",
