@@ -108,59 +108,170 @@ import java.util.*;
  * <ul>
  *
  * <li>{@link XmlaAction#ActionType}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaAction#ActionCaption}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaAction#Description}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaAction#Content}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaAction#Application}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaAction#Invocation}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaCube#BaseCubeName}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaCube#Annotations}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaDimension#Annotations}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaLevel#Annotations}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaLevel#LevelOrderingProperty}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaLevel#LevelDbtype}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaLevel#LevelMasterUniqueName}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaLevel#LevelNameSqlColumnName}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaLevel#LevelKeySqlColumnName}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaLevel#LevelUniqueNameSqlColumnName}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaLevel#LevelKeyCardinality}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaLevel#LevelOrigin}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaHierarchy#DimensionMasterUniqueName}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaHierarchy#HierarchyOrigin}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaHierarchy#HierarchyDisplayFolder}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaHierarchy#InstanceSelection}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaHierarchy#GroupingBehavior}
+ *     TODO: add method
+ *     TODO: add test
+ * <li>{@link XmlaHierarchy#Structure}
+ *     {@link org.olap4j.metadata.Hierarchy#getStructure()}
+ *     TODO: add test
  * <li>{@link XmlaHierarchy#StructureType}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMeasure#NumericPrecision}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMeasure#NumericScale}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMeasure#MeasureUnits}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMeasure#Expression}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMeasure#MeasureNameSqlColumnName}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMeasure#MeasureUnqualifiedCaption}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMeasure#MeasuregroupName}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMeasure#MeasureDisplayFolder}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMember#Description}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMember#Expression}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMember#MemberKey}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMember#IsPlaceholdermember}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMember#IsDatamember}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaMember#Scope}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaProperty#CharacterMaximumLength}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaProperty#CharacterOctetLength}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaProperty#NumericPrecision}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaProperty#NumericScale}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaProperty#SqlColumnName}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaProperty#Language}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaProperty#PropertyOrigin}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaProperty#PropertyAttributeHierarchyName}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaProperty#PropertyCardinality}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaProperty#MimeType}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaProperty#PropertyIsVisible}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaSet#Annotations}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaSet#Expression}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaSet#Dimensions}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaSet#SetDisplayFolder}
+ *     TODO: add method
+ *     TODO: add test
  * <li>{@link XmlaSet#SetEvaluationContext}
+ *     TODO: add method
+ *     TODO: add test
  *
  * </ul>
  *
@@ -179,6 +290,8 @@ import java.util.*;
  * {@link XmlaSet#HierarchyUniqueName}
  *
  * </ul>
+ *
+ * <h2>Tests to be written</h2>
  *
  * Other comments
  *
