@@ -324,7 +324,15 @@ abstract class XmlaOlap4jUtil {
     }
 
     static boolean booleanElement(Element row, String name) {
-        return "true".equals(stringElement(row, name));
+        return booleanElement(row, name, false);
+    }
+
+    static boolean booleanElement(Element row, String name, boolean dflt) {
+        final String s = stringElement(row, name);
+        if (s == null) {
+            return dflt;
+        }
+        return "true".equals(s);
     }
 
     static Float floatElement(Element row, String name) {

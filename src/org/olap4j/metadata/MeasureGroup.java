@@ -20,11 +20,37 @@ package org.olap4j.metadata;
 import java.util.List;
 
 public interface MeasureGroup extends MetadataElement {
-    NamedList<Dimension> getDimensions();
+    /**
+     * Returns the {@link Cube} this {@code MeasureGroup} belongs to.
+     *
+     * @return cube this measure group belongs to; never null
+     */
+    Cube getCube();
 
-    NamedList<Hierarchy> getHierarchies();
+    /**
+     * Returns the {@link MeasureGroupDimension}s in this {@code MeasureGroup}.
+     *
+     * @return dimension uses in this measure group
+     */
+    NamedList<MeasureGroupDimension> getDimensions();
 
-    List<Measure> getMeasures();
+    /**
+     * Returns the measures in this {@code MeasureGroup}. The measures belong to
+     * the same cube, but may be a subset.
+     *
+     * @see org.olap4j.metadata.Cube#getMeasures()
+     *
+     * @return measures in this measure group
+     */
+    // NOTE: This is a NamedList whereas Cube.getMeasures is just a List. Why?
+    // Because Cube measures include calculated measures, so the names may not
+    // be unique. Measure group measures are all stored, so have unique names.
+    NamedList<Measure> getMeasures();
+
+    /**
+     * Returns whether this {@code MeasureGroup} is write-enabled.
+     */
+    boolean isWriteEnabled();
 }
 
 // End MeasureGroup.java

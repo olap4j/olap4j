@@ -27,6 +27,7 @@ import org.olap4j.mdx.parser.impl.DefaultMdxParserImpl;
 import org.olap4j.metadata.*;
 import org.olap4j.metadata.Database.AuthenticationMode;
 import org.olap4j.metadata.Database.ProviderType;
+import org.olap4j.xmla.XmlaMeasureGroup;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -1294,11 +1295,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 XmlaOlap4jUtil.stringElement(row, "CATALOG_NAME");
             String roles =
                 XmlaOlap4jUtil.stringElement(row, "ROLES");
-            List<String> roleList = new ArrayList<String>();
+            final List<String> roleList;
             if (roles !=  null && !"".equals(roles)) {
-                for (String role : roles.split(",")) {
-                    roleList.add(role);
-                }
+                roleList = Arrays.asList(roles.split(","));
+            } else {
+                roleList = Collections.emptyList();
             }
             // Unused: DESCRIPTION
             list.add(
@@ -1374,29 +1375,36 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 caption = measureGroupName;
             }
             String description = stringElement(row, "DESCRIPTION");
+            final boolean writeEnabled =
+                booleanElement(
+                    row, XmlaMeasureGroup.INSTANCE.IsWriteEnabled.name, true);
             XmlaOlap4jMeasureGroup measureGroup =
                 new XmlaOlap4jMeasureGroup(
                     context.olap4jCube,
+                    context.olap4jCube.getUniqueName()
+                        + ".[" + measureGroupName + "]",
                     measureGroupName,
                     caption,
-                    description);
+                    description,
+                    writeEnabled);
             list.add(measureGroup);
         }
     }
 
     static class MeasureGroupDimensionHandler
-        extends HandlerImpl<XmlaOlap4jDimension>
+        extends HandlerImpl<XmlaOlap4jMeasureGroupDimension>
     {
-        private final XmlaOlap4jCube cubeForCallback;
+        private final XmlaOlap4jMeasureGroup olap4jMeasureGroup;
 
-        public MeasureGroupDimensionHandler(XmlaOlap4jCube cube) {
-            this.cubeForCallback = cube;
+        public MeasureGroupDimensionHandler(XmlaOlap4jMeasureGroup cube) {
+            this.olap4jMeasureGroup = cube;
         }
 
         public void handle(
             Element row,
             Context context,
-            List<XmlaOlap4jDimension> list)
+            List<XmlaOlap4jMeasureGroupDimension> list)
+            throws OlapException
         {
             // Example:
             //
@@ -1424,9 +1432,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 stringElement(row, "DIMENSION_UNIQUE_NAME");
             // Cannot use cubeForCallback.dimensionsByUname because it may not
             // be fully populated
-            for (XmlaOlap4jDimension dimension : cubeForCallback.dimensions) {
+            for (XmlaOlap4jDimension dimension
+                : olap4jMeasureGroup.olap4jCube.dimensions)
+            {
                 if (dimension.getUniqueName().equals(dimensionUniqueName)) {
-                    list.add(dimension);
+                    list.add(
+                        new XmlaOlap4jMeasureGroupDimension(
+                            olap4jMeasureGroup, dimension, null));
                     break;
                 }
             }
@@ -1960,7 +1972,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class CatalogSchemaHandler extends HandlerImpl<XmlaOlap4jSchema> {
-
         private String catalogName;
 
         public CatalogSchemaHandler(String catalogName) {

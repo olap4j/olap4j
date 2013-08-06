@@ -21,42 +21,35 @@ import org.olap4j.OlapException;
 import org.olap4j.impl.Named;
 import org.olap4j.impl.NamedListImpl;
 import org.olap4j.impl.Olap4jUtil;
-import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.Measure;
-import org.olap4j.metadata.MeasureGroup;
-import org.olap4j.metadata.NamedList;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.olap4j.metadata.*;
 
 /**
  * Implementation of {@link org.olap4j.metadata.MeasureGroup}
  * for XML/A providers.
  */
 class XmlaOlap4jMeasureGroup
+    extends XmlaOlap4jElement
     implements MeasureGroup, Named
 {
     final XmlaOlap4jCube olap4jCube;
-    private final String name;
-    private final String caption;
-    private final String description;
 
-    final NamedList<XmlaOlap4jDimension> dimensions;
-    private NamedList<XmlaOlap4jHierarchy> hierarchies = null;
-    final List<XmlaOlap4jMeasure> measures = new ArrayList<XmlaOlap4jMeasure>();
+    final NamedList<XmlaOlap4jMeasureGroupDimension> measureGroupDimensions;
+    final NamedList<XmlaOlap4jMeasure> measures =
+        new NamedListImpl<XmlaOlap4jMeasure>();
+    private final boolean writeEnabled;
 
     XmlaOlap4jMeasureGroup(
         XmlaOlap4jCube olap4jCube,
+        String uniqueName,
         String name,
         String caption,
-        String description) throws OlapException
+        String description,
+        boolean writeEnabled) throws OlapException
     {
+        super(uniqueName, name, caption, description);
         assert olap4jCube != null;
         this.olap4jCube = olap4jCube;
-        this.name = name;
-        this.caption = caption;
-        this.description = description;
+        this.writeEnabled = writeEnabled;
 
         final XmlaOlap4jConnection olap4jConnection =
             olap4jCube.olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
@@ -76,14 +69,16 @@ class XmlaOlap4jMeasureGroup
             getName()
         };
 
-        this.dimensions = new DeferredNamedListImpl<XmlaOlap4jDimension>(
-            XmlaOlap4jConnection.MetadataRequest
-                .MDSCHEMA_MEASUREGROUP_DIMENSIONS,
-            context,
-            new XmlaOlap4jConnection.MeasureGroupDimensionHandler(olap4jCube),
-            restrictions);
+        this.measureGroupDimensions =
+            new DeferredNamedListImpl<XmlaOlap4jMeasureGroupDimension>(
+                XmlaOlap4jConnection.MetadataRequest
+                    .MDSCHEMA_MEASUREGROUP_DIMENSIONS,
+                context,
+                new XmlaOlap4jConnection.MeasureGroupDimensionHandler(this),
+                restrictions);
 
-        // populate measures up front; a measure is needed in every query
+        // REVIEW: Measures can be taken from the cube.
+        // REVIEW: Subset of measures.
         olap4jConnection.populateList(
             measures,
             context,
@@ -92,45 +87,26 @@ class XmlaOlap4jMeasureGroup
             restrictions);
     }
 
-    public String getName() {
-        return name;
+    public boolean equals(Object obj) {
+        return obj == this
+            || obj instanceof XmlaOlap4jMeasureGroup
+            && uniqueName.equals(((XmlaOlap4jMeasureGroup) obj).uniqueName);
     }
 
-    public String getUniqueName() {
-        return "[" + name + "]";
+    public Cube getCube() {
+        return olap4jCube;
     }
 
-    public String getCaption() {
-        return caption;
+    public NamedList<MeasureGroupDimension> getDimensions() {
+        return Olap4jUtil.cast(measureGroupDimensions);
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public boolean isVisible() {
-        return true;
-    }
-
-    public NamedList<Dimension> getDimensions() {
-        return Olap4jUtil.cast(dimensions);
-    }
-
-    public NamedList<Hierarchy> getHierarchies() {
-        // This is a costly operation. It forces the init
-        // of all dimensions and all hierarchies.
-        // We defer it to this point.
-        if (this.hierarchies == null) {
-            this.hierarchies = new NamedListImpl<XmlaOlap4jHierarchy>();
-            for (XmlaOlap4jDimension dim : this.dimensions) {
-                this.hierarchies.addAll(dim.hierarchies);
-            }
-        }
-        return Olap4jUtil.cast(hierarchies);
-    }
-
-    public List<Measure> getMeasures() {
+    public NamedList<Measure> getMeasures() {
         return Olap4jUtil.cast(measures);
+    }
+
+    public boolean isWriteEnabled() {
+        return writeEnabled;
     }
 }
 

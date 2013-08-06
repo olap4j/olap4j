@@ -86,6 +86,9 @@ import java.util.*;
  *
  * 12. Make sure every entity has an "annotation" attribute.
  *
+ * 13. Measures of a measure group may be a strict subset of the cube's measures
+ * but XMLA does not provide a way to find out which measures.
+ *
  * <h2>Release notes</h2>
  *
  * <p>{@link org.olap4j.metadata.XmlaConstants.EnumWithDesc} is deprecated.
@@ -205,6 +208,65 @@ import java.util.*;
  *     TODO: add test
  * <li>{@link XmlaMeasure#MeasureDisplayFolder}
  *     TODO: add method
+ *     TODO: add test
+
+ * <li>{@link XmlaMeasureGroup#CatalogName}
+ *     via {@link org.olap4j.metadata.MeasureGroup#getCube()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroup#SchemaName}
+ *     via {@link org.olap4j.metadata.MeasureGroup#getCube()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroup#CubeName}
+ *     via {@link org.olap4j.metadata.MeasureGroup#getCube()}
+ *     TODO: add method
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroup#Description}
+ *     {@link org.olap4j.metadata.MeasureGroup#getDescription()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroup#MeasuregroupCaption}
+ *     {@link org.olap4j.metadata.MeasureGroup#getCaption()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroup#MeasuregroupName}
+ *     {@link org.olap4j.metadata.MeasureGroup#getName()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroup#IsWriteEnabled}
+ *     {@link org.olap4j.metadata.MeasureGroup#isWriteEnabled()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#CatalogName}
+ *     via {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroup()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#SchemaName}
+ *     via {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroup()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#CubeName}
+ *     via {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroup()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#MeasuregroupName}
+ *     via {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroup()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#MeasuregroupCardinality}
+ *     TODO: add method
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#DimensionUniqueName}
+ *     via {@link org.olap4j.metadata.MeasureGroupDimension#getDimension()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#DimensionCardinality}
+ *     TODO: add method
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#DimensionGranularity}
+ *     {@link org.olap4j.metadata.MeasureGroupDimension#getGranularityHierarchy()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#DimensionIsFactDimension}
+ *     TODO: add method
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#DimensionIsVisible}
+ *     via {@link org.olap4j.metadata.MeasureGroupDimension#getDimension()}
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#DimensionPath}
+ *     TODO: add method
+ *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#DimensionVisibility}
+ *     TODO: add restriction
  *     TODO: add test
  * <li>{@link XmlaMember#Description}
  *     TODO: add method
