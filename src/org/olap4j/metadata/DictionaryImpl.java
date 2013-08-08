@@ -62,6 +62,7 @@ public class DictionaryImpl<E extends Enum<E> & XmlaConstant>
         //noinspection unchecked
         this.values = UnmodifiableArrayList.of(constants);
         for (E e : values) {
+            assert e != null : "cyclic initialization?";
             byName.put(e.xmlaName(), e);
             byOrdinal.put(e.xmlaOrdinal(), e);
         }

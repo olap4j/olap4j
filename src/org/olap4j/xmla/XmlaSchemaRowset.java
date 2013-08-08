@@ -45,7 +45,7 @@ public class XmlaSchemaRowset extends Entity {
     public final Column SchemaName =
         new Column(
             "SchemaName",
-            XmlaType.StringArray.of(Enumeration.REQUEST_TYPES),
+            XmlaType.StringArray.of(RowsetDefinition.class),
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the schema or request. This request returns the "

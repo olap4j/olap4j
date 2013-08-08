@@ -40,7 +40,7 @@ public class XmlaTable extends Entity {
             TableType,
             TableGuid,
             Description,
-            TablePropId,
+            TablePropid,
             DateCreated,
             DateModified);
     }
@@ -97,7 +97,7 @@ public class XmlaTable extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A human-readable description of the object.");
-    public final Column TablePropId =
+    public final Column TablePropid =
         new Column(
             "TABLE_PROPID",
             XmlaType.UnsignedInteger.scalar(),

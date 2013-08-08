@@ -19,6 +19,8 @@ package org.olap4j.xmla;
 
 import org.olap4j.metadata.*;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,7 +30,8 @@ public class Enumeration<E extends Enum<E> & XmlaConstant> {
     public final String name;
     public final String description;
     public final XmlaType type;
-    private final XmlaConstant.Dictionary<E> dictionary;
+    private final Class<E> enumClass;
+    private XmlaConstant.Dictionary<E> dictionary;
 
     public static final Enumeration<Member.TreeOp> TREE_OP =
         of(
@@ -36,7 +39,7 @@ public class Enumeration<E extends Enum<E> & XmlaConstant> {
             "Bitmap which controls which relatives of a member are "
             + "returned",
             XmlaType.Integer,
-            Member.TreeOp.DICTIONARY);
+            Member.TreeOp.class);
 
     public static final Enumeration<XmlaConstants.VisualMode> VISUAL_MODE =
         of(
@@ -44,21 +47,21 @@ public class Enumeration<E extends Enum<E> & XmlaConstant> {
             "This property determines the default behavior for visual "
             + "totals.",
             XmlaType.Integer,
-            XmlaConstants.VisualMode.DICTIONARY);
+            XmlaConstants.VisualMode.class);
 
     public static final Enumeration<XmlaConstants.Method> METHODS =
         of(
             "Methods",
             "Set of methods for which a property is applicable",
             XmlaType.Enumeration,
-            XmlaConstants.Method.DICTIONARY);
+            XmlaConstants.Method.class);
 
     public static final Enumeration<XmlaConstants.Access> ACCESS =
         of(
             "Access",
             "The read/write behavior of a property",
             XmlaType.Enumeration,
-            XmlaConstants.Access.DICTIONARY);
+            XmlaConstants.Access.class);
 
     public static final Enumeration<XmlaConstants.AuthenticationMode>
         AUTHENTICATION_MODE =
@@ -67,28 +70,28 @@ public class Enumeration<E extends Enum<E> & XmlaConstant> {
             "Specification of what type of security mode the data source "
             + "uses.",
             XmlaType.EnumString,
-            XmlaConstants.AuthenticationMode.DICTIONARY);
+            XmlaConstants.AuthenticationMode.class);
 
     public static final Enumeration<Database.ProviderType> PROVIDER_TYPE =
         of(
             "ProviderType",
             "The types of data supported by the provider.",
             XmlaType.Array,
-            Database.ProviderType.DICTIONARY);
+            Database.ProviderType.class);
 
     public static final Enumeration<RowsetDefinition> REQUEST_TYPES =
         of(
             "RequestTypes",
             "The types of data supported by the provider.",
             XmlaType.Array,
-            RowsetDefinition.DICTIONARY);
+            RowsetDefinition.class);
 
     public static final Enumeration<Dimension.Type> DIMENSION_TYPE =
         of(
             "DimensionType",
             "The type of a dimension.",
             XmlaType.Short,
-            Dimension.Type.DICTIONARY);
+            Dimension.Type.class);
 
     public static final Enumeration<Dimension.KeyUniqueness>
         DIMENSION_KEY_UNIQUENESS =
@@ -96,42 +99,42 @@ public class Enumeration<E extends Enum<E> & XmlaConstant> {
             "DimensionKeyUniqueness",
             "Key uniqueness.",
             XmlaType.Integer,
-            Dimension.KeyUniqueness.DICTIONARY);
+            Dimension.KeyUniqueness.class);
 
     public static final Enumeration<Dimension.Visibility> VISIBILITY =
         of(
             "Visibility",
             "Whether a dimension is visible.",
             XmlaType.UnsignedShort,
-            Dimension.Visibility.DICTIONARY);
+            Dimension.Visibility.class);
 
     public static final Enumeration<Cube.Type> CUBE_TYPE =
         of(
             "CubeType",
             "Type of a cube.",
             XmlaType.String,
-            Cube.Type.DICTIONARY);
+            Cube.Type.class);
 
     public static final Enumeration<Level.Type> LEVEL_TYPE =
         of(
             "LevelType",
             "Type of a level.",
             XmlaType.Integer,
-            Level.Type.DICTIONARY);
+            Level.Type.class);
 
     public static final Enumeration<Level.CustomRollup> LEVEL_CUSTOM_ROLLUP =
         of(
             "LevelCustomRollup",
             "Custom rollup options for a level.",
             XmlaType.Integer,
-            Level.CustomRollup.DICTIONARY);
+            Level.CustomRollup.class);
 
     public static final Enumeration<Hierarchy.Origin> ORIGIN =
         of(
             "Origin",
             "Source of a hierarchy.",
             XmlaType.Integer,
-            Hierarchy.Origin.DICTIONARY);
+            Hierarchy.Origin.class);
 
     public static final Enumeration<XmlaConstants.FunctionOrigin>
         FUNCTION_ORIGIN =
@@ -139,28 +142,28 @@ public class Enumeration<E extends Enum<E> & XmlaConstant> {
             "FunctionOrigin",
             "Origin of a function.",
             XmlaType.Integer,
-            XmlaConstants.FunctionOrigin.DICTIONARY);
+            XmlaConstants.FunctionOrigin.class);
 
     public static final Enumeration<XmlaConstants.DBType> DBTYPE =
         of(
             "DBType",
             "Database type.",
             XmlaType.Integer,
-            XmlaConstants.DBType.DICTIONARY);
+            XmlaConstants.DBType.class);
 
     public static final Enumeration<NamedSet.Scope> SET_SCOPE =
         of(
             "SetScope",
             "Scope of a set.",
             XmlaType.Integer,
-            NamedSet.Scope.DICTIONARY);
+            NamedSet.Scope.class);
 
     public static final Enumeration<NamedSet.Resolution> SET_RESOLUTION =
         of(
             "SetResolution",
             "The evaluation context for a set.",
             XmlaType.Integer,
-            NamedSet.Resolution.DICTIONARY);
+            NamedSet.Resolution.class);
 
     public static final Enumeration<Hierarchy.InstanceSelection>
         INSTANCE_SELECTION =
@@ -168,7 +171,7 @@ public class Enumeration<E extends Enum<E> & XmlaConstant> {
             "InstanceSelection",
             "A hint to the client application on how to show a hierarchy.",
             XmlaType.UnsignedShort,
-            Hierarchy.InstanceSelection.DICTIONARY);
+            Hierarchy.InstanceSelection.class);
 
     public static final Enumeration<Hierarchy.GroupingBehavior>
         GROUPING_BEHAVIOR =
@@ -176,28 +179,28 @@ public class Enumeration<E extends Enum<E> & XmlaConstant> {
             "GroupingBehavior",
             "Expected grouping behavior of clients of a hierarchy.",
             XmlaType.Short,
-            Hierarchy.GroupingBehavior.DICTIONARY);
+            Hierarchy.GroupingBehavior.class);
 
     public static final Enumeration<Hierarchy.Structure> STRUCTURE =
         of(
             "Structure",
             "The structure of a hierarchy",
             XmlaType.Short,
-            Hierarchy.Structure.DICTIONARY);
+            Hierarchy.Structure.class);
 
     public static final Enumeration<Hierarchy.StructureType> STRUCTURE_TYPE =
         of(
             "StructureType",
             "Type of hierarchy.",
             XmlaType.String,
-            Hierarchy.StructureType.DICTIONARY);
+            Hierarchy.StructureType.class);
 
     public static final Enumeration<XmlaConstants.ActionType> ACTION_TYPE =
         of(
             "ActionType",
             "Triggering method of an action.",
             XmlaType.Integer,
-            XmlaConstants.ActionType.DICTIONARY);
+            XmlaConstants.ActionType.class);
 
     public static final Enumeration<XmlaConstants.CoordinateType>
         COORDINATE_TYPE =
@@ -206,35 +209,35 @@ public class Enumeration<E extends Enum<E> & XmlaConstant> {
             "Specifies how the coordinate restriction column of an action is "
             + "interpreted.",
             XmlaType.Integer,
-            XmlaConstants.CoordinateType.DICTIONARY);
+            XmlaConstants.CoordinateType.class);
 
     public static final Enumeration<XmlaConstants.Invocation> INVOCATION =
         of(
             "Invocation",
             "Information about how an action should be invoked.",
             XmlaType.Integer,
-            XmlaConstants.Invocation.DICTIONARY);
+            XmlaConstants.Invocation.class);
 
     public static final Enumeration<Member.Scope> MEMBER_SCOPE =
         of(
             "MemberScope",
             "Scope of a calculated member.",
             XmlaType.Integer,
-            Member.Scope.DICTIONARY);
+            Member.Scope.class);
 
     public static final Enumeration<Member.Type> MEMBER_TYPE =
         of(
             "MemberType",
             "The type of a member.",
             XmlaType.Integer,
-            Member.Type.DICTIONARY);
+            Member.Type.class);
 
     public static final Enumeration<Property.TypeFlag> PROPERTY_TYPE =
         of(
             "PropertyType",
             "The type of a property.",
             XmlaType.Short,
-            Property.TypeFlag.DICTIONARY);
+            Property.TypeFlag.class);
 
     public static final Enumeration<Property.ContentType>
         PROPERTY_CONTENT_TYPE =
@@ -242,42 +245,71 @@ public class Enumeration<E extends Enum<E> & XmlaConstant> {
             "PropertyContentType",
             "The type of content contained by a property.",
             XmlaType.Short,
-            Property.ContentType.DICTIONARY);
+            Property.ContentType.class);
 
     public static final Enumeration<XmlaKpi.ScopeEnum> KPI_SCOPE =
         of(
             "KpiScope",
             "Scope of a KPI.",
             XmlaType.Integer,
-            XmlaKpi.ScopeEnum.DICTIONARY);
+            XmlaKpi.ScopeEnum.class);
 
-    public static <E extends Enum<E> & XmlaConstant> Enumeration<E> of(
+    private static <E extends Enum<E> & XmlaConstant> Enumeration<E> of(
         String name,
         String description,
         XmlaType type,
-        XmlaConstant.Dictionary<E> dictionary)
+        Class<E> enumClass)
     {
-        return new Enumeration<E>(name, description, type, dictionary);
+        return new Enumeration<E>(name, description, type, enumClass);
     }
 
     private Enumeration(
         String name,
         String description,
         XmlaType type,
-        XmlaConstant.Dictionary<E> dictionary)
+        Class<E> enumClass)
     {
         this.name = name;
         this.description = description;
         this.type = type;
-        this.dictionary = dictionary;
+        this.enumClass = enumClass;
     }
 
     public String getName() {
         return name;
     }
 
-    public List<? extends Enum> getValues() {
-        return dictionary.getValues();
+    /** Returns all instances of {@code Enumeration}. */
+    public static List<Enumeration> getValues() {
+        final List<Enumeration> list = new ArrayList<Enumeration>();
+        for (Field field : Enumeration.class.getFields()) {
+            if (Enumeration.class.isAssignableFrom(field.getType())) {
+                try {
+                    list.add((Enumeration) field.get(null));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Returns a dictionary of the values of this enumeration.
+     */
+    public synchronized XmlaConstant.Dictionary<E> getDictionary() {
+        if (dictionary == null) {
+            try {
+                //noinspection unchecked
+                dictionary = (XmlaConstant.Dictionary<E>)
+                    enumClass.getField("DICTIONARY").get(null);
+            } catch (IllegalAccessException e) {
+                throw new AssertionError("must have DICTIONARY field");
+            } catch (NoSuchFieldException e) {
+                throw new AssertionError("must have DICTIONARY field");
+            }
+        }
+        return dictionary;
     }
 }
 

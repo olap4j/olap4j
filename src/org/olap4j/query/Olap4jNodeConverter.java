@@ -274,7 +274,7 @@ abstract class Olap4jNodeConverter {
      * It might return null if there are no dimensions placed on the axis.
      */
     private static AxisNode toOlap4j(QueryAxis axis) {
-        CallNode callNode = null;
+        CallNode callNode;
         int numDimensions = axis.getDimensions().size();
         if (numDimensions == 0) {
             return null;
@@ -299,7 +299,7 @@ abstract class Olap4jNodeConverter {
             }
         }
 
-        ParseTreeNode filteredNode = null;
+        ParseTreeNode filteredNode;
         if (axis.getFilterCondition() != null) {
             LiteralNode conditionNode =
                 LiteralNode.createSymbol(
@@ -316,7 +316,7 @@ abstract class Olap4jNodeConverter {
             filteredNode = callNode;
         }
         // We might need to limit the axis set
-        ParseTreeNode limitedNode = null;
+        ParseTreeNode limitedNode;
         if (axis.getLimitFunction() != null) {
             ParseTreeNode n =
                 LiteralNode.createNumeric(
@@ -324,8 +324,7 @@ abstract class Olap4jNodeConverter {
                     axis.getLimitFunctionN(),
                     false);
             if (axis.getLimitFunctionSortLiteral() != null) {
-                LiteralNode evaluatorNode = null;
-                evaluatorNode =
+                LiteralNode evaluatorNode =
                     LiteralNode.createSymbol(
                         null,
                         axis.getLimitFunctionSortLiteral());
@@ -350,7 +349,7 @@ abstract class Olap4jNodeConverter {
             limitedNode = filteredNode;
         }
         // We might need to sort the whole axis.
-        ParseTreeNode sortedNode = null;
+        ParseTreeNode sortedNode;
         if (axis.getSortOrder() != null) {
             LiteralNode evaluatorNode =
                  LiteralNode.createSymbol(

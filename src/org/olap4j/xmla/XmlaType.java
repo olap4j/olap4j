@@ -56,19 +56,32 @@ public enum XmlaType {
     }
 
     ColumnType scalar() {
-        return new ColumnType(this, null);
+        return new ColumnType(this, null, null);
     }
 
     public ColumnType of(Enumeration enumeration) {
-        return new ColumnType(this, enumeration);
+        assert enumeration != null;
+        return new ColumnType(this, enumeration, null);
+    }
+
+    public ColumnType of(Class<? extends Enum> dictionary) {
+        assert dictionary != null;
+        return new ColumnType(this, null, dictionary);
     }
 
     static class ColumnType {
         final XmlaType xmlaType;
-        Enumeration enumeratedType;
+        final Enumeration enumeratedType;
+        final Class<? extends Enum> dictionary;
 
-        public ColumnType(XmlaType xmlaType, Enumeration access) {
+        public ColumnType(
+            XmlaType xmlaType,
+            Enumeration enumeratedType,
+            Class<? extends Enum> dictionary)
+        {
             this.xmlaType = xmlaType;
+            this.enumeratedType = enumeratedType;
+            this.dictionary = dictionary;
         }
     }
 }

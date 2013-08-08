@@ -106,7 +106,7 @@ public class XmlaDatasource extends Entity {
             + "include one or more of the following types:\n"
             + sameXmlaName("MDP", Database.ProviderType.MDP)
             + ": multidimensional data provider.\n"
-            + sameXmlaName("MDP", Database.ProviderType.TDP)
+            + sameXmlaName("TDP", Database.ProviderType.TDP)
             + ": tabular data provider.\n"
             + sameXmlaName("DMP", Database.ProviderType.DMP)
             + ": data mining provider (implements the "

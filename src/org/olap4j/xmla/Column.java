@@ -17,8 +17,6 @@
 */
 package org.olap4j.xmla;
 
-import org.olap4j.metadata.Dimension;
-
 import java.lang.reflect.*;
 
 /**
@@ -101,10 +99,20 @@ public class Column {
         String description)
     {
         assert type != null;
-        assert (type.xmlaType == XmlaType.Enumeration
-                || type.xmlaType == XmlaType.EnumerationArray
-                || type.xmlaType == XmlaType.EnumString)
-               == (type.enumeratedType != null);
+        switch (type.xmlaType) {
+        case Enumeration:
+        case EnumerationArray:
+        case EnumString:
+            assert type.enumeratedType != null;
+            break;
+        case Short:
+        case UnsignedShort:
+        case Integer:
+        case String:
+            break;
+        default:
+            assert type.enumeratedType == null;
+        }
         // Line endings must be UNIX style (LF) not Windows style (LF+CR).
         // Thus the client will receive the same XML, regardless
         // of the server O/S.
@@ -116,6 +124,18 @@ public class Column {
         this.restriction = restriction;
         this.nullable = nullable;
         this.unbounded = unbounded;
+    }
+
+    /** Call this method when declaring a column to indicate that the column
+     * is a Mondrian extension to the XMLA standard. The method does nothing
+     * at this time. */
+    Column extension() {
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
     /**

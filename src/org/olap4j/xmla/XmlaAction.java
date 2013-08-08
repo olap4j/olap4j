@@ -44,7 +44,12 @@ public class XmlaAction extends Entity {
             CubeName,
             ActionName,
             Coordinate,
-            CoordinateType);
+            CoordinateType,
+            ActionCaption,
+            Description,
+            Content,
+            Application,
+            Invocation);
     }
 
     public List<Column> sortColumns() {

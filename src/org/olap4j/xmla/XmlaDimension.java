@@ -50,7 +50,7 @@ public class XmlaDimension extends Entity {
             DefaultHierarchy,
             Description,
             IsVirtual,
-            IsReadWrite,
+            IsReadwrite,
             DimensionUniqueSettings,
             DimensionMasterUniqueName,
             DimensionIsVisible,
@@ -175,7 +175,7 @@ public class XmlaDimension extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Always FALSE.");
-    public final Column IsReadWrite =
+    public final Column IsReadwrite =
         new Column(
             "IS_READWRITE",
             XmlaType.Boolean.scalar(),
@@ -213,7 +213,7 @@ public class XmlaDimension extends Entity {
             XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "A set of notes, in XML format.");
+            "A set of notes, in XML format.").extension();
 
     // Only a restriction.
     public final Column CubeSource =
@@ -242,7 +242,7 @@ public class XmlaDimension extends Entity {
             XmlaType.Rowset.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "Hierarchies in this dimension.");
+            "Hierarchies in this dimension.").extension();
 }
 
 // End XmlaDimension.java

@@ -217,7 +217,7 @@ public class XmlaCube extends Entity {
             XmlaType.Rowset.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "Dimensions in this cube.");
+            "Dimensions in this cube.").extension();
 
     // Mondrian extension.
     public final Column Sets =
@@ -226,7 +226,7 @@ public class XmlaCube extends Entity {
             XmlaType.Rowset.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "Sets in this cube.");
+            "Sets in this cube.").extension();
 
     // Mondrian extension.
     public final Column Measures =
@@ -235,7 +235,7 @@ public class XmlaCube extends Entity {
             XmlaType.Rowset.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "Measures in this cube.");
+            "Measures in this cube.").extension();
 
     // Only a restriction.
     public final Column CubeSource =

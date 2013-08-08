@@ -178,7 +178,7 @@ public class XmlaProperty extends Entity {
             + "Returns NULL for all other data types.");
     public final Column CharacterOctetLength =
         new Column(
-            "CHARACTER_MAXIMUM_LENGTH",
+            "CHARACTER_OCTET_LENGTH",
             XmlaType.UnsignedLong.scalar(),
             Restriction.NO,
             Column.OPTIONAL,

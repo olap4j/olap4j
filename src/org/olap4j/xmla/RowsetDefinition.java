@@ -537,6 +537,7 @@ public enum RowsetDefinition implements XmlaConstant {
         String description,
         Entity entity)
     {
+        assert entity.isValid(true);
         this.xmlaOrdinal = xmlaOrdinal;
         this.description = description;
         this.columns = entity.columns();

@@ -19,6 +19,7 @@ package org.olap4j;
 
 import org.olap4j.metadata.*;
 import org.olap4j.xmla.*;
+import org.olap4j.xmla.Enumeration;
 
 import junit.framework.TestCase;
 
@@ -383,6 +384,19 @@ public class MetaModelTest extends TestCase {
         FullType.of(XmlaConstants.DBType.UI2);
     private static final FullType WSTR = FullType.of(XmlaConstants.DBType.WSTR);
     private static final FullType BOOL = FullType.of(XmlaConstants.DBType.BOOL);
+
+    public void testInit() {
+        System.out.println(XmlaAction.INSTANCE);
+        System.out.println(XmlaMeasureGroup.INSTANCE);
+        for (RowsetDefinition rowsetDefinition : RowsetDefinition.values()) {
+            System.out.println(rowsetDefinition);
+        }
+        for (Enumeration enumeration : Enumeration.getValues()) {
+            for (Object o : enumeration.getDictionary().getValues()) {
+                System.out.println(o);
+            }
+        }
+    }
 
     public void testGenerateMethods() {
         final PrintWriter out = new PrintWriter(System.out);

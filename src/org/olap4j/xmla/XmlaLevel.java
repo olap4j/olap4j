@@ -289,7 +289,7 @@ public class XmlaLevel extends Entity {
             XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "A set of notes, in XML format.");
+            "A set of notes, in XML format.").extension();
 
     // Only a restriction.
     public final Column CubeSource =

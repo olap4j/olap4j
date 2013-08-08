@@ -166,7 +166,7 @@ public class XmlaMember extends Entity {
             XmlaType.StringSometimesArray.scalar(),
             Column.RESTRICTION,
             Column.REQUIRED,
-            " Unique name of the member.");
+            "Unique name of the member.");
     public final Column MemberType =
         new Column(
             "MEMBER_TYPE",
@@ -297,7 +297,6 @@ public class XmlaMember extends Entity {
                 Enumeration.CUBE_TYPE, Cube.Type.CUBE),
             Column.OPTIONAL,
             null);
-
 }
 
 // End XmlaMember.java

@@ -54,12 +54,18 @@ public class XmlaHierarchy extends Entity {
             Description,
             Structure,
             IsVirtual,
-            IsReadWrite,
+            IsReadwrite,
             DimensionUniqueSettings,
+            DimensionMasterUniqueName,
             DimensionIsVisible,
-            HierarchyIsVisible,
             HierarchyOrdinal,
             DimensionIsShared,
+            HierarchyIsVisible,
+            HierarchyOrigin,
+            HierarchyDisplayFolder,
+            InstanceSelection,
+            GroupingBehavior,
+            StructureType,
             ParentChild,
             Levels);
     }
@@ -196,7 +202,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "Always returns false.");
-    public final Column IsReadWrite =
+    public final Column IsReadwrite =
         new Column(
             "IS_READWRITE",
             XmlaType.Boolean.scalar(),
@@ -297,7 +303,7 @@ public class XmlaHierarchy extends Entity {
             XmlaType.Rowset.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "Levels in this hierarchy.");
+            "Levels in this hierarchy.").extension();
 
     // NOTE: This is non-standard, where did it come from?
     public final Column ParentChild =

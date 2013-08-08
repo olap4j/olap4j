@@ -42,7 +42,14 @@ public class XmlaSet extends Entity {
             SchemaName,
             CubeName,
             SetName,
-            Scope);
+            Scope,
+            Description,
+            Expression,
+            Dimensions,
+            SetCaption,
+            SetDisplayFolder,
+            SetEvaluationContext,
+            Annotations);
     }
 
     public List<Column> sortColumns() {
@@ -50,6 +57,18 @@ public class XmlaSet extends Entity {
             CatalogName,
             SchemaName,
             CubeName);
+    }
+
+    @Override
+    List<Column> restrictionColumns() {
+        return list(
+            CatalogName,
+            SchemaName,
+            CubeName,
+            SetName,
+            Scope,
+            HierarchyUniqueName,
+            CubeSource);
     }
 
     public final Column CatalogName =
@@ -143,7 +162,7 @@ public class XmlaSet extends Entity {
             XmlaType.String.scalar(),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
-            "A set of notes, in XML format.");
+            "A set of notes, in XML format.").extension();
 
     // Only a restriction.
     public final Column CubeSource =

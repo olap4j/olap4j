@@ -42,13 +42,13 @@ public class XmlaTableInfo extends Entity {
             TableGuid,
             Bookmarks,
             BookmarkType,
-            BookmarkDataType,
+            BookmarkDatatype,
             BookmarkMaximumLength,
             BookmarkInformation,
             TableVersion,
             Cardinality,
             Description,
-            TablePropId);
+            TablePropid);
     }
 
     public List<Column> sortColumns() {
@@ -110,7 +110,7 @@ public class XmlaTableInfo extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Default bookmark type supported on this table.");
-    public final Column BookmarkDataType =
+    public final Column BookmarkDatatype =
         new Column(
             "BOOKMARK_DATATYPE",
             XmlaType.UnsignedShort.scalar(),
@@ -154,7 +154,7 @@ public class XmlaTableInfo extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Human-readable description of the table.");
-    public final Column TablePropId =
+    public final Column TablePropid =
         new Column(
             "TABLE_PROPID",
             XmlaType.UnsignedInteger.scalar(),

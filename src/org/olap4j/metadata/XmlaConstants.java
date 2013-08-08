@@ -498,54 +498,75 @@ public class XmlaConstants
     public enum DBType implements XmlaConstant {
         // The following values exactly match VARENUM
         // in Automation and may be used in VARIANT.
-        I2("I2", -1, null, null),
 
+        /** Corresponds to XMLA constant {@code DBTYPE_I2} (2). */
+        I2("I2", -1, null),
+
+        /** Corresponds to XMLA constant {@code DBTYPE_I4} (3). */
         I4(
-            "INTEGER", 3, "DBTYPE_I4", "A four-byte, signed integer: INTEGER"),
+            "INTEGER", 3, "A four-byte, signed integer: INTEGER"),
 
+        /** Corresponds to XMLA constant {@code DBTYPE_R8} (5). */
         R8(
-            "DOUBLE", 5, "DBTYPE_R8",
+            "DOUBLE", 5,
             "A double-precision floating-point value: Double"),
 
+        /** Corresponds to XMLA constant {@code DBTYPE_CY} (6). */
         CY(
-            "CURRENCY", 6, "DBTYPE_CY",
+            "CURRENCY", 6,
             "A currency value: LARGE_INTEGER, Currency is a fixed-point number "
             + "with four digits to the right of the decimal point. It is "
             + "stored in an eight-byte signed integer, scaled by 10,000."),
 
+        /** Corresponds to XMLA constant {@code DBTYPE_BOOL} (11). */
         BOOL(
-            "BOOLEAN", 11, "DBTYPE_BOOL",
+            "BOOLEAN", 11,
             "A Boolean value stored in the same way as in Automation: "
             + "VARIANT_BOOL; 0 means false and ~0 (bitwise, the value is not "
             + "0; that is, all bits are set to 1) means true."),
 
-        /**
-         * Used by SQL Server for value.
+        /** Corresponds to XMLA constant {@code DBTYPE_VARIANT} (12).
+         *
+         * <p>Used by SQL Server for value.</p>
          */
         VARIANT(
-            "VARIANT", 12, "DBTYPE_VARIANT", "An Automation VARIANT"),
+            "VARIANT", 12, "An Automation VARIANT"),
 
-        /**
-         * Used by SQL Server for font size.
+        /** Corresponds to XMLA constant {@code DBTYPE_UI2} (18).
+         *
+         * <p>Used by SQL Server for font size.</p>
          */
-        UI2("UNSIGNED_SHORT", 18, "DBTYPE_UI2", "A two-byte, unsigned integer"),
+        UI2("UNSIGNED_SHORT", 18, "A two-byte, unsigned integer"),
 
-        /**
-         * Used by SQL Server for colors, font flags and cell ordinal.
+        /** Corresponds to XMLA constant {@code DBTYPE_UI4} (19).
+         *
+         * <p>Used by SQL Server for colors, font flags and cell ordinal.</p>
          */
         UI4(
-            "UNSIGNED_INTEGER", 19, "DBTYPE_UI4",
+            "UNSIGNED_INTEGER", 19,
             "A four-byte, unsigned integer"),
 
         // The following values exactly match VARENUM
         // in Automation but cannot be used in VARIANT.
+
+        /** Corresponds to XMLA constant {@code DBTYPE_I8} (20). */
         I8(
-            "LARGE_INTEGER", 20, "DBTYPE_I8",
+            "LARGE_INTEGER", 20,
             "An eight-byte, signed integer: LARGE_INTEGER"),
 
         // The following values are not in VARENUM in OLE.
+
+        /** Corresponds to XMLA constant {@code DBTYPE_GUID} (72). */
+        GUID(
+            "GUID", 72,
+            "A globally unique identifier (GUID).\n"
+            + "GUIDs are also known as universally unique identifiers (UUIDs) "
+            + "and are used as class identifiers (CLSIDs) and interface "
+            + "identifiers (IIDs)."),
+
+        /** Corresponds to XMLA constant {@code DBTYPE_WSTR} (130). */
         WSTR(
-            "STRING", 130, "DBTYPE_WSTR",
+            "STRING", 130,
             "A null-terminated Unicode character string: wchar_t[length]; If "
             + "DBTYPE_WSTR is used by itself, the number of bytes allocated "
             + "for the string, including the null-termination character, is "
@@ -558,9 +579,10 @@ public class XmlaConstants
             + "number of allocated bytes divided by sizeof(wchar_t) and "
             + "truncated to the nearest integer."),
 
-        GUID("GUID", -1, null, null),
-
-        DBTIMESTAMP("DBTIMESTAMP", -1, null, null);
+        /** Corresponds to XMLA constant {@code DBTYPE_DBTIMESTAMP} (135). */
+        DBTIMESTAMP(
+            "DBTIMESTAMP", 135,
+            "A timestamp structure.");
 
         public final String userName;
         private final int xmlaOrdinal;
@@ -573,13 +595,11 @@ public class XmlaConstants
         DBType(
             String userName,
             int xmlaOrdinal,
-            String dbTypeIndicator,
             String description)
         {
             this.userName = userName;
             this.xmlaOrdinal = xmlaOrdinal;
             this.description = description;
-            assert xmlaName().equals(dbTypeIndicator);
         }
 
         public String xmlaName() {
@@ -595,6 +615,7 @@ public class XmlaConstants
         }
     }
 
+    /** Format of a result set. */
     public enum Format implements XmlaConstant {
         Tabular(
             "a flat or hierarchical rowset. Similar to the XML RAW format in "
