@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/julianhyde/olap4j.png)](https://travis-ci.org/julianhyde/olap4j)
+[![Build Status](https://travis-ci.org/olap4j/olap4j.png)](https://travis-ci.org/olap4j/olap4j)
 
 # olap4j #
 
