@@ -17,6 +17,14 @@
     -->
 <project name="olap4j" basedir="." default="dist" xmlns:ivy="antlib:org.apache.ivy.ant">
     <property file="${basedir}/test.properties"/>
+
+    <!-- Override directories because olap4j uses maven directory structure. -->
+    <property name="src.dir" value="src/main/java"/>
+    <property name="java5.src.dir" value="src/main/java5"/>
+    <property name="java6.src.dir" value="src/main/java6"/>
+    <property name="testsrc.dir" value="src/test/java"/>
+    <property name="javacc.src.dir" value="src/main/javacc"/>
+
     <import file="subfloor.xml" />
 
     <property name="jar-jdk14.file"
@@ -36,13 +44,14 @@ src/org/olap4j/mdx/parser/impl/DefaultMdxParserSym.java" />
 
     <property name="generated.java.files"
         value="
-src/org/olap4j/mdx/parser/impl/MdxParserImpl.java,
-src/org/olap4j/mdx/parser/impl/MdxParserImplTokenManager.java,
-src/org/olap4j/mdx/parser/impl/ParseException.java,
-src/org/olap4j/mdx/parser/impl/SimpleCharStream.java,
-src/org/olap4j/mdx/parser/impl/Token.java,
-src/org/olap4j/mdx/parser/impl/TokenMgrError.java,
-src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
+src/main/java/org/olap4j/mdx/parser/impl/MdxParserImpl.java,
+src/main/java/org/olap4j/mdx/parser/impl/MdxParserImplConstants.java,
+src/main/java/org/olap4j/mdx/parser/impl/MdxParserImplTokenManager.java,
+src/main/java/org/olap4j/mdx/parser/impl/ParseException.java,
+src/main/java/org/olap4j/mdx/parser/impl/SimpleCharStream.java,
+src/main/java/org/olap4j/mdx/parser/impl/Token.java,
+src/main/java/org/olap4j/mdx/parser/impl/TokenMgrError.java,
+src/main/java/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
 
     <target name="checkJdkVersion" unless="jdk17.present">
       <fail message="The 'jar' target (and dependent targets 'dist', 'binzip')
@@ -141,7 +150,7 @@ olap4j_api.pdf"
     </target>
 
     <target name="compile"
-        depends="init, compile.pre, compileJdk15, compileJdk16, compileJdk17, compile.src_copy, compile.res_copy, compile.lic_copy, compile.post"
+        depends="init, compile.pre, compileJdk17, compileJdk16, compileJdk15, compile.src_copy, compile.res_copy, compile.lic_copy, compile.post"
         description="Performs all the steps to prepare the bin directory with a complete compilation" />
 
     <target name="jar" depends="checkJdkVersion, compile, compile-tests, set-build.id, generate.manifest"
@@ -204,10 +213,7 @@ VERSION.txt" />
         <classpath>
           <path refid="classpath" />
         </classpath>
-        <src path="${src.dir}" />
-        <exclude name="org/olap4j/driver/xmla/FactoryJdbc4Impl.java"/>
-        <exclude name="org/olap4j/driver/xmla/FactoryJdbc4Plus.java"/>
-        <exclude name="org/olap4j/driver/xmla/FactoryJdbc41Impl.java"/>
+        <src path="${java5.src.dir}" />
       </javac>
     </target>
 
@@ -218,15 +224,13 @@ VERSION.txt" />
           deprecation="${javac.deprecation}"
           fork="true"
           bootclasspathref="project.bootclasspath.jdk16"
-          source="1.6"
-          target="1.6"
+          source="1.5"
+          target="1.5"
           includeantruntime="false">
         <classpath>
           <path refid="classpath" />
         </classpath>
-        <src path="${src.dir}" />
-        <include name="org/olap4j/driver/xmla/FactoryJdbc4Impl.java"/>
-        <include name="org/olap4j/driver/xmla/FactoryJdbc4Plus.java"/>
+        <src path="${java6.src.dir}" />
       </javac>
     </target>
 
@@ -236,14 +240,13 @@ VERSION.txt" />
           debug="${javac.debug}"
           deprecation="${javac.deprecation}"
           fork="true"
-          source="1.7"
-          target="1.7"
+          source="1.5"
+          target="1.5"
           includeantruntime="false">
         <classpath>
           <path refid="classpath" />
         </classpath>
         <src path="${src.dir}" />
-        <include name="org/olap4j/driver/xmla/FactoryJdbc41Impl.java"/>
       </javac>
     </target>
 
@@ -259,7 +262,6 @@ VERSION.txt" />
             <zipfileset dir="${basedir}" prefix="${ivy.artifact.id}-${project.revision}"
                     includes="
 src/**,
-testsrc/**,
 foodmart/*.zip,
 foodmart/*.xml,
 simple-jndi/**,
@@ -320,7 +322,8 @@ class XmlaOlap4jDriverVersion {
 
     <target name="parser" depends="resolve,define-tasks">
         <javacc
-            target="${src.dir}/org/olap4j/mdx/parser/impl/MdxParser.jj"
+            target="${javacc.src.dir}/org/olap4j/mdx/parser/impl/MdxParser.jj"
+            outputdirectory="${src.dir}/org/olap4j/mdx/parser/impl"
             javacchome="${lib.dir}"/>
     </target>
 
