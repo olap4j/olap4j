@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/julianhyde/olap4j.png)](https://travis-ci.org/julianhyde/olap4j)
+
 # olap4j #
 
 Olap4j is an open Java API for accessing OLAP data.
