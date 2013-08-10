@@ -47,7 +47,8 @@ public class XmlaMeasureGroupDimension extends Entity {
             DimensionIsVisible,
             DimensionIsFactDimension,
             DimensionPath,
-            DimensionGranularity);
+            DimensionGranularity,
+            Annotations);
     }
 
     public List<Column> sortColumns() {
@@ -70,6 +71,11 @@ public class XmlaMeasureGroupDimension extends Entity {
             DimensionVisibility);
     }
 
+    /** Via {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroup()},
+     * {@link org.olap4j.metadata.MeasureGroup#getCube()},
+     * {@link org.olap4j.metadata.Cube#getSchema()},
+     * {@link org.olap4j.metadata.Schema#getCatalog()},
+     * {@link org.olap4j.metadata.Catalog#getName()}. */
     public final Column CatalogName =
         new Column(
             "CATALOG_NAME",
@@ -77,6 +83,10 @@ public class XmlaMeasureGroupDimension extends Entity {
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the catalog to which this cube belongs.");
+    /** Via {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroup()},
+     * {@link org.olap4j.metadata.MeasureGroup#getCube()},
+     * {@link org.olap4j.metadata.Cube#getSchema()},
+     * {@link org.olap4j.metadata.Schema#getName()}. */
     public final Column SchemaName =
         new Column(
             "SCHEMA_NAME",
@@ -84,6 +94,9 @@ public class XmlaMeasureGroupDimension extends Entity {
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the schema to which this cube belongs.");
+    /** Via {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroup()},
+     * {@link org.olap4j.metadata.MeasureGroup#getCube()},
+     * {@link org.olap4j.metadata.Cube#getName()}. */
     public final Column CubeName =
         new Column(
             "CUBE_NAME",
@@ -91,6 +104,8 @@ public class XmlaMeasureGroupDimension extends Entity {
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the cube to which this measure group belongs.");
+    /** Via {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroup()},
+     * {@link org.olap4j.metadata.MeasureGroup#getName()}, */
     public final Column MeasuregroupName =
         new Column(
             "MEASUREGROUP_NAME",
@@ -98,6 +113,7 @@ public class XmlaMeasureGroupDimension extends Entity {
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of measure group.");
+    /** @see org.olap4j.metadata.MeasureGroupDimension#getMeasureGroupCardinality() */
     public final Column MeasuregroupCardinality =
         new Column(
             "MEASUREGROUP_CARDINALITY",
@@ -107,6 +123,8 @@ public class XmlaMeasureGroupDimension extends Entity {
             "The number of instances a measure in the measure group can have "
             + "for a single dimension member. Possible values include: ONE, "
             + "MANY");
+    /** Via {@link org.olap4j.metadata.MeasureGroupDimension#getDimension},
+     * {@link org.olap4j.metadata.Dimension#getUniqueName()}, */
     public final Column DimensionUniqueName =
         new Column(
             "DIMENSION_UNIQUE_NAME",
@@ -114,6 +132,7 @@ public class XmlaMeasureGroupDimension extends Entity {
             Column.RESTRICTION,
             Column.REQUIRED,
             "The unique name for the dimension.");
+    /** @see org.olap4j.metadata.MeasureGroupDimension#getDimensionCardinality() */
     public final Column DimensionCardinality =
         new Column(
             "DIMENSION_CARDINALITY",
@@ -123,6 +142,8 @@ public class XmlaMeasureGroupDimension extends Entity {
             "The number of instances a dimension member can have for a single "
             + "instance of a measure group measure. Possible values include: "
             + "ONE, MANY");
+    /** Via {@link org.olap4j.metadata.MeasureGroupDimension#getDimension},
+     * {@link org.olap4j.metadata.Dimension#isVisible()}, */
     public final Column DimensionIsVisible =
         new Column(
             "DIMENSION_IS_VISIBLE",
@@ -133,6 +154,7 @@ public class XmlaMeasureGroupDimension extends Entity {
             + "are visible.\n"
             + "Returns TRUE if one or more hierarchies in the dimension is "
             + "visible; otherwise, FALSE.");
+    /** @see org.olap4j.metadata.MeasureGroupDimension#isFactDimension() */
     public final Column DimensionIsFactDimension =
         new Column(
             "DIMENSION_IS_FACT_DIMENSION",
@@ -142,6 +164,7 @@ public class XmlaMeasureGroupDimension extends Entity {
             "A Boolean that indicates whether the dimension is a fact "
             + "dimension. Returns TRUE if the dimension is a fact dimension; "
             + "otherwise, FALSE.");
+    /** @see org.olap4j.metadata.MeasureGroupDimension#getDimensionPath() */
     public final Column DimensionPath =
         new Column(
             "DIMENSION_PATH",
@@ -149,6 +172,7 @@ public class XmlaMeasureGroupDimension extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A list of dimensions for the reference dimension.");
+    /** @see org.olap4j.metadata.MeasureGroupDimension#getGranularityHierarchy() */
     public final Column DimensionGranularity =
         new Column(
             "DIMENSION_GRANULARITY",
@@ -157,7 +181,19 @@ public class XmlaMeasureGroupDimension extends Entity {
             Column.REQUIRED,
             "Unique name of the granularity hierarchy.");
 
+    /** See {@link org.olap4j.metadata.MeasureGroupDimension#getAnnotations()}.
+     *
+     * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
+    public final Column Annotations =
+        new Column(
+            "ANNOTATIONS",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "A set of notes, in XML format.").extension();
+
     // Only a restriction.
+    /** Restriction on {@link #DimensionIsVisible}. */
     public final Column DimensionVisibility =
         new Column(
             "DIMENSION_VISIBILITY",
@@ -166,7 +202,6 @@ public class XmlaMeasureGroupDimension extends Entity {
                 Enumeration.VISIBILITY, Dimension.Visibility.VISIBLE),
             Column.OPTIONAL,
             null);
-
 }
 
 // End XmlaMeasureGroupDimension.java

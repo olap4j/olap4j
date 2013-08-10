@@ -73,6 +73,10 @@ class XmlaOlap4jCellProperty implements Property, Named {
     public boolean isVisible() {
         return true;
     }
+
+    public Object getAnnotations() {
+        return null; // FIXME
+    }
 }
 
 // End XmlaOlap4jCellProperty.java

@@ -62,7 +62,8 @@ public class XmlaMember extends Entity {
             IsPlaceholdermember,
             IsDatamember,
             Scope,
-            Depth);
+            Depth,
+            Annotations);
     }
 
     public List<Column> sortColumns() {
@@ -278,6 +279,17 @@ public class XmlaMember extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "depth");
+
+    /** See {@link org.olap4j.metadata.Member#getAnnotations()}.
+     *
+     * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
+    public final Column Annotations =
+        new Column(
+            "ANNOTATIONS",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "A set of notes, in XML format.").extension();
 
     // Only a restriction.
     public final Column TreeOp =

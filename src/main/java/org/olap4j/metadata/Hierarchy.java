@@ -67,8 +67,27 @@ public interface Hierarchy extends MetadataElement {
      * default.
      *
      * @return the default member of this hierarchy
+     *
+     * @see #getAllMember()
+     * @see #getRootMembers()
      */
     Member getDefaultMember() throws OlapException;
+
+    /**
+     * Returns the member at the highest level of the rollup.
+     *
+     * <p>If the hierarchy has no 'all' member (see {@link #hasAll()}),
+     * returns {@code null}.
+     *
+     * @return the member at the highest level of the rollup, or null
+     *
+     * @see #hasAll()
+     * @see #getDefaultMember()
+     * @see #getRootMembers()
+     *
+     * @since olap4j 2.0
+     */
+    Member getAllMember() throws OlapException;
 
     /**
      * Returns the root member or members of this <code>Hierarchy</code>.
@@ -92,11 +111,91 @@ public interface Hierarchy extends MetadataElement {
     NamedList<Member> getRootMembers() throws OlapException;
 
     /**
-     * Returns the structure of this <code>Hierarchy</code>.
+     * Returns whether the write-back to dimension column is enabled.
+     *
+     * @return whether the write-back to dimension column is enabled
+     *
+     * @since olap4j 2.0
+     */
+    boolean isReadWrite();
+
+    /**
+     * Returns the ordinal number of this {@code Hierarchy} across all
+     * hierarchies of the {@link Cube}.
+     *
+     * @return ordinal within cube
+     *
+     * @since olap4j 2.0
+     */
+    int getOrdinal();
+
+    /**
+     * Returns the structure of this {@code Hierarchy}.
      *
      * @return hierarchy structure, never null
+     *
+     * @since olap4j 2.0
      */
     Structure getStructure();
+
+    /**
+     * Returns the structure type of this {@code Hierarchy}.
+     *
+     * @return hierarchy structure type, never null
+     *
+     * @since olap4j 2.0
+     */
+    StructureType getStructureType();
+
+    /**
+     * Returns the number of members in this {@code Hierarchy}. This value can
+     * be an approximation of the real cardinality.
+     *
+     * @return number of members
+     *
+     * @since olap4j 2.0
+     */
+    int getCardinality();
+
+    /**
+     * Returns the path to be used when displaying this {@code Hierarchy} in a
+     * user interface. Folder names are be separated by a semicolon (;). Nested
+     * folders are indicated by a backslash (\).
+     *
+     * @return folder path
+     *
+     * @since olap4j 2.0
+     */
+    String getDisplayFolder();
+
+    /**
+     * Returns a hint to the client application on how to show this
+     * {@code Hierarchy}.
+     *
+     * @return how to show this hierarchy; never null
+     *
+     * @since olap4j 2.0
+     */
+    InstanceSelection getInstanceSelection();
+
+    /**
+     * Returns the expected grouping behavior of clients for this
+     * {@code Hierarchy}.
+     *
+     * @return expected grouping behavior
+     *
+     * @since olap4j 2.0
+     */
+    GroupingBehavior getGroupingBehavior();
+
+    /**
+     * Returns the source of this {@code Hierarchy}.
+     *
+     * @return source of this hierarchy; never null
+     *
+     * @since olap4j 2.0
+     */
+    Origin getOrigin();
 
     /** Source of a hierarchy. */
     enum Origin implements XmlaConstant {

@@ -91,6 +91,11 @@ public class XmlaLevel extends Entity {
             LevelVisibility);
     }
 
+    /** Via {@link org.olap4j.metadata.Level#getDimension()},
+     * {@link org.olap4j.metadata.Dimension#getCube()},
+     * {@link org.olap4j.metadata.Cube#getSchema()},
+     * {@link org.olap4j.metadata.Schema#getCatalog()},
+     * {@link org.olap4j.metadata.Catalog#getName()}. */
     public final Column CatalogName =
         new Column(
             "CATALOG_NAME",
@@ -98,6 +103,10 @@ public class XmlaLevel extends Entity {
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the catalog to which this level belongs.");
+    /** Via {@link org.olap4j.metadata.Level#getDimension()},
+     * {@link org.olap4j.metadata.Dimension#getCube()},
+     * {@link org.olap4j.metadata.Cube#getSchema()},
+     * {@link org.olap4j.metadata.Schema#getName()}. */
     public final Column SchemaName =
         new Column(
             "SCHEMA_NAME",
@@ -105,6 +114,9 @@ public class XmlaLevel extends Entity {
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the schema to which this level belongs.");
+    /** Via {@link org.olap4j.metadata.Level#getDimension()},
+     * {@link org.olap4j.metadata.Dimension#getCube()},
+     * {@link org.olap4j.metadata.Cube#getName()}. */
     public final Column CubeName =
         new Column(
             "CUBE_NAME",
@@ -112,6 +124,9 @@ public class XmlaLevel extends Entity {
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the cube to which this level belongs.");
+    /** See {@link org.olap4j.metadata.Level#getHierarchy()},
+     * {@link org.olap4j.metadata.Hierarchy#getDimension()},
+     * {@link org.olap4j.metadata.Dimension#getUniqueName()}. */
     public final Column DimensionUniqueName =
         new Column(
             "DIMENSION_UNIQUE_NAME",
@@ -120,6 +135,8 @@ public class XmlaLevel extends Entity {
             Column.REQUIRED,
             "The unique name of the dimension to which this level "
             + "belongs.");
+    /** See {@link org.olap4j.metadata.Level#getHierarchy()},
+     * {@link org.olap4j.metadata.Hierarchy#getUniqueName()}. */
     public final Column HierarchyUniqueName =
         new Column(
             "HIERARCHY_UNIQUE_NAME",
@@ -130,6 +147,7 @@ public class XmlaLevel extends Entity {
             + "than one hierarchy, there is one row for each hierarchy to "
             + "which it belongs. For providers that generate unique names by "
             + "qualification, each component of this name is delimited.");
+    /** See {@link org.olap4j.metadata.Level#getName()}. */
     public final Column LevelName =
         new Column(
             "LEVEL_NAME",
@@ -137,6 +155,7 @@ public class XmlaLevel extends Entity {
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the level.");
+    /** See {@link org.olap4j.metadata.Level#getUniqueName()}. */
     public final Column LevelUniqueName =
         new Column(
             "LEVEL_UNIQUE_NAME",
@@ -151,6 +170,7 @@ public class XmlaLevel extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Not supported.");
+    /** See {@link org.olap4j.metadata.Level#getCaption()}. */
     public final Column LevelCaption =
         new Column(
             "LEVEL_CAPTION",
@@ -160,6 +180,7 @@ public class XmlaLevel extends Entity {
             "A label or caption associated with the hierarchy. Used primarily "
             + "for display purposes. If a caption does not exist, "
             + "LEVEL_NAME is returned.");
+    /** See {@link org.olap4j.metadata.Level#getDepth()}. */
     public final Column LevelNumber =
         new Column(
             "LEVEL_NUMBER",
@@ -168,6 +189,7 @@ public class XmlaLevel extends Entity {
             Column.REQUIRED,
             "The distance of the level from the root of the hierarchy. "
             + "Root level is zero (0).");
+    /** See {@link org.olap4j.metadata.Level#getCardinality()}. */
     public final Column LevelCardinality =
         new Column(
             "LEVEL_CARDINALITY",
@@ -176,6 +198,7 @@ public class XmlaLevel extends Entity {
             Column.REQUIRED,
             "The number of members in the level. This value can be an "
             + "approximation of the real cardinality.");
+    /** See {@link org.olap4j.metadata.Level#getLevelType()}. */
     public final Column LevelType =
         new Column(
             "LEVEL_TYPE",
@@ -220,6 +243,7 @@ public class XmlaLevel extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The ID of the attribute that the level is sorted on.");
+    /** See {@link org.olap4j.metadata.Level#getKeyTypes()}. */
     public final Column LevelDbtype =
         new Column(
             "LEVEL_DBTYPE",
@@ -257,6 +281,7 @@ public class XmlaLevel extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The SQL representation of the member unique names.");
+    /** See {@link org.olap4j.metadata.Level#getAttributeHierarchyName}. */
     public final Column LevelAttributeHierarchyName =
         new Column(
             "LEVEL_ATTRIBUTE_HIERARCHY_NAME",
@@ -265,6 +290,8 @@ public class XmlaLevel extends Entity {
             Column.OPTIONAL,
             "The name of the attribute hierarchy providing the source of the "
             + "level");
+    /** See {@link org.olap4j.metadata.Level#getKeyTypes()},
+     * {@link java.util.List#size()}. */
     public final Column LevelKeyCardinality =
         new Column(
             "LEVEL_KEY_CARDINALITY",
@@ -272,6 +299,8 @@ public class XmlaLevel extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The number of columns in the level key.");
+    /** See {@link org.olap4j.metadata.Level#getHierarchy()},
+     * {@link Hierarchy#getOrigin}. */
     public final Column LevelOrigin =
         new Column(
             "LEVEL_ORIGIN",
@@ -282,7 +311,9 @@ public class XmlaLevel extends Entity {
             Column.OPTIONAL,
             "A bit map that defines how the level was sourced.");
 
-    // Mondrian extension; not in XMLA spec.
+    /** See {@link org.olap4j.metadata.Level#getAnnotations()}.
+     *
+     * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
     public final Column Annotations =
         new Column(
             "ANNOTATIONS",

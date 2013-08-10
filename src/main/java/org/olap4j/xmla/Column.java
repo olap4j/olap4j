@@ -51,15 +51,26 @@ public class Column {
      */
     public static final boolean UNBOUNDED = true;
 
+    /** Name of this {@code Column}. */
     public final String name;
+
+    /** Type of this {@code Column}. */
     public final XmlaType type;
+
+    /** Enumeration that provides the values of this {@code Column}. */
     public final Enumeration enumeration;
+
+    /** Description of this {@code Column}. */
     public final String description;
 
     /** @deprecated Use {@link Entity#restrictionColumns()}. */
     @Deprecated
     public final Restriction restriction;
+
+    /** Whether this {@code Column} allows null values. */
     public final boolean nullable;
+
+    /** Whether this {@code Column} is unbounded. */
     public final boolean unbounded;
 
     /**
@@ -211,6 +222,11 @@ public class Column {
         return type.columnType;
     }
 
+    /** Defines whether and how a column may be used to restrict the output from
+     * an XMLA schema rowset.
+     *
+     * @see org.olap4j.xmla.Entity#restrictionColumns()
+     */
     public static class Restriction {
         public static final Restriction NO = new Restriction(null, null);
         public static final Restriction OPTIONAL = new Restriction(null, null);
@@ -224,7 +240,7 @@ public class Column {
             this.enumeration = enumeration;
         }
 
-        public Restriction of(Enumeration enumeration, Enum<?> default_) {
+        Restriction of(Enumeration enumeration, Enum<?> default_) {
             return new Restriction(this, enumeration);
         }
     }

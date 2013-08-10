@@ -19,7 +19,10 @@ package org.olap4j.driver.xmla;
 
 import org.olap4j.OlapException;
 import org.olap4j.impl.Named;
+import org.olap4j.metadata.Dimension;
 import org.olap4j.metadata.MeasureGroupDimension;
+
+import java.util.List;
 
 /**
  * Implementation of {@link org.olap4j.metadata.MeasureGroupDimension}
@@ -67,6 +70,26 @@ class XmlaOlap4jMeasureGroupDimension
 
     public XmlaOlap4jHierarchy getGranularityHierarchy() {
         return olap4jGranularityHierarchy;
+    }
+
+    public List<Dimension> getDimensionPath() {
+        return null; // FIXME
+    }
+
+    public String getMeasureGroupCardinality() {
+        return null; // FIXME
+    }
+
+    public String getDimensionCardinality() {
+        return null; // FIXME
+    }
+
+    public boolean isFactDimension() {
+        return false; // FIXME
+    }
+
+    public Object getAnnotations() {
+        return null; // FIXME
     }
 }
 

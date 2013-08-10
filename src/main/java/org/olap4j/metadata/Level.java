@@ -19,6 +19,7 @@ package org.olap4j.metadata;
 
 import org.olap4j.CellSet;
 import org.olap4j.OlapException;
+import org.olap4j.xmla.XmlaLevel;
 
 import java.util.List;
 
@@ -33,11 +34,12 @@ public interface Level extends MetadataElement {
     /**
      * Returns the depth of this <code>Level</code>.
      *
-     * <p>Note #1: In an access-controlled context, the first visible level of
-     * a hierarchy may not have a depth of 0.</p>
+     * <p>Note #1: In an access-controlled context, the first accessible level
+     * of a hierarchy may not have a depth of 0.</p>
      *
      * <p>Note #2: In a parent-child hierarchy, the depth of a member (as
-     * returned by may not be the same as the depth of its level.
+     * returned by {@link org.olap4j.metadata.Member#getDepth()})
+     * may not be the same as the depth of its level.
      *
      * @return depth of this level
      */
@@ -122,11 +124,66 @@ public interface Level extends MetadataElement {
     List<Member> getMembers() throws OlapException;
 
     /**
-     * Returns the number of members in this Level.
+     * Returns the number of members in this {@code Level}. This value can be an
+     * approximation of the real cardinality.
      *
      * @return number of members
      */
     int getCardinality();
+
+    /**
+     * Returns the name of the attribute this {@code Level} is sorted on.
+     *
+     * @return Name of the attribute this level is sorted on
+     *
+     * @since olap4j 2.0
+     */
+    String getOrderingProperty();
+
+    /**
+     * Returns the name of the attribute hierarchy providing the source of this
+     * {@code Level}.
+     *
+     * @return Name of this level's attribute hierarchy
+     *
+     * @since olap4j 2.0
+     */
+    String getAttributeHierarchyName();
+
+    /**
+     * Returns the types of the member key columns that is used for this
+     * {@code Level}'s attribute.
+     *
+     * @since olap4j 2.0
+     */
+    List<Datatype> getKeyTypes();
+
+    /**
+     * Returns the SQL representation of the level member names.
+     *
+     * @return SQL representation of the level member names
+     *
+     * @since olap4j 2.0
+     */
+    String getNameSqlColumnName();
+
+    /**
+     * Returns the SQL representation of the level member key values.
+     *
+     * @return SQL representation of the level member key values
+     *
+     * @since olap4j 2.0
+     */
+    String getKeySqlColumnName();
+
+    /**
+     * Returns the SQL representation of the level member unique names.
+     *
+     * @return SQL representation of the level member unique names
+     *
+     * @since olap4j 2.0
+     */
+    String getUniqueNameSqlColumnName();
 
     /**
      * Enumeration of the types of a {@link Level}.

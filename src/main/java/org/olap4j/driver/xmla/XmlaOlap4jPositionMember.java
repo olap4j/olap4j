@@ -83,6 +83,10 @@ class XmlaOlap4jPositionMember
         return member.getCube();
     }
 
+    public Object getAnnotations() {
+        return member.getAnnotations();
+    }
+
     public XmlaOlap4jConnection getConnection() {
         return member.getConnection();
     }

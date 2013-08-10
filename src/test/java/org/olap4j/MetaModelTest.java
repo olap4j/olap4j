@@ -90,6 +90,8 @@ import java.util.*;
  * 13. Measures of a measure group may be a strict subset of the cube's measures
  * but XMLA does not provide a way to find out which measures.
  *
+ * 14. Are there any other elements that should have annotations?
+ *
  * <h2>Release notes</h2>
  *
  * <p>{@link org.olap4j.metadata.XmlaConstants.EnumWithDesc} is deprecated.
@@ -130,61 +132,73 @@ import java.util.*;
  *     TODO: add method
  *     TODO: add test
  * <li>{@link XmlaCube#BaseCubeName}
- *     TODO: add method
+ *     {@link Cube#getBaseCube}
  *     TODO: add test
  * <li>{@link XmlaCube#Annotations}
- *     TODO: add method
+ *     {@link org.olap4j.metadata.Cube#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaDimension#Annotations}
- *     TODO: add method
+ *     {@link org.olap4j.metadata.Dimension#getAnnotations}
  *     TODO: add test
- * <li>{@link XmlaLevel#Annotations}
- *     TODO: add method
- *     TODO: add test
- * <li>{@link XmlaLevel#LevelOrderingProperty}
- *     TODO: add method
- *     TODO: add test
- * <li>{@link XmlaLevel#LevelDbtype}
- *     TODO: add method
- *     TODO: add test
- * <li>{@link XmlaLevel#LevelMasterUniqueName}
- *     TODO: add method
- *     TODO: add test
- * <li>{@link XmlaLevel#LevelNameSqlColumnName}
- *     TODO: add method
- *     TODO: add test
- * <li>{@link XmlaLevel#LevelKeySqlColumnName}
- *     TODO: add method
- *     TODO: add test
- * <li>{@link XmlaLevel#LevelUniqueNameSqlColumnName}
- *     TODO: add method
- *     TODO: add test
- * <li>{@link XmlaLevel#LevelKeyCardinality}
- *     TODO: add method
- *     TODO: add test
- * <li>{@link XmlaLevel#LevelOrigin}
- *     TODO: add method
+ * <li>{@link org.olap4j.xmla.XmlaHierarchy#Annotations}
+ *     {@link org.olap4j.metadata.Hierarchy#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaHierarchy#DimensionMasterUniqueName}
  *     TODO: add method
  *     TODO: add test
  * <li>{@link XmlaHierarchy#HierarchyOrigin}
- *     TODO: add method
+ *     {@link org.olap4j.metadata.Hierarchy#getOrigin}
  *     TODO: add test
  * <li>{@link XmlaHierarchy#HierarchyDisplayFolder}
- *     TODO: add method
+ *     {@link org.olap4j.metadata.Hierarchy#getDisplayFolder}
  *     TODO: add test
  * <li>{@link XmlaHierarchy#InstanceSelection}
- *     TODO: add method
+ *     {@link org.olap4j.metadata.Hierarchy#getInstanceSelection}
  *     TODO: add test
  * <li>{@link XmlaHierarchy#GroupingBehavior}
- *     TODO: add method
+ *     {@link org.olap4j.metadata.Hierarchy#getGroupingBehavior}
  *     TODO: add test
  * <li>{@link XmlaHierarchy#Structure}
  *     {@link org.olap4j.metadata.Hierarchy#getStructure()}
  *     TODO: add test
  * <li>{@link XmlaHierarchy#StructureType}
  *     TODO: add method
+ *     TODO: add test
+ * <li>{@link XmlaLevel#Annotations}
+ *     {@link org.olap4j.metadata.Level#getAnnotations}
+ *     TODO: add test
+ * <li>{@link XmlaLevel#LevelAttributeHierarchyName}
+ *     {@link org.olap4j.metadata.Level#getAttributeHierarchyName()}
+ *     TODO: rename method? and tighten up specification?
+ *     TODO: add test
+ * <li>{@link XmlaLevel#LevelOrderingProperty}
+ *     {@link org.olap4j.metadata.Level#getOrderingProperty}
+ *     TODO: rename method? and tighten up specification
+ *     TODO: add test
+ * <li>{@link XmlaLevel#LevelDbtype}
+ *     {@link org.olap4j.metadata.Level#getKeyTypes}
+ *     TODO: should method return list instead of null for composite keys?
+ *     TODO: add test
+ * <li>{@link XmlaLevel#LevelMasterUniqueName}
+ *     (no method, because always returns null)
+ *     TODO: add test
+ * <li>{@link XmlaLevel#LevelNameSqlColumnName}
+ *     {@link org.olap4j.metadata.Level#getNameSqlColumnName()}
+ *     TODO: add test
+ * <li>{@link XmlaLevel#LevelKeySqlColumnName}
+ *     {@link org.olap4j.metadata.Level#getKeySqlColumnName()}
+ *     TODO: add test
+ * <li>{@link XmlaLevel#LevelUniqueNameSqlColumnName}
+ *     {@link org.olap4j.metadata.Level#getUniqueNameSqlColumnName()}
+ *     TODO: add test
+ * <li>{@link XmlaLevel#LevelKeyCardinality}
+ *     {@link org.olap4j.metadata.Level#getKeyTypes()}
+ *     TODO: add test
+ * <li>{@link XmlaLevel#LevelOrigin}
+ *     {@link org.olap4j.metadata.Hierarchy#getOrigin}; review always same as hierarchy.getOrigin?
+ *     TODO: add test
+ * <li>{@link XmlaMeasure#Annotations}
+ *     {@link org.olap4j.metadata.Measure#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaMeasure#NumericPrecision}
  *     TODO: add method
@@ -210,7 +224,9 @@ import java.util.*;
  * <li>{@link XmlaMeasure#MeasureDisplayFolder}
  *     TODO: add method
  *     TODO: add test
-
+ * <li>{@link XmlaMeasureGroup#Annotations}
+ *     {@link org.olap4j.metadata.MeasureGroup#getAnnotations}
+ *     TODO: add test
  * <li>{@link XmlaMeasureGroup#CatalogName}
  *     via {@link org.olap4j.metadata.MeasureGroup#getCube()}
  *     TODO: add test
@@ -233,6 +249,9 @@ import java.util.*;
  * <li>{@link XmlaMeasureGroup#IsWriteEnabled}
  *     {@link org.olap4j.metadata.MeasureGroup#isWriteEnabled()}
  *     TODO: add test
+ * <li>{@link XmlaMeasureGroupDimension#Annotations}
+ *     {@link org.olap4j.metadata.MeasureGroupDimension#getAnnotations}
+ *     TODO: add test
  * <li>{@link XmlaMeasureGroupDimension#CatalogName}
  *     via {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroup()}
  *     TODO: add test
@@ -246,28 +265,32 @@ import java.util.*;
  *     via {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroup()}
  *     TODO: add test
  * <li>{@link XmlaMeasureGroupDimension#MeasuregroupCardinality}
+ *     {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroupCardinality()}
  *     TODO: add method
  *     TODO: add test
  * <li>{@link XmlaMeasureGroupDimension#DimensionUniqueName}
  *     via {@link org.olap4j.metadata.MeasureGroupDimension#getDimension()}
  *     TODO: add test
  * <li>{@link XmlaMeasureGroupDimension#DimensionCardinality}
- *     TODO: add method
+ *     {@link org.olap4j.metadata.MeasureGroupDimension#getDimensionCardinality()}
  *     TODO: add test
  * <li>{@link XmlaMeasureGroupDimension#DimensionGranularity}
  *     {@link org.olap4j.metadata.MeasureGroupDimension#getGranularityHierarchy()}
  *     TODO: add test
  * <li>{@link XmlaMeasureGroupDimension#DimensionIsFactDimension}
- *     TODO: add method
+ *     {@link org.olap4j.metadata.MeasureGroupDimension#isFactDimension()}
  *     TODO: add test
  * <li>{@link XmlaMeasureGroupDimension#DimensionIsVisible}
  *     via {@link org.olap4j.metadata.MeasureGroupDimension#getDimension()}
  *     TODO: add test
  * <li>{@link XmlaMeasureGroupDimension#DimensionPath}
- *     TODO: add method
+ *     {@link org.olap4j.metadata.MeasureGroupDimension#getDimensionPath()}
  *     TODO: add test
  * <li>{@link XmlaMeasureGroupDimension#DimensionVisibility}
  *     TODO: add restriction
+ *     TODO: add test
+ * <li>{@link XmlaMember#Annotations}
+ *     {@link org.olap4j.metadata.Member#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaMember#Description}
  *     TODO: add method
@@ -286,6 +309,9 @@ import java.util.*;
  *     TODO: add test
  * <li>{@link XmlaMember#Scope}
  *     TODO: add method
+ *     TODO: add test
+ * <li>{@link XmlaProperty#Annotations}
+ *     {@link org.olap4j.metadata.Property#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaProperty#CharacterMaximumLength}
  *     TODO: add method
@@ -321,7 +347,7 @@ import java.util.*;
  *     TODO: add method
  *     TODO: add test
  * <li>{@link XmlaSet#Annotations}
- *     TODO: add method
+ *     {@link org.olap4j.metadata.NamedSet#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaSet#Expression}
  *     TODO: add method
@@ -348,10 +374,25 @@ import java.util.*;
  * <li>{@link XmlaDimension#DimensionVisibility}
  * <li>{@link XmlaLevel#LevelOrigin}
  * <li>{@link XmlaLevel#CubeSource}
- * {@link XmlaLevel#LevelVisibility}
- * {@link XmlaSet#CubeSource}
- * {@link XmlaSet#HierarchyUniqueName}
+ * <li>{@link XmlaLevel#LevelVisibility}
+ * <li>{@link XmlaSet#CubeSource}
+ * <li>{@link XmlaSet#HierarchyUniqueName}
  *
+ * </ul>
+ *
+ * <h2>New methods</h2>
+ *
+ * <p>New olap4j methods for existing XMLA attributes are listed here.</p>
+ *
+ * <ul>
+ * <li>{@link org.olap4j.metadata.Dimension#getCube()}
+ *     TODO: add test
+ * <li>{@link org.olap4j.metadata.Dimension#getOrdinal()}
+ *     TODO: add test
+ * <li>{@link org.olap4j.metadata.Hierarchy#getAllMember()}
+ *     TODO: add test
+ * <li>{@link org.olap4j.metadata.Hierarchy#getOrdinal()}
+ *     TODO: add test
  * </ul>
  *
  * <h2>Tests to be written</h2>

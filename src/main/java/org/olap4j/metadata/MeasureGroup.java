@@ -17,8 +17,15 @@
 */
 package org.olap4j.metadata;
 
-import java.util.List;
-
+/**
+ * A collection of measures within a cube that have the same dimensionality
+ * and granularity.
+ *
+ * <p>In a ROLAP system, typically such a set of measures are stored in the same
+ * fact table.</p>
+ *
+ * @see MeasureGroupDimension
+ */
 public interface MeasureGroup extends MetadataElement {
     /**
      * Returns the {@link Cube} this {@code MeasureGroup} belongs to.
@@ -30,6 +37,11 @@ public interface MeasureGroup extends MetadataElement {
     /**
      * Returns the {@link MeasureGroupDimension}s in this {@code MeasureGroup}.
      *
+     * <p>Since dimensions have unique names within a cube, the result is a
+     * {@link NamedList} and measure group dimensions may be accessed
+     * either by name (using {@link NamedList#get(String)} or
+     * by position (using {@link NamedList#get(int)}.</p>
+     *
      * @return dimension uses in this measure group
      */
     NamedList<MeasureGroupDimension> getDimensions();
@@ -38,13 +50,16 @@ public interface MeasureGroup extends MetadataElement {
      * Returns the measures in this {@code MeasureGroup}. The measures belong to
      * the same cube, but may be a subset.
      *
+     * <p>Since measure groups contain only stored measures and stored measures
+     * have unique names within a cube, the result is a {@link NamedList} and
+     * measures may be accessed
+     * either by name (using {@link NamedList#get(String)}
+     * or by position (using {@link NamedList#get(int)}.</p>
+     *
      * @see org.olap4j.metadata.Cube#getMeasures()
      *
      * @return measures in this measure group
      */
-    // NOTE: This is a NamedList whereas Cube.getMeasures is just a List. Why?
-    // Because Cube measures include calculated measures, so the names may not
-    // be unique. Measure group measures are all stored, so have unique names.
     NamedList<Measure> getMeasures();
 
     /**

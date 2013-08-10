@@ -76,6 +76,10 @@ class XmlaOlap4jCellSetMemberProperty implements Property, Named {
     public boolean isVisible() {
         return true;
     }
+
+    public Object getAnnotations() {
+        return null; // FIXME
+    }
 }
 
 // End XmlaOlap4jCellSetMemberProperty.java

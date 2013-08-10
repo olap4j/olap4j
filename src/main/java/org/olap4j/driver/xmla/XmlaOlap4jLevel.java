@@ -199,9 +199,34 @@ class XmlaOlap4jLevel
     }
 
     public boolean equals(Object obj) {
-        return (obj instanceof XmlaOlap4jLevel)
+        return obj == this
+            || (obj instanceof XmlaOlap4jLevel)
             && this.uniqueName.equals(
                 ((XmlaOlap4jLevel) obj).getUniqueName());
+    }
+
+    public String getOrderingProperty() {
+        return null; // FIXME
+    }
+
+    public String getAttributeHierarchyName() {
+        return null; // FIXME
+    }
+
+    public List<Datatype> getKeyTypes() {
+        return null; // FIXME
+    }
+
+    public String getNameSqlColumnName() {
+        return null; // FIXME
+    }
+
+    public String getKeySqlColumnName() {
+        return null; // FIXME
+    }
+
+    public String getUniqueNameSqlColumnName() {
+        return null; // FIXME
     }
 }
 

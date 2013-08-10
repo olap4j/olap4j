@@ -62,7 +62,8 @@ public class XmlaProperty extends Entity {
             PropertyAttributeHierarchyName,
             PropertyCardinality,
             MimeType,
-            PropertyIsVisible);
+            PropertyIsVisible,
+            Annotations);
     }
 
     public List<Column> sortColumns() {
@@ -271,6 +272,17 @@ public class XmlaProperty extends Entity {
             Column.OPTIONAL,
             "A Boolean that indicates whether the property is visible.\n"
             + "TRUE if the property is visible; otherwise, FALSE.");
+
+    /** See {@link org.olap4j.metadata.Property#getAnnotations()}.
+     *
+     * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
+    public final Column Annotations =
+        new Column(
+            "ANNOTATIONS",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "A set of notes, in XML format.").extension();
 
     // Only a restriction.
     public final Column CubeSource =

@@ -286,8 +286,8 @@ public interface Member extends MetadataElement {
     /**
      * Returns the definitions of the properties this member may have.
      *
-     * <p>For many providers, properties are defined against a Level, so result
-     * of this method will be identical to
+     * <p>For many providers, properties are defined against a Level, so the
+     * result of this method will be identical to
      * <code>member.getLevel().{@link Level#getProperties() getProperties}()</code>.
      *
      * @return properties of this Member
@@ -312,7 +312,8 @@ public interface Member extends MetadataElement {
     /**
      * Returns the depth of this member.
      *
-     * <p>In regular hierarchies, this is as the same as the level's depth,
+     * <p>In a regular hierarchy, this is as the same as
+     * {@link Level#getDepth() the depth of the member's level}
      * but in parent-child and ragged hierarchies the value may be
      * different.</p>
      *

@@ -42,7 +42,8 @@ public class XmlaMeasureGroup extends Entity {
             MeasuregroupName,
             Description,
             IsWriteEnabled,
-            MeasuregroupCaption);
+            MeasuregroupCaption,
+            Annotations);
     }
 
     public List<Column> sortColumns() {
@@ -62,6 +63,10 @@ public class XmlaMeasureGroup extends Entity {
             MeasuregroupName);
     }
 
+    /** Via {@link org.olap4j.metadata.MeasureGroup#getCube()},
+     * {@link org.olap4j.metadata.Cube#getSchema()},
+     * {@link org.olap4j.metadata.Schema#getCatalog()},
+     * {@link org.olap4j.metadata.Catalog#getName()}. */
     public final Column CatalogName =
         new Column(
             "CATALOG_NAME",
@@ -69,6 +74,9 @@ public class XmlaMeasureGroup extends Entity {
             Restriction.OPTIONAL,
             Column.OPTIONAL,
             "The name of the catalog to which this measure group belongs.");
+    /** Via {@link org.olap4j.metadata.MeasureGroup#getCube()},
+     * {@link org.olap4j.metadata.Cube#getSchema()},
+     * {@link org.olap4j.metadata.Schema#getName()}. */
     public final Column SchemaName =
         new Column(
             "SCHEMA_NAME",
@@ -76,6 +84,8 @@ public class XmlaMeasureGroup extends Entity {
             Restriction.OPTIONAL,
             Column.OPTIONAL,
             "The name of the schema to which this measure group belongs.");
+    /** Via {@link org.olap4j.metadata.MeasureGroup#getCube()},
+     * {@link org.olap4j.metadata.Cube#getName()}. */
     public final Column CubeName =
         new Column(
             "CUBE_NAME",
@@ -83,6 +93,7 @@ public class XmlaMeasureGroup extends Entity {
             Restriction.OPTIONAL,
             Column.REQUIRED,
             "Name of the cube to which this measure group belongs.");
+    /** See {@link org.olap4j.metadata.MeasureGroup#getName()}. */
     public final Column MeasuregroupName =
         new Column(
             "MEASUREGROUP_NAME",
@@ -90,6 +101,7 @@ public class XmlaMeasureGroup extends Entity {
             Restriction.OPTIONAL,
             Column.REQUIRED,
             "The name of the measure group.");
+    /** See {@link org.olap4j.metadata.MeasureGroup#getDescription()}. */
     public final Column Description =
         new Column(
             "DESCRIPTION",
@@ -97,6 +109,7 @@ public class XmlaMeasureGroup extends Entity {
             Restriction.NO,
             Column.REQUIRED,
             "A human-readable description of the measure group.");
+    /** See {@link org.olap4j.metadata.MeasureGroup#isWriteEnabled()}. */
     public final Column IsWriteEnabled =
         new Column(
             "IS_WRITE_ENABLED",
@@ -106,6 +119,7 @@ public class XmlaMeasureGroup extends Entity {
             "A Boolean that indicates whether the measure group is "
             + "write-enabled. Returns true if the measure group is write "
             + "enabled.");
+    /** See {@link org.olap4j.metadata.MeasureGroup#getCaption()}. */
     public final Column MeasuregroupCaption =
         new Column(
             "MEASUREGROUP_CAPTION",
@@ -113,6 +127,16 @@ public class XmlaMeasureGroup extends Entity {
             Restriction.NO,
             Column.REQUIRED,
             "The display caption for the measure group.");
+    /** See {@link org.olap4j.metadata.MeasureGroup#getAnnotations()}.
+     *
+     * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
+    public final Column Annotations =
+        new Column(
+            "ANNOTATIONS",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "A set of notes, in XML format.").extension();
 }
 
 // End XmlaMeasureGroup.java

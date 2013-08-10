@@ -94,7 +94,8 @@ class XmlaOlap4jMember
     }
 
     public boolean equals(Object obj) {
-        return obj instanceof XmlaOlap4jMember
+        return obj == this
+            || obj instanceof XmlaOlap4jMember
             && ((XmlaOlap4jMember) obj).uniqueName.equals(uniqueName);
     }
 

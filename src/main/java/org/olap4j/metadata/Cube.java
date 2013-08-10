@@ -222,6 +222,16 @@ public interface Cube extends MetadataElement {
      */
     boolean isDrillThroughEnabled();
 
+    /**
+     * Returns the source cube if this cube is a perspective cube. Otherwise
+     * returns null.
+     *
+     * @return Source cube of a perspective cube
+     *
+     * @since olap4j 2.0
+     */
+    Cube getBaseCube();
+
     /** Type of a cube. */
     enum Type implements XmlaConstant {
         /** Cube (1). */

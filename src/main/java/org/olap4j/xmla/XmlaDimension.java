@@ -79,6 +79,10 @@ public class XmlaDimension extends Entity {
             DimensionVisibility);
     }
 
+    /** See {@link org.olap4j.metadata.Dimension#getCube()},
+     * {@link org.olap4j.metadata.Cube#getSchema()},
+     * {@link org.olap4j.metadata.Schema#getCatalog()},
+     * {@link org.olap4j.metadata.Catalog#getName()}. */
     public final Column CatalogName =
         new Column(
             "CATALOG_NAME",
@@ -86,6 +90,9 @@ public class XmlaDimension extends Entity {
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the database.");
+    /** See {@link org.olap4j.metadata.Dimension#getCube()},
+     * {@link org.olap4j.metadata.Cube#getSchema()},
+     * {@link org.olap4j.metadata.Schema#getName()}. */
     public final Column SchemaName =
         new Column(
             "SCHEMA_NAME",
@@ -93,6 +100,8 @@ public class XmlaDimension extends Entity {
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the schema.");
+    /** See {@link org.olap4j.metadata.Dimension#getCube()},
+     * {@link org.olap4j.metadata.Cube#getName()}. */
     public final Column CubeName =
         new Column(
             "CUBE_NAME",
@@ -100,6 +109,7 @@ public class XmlaDimension extends Entity {
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the cube.");
+    /** See {@link org.olap4j.metadata.Dimension#getName()}. */
     public final Column DimensionName =
         new Column(
             "DIMENSION_NAME",
@@ -109,6 +119,7 @@ public class XmlaDimension extends Entity {
             "The name of the dimension. If a dimension is part of more than "
             + "one cube or measure group, then there is one row for each "
             + "unique combination of dimension, measure group, and cube.");
+    /** See {@link org.olap4j.metadata.Dimension#getUniqueName()}. */
     public final Column DimensionUniqueName =
         new Column(
             "DIMENSION_UNIQUE_NAME",
@@ -116,6 +127,7 @@ public class XmlaDimension extends Entity {
             Column.RESTRICTION,
             Column.REQUIRED,
             "The unique name of the dimension.");
+    /** No corresponding method in {@link org.olap4j.metadata.Dimension}. */
     public final Column DimensionGuid =
         new Column(
             "DIMENSION_GUID",
@@ -123,6 +135,7 @@ public class XmlaDimension extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Not supported.");
+    /** See {@link org.olap4j.metadata.Dimension#getCaption()}. */
     public final Column DimensionCaption =
         new Column(
             "DIMENSION_CAPTION",
@@ -132,6 +145,7 @@ public class XmlaDimension extends Entity {
             "The caption of the dimension. This should be used when displaying "
             + "the name of the dimension to the user, such as in the user "
             + "interface or reports.");
+    /** See {@link org.olap4j.metadata.Dimension#getOrdinal()}. */
     public final Column DimensionOrdinal =
         new Column(
             "DIMENSION_ORDINAL",
@@ -139,6 +153,7 @@ public class XmlaDimension extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The position of the dimension within the cube.");
+    /** See {@link org.olap4j.metadata.Dimension#getDimensionType()}. */
     public final Column DimensionType =
         new Column(
             "DIMENSION_TYPE",
@@ -146,6 +161,7 @@ public class XmlaDimension extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The type of the dimension.");
+    /** See {@link org.olap4j.metadata.Dimension#getCardinality()}. */
     public final Column DimensionCardinality =
         new Column(
             "DIMENSION_CARDINALITY",
@@ -153,6 +169,7 @@ public class XmlaDimension extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The number of members in the key attribute.");
+    /** See {@link org.olap4j.metadata.Dimension#getDefaultHierarchy()}. */
     public final Column DefaultHierarchy =
         new Column(
             "DEFAULT_HIERARCHY",
@@ -168,6 +185,7 @@ public class XmlaDimension extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "A user-friendly description of the dimension.");
+    /** No corresponding method in {@link org.olap4j.metadata.Dimension}. */
     public final Column IsVirtual =
         new Column(
             "IS_VIRTUAL",

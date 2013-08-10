@@ -102,6 +102,15 @@ public interface MetadataElement {
      * @return Whether this element is visible
      */
     boolean isVisible();
+
+    /**
+     * Returns annotations.
+     *
+     * @see MeasureGroupDimension#getAnnotations
+     *
+     * @since olap4j 2.0
+     */
+    Object getAnnotations();
 }
 
 // End MetadataElement.java

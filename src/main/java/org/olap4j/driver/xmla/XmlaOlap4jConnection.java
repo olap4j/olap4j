@@ -1593,6 +1593,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             }
             XmlaOlap4jHierarchy hierarchy = new XmlaOlap4jHierarchy(
                 context.getDimension(row),
+                list.size(),
                 hierarchyUniqueName,
                 hierarchyName,
                 hierarchyCaption,

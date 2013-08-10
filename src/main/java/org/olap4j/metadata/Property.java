@@ -18,7 +18,6 @@
 package org.olap4j.metadata;
 
 import org.olap4j.impl.Olap4jUtil;
-import org.olap4j.xmla.Entity;
 
 import java.util.Collections;
 import java.util.Set;
@@ -549,6 +548,10 @@ public interface Property extends MetadataElement {
         public boolean isVisible() {
             return !internal;
         }
+
+        public Object getAnnotations() {
+            return null;
+        }
     }
 
     /**
@@ -790,6 +793,10 @@ public interface Property extends MetadataElement {
 
         public boolean isVisible() {
             return !internal;
+        }
+
+        public Object getAnnotations() {
+            return null;
         }
 
         public ContentType getContentType() {

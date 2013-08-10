@@ -66,6 +66,7 @@ public class XmlaHierarchy extends Entity {
             InstanceSelection,
             GroupingBehavior,
             StructureType,
+            Annotations,
             ParentChild,
             Levels);
     }
@@ -93,6 +94,11 @@ public class XmlaHierarchy extends Entity {
             HierarchyVisibility);
     }
 
+    /** See {@link org.olap4j.metadata.Hierarchy#getDimension()},
+     * {@link org.olap4j.metadata.Dimension#getCube()},
+     * {@link org.olap4j.metadata.Cube#getSchema()},
+     * {@link org.olap4j.metadata.Schema#getCatalog()},
+     * {@link org.olap4j.metadata.Catalog#getName()}. */
     public final Column CatalogName =
         new Column(
             "CATALOG_NAME",
@@ -100,6 +106,10 @@ public class XmlaHierarchy extends Entity {
             Column.RESTRICTION,
             Column.OPTIONAL,
             "The name of the catalog to which this hierarchy belongs.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getDimension()},
+     * {@link org.olap4j.metadata.Dimension#getCube()},
+     * {@link org.olap4j.metadata.Cube#getSchema()},
+     * {@link org.olap4j.metadata.Schema#getName()}. */
     public final Column SchemaName =
         new Column(
             "SCHEMA_NAME",
@@ -107,6 +117,9 @@ public class XmlaHierarchy extends Entity {
             Column.RESTRICTION,
             Column.OPTIONAL,
             "Not supported");
+    /** See {@link org.olap4j.metadata.Hierarchy#getDimension()},
+     * {@link org.olap4j.metadata.Dimension#getCube()},
+     * {@link org.olap4j.metadata.Cube#getName()}. */
     public final Column CubeName =
         new Column(
             "CUBE_NAME",
@@ -114,6 +127,8 @@ public class XmlaHierarchy extends Entity {
             Column.RESTRICTION,
             Column.REQUIRED,
             "The name of the cube to which this hierarchy belongs.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getDimension()},
+     * {@link org.olap4j.metadata.Dimension#getUniqueName()}. */
     public final Column DimensionUniqueName =
         new Column(
             "DIMENSION_UNIQUE_NAME",
@@ -122,6 +137,7 @@ public class XmlaHierarchy extends Entity {
             Column.REQUIRED,
             "The unique name of the dimension to which this hierarchy "
             + "belongs.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getName()}. */
     public final Column HierarchyName =
         new Column(
             "HIERARCHY_NAME",
@@ -130,6 +146,7 @@ public class XmlaHierarchy extends Entity {
             Column.REQUIRED,
             "The name of the hierarchy. Blank if there is only a single "
             + "hierarchy in the dimension.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getUniqueName()}. */
     public final Column HierarchyUniqueName =
         new Column(
             "HIERARCHY_UNIQUE_NAME",
@@ -137,6 +154,7 @@ public class XmlaHierarchy extends Entity {
             Column.RESTRICTION,
             Column.REQUIRED,
             "The unique name of the hierarchy.");
+    /** No corresponding method in {@link org.olap4j.metadata.Hierarchy}. */
     public final Column HierarchyGuid =
         new Column(
             "HIERARCHY_GUID",
@@ -144,6 +162,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Not supported.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getCaption()}. */
     public final Column HierarchyCaption =
         new Column(
             "HIERARCHY_CAPTION",
@@ -151,6 +170,8 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "A label or a caption associated with the hierarchy.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getDimension()},
+     * {@link org.olap4j.metadata.Dimension#getDimensionType()}. */
     public final Column DimensionType =
         new Column(
             "DIMENSION_TYPE",
@@ -158,6 +179,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The type of the dimension.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getCardinality()}. */
     public final Column HierarchyCardinality =
         new Column(
             "HIERARCHY_CARDINALITY",
@@ -165,6 +187,8 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The number of members in the hierarchy.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getDefaultMember()},
+     * {@link org.olap4j.metadata.Member#getUniqueName()}. */
     public final Column DefaultMember =
         new Column(
             "DEFAULT_MEMBER",
@@ -173,6 +197,7 @@ public class XmlaHierarchy extends Entity {
             Column.OPTIONAL,
             "The default member for this hierarchy. This is a unique name. "
             + "Every hierarchy must have a default member.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getAllMember()}. */
     public final Column AllMember =
         new Column(
             "ALL_MEMBER",
@@ -180,6 +205,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The member at the highest level of the rollup.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getDescription()}. */
     public final Column Description =
         new Column(
             "DESCRIPTION",
@@ -188,6 +214,7 @@ public class XmlaHierarchy extends Entity {
             Column.OPTIONAL,
             "A human-readable description of the hierarchy. NULL if no "
             + "description exists.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getStructure()}. */
     public final Column Structure =
         new Column(
             "STRUCTURE",
@@ -195,6 +222,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "The structure of the hierarchy.");
+    /** No corresponding method in {@link org.olap4j.metadata.Hierarchy}. */
     public final Column IsVirtual =
         new Column(
             "IS_VIRTUAL",
@@ -202,6 +230,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "Always returns false.");
+    /** See {@link org.olap4j.metadata.Hierarchy#isReadWrite()}. */
     public final Column IsReadwrite =
         new Column(
             "IS_READWRITE",
@@ -210,6 +239,8 @@ public class XmlaHierarchy extends Entity {
             Column.REQUIRED,
             "A Boolean that indicates whether the Write Back to dimension "
             + "column is enabled.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getDimension()},
+     * {@link org.olap4j.metadata.Dimension#getUniqueSettings()}. */
     public final Column DimensionUniqueSettings =
         new Column(
             "DIMENSION_UNIQUE_SETTINGS",
@@ -221,6 +252,8 @@ public class XmlaHierarchy extends Entity {
                 "MDDIMENSIONS_MEMBER_KEY_UNIQUE (1)",
                 Dimension.KeyUniqueness.MEMBER_KEY_UNIQUE)
              + ".");
+    /** See {@link org.olap4j.metadata.Hierarchy#getDimension()},
+     * {@link org.olap4j.metadata.Dimension#isVisible()}. */
     public final Column DimensionIsVisible =
         new Column(
             "DIMENSION_IS_VISIBLE",
@@ -228,6 +261,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "A Boolean that indicates whether the parent dimension is visible.");
+    /** See {@link org.olap4j.metadata.Hierarchy#isVisible()}. */
     public final Column HierarchyIsVisible =
         new Column(
             "HIERARCHY_IS_VISIBLE",
@@ -235,6 +269,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "A Boolean that indicates whether the hierarchy is visible.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getOrdinal()}. */
     public final Column HierarchyOrdinal =
         new Column(
             "HIERARCHY_ORDINAL",
@@ -243,6 +278,7 @@ public class XmlaHierarchy extends Entity {
             Column.REQUIRED,
             "The ordinal number of the hierarchy across all hierarchies of "
             + "the cube.");
+    /** No corresponding method in {@link org.olap4j.metadata.Hierarchy}. */
     public final Column DimensionIsShared =
         new Column(
             "DIMENSION_IS_SHARED",
@@ -250,6 +286,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "Always returns true.");
+    /** No corresponding method in {@link org.olap4j.metadata.Hierarchy}. */
     public final Column DimensionMasterUniqueName =
         new Column(
             "DIMENSION_MASTER_UNIQUE_NAME",
@@ -257,6 +294,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "Always returns null.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getOrigin()}. */
     public final Column HierarchyOrigin =
         new Column(
             "HIERARCHY_ORIGIN",
@@ -264,6 +302,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "A bit mak that determines the source of the hierarchy.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getDisplayFolder()}. */
     public final Column HierarchyDisplayFolder =
         new Column(
             "HIERARCHY_DISPLAY_FOLDER",
@@ -273,6 +312,7 @@ public class XmlaHierarchy extends Entity {
             "The path to be used when displaying the hierarchy in the user "
             + "interface. Folder names will be separated by a semicolon "
             + "(;). Nested folders are indicated by a backslash (\\).");
+    /** See {@link org.olap4j.metadata.Hierarchy#getInstanceSelection()}. */
     public final Column InstanceSelection =
         new Column(
             "INSTANCE_SELECTION",
@@ -280,6 +320,7 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "A hint to the client application on how to show the hierarchy.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getGroupingBehavior()}. */
     public final Column GroupingBehavior =
         new Column(
             "GROUPING_BEHAVIOR",
@@ -288,6 +329,7 @@ public class XmlaHierarchy extends Entity {
             Column.REQUIRED,
             "An enumeration that specifies the expected grouping behavior of "
             + "clients for this hierarchy.");
+    /** See {@link org.olap4j.metadata.Hierarchy#getStructureType()}. */
     public final Column StructureType =
         new Column(
             "STRUCTURE_TYPE",
@@ -295,6 +337,17 @@ public class XmlaHierarchy extends Entity {
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
             "Indicates the type of hierarchy.");
+
+    /** See {@link org.olap4j.metadata.Hierarchy#getAnnotations()}.
+     *
+     * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
+    public final Column Annotations =
+        new Column(
+            "ANNOTATIONS",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "A set of notes, in XML format.").extension();
 
     // Mondrian extension. Not in XMLA spec.
     public final Column Levels =

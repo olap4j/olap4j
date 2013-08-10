@@ -56,7 +56,8 @@ public class XmlaMeasure extends Entity {
             MeasureUnqualifiedCaption,
             MeasuregroupName,
             MeasureDisplayFolder,
-            DefaultFormatString);
+            DefaultFormatString,
+            Annotations);
     }
 
     public List<Column> sortColumns() {
@@ -223,6 +224,16 @@ public class XmlaMeasure extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The default format string for the measure.");
+    /** See {@link org.olap4j.metadata.Measure#getAnnotations()}.
+     *
+     * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
+    public final Column Annotations =
+        new Column(
+            "ANNOTATIONS",
+            XmlaType.String.scalar(),
+            Column.NOT_RESTRICTION,
+            Column.OPTIONAL,
+            "A set of notes, in XML format.").extension();
 }
 
 // End XmlaMeasure.java

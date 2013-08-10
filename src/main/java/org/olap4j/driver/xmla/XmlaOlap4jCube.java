@@ -33,13 +33,9 @@ import java.util.*;
  * @author jhyde
  * @since Dec 4, 2007
  */
-class XmlaOlap4jCube implements Cube, Named
+class XmlaOlap4jCube extends XmlaOlap4jElement implements Cube, Named
 {
     final XmlaOlap4jSchema olap4jSchema;
-    private final String name;
-    private final String caption;
-    private final String description;
-
     final NamedList<XmlaOlap4jDimension> dimensions;
     final Map<String, XmlaOlap4jDimension> dimensionsByUname =
         new HashMap<String, XmlaOlap4jDimension>();
@@ -70,13 +66,9 @@ class XmlaOlap4jCube implements Cube, Named
         String caption,
         String description) throws OlapException
     {
+        super("[" + name + "]", name, caption, description);
         assert olap4jSchema != null;
-        assert description != null;
-        assert name != null;
         this.olap4jSchema = olap4jSchema;
-        this.name = name;
-        this.caption = caption;
-        this.description = description;
         final Map<String, XmlaOlap4jMeasure> measuresMap =
             new HashMap<String, XmlaOlap4jMeasure>();
         this.metadataReader =
@@ -140,28 +132,24 @@ class XmlaOlap4jCube implements Cube, Named
             restrictions);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj
+            || obj instanceof XmlaOlap4jCube
+            && olap4jSchema.equals(((XmlaOlap4jCube) obj).olap4jSchema)
+            && name.equals(((XmlaOlap4jCube) obj).name);
+    }
+
     public Schema getSchema() {
         return olap4jSchema;
     }
 
-    public String getName() {
-        return name;
+    public Cube getBaseCube() {
+        return null;
     }
 
-    public String getUniqueName() {
-        return "[" + name + "]";
-    }
-
-    public String getCaption() {
-        return caption;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public boolean isVisible() {
-        return true;
+    public Object getAnnotations() {
+        return null;
     }
 
     public NamedList<MeasureGroup> getMeasureGroups() {

@@ -99,13 +99,26 @@ class XmlaOlap4jDimension
     }
 
     public boolean equals(Object obj) {
-        return (obj instanceof XmlaOlap4jDimension)
+        return obj == this
+            || (obj instanceof XmlaOlap4jDimension)
             && this.uniqueName.equals(
                 ((XmlaOlap4jDimension) obj).getUniqueName());
     }
 
     public int getOrdinal() {
         return ordinal;
+    }
+
+    public Cube getCube() {
+        return olap4jCube;
+    }
+
+    public int getCardinality() {
+        return getDefaultHierarchy().getCardinality(); // FIXME
+    }
+
+    public KeyUniqueness getUniqueSettings() {
+        return KeyUniqueness.MEMBER_KEY_UNIQUE; // FIXME
     }
 }
 

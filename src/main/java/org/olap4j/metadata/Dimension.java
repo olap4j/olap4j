@@ -35,6 +35,27 @@ import org.olap4j.OlapException;
 public interface Dimension extends MetadataElement {
 
     /**
+     * Returns the cube that this {@code Dimension} belongs to.
+     *
+     * @return cube
+     *
+     * @since olap4j 2.0
+     */
+    Cube getCube();
+
+    /**
+     * Returns the ordinal number of this {@code Dimension} across all
+     * hierarchies of the {@link Cube}.
+     *
+     * @return ordinal within cube
+     *
+     * @see #getCube()
+     *
+     * @since olap4j 2.0
+     */
+    int getOrdinal();
+
+    /**
      * Returns the hierarchies in this Dimension.
      *
      * <p>Many dimensions have only one Hierarchy, whose name is the same as the
@@ -64,6 +85,26 @@ public interface Dimension extends MetadataElement {
      * @return default hierarchy
      */
     Hierarchy getDefaultHierarchy();
+
+    /**
+     * Returns the number of members in this {@code Dimension}. This value can
+     * be an approximation of the real cardinality.
+     *
+     * @return number of members
+     *
+     * @since olap4j 2.0
+     */
+    int getCardinality();
+
+    /**
+     * Returns a bitmap that specifies which columns contain unique values
+     * if this {@link Dimension} contains only members with unique names.
+     *
+     * @return unique settings
+     *
+     * @since olap4j 2.0
+     */
+    KeyUniqueness getUniqueSettings();
 
     /**
      * Enumeration of the types of a <code>Dimension</code>.

@@ -67,7 +67,8 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         private final String name;
         private static final Map<String, XsdTypes> TYPES;
         static {
-            Map typesInitial = new HashMap<String, XsdTypes>();
+            Map<String, XsdTypes> typesInitial =
+                new HashMap<String, XsdTypes>();
             for (XsdTypes type : values()) {
                 typesInitial.put(type.name, type);
             }
@@ -1425,6 +1426,10 @@ abstract class XmlaOlap4jCellSet implements CellSet {
 
         public final XmlaOlap4jCatalog getCatalog() {
             return getCube().olap4jSchema.olap4jCatalog;
+        }
+
+        public Object getAnnotations() {
+            return null;
         }
 
         public Map<Property, Object> getPropertyValueMap() {

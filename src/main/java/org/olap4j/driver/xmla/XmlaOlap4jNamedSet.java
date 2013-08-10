@@ -17,7 +17,6 @@
 */
 package org.olap4j.driver.xmla;
 
-import org.olap4j.impl.Named;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.metadata.Cube;
 import org.olap4j.metadata.NamedSet;
@@ -30,17 +29,17 @@ import org.olap4j.metadata.NamedSet;
  * @since Dec 4, 2007
  */
 class XmlaOlap4jNamedSet
-    implements NamedSet, Named
+    extends XmlaOlap4jElement
+    implements NamedSet
 {
     private final XmlaOlap4jCube olap4jCube;
-    private final String name;
 
     XmlaOlap4jNamedSet(
         XmlaOlap4jCube olap4jCube,
         String name)
     {
+        super(name, name, name, "");
         this.olap4jCube = olap4jCube;
-        this.name = name;
     }
 
     public Cube getCube() {
@@ -51,24 +50,12 @@ class XmlaOlap4jNamedSet
         throw new UnsupportedOperationException();
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getUniqueName() {
-        return name;
-    }
-
-    public String getCaption() {
-        return name;
-    }
-
-    public String getDescription() {
-        return "";
-    }
-
-    public boolean isVisible() {
-        return true;
+    @Override
+    public boolean equals(Object obj) {
+        return obj == this
+        || obj instanceof XmlaOlap4jNamedSet
+            && olap4jCube.equals(((XmlaOlap4jNamedSet) obj).olap4jCube)
+            && name.equals(((XmlaOlap4jNamedSet) obj).name);
     }
 }
 
