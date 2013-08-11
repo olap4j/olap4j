@@ -66,6 +66,18 @@
   <!-- Dependencies. -->
   <dependencies>
     <dependency>
+      <groupId>com.sun</groupId>
+      <artifactId>rt-jdk1.5</artifactId>
+      <version>1.5.0_22</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.java.openjdk</groupId>
+      <artifactId>rt-java6</artifactId>
+      <version>1.6.0_24</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
       <version>2.11.0</version>
@@ -144,17 +156,53 @@
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.3.2</version>
-          <configuration>
+        <version>2.3.2</version>
+        <configuration>
           <source>1.5</source>
           <target>1.5</target>
           <excludes>
-            <!-- TODO: build these in separate javac invocations -->
-            <exclude>org/olap4j/driver/xmla/FactoryJdbc3Impl.java</exclude>
-            <exclude>org/olap4j/driver/xmla/FactoryJdbc4Impl.java</exclude>
-            <exclude>org/olap4j/driver/xmla/FactoryJdbc4Plus.java</exclude>
+            <exclude>**/FactoryJdbc3Impl.java</exclude>
+            <exclude>**/FactoryJdbc4Impl.java</exclude>
           </excludes>
         </configuration>
+        <executions>
+          <execution>
+            <id>compile-jdk15</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/FactoryJdbc4*.java</exclude>
+              </excludes>
+              <includes>
+                <include>**/FactoryJdbc3Impl.java</include>
+              </includes>
+              <compilerArguments>
+                <verbose/>
+                <bootclasspath>${com.sun:rt-jdk1.5:jar}</bootclasspath>
+              </compilerArguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>compile-jdk16</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/FactoryJdbc3*.java</exclude>
+              </excludes>
+              <includes>
+                <include>**/FactoryJdbc4Impl.java</include>
+              </includes>
+              <compilerArguments>
+                <verbose/>
+                <bootclasspath>${net.java.openjdk:rt-java6:jar}</bootclasspath>
+              </compilerArguments>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
