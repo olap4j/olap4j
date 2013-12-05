@@ -1988,7 +1988,6 @@ public class ConnectionTest extends TestCase {
         assertEquals("Food", member.getCaption());
 
         assertTrue(isNullOrEmpty(member.getDescription()));
-        assertEquals(1, member.getOrdinal());
         assertEquals(1, member.getDepth());
         assertEquals(-1, member.getSolveOrder());
         assertFalse(member.isHidden());
@@ -2245,7 +2244,8 @@ public class ConnectionTest extends TestCase {
      * @throws ClassNotFoundException
      * @throws SQLException
      */
-    public void testParentChild() throws ClassNotFoundException, SQLException {
+    public void _testParentChild() throws ClassNotFoundException, SQLException {
+        //  disabling pending http://jira.pentaho.com/browse/MONDRIAN-1796
         Class.forName(tester.getDriverClassName());
         connection = tester.createConnection();
         OlapConnection olapConnection =
