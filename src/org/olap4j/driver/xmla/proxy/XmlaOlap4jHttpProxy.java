@@ -24,6 +24,7 @@ import org.olap4j.impl.Base64;
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.Future;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Extends the AbstractCachedProxy and serves as
@@ -87,6 +88,8 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
                 getEncodingCharsetName()
                     .concat(";q=1"));
 
+            urlConnection.setRequestProperty("Accept-Encoding", "gzip");
+
             // Some servers expect a SOAPAction header.
             // TODO There is bound to be a better way to do this.
             if (request.contains(DISCOVER)) {
@@ -127,7 +130,13 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
             urlConnection.getOutputStream().write(request.getBytes(encoding));
 
             // Get the response, again assuming default encoding.
-            InputStream is = urlConnection.getInputStream();
+            InputStream is = new BufferedInputStream(urlConnection.getInputStream());
+
+            // Detect that the server used gzip encoding
+            String contentEncoding = urlConnection.getHeaderField("Content-Encoding");
+            if("gzip".equals(contentEncoding)) {
+                is = new GZIPInputStream(is);
+            }
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buf = new byte[1024];
             int count;
