@@ -97,7 +97,7 @@ src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
     <target name="dist" depends="all"/>
 
     <target name="all"
-        depends="clean,version-properties,jar,tck-jar,xmla-jar,javadoc,javadoc-pdf,jar-jdk14,source.zip"
+        depends="clean,version-properties,jar,source.jar,tck-jar,xmla-jar,javadoc,javadoc-pdf,jar-jdk14,source.zip"
         description="Creates a distribution">
         <zip zipfile="${dist.dir}/${zip.filename}">
             <zipfileset dir="${basedir}" prefix="${ivy.artifact.id}-${project.revision}"
