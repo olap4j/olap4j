@@ -3,6 +3,9 @@ olap4j release check-list
 
   - Update README.txt, CHANGES.txt, index.html.
 
+  - To update CHANGES.txt, you can use the following command.
+      git log --pretty --no-merges --format="[%h](../../commit/%H)%n%cD - __(%aN)__%n%s%n"
+
   - Update build.properties
 
   - Edit test.properties and run the test suite. Make sure everything is green.

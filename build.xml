@@ -105,7 +105,7 @@ src/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java" />
 LICENSE,
 NOTICE,
 README.txt,
-CHANGES.txt,
+HISTORY.md,
 VERSION.txt" />
             <zipfileset dir="${basedir}/doc" prefix="${ivy.artifact.id}-${project.revision}/doc"
                 includes="**/*" />
@@ -254,7 +254,7 @@ VERSION.txt" />
 LICENSE,
 NOTICE,
 README.txt,
-CHANGES.txt,
+HISTORY.md,
 VERSION.txt" />
             <zipfileset dir="${basedir}" prefix="${ivy.artifact.id}-${project.revision}"
                     includes="
