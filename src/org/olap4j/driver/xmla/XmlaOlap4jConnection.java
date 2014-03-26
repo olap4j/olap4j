@@ -830,8 +830,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         {
             final String dataSourceInfo =
                 conn.getOlapDatabase().getDataSourceInfo();
+            final String provider = conn.getOlapDatabase().getProviderName();
             for (BackendFlavor flavor : BackendFlavor.values()) {
-                if (dataSourceInfo.contains(flavor.token)) {
+                if (provider.contains(flavor.token) || dataSourceInfo.contains(flavor.token)) {
                     return flavor;
                 }
             }
