@@ -278,7 +278,12 @@ abstract class XmlaOlap4jUtil {
         for (int i = 0; i < childNodes.getLength(); i++) {
             final Node node = childNodes.item(i);
             if (name.equals(node.getLocalName())) {
-                return node.getTextContent();
+				String result = node.getTextContent();
+				// If content is not plain text then returns name of first child tag
+				if (result == null && node.hasChildNodes()) {
+					result = node.getFirstChild().getLocalName();
+				}
+				return result;
             }
         }
         return null;
