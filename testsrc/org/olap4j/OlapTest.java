@@ -1443,15 +1443,15 @@ public class OlapTest extends TestCase {
 
         Level productLevel = productLevels.get("Product Category");
         productDimension.include(productLevel);
-        
+
         QueryDimension measuresDimension = query.getDimension("Measures");
         measuresDimension.include(nameList("Measures", "Sales Count"));
 
         query.getAxis(Axis.ROWS).addDimension(productDimension);
         query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
-        
+
         query.getAxis(Axis.ROWS).topCount(new BigDecimal(6));
-        
+
         query.validate();
 
         // Validate the generated MDX
@@ -1485,12 +1485,12 @@ public class OlapTest extends TestCase {
             + "Row #4: 1,096\n"
             + "Row #5: 1,367\n",
             resultsString);
-        
+
         query.getAxis(Axis.ROWS).limit(
-        	    LimitFunction.TopCount, 
-        	    new BigDecimal(6), 
-        	    "[Measures].[Sales Count]");
-        
+            LimitFunction.TopCount,
+            new BigDecimal(6),
+            "[Measures].[Sales Count]");
+
         query.validate();
 
         // Validate the generated MDX
@@ -1539,15 +1539,16 @@ public class OlapTest extends TestCase {
 
         Level productLevel = productLevels.get("Product Category");
         productDimension.include(productLevel);
-        
+
         QueryDimension measuresDimension = query.getDimension("Measures");
         measuresDimension.include(nameList("Measures", "Sales Count"));
 
         query.getAxis(Axis.ROWS).addDimension(productDimension);
         query.getAxis(Axis.COLUMNS).addDimension(measuresDimension);
-        
-        query.getAxis(Axis.ROWS).filter("InStr(Product.CurrentMember.Name, 'Beverages') > 0");
-        
+
+        query.getAxis(Axis.ROWS)
+            .filter("InStr(Product.CurrentMember.Name, 'Beverages') > 0");
+
         query.validate();
 
         // Validate the generated MDX
@@ -1575,12 +1576,12 @@ public class OlapTest extends TestCase {
             + "Row #1: 1,391\n"
             + "Row #2: 1,096\n",
             resultsString);
-        
+
         query.getAxis(Axis.ROWS).limit(
-        	    LimitFunction.TopCount, 
-        	    new BigDecimal(2), 
-        	    "[Measures].[Sales Count]");
-        
+            LimitFunction.TopCount,
+            new BigDecimal(2),
+            "[Measures].[Sales Count]");
+
         query.validate();
 
         // Validate the generated MDX
@@ -1606,9 +1607,10 @@ public class OlapTest extends TestCase {
             + "Row #0: 1,391\n"
             + "Row #1: 1,107\n",
             resultsString);
-        
-        query.getAxis(Axis.ROWS).filter("InStr(Product.CurrentMember.Name, 'NoMatchingString') > 0");
-        
+
+        query.getAxis(Axis.ROWS).filter(
+            "InStr(Product.CurrentMember.Name, 'NoMatchingString') > 0");
+
         query.validate();
 
         // Validate the generated MDX
@@ -1630,9 +1632,8 @@ public class OlapTest extends TestCase {
             + "{[Measures].[Sales Count]}\n"
             + "Axis #2:\n",
             resultsString);
-        
-
     }
+
     public void testHierarchyConsistency() throws Exception {
         Cube cube = getFoodmartCube("Sales");
         if (cube == null) {

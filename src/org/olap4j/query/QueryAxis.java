@@ -355,95 +355,97 @@ public class QueryAxis extends QueryNodeImpl {
     public String getSortIdentifierNodeName() {
         return sortEvaluationLiteral;
     }
-    
+
     /**
-     * Returns a specified number of items from the 
+     * Returns a specified number of items from the
      *  top of the axis set.
      * @param n
      */
     public void topCount(BigDecimal n) {
-    	this.limitFunction = LimitFunction.TopCount;
-    	this.limitFunctionN = n;
+        this.limitFunction = LimitFunction.TopCount;
+        this.limitFunctionN = n;
     }
 
     /**
-     * Returns a specified number of items from the 
+     * Returns a specified number of items from the
      * bottom of the axis set.
      * @param n
-     */    
+     */
     public void bottomCount(BigDecimal n) {
-    	this.limitFunction = LimitFunction.BottomCount;
-    	this.limitFunctionN = n;
+        this.limitFunction = LimitFunction.BottomCount;
+        this.limitFunctionN = n;
     }
-    
+
     /**
      * Limit the axis set to a specified number of items depending
      * on the limitSortLiteral and {@link LimitFunction}.
      * @param n - number of items/cumulative sum/percentage
      */
-    public void limit(LimitFunction function, BigDecimal n, String limitSortLiteral) {
-    	this.limitFunction = function;
-    	this.limitFunctionN = n;
-    	this.limitFunctionSortLiteral = limitSortLiteral;
+    public void limit(
+        LimitFunction function, BigDecimal n, String limitSortLiteral)
+    {
+        this.limitFunction = function;
+        this.limitFunctionN = n;
+        this.limitFunctionSortLiteral = limitSortLiteral;
     }
-    
+
     /**
      * Clears the limit parameters of that axis.
      */
     public void clearLimitFunction() {
-    	this.limitFunction = null;
-    	this.limitFunctionN = null;
-    	this.limitFunctionSortLiteral = null;
+        this.limitFunction = null;
+        this.limitFunctionN = null;
+        this.limitFunctionSortLiteral = null;
     }
 
-	/**
-	 * @return The {@link LimitFunction}
-	 */
-	public LimitFunction getLimitFunction() {
-		return limitFunction;
-	}
+    /**
+     * @return The {@link LimitFunction}
+     */
+    public LimitFunction getLimitFunction() {
+        return limitFunction;
+    }
 
-	/**
-	 * @return The number of items or cumulative sum or percentage
-	 * being used by the {@link LimitFunction}.
-	 */
-	public BigDecimal getLimitFunctionN() {
-		return limitFunctionN;
-	}
+    /**
+     * @return The number of items or cumulative sum or percentage
+     * being used by the {@link LimitFunction}.
+     */
+    public BigDecimal getLimitFunctionN() {
+        return limitFunctionN;
+    }
 
     /**
      * Returns the current sort literal being used by the
      * limit functionMight return null of none
      * is currently specified.
      * @return sort literal of the limit function
-     */	public String getLimitFunctionSortLiteral() {
-		return limitFunctionSortLiteral;
-	}
+     */
+    public String getLimitFunctionSortLiteral() {
+        return limitFunctionSortLiteral;
+    }
 
-     /**
-      * Filter the axis using the given condition before TopCount / Order
-      * are applied.
-      * @param filterCondition - the condition used for Filter()
-      */
-     public void filter(String filterCondition) {
-     	this.filterCondition = filterCondition;
-     }
-     
-     /**
-      * Returns the Filter Condition used to filter the axis set.
-      * @return filter condition
-      */
-     public String getFilterCondition() {
-    	 return this.filterCondition;
-     }
-     
-     /**
-      * Clears the filter condition for this axis.
-      */
-     public void clearFilter() {
-    	 this.filterCondition = null;
-     }
-    
+    /**
+     * Filter the axis using the given condition before TopCount / Order
+     * are applied.
+     * @param filterCondition - the condition used for Filter()
+     */
+    public void filter(String filterCondition) {
+        this.filterCondition = filterCondition;
+    }
+
+    /**
+     * Returns the Filter Condition used to filter the axis set.
+     * @return filter condition
+     */
+    public String getFilterCondition() {
+        return this.filterCondition;
+    }
+
+    /**
+     * Clears the filter condition for this axis.
+     */
+    public void clearFilter() {
+        this.filterCondition = null;
+    }
 }
 
 // End QueryAxis.java

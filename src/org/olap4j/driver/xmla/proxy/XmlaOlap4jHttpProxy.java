@@ -138,7 +138,7 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
             // Detect that the server used gzip encoding
             String contentEncoding =
                 urlConnection.getHeaderField("Content-Encoding");
-            if("gzip".equals(contentEncoding)) {
+            if ("gzip".equals(contentEncoding)) {
                 is = new GZIPInputStream(is);
             }
 

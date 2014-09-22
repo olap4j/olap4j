@@ -301,53 +301,53 @@ abstract class Olap4jNodeConverter {
 
         ParseTreeNode filteredNode = null;
         if (axis.getFilterCondition() != null) {
-        	LiteralNode conditionNode = 
-        		LiteralNode.createSymbol(
-                        null,
-                        axis.getFilterCondition());
-        	filteredNode =
-    	    	    new CallNode(
-    	    	    	    null,
-    	    	    	    "Filter",
-    	    	    	    Syntax.Function,
-    	    	    	    callNode,
-    	    	    	    conditionNode);
+            LiteralNode conditionNode =
+                LiteralNode.createSymbol(
+                    null,
+                    axis.getFilterCondition());
+            filteredNode =
+                new CallNode(
+                    null,
+                    "Filter",
+                    Syntax.Function,
+                    callNode,
+                    conditionNode);
         } else {
-        	filteredNode = callNode;
+            filteredNode = callNode;
         }
         // We might need to limit the axis set
         ParseTreeNode limitedNode = null;
         if (axis.getLimitFunction() != null) {
-        	ParseTreeNode n =
-        	    LiteralNode.createNumeric(
-        	            null, 
-        	            axis.getLimitFunctionN(), 
-        	            false);
-        	if (axis.getLimitFunctionSortLiteral() != null) {
-            	LiteralNode evaluatorNode = null;
-        		evaluatorNode = 
-        		    LiteralNode.createSymbol(
+            ParseTreeNode n =
+                LiteralNode.createNumeric(
+                    null,
+                    axis.getLimitFunctionN(),
+                    false);
+            if (axis.getLimitFunctionSortLiteral() != null) {
+                LiteralNode evaluatorNode = null;
+                evaluatorNode =
+                    LiteralNode.createSymbol(
                         null,
                         axis.getLimitFunctionSortLiteral());
-        	    limitedNode =
-        	    	    new CallNode(
-        	    	    	    null,
-        	    	    	    axis.getLimitFunction().toString(),
-        	    	    	    Syntax.Function,
-        	    	    	    filteredNode,
-        	    	    	    n,
-        	    	    	    evaluatorNode);
-        	} else {
-        		limitedNode =
-        	    	    new CallNode(
-        	    	    	    null,
-        	    	    	    axis.getLimitFunction().toString(),
-        	    	    	    Syntax.Function,
-        	    	    	    filteredNode,
-        	    	    	    n);
-        	}
+                limitedNode =
+                    new CallNode(
+                        null,
+                        axis.getLimitFunction().toString(),
+                        Syntax.Function,
+                        filteredNode,
+                        n,
+                        evaluatorNode);
+            } else {
+                limitedNode =
+                    new CallNode(
+                        null,
+                        axis.getLimitFunction().toString(),
+                        Syntax.Function,
+                        filteredNode,
+                        n);
+            }
         } else {
-        	limitedNode = filteredNode;
+            limitedNode = filteredNode;
         }
         // We might need to sort the whole axis.
         ParseTreeNode sortedNode = null;

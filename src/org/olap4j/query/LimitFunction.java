@@ -25,34 +25,35 @@ package org.olap4j.query;
  */
 public enum LimitFunction {
     /**
-     *  Returns a specified number of items from the 
-     *  top of a set, optionally ordering the set first. 
+     * Returns a specified number of items from the
+     * top of a set, optionally ordering the set first.
      */
     TopCount,
     /**
-     *  Sorts a set and returns the top N elements 
-     *  whose cumulative total is at least a specified percentage. 
+     * Sorts a set and returns the top N elements
+     * whose cumulative total is at least a specified percentage.
      */
     TopPercent,
     /**
-     * Sorts a set and returns the top N elements 
-     * whose cumulative total is at least a specified value. 
+     * Sorts a set and returns the top N elements
+     * whose cumulative total is at least a specified value.
      */
     TopSum,
     /**
      * Returns a specified number of items from the
-     *  bottom of a set, optionally ordering the set first. 
+     * bottom of a set, optionally ordering the set first.
      */
     BottomCount,
     /**
-     *  Sorts a set and returns the bottom N elements 
-     *  whose cumulative total is at least a specified percentage. 
+     * Sorts a set and returns the bottom N elements
+     * whose cumulative total is at least a specified percentage.
      */
     BottomPercent,
     /**
-     * Sorts a set and returns the bottom N elements 
-     * whose cumulative total is at least a specified value. 
+     * Sorts a set and returns the bottom N elements
+     * whose cumulative total is at least a specified value.
      */
     BottomSum
 }
+
 // End LimitFunction.java
