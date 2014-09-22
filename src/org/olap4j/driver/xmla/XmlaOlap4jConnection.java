@@ -355,6 +355,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             }
             try {
                 XmlaOlap4jDriver.Property.valueOf(prop);
+                if ("CATALOG".equalsIgnoreCase(prop)) {
+                    throw new IllegalArgumentException(
+                            "Essbase needs a catalog property!");
+                }
                 continue;
             } catch (IllegalArgumentException e) {
                 if (olap4jDatabaseProperties.contains(prop)) {
