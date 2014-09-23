@@ -313,6 +313,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return url.startsWith(CONNECT_STRING_PREFIX);
     }
 
+    protected BackendFlavor getFlavor(boolean fail) throws OlapException {
+        final Database database = getOlapDatabase();
+        final String dataSourceInfo = database.getDataSourceInfo();
+        final String provider = database.getProviderName();
+        return BackendFlavor.getFlavor(dataSourceInfo, provider, fail);
+    }
+
     String makeConnectionPropertyList() throws OlapException {
         synchronized (propPopulation) {
             if (propPopulation.get()) {
@@ -347,32 +354,42 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         }
         StringBuilder buf = new StringBuilder();
         for (String prop : databaseProperties.keySet()) {
-            if (prop.startsWith(
-                    XmlaOlap4jDriver.Property.CACHE.name()))
-            {
+            if (prop.startsWith(XmlaOlap4jDriver.Property.CACHE.name())) {
                 // Skip over the pass-through properties for the cache.
                 continue;
             }
             try {
-                XmlaOlap4jDriver.Property.valueOf(prop);
-                if ("CATALOG".equalsIgnoreCase(prop)) {
-                    throw new IllegalArgumentException(
-                        "Essbase needs a catalog property!");
+                final XmlaOlap4jDriver.Property property =
+                    XmlaOlap4jDriver.Property.valueOf(prop);
+                switch (property) {
+                case CATALOG:
+                    // Before we've connected, there's no way to tell
+                    // whether we're talking to Essbase.
+                    if (olap4jDatabase != null) {
+                        switch (getFlavor(false)) {
+                        case ESSBASE:
+                            // Essbase needs a CATALOG property.
+                            outputProp(buf, prop);
+                        }
+                    }
                 }
-                continue;
             } catch (IllegalArgumentException e) {
-                if (olap4jDatabaseProperties.contains(prop)) {
-                    buf.append("        <");
-                    xmlEncode(buf, prop);
-                    buf.append(">");
-                    xmlEncode(buf, databaseProperties.get(prop));
-                    buf.append("</");
-                    xmlEncode(buf, prop);
-                    buf.append(">\n");
-                }
+                outputProp(buf, prop);
             }
         }
         return buf.toString();
+    }
+
+    private void outputProp(StringBuilder buf, String prop) {
+        if (olap4jDatabaseProperties.contains(prop)) {
+            buf.append("        <");
+            xmlEncode(buf, prop);
+            buf.append(">");
+            xmlEncode(buf, databaseProperties.get(prop));
+            buf.append("</");
+            xmlEncode(buf, prop);
+            buf.append(">\n");
+        }
     }
 
     public OlapStatement createStatement() {
@@ -815,7 +832,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * {@link BackendFlavor#getFlavor(XmlaOlap4jConnection)}
      * to get the vendor for a given connection.
      */
-    static enum BackendFlavor {
+    enum BackendFlavor {
         MONDRIAN("Mondrian"),
         SSAS("Microsoft"),
         PALO("Palo"),
@@ -829,12 +846,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             this.token = token;
         }
 
-        static BackendFlavor getFlavor(XmlaOlap4jConnection conn)
-            throws OlapException
+        static BackendFlavor getFlavor(
+            String dataSourceInfo, String provider, boolean fail)
         {
-            final String dataSourceInfo =
-                conn.getOlapDatabase().getDataSourceInfo();
-            final String provider = conn.getOlapDatabase().getProviderName();
             for (BackendFlavor flavor : BackendFlavor.values()) {
                 if (provider.contains(flavor.token)
                     || dataSourceInfo.contains(flavor.token))
@@ -842,7 +856,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     return flavor;
                 }
             }
-            throw new AssertionError("Can't determine the backend vendor.");
+            if (fail) {
+                throw new AssertionError("Can't determine the backend vendor.");
+            } else {
+                return UNKNOWN;
+            }
         }
     }
 
@@ -1055,7 +1073,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         // Add the datasource node only if this request requires it.
         if (metadataRequest.requiresDatasourceName()) {
             final String dataSourceInfo;
-            switch (BackendFlavor.getFlavor(context.olap4jConnection)) {
+            switch (context.olap4jConnection.getFlavor(true)) {
             case ESSBASE:
                 dataSourceInfo =
                     context.olap4jConnection.getOlapDatabase()

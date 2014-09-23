@@ -293,7 +293,7 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
         final String propList = olap4jConnection.makeConnectionPropertyList();
 
         final String dataSourceInfo;
-        switch (BackendFlavor.getFlavor(olap4jConnection)) {
+        switch (olap4jConnection.getFlavor(true)) {
         case ESSBASE:
             dataSourceInfo =
                 olap4jConnection.getOlapDatabase().getDataSourceInfo();
