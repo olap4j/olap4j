@@ -18,6 +18,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.OlapException;
+import org.olap4j.driver.xmla.XmlaOlap4jConnection.BackendFlavor;
 import org.olap4j.impl.*;
 import org.olap4j.mdx.IdentifierSegment;
 import org.olap4j.metadata.*;
@@ -462,9 +463,9 @@ class XmlaOlap4jCube implements Cube, Named
             List<String> memberUniqueNames,
             Map<String, XmlaOlap4jMember> memberMap) throws OlapException
         {
-            if (olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
-                    .olap4jConnection.getDatabase()
-                    .indexOf("Provider=Mondrian") != -1)
+            if (BackendFlavor.getFlavor(
+                olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
+                    .olap4jConnection).equals(BackendFlavor.MONDRIAN))
             {
                 mondrianMembersLookup(memberUniqueNames, memberMap);
             } else {
