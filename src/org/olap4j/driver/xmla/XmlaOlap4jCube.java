@@ -47,8 +47,9 @@ class XmlaOlap4jCube implements Cube, Named
         new HashMap<String, XmlaOlap4jHierarchy>();
     final Map<String, XmlaOlap4jLevel> levelsByUname =
         new HashMap<String, XmlaOlap4jLevel>();
-    final List<XmlaOlap4jMeasure> measures =
-        new ArrayList<XmlaOlap4jMeasure>();
+    final NamedList<XmlaOlap4jMeasure> measures;
+    final Map<String, XmlaOlap4jMeasure> measuresMap =
+            new HashMap<String, XmlaOlap4jMeasure>();
     private final NamedList<XmlaOlap4jNamedSet> namedSets;
     private final MetadataReader metadataReader;
 
@@ -67,15 +68,13 @@ class XmlaOlap4jCube implements Cube, Named
         String caption,
         String description) throws OlapException
     {
-        assert olap4jSchema != null;
-        assert description != null;
+        assert olap4jSchema != null; 
+        assert description != null; 
         assert name != null;
         this.olap4jSchema = olap4jSchema;
         this.name = name;
         this.caption = caption;
         this.description = description;
-        final Map<String, XmlaOlap4jMeasure> measuresMap =
-            new HashMap<String, XmlaOlap4jMeasure>();
         this.metadataReader =
             new CachingMetadataReader(
                 new RawMetadataReader(),
@@ -85,6 +84,7 @@ class XmlaOlap4jCube implements Cube, Named
         if ("".equals(name)) {
             namedSets = null;
             dimensions = null;
+            measures = null;
             return;
         }
 
@@ -106,16 +106,13 @@ class XmlaOlap4jCube implements Cube, Named
             new XmlaOlap4jConnection.DimensionHandler(this),
             restrictions);
 
-        // populate measures up front; a measure is needed in every query
-        olap4jConnection.populateList(
-            measures,
-            context,
-            XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEASURES,
-            new XmlaOlap4jConnection.MeasureHandler(),
-            restrictions);
-        for (XmlaOlap4jMeasure measure : measures) {
-            measuresMap.put(measure.getUniqueName(), measure);
-        }
+        // populate measures 
+        measures = new DeferredNamedListImpl<XmlaOlap4jMeasure>(
+                XmlaOlap4jConnection.MetadataRequest.MDSCHEMA_MEASURES,
+                context,
+                new XmlaOlap4jConnection.MeasureHandler(this),
+                restrictions);
+        
 
         // populate named sets
         namedSets = new DeferredNamedListImpl<XmlaOlap4jNamedSet>(

@@ -1529,6 +1529,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class MeasureHandler extends HandlerImpl<XmlaOlap4jMeasure> {
+        private final XmlaOlap4jCube cubeForCallback;
+
+        public MeasureHandler(XmlaOlap4jCube cube) {
+            this.cubeForCallback = cube;
+        }
+    	
+    	
         public void handle(
             Element row,
             Context context,
@@ -1588,12 +1595,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     + measureUniqueName);
             }
 
-            list.add(
-                new XmlaOlap4jMeasure(
+            XmlaOlap4jMeasure measure = new XmlaOlap4jMeasure(
                     (XmlaOlap4jLevel)member.getLevel(), measureUniqueName,
                     measureName, measureCaption, description, formatString,
                     null, measureAggregator, datatype, measureIsVisible,
-                    member.getOrdinal()));
+                    member.getOrdinal());
+            list.add(measure);
+            this.cubeForCallback.measuresMap.put(measure.getUniqueName(),measure);
         }
 
         public void sortList(List<XmlaOlap4jMeasure> list) {
