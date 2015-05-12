@@ -74,7 +74,8 @@ public class XmlaOlap4jHttpProxy extends XmlaOlap4jAbstractHttpProxy
             // Set headers
             urlConnection.setRequestProperty(
                 "content-type",
-                "text/xml");
+                "text/xml; charset="
+                    .concat(getEncodingCharsetName()));
             urlConnection.setRequestProperty(
                 "User-Agent",
                 "Olap4j("
