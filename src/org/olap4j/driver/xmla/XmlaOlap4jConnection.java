@@ -1512,8 +1512,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             final int levelNumber =
                 integerElement(row, "LEVEL_NUMBER");
             final Integer levelTypeCode = integerElement(row, "LEVEL_TYPE");
-            final Level.Type levelType =
-                Level.Type.getDictionary().forOrdinal(levelTypeCode);
+            Level.Type optionalLevelType = Level.Type.getDictionary().forOrdinal(levelTypeCode);
+            final Level.Type levelType = optionalLevelType == null ? Level.Type.REGULAR : optionalLevelType;
             boolean calculated = (levelTypeCode & MDLEVEL_TYPE_CALCULATED) != 0;
             final int levelCardinality =
                 integerElement(row, "LEVEL_CARDINALITY");
