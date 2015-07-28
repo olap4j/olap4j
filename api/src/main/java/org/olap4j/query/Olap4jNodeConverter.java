@@ -298,7 +298,14 @@ abstract class Olap4jNodeConverter {
                 axis, 0, null, unions, selsWithContext, contextUnions);
             unions.addAll(contextUnions);
             if (unions.size() > 1) {
-                callNode = generateHierarchizeUnion(unions);
+                if (axis.getHierarchizeMode() != null
+                    && axis.getHierarchizeMode()
+                        .equals(QueryDimension.HierarchizeMode.POST))
+                {
+                    callNode = generateHierarchizeUnionPost(unions);
+                } else {
+                    callNode = generateHierarchizeUnion(unions);
+                }
             } else {
                 callNode = generateCrossJoin(unions.get(0));
             }
@@ -379,6 +386,16 @@ abstract class Olap4jNodeConverter {
             axis.getLocation(),
             new ArrayList<IdentifierNode>(),
             sortedNode);
+    }
+
+    protected static CallNode generateHierarchizeUnionPost(
+        List<List<ParseTreeNode>> unions)
+    {
+        return new CallNode(
+            null, "Hierarchize", Syntax.Function,
+            generateUnion(unions),
+            LiteralNode.createSymbol(
+                null, QueryDimension.HierarchizeMode.POST.name()));
     }
 
     private static List<ParseTreeNode> toOlap4j(QueryDimension dimension) {

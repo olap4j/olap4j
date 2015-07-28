@@ -48,6 +48,8 @@ public class QueryAxis extends QueryNodeImpl {
     private BigDecimal limitFunctionN = null;
     private String limitFunctionSortLiteral = null;
     private String filterCondition = null;
+    private QueryDimension.HierarchizeMode hierarchizeMode = null;
+
     /**
      * Creates a QueryAxis.
      *
@@ -190,6 +192,16 @@ public class QueryAxis extends QueryNodeImpl {
      */
     public void setNonEmpty(boolean nonEmpty) {
         this.nonEmpty = nonEmpty;
+    }
+
+    public QueryDimension.HierarchizeMode getHierarchizeMode() {
+        return hierarchizeMode;
+    }
+
+    public void setHierarchizeMode(
+        QueryDimension.HierarchizeMode hierarchizeMode)
+    {
+        this.hierarchizeMode = hierarchizeMode;
     }
 
     /**
