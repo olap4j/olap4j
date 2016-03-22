@@ -141,9 +141,13 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     /**
      * This is a private property used for development only.
      * Enabling it makes the connection print out all queries
-     * to {@link System#out}
+     * to {@link System#out}.
+     *
+     * <p>To enable externally, set the environment variable:
+     * <code>olap4j.xmla.debug=true</code>.
      */
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG =
+        Boolean.valueOf(System.getProperty("olap4j.xmla.debug"));
 
     /**
      * Creates an Olap4j connection an XML/A provider.
@@ -313,13 +317,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         return url.startsWith(CONNECT_STRING_PREFIX);
     }
 
-    protected BackendFlavor getFlavor(boolean fail) throws OlapException {
-        final Database database = getOlapDatabase();
-        final String dataSourceInfo = database.getDataSourceInfo();
-        final String provider = database.getProviderName();
-        return BackendFlavor.getFlavor(dataSourceInfo, provider, fail);
-    }
-
     String makeConnectionPropertyList() throws OlapException {
         synchronized (propPopulation) {
             if (propPopulation.get()) {
@@ -366,12 +363,22 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     // Before we've connected, there's no way to tell
                     // whether we're talking to Essbase.
                     if (olap4jDatabase != null) {
+                        // Use the special version of getFlavor here
+                        // because there isn't a connection extablished yet.
                         switch (getFlavor(false)) {
                         case ESSBASE:
                             // Essbase needs a CATALOG property.
                             outputProp(buf, prop);
+                            break;
+                        default:
+                            // Just making the compiler happy.
+                            break;
                         }
                     }
+                    break;
+                default:
+                    // Just making the compiler happy.
+                    break;
                 }
             } catch (IllegalArgumentException e) {
                 outputProp(buf, prop);
@@ -784,7 +791,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
      * Clears the cache.
      */
     private void clearCache() {
-        ((DeferredNamedListImpl) this.olapDatabases).reset();
+        ((DeferredNamedListImpl<XmlaOlap4jDatabase>)this.olapDatabases)
+            .reset();
         this.olap4jCatalog = null;
         this.olap4jDatabase = null;
         this.olap4jSchema = null;
@@ -828,6 +836,19 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     /**
+     * This is a special rewrite of
+     * {@link BackendFlavor#getFlavor(OlapConnection, boolean)} to get the
+     * backend flavor without having to actually connect. It should not be used
+     * outside of the connection's constructor.
+     */
+    protected BackendFlavor getFlavor(boolean fail) throws OlapException {
+        final Database database = getOlapDatabase();
+        final String dataSourceInfo = database.getDataSourceInfo();
+        final String provider = database.getProviderName();
+        return BackendFlavor.getFlavor(dataSourceInfo, provider, fail);
+    }
+
+    /**
      * Enumeration of server backends. Use
      * {@link BackendFlavor#getFlavor(XmlaOlap4jConnection)}
      * to get the vendor for a given connection.
@@ -846,12 +867,23 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             this.token = token;
         }
 
+        static BackendFlavor getFlavor(OlapConnection conn, boolean fail)
+            throws OlapException
+        {
+            return getFlavor(
+                conn.getOlapDatabase().getDataSourceInfo(),
+                conn.getOlapDatabase().getProviderName(),
+                fail);
+        }
+
         static BackendFlavor getFlavor(
-            String dataSourceInfo, String provider, boolean fail)
+            String dataSourceInfo, String providerName, boolean fail)
         {
             for (BackendFlavor flavor : BackendFlavor.values()) {
-                if (provider.contains(flavor.token)
-                    || dataSourceInfo.contains(flavor.token))
+                if (providerName.toUpperCase()
+                        .contains(flavor.token.toUpperCase())
+                    || dataSourceInfo.toUpperCase()
+                        .contains(flavor.token.toUpperCase()))
                 {
                     return flavor;
                 }
@@ -1073,6 +1105,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         // Add the datasource node only if this request requires it.
         if (metadataRequest.requiresDatasourceName()) {
             final String dataSourceInfo;
+            // Use the call to getFlavor here instead of going through
+            // BackendFlavor or risk going into a loop.
             switch (context.olap4jConnection.getFlavor(true)) {
             case ESSBASE:
                 dataSourceInfo =

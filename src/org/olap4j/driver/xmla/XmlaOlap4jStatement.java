@@ -77,12 +77,6 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
         throw new UnsupportedOperationException();
     }
 
-    private void checkOpen() throws SQLException {
-        if (closed) {
-            throw getHelper().createException("closed");
-        }
-    }
-
     public int executeUpdate(String sql) throws SQLException {
         throw new UnsupportedOperationException();
     }
@@ -293,7 +287,7 @@ abstract class XmlaOlap4jStatement implements OlapStatement {
         final String propList = olap4jConnection.makeConnectionPropertyList();
 
         final String dataSourceInfo;
-        switch (olap4jConnection.getFlavor(true)) {
+        switch (BackendFlavor.getFlavor(olap4jConnection, true)) {
         case ESSBASE:
             dataSourceInfo =
                 olap4jConnection.getOlapDatabase().getDataSourceInfo();
