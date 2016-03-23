@@ -741,7 +741,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
         if (coordinates.size() != axes.size()) {
             throw new IllegalArgumentException(
                 "Coordinates have different dimension " + coordinates.size()
-                    + " than axes " + axes.size());
+                + " than axes " + axes.size());
         }
         int modulo = 1;
         int ordinal = 0;

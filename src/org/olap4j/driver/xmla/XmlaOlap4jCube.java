@@ -454,8 +454,8 @@ class XmlaOlap4jCube implements Cube, Named
                 }
                 throw new IllegalArgumentException(
                     "more than one member with unique name '"
-                        + memberUniqueName
-                        + "'");
+                    + memberUniqueName
+                    + "'");
             }
         }
 
@@ -463,12 +463,13 @@ class XmlaOlap4jCube implements Cube, Named
             List<String> memberUniqueNames,
             Map<String, XmlaOlap4jMember> memberMap) throws OlapException
         {
-            if (BackendFlavor.getFlavor(
-                olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData
-                    .olap4jConnection, false).equals(BackendFlavor.MONDRIAN))
-            {
+            final XmlaOlap4jDatabaseMetaData m =
+                olap4jSchema.olap4jCatalog.olap4jDatabaseMetaData;
+            switch (BackendFlavor.getFlavor(m.olap4jConnection, false)) {
+            case MONDRIAN:
                 mondrianMembersLookup(memberUniqueNames, memberMap);
-            } else {
+                break;
+            default:
                 genericMembersLookup(memberUniqueNames, memberMap);
             }
         }

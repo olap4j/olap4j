@@ -1480,12 +1480,16 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 stringElement(row, "ALL_MEMBER");
             final String defaultMemberUniqueName =
                 stringElement(row, "DEFAULT_MEMBER");
+            final String hierarchyDisplayFolder =
+                stringElement(row, "HIERARCHY_DISPLAY_FOLDER");
+
             XmlaOlap4jHierarchy hierarchy = new XmlaOlap4jHierarchy(
                 context.getDimension(row),
                 hierarchyUniqueName,
                 hierarchyName,
                 hierarchyCaption,
                 description,
+                hierarchyDisplayFolder,
                 allMember != null,
                 defaultMemberUniqueName);
             list.add(hierarchy);
@@ -1546,8 +1550,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             final int levelNumber =
                 integerElement(row, "LEVEL_NUMBER");
             final Integer levelTypeCode = integerElement(row, "LEVEL_TYPE");
-            Level.Type optionalLevelType = Level.Type.getDictionary().forOrdinal(levelTypeCode);
-            final Level.Type levelType = optionalLevelType == null ? Level.Type.REGULAR : optionalLevelType;
+            Level.Type optionalLevelType =
+                Level.Type.getDictionary().forOrdinal(levelTypeCode);
+            final Level.Type levelType =
+                optionalLevelType == null ? Level.Type.REGULAR
+                    : optionalLevelType;
             boolean calculated = (levelTypeCode & MDLEVEL_TYPE_CALCULATED) != 0;
             final int levelCardinality =
                 integerElement(row, "LEVEL_CARDINALITY");
@@ -1594,6 +1601,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 stringElement(row, "DESCRIPTION");
             final String formatString =
                 stringElement(row, "DEFAULT_FORMAT_STRING");
+            final String measureDisplayFolder =
+                stringElement(row, "MEASURE_DISPLAY_FOLDER");
             final Measure.Aggregator measureAggregator =
                 Measure.Aggregator.getDictionary().forOrdinal(
                     integerElement(
@@ -1626,6 +1635,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 new XmlaOlap4jMeasure(
                     (XmlaOlap4jLevel)member.getLevel(), measureUniqueName,
                     measureName, measureCaption, description, formatString,
+                    measureDisplayFolder,
                     null, measureAggregator, datatype, measureIsVisible,
                     member.getOrdinal()));
         }
