@@ -32,12 +32,13 @@ import java.util.List;
  */
 class XmlaOlap4jHierarchy
     extends XmlaOlap4jElement
-    implements Hierarchy, Named
+    implements Hierarchy, DisplayFolder, Named
 {
     final XmlaOlap4jDimension olap4jDimension;
     final NamedList<XmlaOlap4jLevel> levels;
     private final boolean all;
     private final String defaultMemberUniqueName;
+    private final String hierarchyDisplayFolder;
 
     XmlaOlap4jHierarchy(
         XmlaOlap4jDimension olap4jDimension,
@@ -45,6 +46,7 @@ class XmlaOlap4jHierarchy
         String name,
         String caption,
         String description,
+        String hierarchyDisplayFolder,
         boolean all,
         String defaultMemberUniqueName) throws OlapException
     {
@@ -53,6 +55,7 @@ class XmlaOlap4jHierarchy
         this.olap4jDimension = olap4jDimension;
         this.all = all;
         this.defaultMemberUniqueName = defaultMemberUniqueName;
+        this.hierarchyDisplayFolder = hierarchyDisplayFolder;
 
         String[] hierarchyRestrictions = {
             "CATALOG_NAME",
@@ -111,6 +114,11 @@ class XmlaOlap4jHierarchy
         final NamedList<XmlaOlap4jMember> list =
             new NamedListImpl<XmlaOlap4jMember>(memberList);
         return Olap4jUtil.cast(list);
+    }
+
+    @Override
+    public String getDisplayFolder() {
+        return hierarchyDisplayFolder;
     }
 
     public boolean equals(Object obj) {

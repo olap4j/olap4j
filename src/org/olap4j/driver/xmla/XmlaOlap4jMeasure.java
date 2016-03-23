@@ -31,11 +31,12 @@ import java.util.*;
  */
 class XmlaOlap4jMeasure
     extends XmlaOlap4jMember
-    implements Measure, Named
+    implements Measure, DisplayFolder, Named
 {
     private final Aggregator aggregator;
     private final Datatype datatype;
     private final boolean visible;
+    private String measureDisplayFolder;
 
     /**
      * Creates an XmlaOlap4jMeasure.
@@ -58,6 +59,7 @@ class XmlaOlap4jMeasure
         String caption,
         String description,
         final String formatString,
+        String measureDisplayFolder,
         String parentMemberUniqueName,
         Aggregator aggregator,
         Datatype datatype,
@@ -82,6 +84,7 @@ class XmlaOlap4jMeasure
         this.aggregator = aggregator;
         this.datatype = datatype;
         this.visible = visible;
+        this.measureDisplayFolder = measureDisplayFolder;
     }
 
     public Aggregator getAggregator() {
@@ -94,6 +97,11 @@ class XmlaOlap4jMeasure
 
     public boolean isVisible() {
         return visible;
+    }
+
+    @Override
+    public String getDisplayFolder() {
+        return measureDisplayFolder;
     }
 }
 
