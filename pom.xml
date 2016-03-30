@@ -31,7 +31,7 @@
         <role>developer</role>
       </roles>
       <timezone>-8</timezone>
-      <properties></properties>
+      <properties/>
     </developer>
     <developer>
       <id>lucboudreau</id>
@@ -42,7 +42,7 @@
         <role>developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties></properties>
+      <properties/>
     </developer>
     <developer>
       <id>buggtb</id>
@@ -53,7 +53,7 @@
         <role>developer</role>
       </roles>
       <timezone>0</timezone>
-      <properties></properties>
+      <properties/>
     </developer>
   </developers>
 
@@ -202,6 +202,27 @@
       </resource>
     </resources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>0.11</version>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <excludes>
+            <exclude>**/*.md</exclude>
+            <exclude>RELEASE_CHECKLIST.txt</exclude>
+            <exclude>doc/*</exclude>
+            <exclude>.travis.yml</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -383,6 +404,9 @@
             <phase>verify</phase>
           </execution>
         </executions>
+        <configuration>
+          <predefinedSortOrder>default_1_0_0</predefinedSortOrder>
+        </configuration>
       </plugin>
     </plugins>
   </build>
