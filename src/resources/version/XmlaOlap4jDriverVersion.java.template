@@ -1,0 +1,16 @@
+/*
+ * Project version information. Generated - do not modify.
+ */
+package org.olap4j.driver.xmla;
+/**
+  * Version information for the XMLA driver. (Generated.)
+  */
+class XmlaOlap4jDriverVersion {
+    static final String NAME = "olap4j driver for XML/A";
+    static final String VERSION = "@pomversion@";
+    static final String BUILD_TIMESTAMP = "@buildtime@";
+    static final int MAJOR_VERSION = 1;
+    static final int MINOR_VERSION = 3;
+}
+
+// End XmlaOlap4jDriverVersion.java
