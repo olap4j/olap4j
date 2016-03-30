@@ -234,7 +234,7 @@
         </executions>
       </plugin>
 
-      <plugin>
+      <!--<plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>javacc-maven-plugin</artifactId>
         <version>2.4</version>
@@ -253,7 +253,40 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
+      </plugin>-->
+      <plugin>
+                <groupId>com.helger.maven</groupId>
+                <artifactId>ph-javacc-maven-plugin</artifactId>
+                <version>2.8.0</version>
+                <executions>
+                  <execution>
+                    <id>jjc1</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                      <goal>javacc</goal>
+                    </goals>
+                    <configuration>
+                      <jdkVersion>1.4</jdkVersion>
+                      <!--<packageName>org.javacc.parser</packageName>-->
+                      <sourceDirectory>src/org/olap4j/mdx/parser/impl</sourceDirectory>
+                      <outputDirectory>target/generated-sources/javacc</outputDirectory>
+                    </configuration>
+                  </execution>
+                  <execution>
+                    <id>jjt2</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                      <goal>javacc</goal>
+                    </goals>
+                    <configuration>
+                      <jdkVersion>1.5</jdkVersion>
+                      <!--<packageName>org.javacc.utils</packageName>-->
+                      <sourceDirectory>src/org/olap4j/mdx/parser/impl</sourceDirectory>
+                      <outputDirectory>target/generated-sources/javacc</outputDirectory>
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
