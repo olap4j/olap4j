@@ -17,4 +17,4 @@ src/org/olap4j/mdx/parser/impl/Token.java
 src/org/olap4j/mdx/parser/impl/TokenMgrError.java
 testlib/
 eclipse-bin/
-
+pom.xml.bak
