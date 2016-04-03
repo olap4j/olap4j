@@ -3,7 +3,9 @@ olap4j release check-list
 
   - Update README.txt, CHANGES.txt, index.html.
 
-  - To update CHANGES.txt, you can use the following command.
+  - Add your pgp key to the KEYS file, if not already present.
+
+  - To update HISTORY.md, you can use the following command.
       git log --pretty --no-merges --format="[%h](../../commit/%H)%n%cD - __(%aN)__%n%s%n"
 
   - Update build.properties
@@ -32,5 +34,11 @@ olap4j release check-list
       * Make sure that it contains all the required files.
       * Make sure that the Javadoc links work correctly.
       * Make sure that all JAR files are present.
+
+  - Deploy to maven central
+
+      * mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=ossrh -DpomFile=pom.xml -Dfile=olap4j-xmlaserver-1.2.0.jar
+      * mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=ossrh -DpomFile=pom.xml -Dfile=olap4j-xmlaserver-1.2.0-javadoc.jar -Dclassifier=javadoc
+      * mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=ossrh -DpomFile=pom.xml -Dfile=olap4j-xmlaserver-1.2.0-sources.jar -Dclassifier=sources
 
 # End RELEASE_CHECKLIST.txt
