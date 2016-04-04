@@ -52,6 +52,22 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Dependency and plugin versions (in alphabetical order). -->
+    <commons-dbcp.version>1.4</commons-dbcp.version>
+    <javacc-maven-plugin.version>2.4</javacc-maven-plugin.version>
+    <junit.version>3.8</junit.version>
+    <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+    <maven-dependency-plugin.version>2.8</maven-dependency-plugin.version>
+    <maven-javadoc-plugin.version>2.8.1</maven-javadoc-plugin.version>
+    <maven-replacer-plugin.version>1.4.0</maven-replacer-plugin.version>
+    <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
+    <maven-surefire-plugin.version>2.7.2</maven-surefire-plugin.version>
+    <mondrian.version>4.0.0-SNAPSHOT</mondrian.version>
+    <mysql-driver.version>5.1.20</mysql-driver.version>
+    <rt-java5.version>1.5.0_22</rt-java5.version>
+    <rt-java6.version>1.6.0_24</rt-java6.version>
+    <xerces.version>2.11.0</xerces.version>
   </properties>
 
   <!-- Environment settings. -->
@@ -68,36 +84,41 @@
     <dependency>
       <groupId>com.sun</groupId>
       <artifactId>rt-jdk1.5</artifactId>
-      <version>1.5.0_22</version>
+      <version>${rt-java5.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>net.java.openjdk</groupId>
       <artifactId>rt-java6</artifactId>
-      <version>1.6.0_24</version>
+      <version>${rt-java6.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
-      <version>2.11.0</version>
+      <version>${xerces.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
-      <version>1.4</version>
+      <version>${commons-dbcp.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>${mysql-driver.version}</version>
     </dependency>
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>mondrian</artifactId>
-      <version>4.0.0-SNAPSHOT</version>
+      <version>${mondrian.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -237,7 +258,7 @@
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>maven-replacer-plugin</artifactId>
         <version>1.4.0</version>
-        <executions>                
+        <executions>
           <execution>
             <phase>generate-sources</phase>
             <id>replace</id>
@@ -258,7 +279,7 @@
               <token>@pomversion@</token>
               <value>${project.version}</value>
             </replacement>
-          </replacements>                        
+          </replacements>
         </configuration>
       </plugin>
       <plugin>
@@ -277,6 +298,45 @@
         </executions>
       </plugin>
     </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>${maven-dependency-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>javacc-maven-plugin</artifactId>
+          <version>${javacc-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>com.google.code.maven-replacer-plugin</groupId>
+          <artifactId>maven-replacer-plugin</artifactId>
+          <version>${maven-replacer-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
 
     <resources>
       <resource>
