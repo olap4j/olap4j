@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
+  <!-- The basics. -->
   <groupId>org.olap4j</groupId>
   <artifactId>olap4j</artifactId>
   <version>1.3.0-SNAPSHOT</version>
   <packaging>jar</packaging>
+
+  <!-- More project information. -->
   <name>olap4j</name>
   <description>Open Java API for OLAP</description>
   <url>http://github.com/olap4j/olap4j</url>
@@ -31,7 +35,7 @@
         <role>developer</role>
       </roles>
       <timezone>-8</timezone>
-      <properties/>
+      <properties />
     </developer>
     <developer>
       <id>lucboudreau</id>
@@ -42,7 +46,7 @@
         <role>developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties/>
+      <properties />
     </developer>
     <developer>
       <id>buggtb</id>
@@ -53,15 +57,18 @@
         <role>developer</role>
       </roles>
       <timezone>0</timezone>
-      <properties/>
+      <properties />
     </developer>
   </developers>
 
+  <!-- Environment settings. -->
   <scm>
     <connection>scm:git:git://github.com/olap4j/olap4j.git</connection>
     <developerConnection>scm:git:git@github.com:olap4j/olap4j.git</developerConnection>
     <url>http://github.com/olap4j/olap4j/tree/master</url>
   </scm>
+
+  <issueManagement />
 
   <distributionManagement>
     <repository>
@@ -75,104 +82,135 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Dependency and plugin versions (in alphabetical order). -->
+    <apache-rat-plugin.version>0.11</apache-rat-plugin.version>
+    <commons-collections.version>3.2</commons-collections.version>
+    <commons-dbcp.version>1.1</commons-dbcp.version>
+    <commons-dbcp2.version>2.1</commons-dbcp2.version>
+    <commons-logging.version>1.2</commons-logging.version>
+    <commons-math.version>1.2</commons-math.version>
+    <commons-pool.version>1.1</commons-pool.version>
+    <commons-vfs.version>1.0</commons-vfs.version>
+    <h2.version>1.3.172</h2.version>
+    <javacc-maven-plugin.version>2.4</javacc-maven-plugin.version>
+    <junit.version>3.8</junit.version>
+    <log4j.version>1.2.17</log4j.version>
+    <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+    <maven-dependency-plugin.version>2.8</maven-dependency-plugin.version>
+    <maven-javadoc-plugin.version>2.8.1</maven-javadoc-plugin.version>
+    <maven-replacer-plugin.version>1.4.0</maven-replacer-plugin.version>
+    <maven-source-plugin.version>2.1.2</maven-source-plugin.version>
+    <maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
+    <mondrian-data-foodmart.version>0.9-SNAPSHOT</mondrian-data-foodmart.version>
+    <mondrian.version>4.3.0.1-130</mondrian.version>
+    <mysql-connector-java.version>5.1.38</mysql-connector-java.version>
+    <rt-java5.version>1.5.0_22</rt-java5.version>
+    <rt-java6.version>1.6.0_24</rt-java6.version>
+    <rt-java7.version>1.7.0_15</rt-java7.version>
+    <ph-javacc-maven-plugin.version>2.8.0</ph-javacc-maven-plugin.version>
+    <servlet-api.version>2.4</servlet-api.version>
+    <sortpom-maven-plugin.version>2.4.0</sortpom-maven-plugin.version>
+    <xerces.version>2.6.2</xerces.version>
   </properties>
+
+  <!-- Dependencies. -->
   <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-      <version>2.6.2</version>
-    </dependency>
     <dependency>
       <groupId>com.sun</groupId>
       <artifactId>rt-jdk1.5</artifactId>
-      <version>1.5.0_22</version>
+      <version>${rt-java5.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>net.java.openjdk</groupId>
-      <artifactId>ctsym-java6</artifactId>
-      <version>1.6.0_24</version>
+      <artifactId>rt-java6</artifactId>
+      <version>${rt-java6.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>net.java.openjdk</groupId>
       <artifactId>ctsym-java7</artifactId>
-      <version>1.7.0_15</version>
+      <version>${rt-java7.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>${xerces.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-dbcp2</artifactId>
-      <version>2.1</version>
+      <version>${commons-dbcp2.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
+      <version>${commons-dbcp.version}</version>
     </dependency>
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>mondrian</artifactId>
-      <version>4.3.0.1-130</version>
+      <version>${mondrian.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-      <version>1.2.17</version>
+      <version>${log4j.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.3.172</version>
+      <version>${h2.version}</version>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.38</version>
+      <version>${mysql-connector-java.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
-      <version>1.1</version>
+      <version>${commons-pool.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
-      <version>3.2</version>
+      <version>${commons-collections.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-vfs</groupId>
       <artifactId>commons-vfs</artifactId>
-      <version>1.0</version>
+      <version>${commons-vfs.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <version>1.2</version>
+      <version>${commons-logging.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-math</groupId>
       <artifactId>commons-math</artifactId>
-      <version>1.2</version>
+      <version>${commons-math.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
+      <version>${servlet-api.version}</version>
     </dependency>
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>mondrian-data-foodmart</artifactId>
-      <version>0.9-SNAPSHOT</version>
+      <version>${mondrian-data-foodmart.version}</version>
     </dependency>
   </dependencies>
 
@@ -193,6 +231,7 @@
     <sourceDirectory>src/</sourceDirectory>
     <testSourceDirectory>testsrc/</testSourceDirectory>
     <defaultGoal>package</defaultGoal>
+
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -201,11 +240,65 @@
         </excludes>
       </resource>
     </resources>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <version>${apache-rat-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>${maven-dependency-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>javacc-maven-plugin</artifactId>
+          <version>${javacc-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>com.github.ekryd.sortpom</groupId>
+          <artifactId>sortpom-maven-plugin</artifactId>
+          <version>${sortpom-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>com.google.code.maven-replacer-plugin</groupId>
+          <artifactId>maven-replacer-plugin</artifactId>
+          <version>${maven-replacer-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>com.helger.maven</groupId>
+          <artifactId>ph-javacc-maven-plugin</artifactId>
+          <version>${ph-javacc-maven-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
     <plugins>
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
-        <version>0.11</version>
         <executions>
           <execution>
             <phase>verify</phase>
@@ -226,7 +319,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.8</version>
         <executions>
           <execution>
             <id>properties</id>
@@ -240,7 +332,6 @@
       <plugin>
         <groupId>com.helger.maven</groupId>
         <artifactId>ph-javacc-maven-plugin</artifactId>
-        <version>2.8.0</version>
         <executions>
           <execution>
             <id>jjc1</id>
@@ -273,7 +364,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.1.2</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -288,7 +378,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
         <executions>
           <execution>
             <id>compile-jdk15</id>
@@ -305,7 +394,7 @@
                 <include>org/olap4j/driver/xmla/FactoryJdbc3Impl.java</include>
               </includes>
               <compilerArguments>
-                <verbose></verbose>
+                <verbose />
                 <bootclasspath>${com.sun:rt-jdk1.5:jar}</bootclasspath>
               </compilerArguments>
             </configuration>
@@ -325,7 +414,7 @@
                 <include>org/olap4j/driver/xmla/FactoryJdbc41Impl.java</include>
               </includes>
               <compilerArguments>
-                <verbose></verbose>
+                <verbose />
                 <bootclasspath>${net.java.openjdk:rt-java6:jar}</bootclasspath>
               </compilerArguments>
             </configuration>
@@ -342,7 +431,7 @@
                 <include>org/olap4j/driver/xmla/FactoryJdbc41Impl.java</include>
               </includes>
               <compilerArguments>
-                <verbose></verbose>
+                <verbose />
                 <bootclasspath>${net.java.openjdk:rt-java7:jar}</bootclasspath>
               </compilerArguments>
             </configuration>
@@ -360,14 +449,13 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.17</version>
-        <configuration></configuration>
+        <configuration />
       </plugin>
       <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>maven-replacer-plugin</artifactId>
-        <version>1.4.0</version>
         <executions>
           <execution>
             <id>replace</id>
@@ -395,17 +483,18 @@
       <plugin>
         <groupId>com.github.ekryd.sortpom</groupId>
         <artifactId>sortpom-maven-plugin</artifactId>
-        <version>2.4.0</version>
         <executions>
           <execution>
+            <phase>verify</phase>
             <goals>
               <goal>sort</goal>
             </goals>
-            <phase>verify</phase>
           </execution>
         </executions>
         <configuration>
           <predefinedSortOrder>default_1_0_0</predefinedSortOrder>
+          <keepBlankLines>true</keepBlankLines>
+          <expandEmptyElements>false</expandEmptyElements>
         </configuration>
       </plugin>
     </plugins>
@@ -416,7 +505,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.8.1</version>
+        <version>${maven-javadoc-plugin.version}</version>
         <configuration>
           <links>
             <link>http://docs.oracle.com/javase/7/docs/api/</link>
