@@ -32,7 +32,7 @@ import java.util.List;
  */
 class XmlaOlap4jHierarchy
     extends XmlaOlap4jElement
-    implements Hierarchy, DisplayFolder, Named
+    implements Hierarchy, Named
 {
     final XmlaOlap4jDimension olap4jDimension;
     final NamedList<XmlaOlap4jLevel> levels;
@@ -122,7 +122,7 @@ class XmlaOlap4jHierarchy
     }
 
     public String getDisplayFolder() {
-        return null; // FIXME
+        return hierarchyDisplayFolder;
     }
 
     public InstanceSelection getInstanceSelection() {
@@ -163,11 +163,7 @@ class XmlaOlap4jHierarchy
         return Olap4jUtil.cast(list);
     }
 
-    public String getDisplayFolder() {
-        return hierarchyDisplayFolder;
-    }
-
-  public Structure getStructure() {
+    public Structure getStructure() {
         return structure;
     }
 

@@ -49,6 +49,17 @@ public interface Measure extends Member {
     boolean isVisible();
 
     /**
+     * Returns the path to be used when displaying this {@code Measure} in a
+     * user interface. Folder names are be separated by a semicolon (;). Nested
+     * folders are indicated by a backslash (\).
+     *
+     * @return folder path
+     *
+     * @since olap4j 2.0
+     */
+    String getDisplayFolder();
+
+    /**
      * Enumeration of the aggregate functions which can be used to derive a
      * <code>Measure</code>.
      *

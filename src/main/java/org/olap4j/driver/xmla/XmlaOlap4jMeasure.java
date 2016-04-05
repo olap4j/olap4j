@@ -31,7 +31,7 @@ import java.util.*;
  */
 class XmlaOlap4jMeasure
     extends XmlaOlap4jMember
-    implements Measure, DisplayFolder, Named
+    implements Measure, Named
 {
     private final Aggregator aggregator;
     private final Datatype datatype;
@@ -99,7 +99,6 @@ class XmlaOlap4jMeasure
         return visible;
     }
 
-    @Override
     public String getDisplayFolder() {
         return measureDisplayFolder;
     }
