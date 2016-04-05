@@ -896,10 +896,6 @@ public class XmlaConstants
         }
     }
 
-    @Deprecated
-    public interface EnumWithDesc {
-        String getDescription();
-    }
 }
 
 // End XmlaConstants.java

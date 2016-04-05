@@ -19,8 +19,9 @@
   </organization>
   <licenses>
     <license>
-      <name>Apache 2</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
     </license>
   </licenses>
 
@@ -28,7 +29,7 @@
     <developer>
       <id>julianhyde</id>
       <name>Julian Hyde</name>
-      <email>julianhyde@gmail.com</email>
+      <email>jhyde@apache.org</email>
       <url>https://github.com/julianhyde</url>
       <roles>
         <role>architect</role>
@@ -93,9 +94,7 @@
     <commons-pool.version>1.1</commons-pool.version>
     <commons-vfs.version>1.0</commons-vfs.version>
     <h2.version>1.3.172</h2.version>
-    <javacc-maven-plugin.version>2.4</javacc-maven-plugin.version>
     <junit.version>3.8</junit.version>
-    <log4j.version>1.2.17</log4j.version>
     <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
     <maven-dependency-plugin.version>2.8</maven-dependency-plugin.version>
     <maven-javadoc-plugin.version>2.8.1</maven-javadoc-plugin.version>
@@ -103,7 +102,7 @@
     <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
     <maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
     <mondrian-data-foodmart.version>0.9-SNAPSHOT</mondrian-data-foodmart.version>
-    <mondrian.version>4.3.0.1-130</mondrian.version>
+    <mondrian.version>4.6-olap4j2-SNAPSHOT</mondrian.version>
     <mysql-connector-java.version>5.1.38</mysql-connector-java.version>
     <rt-java5.version>1.5.0_22</rt-java5.version>
     <rt-java6.version>1.6.0_24</rt-java6.version>
@@ -151,6 +150,8 @@
       <version>${mysql-connector-java.version}</version>
     </dependency>
     <dependency>
+      <!-- A reference implementation of Mondrian for testing.
+           Other versions of Mondrian will be able to work on olap4j. -->
       <groupId>pentaho</groupId>
       <artifactId>mondrian</artifactId>
       <version>${mondrian.version}</version>

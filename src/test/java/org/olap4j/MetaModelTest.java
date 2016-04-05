@@ -24,6 +24,7 @@ import org.olap4j.xmla.Enumeration;
 import junit.framework.TestCase;
 
 import java.io.PrintWriter;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -94,9 +95,11 @@ import java.util.*;
  *
  * <h2>Release notes</h2>
  *
- * <p>{@link org.olap4j.metadata.XmlaConstants.EnumWithDesc} is deprecated.
- * Use an enum that implements {@link XmlaConstant} instead.
- * (Should we remove?)</p>
+ * <p>{@code org.olap4j.metadata.XmlaConstants.EnumWithDesc} has been removed;
+ * use {@link XmlaConstant} instead.
+ *
+ * <p>Every enum that implements {@link XmlaConstant} used to have a
+ * {@code getDictionary} method, now has a {@code DICTIONARY} field.
  *
  * <h2>New entities</h2>
  *
@@ -1044,15 +1047,39 @@ public class MetaModelTest extends TestCase {
 
     static class FullType {
         static FullType of(XmlaConstants.DBType dbType) {
-            return null;
+            switch (dbType) {
+            case DBTIMESTAMP:
+                return new FullType(Timestamp.class);
+            case GUID:
+                return new FullType(UUID.class);
+            case UI2:
+            case I2:
+                return new FullType(short.class);
+            case UI4:
+            case I4:
+                return new FullType(int.class);
+            case BOOL:
+                return new FullType(boolean.class);
+            case WSTR:
+                return new FullType(String.class);
+            default:
+                throw new AssertionError("no FullType for " + dbType);
+            }
         }
 
-        static FullType of(Class<? extends XmlaConstant> enumClass, XmlaConstants.DBType dbType) {
-            return null;
+        static FullType of(
+            Class<? extends XmlaConstant> enumClass,
+            XmlaConstants.DBType dbType)
+        {
+            return of(dbType);
         }
 
         private FullType(String java) {
             this.java = java;
+        }
+
+        private FullType(Class _class) {
+            this(_class.getCanonicalName());
         }
 
         private final String java;

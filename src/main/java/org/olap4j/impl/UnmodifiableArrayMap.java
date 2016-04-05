@@ -94,7 +94,7 @@ public class UnmodifiableArrayMap<K, V>
     }
 
     /**
-     * Creates an unmodifable map as a shallow copy of a map.
+     * Creates an unmodifiable map as a shallow copy of a map.
      *
      * <p>Future changes to the map will not be reflected in the contents
      * of the map.

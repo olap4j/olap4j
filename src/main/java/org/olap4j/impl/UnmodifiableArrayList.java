@@ -79,7 +79,7 @@ public class UnmodifiableArrayList<T>
     }
 
     /**
-     * Creates an unmodifable list as a shallow copy of an array.
+     * Creates an unmodifiable list as a shallow copy of an array.
      *
      * <p>Future changes to the array will not be reflected in the contents
      * of the list.
@@ -95,7 +95,7 @@ public class UnmodifiableArrayList<T>
     }
 
     /**
-     * Creates an unmodifable list as a shallow copy of a collection.
+     * Creates an unmodifiable list as a shallow copy of a collection.
      *
      * <p>Future changes to the collection will not be reflected in the contents
      * of the list.
