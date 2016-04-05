@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <!-- The basics. -->
@@ -35,7 +35,7 @@
         <role>developer</role>
       </roles>
       <timezone>-8</timezone>
-      <properties/>
+      <properties />
     </developer>
     <developer>
       <id>lucboudreau</id>
@@ -46,38 +46,73 @@
         <role>developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties/>
+      <properties />
+    </developer>
+    <developer>
+      <id>buggtb</id>
+      <name>Tom Barber</name>
+      <url>https://github.com/buggtb</url>
+      <roles>
+        <role>project manager</role>
+        <role>developer</role>
+      </roles>
+      <timezone>0</timezone>
+      <properties />
     </developer>
   </developers>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <!-- Dependency and plugin versions (in alphabetical order). -->
-    <commons-dbcp.version>1.4</commons-dbcp.version>
-    <javacc-maven-plugin.version>2.4</javacc-maven-plugin.version>
-    <junit.version>3.8</junit.version>
-    <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
-    <maven-dependency-plugin.version>2.8</maven-dependency-plugin.version>
-    <maven-javadoc-plugin.version>2.8.1</maven-javadoc-plugin.version>
-    <maven-replacer-plugin.version>1.4.0</maven-replacer-plugin.version>
-    <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
-    <maven-surefire-plugin.version>2.7.2</maven-surefire-plugin.version>
-    <mondrian.version>4.0.0-SNAPSHOT</mondrian.version>
-    <mysql-driver.version>5.1.20</mysql-driver.version>
-    <rt-java5.version>1.5.0_22</rt-java5.version>
-    <rt-java6.version>1.6.0_24</rt-java6.version>
-    <xerces.version>2.11.0</xerces.version>
-  </properties>
-
   <!-- Environment settings. -->
-  <issueManagement/>
-
   <scm>
     <connection>scm:git:git://github.com/olap4j/olap4j.git</connection>
     <developerConnection>scm:git:git@github.com:olap4j/olap4j.git</developerConnection>
     <url>http://github.com/olap4j/olap4j/tree/master</url>
   </scm>
+
+  <issueManagement />
+
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>pentaho</id>
+      <name>Pentaho Open Repository</name>
+      <url>http://repository.pentaho.org/artifactory/pentaho</url>
+      <layout>default</layout>
+    </repository>
+  </distributionManagement>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Dependency and plugin versions (in alphabetical order). -->
+    <apache-rat-plugin.version>0.11</apache-rat-plugin.version>
+    <commons-collections.version>3.2</commons-collections.version>
+    <commons-dbcp.version>1.4</commons-dbcp.version>
+    <commons-dbcp2.version>2.1</commons-dbcp2.version>
+    <commons-logging.version>1.2</commons-logging.version>
+    <commons-math.version>1.2</commons-math.version>
+    <commons-pool.version>1.1</commons-pool.version>
+    <commons-vfs.version>1.0</commons-vfs.version>
+    <h2.version>1.3.172</h2.version>
+    <javacc-maven-plugin.version>2.4</javacc-maven-plugin.version>
+    <junit.version>3.8</junit.version>
+    <log4j.version>1.2.17</log4j.version>
+    <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+    <maven-dependency-plugin.version>2.8</maven-dependency-plugin.version>
+    <maven-javadoc-plugin.version>2.8.1</maven-javadoc-plugin.version>
+    <maven-replacer-plugin.version>1.4.0</maven-replacer-plugin.version>
+    <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
+    <maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
+    <mondrian-data-foodmart.version>0.9-SNAPSHOT</mondrian-data-foodmart.version>
+    <mondrian.version>4.3.0.1-130</mondrian.version>
+    <mysql-connector-java.version>5.1.38</mysql-connector-java.version>
+    <rt-java5.version>1.5.0_22</rt-java5.version>
+    <rt-java6.version>1.6.0_24</rt-java6.version>
+    <rt-java7.version>1.7.0_15</rt-java7.version>
+    <ph-javacc-maven-plugin.version>2.8.0</ph-javacc-maven-plugin.version>
+    <servlet-api.version>2.4</servlet-api.version>
+    <sortpom-maven-plugin.version>2.4.0</sortpom-maven-plugin.version>
+    <xerces.version>2.11.0</xerces.version>
+  </properties>
 
   <!-- Dependencies. -->
   <dependencies>
@@ -113,7 +148,7 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>${mysql-driver.version}</version>
+      <version>${mysql-connector-java.version}</version>
     </dependency>
     <dependency>
       <groupId>pentaho</groupId>
@@ -121,186 +156,42 @@
       <version>${mondrian.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>pentaho</groupId>
+      <artifactId>mondrian-data-foodmart</artifactId>
+      <version>${mondrian-data-foodmart.version}</version>
+    </dependency>
   </dependencies>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.8.1</version>
-        <configuration>
-          <links>
-            <link>http://docs.oracle.com/javase/7/docs/api/</link>
-          </links>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
-
-  <distributionManagement>
-    <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>pentaho</id>
-      <name>Pentaho Open Repository</name>
-      <url>http://repository.pentaho.org/artifactory/pentaho</url>
-      <layout>default</layout>
-    </repository>
-  </distributionManagement>
 
   <repositories>
     <repository>
-      <id>pentaho</id>
-      <url>http://repo.pentaho.org/artifactory/repo/</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
+      <id>pentaho</id>
+      <url>http://repo.pentaho.org/artifactory/repo/</url>
     </repository>
   </repositories>
 
   <build>
     <defaultGoal>package</defaultGoal>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.8</version>
-        <executions>
-          <execution>
-            <id>properties</id>
-            <goals>
-              <goal>properties</goal>
-            </goals>
-            <phase>initialize</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-          <excludes>
-            <exclude>**/FactoryJdbc3Impl.java</exclude>
-            <exclude>**/FactoryJdbc4Impl.java</exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>compile-jdk15</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <configuration>
-              <excludes>
-                <exclude>**/FactoryJdbc4*.java</exclude>
-              </excludes>
-              <includes>
-                <include>**/FactoryJdbc3Impl.java</include>
-              </includes>
-              <compilerArguments>
-                <verbose/>
-                <bootclasspath>${com.sun:rt-jdk1.5:jar}</bootclasspath>
-              </compilerArguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>compile-jdk16</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <configuration>
-              <excludes>
-                <exclude>**/FactoryJdbc3*.java</exclude>
-              </excludes>
-              <includes>
-                <include>**/FactoryJdbc4Impl.java</include>
-              </includes>
-              <compilerArguments>
-                <verbose/>
-                <bootclasspath>${net.java.openjdk:rt-java6:jar}</bootclasspath>
-              </compilerArguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javacc-maven-plugin</artifactId>
-        <version>2.4</version>
-        <executions>
-          <execution>
-            <id>javacc</id>
-            <goals>
-              <goal>javacc</goal>
-            </goals>
-            <configuration>
-              <includes>
-                <include>**/MdxParser.jj</include>
-              </includes>
-              <lookAhead>2</lookAhead>
-              <isStatic>false</isStatic>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>org/olap4j/**/*.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.google.code.maven-replacer-plugin</groupId>
-        <artifactId>maven-replacer-plugin</artifactId>
-        <version>1.4.0</version>
-        <executions>
-          <execution>
-            <phase>generate-sources</phase>
-            <id>replace</id>
-            <goals>
-              <goal>replace</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <file>src/main/resources/version/XmlaOlap4jDriverVersion.java.template</file>
-          <outputFile>target/generated-sources/javacc/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java</outputFile>
-          <replacements>
-            <replacement>
-              <token>@buildtime@</token>
-              <value>${maven.build.timestamp}</value>
-            </replacement>
-            <replacement>
-              <token>@pomversion@</token>
-              <value>${project.version}</value>
-            </replacement>
-          </replacements>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>2.2.1</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>jar-no-fork</goal>
-              <goal>test-jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>version/*</exclude>
+        </excludes>
+      </resource>
+    </resources>
 
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <version>${apache-rat-plugin.version}</version>
+        </plugin>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${maven-compiler-plugin.version}</version>
@@ -331,21 +222,242 @@
           <version>${javacc-maven-plugin.version}</version>
         </plugin>
         <plugin>
+          <groupId>com.github.ekryd.sortpom</groupId>
+          <artifactId>sortpom-maven-plugin</artifactId>
+          <version>${sortpom-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
           <groupId>com.google.code.maven-replacer-plugin</groupId>
           <artifactId>maven-replacer-plugin</artifactId>
           <version>${maven-replacer-plugin.version}</version>
         </plugin>
+        <plugin>
+          <groupId>com.helger.maven</groupId>
+          <artifactId>ph-javacc-maven-plugin</artifactId>
+          <version>${ph-javacc-maven-plugin.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
 
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <excludes>
-          <exclude>version/*</exclude>
-        </excludes>
-      </resource>
-    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <excludes>
+            <exclude>**/*.md</exclude>
+            <exclude>RELEASE_CHECKLIST.txt</exclude>
+            <exclude>doc/*</exclude>
+            <exclude>.travis.yml</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>properties</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.helger.maven</groupId>
+        <artifactId>ph-javacc-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>jjc1</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <jdkVersion>1.4</jdkVersion>
+              <sourceDirectory>src/main/javacc/org/olap4j/mdx/parser/impl</sourceDirectory>
+              <outputDirectory>target/generated-sources/javacc</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>jjt2</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <jdkVersion>1.5</jdkVersion>
+              <sourceDirectory>src/main/javacc/org/olap4j/mdx/parser/impl</sourceDirectory>
+              <outputDirectory>target/generated-sources/javacc</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+              <goal>test-jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile-jdk15</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>org/olap4j/driver/xmla/FactoryJdbc4Impl.java</exclude>
+                <exclude>org/olap4j/driver/xmla/FactoryJdbc4Plus.java</exclude>
+                <exclude>org/olap4j/driver/xmla/FactoryJdbc41Impl.java</exclude>
+              </excludes>
+              <includes>
+                <include>org/olap4j/driver/xmla/FactoryJdbc3Impl.java</include>
+              </includes>
+              <compilerArguments>
+                <verbose />
+                <bootclasspath>${com.sun:rt-jdk1.5:jar}</bootclasspath>
+              </compilerArguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>compile-jdk16</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>org/olap4j/driver/xmla/FactoryJdbc3Impl.java</exclude>
+              </excludes>
+              <includes>
+                <include>org/olap4j/driver/xmla/FactoryJdbc4Impl.java</include>
+                <include>org/olap4j/driver/xmla/FactoryJdbc4Plus.java</include>
+                <include>org/olap4j/driver/xmla/FactoryJdbc41Impl.java</include>
+              </includes>
+              <compilerArguments>
+                <verbose />
+                <bootclasspath>${net.java.openjdk:rt-java6:jar}</bootclasspath>
+              </compilerArguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>compile-jdk17</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>org/olap4j/driver/xmla/FactoryJdbc4Impl.java</include>
+                <include>org/olap4j/driver/xmla/FactoryJdbc4Plus.java</include>
+                <include>org/olap4j/driver/xmla/FactoryJdbc41Impl.java</include>
+              </includes>
+              <compilerArguments>
+                <verbose />
+                <bootclasspath>${net.java.openjdk:rt-java7:jar}</bootclasspath>
+              </compilerArguments>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+          <excludes>
+            <exclude>org/olap4j/driver/xmla/FactoryJdbc4Impl.java</exclude>
+            <exclude>org/olap4j/driver/xmla/FactoryJdbc4Plus.java</exclude>
+            <exclude>org/olap4j/driver/xmla/FactoryJdbc41Impl.java</exclude>
+            <exclude>org/olap4j/driver/xmla/FactoryJdbc3Impl.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>org/olap4j/**/*.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>maven-replacer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>replace</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <file>src/main/resources/version/XmlaOlap4jDriverVersion.java.template</file>
+          <outputFile>target/generated-sources/javacc/org/olap4j/driver/xmla/XmlaOlap4jDriverVersion.java</outputFile>
+          <replacements>
+            <replacement>
+              <token>@buildtime@</token>
+              <value>${maven.build.timestamp}</value>
+            </replacement>
+            <replacement>
+              <token>@pomversion@</token>
+              <value>${project.version}</value>
+            </replacement>
+          </replacements>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.github.ekryd.sortpom</groupId>
+        <artifactId>sortpom-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>sort</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <predefinedSortOrder>default_1_0_0</predefinedSortOrder>
+          <keepBlankLines>true</keepBlankLines>
+          <expandEmptyElements>false</expandEmptyElements>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${maven-javadoc-plugin.version}</version>
+        <configuration>
+          <links>
+            <link>http://docs.oracle.com/javase/7/docs/api/</link>
+          </links>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
