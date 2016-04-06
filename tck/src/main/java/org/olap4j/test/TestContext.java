@@ -71,25 +71,8 @@ public class TestContext {
         org.olap4j.MetadataTest.class,
         org.olap4j.mdx.MdxTest.class,
         org.olap4j.transform.TransformTest.class,
-        org.olap4j.XmlaConnectionTest.class,
         org.olap4j.OlapTreeTest.class,
         org.olap4j.OlapTest.class,
-    };
-
-    /**
-     * The following tests do not depend upon the driver implementation.
-     * They should be executed once, in olap4j's test suite, not for each
-     * provider's test suite.
-     */
-    public static final Class<?>[] NON_TCK_CLASSES = {
-        org.olap4j.impl.ConnectStringParserTest.class,
-        org.olap4j.impl.Olap4jUtilTest.class,
-        org.olap4j.impl.Base64Test.class,
-        org.olap4j.test.ParserTest.class,
-        org.olap4j.test.ArrayMapTest.class,
-        org.olap4j.driver.xmla.cache.XmlaShaEncoderTest.class,
-        org.olap4j.driver.xmla.proxy.XmlaCookieManagerTest.class,
-        org.olap4j.driver.xmla.proxy.XmlaCachedProxyTest.class,
     };
 
     private final Tester tester;
@@ -666,6 +649,9 @@ public class TestContext {
          */
         Wrapper getWrapper();
 
+        /** Sets the timeout of statements. */
+        void setTimeout(int seconds);
+
         enum Flavor {
             MONDRIAN,
             XMLA,
@@ -716,6 +702,10 @@ public class TestContext {
 
         public Flavor getFlavor() {
             return tester.getFlavor();
+        }
+
+        public void setTimeout(int seconds) {
+            tester.setTimeout(seconds);
         }
 
         public Wrapper getWrapper() {

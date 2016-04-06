@@ -114,6 +114,10 @@ public class RemoteXmlaTester implements Tester {
     public Wrapper getWrapper() {
         return TestContext.Wrapper.NONE;
     }
-}
-// End RemoteXmlaTester.java
 
+    public void setTimeout(int seconds) {
+        // do nothing
+    }
+}
+
+// End RemoteXmlaTester.java

@@ -17,7 +17,6 @@
 */
 package org.olap4j;
 
-import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.impl.Bug;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.*;
@@ -31,8 +30,6 @@ import org.olap4j.type.*;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-import mondrian.olap.MondrianProperties;
-
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
@@ -44,8 +41,7 @@ import static org.olap4j.test.TestContext.nameList;
  * Unit test for olap4j Driver and Connection classes.
  *
  * <p>The system property "org.olap4j.test.helperClassName" determines the
- * name of the helper class. By default, uses {@link org.olap4j.XmlaTester},
- * use the XMLA driver.
+ * name of the helper class. By default, uses the XMLA driver.
  *
  * @author jhyde
  */
@@ -420,16 +416,14 @@ public class ConnectionTest extends TestCase {
             assertNotNull(axesList);
             assertEquals(0, axesList.size());
 
-            info.setProperty(
-                XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMart");
+            info.setProperty("CATALOG", "FoodMart");
             connection =
                 DriverManager.getConnection(
                     tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
                     info);
             assertEquals("FoodMart", connection.getCatalog());
 
-            info.setProperty(
-                XmlaOlap4jDriver.Property.CATALOG.name(), "FoodMartError");
+            info.setProperty("CATALOG", "FoodMartError");
             try {
                 connection = DriverManager.getConnection(
                     tester.getURL().replaceFirst("\\;Catalog=FoodMart", ""),
@@ -711,12 +705,12 @@ public class ConnectionTest extends TestCase {
             case REMOTE_XMLA:
                 assertTrue(
                     e.getMessage(),
-                    e.getMessage().indexOf("XMLA MDX parse failed") >= 0);
+                    e.getMessage().contains("XMLA MDX parse failed"));
                 break;
             default:
                 assertTrue(
-                    TestContext.getStackTrace(e).indexOf(
-                        "Failed to parse query") >= 0);
+                    TestContext.getStackTrace(e)
+                        .contains("Failed to parse query"));
                 break;
             }
         }
@@ -2653,7 +2647,7 @@ public class ConnectionTest extends TestCase {
             if (tester.getFlavor().equals(Flavor.XMLA)
                 || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
             {
-                MondrianProperties.instance().QueryTimeout.set(5);
+                tester.setTimeout(5);
             }
             final CellSet cellSet = olapStatement.executeOlapQuery(
                 "SELECT Filter(\n"
@@ -2673,7 +2667,7 @@ public class ConnectionTest extends TestCase {
             if (tester.getFlavor().equals(Flavor.XMLA)
                 || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
             {
-                MondrianProperties.instance().QueryTimeout.set(0);
+                tester.setTimeout(0);
             }
         }
         if (exceptions[0] != null) {
@@ -2697,7 +2691,7 @@ public class ConnectionTest extends TestCase {
         if (tester.getFlavor().equals(Flavor.XMLA)
             || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
         {
-            MondrianProperties.instance().QueryTimeout.set(1);
+            tester.setTimeout(1);
         }
         try {
             final CellSet cellSet =
@@ -2714,11 +2708,11 @@ public class ConnectionTest extends TestCase {
             if (tester.getFlavor().equals(Flavor.XMLA)
                 || tester.getFlavor().equals(Flavor.REMOTE_XMLA))
             {
-                MondrianProperties.instance().QueryTimeout.set(0);
+                tester.setTimeout(0);
             }
             assertTrue(
                 e.getMessage(),
-                e.getMessage().indexOf("Query timeout of ") >= 0);
+                e.getMessage().contains("Query timeout of "));
         }
     }
 
@@ -3501,10 +3495,7 @@ public class ConnectionTest extends TestCase {
             {
                 list.add(schema.getName());
             }
-            assertListsEquals(
-                Arrays.asList(
-                    "FoodMart"),
-                list);
+            assertListsEquals(Collections.singletonList("FoodMart"), list);
         } finally {
             olapConnection.setRoleName(null);
         }
@@ -3527,10 +3518,7 @@ public class ConnectionTest extends TestCase {
             for (Cube cube : olapConnection.getOlapSchema().getCubes()) {
                 list.add(cube.getName());
             }
-            assertListsEquals(
-                Arrays.asList(
-                    "Sales"),
-                list);
+            assertListsEquals(Collections.singletonList("Sales"), list);
             olapConnection.setRoleName("No HR Cube");
             list.clear();
             for (Cube cube : olapConnection.getOlapSchema().getCubes()) {
@@ -3648,10 +3636,7 @@ public class ConnectionTest extends TestCase {
             {
                 list.add(member.getName());
             }
-            assertEquals(
-                Arrays.asList(
-                    "USA"),
-                list);
+            assertEquals(Collections.singletonList("USA"), list);
             list.clear();
             for (Member member
                 : olapConnection.getOlapSchema()
@@ -3663,10 +3648,7 @@ public class ConnectionTest extends TestCase {
             {
                 list.add(member.getName());
             }
-            assertListsEquals(
-                Arrays.asList(
-                    "CA"),
-                list);
+            assertListsEquals(Collections.singletonList("CA"), list);
             list.clear();
             for (Member member
                 : olapConnection.getOlapSchema()
@@ -3747,8 +3729,12 @@ public class ConnectionTest extends TestCase {
     }
 
     protected void assertListsEquals(List<String> list1, List<String> list2) {
-        Collections.sort(list1);
-        Collections.sort(list2);
+        if (list1.size() > 1) {
+            Collections.sort(list1);
+        }
+        if (list2.size() > 1) {
+            Collections.sort(list2);
+        }
         assertEquals(list1, list2);
     }
 }

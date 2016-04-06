@@ -18,7 +18,6 @@
 package org.olap4j.sample;
 
 import org.olap4j.*;
-import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.layout.RectangularCellSetFormatter;
 
 import java.io.PrintWriter;
@@ -26,9 +25,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 /**
- * This class demonstrates how to connect the {@link XmlaOlap4jDriver}
- * to a Palo server. Thanks to Vladislav Malicevic for this
- * contribution.
+ * This class demonstrates how to connect the XMLA driver
+ * to a Palo server.
+ *
+ * <p>Thanks to Vladislav Malicevic for this contribution.
  *
  * @author Luc Boudreau
  */
