@@ -31,7 +31,12 @@ abstract class Olap4jNodeConverter {
 
     public static SelectNode toOlap4j(Query query) {
         List<IdentifierNode> list = Collections.emptyList();
-        List<ParseTreeNode> withList = Collections.emptyList();
+        List<ParseTreeNode> withList;
+        if (query.getWithList().isEmpty()) {
+            withList = Collections.emptyList();
+        } else {
+            withList = query.getWithList();
+        }
         List<QueryAxis> axisList = new ArrayList<QueryAxis>();
         axisList.add(query.getAxes().get(Axis.COLUMNS));
         axisList.add(query.getAxes().get(Axis.ROWS));
@@ -81,8 +86,7 @@ abstract class Olap4jNodeConverter {
                 cnodes);
     }
 
-    protected static CallNode generateCrossJoin(List<ParseTreeNode> selections)
-    {
+    protected static CallNode generateCrossJoin(List<ParseTreeNode> selections) {
         ParseTreeNode sel1 = selections.remove(0);
         if (sel1 instanceof MemberNode) {
             sel1 = generateSetCall(sel1);
@@ -117,8 +121,7 @@ abstract class Olap4jNodeConverter {
     }
 
     protected static CallNode generateHierarchizeUnion(
-        List<List<ParseTreeNode>> unions)
-    {
+        List<List<ParseTreeNode>> unions) {
         return new CallNode(
             null, "Hierarchize", Syntax.Function,
             generateUnion(unions));
@@ -138,8 +141,7 @@ abstract class Olap4jNodeConverter {
         List<ParseTreeNode> curr,
         List<List<ParseTreeNode>> unions,
         List<Selection> selsWithContext,
-        List<List<ParseTreeNode>> contextUnions)
-    {
+        List<List<ParseTreeNode>> contextUnions) {
         ParseTreeNode exceptSet = null;
         QueryDimension qDim = axis.getDimensions().get(dim);
 
@@ -161,16 +163,15 @@ abstract class Olap4jNodeConverter {
             // consistent results, generate a filter that checks
             // inclusions for ancestors in higher levels
             if (qDim.isHierarchyConsistent()
-                    && qDim.getInclusions().size() > 1)
-            {
+                && qDim.getInclusions().size() > 1) {
                 Integer currentDepth = null;
                 if (sel.getRootElement() instanceof Member) {
-                    currentDepth = ((Member)sel.getRootElement()).getDepth();
+                    currentDepth = ((Member) sel.getRootElement()).getDepth();
                 } else if (sel.getRootElement() instanceof Level) {
-                    currentDepth = ((Level)sel.getRootElement()).getDepth();
+                    currentDepth = ((Level) sel.getRootElement()).getDepth();
                 }
                 selectionNode =
-                   toHierarchyConsistentNode(selectionNode, currentDepth, qDim);
+                    toHierarchyConsistentNode(selectionNode, currentDepth, qDim);
             }
             // If a sort Order was specified for this dimension
             // apply it for this inclusion
@@ -210,8 +211,7 @@ abstract class Olap4jNodeConverter {
                         exceptSet);
             }
             if (sel.getSelectionContext() != null
-                && sel.getSelectionContext().size() > 0)
-            {
+                && sel.getSelectionContext().size() > 0) {
                 // selections that have a context are treated
                 // differently than the rest of the MDX generation
                 if (!selsWithContext.contains(sel)) {
@@ -228,11 +228,9 @@ abstract class Olap4jNodeConverter {
 
                             boolean found = false;
                             for (Selection selection
-                                : sel.getSelectionContext())
-                            {
+                                : sel.getSelectionContext()) {
                                 if (selection.getDimension().equals(
-                                        dimension.getDimension()))
-                                {
+                                    dimension.getDimension())) {
                                     sels.add(toOlap4j(selection));
                                     found = true;
                                 }
@@ -293,7 +291,11 @@ abstract class Olap4jNodeConverter {
                 axis, 0, null, unions, selsWithContext, contextUnions);
             unions.addAll(contextUnions);
             if (unions.size() > 1) {
-                callNode = generateHierarchizeUnion(unions);
+                if (axis.getHierarchizeMode() != null && axis.getHierarchizeMode().equals(QueryDimension.HierarchizeMode.POST)) {
+                    callNode = generateHierarchizeUnionPost(unions);
+                } else {
+                    callNode = generateHierarchizeUnion(unions);
+                }
             } else {
                 callNode = generateCrossJoin(unions.get(0));
             }
@@ -353,9 +355,9 @@ abstract class Olap4jNodeConverter {
         ParseTreeNode sortedNode = null;
         if (axis.getSortOrder() != null) {
             LiteralNode evaluatorNode =
-                 LiteralNode.createSymbol(
-                     null,
-                     axis.getSortIdentifierNodeName());
+                LiteralNode.createSymbol(
+                    null,
+                    axis.getSortIdentifierNodeName());
             sortedNode =
                 new CallNode(
                     null,
@@ -377,6 +379,14 @@ abstract class Olap4jNodeConverter {
             sortedNode);
     }
 
+    protected static CallNode generateHierarchizeUnionPost(
+        List<List<ParseTreeNode>> unions) {
+        return new CallNode(
+            null, "Hierarchize", Syntax.Function,
+            generateUnion(unions), LiteralNode.createSymbol(
+            null, QueryDimension.HierarchizeMode.POST.name()));
+    }
+
     private static List<ParseTreeNode> toOlap4j(QueryDimension dimension) {
         // Let's build a first list of included members.
         List<ParseTreeNode> includeList = new ArrayList<ParseTreeNode>();
@@ -388,13 +398,12 @@ abstract class Olap4jNodeConverter {
             // consistent results, generate a filter that checks
             // inclusions for ancestors in higher levels
             if (dimension.isHierarchyConsistent()
-                && dimension.getInclusions().size() > 1)
-            {
+                && dimension.getInclusions().size() > 1) {
                 Integer curdepth = 0;
                 if (selection.getRootElement() instanceof Member) {
-                    curdepth = ((Member)selection.getRootElement()).getDepth();
+                    curdepth = ((Member) selection.getRootElement()).getDepth();
                 } else if (selection.getRootElement() instanceof Level) {
-                    curdepth = ((Level)selection.getRootElement()).getDepth();
+                    curdepth = ((Level) selection.getRootElement()).getDepth();
                 }
 
                 if (levelNodes.get(curdepth) != null) {
@@ -409,8 +418,7 @@ abstract class Olap4jNodeConverter {
             }
         }
         if (dimension.isHierarchyConsistent()
-            && dimension.getInclusions().size() > 1)
-        {
+            && dimension.getInclusions().size() > 1) {
             Integer levelDepths[] =
                 levelNodes.keySet()
                     .toArray(new Integer[levelNodes.keySet().size()]);
@@ -482,8 +490,7 @@ abstract class Olap4jNodeConverter {
             CallNode hierarchyNode;
             // There are two modes available, PRE and POST.
             if (dimension.getHierarchizeMode().equals(
-                    QueryDimension.HierarchizeMode.PRE))
-            {
+                QueryDimension.HierarchizeMode.PRE)) {
                 // In pre mode, we don't add the "POST" literal.
                 hierarchyNode = new CallNode(
                     null,
@@ -491,8 +498,7 @@ abstract class Olap4jNodeConverter {
                     Syntax.Function,
                     generateListSetCall(listWithExclusions));
             } else if (dimension.getHierarchizeMode().equals(
-                    QueryDimension.HierarchizeMode.POST))
-            {
+                QueryDimension.HierarchizeMode.POST)) {
                 hierarchyNode = new CallNode(
                     null,
                     "Hierarchize",
@@ -522,54 +528,53 @@ abstract class Olap4jNodeConverter {
 
     static ParseTreeNode toOlap4j(
         Member member,
-        Selection.Operator oper)
-    {
+        Selection.Operator oper) {
         ParseTreeNode node = null;
         try {
             switch (oper) {
-            case MEMBER:
-                node = new MemberNode(null, member);
-                break;
-            case SIBLINGS:
-                node =
-                    new CallNode(
-                        null,
-                        "Siblings",
-                        Syntax.Property,
-                        new MemberNode(null, member));
-                break;
-            case CHILDREN:
-                node =
-                    new CallNode(
-                        null,
-                        "Children",
-                        Syntax.Property,
-                        new MemberNode(null, member));
-                break;
-            case INCLUDE_CHILDREN:
-                node =
-                    generateSetCall(
-                        new MemberNode(null, member),
-                        toOlap4j(member, Selection.Operator.CHILDREN));
-                break;
-            case DESCENDANTS:
-                node =
-                    new CallNode(
-                        null,
-                        "Descendants",
-                        Syntax.Function,
-                        new MemberNode(null, member));
-                break;
-            case ANCESTORS:
-                node =
-                    new CallNode(
-                        null,
-                        "Ascendants",
-                        Syntax.Function,
-                        new MemberNode(null, member));
-                break;
-            default:
-                System.out.println("NOT IMPLEMENTED: " + oper);
+                case MEMBER:
+                    node = new MemberNode(null, member);
+                    break;
+                case SIBLINGS:
+                    node =
+                        new CallNode(
+                            null,
+                            "Siblings",
+                            Syntax.Property,
+                            new MemberNode(null, member));
+                    break;
+                case CHILDREN:
+                    node =
+                        new CallNode(
+                            null,
+                            "Children",
+                            Syntax.Property,
+                            new MemberNode(null, member));
+                    break;
+                case INCLUDE_CHILDREN:
+                    node =
+                        generateSetCall(
+                            new MemberNode(null, member),
+                            toOlap4j(member, Selection.Operator.CHILDREN));
+                    break;
+                case DESCENDANTS:
+                    node =
+                        new CallNode(
+                            null,
+                            "Descendants",
+                            Syntax.Function,
+                            new MemberNode(null, member));
+                    break;
+                case ANCESTORS:
+                    node =
+                        new CallNode(
+                            null,
+                            "Ascendants",
+                            Syntax.Function,
+                            new MemberNode(null, member));
+                    break;
+                default:
+                    System.out.println("NOT IMPLEMENTED: " + oper);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -579,21 +584,20 @@ abstract class Olap4jNodeConverter {
 
     static ParseTreeNode toOlap4j(
         Level level,
-        Selection.Operator oper)
-    {
+        Selection.Operator oper) {
         ParseTreeNode node = null;
         try {
             switch (oper) {
-            case MEMBERS:
-                node =
-                    new CallNode(
-                        null,
-                        "Members",
-                        Syntax.Property,
-                        new LevelNode(null, level));
-                break;
-            default:
-                System.out.println("NOT IMPLEMENTED: " + oper);
+                case MEMBERS:
+                    node =
+                        new CallNode(
+                            null,
+                            "Members",
+                            Syntax.Property,
+                            new LevelNode(null, level));
+                    break;
+                default:
+                    System.out.println("NOT IMPLEMENTED: " + oper);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -615,8 +619,7 @@ abstract class Olap4jNodeConverter {
     private static ParseTreeNode toHierarchyConsistentNode(
         ParseTreeNode selectionNode,
         Integer maxDepth,
-        QueryDimension qDim)
-    {
+        QueryDimension qDim) {
         // If a the querydimension should return only hierarchy
         // consistent results, generate a filter that checks
         // inclusions for ancestors in higher levels
@@ -624,15 +627,15 @@ abstract class Olap4jNodeConverter {
             Map<Integer, Level> levels = new HashMap<Integer, Level>();
             for (Selection s : qDim.getInclusions()) {
                 if (s.getRootElement() instanceof Member) {
-                    Integer d = ((Member)s.getRootElement()).getDepth();
+                    Integer d = ((Member) s.getRootElement()).getDepth();
                     if (!levels.containsKey(d)) {
-                        Level lvl = ((Member)s.getRootElement()).getLevel();
+                        Level lvl = ((Member) s.getRootElement()).getLevel();
                         levels.put(d, lvl);
                     }
                 } else if (s.getRootElement() instanceof Level) {
-                    Integer d = ((Level)s.getRootElement()).getDepth();
+                    Integer d = ((Level) s.getRootElement()).getDepth();
                     if (!levels.containsKey(d)) {
-                        Level lvl = ((Level)s.getRootElement());
+                        Level lvl = ((Level) s.getRootElement());
                         levels.put(d, lvl);
                     }
                 }
@@ -647,8 +650,7 @@ abstract class Olap4jNodeConverter {
             for (Integer i = 0; i < levelDepths.length - 1; i++) {
                 Level currentLevel = levels.get(levelDepths[i]);
                 if (levelDepths[i] < maxDepth
-                    && currentLevel.getLevelType() != Level.Type.ALL)
-                {
+                    && currentLevel.getLevelType() != Level.Type.ALL) {
                     CallNode currentMemberNode =
                         new CallNode(
                             null,
@@ -666,12 +668,12 @@ abstract class Olap4jNodeConverter {
                             currentMemberNode,
                             new LevelNode(null, currentLevel));
 
-                    List <ParseTreeNode> ancestorList =
+                    List<ParseTreeNode> ancestorList =
                         new ArrayList<ParseTreeNode>();
 
                     for (Selection anc : qDim.getInclusions()) {
                         if (anc.getRootElement() instanceof Member) {
-                            Level l = ((Member)anc.getRootElement()).getLevel();
+                            Level l = ((Member) anc.getRootElement()).getLevel();
                             if (l.equals(levels.get(levelDepths[i]))) {
                                 ancestorList.add(anc.visit());
                             }
@@ -705,7 +707,7 @@ abstract class Olap4jNodeConverter {
             if (inConditions.size() > 0) {
                 CallNode chainedIn = inConditions.get(0);
                 if (inConditions.size() > 1) {
-                    for (int c = 1;c < inConditions.size();c++) {
+                    for (int c = 1; c < inConditions.size(); c++) {
                         chainedIn = new CallNode(
                             null,
                             "AND",
