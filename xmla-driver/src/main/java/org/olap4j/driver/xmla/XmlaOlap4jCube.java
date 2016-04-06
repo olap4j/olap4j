@@ -148,10 +148,6 @@ class XmlaOlap4jCube extends XmlaOlap4jElement implements Cube, Named
         return null;
     }
 
-    public Object getAnnotations() {
-        return null;
-    }
-
     public NamedList<MeasureGroup> getMeasureGroups() {
         return Olap4jUtil.cast(measureGroups);
     }

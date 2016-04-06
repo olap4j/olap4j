@@ -19,9 +19,10 @@ package org.olap4j.metadata;
 
 import org.olap4j.CellSet;
 import org.olap4j.OlapException;
-import org.olap4j.xmla.XmlaLevel;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Group of {@link Member} objects in a {@link Hierarchy},
@@ -186,6 +187,11 @@ public interface Level extends MetadataElement {
     String getUniqueNameSqlColumnName();
 
     /**
+     * Returns a set that defines how the level was sourced.
+     */
+    Set<Origin> getOrigin();
+
+    /**
      * Enumeration of the types of a {@link Level}.
      *
      * <p>Several of the values are defined by OLE DB for OLAP and/or XML/A,
@@ -256,7 +262,7 @@ public interface Level extends MetadataElement {
      * @see Level#getLevelType
      * @see org.olap4j.OlapDatabaseMetaData#getLevels
      */
-    public enum Type implements XmlaConstant {
+    enum Type implements XmlaConstant {
 
         /**
          * Indicates that the level is not related to time.
@@ -500,7 +506,7 @@ public interface Level extends MetadataElement {
         public static final Dictionary<Type> DICTIONARY =
             DictionaryImpl.forClass(Type.class);
 
-        private Type(int xmlaOrdinal) {
+        Type(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
         }
 
@@ -550,7 +556,7 @@ public interface Level extends MetadataElement {
         }
     }
 
-    public enum CustomRollup implements XmlaConstant {
+    enum CustomRollup implements XmlaConstant {
         /**
          * Indicates an expression exists for this level. (Deprecated.)
          *
@@ -615,6 +621,72 @@ public interface Level extends MetadataElement {
 
         public String xmlaName() {
             return "MDLEVELS_" + name();
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public int xmlaOrdinal() {
+            return xmlaOrdinal;
+        }
+    }
+
+    /** Source of a level. */
+    enum Origin implements XmlaConstant {
+        /**
+         * Identifies levels in a user defined hierarchy.
+         *
+         * <p>Corresponds to the XMLA constant
+         * <code>MD_ORIGIN_USER_DEFINED</code> (1).</p>
+         */
+        USER_DEFINED(
+            1, "Identifies levels in a user defined hierarchy."),
+
+        /**
+         * Identifies levels in an attribute hierarchy.
+         *
+         * <p>Corresponds to the XMLA constant
+         * <code>MD_ORIGIN_USER_DEFINED</code> (2).</p>
+         */
+        ATTRIBUTE(
+            2, "Identifies levels in an attribute hierarchy."),
+
+        /**
+         * Identifies levels in a key attribute hierarchy.
+         *
+         * <p>Corresponds to the XMLA constant
+         * <code>MD_ORIGIN_KEY_ATTRIBUTE</code> (4).</p>
+         */
+        KEY_ATTRIBUTE(
+            4, "Identifies levels in a key attribute hierarchy."),
+
+        /**
+         * Identifies levels in a user defined hierarchy.
+         *
+         * <p>Corresponds to the XMLA constant
+         * <code>MD_ORIGIN_INTERNAL</code> (8).</p>
+         */
+        INTERNAL(
+            8,
+            "Identifies levels in attribute hierarchies that are not enabled.");
+
+        private final int xmlaOrdinal;
+        private final String description;
+
+        public static final Dictionary<Origin> DICTIONARY =
+            DictionaryImpl.forClass(Origin.class);
+
+        public static final EnumSet<Origin> ONLY_USER_DEFINED =
+            EnumSet.of(USER_DEFINED);
+
+        Origin(int xmlaOrdinal, String description) {
+            this.xmlaOrdinal = xmlaOrdinal;
+            this.description = description;
+        }
+
+        public String xmlaName() {
+            return "MD_ORIGIN_" + name();
         }
 
         public String getDescription() {

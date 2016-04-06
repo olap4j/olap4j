@@ -19,6 +19,10 @@ package org.olap4j.metadata;
 
 import org.olap4j.OlapException;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * An organization of the set of {@link Member}s in a {@link Dimension} and
  * their positions relative to one another.
@@ -191,51 +195,50 @@ public interface Hierarchy extends MetadataElement {
     /**
      * Returns the source of this {@code Hierarchy}.
      *
+     * <p>Note that a parent/child attribute hierarchy is both
+     * {@link Origin#USER_DEFINED} and {@link Origin#SYSTEM_ENABLED}.
+     *
      * @return source of this hierarchy; never null
      *
      * @since olap4j 2.0
      */
-    Origin getOrigin();
+    Set<Origin> getOrigin();
+
+    /**
+     * Returns whether this hierarchy is parent-child.
+     *
+     * @return whether this hierarchy is parent-child
+     *
+     * @since olap4j 2.0
+     */
+    boolean isParentChild();
 
     /** Source of a hierarchy. */
     enum Origin implements XmlaConstant {
         /**
-         * Identifies levels in a user defined hierarchy.
+         * Identifies a user defined hierarchy.
          *
          * <p>Corresponds to the XMLA constant
-         * <code>MD_ORIGIN_USER_DEFINED</code> (1).</p>
+         * <code>MD_USER_DEFINED</code> (1).
          */
-        USER_DEFINED(
-            1, "Identifies levels in a user defined hierarchy."),
+        USER_DEFINED(1, "Identifies a user defined hierarchy."),
 
         /**
-         * Identifies levels in an attribute hierarchy.
+         * Identifies an attribute hierarchy.
          *
          * <p>Corresponds to the XMLA constant
-         * <code>MD_ORIGIN_USER_DEFINED</code> (2).</p>
+         * <code>MD_SYSTEM_ENABLED</code> (2).
          */
-        ATTRIBUTE(
-            2, "Identifies levels in an attribute hierarchy."),
+        SYSTEM_ENABLED(2, "Identifies an attribute hierarchy"),
 
         /**
-         * Identifies levels in a key attribute hierarchy.
+         * Identifies attributes with no attribute hierarchies.
          *
          * <p>Corresponds to the XMLA constant
-         * <code>MD_ORIGIN_KEY_ATTRIBUTE</code> (4).</p>
+         * <code>MD_SYSTEM_INTERNAL</code> (4).
          */
-        KEY_ATTRIBUTE(
-            4, "Identifies levels in a key attribute hierarchy."),
-
-        /**
-         * Identifies levels in a user defined hierarchy.
-         *
-         * <p>Corresponds to the XMLA constant
-         * <code>MD_ORIGIN_INTERNAL</code> (8).</p>
-         */
-        INTERNAL(
-            8,
-            "Identifies levels in attribute hierarchies that are not enabled.");
-
+        SYSTEM_INTERNAL(
+            4, "Identifies attributes with no attribute hierarchies.");
 
         private final int xmlaOrdinal;
         private final String description;
@@ -243,13 +246,20 @@ public interface Hierarchy extends MetadataElement {
         public static final Dictionary<Origin> DICTIONARY =
             DictionaryImpl.forClass(Origin.class);
 
+        public static final Set<Origin> ONLY_USER_DEFINED =
+            Collections.unmodifiableSet(EnumSet.of(USER_DEFINED));
+
+        public static final Set<Origin> PARENT_CHILD =
+            Collections.unmodifiableSet(
+                EnumSet.of(USER_DEFINED, SYSTEM_ENABLED));
+
         Origin(int xmlaOrdinal, String description) {
             this.xmlaOrdinal = xmlaOrdinal;
             this.description = description;
         }
 
         public String xmlaName() {
-            return "MD_ORIGIN_" + name();
+            return "MD_" + name();
         }
 
         public String getDescription() {

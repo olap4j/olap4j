@@ -22,6 +22,7 @@ import org.olap4j.impl.ArrayMap;
 import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.metadata.*;
 
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -81,10 +82,6 @@ class XmlaOlap4jPositionMember
 
     public XmlaOlap4jCube getCube() {
         return member.getCube();
-    }
-
-    public Object getAnnotations() {
-        return member.getAnnotations();
     }
 
     public XmlaOlap4jConnection getConnection() {
@@ -233,6 +230,19 @@ class XmlaOlap4jPositionMember
 
     public boolean isVisible() {
         return member.isVisible();
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        // Delegate to the underlying member, e.g. for Annotation
+        return member.isWrapperFor(iface)
+            || iface.isInstance(this);
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        // Delegate to the underlying member, e.g. for Annotation
+        return member.isWrapperFor(iface)
+            ? member.unwrap(iface)
+            : iface.cast(this);
     }
 
     /**

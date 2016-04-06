@@ -293,7 +293,7 @@ abstract class XmlaOlap4jCellSet implements CellSet {
                     if (member == null) {
                         final String caption =
                             stringElement(memberNode, "Caption");
-                        final int lnum = integerElement(memberNode, "LNum");
+                        final int lnum = integerElement(memberNode, "LNum", 0);
                         final Hierarchy hierarchy =
                             lookupHierarchy(metaData.cube, hierarchyName);
                         final Level level = hierarchy.getLevels().get(lnum);
@@ -1428,10 +1428,6 @@ abstract class XmlaOlap4jCellSet implements CellSet {
             return getCube().olap4jSchema.olap4jCatalog;
         }
 
-        public Object getAnnotations() {
-            return null;
-        }
-
         public Map<Property, Object> getPropertyValueMap() {
             return Collections.emptyMap();
         }
@@ -1590,6 +1586,14 @@ abstract class XmlaOlap4jCellSet implements CellSet {
 
         public boolean isVisible() {
             return true;
+        }
+
+        public boolean isWrapperFor(Class<?> iface) {
+            return iface.isInstance(this);
+        }
+
+        public <T> T unwrap(Class<T> iface) {
+            return iface.cast(this);
         }
     }
 }

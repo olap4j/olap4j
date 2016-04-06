@@ -88,9 +88,14 @@ class XmlaOlap4jMeasureGroupDimension
         return false; // FIXME
     }
 
-    public Object getAnnotations() {
-        return null; // FIXME
+    public boolean isWrapperFor(Class<?> iface) {
+        return iface.isInstance(this);
     }
+
+    public <T> T unwrap(Class<T> iface) {
+        return iface.cast(this);
+    }
+
 }
 
 // End XmlaOlap4jMeasureGroupDimension.java

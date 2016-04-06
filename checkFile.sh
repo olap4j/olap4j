@@ -78,7 +78,8 @@ doCheck() {
 
     # Exceptions for olap4j
     */org/olap4j/mdx/parser/impl/*.java| \
-    */org/olap4j/impl/Base64.java)
+    */org/olap4j/impl/Base64.java| \
+    */org/olap4j/MetaModelTest.java)
         return
         ;;
 

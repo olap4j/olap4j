@@ -22,6 +22,7 @@ import org.olap4j.impl.*;
 import org.olap4j.metadata.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of {@link org.olap4j.metadata.Hierarchy}
@@ -41,6 +42,7 @@ class XmlaOlap4jHierarchy
     private final String hierarchyDisplayFolder;
     private final Structure structure;
     private final int ordinal;
+    private final Set<Origin> originSet;
 
     XmlaOlap4jHierarchy(
         XmlaOlap4jDimension olap4jDimension,
@@ -52,17 +54,20 @@ class XmlaOlap4jHierarchy
         String hierarchyDisplayFolder,
         boolean all,
         String defaultMemberUniqueName,
+        Set<Origin> originSet,
         Structure structure) throws OlapException
     {
         super(uniqueName, name, caption, description);
         assert olap4jDimension != null;
         assert structure != null;
+        assert originSet != null;
         this.olap4jDimension = olap4jDimension;
         this.ordinal = ordinal;
         this.all = all;
         this.defaultMemberUniqueName = defaultMemberUniqueName;
         this.hierarchyDisplayFolder = hierarchyDisplayFolder;
         this.structure = structure;
+        this.originSet = originSet;
 
         String[] hierarchyRestrictions = {
             "CATALOG_NAME",
@@ -133,8 +138,12 @@ class XmlaOlap4jHierarchy
         return null; // FIXME
     }
 
-    public Origin getOrigin() {
-        return Origin.USER_DEFINED; // FIXME
+    public Set<Origin> getOrigin() {
+        return originSet;
+    }
+
+    public boolean isParentChild() {
+        return originSet.containsAll(Origin.PARENT_CHILD);
     }
 
     public NamedList<Level> getLevels() {

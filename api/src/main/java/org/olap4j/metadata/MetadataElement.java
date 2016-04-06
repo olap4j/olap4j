@@ -17,13 +17,25 @@
 */
 package org.olap4j.metadata;
 
+import java.sql.Wrapper;
+
 /**
  * An element which describes the structure of an OLAP schema.
+ *
+ * <p>Since every metadata element implements {@link Wrapper}, you can
+ * query {@link Annotation}s via {@link Annotated}, as follows:
+ *
+ * <blockquote><pre>
+ * final MetadataElement element;
+ * if (element.isWrapperFor(Annotated.class)) {
+ *   final Annotated annotated = element.unwrap(Annotated.class);
+ *   System.out.println(element.getAnnotationMap().get("displayFolder"));
+ * }</code></blockquote>
  *
  * @author jhyde
  * @since Oct 13, 2006
  */
-public interface MetadataElement {
+public interface MetadataElement extends Wrapper {
     /**
      * Returns the name of this element.
      *
@@ -103,14 +115,6 @@ public interface MetadataElement {
      */
     boolean isVisible();
 
-    /**
-     * Returns annotations.
-     *
-     * @see MeasureGroupDimension#getAnnotations
-     *
-     * @since olap4j 2.0
-     */
-    Object getAnnotations();
 }
 
 // End MetadataElement.java

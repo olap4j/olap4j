@@ -23,6 +23,7 @@ import org.olap4j.metadata.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of {@link org.olap4j.metadata.Level}
@@ -42,6 +43,7 @@ class XmlaOlap4jLevel
     private final NamedList<XmlaOlap4jProperty> propertyList;
     final NamedList<XmlaOlap4jMember> memberList;
     private final boolean calculated;
+    private final Set<Origin> originSet;
 
     /**
      * Creates an XmlaOlap4jLevel.
@@ -64,6 +66,7 @@ class XmlaOlap4jLevel
         int depth,
         Type type,
         boolean calculated,
+        Set<Origin> originSet,
         int cardinality)
     {
         super(uniqueName, name, caption, description);
@@ -71,6 +74,7 @@ class XmlaOlap4jLevel
         this.type = type;
         this.calculated = calculated;
         this.cardinality = cardinality;
+        this.originSet = originSet;
         this.depth = depth;
         this.olap4jHierarchy = olap4jHierarchy;
 
@@ -174,6 +178,10 @@ class XmlaOlap4jLevel
 
     public Type getLevelType() {
         return type;
+    }
+
+    public Set<Origin> getOrigin() {
+        return originSet;
     }
 
     public NamedList<Property> getProperties() {

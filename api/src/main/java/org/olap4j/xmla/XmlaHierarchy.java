@@ -301,7 +301,7 @@ public class XmlaHierarchy extends Entity {
             XmlaType.UnsignedShort.of(Enumeration.ORIGIN),
             Column.NOT_RESTRICTION,
             Column.REQUIRED,
-            "A bit mak that determines the source of the hierarchy.");
+            "A bit mask that determines the source of the hierarchy.");
     /** See {@link org.olap4j.metadata.Hierarchy#getDisplayFolder()}. */
     public final Column HierarchyDisplayFolder =
         new Column(
@@ -338,7 +338,8 @@ public class XmlaHierarchy extends Entity {
             Column.REQUIRED,
             "Indicates the type of hierarchy.");
 
-    /** See {@link org.olap4j.metadata.Hierarchy#getAnnotations()}.
+    /** To access the annotations of a {@link org.olap4j.metadata.Hierarchy},
+     * see how to unwrap an {@link org.olap4j.metadata.Annotated}.
      *
      * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
     public final Column Annotations =

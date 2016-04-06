@@ -754,7 +754,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         };
     }
 
-    public static Map<String, String> toMap(final Properties properties) {
+    private static Map<String, String> toMap(final Properties properties) {
         return new AbstractMap<String, String>() {
             public Set<Entry<String, String>> entrySet() {
                 return Olap4jUtil.cast(properties.entrySet());
@@ -850,8 +850,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     /**
-     * Enumeration of server backends. Use
-     * {@link BackendFlavor#getFlavor(XmlaOlap4jConnection)}
+     * Enumeration of server back-ends. Use
+     * {@link BackendFlavor#getFlavor(OlapConnection, boolean)}
      * to get the vendor for a given connection.
      */
     enum BackendFlavor {
@@ -864,7 +864,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
         private final String token;
 
-        private BackendFlavor(String token) {
+        BackendFlavor(String token) {
             this.token = token;
         }
 
@@ -1276,9 +1276,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
         extends HandlerImpl<XmlaOlap4jCatalog>
     {
         private final XmlaOlap4jDatabase database;
-        public CatalogHandler(XmlaOlap4jDatabase database) {
+
+        CatalogHandler(XmlaOlap4jDatabase database) {
             this.database = database;
         }
+
         public void handle(
             Element row,
             Context context,
@@ -1396,7 +1398,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     {
         private final XmlaOlap4jMeasureGroup olap4jMeasureGroup;
 
-        public MeasureGroupDimensionHandler(XmlaOlap4jMeasureGroup cube) {
+        MeasureGroupDimensionHandler(XmlaOlap4jMeasureGroup cube) {
             this.olap4jMeasureGroup = cube;
         }
 
@@ -1448,7 +1450,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     static class DimensionHandler extends HandlerImpl<XmlaOlap4jDimension> {
         private final XmlaOlap4jCube cubeForCallback;
 
-        public DimensionHandler(XmlaOlap4jCube cube) {
+        DimensionHandler(XmlaOlap4jCube cube) {
             this.cubeForCallback = cube;
         }
 
@@ -1484,10 +1486,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 stringElement(row, "DIMENSION_CAPTION");
             final String description =
                 stringElement(row, "DESCRIPTION");
-            final int dimensionType =
-                integerElement(row, "DIMENSION_TYPE");
             final Dimension.Type type =
-                Dimension.Type.DICTIONARY.forOrdinal(dimensionType);
+                enumElement(row, Dimension.Type.DICTIONARY, "DIMENSION_TYPE");
             final String defaultHierarchyUniqueName =
                 stringElement(row, "DEFAULT_HIERARCHY");
             final Integer dimensionOrdinal =
@@ -1529,9 +1529,11 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
 
     static class HierarchyHandler extends HandlerImpl<XmlaOlap4jHierarchy> {
         private final XmlaOlap4jCube cubeForCallback;
-        public HierarchyHandler(XmlaOlap4jCube cubeForCallback) {
+
+        HierarchyHandler(XmlaOlap4jCube cubeForCallback) {
             this.cubeForCallback = cubeForCallback;
         }
+
         public void handle(
             Element row, Context context, List<XmlaOlap4jHierarchy> list)
             throws OlapException
@@ -1582,15 +1584,14 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             final String hierarchyDisplayFolder =
                 stringElement(row, "HIERARCHY_DISPLAY_FOLDER");
 
-            final Integer structureCode = integerElement(row, "STRUCTURE");
-            Hierarchy.Structure structure = null;
-            if (structureCode != null) {
-                structure =
-                    Hierarchy.Structure.DICTIONARY.forOrdinal(structureCode);
-            }
-            if (structure == null) {
-                structure = Hierarchy.Structure.FULLYBALANCED;
-            }
+            Hierarchy.Structure structure =
+                enumElement(
+                    row, Hierarchy.Structure.DICTIONARY, "STRUCTURE",
+                    Hierarchy.Structure.FULLYBALANCED);
+            Set<Hierarchy.Origin> originSet =
+                enumSetElement(
+                    row, Hierarchy.Origin.DICTIONARY, "ORIGIN",
+                    Hierarchy.Origin.ONLY_USER_DEFINED);
             XmlaOlap4jHierarchy hierarchy = new XmlaOlap4jHierarchy(
                 context.getDimension(row),
                 list.size(),
@@ -1601,6 +1602,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 hierarchyDisplayFolder,
                 allMember != null,
                 defaultMemberUniqueName,
+                originSet,
                 structure);
             list.add(hierarchy);
             cubeForCallback.hierarchiesByUname.put(
@@ -1610,10 +1612,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     }
 
     static class LevelHandler extends HandlerImpl<XmlaOlap4jLevel> {
-        public static final int MDLEVEL_TYPE_CALCULATED = 0x0002;
+        static final int MDLEVEL_TYPE_CALCULATED = 0x0002;
         private final XmlaOlap4jCube cubeForCallback;
 
-        public LevelHandler(XmlaOlap4jCube cubeForCallback) {
+        LevelHandler(XmlaOlap4jCube cubeForCallback) {
             this.cubeForCallback = cubeForCallback;
         }
 
@@ -1658,20 +1660,21 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             final String description =
                 stringElement(row, "DESCRIPTION");
             final int levelNumber =
-                integerElement(row, "LEVEL_NUMBER");
-            final Integer levelTypeCode = integerElement(row, "LEVEL_TYPE");
-            final Level.Type optionalLevelType =
-                Level.Type.DICTIONARY.forOrdinal(levelTypeCode);
+                integerElement(row, "LEVEL_NUMBER", 0);
+            final int levelTypeCode = integerElement(row, "LEVEL_TYPE", 0);
             final Level.Type levelType =
-                optionalLevelType == null ? Level.Type.REGULAR
-                    : optionalLevelType;
+                Level.Type.DICTIONARY.forOrdinal(levelTypeCode);
             boolean calculated = (levelTypeCode & MDLEVEL_TYPE_CALCULATED) != 0;
+            final Set<Level.Origin> originSet =
+                enumSetElement(
+                    row, Level.Origin.DICTIONARY, "ORIGIN",
+                    Level.Origin.ONLY_USER_DEFINED);
             final int levelCardinality =
-                integerElement(row, "LEVEL_CARDINALITY");
+                integerElement(row, "LEVEL_CARDINALITY", -1);
             XmlaOlap4jLevel level = new XmlaOlap4jLevel(
                 context.getHierarchy(row), levelUniqueName, levelName,
                 levelCaption, description, levelNumber, levelType,
-                calculated, levelCardinality);
+                calculated, originSet, levelCardinality);
             list.add(level);
             cubeForCallback.levelsByUname.put(
                 level.getUniqueName(),
@@ -1714,19 +1717,10 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             final String measureDisplayFolder =
                 stringElement(row, "MEASURE_DISPLAY_FOLDER");
             final Measure.Aggregator measureAggregator =
-                Measure.Aggregator.DICTIONARY.forOrdinal(
-                    integerElement(
-                        row, "MEASURE_AGGREGATOR"));
-            final Datatype datatype;
-            Datatype ordinalDatatype =
-                Datatype.DICTIONARY.forName(
-                    stringElement(row, "DATA_TYPE"));
-            if (ordinalDatatype == null) {
-                datatype = Datatype.DICTIONARY.forOrdinal(
-                    integerElement(row, "DATA_TYPE"));
-            } else {
-                datatype = ordinalDatatype;
-            }
+                enumElement(
+                    row, Measure.Aggregator.DICTIONARY, "MEASURE_AGGREGATOR");
+            final Datatype datatype =
+                enumElement(row, Datatype.DICTIONARY, "DATA_TYPE");
             final boolean measureIsVisible =
                 booleanElement(row, "MEASURE_IS_VISIBLE");
 
@@ -1796,14 +1790,6 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     Property.StandardMemberProperty.CHILDREN_CARDINALITY.name(),
                     Property.StandardMemberProperty.DEPTH.name()));
 
-        /**
-         * Cached value returned by the {@link Member.Type#values} method, which
-         * calls {@link Class#getEnumConstants()} and unfortunately clones an
-         * array every time.
-         */
-        private static final Member.Type[] MEMBER_TYPE_VALUES =
-            Member.Type.values();
-
         public void handle(
             Element row,
             Context context,
@@ -1839,7 +1825,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             int memberOrdinal =
                 integerElement(
                     row,
-                    Property.StandardMemberProperty.MEMBER_ORDINAL.name());
+                    Property.StandardMemberProperty.MEMBER_ORDINAL.name(), -1);
             String memberUniqueName =
                 stringElement(
                     row,
@@ -1853,10 +1839,9 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     row,
                     Property.StandardMemberProperty.PARENT_UNIQUE_NAME.name());
             Member.Type memberType =
-                MEMBER_TYPE_VALUES[
-                    integerElement(
-                        row,
-                        Property.StandardMemberProperty.MEMBER_TYPE.name())];
+                enumElement(
+                    row, Member.Type.DICTIONARY,
+                    Property.StandardMemberProperty.MEMBER_TYPE.name());
             String memberCaption =
                 stringElement(
                     row,
@@ -1865,7 +1850,8 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                 integerElement(
                     row,
                     Property.StandardMemberProperty.CHILDREN_CARDINALITY
-                        .name());
+                        .name(),
+                    -1);
 
             // Gather member property values into a temporary map, so we can
             // create the member with all properties known. XmlaOlap4jMember
@@ -1884,7 +1870,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
                     row,
                     Property.StandardMemberProperty.DEPTH.name());
             if (depth != null
-                && depth.intValue() != level.getDepth())
+                && depth != level.getDepth())
             {
                 map.put(
                     Property.StandardMemberProperty.DEPTH,
@@ -1975,7 +1961,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
     static class CatalogSchemaHandler extends HandlerImpl<XmlaOlap4jSchema> {
         private String catalogName;
 
-        public CatalogSchemaHandler(String catalogName) {
+        CatalogSchemaHandler(String catalogName) {
             super();
             if (catalogName == null) {
                 throw new RuntimeException(
@@ -2043,28 +2029,18 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             String uniqueName = stringElement(row, "DESCRIPTION");
             String caption = stringElement(row, "PROPERTY_CAPTION");
             String name = stringElement(row, "PROPERTY_NAME");
-            Datatype datatype;
+            final Datatype datatype =
+                enumElement(row, Datatype.DICTIONARY, "DATA_TYPE");
 
-            Datatype ordinalDatatype =
-                Datatype.DICTIONARY.forName(
-                    stringElement(row, "DATA_TYPE"));
-            if (ordinalDatatype == null) {
-                datatype = Datatype.DICTIONARY.forOrdinal(
-                    integerElement(row, "DATA_TYPE"));
-            } else {
-                datatype = ordinalDatatype;
-            }
-
-            final Integer contentTypeOrdinal =
-                integerElement(row, "PROPERTY_CONTENT_TYPE");
             Property.ContentType contentType =
-                contentTypeOrdinal == null
-                    ? null
-                    : Property.ContentType.DICTIONARY.forOrdinal(
-                        contentTypeOrdinal);
-            int propertyType = integerElement(row, "PROPERTY_TYPE");
+                enumElement(
+                    row, Property.ContentType.DICTIONARY,
+                    "PROPERTY_CONTENT_TYPE");
+
             Set<Property.TypeFlag> type =
-                Property.TypeFlag.DICTIONARY.forMask(propertyType);
+                enumSetElement(
+                    row, Property.TypeFlag.DICTIONARY, "PROPERTY_TYPE",
+                    Property.TypeFlag.EMPTY);
             list.add(
                 new XmlaOlap4jProperty(
                     uniqueName, name, caption, description, datatype, type,
@@ -2251,7 +2227,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             return dimension;
         }
 
-        public XmlaOlap4jLevel getLevel(Element row) {
+        XmlaOlap4jLevel getLevel(Element row) {
             if (olap4jLevel != null) {
                 return olap4jLevel;
             }
@@ -2278,7 +2254,7 @@ abstract class XmlaOlap4jConnection implements OlapConnection {
             return level;
         }
 
-        public XmlaOlap4jCatalog getCatalog(Element row) throws OlapException {
+        XmlaOlap4jCatalog getCatalog(Element row) throws OlapException {
             if (olap4jCatalog != null) {
                 return olap4jCatalog;
             }

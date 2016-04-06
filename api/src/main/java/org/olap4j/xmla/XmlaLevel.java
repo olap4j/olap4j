@@ -311,7 +311,8 @@ public class XmlaLevel extends Entity {
             Column.OPTIONAL,
             "A bit map that defines how the level was sourced.");
 
-    /** See {@link org.olap4j.metadata.Level#getAnnotations()}.
+    /** To access the annotations of a {@link org.olap4j.metadata.Level},
+     * see how to unwrap an {@link org.olap4j.metadata.Annotated}.
      *
      * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
     public final Column Annotations =

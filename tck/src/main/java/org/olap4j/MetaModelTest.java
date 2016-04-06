@@ -138,13 +138,10 @@ import java.util.*;
  *     {@link Cube#getBaseCube}
  *     TODO: add test
  * <li>{@link XmlaCube#Annotations}
- *     {@link org.olap4j.metadata.Cube#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaDimension#Annotations}
- *     {@link org.olap4j.metadata.Dimension#getAnnotations}
  *     TODO: add test
  * <li>{@link org.olap4j.xmla.XmlaHierarchy#Annotations}
- *     {@link org.olap4j.metadata.Hierarchy#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaHierarchy#DimensionMasterUniqueName}
  *     TODO: add method
@@ -168,7 +165,6 @@ import java.util.*;
  *     TODO: add method
  *     TODO: add test
  * <li>{@link XmlaLevel#Annotations}
- *     {@link org.olap4j.metadata.Level#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaLevel#LevelAttributeHierarchyName}
  *     {@link org.olap4j.metadata.Level#getAttributeHierarchyName()}
@@ -201,7 +197,6 @@ import java.util.*;
  *     {@link org.olap4j.metadata.Hierarchy#getOrigin}; review always same as hierarchy.getOrigin?
  *     TODO: add test
  * <li>{@link XmlaMeasure#Annotations}
- *     {@link org.olap4j.metadata.Measure#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaMeasure#NumericPrecision}
  *     TODO: add method
@@ -228,7 +223,6 @@ import java.util.*;
  *     TODO: add method
  *     TODO: add test
  * <li>{@link XmlaMeasureGroup#Annotations}
- *     {@link org.olap4j.metadata.MeasureGroup#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaMeasureGroup#CatalogName}
  *     via {@link org.olap4j.metadata.MeasureGroup#getCube()}
@@ -253,7 +247,6 @@ import java.util.*;
  *     {@link org.olap4j.metadata.MeasureGroup#isWriteEnabled()}
  *     TODO: add test
  * <li>{@link XmlaMeasureGroupDimension#Annotations}
- *     {@link org.olap4j.metadata.MeasureGroupDimension#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaMeasureGroupDimension#CatalogName}
  *     via {@link org.olap4j.metadata.MeasureGroupDimension#getMeasureGroup()}
@@ -293,7 +286,6 @@ import java.util.*;
  *     TODO: add restriction
  *     TODO: add test
  * <li>{@link XmlaMember#Annotations}
- *     {@link org.olap4j.metadata.Member#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaMember#Description}
  *     TODO: add method
@@ -314,7 +306,6 @@ import java.util.*;
  *     TODO: add method
  *     TODO: add test
  * <li>{@link XmlaProperty#Annotations}
- *     {@link org.olap4j.metadata.Property#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaProperty#CharacterMaximumLength}
  *     TODO: add method
@@ -350,7 +341,6 @@ import java.util.*;
  *     TODO: add method
  *     TODO: add test
  * <li>{@link XmlaSet#Annotations}
- *     {@link org.olap4j.metadata.NamedSet#getAnnotations}
  *     TODO: add test
  * <li>{@link XmlaSet#Expression}
  *     TODO: add method

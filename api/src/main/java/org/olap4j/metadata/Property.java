@@ -19,7 +19,9 @@ package org.olap4j.metadata;
 
 import org.olap4j.impl.Olap4jUtil;
 
+import java.sql.SQLException;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
 
 import static org.olap4j.metadata.XmlaConstants.*;
@@ -104,12 +106,15 @@ public interface Property extends MetadataElement {
         public static final Set<TypeFlag> MEMBER_TYPE_FLAG =
             Collections.unmodifiableSet(
                 Olap4jUtil.enumSetOf(TypeFlag.MEMBER));
+        public static final Set<TypeFlag> EMPTY =
+            Collections.unmodifiableSet(
+                EnumSet.noneOf(TypeFlag.class));
 
         /** Per {@link XmlaConstant}. */
         public static final Dictionary<TypeFlag> DICTIONARY =
             DictionaryImpl.forClass(TypeFlag.class);
 
-        private TypeFlag(int xmlaOrdinal) {
+        TypeFlag(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
         }
 
@@ -488,7 +493,7 @@ public interface Property extends MetadataElement {
         private final String description;
         private final boolean internal;
 
-        private StandardMemberProperty(
+        StandardMemberProperty(
             Datatype type,
             int ordinal,
             boolean internal,
@@ -549,8 +554,12 @@ public interface Property extends MetadataElement {
             return !internal;
         }
 
-        public Object getAnnotations() {
-            return null;
+        public boolean isWrapperFor(Class<?> iface) {
+            return iface.isInstance(this);
+        }
+
+        public <T> T unwrap(Class<T> iface) {
+            return iface.cast(this);
         }
     }
 
@@ -739,7 +748,7 @@ public interface Property extends MetadataElement {
         private final String description;
         private final boolean internal;
 
-        private StandardCellProperty(
+        StandardCellProperty(
             Datatype type,
             int ordinal,
             boolean internal,
@@ -795,12 +804,16 @@ public interface Property extends MetadataElement {
             return !internal;
         }
 
-        public Object getAnnotations() {
-            return null;
-        }
-
         public ContentType getContentType() {
             return ContentType.REGULAR;
+        }
+
+        public boolean isWrapperFor(Class<?> iface) throws SQLException {
+            return iface.isInstance(this);
+        }
+
+        public <T> T unwrap(Class<T> iface) throws SQLException {
+            return iface.cast(this);
         }
     }
 
@@ -1145,7 +1158,7 @@ public interface Property extends MetadataElement {
         public static final Dictionary<ContentType> DICTIONARY =
             DictionaryImpl.forClass(ContentType.class);
 
-        private ContentType(int xmlaOrdinal) {
+        ContentType(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
         }
 

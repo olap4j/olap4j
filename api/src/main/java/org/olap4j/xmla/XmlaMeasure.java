@@ -224,7 +224,8 @@ public class XmlaMeasure extends Entity {
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             "The default format string for the measure.");
-    /** See {@link org.olap4j.metadata.Measure#getAnnotations()}.
+    /** To access the annotations of a {@link org.olap4j.metadata.Measure},
+     * see how to unwrap an {@link org.olap4j.metadata.Annotated}.
      *
      * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
     public final Column Annotations =

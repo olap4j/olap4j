@@ -155,7 +155,8 @@ public class XmlaSet extends Entity {
             Column.OPTIONAL,
             "The context for the set. The set can be static or dynamic.");
 
-    /** See {@link org.olap4j.metadata.NamedSet#getAnnotations()}.
+    /** To access the annotations of a {@link org.olap4j.metadata.NamedSet},
+     * see how to unwrap an {@link org.olap4j.metadata.Annotated}.
      *
      * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
     public final Column Annotations =

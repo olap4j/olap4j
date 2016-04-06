@@ -70,10 +70,6 @@ abstract class XmlaOlap4jElement implements MetadataElement, Named {
         return true;
     }
 
-    public Object getAnnotations() {
-        return null;
-    }
-
     public int hashCode() {
         // By the book implementation of a hash code identifier.
         if (this.hash == 0) {
@@ -85,6 +81,15 @@ abstract class XmlaOlap4jElement implements MetadataElement, Named {
     // Keep this declaration abstract as a reminder to
     // overriding classes.
     public abstract boolean equals(Object obj);
+
+    public boolean isWrapperFor(Class<?> iface) {
+        return iface.isInstance(this);
+    }
+
+    public <T> T unwrap(Class<T> iface) {
+        return iface.cast(this);
+    }
+
 }
 
 // End XmlaOlap4jElement.java

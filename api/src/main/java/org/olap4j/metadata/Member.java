@@ -150,7 +150,7 @@ public interface Member extends MetadataElement {
         public static final Dictionary<Type> DICTIONARY =
             DictionaryImpl.forClass(Type.class);
 
-        private Type(int ordinal) {
+        Type(int ordinal) {
             assert ordinal == ordinal();
         }
 

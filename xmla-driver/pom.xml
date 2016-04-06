@@ -172,8 +172,8 @@ limitations under the License.
           </execution>
         </executions>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
           <excludes>
             <exclude>org/olap4j/driver/xmla/FactoryJdbc4Impl.java</exclude>
             <exclude>org/olap4j/driver/xmla/FactoryJdbc4Plus.java</exclude>

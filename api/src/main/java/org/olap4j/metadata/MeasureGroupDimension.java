@@ -17,12 +17,13 @@
 */
 package org.olap4j.metadata;
 
+import java.sql.Wrapper;
 import java.util.List;
 
 /**
  * Use of a {@link Dimension} within a {@link MeasureGroup}.
  */
-public interface MeasureGroupDimension {
+public interface MeasureGroupDimension extends Wrapper {
     /**
      * Returns the {@link MeasureGroup} that this {@code MeasureGroupDimension}
      * belongs to.
@@ -73,12 +74,6 @@ public interface MeasureGroupDimension {
      */
     boolean isFactDimension();
 
-    /**
-     * Returns annotations.
-     *
-     * @since olap4j 2.0
-     */
-    Object getAnnotations();
 }
 
 // End MeasureGroupDimension.java

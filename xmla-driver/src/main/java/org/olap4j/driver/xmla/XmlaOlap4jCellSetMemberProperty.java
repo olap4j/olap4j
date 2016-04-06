@@ -77,9 +77,14 @@ class XmlaOlap4jCellSetMemberProperty implements Property, Named {
         return true;
     }
 
-    public Object getAnnotations() {
-        return null; // FIXME
+    public boolean isWrapperFor(Class<?> iface) {
+        return iface.isInstance(this);
     }
+
+    public <T> T unwrap(Class<T> iface) {
+        return iface.cast(this);
+    }
+
 }
 
 // End XmlaOlap4jCellSetMemberProperty.java

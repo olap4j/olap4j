@@ -25,7 +25,7 @@ import java.util.Set;
 
 /**
  * Implementation of {@link org.olap4j.metadata.Property}
- * for a cell in a cellset
+ * for a cell in a cell set
  * from XML/A providers.
  *
  * @author jhyde
@@ -74,9 +74,14 @@ class XmlaOlap4jCellProperty implements Property, Named {
         return true;
     }
 
-    public Object getAnnotations() {
-        return null; // FIXME
+    public boolean isWrapperFor(Class<?> iface) {
+        return iface.isInstance(this);
     }
+
+    public <T> T unwrap(Class<T> iface) {
+        return iface.cast(this);
+    }
+
 }
 
 // End XmlaOlap4jCellProperty.java

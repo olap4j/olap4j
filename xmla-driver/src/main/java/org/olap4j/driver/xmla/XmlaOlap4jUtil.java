@@ -17,6 +17,9 @@
 */
 package org.olap4j.driver.xmla;
 
+import org.olap4j.metadata.Hierarchy;
+import org.olap4j.metadata.XmlaConstant;
+
 import org.apache.xerces.impl.Constants;
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.OutputFormat;
@@ -302,6 +305,15 @@ abstract class XmlaOlap4jUtil {
         }
     }
 
+    static int integerElement(Element row, String name, int defaultValue) {
+        final String s = stringElement(row, name);
+        if (s == null || s.equals("")) {
+            return defaultValue;
+        } else {
+            return Integer.valueOf(s);
+        }
+    }
+
     static byte byteElement(Element row, String name) {
         return Byte.valueOf(stringElement(row, name)).byteValue();
     }
@@ -340,11 +352,44 @@ abstract class XmlaOlap4jUtil {
     }
 
     static long longElement(Element row, String name) {
-        return Long.valueOf(stringElement(row, name)).longValue();
+        return Long.parseLong(stringElement(row, name));
     }
 
     static Object bigIntegerElement(Element row, String name) {
         return new BigInteger(stringElement(row, name));
+    }
+
+    static <E extends Enum<E> & XmlaConstant> E enumElement(
+        Element row, XmlaConstant.Dictionary<E> dictionary, String name)
+    {
+        return enumElement(row, dictionary, name, null);
+    }
+
+    static <E extends Enum<E> & XmlaConstant> E enumElement(
+        Element row, XmlaConstant.Dictionary<E> dictionary, String name,
+        E defaultValue)
+    {
+        final String s = stringElement(row, name);
+        if (s != null && !s.equals("")) {
+            int result = Integer.valueOf(s);
+            final E e = dictionary.forOrdinal(result);
+            if (e != null) {
+                return e;
+            }
+        }
+        return defaultValue;
+    }
+
+    static <E extends Enum<E> & XmlaConstant> Set<E> enumSetElement(
+        Element row, XmlaConstant.Dictionary<E> dictionary, String name,
+        Set<E> defaultValue)
+    {
+        final Integer code = integerElement(row, name);
+        if (code != null) {
+            return dictionary.forMask(code);
+        } else {
+            return defaultValue;
+        }
     }
 
     static List<Element> childElements(Element memberNode) {

@@ -273,7 +273,8 @@ public class XmlaProperty extends Entity {
             "A Boolean that indicates whether the property is visible.\n"
             + "TRUE if the property is visible; otherwise, FALSE.");
 
-    /** See {@link org.olap4j.metadata.Property#getAnnotations()}.
+    /** To access the annotations of a {@link org.olap4j.metadata.Property},
+     * see how to unwrap an {@link org.olap4j.metadata.Annotated}.
      *
      * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
     public final Column Annotations =

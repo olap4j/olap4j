@@ -280,7 +280,8 @@ public class XmlaMember extends Entity {
             Column.OPTIONAL,
             "depth");
 
-    /** See {@link org.olap4j.metadata.Member#getAnnotations()}.
+    /** To access the annotations of a {@link org.olap4j.metadata.Member},
+     * see how to unwrap an {@link org.olap4j.metadata.Annotated}.
      *
      * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
     public final Column Annotations =

@@ -127,7 +127,8 @@ public class XmlaMeasureGroup extends Entity {
             Restriction.NO,
             Column.REQUIRED,
             "The display caption for the measure group.");
-    /** See {@link org.olap4j.metadata.MeasureGroup#getAnnotations()}.
+    /** To access the annotations of a {@link org.olap4j.metadata.MeasureGroup},
+     * see how to unwrap an {@link org.olap4j.metadata.Annotated}.
      *
      * @since olap4j 2.0; mondrian extension (not in XMLA spec) */
     public final Column Annotations =
