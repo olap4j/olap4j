@@ -36,28 +36,28 @@ import java.util.List;
  * they are accessed, is as follows:
  * <blockquote>
  * <ul>
- * <li type="circle">{@link org.olap4j.OlapConnection}<ul>
- *     <li type="circle">{@link Database}<ul>
- *         <li type="circle">{@link Catalog}<ul>
- *             <li type="circle">{@link Schema}<ul>
- *                 <li type="circle">{@link Cube}<ul>
- *                     <li type="circle">{@link Dimension}<ul>
- *                         <li type="circle">{@link Hierarchy}<ul>
- *                             <li type="circle">{@link Level}<ul>
- *                                 <li type="circle">{@link Member}</li>
- *                                 <li type="circle">{@link Property}</li>
+ * <li>{@link org.olap4j.OlapConnection}<ul>
+ *     <li>{@link Database}<ul>
+ *         <li>{@link Catalog}<ul>
+ *             <li>{@link Schema}<ul>
+ *                 <li>{@link Cube}<ul>
+ *                     <li>{@link Dimension}<ul>
+ *                         <li>{@link Hierarchy}<ul>
+ *                             <li>{@link Level}<ul>
+ *                                 <li>{@link Member}</li>
+ *                                 <li>{@link Property}</li>
  *                             </ul></li>
  *                         </ul></li>
  *                     </ul></li>
- *                 <li type="circle">{@link NamedSet}</li>
+ *                 <li>{@link NamedSet}</li>
  *                 </ul></li>
- *             <li type="circle">{@link Dimension} (shared)</li>
+ *             <li>{@link Dimension} (shared)</li>
  *             </ul></li>
  *         </ul></li>
  *     </ul></li>
- *  </ul>
+ *  </ul></li>
+ * </ul>
  * </blockquote>
- * </p>
  *
  * @author Luc Boudreau
  * @since Jan 15 2011
@@ -157,11 +157,16 @@ public interface Database {
         /**
          * Designates providers which don't support
          * authentication.
+         *
+         * <p>No user ID or password needs to be sent.
          */
         Unauthenticated("No user ID or password needs to be sent."),
         /**
          * Designates providers which support authentication
          * through the JDBC interface.
+         *
+         * <p>User ID and Password must be included in the information required
+         * for the connection.
          */
         Authenticated(
             "User ID and Password must be included in the information required"
@@ -169,6 +174,10 @@ public interface Database {
         /**
          * Designates providers which support authentication through
          * vendor or implementation specific means.
+         *
+         * <p>The data source uses the underlying security to determine
+         * authorization, such as Integrated Security provided by
+         * Microsoft Internet Information Services (IIS).
          */
         Integrated(
             "The data source uses the underlying security to determine "
@@ -195,17 +204,24 @@ public interface Database {
      */
     public static enum ProviderType implements XmlaConstant {
         /**
-         * Designates providers which provide results in the form of
+         * Tabular Data Provider.
+         *
+         * <p>Designates providers which provide results in the form of
          * tabular data sets.
          */
         TDP("Tabular Data Provider."),
         /**
-         * Designates providers which provide results in the form of
+         * Multidimensional Data Provider.
+         *
+         * <p>Designates providers which provide results in the form of
          * multidimensional data sets.
          */
         MDP("Multidimensional Data Provider."),
         /**
-         * Designates providers which provide results optimized for
+         * Data Mining Provider. A DMP provider implements the OLE DB for
+         * Data Mining specification.
+         *
+         * <p>Designates providers which provide results optimized for
          * data mining operations.
          */
         DMP(

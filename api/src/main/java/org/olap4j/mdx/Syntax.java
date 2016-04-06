@@ -293,7 +293,8 @@ public enum Syntax {
     },
 
     /**
-     * Defines syntax for expression invoked <code>object&#46;&PROPERTY</code>
+     * Defines syntax for expression invoked
+     * <code>object&#46;&amp;PROPERTY</code>
      * (a variant of {@link #Property}).
      */
     QuotedProperty {
@@ -312,7 +313,8 @@ public enum Syntax {
     },
 
     /**
-     * Defines syntax for expression invoked <code>object&#46;[&PROPERTY]</code>
+     * Defines syntax for expression invoked
+     * <code>object&#46;[&amp;PROPERTY]</code>
      * (a variant of {@link #Property}).
      */
     AmpersandQuotedProperty {

@@ -163,9 +163,9 @@ public class Olap4jUtil {
      * <p>Use this method in initializers. Type parameters are inferred from
      * context, and the contents are initialized declaratively. For example,
      *
-     * <blockquote><code>Map&lt;String, Integer&gt; population =<br/>
-     * &nbsp;&nbsp;Olap4jUtil.mapOf(<br/>
-     * &nbsp;&nbsp;&nbsp;&nbsp;"UK", 65000000,<br/>
+     * <blockquote><code>Map&lt;String, Integer&gt; population =<br>
+     * &nbsp;&nbsp;Olap4jUtil.mapOf(<br>
+     * &nbsp;&nbsp;&nbsp;&nbsp;"UK", 65000000,<br>
      * &nbsp;&nbsp;&nbsp;&nbsp;"USA", 300000000);</code></blockquote>
      *
      * @see org.olap4j.impl.UnmodifiableArrayMap#of(Object, Object, Object...)
@@ -560,7 +560,7 @@ public class Olap4jUtil {
     /**
      * Parses a formatted cell values.
      *
-     * <p>There is a customary way of including formatting infornation in cell
+     * <p>There is a customary way of including formatting information in cell
      * values (started with Microsoft OLAP Services, and continued by JPivot and
      * now Pentaho Analyzer). This method parses out the formatted value that
      * should be displayed on the screen and also any properties present.
@@ -571,9 +571,10 @@ public class Olap4jUtil {
      * <li>"|$123|style=red|arrow=up|" print in red style with an up arrow</li>
      * </ul>
      *
-     * <h4>Properties</h4>
+     * <h3>Properties</h3>
      *
      * <table border="1">
+     *     <caption>Properties of format strings</caption>
      * <tr>
      *     <th>Name</th>
      *     <th>Value</th>

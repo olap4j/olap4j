@@ -44,6 +44,7 @@ import java.util.List;
  * {<code>[Gender]</code>, <code>[Product]</code>}. In the result,</p>
  *
  *  <table border="1" id="table1" cellpadding="3">
+ *      <caption>Example result</caption>
  *      <tr>
  *          <td bgcolor="#E0E0E0"><b><i>Gender</i></b></td>
  *          <td bgcolor="#E0E0E0"><b><i>Product</i></b></td>

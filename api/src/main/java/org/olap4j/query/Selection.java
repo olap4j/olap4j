@@ -52,9 +52,13 @@ public interface Selection extends QueryNode {
     /**
      * Visitor pattern-like function to convert
      * the selection into a ParseTreeNode. Typical
-     * implementation should be:<br/>
+     * implementation should be:
+     *
+     * <blockquote>
      * <code>Olap4jNodeConverter.toOlap4j(member, operator);</code>
-     * @return A parse tree node of the selection.
+     * </blockquote>
+     *
+     * @return A parse tree node of the selection
      */
     ParseTreeNode visit();
 

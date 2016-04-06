@@ -29,18 +29,18 @@ import org.olap4j.metadata.*;
  */
 public interface Type {
     /**
-     * Returns whether this type contains a given dimension.<p/>
+     * Returns whether this type contains a given dimension.
      *
-     * For example:
+     * <p>For example:
      * <ul>
      * <li><code>DimensionType([Gender])</code> uses only the
      *     <code>[Gender]</code> dimension.</li>
      * <li><code>TupleType(MemberType([Gender]), MemberType([Store]))</code>
      *     uses <code>[Gender]</code>  and <code>[Store]</code>
      *     dimensions.</li>
-     * </ul><p/>
+     * </ul>
      *
-     * The <code>maybe</code> parameter comes into play when the
+     * <p>The <code>maybe</code> parameter comes into play when the
      * dimensional information is incomplete. For example, when applied to
      * <code>TupleType(MemberType(null), MemberType([Store]))</code>,
      * <code>usesDimension([Gender], false)</code> returns true because it

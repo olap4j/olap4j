@@ -26,7 +26,7 @@ import java.util.Set;
  * <p>The methods should not be called directly, only via the corresponding
  * static methods in {@link Olap4jUtil}, namely:<ul>
  * <li>{@link org.olap4j.impl.Olap4jUtil#quotePattern(String)}</li>
- * </ul></p>
+ * </ul>
  *
  * <p>This interface could in principle be extended to allow native
  * implementations of methods, or to serve as a factory for entire classes

@@ -66,7 +66,7 @@ public enum AllocationPolicy {
      * <blockquote>
      * &lt;weight value expression&gt; =
      * &lt;atomic cell value&gt; / &lt;existing value&gt;
-     * <blockquote>
+     * </blockquote>
      *
      * <p>The value of {@code weight value expression} should be expressed
      * as a value between 0 and 1. This value specifies the ratio of the
@@ -94,7 +94,7 @@ public enum AllocationPolicy {
      * <blockquote>
      * &lt;weight value expression&gt; =
      * &lt;atomic cell value&gt; / &lt;existing value&gt;
-     * <blockquote>
+     * </blockquote>
      *
      * <p>The value of {@code weight value expression} should be expressed
      * as a value between 0 and 1. This value specifies the ratio of the

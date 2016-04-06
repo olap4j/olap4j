@@ -64,15 +64,16 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * <p>Specification as for XML/A MDSCHEMA_ACTIONS schema rowset.
      *
      * <p>Each action description has the following columns:
-     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) => The name of
-     *         the database.</li>
-     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) => The name of
-     *         the schema to which this action belongs.</li>
-     * <li><b>CUBE_NAME</b> String => The name of the cube to which this action
-     *         belongs.</li>
-     * <li><b>ACTION_NAME</b> String => The name of the action.</li>
-     * <li><b>COORDINATE</b> String => null</li>
-     * <li><b>COORDINATE_TYPE</b> int => null</li>
+     * <ol>
+     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the database.</li>
+     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the schema to which this action belongs.</li>
+     * <li><b>CUBE_NAME</b> String &rarr; The name of the cube to which this
+     *         action belongs.</li>
+     * <li><b>ACTION_NAME</b> String &rarr; The name of the action.</li>
+     * <li><b>COORDINATE</b> String &rarr; null</li>
+     * <li><b>COORDINATE_TYPE</b> int &rarr; null</li>
      * </ol>
      *
      * @param catalog a catalog name; must match the catalog name as it
@@ -116,37 +117,31 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * <p>Specification as for XML/A DISCOVER_DATASOURCES schema rowset.
      *
      * <ol>
-     * <li><b>DATA_SOURCE_NAME</b> String => The name of the data source, such
-     *         as FoodMart 2000.</li>
-     * <li><b>DATA_SOURCE_DESCRIPTION</b> String => A description of the data
-     *         source, as entered by the publisher. (may be
+     * <li><b>DATA_SOURCE_NAME</b> String &rarr; The name of the data source,
+     *         such as FoodMart 2000.</li>
+     * <li><b>DATA_SOURCE_DESCRIPTION</b> String &rarr; A description of the
+     *         data source, as entered by the publisher. (may be
      *         <code>null</code>)</li>
-     * <li><b>URL</b> String => The unique path that shows where to invoke the
-     *         XML for Analysis methods for that data source. (may be
+     * <li><b>URL</b> String &rarr; The unique path that shows where to invoke
+     *         the XML for Analysis methods for that data source. (may be
      *         <code>null</code>)</li>
-     * <li><b>DATA_SOURCE_INFO</b> String => A string containing any additional
-     *         information required to connect to the data source. This can
-     *         include the Initial Catalog property or other information for
-     *         the provider.<br/>Example: "Provider=MSOLAP;Data
-     *         Source=Local;" (may be <code>null</code>)</li>
-     * <li><b>PROVIDER_NAME</b> String => The name of the provider behind the
-     *         data source. <br/>Example: "MSDASQL" (may be
-     *         <code>null</code>)</li>
-     * <li><b>PROVIDER_TYPE</b> EnumerationArray => The types of data supported
-     *         by the provider. May include one or more of the following
-     *         types. Example follows this table.<br/>TDP: tabular data
-     *         provider.<br/>MDP: multidimensional data provider.<br/>DMP:
-     *         data mining provider. A DMP provider implements the OLE DB for
-     *         Data Mining specification.</li>
-     * <li><b>AUTHENTICATION_MODE</b> EnumString => Specification of what type
-     *         of security mode the data source uses. Values can be one of
-     *         the following:<br/>Unauthenticated: no user ID or password
-     *         needs to be sent.<br/>Authenticated: User ID and Password must
-     *         be included in the information required for the
-     *         connection.<br/>Integrated: the data source uses the
-     *         underlying security to determine authorization, such as
-     *         Integrated Security provided by Microsoft Internet Information
-     *         Services (IIS).</li>
+     * <li><b>DATA_SOURCE_INFO</b> String &rarr; A string containing any
+     *         additional information required to connect to the data source.
+     *         This can include the Initial Catalog property or other
+     *         information for the provider.<br>
+     *         <br>
+     *         Example: "Provider=MSOLAP;Data Source=Local;"
+     *         (may be <code>null</code>)</li>
+     * <li><b>PROVIDER_NAME</b> String &rarr; The name of the provider behind
+     *         the data source.<br>
+     *         <br>
+     *         Example: "MSDASQL" (may be <code>null</code>)</li>
+     * <li><b>PROVIDER_TYPE</b> EnumerationArray &rarr; The types of data
+     *         supported by the provider. May include one or more values of
+     *         type {@link org.olap4j.metadata.Database.ProviderType}.</li>
+     * <li><b>AUTHENTICATION_MODE</b> EnumString &rarr; Specification of what
+     *         type of security mode the data source uses. Values can be of type
+     *         {@link org.olap4j.metadata.Database.AuthenticationMode}.</li>
      * </ol>
      *
      * @return a <code>ResultSet</code> object in which each row is an
@@ -162,22 +157,27 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * <p>Specification as for XML/A DISCOVER_LITERALS schema rowset.
      *
      * <ol>
-     * <li><b>LITERAL_NAME</b> String => The name of the literal described in
-     *         the row.<br/>Example: DBLITERAL_LIKE_PERCENT</li>
-     * <li><b>LITERAL_VALUE</b> String (may be <code>null</code>) => Contains
-     *         the actual literal value.<br/>Example, if LiteralName is
+     * <li><b>LITERAL_NAME</b> String &rarr; The name of the literal described
+     *         in the row.<br>
+     *         <br>
+     *         Example: DBLITERAL_LIKE_PERCENT</li>
+     * <li><b>LITERAL_VALUE</b> String (may be <code>null</code>) &rarr;
+     *         Contains the actual literal value.<br>
+     *         <br>
+     *         Example, if LiteralName is
      *         DBLITERAL_LIKE_PERCENT and the percent character (%) is used
      *         to match zero or more characters in a LIKE clause, this
      *         column's value would be "%".</li>
-     * <li><b>LITERAL_INVALID_CHARS</b> String (may be <code>null</code>) =>
-     *         The characters, in the literal, that are not valid.<br/>For
-     *         example, if table names can contain anything other than a
+     * <li><b>LITERAL_INVALID_CHARS</b> String (may be <code>null</code>) &rarr;
+     *         The characters, in the literal, that are not valid.<br>
+     *         <br>
+     *         For example, if table names can contain anything other than a
      *         numeric character, this string would be "0123456789".</li>
      * <li><b>LITERAL_INVALID_STARTING_CHARS</b> String (may be
-     *         <code>null</code>) => The characters that are not valid as the
-     *         first character of the literal. If the literal can start with
+     *         <code>null</code>) &rarr; The characters that are not valid as
+     *         the first character of the literal. If the literal can start with
      *         any valid character, this is null.</li>
-     * <li><b>LITERAL_MAX_LENGTH</b> int (may be <code>null</code>) => The
+     * <li><b>LITERAL_MAX_LENGTH</b> int (may be <code>null</code>) &rarr; The
      *         maximum number of characters in the literal. If there is no
      *         maximum or the maximum is unknown, the value is -1.</li>
      * </ol>
@@ -199,16 +199,16 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * <p>Not to be confused with {@link #getProperties}.
      *
      * <ol>
-     * <li><b>PROPERTY_NAME</b> String => The name of the property.</li>
-     * <li><b>PROPERTY_DESCRIPTION</b> String => A localizable text description
-     *         of the property.</li>
-     * <li><b>PROPERTY_TYPE</b> String => The XML data type of the
+     * <li><b>PROPERTY_NAME</b> String &rarr; The name of the property.</li>
+     * <li><b>PROPERTY_DESCRIPTION</b> String &rarr; A localizable text
+     *         description of the property.</li>
+     * <li><b>PROPERTY_TYPE</b> String &rarr; The XML data type of the
      *         property.</li>
-     * <li><b>PROPERTY_ACCESS_TYPE</b> EnumString => Access for the property.
-     *         The value can be Read, Write, or ReadWrite.</li>
-     * <li><b>IS_REQUIRED</b> Boolean => True if a property is required, false
-     *         if it is not required.</li>
-     * <li><b>PROPERTY_VALUE</b> String => The current value of the
+     * <li><b>PROPERTY_ACCESS_TYPE</b> EnumString &rarr; Access for the
+     *         property. The value can be Read, Write, or ReadWrite.</li>
+     * <li><b>IS_REQUIRED</b> Boolean &rarr; True if a property is required,
+     *         false if it is not required.</li>
+     * <li><b>PROPERTY_VALUE</b> String &rarr; The current value of the
      *         property.</li>
      * </ol>
      *
@@ -237,28 +237,29 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *
      * <p>Not to be confused with {@link #getDatabaseProperties(String,String)}.
      *
-     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) => The name of
-     *         the database.</li>
-     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) => The name of
-     *         the schema to which this property belongs.</li>
-     * <li><b>CUBE_NAME</b> String => The name of the cube.</li>
-     * <li><b>DIMENSION_UNIQUE_NAME</b> String => The unique name of the
+     * <ol>
+     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the database.</li>
+     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the schema to which this property belongs.</li>
+     * <li><b>CUBE_NAME</b> String &rarr; The name of the cube.</li>
+     * <li><b>DIMENSION_UNIQUE_NAME</b> String &rarr; The unique name of the
      *         dimension.</li>
-     * <li><b>HIERARCHY_UNIQUE_NAME</b> String => The unique name of the
+     * <li><b>HIERARCHY_UNIQUE_NAME</b> String &rarr; The unique name of the
      *         hierarchy.</li>
-     * <li><b>LEVEL_UNIQUE_NAME</b> String => The unique name of the level to
-     *         which this property belongs.</li>
-     * <li><b>MEMBER_UNIQUE_NAME</b> String (may be <code>null</code>) => The
-     *         unique name of the member to which the property belongs.</li>
-     * <li><b>PROPERTY_NAME</b> String => Name of the property.</li>
-     * <li><b>PROPERTY_CAPTION</b> String => A label or caption associated with
-     *         the property, used primarily for display purposes.</li>
-     * <li><b>PROPERTY_TYPE</b> Short => A bitmap that specifies the type of
+     * <li><b>LEVEL_UNIQUE_NAME</b> String &rarr; The unique name of the level
+     *         to which this property belongs.</li>
+     * <li><b>MEMBER_UNIQUE_NAME</b> String (may be <code>null</code>) &rarr;
+     *         The unique name of the member to which the property belongs.</li>
+     * <li><b>PROPERTY_NAME</b> String &rarr; Name of the property.</li>
+     * <li><b>PROPERTY_CAPTION</b> String &rarr; A label or caption associated
+     *         with the property, used primarily for display purposes.</li>
+     * <li><b>PROPERTY_TYPE</b> Short &rarr; A bitmap that specifies the type of
      *         the property</li>
-     * <li><b>DATA_TYPE</b> UnsignedShort => Data type of the property.</li>
-     * <li><b>PROPERTY_CONTENT_TYPE</b> Short (may be <code>null</code>) => The
-     *         type of the property. </li>
-     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) => A
+     * <li><b>DATA_TYPE</b> UnsignedShort &rarr; Data type of the property.</li>
+     * <li><b>PROPERTY_CONTENT_TYPE</b> Short (may be <code>null</code>) &rarr;
+     *         The type of the property. </li>
+     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) &rarr; A
      *         human-readable description of the measure. </li>
      * </ol>
      *
@@ -338,36 +339,37 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *
      * <p>Each cube description has the following columns:
      * <ol>
-     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) => The name of
-     *         the catalog to which this cube belongs.</li>
-     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) => The name of
-     *         the schema to which this cube belongs.</li>
-     * <li><b>CUBE_NAME</b> String => Name of the cube.</li>
-     * <li><b>CUBE_TYPE</b> String => Cube type.</li>
-     * <li><b>CUBE_GUID</b> UUID (may be <code>null</code>) => Cube type.</li>
-     * <li><b>CREATED_ON</b> Timestamp (may be <code>null</code>) => Date and
-     *         time of cube creation.</li>
-     * <li><b>LAST_SCHEMA_UPDATE</b> Timestamp (may be <code>null</code>) =>
+     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the catalog to which this cube belongs.</li>
+     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the schema to which this cube belongs.</li>
+     * <li><b>CUBE_NAME</b> String &rarr; Name of the cube.</li>
+     * <li><b>CUBE_TYPE</b> String &rarr; Cube type.</li>
+     * <li><b>CUBE_GUID</b> UUID (may be <code>null</code>) &rarr; Cube
+     *         type.</li>
+     * <li><b>CREATED_ON</b> Timestamp (may be <code>null</code>) &rarr; Date
+     *         and time of cube creation.</li>
+     * <li><b>LAST_SCHEMA_UPDATE</b> Timestamp (may be <code>null</code>) &rarr;
      *         Date and time of last schema update.</li>
-     * <li><b>SCHEMA_UPDATED_BY</b> String (may be <code>null</code>) => User
-     *         ID of the person who last updated the schema.</li>
-     * <li><b>LAST_DATA_UPDATE</b> Timestamp (may be <code>null</code>) => Date
-     *         and time of last data update.</li>
-     * <li><b>DATA_UPDATED_BY</b> String (may be <code>null</code>) => User ID
-     *         of the person who last updated the data. </li>
-     * <li><b>IS_DRILLTHROUGH_ENABLED</b> boolean => Describes whether
+     * <li><b>SCHEMA_UPDATED_BY</b> String (may be <code>null</code>) &rarr;
+     *         User ID of the person who last updated the schema.</li>
+     * <li><b>LAST_DATA_UPDATE</b> Timestamp (may be <code>null</code>) &rarr;
+     *         Date and time of last data update.</li>
+     * <li><b>DATA_UPDATED_BY</b> String (may be <code>null</code>) &rarr; User
+     *         ID of the person who last updated the data. </li>
+     * <li><b>IS_DRILLTHROUGH_ENABLED</b> boolean &rarr; Describes whether
      *         DRILLTHROUGH can be performed on the members of a cube</li>
-     * <li><b>IS_WRITE_ENABLED</b> boolean => Describes whether a cube is
+     * <li><b>IS_WRITE_ENABLED</b> boolean &rarr; Describes whether a cube is
      *         write-enabled</li>
-     * <li><b>IS_LINKABLE</b> boolean => Describes whether a cube can be used
-     *         in a linked cube</li>
-     * <li><b>IS_SQL_ENABLED</b> boolean => Describes whether or not SQL can be
-     *         used on the cube</li>
-     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) => A
+     * <li><b>IS_LINKABLE</b> boolean &rarr; Describes whether a cube can be
+     *         used in a linked cube</li>
+     * <li><b>IS_SQL_ENABLED</b> boolean &rarr; Describes whether or not SQL can
+     *         be used on the cube</li>
+     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) &rarr; A
      *         user-friendly description of the cube.</li>
-     * <li><b>CUBE_CAPTION</b> String (may be <code>null</code>) =>
+     * <li><b>CUBE_CAPTION</b> String (may be <code>null</code>) &rarr;
      *         The caption of the cube.</li>
-     * <li><b>BASE_CUBE_NAME</b> String (may be <code>null</code>) =>
+     * <li><b>BASE_CUBE_NAME</b> String (may be <code>null</code>) &rarr;
      *         The name of the source cube if this cube is a perspective
      *         cube.</li>
      * </ol>
@@ -406,37 +408,39 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *
      * <p>Each dimension description has the following columns:
      * <ol>
-     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) => The name of
-     *         the database.</li>
-     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) => Not
+     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the database.</li>
+     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) &rarr; Not
      *         supported.</li>
-     * <li><b>CUBE_NAME</b> String => The name of the cube.</li>
-     * <li><b>DIMENSION_NAME</b> String => The name of the dimension. </li>
-     * <li><b>DIMENSION_UNIQUE_NAME</b> String => The unique name of the
+     * <li><b>CUBE_NAME</b> String &rarr; The name of the cube.</li>
+     * <li><b>DIMENSION_NAME</b> String &rarr; The name of the dimension. </li>
+     * <li><b>DIMENSION_UNIQUE_NAME</b> String &rarr; The unique name of the
      *         dimension.</li>
-     * <li><b>DIMENSION_GUID</b> String (may be <code>null</code>) => Not
+     * <li><b>DIMENSION_GUID</b> String (may be <code>null</code>) &rarr; Not
      *         supported.</li>
-     * <li><b>DIMENSION_CAPTION</b> String => The caption of the
+     * <li><b>DIMENSION_CAPTION</b> String &rarr; The caption of the
      *         dimension.</li>
-     * <li><b>DIMENSION_ORDINAL</b> int => The position of the dimension within
-     *         the cube.</li>
-     * <li><b>DIMENSION_TYPE</b> Short => The type of the dimension.</li>
-     * <li><b>DIMENSION_CARDINALITY</b> int => The number of members in the key
-     *         attribute.</li>
-     * <li><b>DEFAULT_HIERARCHY</b> String => A hierarchy from the dimension.
-     *         Preserved for backwards compatibility.</li>
-     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) => A
+     * <li><b>DIMENSION_ORDINAL</b> int &rarr; The position of the dimension
+     *         within the cube.</li>
+     * <li><b>DIMENSION_TYPE</b> Short &rarr; The type of the dimension.</li>
+     * <li><b>DIMENSION_CARDINALITY</b> int &rarr; The number of members in the
+     *         key attribute.</li>
+     * <li><b>DEFAULT_HIERARCHY</b> String &rarr; A hierarchy from the
+     *         dimension. Preserved for backwards compatibility.</li>
+     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) &rarr; A
      *         user-friendly description of the dimension.</li>
-     * <li><b>IS_VIRTUAL</b> boolean (may be <code>null</code>) => Always
+     * <li><b>IS_VIRTUAL</b> boolean (may be <code>null</code>) &rarr; Always
      *         FALSE.</li>
-     * <li><b>IS_READWRITE</b> boolean (may be <code>null</code>) => A Boolean
-     *         that indicates whether the dimension is write-enabled.</li>
-     * <li><b>DIMENSION_UNIQUE_SETTINGS</b> int (may be <code>null</code>) => A
-     *         bitmap that specifies which columns contain unique values if
-     *         the dimension contains only members with unique names.</li>
+     * <li><b>IS_READWRITE</b> boolean (may be <code>null</code>) &rarr; A
+     *         Boolean that indicates whether the dimension is
+     *         write-enabled.</li>
+     * <li><b>DIMENSION_UNIQUE_SETTINGS</b> int (may be <code>null</code>)
+     *         &rarr; A bitmap that specifies which columns contain unique
+     *         values if the dimension contains only members with unique
+     *         names.</li>
      * <li><b>DIMENSION_MASTER_UNIQUE_NAME</b> String (may be
-     *         <code>null</code>) => Always NULL.</li>
-     * <li><b>DIMENSION_IS_VISIBLE</b> boolean (may be <code>null</code>) =>
+     *         <code>null</code>) &rarr; Always NULL.</li>
+     * <li><b>DIMENSION_IS_VISIBLE</b> boolean (may be <code>null</code>) &rarr;
      *         Always TRUE.</li>
      * </ol>
      *
@@ -482,21 +486,23 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * <p>Specification as for XML/A MDSCHEMA_FUNCTIONS schema rowset.
      *
      * <p>Each function description has the following columns:
-     * <li><b>FUNCTION_NAME</b> String => The name of the function.</li>
-     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) => A
+     *
+     * <ol>
+     * <li><b>FUNCTION_NAME</b> String &rarr; The name of the function.</li>
+     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) &rarr; A
      *         description of the function.</li>
-     * <li><b>PARAMETER_LIST</b> String (may be <code>null</code>) => A comma
-     *         delimited list of parameters.</li>
-     * <li><b>RETURN_TYPE</b> int => The VARTYPE of the return data type of the
-     *         function.</li>
-     * <li><b>ORIGIN</b> int => The origin of the function:  1 for MDX
+     * <li><b>PARAMETER_LIST</b> String (may be <code>null</code>) &rarr; A
+     *         comma delimited list of parameters.</li>
+     * <li><b>RETURN_TYPE</b> int &rarr; The VARTYPE of the return data type of
+     *         the function.</li>
+     * <li><b>ORIGIN</b> int &rarr; The origin of the function:  1 for MDX
      *         functions.  2 for user-defined functions.</li>
-     * <li><b>INTERFACE_NAME</b> String => The name of the interface for
+     * <li><b>INTERFACE_NAME</b> String &rarr; The name of the interface for
      *         user-defined functions</li>
-     * <li><b>LIBRARY_NAME</b> String (may be <code>null</code>) => The name of
-     *         the type library for user-defined functions. NULL for MDX
+     * <li><b>LIBRARY_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the type library for user-defined functions. NULL for MDX
      *         functions.</li>
-     * <li><b>CAPTION</b> String (may be <code>null</code>) => The display
+     * <li><b>CAPTION</b> String (may be <code>null</code>) &rarr; The display
      *         caption for the function.</li>
      * </ol>
      *
@@ -525,43 +531,45 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * <p>Specification as for XML/A MDSCHEMA_HIERARCHIES schema rowset.
      *
      * <p>Each hierarchy description has the following columns:
-     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) => The name of
-     *         the catalog to which this hierarchy belongs.</li>
-     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) => Not
+     *
+     * <ol>
+     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the catalog to which this hierarchy belongs.</li>
+     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) &rarr; Not
      *         supported</li>
-     * <li><b>CUBE_NAME</b> String => The name of the cube to which this
+     * <li><b>CUBE_NAME</b> String &rarr; The name of the cube to which this
      *         hierarchy belongs.</li>
-     * <li><b>DIMENSION_UNIQUE_NAME</b> String => The unique name of the
+     * <li><b>DIMENSION_UNIQUE_NAME</b> String &rarr; The unique name of the
      *         dimension to which this hierarchy belongs. </li>
-     * <li><b>HIERARCHY_NAME</b> String => The name of the hierarchy. Blank if
-     *         there is only a single hierarchy in the dimension.</li>
-     * <li><b>HIERARCHY_UNIQUE_NAME</b> String => The unique name of the
+     * <li><b>HIERARCHY_NAME</b> String &rarr; The name of the hierarchy. Blank
+     *         if there is only a single hierarchy in the dimension.</li>
+     * <li><b>HIERARCHY_UNIQUE_NAME</b> String &rarr; The unique name of the
      *         hierarchy.</li>
-     * <li><b>HIERARCHY_GUID</b> String (may be <code>null</code>) => Hierarchy
-     *         GUID.</li>
-     * <li><b>HIERARCHY_CAPTION</b> String => A label or a caption associated
-     *         with the hierarchy.</li>
-     * <li><b>DIMENSION_TYPE</b> Short => The type of the dimension. </li>
-     * <li><b>HIERARCHY_CARDINALITY</b> int => The number of members in the
+     * <li><b>HIERARCHY_GUID</b> String (may be <code>null</code>) &rarr;
+     *         Hierarchy GUID.</li>
+     * <li><b>HIERARCHY_CAPTION</b> String &rarr; A label or a caption
+     *         associated with the hierarchy.</li>
+     * <li><b>DIMENSION_TYPE</b> Short &rarr; The type of the dimension. </li>
+     * <li><b>HIERARCHY_CARDINALITY</b> int &rarr; The number of members in the
      *         hierarchy.</li>
-     * <li><b>DEFAULT_MEMBER</b> String (may be <code>null</code>) => The
+     * <li><b>DEFAULT_MEMBER</b> String (may be <code>null</code>) &rarr; The
      *         default member for this hierarchy. </li>
-     * <li><b>ALL_MEMBER</b> String (may be <code>null</code>) => The member at
-     *         the highest level of rollup in the hierarchy.</li>
-     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) => A
+     * <li><b>ALL_MEMBER</b> String (may be <code>null</code>) &rarr; The member
+     *         at the highest level of rollup in the hierarchy.</li>
+     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) &rarr; A
      *         human-readable description of the hierarchy. NULL if no
      *         description exists.</li>
-     * <li><b>STRUCTURE</b> Short => The structure of the hierarchy.</li>
-     * <li><b>IS_VIRTUAL</b> boolean => Always returns False.</li>
-     * <li><b>IS_READWRITE</b> boolean => A Boolean that indicates whether the
-     *         Write Back to dimension column is enabled.</li>
-     * <li><b>DIMENSION_UNIQUE_SETTINGS</b> int => Always returns
+     * <li><b>STRUCTURE</b> Short &rarr; The structure of the hierarchy.</li>
+     * <li><b>IS_VIRTUAL</b> boolean &rarr; Always returns False.</li>
+     * <li><b>IS_READWRITE</b> boolean &rarr; A Boolean that indicates whether
+     *         the Write Back to dimension column is enabled.</li>
+     * <li><b>DIMENSION_UNIQUE_SETTINGS</b> int &rarr; Always returns
      *         MDDIMENSIONS_MEMBER_KEY_UNIQUE (1).</li>
-     * <li><b>DIMENSION_IS_VISIBLE</b> boolean => Always returns true.</li>
-     * <li><b>HIERARCHY_ORDINAL</b> int => The ordinal number of the hierarchy
-     *         across all hierarchies of the cube.</li>
-     * <li><b>DIMENSION_IS_SHARED</b> boolean => Always returns true.</li>
-     * <li><b>PARENT_CHILD</b> boolean (may be <code>null</code>) => Is
+     * <li><b>DIMENSION_IS_VISIBLE</b> boolean &rarr; Always returns true.</li>
+     * <li><b>HIERARCHY_ORDINAL</b> int &rarr; The ordinal number of the
+     *         hierarchy across all hierarchies of the cube.</li>
+     * <li><b>DIMENSION_IS_SHARED</b> boolean &rarr; Always returns true.</li>
+     * <li><b>PARENT_CHILD</b> boolean (may be <code>null</code>) &rarr; Is
      *         hierarchy a parent.</li>
      * </ol>
      *
@@ -613,37 +621,37 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *
      * <p>Each level description has the following columns:
      * <ol>
-     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) => The name of
-     *         the catalog to which this level belongs.</li>
-     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) => The name of
-     *         the schema to which this level belongs.</li>
-     * <li><b>CUBE_NAME</b> String => The name of the cube to which this level
-     *         belongs.</li>
-     * <li><b>DIMENSION_UNIQUE_NAME</b> String => The unique name of the
+     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the catalog to which this level belongs.</li>
+     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the schema to which this level belongs.</li>
+     * <li><b>CUBE_NAME</b> String &rarr; The name of the cube to which this
+     *         level belongs.</li>
+     * <li><b>DIMENSION_UNIQUE_NAME</b> String &rarr; The unique name of the
      *         dimension to which this level belongs.</li>
-     * <li><b>HIERARCHY_UNIQUE_NAME</b> String => The unique name of the
+     * <li><b>HIERARCHY_UNIQUE_NAME</b> String &rarr; The unique name of the
      *         hierarchy.</li>
-     * <li><b>LEVEL_NAME</b> String => The name of the level.</li>
-     * <li><b>LEVEL_UNIQUE_NAME</b> String => The properly escaped unique name
-     *         of the level.</li>
-     * <li><b>LEVEL_GUID</b> String (may be <code>null</code>) => Level
+     * <li><b>LEVEL_NAME</b> String &rarr; The name of the level.</li>
+     * <li><b>LEVEL_UNIQUE_NAME</b> String &rarr; The properly escaped unique
+     *         name of the level.</li>
+     * <li><b>LEVEL_GUID</b> String (may be <code>null</code>) &rarr; Level
      *         GUID.</li>
-     * <li><b>LEVEL_CAPTION</b> String => A label or caption associated with
+     * <li><b>LEVEL_CAPTION</b> String &rarr; A label or caption associated with
      *         the hierarchy.</li>
-     * <li><b>LEVEL_NUMBER</b> int => The distance of the level from the root
-     *         of the hierarchy. Root level is zero (0).</li>
-     * <li><b>LEVEL_CARDINALITY</b> int => The number of members in the level.
-     *         This value can be an approximation of the real
+     * <li><b>LEVEL_NUMBER</b> int &rarr; The distance of the level from the
+     *         root of the hierarchy. Root level is zero (0).</li>
+     * <li><b>LEVEL_CARDINALITY</b> int &rarr; The number of members in the
+     *         level. This value can be an approximation of the real
      *         cardinality.</li>
-     * <li><b>LEVEL_TYPE</b> int => Type of the level</li>
-     * <li><b>CUSTOM_ROLLUP_SETTINGS</b> int => A bitmap that specifies the
+     * <li><b>LEVEL_TYPE</b> int &rarr; Type of the level</li>
+     * <li><b>CUSTOM_ROLLUP_SETTINGS</b> int &rarr; A bitmap that specifies the
      *         custom rollup options.</li>
-     * <li><b>LEVEL_UNIQUE_SETTINGS</b> int => A bitmap that specifies which
+     * <li><b>LEVEL_UNIQUE_SETTINGS</b> int &rarr; A bitmap that specifies which
      *         columns contain unique values, if the level only has members
      *         with unique names or keys.</li>
-     * <li><b>LEVEL_IS_VISIBLE</b> boolean => A Boolean that indicates whether
-     *         the level is visible.</li>
-     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) => A
+     * <li><b>LEVEL_IS_VISIBLE</b> boolean &rarr; A Boolean that indicates
+     *         whether the level is visible.</li>
+     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) &rarr; A
      *         human-readable description of the level. NULL if no
      *         description exists.</li>
      * </ol>
@@ -703,28 +711,28 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *
      * <p>Each measure description has the following columns:
      * <ol>
-     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) => The name of
-     *         the catalog to which this measure belongs. </li>
-     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) => The name of
-     *         the schema to which this measure belongs.</li>
-     * <li><b>CUBE_NAME</b> String => The name of the cube to which this
+     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the catalog to which this measure belongs. </li>
+     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the schema to which this measure belongs.</li>
+     * <li><b>CUBE_NAME</b> String &rarr; The name of the cube to which this
      *         measure belongs.</li>
-     * <li><b>MEASURE_NAME</b> String => The name of the measure.</li>
-     * <li><b>MEASURE_UNIQUE_NAME</b> String => The Unique name of the
+     * <li><b>MEASURE_NAME</b> String &rarr; The name of the measure.</li>
+     * <li><b>MEASURE_UNIQUE_NAME</b> String &rarr; The Unique name of the
      *         measure.</li>
-     * <li><b>MEASURE_CAPTION</b> String => A label or caption associated with
-     *         the measure. </li>
-     * <li><b>MEASURE_GUID</b> String (may be <code>null</code>) => Measure
+     * <li><b>MEASURE_CAPTION</b> String &rarr; A label or caption associated
+     *         with the measure. </li>
+     * <li><b>MEASURE_GUID</b> String (may be <code>null</code>) &rarr; Measure
      *         GUID.</li>
-     * <li><b>MEASURE_AGGREGATOR</b> int => How a measure was derived. </li>
-     * <li><b>DATA_TYPE</b> UnsignedShort => Data type of the measure.</li>
-     * <li><b>MEASURE_IS_VISIBLE</b> boolean => A Boolean that always returns
-     *         True. If the measure is not visible, it will not be included
-     *         in the schema rowset.</li>
-     * <li><b>LEVELS_LIST</b> String (may be <code>null</code>) => A string
+     * <li><b>MEASURE_AGGREGATOR</b> int &rarr; How a measure was derived. </li>
+     * <li><b>DATA_TYPE</b> UnsignedShort &rarr; Data type of the measure.</li>
+     * <li><b>MEASURE_IS_VISIBLE</b> boolean &rarr; A Boolean that always
+     *         returns True. If the measure is not visible, it will not be
+     *         included in the schema rowset.</li>
+     * <li><b>LEVELS_LIST</b> String (may be <code>null</code>) &rarr; A string
      *         that always returns NULL. EXCEPT that SQL Server returns
      *         non-null values!!!</li>
-     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) => A
+     * <li><b>DESCRIPTION</b> String (may be <code>null</code>) &rarr; A
      *         human-readable description of the measure. </li>
      * </ol>
      *
@@ -791,44 +799,45 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      *
      * <p>Each member description has the following columns:
      * <ol>
-     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) => The name of
-     *         the catalog to which this member belongs. </li>
-     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) => The name of
-     *         the schema to which this member belongs. </li>
-     * <li><b>CUBE_NAME</b> String => Name of the cube to which this member
+     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the catalog to which this member belongs. </li>
+     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) &rarr; The name
+     *         of the schema to which this member belongs. </li>
+     * <li><b>CUBE_NAME</b> String &rarr; Name of the cube to which this member
      *         belongs.</li>
-     * <li><b>DIMENSION_UNIQUE_NAME</b> String => Unique name of the dimension
-     *         to which this member belongs. </li>
-     * <li><b>HIERARCHY_UNIQUE_NAME</b> String => Unique name of the hierarchy.
-     *         If the member belongs to more than one hierarchy, there is one
-     *         row for each hierarchy to which it belongs.</li>
-     * <li><b>LEVEL_UNIQUE_NAME</b> String =>  Unique name of the level to
+     * <li><b>DIMENSION_UNIQUE_NAME</b> String &rarr; Unique name of the
+     *         dimension to which this member belongs. </li>
+     * <li><b>HIERARCHY_UNIQUE_NAME</b> String &rarr; Unique name of the
+     *         hierarchy. If the member belongs to more than one hierarchy,
+     *         there is one row for each hierarchy to which it belongs.</li>
+     * <li><b>LEVEL_UNIQUE_NAME</b> String &rarr;  Unique name of the level to
      *         which the member belongs.</li>
-     * <li><b>LEVEL_NUMBER</b> int => The distance of the member from the root
-     *         of the hierarchy.</li>
-     * <li><b>MEMBER_ORDINAL</b> int => Ordinal number of the member. Sort rank
-     *         of the member when members of this dimension are sorted in
+     * <li><b>LEVEL_NUMBER</b> int &rarr; The distance of the member from the
+     *         root of the hierarchy.</li>
+     * <li><b>MEMBER_ORDINAL</b> int &rarr; Ordinal number of the member. Sort
+     *         rank of the member when members of this dimension are sorted in
      *         their natural sort order. If providers do not have the concept
      *         of natural ordering, this should be the rank when sorted by
      *         MEMBER_NAME.</li>
-     * <li><b>MEMBER_NAME</b> String => Name of the member.</li>
-     * <li><b>MEMBER_UNIQUE_NAME</b> String =>  Unique name of the member.</li>
-     * <li><b>MEMBER_TYPE</b> int => Type of the member.</li>
-     * <li><b>MEMBER_GUID</b> String (may be <code>null</code>) => Memeber
+     * <li><b>MEMBER_NAME</b> String &rarr; Name of the member.</li>
+     * <li><b>MEMBER_UNIQUE_NAME</b> String &rarr;  Unique name of the
+     *          member.</li>
+     * <li><b>MEMBER_TYPE</b> int &rarr; Type of the member.</li>
+     * <li><b>MEMBER_GUID</b> String (may be <code>null</code>) &rarr; Memeber
      *         GUID.</li>
-     * <li><b>MEMBER_CAPTION</b> String => A label or caption associated with
-     *         the member.</li>
-     * <li><b>CHILDREN_CARDINALITY</b> int => Number of children that the
+     * <li><b>MEMBER_CAPTION</b> String &rarr; A label or caption associated
+     *         with the member.</li>
+     * <li><b>CHILDREN_CARDINALITY</b> int &rarr; Number of children that the
      *         member has.</li>
-     * <li><b>PARENT_LEVEL</b> int => The distance of the member's parent from
-     *         the root level of the hierarchy. </li>
-     * <li><b>PARENT_UNIQUE_NAME</b> String (may be <code>null</code>) =>
+     * <li><b>PARENT_LEVEL</b> int &rarr; The distance of the member's parent
+     *         from the root level of the hierarchy. </li>
+     * <li><b>PARENT_UNIQUE_NAME</b> String (may be <code>null</code>) &rarr;
      *         Unique name of the member's parent.</li>
-     * <li><b>PARENT_COUNT</b> int => Number of parents that this member
+     * <li><b>PARENT_COUNT</b> int &rarr; Number of parents that this member
      *         has.</li>
-     * <li><b>TREE_OP</b> Enumeration (may be <code>null</code>) => Tree
+     * <li><b>TREE_OP</b> Enumeration (may be <code>null</code>) &rarr; Tree
      *         Operation</li>
-     * <li><b>DEPTH</b> int (may be <code>null</code>) => depth</li>
+     * <li><b>DEPTH</b> int (may be <code>null</code>) &rarr; depth</li>
      * </ol>
      *
      * @param catalog a catalog name; must match the catalog name as it
@@ -896,12 +905,15 @@ public interface OlapDatabaseMetaData extends DatabaseMetaData, OlapWrapper {
      * <p>Specification as for XML/A MDSCHEMA_SETS schema rowset.
      *
      * <p>Each set description has the following columns:
+     *
      * <ol>
-     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) => null</li>
-     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) => null</li>
-     * <li><b>CUBE_NAME</b> String => null</li>
-     * <li><b>SET_NAME</b> String => null</li>
-     * <li><b>SCOPE</b> int => null</li>
+     * <li><b>CATALOG_NAME</b> String (may be <code>null</code>) &rarr;
+     *         null</li>
+     * <li><b>SCHEMA_NAME</b> String (may be <code>null</code>) &rarr; null</li>
+     * <li><b>CUBE_NAME</b> String &rarr; null</li>
+     * <li><b>SET_NAME</b> String &rarr; null</li>
+     * <li><b>SCOPE</b> int &rarr; null</li>
+     * </ol>
      *
      * @param catalog a catalog name; must match the catalog name as it
      *        is stored in the database; "" retrieves those without a catalog;

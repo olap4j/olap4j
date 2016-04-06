@@ -40,14 +40,14 @@ import java.util.logging.Logger;
  * For example,
  *
  * <blockquote>
- * <code>import java.sql.Connection;<br/>
- * import java.sql.DriverManager;<br/>
- * import org.olap4j.OlapConnection;<br/>
- * <br/>
- * Connection connection =<br/>
- * &nbsp;&nbsp;&nbsp;DriverManager.getConnection(<br/>
- * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"jdbc:xmla:");<br/>
- * OlapConnection olapConnection =<br/>
+ * <code>import java.sql.Connection;<br>
+ * import java.sql.DriverManager;<br>
+ * import org.olap4j.OlapConnection;<br>
+ * <br>
+ * Connection connection =<br>
+ * &nbsp;&nbsp;&nbsp;DriverManager.getConnection(<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"jdbc:xmla:");<br>
+ * OlapConnection olapConnection =<br>
  * &nbsp;&nbsp;&nbsp;connection.unwrap(OlapConnection.class);</code>
  * </blockquote>
  *
@@ -68,6 +68,7 @@ import java.util.logging.Logger;
  *
  *
  * <table border="1">
+ * <caption>Connection properties</caption>
  * <tr><th>Property</th>     <th>Description</th> </tr>
  *
  * <tr><td>Server</td>       <td>URL of HTTP server. Required.</td></tr>
@@ -105,7 +106,8 @@ import java.util.logging.Logger;
  *                             purposes.
  *                             </td></tr>
  * <tr><td>Role</td>       <td>Comma separated list of role names used for
- *                             this connection (Optional). <br />
+ *                             this connection (Optional).<br>
+ *                             <br>
  *                             Available role names can be retrieved via
  *    {@link org.olap4j.driver.xmla.XmlaOlap4jConnection#getAvailableRoleNames}
  *                             </td></tr>
@@ -254,6 +256,7 @@ public class XmlaOlap4jDriver implements Driver {
 
     /**
      * Returns the driver name. Not in the JDBC API.
+     *
      * @return Driver name
      */
     String getName() {
@@ -262,6 +265,7 @@ public class XmlaOlap4jDriver implements Driver {
 
     /**
      * Returns the driver version. Not in the JDBC API.
+     *
      * @return Driver version
      */
     public String getVersion() {

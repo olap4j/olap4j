@@ -32,30 +32,31 @@ import org.olap4j.*;
  *
  * <p>The hierarchy of metadata objects, rooted at the connection from which
  * they are accessed, is as follows:
+ *
  * <blockquote>
  * <ul>
- * <li type="circle">{@link org.olap4j.OlapConnection}<ul>
- *     <li type="circle">{@link Database}<ul>
- *         <li type="circle">{@link Catalog}<ul>
- *             <li type="circle">{@link Schema}<ul>
- *                 <li type="circle">{@link Cube}<ul>
- *                     <li type="circle">{@link Dimension}<ul>
- *                         <li type="circle">{@link Hierarchy}<ul>
- *                             <li type="circle">{@link Level}<ul>
- *                                 <li type="circle">{@link Member}</li>
- *                                 <li type="circle">{@link Property}</li>
+ * <li>{@link org.olap4j.OlapConnection}<ul>
+ *     <li>{@link Database}<ul>
+ *         <li>{@link Catalog}<ul>
+ *             <li>{@link Schema}<ul>
+ *                 <li>{@link Cube}<ul>
+ *                     <li>{@link Dimension}<ul>
+ *                         <li>{@link Hierarchy}<ul>
+ *                             <li>{@link Level}<ul>
+ *                                 <li>{@link Member}</li>
+ *                                 <li>{@link Property}</li>
  *                             </ul></li>
  *                         </ul></li>
  *                     </ul></li>
- *                 <li type="circle">{@link NamedSet}</li>
+ *                 <li>{@link NamedSet}</li>
  *                 </ul></li>
- *             <li type="circle">{@link Dimension} (shared)</li>
+ *             <li>{@link Dimension} (shared)</li>
  *             </ul></li>
  *         </ul></li>
  *     </ul></li>
+ *  </ul></li>
  *  </ul>
  * </blockquote>
- * </p>
  *
  * @author jhyde
  * @since Oct 24, 2006

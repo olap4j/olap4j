@@ -70,7 +70,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
     /**
      * Sends a request to a URL and returns the response.
      *
-     * @param url Target URL
+     * @param serverInfos Target URL
      * @param request Request string
      * @return Response
      */
@@ -83,7 +83,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
     /**
      * Submits a request for background execution.
      *
-     * @param url URL
+     * @param serverInfos URL
      * @param request Request
      * @return Future object representing the submitted job
      */
@@ -93,6 +93,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
 
     /**
      * Helper method to add cookies to a given connection.
+     *
      * @param urlConn The url connection to which we want the cookies
      * applied to.
      */
@@ -105,6 +106,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
 
     /**
      * Helper method to save cookies for later use.
+     *
      * @param urlConn The url connection for which we want the cookies
      * saved for later use.
      */
@@ -160,7 +162,7 @@ abstract class XmlaOlap4jAbstractHttpProxy
         String request)
         throws XmlaOlap4jProxyException
     {
-        byte[] response = null;
+        byte[] response;
         // Tries to fetch from cache
         try {
             response =

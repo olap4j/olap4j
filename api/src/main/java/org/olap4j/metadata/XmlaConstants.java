@@ -86,7 +86,7 @@ public class XmlaConstants
         }
     }
 
-    public static enum Method implements XmlaConstant {
+    public enum Method implements XmlaConstant {
         DISCOVER,
         EXECUTE,
         DISCOVER_AND_EXECUTE;
@@ -136,7 +136,7 @@ public class XmlaConstants
         }
     }
 
-    public static enum AuthenticationMode implements XmlaConstant {
+    public enum AuthenticationMode implements XmlaConstant {
         Unauthenticated("no user ID or password needs to be sent."),
         Authenticated(
             "User ID and Password must be included in the information required "
@@ -169,7 +169,7 @@ public class XmlaConstants
         }
     }
 
-    public static enum Updateable implements XmlaConstant {
+    public enum Updateable implements XmlaConstant {
         MD_MASK_ENABLED(
             0x00000000,
             "The cell can be updated."),
@@ -250,7 +250,7 @@ public class XmlaConstants
         }
     }
 
-    public static enum FontFlag implements XmlaConstant {
+    public enum FontFlag implements XmlaConstant {
         /**
          * <p>Corresponds to the XMLA constant
          * {@code MDFF_BOLD} (0x01).</p>
@@ -298,7 +298,7 @@ public class XmlaConstants
     /**
      * Action type.
      */
-    public static enum ActionType implements XmlaConstant {
+    public enum ActionType implements XmlaConstant {
         /**
          * <p>Corresponds to the XMLA constant
          * <code>MDACTION_TYPE_URL</code> (0x01).</p>
@@ -371,7 +371,7 @@ public class XmlaConstants
     /**
      * How the COORDINATE restriction column is interpreted.
      */
-    public static enum CoordinateType implements XmlaConstant {
+    public enum CoordinateType implements XmlaConstant {
         /**
          * <p>Corresponds to the XMLA constant
          * <code>MDACTION_COORDINATE_CUBE</code> (1).</p>
@@ -429,7 +429,7 @@ public class XmlaConstants
     /**
      * Information about how an action should be invoked.
      */
-    public static enum Invocation implements XmlaConstant {
+    public enum Invocation implements XmlaConstant {
         /**
          * Indicates a regular action used during normal operations. This is the
          * default value for this column.

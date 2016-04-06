@@ -32,6 +32,7 @@ import java.util.Set;
  * their XMLA constant names.
  *
  * <table border='1'>
+ *     <caption>XMLA constant names</caption>
  * <tr>
  * <th>Prefix</th>
  * <th>Enum class</th>

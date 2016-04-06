@@ -39,11 +39,11 @@ public enum Quoting {
 
     /**
      * Identifier quoted with an ampersand and brackets to indicate a key
-     * value, for example the second segment in "[Employees].&[89]".
+     * value, for example the second segment in "{@code [Employees].&[89]}".
      *
      * <p>Such a segment has one or more sub-segments. Each segment is
      * either quoted or unquoted. For example, the second segment in
-     * "[Employees].&[89]&[San Francisco]&CA&USA" has four sub-segments,
+     * "{@code [Employees].&[89]&[San Francisco]&CA&USA}" has four sub-segments,
      * two quoted and two unquoted.
      */
     KEY,

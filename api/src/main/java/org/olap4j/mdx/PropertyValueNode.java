@@ -26,9 +26,9 @@ import org.olap4j.type.Type;
  * For example, in
  *
  * <blockquote>
- * <code>WITH MEMBER [Measures].[Foo] AS ' [Measures].[Unit Sales] ',<br/>
- * &nbsp;&nbsp;FORMAT_STRING = 'Bold',<br/>
- * &nbsp;&nbsp;SOLVE_ORDER = 2<br/>
+ * <code>WITH MEMBER [Measures].[Foo] AS ' [Measures].[Unit Sales] ',<br>
+ * &nbsp;&nbsp;FORMAT_STRING = 'Bold',<br>
+ * &nbsp;&nbsp;SOLVE_ORDER = 2<br>
  * SELECT ...</code>
  * </blockquote>
  *

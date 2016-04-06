@@ -42,6 +42,7 @@ import java.util.List;
  * <p>the ROWS axis is described by the following metadata:</p>
  *
  * <table border="1">
+ * <caption>ROWS axis metadata</caption>
  * <tr>
  * <th>Attribute</th>
  * <th>Value</th>

@@ -46,6 +46,7 @@ import java.util.List;
  *
  * <p>The ordinal number of a cell whose tuple ordinals are
  * <code>(S<sub>0</sub>, S<sub>1</sub>, ... S<sub>p-1</sub>)</code> is
+ *
  * <blockquote>
  * <code>
  * &#931;<sub>i=0</sub><sup>p-1</sup> S<sub>i</sub> . E<sub>i</sub>
@@ -56,7 +57,7 @@ import java.util.List;
  * <code>
  * E<sub>i</sub> = &#928;<sub>i=0</sub><sup>p-1</sup> U<sub>k</sub>
  * </code>
- * </blockquote></p>
+ * </blockquote>
  *
  * @author jhyde
  * @since Aug 22, 2006

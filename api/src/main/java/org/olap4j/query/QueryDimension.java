@@ -535,10 +535,13 @@ public class QueryDimension extends QueryNodeImpl {
      * Only members whose Ancestors are included will be included.
      *
      * <p>It uses the MDX function FILTER() in combination with
-     * ANCESTOR() to produce a set like:<br /><br />
-     * {[Time].[1997]}, <br />
+     * ANCESTOR() to produce a set like this:
+     *
+     * <blockquote>
+     * {[Time].[1997]},<br>
      * Filter({{[Time].[Quarter].Members}},
      * (Ancestor([Time].CurrentMember, [Time].[Year]) IN {[Time].[1997]}))
+     * </blockquote>
      */
     public void setHierarchyConsistent(boolean consistent) {
         this.hierarchyConsistent = consistent;

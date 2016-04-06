@@ -108,9 +108,9 @@ public interface Level extends MetadataElement {
      * from [Sales]
      * where [Measures].[Zero]</pre>
      *
-     * returns the {@code [Month]} level including calculated members. The
+     * <p>returns the {@code [Month]} level including calculated members. The
      * {@code [Measures].[Zero]} calculated member saves the OLAP server the
-     * effort of retrieving cell values.</p>
+     * effort of retrieving cell values.
      *
      * <p>The members of a level do not have unique names, so unlike
      * {@link Hierarchy#getRootMembers()} and

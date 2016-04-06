@@ -335,7 +335,8 @@ public class IdentifierParser {
     }
 
     /**
-     * Parses an MDX identifier such as <code>[Foo].[Bar].Baz.&Key&Key2</code>
+     * Parses an MDX identifier such as
+     * <code>[Foo].[Bar].Baz.&amp;Key&amp;Key2</code>
      * and returns the result as a list of segments.
      *
      * @param s MDX identifier

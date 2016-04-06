@@ -190,15 +190,15 @@ public class IdentifierNode
      * "[Customers].USA.[South Dakota].[Sioux Falls].&amp;[1245]")
      * </code></blockquote>
      *
-     * returns an IdentifierNode consisting of the following segments:
+     * <p>returns an IdentifierNode consisting of the following segments:
      *
-     * <code><ul>
-     * <li>NameSegment("Customers", quoted=true),
-     * <li>NameSegment("USA", quoted=false),
-     * <li>NameSegment("South Dakota", quoted=true),
-     * <li>NameSegment("Sioux Falls", quoted=true),
-     * <li>KeySegment( { NameSegment("1245", quoted=true) } )
-     * </ul></code>
+     * <ul>
+     * <li><code>NameSegment("Customers", quoted=true)</code>
+     * <li><code>NameSegment("USA", quoted=false)</code>
+     * <li><code>NameSegment("South Dakota", quoted=true)</code>
+     * <li><code>NameSegment("Sioux Falls", quoted=true)</code>
+     * <li><code>KeySegment( { NameSegment("1245", quoted=true) } )</code>
+     * </ul>
      *
      * @see #ofNames(String...)
      *
@@ -223,13 +223,13 @@ public class IdentifierNode
      *
      * returns an IdentifierNode consisting of the following segments:
      *
-     * <code><ul>
-     * <li>NameSegment("Customers", quoted=true),
-     * <li>NameSegment("USA", quoted=false),
-     * <li>NameSegment("South Dakota", quoted=true),
-     * <li>NameSegment("Sioux Falls", quoted=true),
-     * <li>KeySegment( { NameSegment("1245", quoted=true) } )
-     * </ul></code>
+     * <ul>
+     * <li><code>NameSegment("Customers", quoted=true)</code>
+     * <li><code>NameSegment("USA", quoted=false)</code>
+     * <li><code>NameSegment("South Dakota", quoted=true)</code>
+     * <li><code>NameSegment("Sioux Falls", quoted=true)</code>
+     * <li><code>KeySegment( { NameSegment("1245", quoted=true) } )</code>
+     * </ul>
      *
      * @see #parseIdentifier(String)
      *

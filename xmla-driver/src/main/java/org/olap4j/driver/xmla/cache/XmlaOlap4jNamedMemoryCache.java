@@ -33,16 +33,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>All parameters are optional.
  *
  * <ul>
- * <li><b>NAME</b><br />A unique identifier which allows two connections
+ * <li><b>NAME</b><br>A unique identifier which allows two connections
  * to share a same cache space. Setting this to an already existing cache
  * space will cause the cache manager to ignore other configuration properties,
  * such as eviction mode and so on. Not setting this property will
  * assign a random name to the cache space, thus creating a unique space.</li>
- * <li><b>SIZE</b><br />The number of entries to maintain in cache under
+ * <li><b>SIZE</b><br>The number of entries to maintain in cache under
  * the given cache name.</li>
- * <li><b>TIMEOUT</b><br />The number of seconds to maintain entries in
+ * <li><b>TIMEOUT</b><br>The number of seconds to maintain entries in
  * cache before expiration.</li>
- * <li><b>MODE</b><br />Supported eviction modes are LIFO (last in first out),
+ * <li><b>MODE</b><br>Supported eviction modes are LIFO (last in first out),
  * FIFO (first in first out), LFU (least frequently used) and MFU
  * (most frequently used)</li>
  * </ul>
@@ -52,17 +52,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
 
     /**
-     * <p>Thread safe hashmap which will be used to keep track of
+     * <p>Thread safe hash map which will be used to keep track of
      * the current caches. The unique ID is the URL.
      */
-    private static Map<String, XmlaOlap4jConcurrentMemoryCache> caches = null;
+    private static final Map<String, XmlaOlap4jConcurrentMemoryCache> CACHES =
+        new ConcurrentHashMap<String, XmlaOlap4jConcurrentMemoryCache>();
 
     /**
      * Properties which will be considered for configuration.
      *
      * <p>All parameters are optional.
      */
-    public static enum Property {
+    public enum Property {
         /**
          * A unique identifier which allows two connections to share a same
          * cache space. Setting this to an already existing cache
@@ -110,7 +111,7 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
     /**
      * Defines the supported eviction modes.
      */
-    public static enum Mode {
+    public enum Mode {
         /** Last-in, first-out. */
         LIFO,
         /** First-in, first-out. */
@@ -132,22 +133,8 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
      * Default constructor which instantiates the concurrent hash map.
      */
     public XmlaOlap4jNamedMemoryCache() {
-        XmlaOlap4jNamedMemoryCache.initCaches();
     }
 
-
-    /**
-     * Initializes the caches in a static and thread safe way.
-     */
-    private static synchronized void initCaches() {
-        if (caches == null) {
-            caches =
-                new ConcurrentHashMap<
-                String, XmlaOlap4jConcurrentMemoryCache>();
-        }
-    }
-
-    // implement XmlaOlap4jCache
     public String setParameters(
         Map<String, String> config,
         Map<String, String> props)
@@ -156,32 +143,25 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
 
         // Make sure there's a name for the cache. Generate a
         // random one if needed.
-        if (props.containsKey(
-                XmlaOlap4jNamedMemoryCache.Property.NAME.name()))
-        {
-            refId = (String) props.get(
-                XmlaOlap4jNamedMemoryCache.Property.NAME.name());
+        if (props.containsKey(Property.NAME.name())) {
+            refId = props.get(Property.NAME.name());
         } else {
             refId = String.valueOf(UUID.randomUUID());
-            props.put(XmlaOlap4jNamedMemoryCache.Property.NAME.name(), refId);
+            props.put(Property.NAME.name(), refId);
         }
 
 
         // Wait for exclusive access to the caches
-        synchronized (caches) {
+        synchronized (CACHES) {
             // Create a cache for this URL if it is not created yet
-            if (!caches.containsKey(
-                    props.get(
-                        XmlaOlap4jNamedMemoryCache.Property.NAME.name())))
-            {
-                caches.put(
-                    (String) props.get(
-                        XmlaOlap4jNamedMemoryCache.Property.NAME.name()),
+            if (!CACHES.containsKey(props.get(Property.NAME.name()))) {
+                CACHES.put(
+                    props.get(Property.NAME.name()),
                     new XmlaOlap4jConcurrentMemoryCache(props));
             }
         }
 
-        // Mark this cache as inited.
+        // Mark this cache as initialized.
         this.initDone = true;
 
         // Give back the reference id.
@@ -189,7 +169,6 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
     }
 
 
-    // implement XmlaOlap4jCache
     public byte[] get(
         String id,
         URL url,
@@ -199,9 +178,9 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
         this.validateState();
 
         // Wait for exclusive access to the caches
-        synchronized (caches) {
-            if (caches.containsKey(id)) {
-                return caches.get(id).get(url, request);
+        synchronized (CACHES) {
+            if (CACHES.containsKey(id)) {
+                return CACHES.get(id).get(url, request);
             } else {
                 throw new XmlaOlap4jInvalidStateException();
             }
@@ -209,7 +188,6 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
     }
 
 
-    // implement XmlaOlap4jCache
     public void put(
         String id,
         URL url,
@@ -220,27 +198,26 @@ public class XmlaOlap4jNamedMemoryCache implements XmlaOlap4jCache {
         this.validateState();
 
         // Wait for exclusive access to the caches
-        synchronized (caches) {
-            if (caches.containsKey(id)) {
-                caches.get(id).put(url, request, response);
+        synchronized (CACHES) {
+            if (CACHES.containsKey(id)) {
+                CACHES.get(id).put(url, request, response);
             } else {
                 throw new XmlaOlap4jInvalidStateException();
             }
         }
     }
 
-    // implement XmlaOlap4jCache
     public void flushCache() {
         // Wait for exclusive access to the caches
-        synchronized (caches) {
-            caches.clear();
+        synchronized (CACHES) {
+            CACHES.clear();
         }
     }
 
     /**
      * Helper method to validate that the cache is initialized.
      *
-     * @throws XmlaOlap4jInvalidStateException When the cache is not initialized.
+     * @throws XmlaOlap4jInvalidStateException When the cache is not initialized
      */
     private void validateState() throws XmlaOlap4jInvalidStateException {
         if (!this.initDone) {

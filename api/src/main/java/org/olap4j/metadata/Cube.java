@@ -141,14 +141,14 @@ public interface Cube extends MetadataElement {
      * to parse the string into an identifier, then
      * {@link org.olap4j.mdx.IdentifierNode#getSegmentList()}. For example,
      *
-     * <blockquote><code>Member member = cube.lookupMember(<br/>
+     * <blockquote><code>Member member = cube.lookupMember(<br>
      * &nbsp;&nbsp;IdentifierNode.parseIdentifier(
      * "[Product].[Food]").getSegmentList())</code></blockquote>
      *
      * <p>If you have an array of names, call
      * {@link org.olap4j.mdx.IdentifierNode#ofNames(String...)}. For example,
      *
-     * <blockquote><code>Member member = cube.lookupMember(<br/>
+     * <blockquote><code>Member member = cube.lookupMember(<br>
      * &nbsp;&nbsp;IdentifierNode.parseIdentifier(
      * "[Product].[Food]").getSegmentList())</code></blockquote>
      *
@@ -246,7 +246,7 @@ public interface Cube extends MetadataElement {
         public static final DictionaryImpl<Type> DICTIONARY =
             DictionaryImpl.forClass(Type.class);
 
-        private Type(int xmlaOrdinal) {
+        Type(int xmlaOrdinal) {
             this.xmlaOrdinal = xmlaOrdinal;
         }
 
