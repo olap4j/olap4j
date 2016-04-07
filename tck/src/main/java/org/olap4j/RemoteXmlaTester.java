@@ -20,6 +20,7 @@ package org.olap4j;
 import org.olap4j.test.TestContext;
 import org.olap4j.test.TestContext.Tester;
 import org.olap4j.test.TestContext.Wrapper;
+import org.olap4j.test.TestEnv;
 
 import java.sql.*;
 import java.util.Properties;
@@ -68,7 +69,7 @@ public class RemoteXmlaTester implements Tester {
                 TestContext.Property.REMOTE_XMLA_PASSWORD.path);
     }
 
-    public TestContext getTestContext() {
+    public TestEnv env() {
         return testContext;
     }
 

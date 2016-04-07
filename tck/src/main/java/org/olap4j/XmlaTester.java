@@ -20,6 +20,7 @@ package org.olap4j;
 import org.olap4j.driver.xmla.XmlaOlap4jDriver;
 import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxy;
 import org.olap4j.test.TestContext;
+import org.olap4j.test.TestEnv;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -27,13 +28,13 @@ import java.sql.*;
 import java.util.*;
 
 /**
- * Implementation of {@link org.olap4j.test.TestContext.Tester} which speaks
+ * Implementation of {@link org.olap4j.test.TestContext.Tester} that speaks
  * to the olap4j driver for XML/A.
  *
  * @author jhyde
  */
 public class XmlaTester implements TestContext.Tester {
-    private final TestContext testContext;
+    private final TestEnv env;
     final XmlaOlap4jProxy proxy;
     static final String cookie = XmlaOlap4jDriver.nextCookie();
     private Connection connection;
@@ -44,7 +45,7 @@ public class XmlaTester implements TestContext.Tester {
      * <p>The {@link org.olap4j.test.TestContext.Tester} API requires a public
      * constructor with a {@link org.olap4j.test.TestContext} parameter.
      *
-     * @param testContext Test context
+     * @param env Test context
      *
      * @throws ClassNotFoundException on error
      * @throws IllegalAccessException on error
@@ -52,13 +53,13 @@ public class XmlaTester implements TestContext.Tester {
      * @throws NoSuchMethodException on error
      * @throws InvocationTargetException on error
      */
-    public XmlaTester(TestContext testContext)
+    public XmlaTester(TestEnv env)
         throws ClassNotFoundException, IllegalAccessException,
         InstantiationException, NoSuchMethodException,
         InvocationTargetException
     {
-        this.testContext = testContext;
-        final Properties properties = testContext.getProperties();
+        this.env = env;
+        final Properties properties = env.getProperties();
         final String catalogUrl =
             properties.getProperty(
                 TestContext.Property.XMLA_CATALOG_URL.path, "http://foo");
@@ -83,8 +84,8 @@ public class XmlaTester implements TestContext.Tester {
         XmlaOlap4jDriver.PROXY_MAP.put(cookie, proxy);
     }
 
-    public TestContext getTestContext() {
-        return testContext;
+    public TestEnv env() {
+        return env;
     }
 
     public Connection createConnection() throws SQLException {
@@ -147,6 +148,10 @@ public class XmlaTester implements TestContext.Tester {
 
     public Flavor getFlavor() {
         return Flavor.XMLA;
+    }
+
+    public void setTimeout(int seconds) {
+        // not possible with XMLA
     }
 
     public TestContext.Wrapper getWrapper() {

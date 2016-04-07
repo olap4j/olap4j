@@ -121,7 +121,8 @@ limitations under the License.
     <commons-math.version>1.2</commons-math.version>
     <commons-pool.version>1.1</commons-pool.version>
     <commons-vfs.version>1.0</commons-vfs.version>
-    <h2.version>1.3.172</h2.version>
+    <foodmart-data-hsqldb.version>0.4</foodmart-data-hsqldb.version>
+    <hsqldb.version>2.3.1</hsqldb.version>
     <junit.version>3.8</junit.version>
     <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
     <maven-dependency-plugin.version>2.8</maven-dependency-plugin.version>
@@ -129,9 +130,9 @@ limitations under the License.
     <maven-replacer-plugin.version>1.4.0</maven-replacer-plugin.version>
     <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
     <maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
-    <mondrian-data-foodmart.version>0.9-SNAPSHOT</mondrian-data-foodmart.version>
+    <!-- A reference implementation of Mondrian for testing.
+         Other versions of Mondrian will be able to work on olap4j. -->
     <mondrian.version>4.6-olap4j2-SNAPSHOT</mondrian.version>
-    <mysql-connector-java.version>5.1.38</mysql-connector-java.version>
     <rt-java5.version>1.5.0_22</rt-java5.version>
     <rt-java6.version>1.6.0_24</rt-java6.version>
     <rt-java7.version>1.7.0_15</rt-java7.version>
@@ -148,6 +149,16 @@ limitations under the License.
       <dependency>
         <groupId>org.olap4j</groupId>
         <artifactId>olap4j</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.olap4j</groupId>
+        <artifactId>olap4j-tck</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.olap4j</groupId>
+        <artifactId>olap4j-xmla</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -176,9 +187,9 @@ limitations under the License.
         <version>${commons-dbcp.version}</version>
       </dependency>
       <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>${mysql-connector-java.version}</version>
+        <groupId>org.hsqldb</groupId>
+        <artifactId>hsqldb</artifactId>
+        <version>${hsqldb.version}</version>
       </dependency>
       <dependency>
         <groupId>pentaho</groupId>
@@ -186,9 +197,9 @@ limitations under the License.
         <version>${mondrian.version}</version>
       </dependency>
       <dependency>
-        <groupId>pentaho</groupId>
-        <artifactId>mondrian-data-foodmart</artifactId>
-        <version>${mondrian-data-foodmart.version}</version>
+        <groupId>net.hydromatic</groupId>
+        <artifactId>foodmart-data-hsqldb</artifactId>
+        <version>${foodmart-data-hsqldb.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -277,6 +288,14 @@ limitations under the License.
             <exclude>doc/*</exclude>
             <exclude>.travis.yml</exclude>
           </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
         </configuration>
       </plugin>
       <plugin>

@@ -38,16 +38,6 @@ limitations under the License.
   <!-- Dependencies. -->
   <dependencies>
     <dependency>
-      <groupId>com.sun</groupId>
-      <artifactId>rt-jdk1.5</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.java.openjdk</groupId>
-      <artifactId>rt-java6</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
     </dependency>
@@ -60,21 +50,6 @@ limitations under the License.
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-    </dependency>
-    <dependency>
-      <!-- A reference implementation of Mondrian for testing.
-           Other versions of Mondrian will be able to work on olap4j. -->
-      <groupId>pentaho</groupId>
-      <artifactId>mondrian</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>mondrian-data-foodmart</artifactId>
     </dependency>
   </dependencies>
 

@@ -19,9 +19,8 @@ package org.olap4j;
 
 import org.olap4j.layout.RectangularCellSetFormatter;
 import org.olap4j.layout.TraditionalCellSetFormatter;
+import org.olap4j.test.TckTestCase;
 import org.olap4j.test.TestContext;
-
-import junit.framework.TestCase;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -37,20 +36,9 @@ import java.sql.SQLException;
  *
  * @author jhyde
  */
-public class CellSetFormatterTest extends TestCase {
+public class CellSetFormatterTest extends TckTestCase {
 
-    private TestContext testContext = TestContext.instance();
-    private TestContext.Tester tester = testContext.getTester();
-
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-        testContext = null;
-        tester = null;
-        super.tearDown();
-    }
+    private final TestContext.Tester tester = env.getTester();
 
     private static final String query1 =
         "select\n"

@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
  * @author jhyde
  * @since Jun 7, 2007
  */
-public class TestContext {
+public class TestContext implements TestEnv {
     public static final String NL = System.getProperty("line.separator");
     private static final String indent = "                ";
     private static final String lineBreak2 = "\\\\n\"" + NL + indent + "+ \"";
@@ -73,6 +73,9 @@ public class TestContext {
         org.olap4j.transform.TransformTest.class,
         org.olap4j.OlapTreeTest.class,
         org.olap4j.OlapTest.class,
+        org.olap4j.test.ParserTest.class,
+        org.olap4j.XmlaConnectionTest.class,
+        org.olap4j.driver.xmla.XmlaOlap4jCellSetTest.class,
     };
 
     private final Tester tester;
@@ -172,7 +175,7 @@ public class TestContext {
      *
      * @return default TestContext
      */
-    public static TestContext instance() {
+    public static TestEnv instance() {
         return THREAD_INSTANCE.get();
     }
 
@@ -587,11 +590,11 @@ public class TestContext {
      */
     public interface Tester {
         /**
-         * Returns the test context.
+         * Returns the test environment.
          *
-         * @return Test context
+         * @return Test environment
          */
-        TestContext getTestContext();
+        TestEnv env();
 
         /**
          * Creates a connection
@@ -674,8 +677,8 @@ public class TestContext {
             this.tester = tester;
         }
 
-        public TestContext getTestContext() {
-            return tester.getTestContext();
+        public TestEnv env() {
+            return tester.env();
         }
 
         public Connection createConnection() throws SQLException {

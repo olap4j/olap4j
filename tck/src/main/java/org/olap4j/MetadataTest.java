@@ -20,9 +20,8 @@ package org.olap4j;
 import org.olap4j.impl.Bug;
 import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.metadata.*;
+import org.olap4j.test.TckTestCase;
 import org.olap4j.test.TestContext;
-
-import junit.framework.TestCase;
 
 import java.sql.*;
 import java.util.*;
@@ -30,9 +29,9 @@ import java.util.*;
 /**
  * Unit test for olap4j metadata methods.
  */
-public class MetadataTest extends TestCase {
-    private TestContext testContext = TestContext.instance();
-    private TestContext.Tester tester = testContext.getTester();
+public class MetadataTest extends TckTestCase {
+    private final TestContext.Tester tester = env.getTester();
+
     private static final String NL = System.getProperty("line.separator");
 
     private Connection connection;
@@ -127,8 +126,6 @@ public class MetadataTest extends TestCase {
         connection = null;
         olapConnection = null;
         olapDatabaseMetaData = null;
-        testContext = null;
-        tester = null;
     }
 
     // ~ Helper methods ----------
@@ -554,7 +551,7 @@ public class MetadataTest extends TestCase {
                 "FoodMart",
                 "Sales"),
             CUBE_COLUMN_NAMES);
-        switch (testContext.getTester().getFlavor()) {
+        switch (env.getTester().getFlavor()) {
         case MONDRIAN:
             assertTrue(s.contains(", IS_DRILLTHROUGH_ENABLED=true"));
             break;

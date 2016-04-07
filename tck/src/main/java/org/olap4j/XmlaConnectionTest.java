@@ -23,6 +23,7 @@ import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxy;
 import org.olap4j.driver.xmla.proxy.XmlaOlap4jProxyException;
 import org.olap4j.test.TestContext;
 import org.olap4j.test.TestContext.Tester;
+import org.olap4j.test.TestEnv;
 
 import junit.framework.TestCase;
 
@@ -36,8 +37,8 @@ import java.util.concurrent.Future;
  * Unit test for XMLA driver connections.
  */
 public class XmlaConnectionTest extends TestCase {
-    private TestContext testContext = TestContext.instance();
-    private TestContext.Tester tester = testContext.getTester();
+    private final TestEnv env = TestEnv.STATIC.instance();
+    private TestContext.Tester tester = env.getTester();
     public static final String DRIVER_CLASS_NAME =
         "org.olap4j.driver.xmla.XmlaOlap4jDriver";
 
@@ -206,7 +207,6 @@ public class XmlaConnectionTest extends TestCase {
     }
 
     protected void tearDown() throws Exception {
-        testContext = null;
         tester = null;
         super.tearDown();
     }
@@ -216,7 +216,7 @@ public class XmlaConnectionTest extends TestCase {
      * XMLA objects during DriverManager.getConnection() do not make
      * calls that could cause deadlocks.
      */
-    public void testNoNonTrivalCallsOnConnect() throws Exception {
+    public void testNoNonTrivialCallsOnConnect() throws Exception {
         String cookie = XmlaOlap4jDriver.nextCookie();
         try {
             XmlaOlap4jDriver.PROXY_MAP.put(cookie, new XmlaOlap4jProxyMock());
@@ -241,7 +241,7 @@ public class XmlaConnectionTest extends TestCase {
     }
 
     public void testDbSchemaSchemata() throws Exception {
-        if (!testContext.getTester().getFlavor()
+        if (!env.getTester().getFlavor()
                 .equals(Tester.Flavor.XMLA))
         {
             return;
@@ -299,9 +299,9 @@ public class XmlaConnectionTest extends TestCase {
      * @throws Exception If the test fails.
      */
     public void testNoDoubleQuerySubmission() throws Exception {
-        if (!testContext.getTester().getFlavor()
+        if (!env.getTester().getFlavor()
                 .equals(Tester.Flavor.XMLA)
-            && !testContext.getTester().getFlavor()
+            && !env.getTester().getFlavor()
                 .equals(Tester.Flavor.REMOTE_XMLA))
         {
             return;
@@ -345,14 +345,14 @@ public class XmlaConnectionTest extends TestCase {
      * not be sent to the server.
      */
     public void testPropertyList() throws Exception {
-        if (!testContext.getTester().getFlavor()
+        if (!env.getTester().getFlavor()
                 .equals(Tester.Flavor.XMLA)
-            && !testContext.getTester().getFlavor()
+            && !env.getTester().getFlavor()
                 .equals(Tester.Flavor.REMOTE_XMLA))
         {
             return;
         }
-        switch (testContext.getTester().getWrapper()) {
+        switch (env.getTester().getWrapper()) {
         case DBCP:
             return;
         }

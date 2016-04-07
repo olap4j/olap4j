@@ -20,9 +20,8 @@ package org.olap4j.transform;
 import org.olap4j.*;
 import org.olap4j.mdx.SelectNode;
 import org.olap4j.mdx.parser.MdxParser;
+import org.olap4j.test.TckTestCase;
 import org.olap4j.test.TestContext;
-
-import junit.framework.TestCase;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -34,9 +33,8 @@ import java.sql.SQLException;
  * @author jhyde
  * @since Jul 28, 2008
  */
-public class TransformTest extends TestCase {
-    private TestContext testContext = TestContext.instance();
-    private TestContext.Tester tester = testContext.getTester();
+public class TransformTest extends TckTestCase {
+    private final TestContext.Tester tester = env.getTester();
     private Connection connection = null;
 
     public TransformTest() {
@@ -56,8 +54,6 @@ public class TransformTest extends TestCase {
             connection.close();
             connection = null;
         }
-        testContext = null;
-        tester = null;
     }
 
     protected OlapConnection getConnection() throws SQLException {

@@ -18,9 +18,8 @@
 package org.olap4j;
 
 import org.olap4j.metadata.*;
+import org.olap4j.test.TckTestCase;
 import org.olap4j.test.TestContext;
-
-import junit.framework.TestCase;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -28,12 +27,12 @@ import java.util.Map;
 
 /**
  * Tests some particularities of the OLAP tree objects.
+ *
  * @author Luc Boudreau
  */
-public class OlapTreeTest extends TestCase {
+public class OlapTreeTest extends TckTestCase {
 
-    private TestContext.Tester tester =
-        TestContext.instance().getTester();
+    private final TestContext.Tester tester = env.getTester();
 
     /**
      * Simple strategy to prevent connection leaks: each test that needs a
@@ -51,7 +50,6 @@ public class OlapTreeTest extends TestCase {
             connection.close();
             connection = null;
         }
-        tester = null;
     }
 
     /**

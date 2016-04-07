@@ -25,7 +25,6 @@ import org.olap4j.mdx.parser.MdxParseException;
 import org.olap4j.mdx.parser.MdxParser;
 
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -39,7 +38,7 @@ import java.util.regex.Pattern;
  *
  * @author gjohnson, jhyde
  */
-public class ParserTest extends TestCase {
+public class ParserTest extends TckTestCase {
     private static final Pattern lineColPattern =
         Pattern.compile("At line ([0-9]+), column ([0-9]+)");
 
@@ -47,18 +46,17 @@ public class ParserTest extends TestCase {
         Pattern.compile(
             "(?s)From line ([0-9]+), column ([0-9]+) to line ([0-9]+), column ([0-9]+): (.*)");
 
-    private TestContext testContext = TestContext.instance();
     private Connection connection;
 
-    public ParserTest(String name) {
-        super(name);
+    public ParserTest() {
+        super();
     }
 
     protected OlapConnection getOlapConnection() throws SQLException {
         if (connection == null) {
-            connection = testContext.getTester().createConnection();
+            connection = env.getTester().createConnection();
         }
-        return testContext.getTester().getWrapper().unwrap(
+        return env.getTester().getWrapper().unwrap(
             connection, OlapConnection.class);
     }
 
@@ -67,7 +65,6 @@ public class ParserTest extends TestCase {
             connection.close();
             connection = null;
         }
-        testContext = null;
     }
 
     private MdxParser createParser() {

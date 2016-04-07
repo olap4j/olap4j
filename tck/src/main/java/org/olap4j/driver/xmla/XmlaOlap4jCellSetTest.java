@@ -18,7 +18,7 @@
 package org.olap4j.driver.xmla;
 
 import org.olap4j.*;
-import org.olap4j.test.TestContext;
+import org.olap4j.test.TestEnv;
 
 import junit.framework.TestCase;
 
@@ -91,9 +91,9 @@ public class XmlaOlap4jCellSetTest extends TestCase {
             "<Value xsi:type=\"xsd:UNKNOWN\">Unknown</Value>",
             String.class);
 
+        final TestEnv env = TestEnv.STATIC.instance();
         MockOlap4jStatement statement = new MockOlap4jStatement(
-            (XmlaOlap4jConnection) new XmlaTester(TestContext.instance())
-                .createConnection());
+            (XmlaOlap4jConnection) new XmlaTester(env).createConnection());
 
         XmlaOlap4jCellSet cellSet = new StubbedOlap4jCellSet(statement);
 

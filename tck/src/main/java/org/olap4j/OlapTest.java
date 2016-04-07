@@ -23,9 +23,8 @@ import org.olap4j.metadata.*;
 import org.olap4j.query.*;
 import org.olap4j.query.QueryDimension.HierarchizeMode;
 import org.olap4j.query.Selection.Operator;
+import org.olap4j.test.TckTestCase;
 import org.olap4j.test.TestContext;
-
-import junit.framework.TestCase;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -40,9 +39,8 @@ import static org.olap4j.test.TestContext.nameList;
  * @since  May 22, 2007
  * @author James Dixon
  */
-public class OlapTest extends TestCase {
-    private TestContext testContext = TestContext.instance();
-    private TestContext.Tester tester = testContext.getTester();
+public class OlapTest extends TckTestCase {
+    private final TestContext.Tester tester = env.getTester();
     private Connection connection;
 
     public OlapTest() {
@@ -57,8 +55,6 @@ public class OlapTest extends TestCase {
             connection.close();
             connection = null;
         }
-        testContext = null;
-        tester = null;
     }
 
     public Cube getFoodmartCube(String cubeName) throws Exception {

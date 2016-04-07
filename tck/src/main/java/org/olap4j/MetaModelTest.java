@@ -18,10 +18,9 @@
 package org.olap4j;
 
 import org.olap4j.metadata.*;
+import org.olap4j.test.TckTestCase;
 import org.olap4j.xmla.*;
 import org.olap4j.xmla.Enumeration;
-
-import junit.framework.TestCase;
 
 import java.io.PrintWriter;
 import java.sql.Timestamp;
@@ -406,7 +405,7 @@ import java.util.*;
  *
  * </ul>
  */
-public class MetaModelTest extends TestCase {
+public class MetaModelTest extends TckTestCase {
 
     private static final FullType GUID = FullType.of(XmlaConstants.DBType.GUID);
     private static final FullType DBTIMESTAMP =

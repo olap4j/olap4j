@@ -22,13 +22,13 @@ import org.olap4j.impl.Olap4jUtil;
 import org.olap4j.mdx.*;
 import org.olap4j.mdx.parser.*;
 import org.olap4j.metadata.*;
+import org.olap4j.test.TckTestCase;
 import org.olap4j.test.TestContext;
 import org.olap4j.test.TestContext.Tester;
 import org.olap4j.test.TestContext.Tester.Flavor;
 import org.olap4j.type.*;
 
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -45,9 +45,8 @@ import static org.olap4j.test.TestContext.nameList;
  *
  * @author jhyde
  */
-public class ConnectionTest extends TestCase {
-    private TestContext testContext = TestContext.instance();
-    private TestContext.Tester tester = testContext.getTester();
+public class ConnectionTest extends TckTestCase {
+    private final TestContext.Tester tester = env.getTester();
 
     private static final boolean IS_JDK_16 =
         System.getProperty("java.version").startsWith("1.6.");
@@ -71,8 +70,6 @@ public class ConnectionTest extends TestCase {
             connection.close();
         }
         connection = null;
-        testContext = null;
-        tester = null;
     }
 
     /**
