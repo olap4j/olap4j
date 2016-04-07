@@ -31,7 +31,12 @@ abstract class Olap4jNodeConverter {
 
     public static SelectNode toOlap4j(Query query) {
         List<IdentifierNode> list = Collections.emptyList();
-        List<ParseTreeNode> withList = Collections.emptyList();
+        List<ParseTreeNode> withList;
+        if (query.getWithList().isEmpty()) {
+            withList = Collections.emptyList();
+        } else {
+            withList = query.getWithList();
+        }
         List<QueryAxis> axisList = new ArrayList<QueryAxis>();
         axisList.add(query.getAxes().get(Axis.COLUMNS));
         axisList.add(query.getAxes().get(Axis.ROWS));

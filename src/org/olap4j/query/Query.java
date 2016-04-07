@@ -18,6 +18,7 @@
 package org.olap4j.query;
 
 import org.olap4j.*;
+import org.olap4j.mdx.ParseTreeNode;
 import org.olap4j.mdx.SelectNode;
 import org.olap4j.metadata.*;
 
@@ -35,6 +36,7 @@ public class Query extends QueryNodeImpl {
 
     protected final String name;
     protected Map<Axis, QueryAxis> axes = new HashMap<Axis, QueryAxis>();
+    private List<ParseTreeNode> withList;
     protected QueryAxis across;
     protected QueryAxis down;
     protected QueryAxis filter;
@@ -79,6 +81,7 @@ public class Query extends QueryNodeImpl {
         axes.put(Axis.COLUMNS, across);
         axes.put(Axis.ROWS, down);
         axes.put(Axis.FILTER, filter);
+        withList = new ArrayList<ParseTreeNode>();
     }
 
     /**
@@ -336,6 +339,14 @@ public class Query extends QueryNodeImpl {
      */
     public void setSelectDefaultMembers(boolean selectDefaultMembers) {
         this.selectDefaultMembers = selectDefaultMembers;
+    }
+
+    public List<ParseTreeNode> getWithList() {
+        return withList;
+    }
+
+    public void setWithList(List<ParseTreeNode> withList) {
+        this.withList = withList;
     }
 }
 
