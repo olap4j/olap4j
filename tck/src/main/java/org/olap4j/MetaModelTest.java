@@ -481,7 +481,7 @@ public class MetaModelTest extends TckTestCase {
                 out,
                 "<li><b>" + up(attribute.name) + "</b> "
                 + typeString(attribute.type, nullable)
-                + " => " + attribute.description);
+                + " &rarr; " + attribute.description);
         }
         int patternCount = 0;
         for (Attribute attribute : entity.attributes) {

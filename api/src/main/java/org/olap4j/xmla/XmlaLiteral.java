@@ -17,6 +17,8 @@
 */
 package org.olap4j.xmla;
 
+import org.olap4j.metadata.XmlaConstants;
+
 import java.util.List;
 
 /**
@@ -97,7 +99,7 @@ public class XmlaLiteral extends Entity {
     public final Column LiteralNameEnumValue =
         new Column(
             "LiteralNameEnumValue",
-            XmlaType.Integer.scalar(),
+            XmlaType.Integer.of(XmlaConstants.Literal.class),
             Column.NOT_RESTRICTION,
             Column.OPTIONAL,
             null);

@@ -75,7 +75,8 @@ public class TestContext implements TestEnv {
         org.olap4j.OlapTest.class,
         org.olap4j.test.ParserTest.class,
         org.olap4j.XmlaConnectionTest.class,
-        org.olap4j.driver.xmla.XmlaOlap4jCellSetTest.class,
+        // TODO: enable
+        // org.olap4j.driver.xmla.XmlaOlap4jCellSetTest.class,
     };
 
     private final Tester tester;
@@ -340,7 +341,7 @@ public class TestContext implements TestEnv {
         try {
             Class<?> clazz = Class.forName(helperClassName);
             final Constructor<?> constructor =
-                clazz.getConstructor(TestContext.class);
+                clazz.getConstructor(TestEnv.class);
             tester = (Tester) constructor.newInstance(testContext);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -501,7 +502,7 @@ public class TestContext implements TestEnv {
      *
      * @return object containing properties needed by the test suite
      */
-    private static synchronized Properties getStaticTestProperties() {
+    public static synchronized Properties getStaticTestProperties() {
         if (testProperties == null) {
             testProperties = new Properties(System.getProperties());
 

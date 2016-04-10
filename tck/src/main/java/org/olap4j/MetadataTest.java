@@ -395,29 +395,27 @@ public class MetadataTest extends TckTestCase {
             DATASOURCES_COLUMN_NAMES);
         switch (tester.getFlavor()) {
         case MONDRIAN:
-            TestContext.assertEqualsVerbose(
-                "DATA_SOURCE_NAME=FoodMart,"
+            final String expected = "DATA_SOURCE_NAME=FoodMart,"
                 + " DATA_SOURCE_DESCRIPTION=null,"
                 + " URL=null,"
                 + " DATA_SOURCE_INFO=FoodMart,"
                 + " PROVIDER_NAME=Mondrian,"
                 + " PROVIDER_TYPE=MDP,"
-                + " AUTHENTICATION_MODE=Unauthenticated\n",
-                s);
+                + " AUTHENTICATION_MODE=Unauthenticated\n";
+            TestContext.assertEqualsVerbose(expected, s);
             break;
         case REMOTE_XMLA:
             // This can be anything, depending on the remote server.
             break;
         case XMLA:
-            TestContext.assertEqualsVerbose(
-                "DATA_SOURCE_NAME=FoodMart,"
+            final String expected1 = "DATA_SOURCE_NAME=FoodMart,"
                 + " DATA_SOURCE_DESCRIPTION=Mondrian FoodMart data source,"
                 + " URL=http://localhost:8080/mondrian/xmla,"
                 + " DATA_SOURCE_INFO=FoodMart,"
                 + " PROVIDER_NAME=Mondrian,"
                 + " PROVIDER_TYPE=MDP,"
-                + " AUTHENTICATION_MODE=Unauthenticated\n",
-                s);
+                + " AUTHENTICATION_MODE=Unauthenticated\n";
+            TestContext.assertEqualsVerbose(expected1, s);
             break;
         }
     }
@@ -468,7 +466,8 @@ public class MetadataTest extends TckTestCase {
         String s = checkResultSet(
             olapDatabaseMetaData.getLiterals(),
             LITERALS_COLUMN_NAMES);
-        assertContains("LITERAL_NAME=DBLITERAL_QUOTE, LITERAL_VALUE=[, ", s);
+        assertContains(
+            "LITERAL_NAME=DBLITERAL_QUOTE_PREFIX, LITERAL_VALUE=[, ", s);
     }
 
     public void testDatabaseMetaDataGetDatabaseProperties()
@@ -486,10 +485,30 @@ public class MetadataTest extends TckTestCase {
             olapDatabaseMetaData.getProperties(
                 catalogName, null, null, null, null, null, null, null),
             PROPERTIES_COLUMN_NAMES);
-        assertContains(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse and Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store].[Store], LEVEL_UNIQUE_NAME=[Store].[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Frozen Sqft, PROPERTY_CAPTION=Frozen Sqft, PROPERTY_TYPE=1, DATA_TYPE=5, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Warehouse and Sales Cube - Store Hierarchy - Store Name Level - Frozen Sqft Property",
-            s);
+        final String expected = "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Warehouse and Sales"
+            + ", DIMENSION_UNIQUE_NAME=[Store]"
+            + ", HIERARCHY_UNIQUE_NAME=[Store].[Store]"
+            + ", LEVEL_UNIQUE_NAME=[Store].[Store].[Store Name]"
+            + ", MEMBER_UNIQUE_NAME=null"
+            + ", PROPERTY_TYPE=1"
+            + ", PROPERTY_NAME=Frozen Sqft"
+            + ", PROPERTY_CAPTION=Frozen Sqft"
+            + ", DATA_TYPE=5, CHARACTER_MAXIMUM_LENGTH=null"
+            + ", CHARACTER_OCTET_LENGTH=null"
+            + ", NUMERIC_PRECISION=null, NUMERIC_SCALE=null"
+            + ", DESCRIPTION=Warehouse and Sales Cube - Store Hierarchy - Store Name Level - Frozen Sqft Property"
+            + ", PROPERTY_CONTENT_TYPE=0"
+            + ", SQL_COLUMN_NAME=null"
+            + ", LANGUAGE=null"
+            + ", PROPERTY_ORIGIN=null"
+            + ", PROPERTY_ATTRIBUTE_HIERARCHY_NAME=null"
+            + ", PROPERTY_CARDINALITY=null"
+            + ", MIME_TYPE=null"
+            + ", PROPERTY_IS_VISIBLE=null"
+            + ", ANNOTATIONS=null";
+        assertContains(expected, s);
         assertEquals(s, 66, linecount(s));
 
         s = checkResultSet(
@@ -498,14 +517,37 @@ public class MetadataTest extends TckTestCase {
                 null, null, "[Store].[Store].[Store Name]",
                 null, null),
             PROPERTIES_COLUMN_NAMES);
-        assertContains(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store].[Store], LEVEL_UNIQUE_NAME=[Store].[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Has coffee bar, PROPERTY_CAPTION=Has coffee bar, PROPERTY_TYPE=1, DATA_TYPE=130, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Sales Cube - Store Hierarchy - Store Name Level - Has coffee bar Property",
-            s);
-        assertNotContains(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse and Sales, ",
-            s);
+        final String expected2 = "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Sales"
+            + ", DIMENSION_UNIQUE_NAME=[Store]"
+            + ", HIERARCHY_UNIQUE_NAME=[Store].[Store]"
+            + ", LEVEL_UNIQUE_NAME=[Store].[Store].[Store Name]"
+            + ", MEMBER_UNIQUE_NAME=null"
+            + ", PROPERTY_TYPE=1"
+            + ", PROPERTY_NAME=Frozen Sqft"
+            + ", PROPERTY_CAPTION=Frozen Sqft"
+            + ", DATA_TYPE=5"
+            + ", CHARACTER_MAXIMUM_LENGTH=null"
+            + ", CHARACTER_OCTET_LENGTH=null"
+            + ", NUMERIC_PRECISION=null"
+            + ", NUMERIC_SCALE=null"
+            + ", DESCRIPTION=Sales Cube - Store Hierarchy - Store Name Level - Frozen Sqft Property"
+            + ", PROPERTY_CONTENT_TYPE=0"
+            + ", SQL_COLUMN_NAME=null"
+            + ", LANGUAGE=null"
+            + ", PROPERTY_ORIGIN=null"
+            + ", PROPERTY_ATTRIBUTE_HIERARCHY_NAME=null"
+            + ", PROPERTY_CARDINALITY=null"
+            + ", MIME_TYPE=null"
+            + ", PROPERTY_IS_VISIBLE=null"
+            + ", ANNOTATIONS=null";
+        assertContains(expected2, s);
+
+        final String expected3 = "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Warehouse and Sales, ";
+        assertNotContains(expected3, s);
         assertEquals(8, linecount(s));
     }
 
@@ -522,10 +564,10 @@ public class MetadataTest extends TckTestCase {
                 null,
                 null),
             CUBE_COLUMN_NAMES);
-        assertContains(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, ",
-            s);
+        final String expected = "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Sales, ";
+        assertContains(expected, s);
         final int lineCount = linecount(s);
 
         // Null catalog specified in metadata request, but connection has a
@@ -537,10 +579,7 @@ public class MetadataTest extends TckTestCase {
                 null,
                 null),
             CUBE_COLUMN_NAMES);
-        assertContains(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, ",
-            s);
+        assertContains(expected, s);
         final int lineCount3 = linecount(s);
         if (tester.getFlavor() == TestContext.Tester.Flavor.XMLA) {
             assertEquals(lineCount * 2, lineCount3);
@@ -592,10 +631,24 @@ public class MetadataTest extends TckTestCase {
             olapDatabaseMetaData.getDimensions(
                 catalogName, null, null, null),
             DIMENSIONS_COLUMN_NAMES);
-        assertContains(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_NAME=Education Level, DIMENSION_UNIQUE_NAME=[Education Level], DIMENSION_GUID=null, DIMENSION_CAPTION=Education Level, DIMENSION_ORDINAL=9, DIMENSION_TYPE=3, DIMENSION_CARDINALITY=6, DEFAULT_HIERARCHY=[Education Level], DESCRIPTION=Sales Cube - Education Level Dimension, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_MASTER_UNIQUE_NAME=null, DIMENSION_IS_VISIBLE=true",
-            s);
+        final String expected = "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Sales"
+            + ", DIMENSION_NAME=Education Level"
+            + ", DIMENSION_UNIQUE_NAME=[Education Level]"
+            + ", DIMENSION_GUID=null"
+            + ", DIMENSION_CAPTION=Education Level"
+            + ", DIMENSION_ORDINAL=9"
+            + ", DIMENSION_TYPE=3"
+            + ", DIMENSION_CARDINALITY=6"
+            + ", DEFAULT_HIERARCHY=[Education Level]"
+            + ", DESCRIPTION=Sales Cube - Education Level Dimension"
+            + ", IS_VIRTUAL=false"
+            + ", IS_READWRITE=false"
+            + ", DIMENSION_UNIQUE_SETTINGS=0"
+            + ", DIMENSION_MASTER_UNIQUE_NAME=null"
+            + ", DIMENSION_IS_VISIBLE=true";
+        assertContains(expected, s);
         assertEquals(68, linecount(s));
     }
 
@@ -603,9 +656,19 @@ public class MetadataTest extends TckTestCase {
         String s = checkResultSet(
             olapDatabaseMetaData.getOlapFunctions(null),
             FUNCTIONS_COLUMN_NAMES);
-        assertContains(
-            "FUNCTION_NAME=Name, DESCRIPTION=Returns the name of a member., PARAMETER_LIST=Member, RETURN_TYPE=8, ORIGIN=1, INTERFACE_NAME=, LIBRARY_NAME=null, CAPTION=Name",
-            s);
+        final String expected = "FUNCTION_NAME=Name"
+            + ", DESCRIPTION=Returns the name of a member."
+            + ", PARAMETER_LIST=Member"
+            + ", RETURN_TYPE=8"
+            + ", ORIGIN=1"
+            + ", INTERFACE_NAME="
+            + ", LIBRARY_NAME=null"
+            + ", DLL_NAME=null"
+            + ", HELP_FILE=null"
+            + ", HELP_CONTEXT=null"
+            + ", OBJECT=null"
+            + ", CAPTION=Name";
+        assertContains(expected, s);
         // Mondrian has 361 functions (as of 2008/1/23)
         final int functionCount = linecount(s);
         assertTrue(functionCount + " functions", functionCount > 360);
@@ -622,29 +685,78 @@ public class MetadataTest extends TckTestCase {
             olapDatabaseMetaData.getHierarchies(
                 catalogName, null, null, null, null),
             HIERARCHIES_COLUMN_NAMES);
-        assertContains(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=HR, DIMENSION_UNIQUE_NAME=[Employees], HIERARCHY_NAME=Employees, HIERARCHY_UNIQUE_NAME=[Employees].[Employees], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Employees, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=1156, DEFAULT_MEMBER=[Employees].[Employees].[All Employees], ALL_MEMBER=[Employees].[Employees].[All Employees], DESCRIPTION=HR Cube - Employees Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_IS_VISIBLE=true, HIERARCHY_ORDINAL=7, DIMENSION_IS_SHARED=true, PARENT_CHILD=true",
-            s);
+        final String expected = "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=HR"
+            + ", DIMENSION_UNIQUE_NAME=[Employees]"
+            + ", HIERARCHY_NAME=Employees"
+            + ", HIERARCHY_UNIQUE_NAME=[Employees].[Employees]"
+            + ", HIERARCHY_GUID=null"
+            + ", HIERARCHY_CAPTION=Employees"
+            + ", DIMENSION_TYPE=3"
+            + ", HIERARCHY_CARDINALITY=1156"
+            + ", DEFAULT_MEMBER=[Employees].[Employees].[All Employees]"
+            + ", ALL_MEMBER=[Employees].[Employees].[All Employees]"
+            + ", DESCRIPTION=HR Cube - Employees Hierarchy"
+            + ", STRUCTURE=0"
+            + ", IS_VIRTUAL=false"
+            + ", IS_READWRITE=false"
+            + ", DIMENSION_UNIQUE_SETTINGS=0"
+            + ", DIMENSION_MASTER_UNIQUE_NAME=null"
+            + ", DIMENSION_IS_VISIBLE=true"
+            + ", HIERARCHY_ORDINAL=7"
+            + ", DIMENSION_IS_SHARED=true"
+            + ", HIERARCHY_IS_VISIBLE=true"
+            + ", HIERARCHY_ORIGIN=true"
+            + ", HIERARCHY_DISPLAY_FOLDER=null"
+            + ", INSTANCE_SELECTION=null"
+            + ", GROUPING_BEHAVIOR=null"
+            + ", STRUCTURE_TYPE=null"
+            + ", ANNOTATIONS=null"
+            + ", PARENT_CHILD=true";
+        assertContains(expected, s);
 
         s = checkResultSet(
             olapDatabaseMetaData.getHierarchies(
                 catalogName, null, "Sales", null, "Store"),
             HIERARCHIES_COLUMN_NAMES);
-        TestContext.assertEqualsVerbose(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_NAME=Store, HIERARCHY_UNIQUE_NAME=[Store].[Store], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Store, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=63, DEFAULT_MEMBER=[Store].[Store].[All Stores], ALL_MEMBER=[Store].[Store].[All Stores], DESCRIPTION=Sales Cube - Store Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_IS_VISIBLE=true, HIERARCHY_ORDINAL=1, DIMENSION_IS_SHARED=true, PARENT_CHILD=false\n",
-            s);
+        final String expected2 = "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Sales"
+            + ", DIMENSION_UNIQUE_NAME=[Store]"
+            + ", HIERARCHY_NAME=Store"
+            + ", HIERARCHY_UNIQUE_NAME=[Store].[Store]"
+            + ", HIERARCHY_GUID=null"
+            + ", HIERARCHY_CAPTION=Store"
+            + ", DIMENSION_TYPE=3"
+            + ", HIERARCHY_CARDINALITY=63"
+            + ", DEFAULT_MEMBER=[Store].[Store].[All Stores]"
+            + ", ALL_MEMBER=[Store].[Store].[All Stores]"
+            + ", DESCRIPTION=Sales Cube - Store Hierarchy"
+            + ", STRUCTURE=0"
+            + ", IS_VIRTUAL=false"
+            + ", IS_READWRITE=false"
+            + ", DIMENSION_UNIQUE_SETTINGS=0"
+            + ", DIMENSION_MASTER_UNIQUE_NAME=null"
+            + ", DIMENSION_IS_VISIBLE=true"
+            + ", HIERARCHY_ORDINAL=1"
+            + ", DIMENSION_IS_SHARED=true"
+            + ", HIERARCHY_IS_VISIBLE=true"
+            + ", HIERARCHY_ORIGIN=false"
+            + ", HIERARCHY_DISPLAY_FOLDER=null"
+            + ", INSTANCE_SELECTION=null"
+            + ", GROUPING_BEHAVIOR=null"
+            + ", STRUCTURE_TYPE=null"
+            + ", ANNOTATIONS=null"
+            + ", PARENT_CHILD=false\n";
+        TestContext.assertEqualsVerbose(expected2, s);
 
         // With dimension unique name (bug 2527862).
         s = checkResultSet(
             olapDatabaseMetaData.getHierarchies(
                 catalogName, null, "Sales", "[Store]", null),
             HIERARCHIES_COLUMN_NAMES);
-        TestContext.assertEqualsVerbose(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_NAME=Store, HIERARCHY_UNIQUE_NAME=[Store].[Store], HIERARCHY_GUID=null, HIERARCHY_CAPTION=Store, DIMENSION_TYPE=3, HIERARCHY_CARDINALITY=63, DEFAULT_MEMBER=[Store].[Store].[All Stores], ALL_MEMBER=[Store].[Store].[All Stores], DESCRIPTION=Sales Cube - Store Hierarchy, STRUCTURE=0, IS_VIRTUAL=false, IS_READWRITE=false, DIMENSION_UNIQUE_SETTINGS=0, DIMENSION_IS_VISIBLE=true, HIERARCHY_IS_VISIBLE=true, HIERARCHY_ORDINAL=1, DIMENSION_IS_SHARED=true, PARENT_CHILD=false\n",
-            s);
+        TestContext.assertEqualsVerbose(expected2, s);
     }
 
     public void testDatabaseMetaDataGetLevels() throws SQLException {
@@ -652,9 +764,23 @@ public class MetadataTest extends TckTestCase {
             olapDatabaseMetaData.getLevels(
                 catalogName, null, null, null, null, null),
             LEVELS_COLUMN_NAMES);
-        assertContains(
-            "CATALOG_NAME=FoodMart, SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Measures], HIERARCHY_UNIQUE_NAME=[Measures], LEVEL_NAME=MeasuresLevel, LEVEL_UNIQUE_NAME=[Measures].[MeasuresLevel], LEVEL_GUID=null, LEVEL_CAPTION=MeasuresLevel, LEVEL_NUMBER=0, LEVEL_CARDINALITY=9, LEVEL_TYPE=0, CUSTOM_ROLLUP_SETTINGS=0, LEVEL_UNIQUE_SETTINGS=1, LEVEL_IS_VISIBLE=true, DESCRIPTION=Sales Cube - Measures Hierarchy - MeasuresLevel Level",
-            s);
+        final String expected = "CATALOG_NAME=FoodMart"
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Sales"
+            + ", DIMENSION_UNIQUE_NAME=[Measures]"
+            + ", HIERARCHY_UNIQUE_NAME=[Measures]"
+            + ", LEVEL_NAME=MeasuresLevel"
+            + ", LEVEL_UNIQUE_NAME=[Measures].[MeasuresLevel]"
+            + ", LEVEL_GUID=null"
+            + ", LEVEL_CAPTION=MeasuresLevel"
+            + ", LEVEL_NUMBER=0"
+            + ", LEVEL_CARDINALITY=9"
+            + ", LEVEL_TYPE=0"
+            + ", CUSTOM_ROLLUP_SETTINGS=0"
+            + ", LEVEL_UNIQUE_SETTINGS=1"
+            + ", LEVEL_IS_VISIBLE=true"
+            + ", DESCRIPTION=Sales Cube - Measures Hierarchy - MeasuresLevel Level";
+        assertContains(expected, s);
 
         s = checkResultSet(
             olapDatabaseMetaData.getLevels(
@@ -667,9 +793,13 @@ public class MetadataTest extends TckTestCase {
         String s = checkResultSet(
             olapDatabaseMetaData.getLiterals(),
             LITERALS_COLUMN_NAMES);
-        assertContains(
-            "LITERAL_NAME=DBLITERAL_QUOTE, LITERAL_VALUE=[, LITERAL_INVALID_CHARS=null, LITERAL_INVALID_STARTING_CHARS=null, LITERAL_MAX_LENGTH=-1",
-            s);
+        final String expected = "LITERAL_NAME=DBLITERAL_QUOTE_PREFIX"
+            + ", LITERAL_VALUE=["
+            + ", LITERAL_INVALID_CHARS=null"
+            + ", LITERAL_INVALID_STARTING_CHARS=null"
+            + ", LITERAL_MAX_LENGTH=-1"
+            + ", LITERAL_NAME_ENUM_VALUE=15";
+        assertContains(expected, s);
         assertEquals(17, linecount(s));
     }
 
@@ -678,10 +808,29 @@ public class MetadataTest extends TckTestCase {
             olapDatabaseMetaData.getMeasures(
                 catalogName, null, null, null, null),
             MEASURES_COLUMN_NAMES);
-        assertContains(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, MEASURE_NAME=Profit, MEASURE_UNIQUE_NAME=[Measures].[Profit], MEASURE_CAPTION=Profit, MEASURE_GUID=null, MEASURE_AGGREGATOR=127, DATA_TYPE=130, MEASURE_IS_VISIBLE=true, LEVELS_LIST=null, DESCRIPTION=Sales Cube - Profit Member",
-            s);
+        final String expected = "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Sales"
+            + ", MEASURE_NAME=Profit"
+            + ", MEASURE_UNIQUE_NAME=[Measures].[Profit]"
+            + ", MEASURE_CAPTION=Profit"
+            + ", MEASURE_GUID=null"
+            + ", MEASURE_AGGREGATOR=MDMEASURE_AGGR_CALCULATED"
+            + ", DATA_TYPE=130"
+            + ", NUMERIC_PRECISION=null"
+            + ", NUMERIC_SCALE=null"
+            + ", MEASURE_UNITS=null"
+            + ", DESCRIPTION=Sales Cube - Profit Member"
+            + ", EXPRESSION=null"
+            + ", MEASURE_IS_VISIBLE=true"
+            + ", LEVELS_LIST=null"
+            + ", MEASURE_NAME_SQL_COLUMN_NAME=null"
+            + ", MEASURE_UNQUALIFIED_CAPTION=null"
+            + ", MEASUREGROUP_NAME=null"
+            + ", MEASURE_DISPLAY_FOLDER=null"
+            + ", DEFAULT_FORMAT_STRING=null"
+            + ", ANNOTATIONS=null";
+        assertContains(expected, s);
 
         // wildcard match
         s = checkResultSet(
@@ -711,14 +860,64 @@ public class MetadataTest extends TckTestCase {
                 catalogName, "FoodMart", "Sales", null, "[Gender].[Gender]",
                 null, null, null),
             MEMBERS_COLUMN_NAMES);
-        TestContext.assertEqualsVerbose(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender].[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender].[(All)], LEVEL_NUMBER=0, MEMBER_ORDINAL=0, MEMBER_NAME=All Gender, MEMBER_UNIQUE_NAME=[Gender].[Gender].[All Gender], MEMBER_TYPE=2, MEMBER_GUID=null, MEMBER_CAPTION=All Gender, CHILDREN_CARDINALITY=2, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=null, PARENT_COUNT=0, TREE_OP=null, DEPTH=0\n"
+        final String expected = "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Sales"
+            + ", DIMENSION_UNIQUE_NAME=[Gender]"
+            + ", HIERARCHY_UNIQUE_NAME=[Gender].[Gender]"
+            + ", LEVEL_UNIQUE_NAME=[Gender].[Gender].[(All)]"
+            + ", LEVEL_NUMBER=0"
+            + ", MEMBER_ORDINAL=0"
+            + ", MEMBER_NAME=All Gender"
+            + ", MEMBER_UNIQUE_NAME=[Gender].[Gender].[All Gender]"
+            + ", MEMBER_TYPE=2"
+            + ", MEMBER_GUID=null"
+            + ", MEMBER_CAPTION=All Gender"
+            + ", CHILDREN_CARDINALITY=2"
+            + ", PARENT_LEVEL=0"
+            + ", PARENT_UNIQUE_NAME=null"
+            + ", PARENT_COUNT=0"
+            + ", TREE_OP=null"
+            + ", DEPTH=0\n"
             + "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender].[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender].[Gender], LEVEL_NUMBER=1, MEMBER_ORDINAL=0, MEMBER_NAME=F, MEMBER_UNIQUE_NAME=[Gender].[Gender].[F], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=F, CHILDREN_CARDINALITY=0, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Gender].[Gender].[All Gender], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Sales"
+            + ", DIMENSION_UNIQUE_NAME=[Gender]"
+            + ", HIERARCHY_UNIQUE_NAME=[Gender].[Gender]"
+            + ", LEVEL_UNIQUE_NAME=[Gender].[Gender].[Gender]"
+            + ", LEVEL_NUMBER=1"
+            + ", MEMBER_ORDINAL=0"
+            + ", MEMBER_NAME=F"
+            + ", MEMBER_UNIQUE_NAME=[Gender].[Gender].[F]"
+            + ", MEMBER_TYPE=1"
+            + ", MEMBER_GUID=null"
+            + ", MEMBER_CAPTION=F"
+            + ", CHILDREN_CARDINALITY=0"
+            + ", PARENT_LEVEL=0"
+            + ", PARENT_UNIQUE_NAME=[Gender].[Gender].[All Gender]"
+            + ", PARENT_COUNT=1"
+            + ", TREE_OP=null"
+            + ", DEPTH=1\n"
             + "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Gender], HIERARCHY_UNIQUE_NAME=[Gender].[Gender], LEVEL_UNIQUE_NAME=[Gender].[Gender].[Gender], LEVEL_NUMBER=1, MEMBER_ORDINAL=1, MEMBER_NAME=M, MEMBER_UNIQUE_NAME=[Gender].[Gender].[M], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=M, CHILDREN_CARDINALITY=0, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Gender].[Gender].[All Gender], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n",
-            s);
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Sales"
+            + ", DIMENSION_UNIQUE_NAME=[Gender]"
+            + ", HIERARCHY_UNIQUE_NAME=[Gender].[Gender]"
+            + ", LEVEL_UNIQUE_NAME=[Gender].[Gender].[Gender]"
+            + ", LEVEL_NUMBER=1"
+            + ", MEMBER_ORDINAL=1"
+            + ", MEMBER_NAME=M"
+            + ", MEMBER_UNIQUE_NAME=[Gender].[Gender].[M]"
+            + ", MEMBER_TYPE=1"
+            + ", MEMBER_GUID=null"
+            + ", MEMBER_CAPTION=M"
+            + ", CHILDREN_CARDINALITY=0"
+            + ", PARENT_LEVEL=0"
+            + ", PARENT_UNIQUE_NAME=[Gender].[Gender].[All Gender]"
+            + ", PARENT_COUNT=1"
+            + ", TREE_OP=null"
+            + ", DEPTH=1\n";
+        TestContext.assertEqualsVerbose(expected, s);
 
         // by member unique name
         s = checkResultSet(
@@ -726,10 +925,26 @@ public class MetadataTest extends TckTestCase {
                 catalogName, "FoodMart", "Sales", null, null, null,
                 "[Time].[Time].[1997].[Q2].[4]", null),
             MEMBERS_COLUMN_NAMES);
-        TestContext.assertEqualsVerbose(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Time], HIERARCHY_UNIQUE_NAME=[Time].[Time], LEVEL_UNIQUE_NAME=[Time].[Time].[Month], LEVEL_NUMBER=2, MEMBER_ORDINAL=7, MEMBER_NAME=4, MEMBER_UNIQUE_NAME=[Time].[Time].[1997].[Q2].[4], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=4, CHILDREN_CARDINALITY=0, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Time].[Time].[1997].[Q2], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n",
-            s);
+        final String expected2 = "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Sales"
+            + ", DIMENSION_UNIQUE_NAME=[Time]"
+            + ", HIERARCHY_UNIQUE_NAME=[Time].[Time]"
+            + ", LEVEL_UNIQUE_NAME=[Time].[Time].[Month]"
+            + ", LEVEL_NUMBER=2"
+            + ", MEMBER_ORDINAL=7"
+            + ", MEMBER_NAME=4"
+            + ", MEMBER_UNIQUE_NAME=[Time].[Time].[1997].[Q2].[4]"
+            + ", MEMBER_TYPE=1"
+            + ", MEMBER_GUID=null"
+            + ", MEMBER_CAPTION=4"
+            + ", CHILDREN_CARDINALITY=0"
+            + ", PARENT_LEVEL=1"
+            + ", PARENT_UNIQUE_NAME=[Time].[Time].[1997].[Q2]"
+            + ", PARENT_COUNT=1"
+            + ", TREE_OP=null"
+            + ", DEPTH=2\n";
+        TestContext.assertEqualsVerbose(expected2, s);
 
         // with treeop
         s = checkResultSet(
@@ -743,28 +958,162 @@ public class MetadataTest extends TckTestCase {
         case MONDRIAN:
             // TODO: fix mondrian driver so that members are returned sorted
             // by level depth
-            TestContext.assertEqualsVerbose(
-                "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=3, MEMBER_NAME=OR, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[OR], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=OR, CHILDREN_CARDINALITY=11, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
+            final String expected4 = "CATALOG_NAME=" + catalogName
+                + ", SCHEMA_NAME=FoodMart"
+                + ", CUBE_NAME=Sales"
+                + ", DIMENSION_UNIQUE_NAME=[Customers]"
+                + ", HIERARCHY_UNIQUE_NAME=[Customers].[Customers]"
+                + ", LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province]"
+                + ", LEVEL_NUMBER=2"
+                + ", MEMBER_ORDINAL=3"
+                + ", MEMBER_NAME=OR"
+                + ", MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[OR]"
+                + ", MEMBER_TYPE=1"
+                + ", MEMBER_GUID=null"
+                + ", MEMBER_CAPTION=OR"
+                + ", CHILDREN_CARDINALITY=11"
+                + ", PARENT_LEVEL=1"
+                + ", PARENT_UNIQUE_NAME=[Customers].[Customers].[USA]"
+                + ", PARENT_COUNT=1"
+                + ", TREE_OP=null"
+                + ", DEPTH=2\n"
                 + "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=4, MEMBER_NAME=WA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[WA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=WA, CHILDREN_CARDINALITY=22, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
+                + ", SCHEMA_NAME=FoodMart"
+                + ", CUBE_NAME=Sales"
+                + ", DIMENSION_UNIQUE_NAME=[Customers]"
+                + ", HIERARCHY_UNIQUE_NAME=[Customers].[Customers]"
+                + ", LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province]"
+                + ", LEVEL_NUMBER=2"
+                + ", MEMBER_ORDINAL=4"
+                + ", MEMBER_NAME=WA"
+                + ", MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[WA]"
+                + ", MEMBER_TYPE=1"
+                + ", MEMBER_GUID=null"
+                + ", MEMBER_CAPTION=WA"
+                + ", CHILDREN_CARDINALITY=22"
+                + ", PARENT_LEVEL=1"
+                + ", PARENT_UNIQUE_NAME=[Customers].[Customers].[USA]"
+                + ", PARENT_COUNT=1"
+                + ", TREE_OP=null"
+                + ", DEPTH=2\n"
                 + "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[Country], LEVEL_NUMBER=1, MEMBER_ORDINAL=0, MEMBER_NAME=USA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=USA, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Customers].[Customers].[All Customers], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
+                + ", SCHEMA_NAME=FoodMart"
+                + ", CUBE_NAME=Sales"
+                + ", DIMENSION_UNIQUE_NAME=[Customers]"
+                + ", HIERARCHY_UNIQUE_NAME=[Customers].[Customers]"
+                + ", LEVEL_UNIQUE_NAME=[Customers].[Customers].[Country]"
+                + ", LEVEL_NUMBER=1"
+                + ", MEMBER_ORDINAL=0"
+                + ", MEMBER_NAME=USA"
+                + ", MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA]"
+                + ", MEMBER_TYPE=1"
+                + ", MEMBER_GUID=null"
+                + ", MEMBER_CAPTION=USA"
+                + ", CHILDREN_CARDINALITY=3"
+                + ", PARENT_LEVEL=0"
+                + ", PARENT_UNIQUE_NAME=[Customers].[Customers].[All Customers]"
+                + ", PARENT_COUNT=1"
+                + ", TREE_OP=null"
+                + ", DEPTH=1\n"
                 + "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[(All)], LEVEL_NUMBER=0, MEMBER_ORDINAL=0, MEMBER_NAME=All Customers, MEMBER_UNIQUE_NAME=[Customers].[Customers].[All Customers], MEMBER_TYPE=2, MEMBER_GUID=null, MEMBER_CAPTION=All Customers, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=null, PARENT_COUNT=0, TREE_OP=null, DEPTH=0\n",
-                s);
+                + ", SCHEMA_NAME=FoodMart"
+                + ", CUBE_NAME=Sales"
+                + ", DIMENSION_UNIQUE_NAME=[Customers]"
+                + ", HIERARCHY_UNIQUE_NAME=[Customers].[Customers]"
+                + ", LEVEL_UNIQUE_NAME=[Customers].[Customers].[(All)]"
+                + ", LEVEL_NUMBER=0"
+                + ", MEMBER_ORDINAL=0"
+                + ", MEMBER_NAME=All Customers"
+                + ", MEMBER_UNIQUE_NAME=[Customers].[Customers].[All Customers]"
+                + ", MEMBER_TYPE=2"
+                + ", MEMBER_GUID=null"
+                + ", MEMBER_CAPTION=All Customers"
+                + ", CHILDREN_CARDINALITY=3"
+                + ", PARENT_LEVEL=0"
+                + ", PARENT_UNIQUE_NAME=null"
+                + ", PARENT_COUNT=0"
+                + ", TREE_OP=null"
+                + ", DEPTH=0\n";
+            TestContext.assertEqualsVerbose(expected4, s);
             break;
         default:
-            TestContext.assertEqualsVerbose(
-                "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[(All)], LEVEL_NUMBER=0, MEMBER_ORDINAL=0, MEMBER_NAME=All Customers, MEMBER_UNIQUE_NAME=[Customers].[Customers].[All Customers], MEMBER_TYPE=2, MEMBER_GUID=null, MEMBER_CAPTION=All Customers, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=null, PARENT_COUNT=0, TREE_OP=null, DEPTH=0\n"
+            final String expected3 = "CATALOG_NAME=" + catalogName
+                + ", SCHEMA_NAME=FoodMart"
+                + ", CUBE_NAME=Sales"
+                + ", DIMENSION_UNIQUE_NAME=[Customers]"
+                + ", HIERARCHY_UNIQUE_NAME=[Customers].[Customers]"
+                + ", LEVEL_UNIQUE_NAME=[Customers].[Customers].[(All)]"
+                + ", LEVEL_NUMBER=0"
+                + ", MEMBER_ORDINAL=0"
+                + ", MEMBER_NAME=All Customers"
+                + ", MEMBER_UNIQUE_NAME=[Customers].[Customers].[All Customers]"
+                + ", MEMBER_TYPE=2"
+                + ", MEMBER_GUID=null"
+                + ", MEMBER_CAPTION=All Customers"
+                + ", CHILDREN_CARDINALITY=3"
+                + ", PARENT_LEVEL=0"
+                + ", PARENT_UNIQUE_NAME=null"
+                + ", PARENT_COUNT=0"
+                + ", TREE_OP=null"
+                + ", DEPTH=0\n"
                 + "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[Country], LEVEL_NUMBER=1, MEMBER_ORDINAL=0, MEMBER_NAME=USA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=USA, CHILDREN_CARDINALITY=3, PARENT_LEVEL=0, PARENT_UNIQUE_NAME=[Customers].[Customers].[All Customers], PARENT_COUNT=1, TREE_OP=null, DEPTH=1\n"
+                + ", SCHEMA_NAME=FoodMart"
+                + ", CUBE_NAME=Sales"
+                + ", DIMENSION_UNIQUE_NAME=[Customers]"
+                + ", HIERARCHY_UNIQUE_NAME=[Customers].[Customers]"
+                + ", LEVEL_UNIQUE_NAME=[Customers].[Customers].[Country]"
+                + ", LEVEL_NUMBER=1"
+                + ", MEMBER_ORDINAL=0"
+                + ", MEMBER_NAME=USA"
+                + ", MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA]"
+                + ", MEMBER_TYPE=1"
+                + ", MEMBER_GUID=null"
+                + ", MEMBER_CAPTION=USA"
+                + ", CHILDREN_CARDINALITY=3"
+                + ", PARENT_LEVEL=0"
+                + ", PARENT_UNIQUE_NAME=[Customers].[Customers].[All Customers]"
+                + ", PARENT_COUNT=1"
+                + ", TREE_OP=null"
+                + ", DEPTH=1\n"
                 + "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=3, MEMBER_NAME=OR, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[OR], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=OR, CHILDREN_CARDINALITY=11, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n"
+                + ", SCHEMA_NAME=FoodMart"
+                + ", CUBE_NAME=Sales"
+                + ", DIMENSION_UNIQUE_NAME=[Customers]"
+                + ", HIERARCHY_UNIQUE_NAME=[Customers].[Customers]"
+                + ", LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province]"
+                + ", LEVEL_NUMBER=2"
+                + ", MEMBER_ORDINAL=3"
+                + ", MEMBER_NAME=OR"
+                + ", MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[OR]"
+                + ", MEMBER_TYPE=1"
+                + ", MEMBER_GUID=null"
+                + ", MEMBER_CAPTION=OR"
+                + ", CHILDREN_CARDINALITY=11"
+                + ", PARENT_LEVEL=1"
+                + ", PARENT_UNIQUE_NAME=[Customers].[Customers].[USA]"
+                + ", PARENT_COUNT=1"
+                + ", TREE_OP=null"
+                + ", DEPTH=2\n"
                 + "CATALOG_NAME=" + catalogName
-                + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Customers], HIERARCHY_UNIQUE_NAME=[Customers].[Customers], LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province], LEVEL_NUMBER=2, MEMBER_ORDINAL=4, MEMBER_NAME=WA, MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[WA], MEMBER_TYPE=1, MEMBER_GUID=null, MEMBER_CAPTION=WA, CHILDREN_CARDINALITY=22, PARENT_LEVEL=1, PARENT_UNIQUE_NAME=[Customers].[Customers].[USA], PARENT_COUNT=1, TREE_OP=null, DEPTH=2\n",
-                s);
+                + ", SCHEMA_NAME=FoodMart"
+                + ", CUBE_NAME=Sales"
+                + ", DIMENSION_UNIQUE_NAME=[Customers]"
+                + ", HIERARCHY_UNIQUE_NAME=[Customers].[Customers]"
+                + ", LEVEL_UNIQUE_NAME=[Customers].[Customers].[State Province]"
+                + ", LEVEL_NUMBER=2"
+                + ", MEMBER_ORDINAL=4"
+                + ", MEMBER_NAME=WA"
+                + ", MEMBER_UNIQUE_NAME=[Customers].[Customers].[USA].[WA]"
+                + ", MEMBER_TYPE=1"
+                + ", MEMBER_GUID=null"
+                + ", MEMBER_CAPTION=WA"
+                + ", CHILDREN_CARDINALITY=22"
+                + ", PARENT_LEVEL=1"
+                + ", PARENT_UNIQUE_NAME=[Customers].[Customers].[USA]"
+                + ", PARENT_COUNT=1"
+                + ", TREE_OP=null"
+                + ", DEPTH=2\n";
+            TestContext.assertEqualsVerbose(expected3, s);
             break;
         }
     }
@@ -774,10 +1123,19 @@ public class MetadataTest extends TckTestCase {
             olapDatabaseMetaData.getSets(
                 catalogName, null, null, null),
             SETS_COLUMN_NAMES);
-        TestContext.assertEqualsVerbose(
-            "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Warehouse, SET_NAME=[Top Sellers], SCOPE=1\n",
-            s);
+        final String expected = "CATALOG_NAME=" + catalogName
+            + ", SCHEMA_NAME=FoodMart"
+            + ", CUBE_NAME=Warehouse"
+            + ", SET_NAME=[Top Sellers]"
+            + ", SCOPE=1"
+            + ", DESCRIPTION=null"
+            + ", EXPRESSION=null"
+            + ", DIMENSIONS=null"
+            + ", SET_CAPTION=null"
+            + ", SET_DISPLAY_FOLDER=null"
+            + ", SET_EVALUATION_CONTEXT=null"
+            + ", ANNOTATIONS=null\n";
+        TestContext.assertEqualsVerbose(expected, s);
 
         s = checkResultSet(
             olapDatabaseMetaData.getSets(

@@ -74,7 +74,7 @@ public class XmlaConstants
         }
 
         public String xmlaName() {
-            return "DBPROPVAL_VISUAL_MODE_";
+            return "DBPROPVAL_VISUAL_MODE_" + name();
         }
 
         public String getDescription() {
@@ -720,7 +720,7 @@ public class XmlaConstants
         MEMBER_NAME(25, null, -1, ".", "0123456789", null),
         PROCEDURE_NAME(14, null, -1, ".", "0123456789", null),
         PROPERTY_NAME(26, null, -1, ".", "0123456789", null),
-        QUOTE(
+        QUOTE_PREFIX(
             15, "[", -1, null, null,
             "The character used in a text command as the opening quote for "
             + "quoting identifiers that contain special characters."),
@@ -736,6 +736,9 @@ public class XmlaConstants
             18, null, -1, null, null,
             "A text command, such as an SQL statement."),
         USER_NAME(19, null, 0, null, null, null);
+
+        /** QUOTE is alias for {@link #QUOTE_PREFIX}. */
+        public static final Literal QUOTE = QUOTE_PREFIX;
 
         // Enum DBLITERALENUM and DBLITERALENUM20, OLEDB.H.
         //
@@ -769,6 +772,8 @@ public class XmlaConstants
         //   DBLITERAL_PROPERTY_NAME = 26,
         //   DBLITERAL_SCHEMA_SEPARATOR  = 27,
         //   DBLITERAL_QUOTE_SUFFIX  = 28;
+        //   DBLITERAL_ESCAPE_PERCENT_SUFFIX = 29
+        //   DBLITERAL_ESCAPE_UNDERSCORE_SUFFIX = 30
 
         private int xmlaOrdinal;
         private final String literalValue;
@@ -803,6 +808,10 @@ public class XmlaConstants
 
         public String getLiteralValue() {
             return literalValue;
+        }
+
+        public int getLiteralNameEnumValue() {
+            return xmlaOrdinal;
         }
 
         public String getLiteralInvalidChars() {
