@@ -501,9 +501,17 @@ public class MetadataTest extends TestCase {
                 null, null, "[Store].[Store].[Store Name]",
                 null, null),
             PROPERTIES_COLUMN_NAMES);
+        // Partial fix for
+        //   [OLAP4J-46] TCK should expect "Has coffee bar"
+        //   property to be BOOLEAN (11) not STRING (130)
+        // Be lenient if OLAP provider says "Has coffee bar" is STRING (130),
+        // but prefer BOOLEAN (11).
+        s = s.replace(
+            "PROPERTY_CAPTION=Has coffee bar, PROPERTY_TYPE=1, DATA_TYPE=130, ",
+            "PROPERTY_CAPTION=Has coffee bar, PROPERTY_TYPE=1, DATA_TYPE=11, ");
         assertContains(
             "CATALOG_NAME=" + catalogName
-            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store].[Store], LEVEL_UNIQUE_NAME=[Store].[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Has coffee bar, PROPERTY_CAPTION=Has coffee bar, PROPERTY_TYPE=1, DATA_TYPE=130, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Sales Cube - Store Hierarchy - Store Name Level - Has coffee bar Property",
+            + ", SCHEMA_NAME=FoodMart, CUBE_NAME=Sales, DIMENSION_UNIQUE_NAME=[Store], HIERARCHY_UNIQUE_NAME=[Store].[Store], LEVEL_UNIQUE_NAME=[Store].[Store].[Store Name], MEMBER_UNIQUE_NAME=null, PROPERTY_NAME=Has coffee bar, PROPERTY_CAPTION=Has coffee bar, PROPERTY_TYPE=1, DATA_TYPE=11, PROPERTY_CONTENT_TYPE=0, DESCRIPTION=Sales Cube - Store Hierarchy - Store Name Level - Has coffee bar Property",
             s);
         assertNotContains(
             "CATALOG_NAME=" + catalogName
