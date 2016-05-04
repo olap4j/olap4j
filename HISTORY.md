@@ -1,5 +1,19 @@
 # Olap4j changes
 
+
+###############################################################################
+
+## Olap4j 1.3.0
+
+* Issues fixed in core olap4j
+    - Improved backend detection
+    - Charset encoding in content type
+    - Add withlist to query
+    - Add HierarchizeMode to an Axis
+* Issues addressed in XMLA
+    - Improved Essbase support
+    - Fix to XMLA level support for MSAS
+    - Display folder support for XMLA providers
 ###############################################################################
 
 ## Olap4j 1.2.0
