@@ -1,4 +1,4 @@
-olap4j, release 1.1.0
+olap4j, release 1.3.0
 
 Contents of this distribution
 -----------------------------
