@@ -22,6 +22,7 @@ import org.olap4j.driver.xmla.cache.XmlaOlap4jNamedMemoryCache.Property;
 import org.olap4j.impl.Olap4jUtil;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -171,8 +172,8 @@ class XmlaOlap4jConcurrentMemoryCache {
             }
 
             // Return a copy to prevent corruption
-            return entry != null
-                ? new String(entry.getResponse()).getBytes()
+            return entry != null && entry.getResponse() != null
+                ? Arrays.copyOf(entry.getResponse(), entry.getResponse().length)
                 : null;
         }
     }
