@@ -171,9 +171,9 @@ class XmlaOlap4jConcurrentMemoryCache {
             }
 
             // Return a copy to prevent corruption
-            return entry != null
-                ? new String(entry.getResponse()).getBytes()
-                : null;
+            return entry != null && entry.getResponse() != null
+            			? entry.getResponse().clone()
+            			: null;
         }
     }
 
