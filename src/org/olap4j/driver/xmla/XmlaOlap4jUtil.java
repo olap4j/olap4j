@@ -17,17 +17,34 @@
 */
 package org.olap4j.driver.xmla;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.xerces.impl.Constants;
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
-
-import org.w3c.dom.*;
-import org.xml.sax.*;
-
-import java.io.*;
-import java.math.*;
-import java.util.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Utility methods for the olap4j driver for XML/A.
@@ -66,6 +83,11 @@ abstract class XmlaOlap4jUtil {
         "http://apache.org/xml/features/dom/defer-node-expansion";
     static final String SCHEMA_LOCATION =
         Constants.XERCES_PROPERTY_PREFIX + Constants.SCHEMA_LOCATION;
+
+    static final String INF = "INF";
+    static final String POSITIVE_INF = "+INF";
+    static final String NEGATIVE_INF = "-INF";
+    static final String NAN = "NAN";
 
     /**
      * Parse a stream into a Document (no validation).
@@ -191,70 +213,70 @@ abstract class XmlaOlap4jUtil {
 
         int type = node.getNodeType();
         switch (type) {
-        case Node.DOCUMENT_NODE:
-            string.append("\n");
-            prettyPrintLoop(node.getChildNodes(), string, indentation + "\t");
-            break;
+            case Node.DOCUMENT_NODE:
+                string.append("\n");
+                prettyPrintLoop(node.getChildNodes(), string, indentation + "\t");
+                break;
 
-        case Node.ELEMENT_NODE:
-            string.append(indentation);
-            string.append("<");
-            string.append(node.getNodeName());
+            case Node.ELEMENT_NODE:
+                string.append(indentation);
+                string.append("<");
+                string.append(node.getNodeName());
 
-            Attr[] attributes;
-            if (node.getAttributes() != null) {
-                int length = node.getAttributes().getLength();
-                attributes = new Attr[length];
-                for (int loopIndex = 0; loopIndex < length; loopIndex++) {
-                    attributes[loopIndex] =
-                        (Attr)node.getAttributes().item(loopIndex);
+                Attr[] attributes;
+                if (node.getAttributes() != null) {
+                    int length = node.getAttributes().getLength();
+                    attributes = new Attr[length];
+                    for (int loopIndex = 0; loopIndex < length; loopIndex++) {
+                        attributes[loopIndex] =
+                            (Attr)node.getAttributes().item(loopIndex);
+                    }
+                } else {
+                    attributes = new Attr[0];
                 }
-            } else {
-                attributes = new Attr[0];
-            }
 
-            for (Attr attribute : attributes) {
-                string.append(" ");
-                string.append(attribute.getNodeName());
-                string.append("=\"");
-                string.append(attribute.getNodeValue());
-                string.append("\"");
-            }
+                for (Attr attribute : attributes) {
+                    string.append(" ");
+                    string.append(attribute.getNodeName());
+                    string.append("=\"");
+                    string.append(attribute.getNodeValue());
+                    string.append("\"");
+                }
 
-            string.append(">\n");
+                string.append(">\n");
 
-            prettyPrintLoop(node.getChildNodes(), string, indentation + "\t");
+                prettyPrintLoop(node.getChildNodes(), string, indentation + "\t");
 
-            string.append(indentation);
-            string.append("</");
-            string.append(node.getNodeName());
-            string.append(">\n");
+                string.append(indentation);
+                string.append("</");
+                string.append(node.getNodeName());
+                string.append(">\n");
 
-            break;
+                break;
 
-        case Node.TEXT_NODE:
-            string.append(indentation);
-            string.append(node.getNodeValue().trim());
-            string.append("\n");
-            break;
+            case Node.TEXT_NODE:
+                string.append(indentation);
+                string.append(node.getNodeValue().trim());
+                string.append("\n");
+                break;
 
-        case Node.PROCESSING_INSTRUCTION_NODE:
-            string.append(indentation);
-            string.append("<?");
-            string.append(node.getNodeName());
-            String text = node.getNodeValue();
-            if (text != null && text.length() > 0) {
-                string.append(text);
-            }
-            string.append("?>\n");
-            break;
+            case Node.PROCESSING_INSTRUCTION_NODE:
+                string.append(indentation);
+                string.append("<?");
+                string.append(node.getNodeName());
+                String text = node.getNodeValue();
+                if (text != null && text.length() > 0) {
+                    string.append(text);
+                }
+                string.append("?>\n");
+                break;
 
-        case Node.CDATA_SECTION_NODE:
-            string.append(indentation);
-            string.append("<![CDATA[");
-            string.append(node.getNodeValue());
-            string.append("]]>");
-            break;
+            case Node.CDATA_SECTION_NODE:
+                string.append(indentation);
+                string.append("<![CDATA[");
+                string.append(node.getNodeValue());
+                string.append("]]>");
+                break;
         }
     }
 
@@ -313,11 +335,11 @@ abstract class XmlaOlap4jUtil {
     }
 
     static Double doubleElement(Element row, String name) {
-        return Double.valueOf(stringElement(row, name));
+        return toDoubleFromString(stringElement(row, name));
     }
 
-    static BigDecimal bigDecimalElement(Element row, String name) {
-        return new BigDecimal(stringElement(row, name));
+    static Object bigDecimalElement(Element row, String name) {
+        return toBigDecimalFromString(stringElement(row, name));
     }
 
     static boolean booleanElement(Element row, String name) {
@@ -325,7 +347,7 @@ abstract class XmlaOlap4jUtil {
     }
 
     static Float floatElement(Element row, String name) {
-        return Float.valueOf(stringElement(row, name));
+        return toFloatFromString(stringElement(row, name));
     }
 
     static long longElement(Element row, String name) {
@@ -358,6 +380,69 @@ abstract class XmlaOlap4jUtil {
             }
         }
         return list;
+    }
+
+    static Object toBigDecimalFromString(String number) {
+        if (number == null) {
+            return null;
+        }
+
+        final String numberUpper = number.toUpperCase();
+        if (INF.equals(numberUpper)) {
+            return Double.POSITIVE_INFINITY;
+        }
+        if (POSITIVE_INF.equals(numberUpper)) {
+            return Double.POSITIVE_INFINITY;
+        }
+        if (NEGATIVE_INF.equals(numberUpper)) {
+            return Double.NEGATIVE_INFINITY;
+        }
+        if (NAN.equals(numberUpper)) {
+            return Double.NaN;
+        }
+        return new BigDecimal(number);
+    }
+
+    static Double toDoubleFromString(String number) {
+        if (number == null) {
+            return null;
+        }
+
+        final String numberUpper = number.toUpperCase();
+        if (INF.equals(numberUpper)) {
+            return Double.POSITIVE_INFINITY;
+        }
+        if (POSITIVE_INF.equals(numberUpper)) {
+            return Double.POSITIVE_INFINITY;
+        }
+        if (NEGATIVE_INF.equals(numberUpper)) {
+            return Double.NEGATIVE_INFINITY;
+        }
+        if (NAN.equals(numberUpper)) {
+            return Double.NaN;
+        }
+        return Double.valueOf(number);
+    }
+
+    static Float toFloatFromString(String number) {
+        if (number == null) {
+            return null;
+        }
+
+        final String numberUpper = number.toUpperCase();
+        if (INF.equals(numberUpper)) {
+            return Float.POSITIVE_INFINITY;
+        }
+        if (POSITIVE_INF.equals(numberUpper)) {
+            return Float.POSITIVE_INFINITY;
+        }
+        if (NEGATIVE_INF.equals(numberUpper)) {
+            return Float.NEGATIVE_INFINITY;
+        }
+        if (NAN.equals(numberUpper)) {
+            return Float.NaN;
+        }
+        return Float.valueOf(number);
     }
 
     /**
@@ -468,15 +553,15 @@ abstract class XmlaOlap4jUtil {
             StringBuilder buf = new StringBuilder(128);
             buf.append("[");
             switch (ei.severity) {
-            case SEVERITY_WARNING:
-                buf.append(WARNING_STRING);
-                break;
-            case SEVERITY_ERROR:
-                buf.append(ERROR_STRING);
-                break;
-            case SEVERITY_FATAL_ERROR:
-                buf.append(FATAL_ERROR_STRING);
-                break;
+                case SEVERITY_WARNING:
+                    buf.append(WARNING_STRING);
+                    break;
+                case SEVERITY_ERROR:
+                    buf.append(ERROR_STRING);
+                    break;
+                case SEVERITY_FATAL_ERROR:
+                    buf.append(FATAL_ERROR_STRING);
+                    break;
             }
             buf.append(']');
             String systemId = ei.exception.getSystemId();
