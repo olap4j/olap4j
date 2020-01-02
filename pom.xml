@@ -139,7 +139,7 @@ limitations under the License.
     <ph-javacc-maven-plugin.version>2.8.0</ph-javacc-maven-plugin.version>
     <servlet-api.version>2.4</servlet-api.version>
     <sortpom-maven-plugin.version>2.4.0</sortpom-maven-plugin.version>
-    <xerces.version>2.11.0</xerces.version>
+    <xerces.version>2.12.0</xerces.version>
     <build-helper-maven-plugin.version>1.9</build-helper-maven-plugin.version>
   </properties>
 
